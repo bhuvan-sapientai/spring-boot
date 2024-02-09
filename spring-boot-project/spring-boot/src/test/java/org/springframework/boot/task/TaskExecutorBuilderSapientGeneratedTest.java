@@ -1,0 +1,346 @@
+package org.springframework.boot.task;
+
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import org.mockito.stubbing.Answer;
+
+import org.springframework.boot.context.properties.PropertyMapper;
+import org.springframework.util.CollectionUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.Assert;
+import org.springframework.core.task.TaskDecorator;
+
+import java.time.Duration;
+import java.util.function.Function;
+
+import org.mockito.MockedStatic;
+
+import java.util.ArrayList;
+import java.util.function.Consumer;
+
+import org.springframework.beans.BeanUtils;
+
+import static org.mockito.Mockito.doNothing;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mockStatic;
+
+import org.junit.jupiter.api.Disabled;
+
+@Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+class TaskExecutorBuilderSapientGeneratedTest {
+
+	private final TaskExecutorBuilder taskExecutorBuilderMock = mock(TaskExecutorBuilder.class);
+
+	private final ThreadPoolTaskExecutor threadPoolTaskExecutorMock = mock(ThreadPoolTaskExecutor.class);
+
+	//Sapient generated method id: ${e99b7fef-8979-33e3-ae50-fa6d305e54b1}
+	@Test()
+	void queueCapacityTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.queueCapacity(1);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${a0ac482f-bb56-3aa3-bca1-b3e47d431f45}
+	@Test()
+	void corePoolSizeTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.corePoolSize(1);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${1de9e5b7-73e7-3ca0-87f7-0b1d45ce21c5}
+	@Test()
+	void maxPoolSizeTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.maxPoolSize(1);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${c7999cfa-4c49-3069-9a75-5c2fa1ea7daa}
+	@Test()
+	void allowCoreThreadTimeOutTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.allowCoreThreadTimeOut(false);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${f011f850-0807-3238-8d56-5e8ddaa01ad9}
+	@Test()
+	void keepAliveTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		Duration duration = Duration.ofDays(0L);
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.keepAlive(duration);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${d3a86441-89f4-3a11-9ff3-57e1b584ea81}
+	@Test()
+	void awaitTerminationTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.awaitTermination(false);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${f053c8a2-a61c-3106-a56d-ffd51d370963}
+	@Test()
+	void awaitTerminationPeriodTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		Duration duration = Duration.ofDays(0L);
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.awaitTerminationPeriod(duration);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${685f4a5d-cad1-361d-add4-158862b5b607}
+	@Test()
+	void threadNamePrefixTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.threadNamePrefix("threadNamePrefix1");
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${2647b519-24dd-3d60-a3d8-92d143b722f9}
+	@Test()
+	void taskDecoratorTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = new TaskExecutorBuilder();
+		TaskDecorator taskDecoratorMock = mock(TaskDecorator.class);
+		//Act Statement(s)
+		TaskExecutorBuilder result = target.taskDecorator(taskDecoratorMock);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
+
+	//Sapient generated method id: ${096c8c26-248f-3c0b-a109-b0008208dcb4}
+	@Test()
+	void customizersTest() {
+		//Arrange Statement(s)
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			TaskExecutorCustomizer[] taskExecutorCustomizerArray = new TaskExecutorCustomizer[] {};
+			_assert.when(() -> Assert.notNull(taskExecutorCustomizerArray, "Customizers must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			TaskExecutorBuilder target = spy(new TaskExecutorBuilder());
+			List<TaskExecutorCustomizer> taskExecutorCustomizerList = new ArrayList<>();
+			doReturn(taskExecutorBuilderMock).when(target).customizers(taskExecutorCustomizerList);
+			//Act Statement(s)
+			TaskExecutorBuilder result = target.customizers(taskExecutorCustomizerArray);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(taskExecutorBuilderMock));
+				_assert.verify(() -> Assert.notNull(taskExecutorCustomizerArray, "Customizers must not be null"), atLeast(1));
+				verify(target).customizers(taskExecutorCustomizerList);
+			});
+		}
+	}
+
+	//Sapient generated method id: ${4093ce62-8361-3b14-be69-19a1177dbf57}
+	@Test()
+	void customizers1WhenSetIsNull() {
+		/* Branches:
+		 * (set != null) : false  #  inside append method
+		 */
+		//Arrange Statement(s)
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			_assert.when(() -> Assert.notNull((Iterable) null, "Customizers must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			TaskExecutorBuilder target = new TaskExecutorBuilder();
+			Iterable<TaskExecutorCustomizer> iterable = null;
+			//Act Statement(s)
+			final NullPointerException result = assertThrows(NullPointerException.class, () -> {
+				target.customizers(iterable);
+			});
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull((Iterable) null, "Customizers must not be null"), atLeast(1));
+			});
+		}
+	}
+
+	//Sapient generated method id: ${01c5b568-1ccf-3f8d-be31-7c6a00d3b86f}
+	@Test()
+	void additionalCustomizersTest() {
+		//Arrange Statement(s)
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			TaskExecutorCustomizer[] taskExecutorCustomizerArray = new TaskExecutorCustomizer[] {};
+			_assert.when(() -> Assert.notNull(taskExecutorCustomizerArray, "Customizers must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			TaskExecutorBuilder target = spy(new TaskExecutorBuilder());
+			List<TaskExecutorCustomizer> taskExecutorCustomizerList = new ArrayList<>();
+			doReturn(taskExecutorBuilderMock).when(target).additionalCustomizers(taskExecutorCustomizerList);
+			//Act Statement(s)
+			TaskExecutorBuilder result = target.additionalCustomizers(taskExecutorCustomizerArray);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(taskExecutorBuilderMock));
+				_assert.verify(() -> Assert.notNull(taskExecutorCustomizerArray, "Customizers must not be null"), atLeast(1));
+				verify(target).additionalCustomizers(taskExecutorCustomizerList);
+			});
+		}
+	}
+
+	//Sapient generated method id: ${ec4a4216-0b11-3482-8467-7bedcdd174bc}
+	@Test()
+	void additionalCustomizers1WhenSetIsNull() {
+		/* Branches:
+		 * (set != null) : false  #  inside append method
+		 */
+		//Arrange Statement(s)
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			_assert.when(() -> Assert.notNull((Iterable) null, "Customizers must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			TaskExecutorBuilder target = new TaskExecutorBuilder();
+			Iterable<TaskExecutorCustomizer> iterable = null;
+			//Act Statement(s)
+			final NullPointerException result = assertThrows(NullPointerException.class, () -> {
+				target.additionalCustomizers(iterable);
+			});
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull((Iterable) null, "Customizers must not be null"), atLeast(1));
+			});
+		}
+	}
+
+	//Sapient generated method id: ${c319ea97-f8d0-37c4-a5dd-88e142a90c6d}
+	@Test()
+	void buildTest() {
+		//Arrange Statement(s)
+		TaskExecutorBuilder target = spy(new TaskExecutorBuilder());
+		doReturn(threadPoolTaskExecutorMock).when(target).configure((ThreadPoolTaskExecutor) any());
+		//Act Statement(s)
+		ThreadPoolTaskExecutor result = target.build();
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, equalTo(threadPoolTaskExecutorMock));
+			verify(target).configure((ThreadPoolTaskExecutor) any());
+		});
+	}
+
+	//Sapient generated method id: ${716d80b9-84b4-3f5a-bb9e-a90cac149ddf}
+	@Test()
+	void build1Test() {
+		//Arrange Statement(s)
+		ThreadPoolTaskExecutor threadPoolTaskExecutorMock2 = mock(ThreadPoolTaskExecutor.class);
+		try (MockedStatic<BeanUtils> beanUtils = mockStatic(BeanUtils.class)) {
+			beanUtils.when(() -> BeanUtils.instantiateClass(ThreadPoolTaskExecutor.class)).thenReturn(threadPoolTaskExecutorMock);
+			TaskExecutorBuilder target = spy(new TaskExecutorBuilder());
+			doReturn(threadPoolTaskExecutorMock2).when(target).configure(threadPoolTaskExecutorMock);
+			//Act Statement(s)
+			ThreadPoolTaskExecutor result = target.build(ThreadPoolTaskExecutor.class);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(threadPoolTaskExecutorMock2));
+				beanUtils.verify(() -> BeanUtils.instantiateClass(ThreadPoolTaskExecutor.class), atLeast(1));
+				verify(target).configure(threadPoolTaskExecutorMock);
+			});
+		}
+	}
+
+	//Sapient generated method id: ${92778da8-5cb9-368b-8e0b-ad44bc4f7017}
+	@Disabled()
+	@Test()
+	void configureWhenCollectionUtilsIsEmptyThisCustomizers() {
+		/* Branches:
+		 * (!CollectionUtils.isEmpty(this.customizers)) : false
+		 */
+		//Arrange Statement(s)
+		PropertyMapper propertyMapperMock = mock(PropertyMapper.class);
+		PropertyMapper propertyMapperMock2 = mock(PropertyMapper.class);
+		PropertyMapper.Source propertyMapperSourceMock = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock2 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock3 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock4 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source<Integer> propertyMapperSourceMock5 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock6 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock7 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock8 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock9 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock10 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock11 = mock(PropertyMapper.Source.class);
+		PropertyMapper.Source propertyMapperSourceMock12 = mock(PropertyMapper.Source.class);
+		try (MockedStatic<PropertyMapper> propertyMapper = mockStatic(PropertyMapper.class)) {
+			propertyMapper.when(() -> PropertyMapper.get()).thenReturn(propertyMapperMock);
+			doReturn(propertyMapperMock2).when(propertyMapperMock).alwaysApplyingWhenNonNull();
+			doNothing().when(propertyMapperSourceMock).to((Consumer) any());
+			doNothing().when(propertyMapperSourceMock2).to((Consumer) any());
+			doReturn(propertyMapperSourceMock, propertyMapperSourceMock2, propertyMapperSourceMock3).when(propertyMapperMock2).from((Integer) null);
+			doNothing().when(propertyMapperSourceMock3).to((Consumer) any());
+			doReturn(propertyMapperSourceMock5).when(propertyMapperSourceMock4).asInt((Function) any());
+			doNothing().when(propertyMapperSourceMock5).to((Consumer) any());
+			doNothing().when(propertyMapperSourceMock6).to((Consumer) any());
+			doReturn(propertyMapperSourceMock6, propertyMapperSourceMock7).when(propertyMapperMock2).from((Boolean) null);
+			doNothing().when(propertyMapperSourceMock7).to((Consumer) any());
+			doReturn(propertyMapperSourceMock4, propertyMapperSourceMock8).when(propertyMapperMock2).from((Duration) null);
+			doReturn(propertyMapperSourceMock9).when(propertyMapperSourceMock8).as((Function) any());
+			doNothing().when(propertyMapperSourceMock9).to((Consumer) any());
+			doReturn(propertyMapperSourceMock10).when(propertyMapperMock2).from((String) null);
+			doReturn(propertyMapperSourceMock11).when(propertyMapperSourceMock10).whenHasText();
+			doNothing().when(propertyMapperSourceMock11).to((Consumer) any());
+			doReturn(propertyMapperSourceMock12).when(propertyMapperMock2).from((TaskDecorator) null);
+			doNothing().when(propertyMapperSourceMock12).to((Consumer) any());
+			TaskExecutorBuilder target = new TaskExecutorBuilder();
+			//Act Statement(s)
+			ThreadPoolTaskExecutor result = target.configure(threadPoolTaskExecutorMock);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(threadPoolTaskExecutorMock));
+				propertyMapper.verify(() -> PropertyMapper.get(), atLeast(1));
+				verify(propertyMapperMock).alwaysApplyingWhenNonNull();
+				verify(propertyMapperMock2, times(3)).from((Integer) null);
+				verify(propertyMapperSourceMock).to((Consumer) any());
+				verify(propertyMapperSourceMock2).to((Consumer) any());
+				verify(propertyMapperSourceMock3).to((Consumer) any());
+				verify(propertyMapperMock2, times(2)).from((Duration) null);
+				verify(propertyMapperSourceMock4).asInt((Function) any());
+				verify(propertyMapperSourceMock5).to((Consumer) any());
+				verify(propertyMapperMock2, times(2)).from((Boolean) null);
+				verify(propertyMapperSourceMock6).to((Consumer) any());
+				verify(propertyMapperSourceMock7).to((Consumer) any());
+				verify(propertyMapperSourceMock8).as((Function) any());
+				verify(propertyMapperSourceMock9).to((Consumer) any());
+				verify(propertyMapperMock2).from((String) null);
+				verify(propertyMapperSourceMock10).whenHasText();
+				verify(propertyMapperSourceMock11).to((Consumer) any());
+				verify(propertyMapperMock2).from((TaskDecorator) null);
+				verify(propertyMapperSourceMock12).to((Consumer) any());
+			});
+		}
+	}
+}
