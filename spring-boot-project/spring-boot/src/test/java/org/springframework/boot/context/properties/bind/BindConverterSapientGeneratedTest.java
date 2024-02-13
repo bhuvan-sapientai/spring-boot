@@ -44,6 +44,8 @@ import static org.mockito.Mockito.mockStatic;
 
 import org.junit.jupiter.api.Disabled;
 
+import java.lang.reflect.Field;
+
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class BindConverterSapientGeneratedTest {
 
@@ -95,24 +97,29 @@ class BindConverterSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		ConversionService serviceMock = mock(ConversionService.class, "List<ConversionService>");
+		ConversionService conversionServiceMock = mock(ConversionService.class, "ConversionService");
 		try (MockedStatic<TypeDescriptor> typeDescriptor = mockStatic(TypeDescriptor.class);
 			 MockedStatic<ApplicationConversionService> applicationConversionService = mockStatic(ApplicationConversionService.class)) {
+			TypeDescriptor typeDescriptor2 = new TypeDescriptor((Field) null);
+			doReturn(false).when(serviceMock).canConvert(eq(typeDescriptor2), (TypeDescriptor) any());
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			applicationConversionService.when(() -> ApplicationConversionService.getSharedInstance()).thenReturn(conversionService).thenReturn(conversionServiceMock);
-			doReturn(false).when(conversionServiceMock).canConvert(eq(typeDescriptorMock), (TypeDescriptor) any());
+			doReturn(false).when(conversionServiceMock).canConvert(eq(typeDescriptor2), (TypeDescriptor) any());
 			Object object = new Object();
-			typeDescriptor.when(() -> TypeDescriptor.forObject(object)).thenReturn(typeDescriptorMock);
+			typeDescriptor.when(() -> TypeDescriptor.forObject(object)).thenReturn(typeDescriptor2);
 			List<ConversionService> conversionServiceList = new ArrayList<>();
-			conversionServiceList.add(conversionService);
+			conversionServiceList.add(serviceMock);
 			BindConverter target = BindConverter.get(conversionServiceList, (Consumer) null);
-			Annotation[] annotationArray = new Annotation[] {};
+			Annotation[] annotationArray = new Annotation[] { (Annotation) null };
 			//Act Statement(s)
 			boolean result = target.canConvert(object, resolvableTypeMock, annotationArray);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(Boolean.FALSE));
+				verify(serviceMock).canConvert(eq(typeDescriptor2), (TypeDescriptor) any());
 				applicationConversionService.verify(() -> ApplicationConversionService.getSharedInstance(), atLeast(2));
-				verify(conversionServiceMock).canConvert(eq(typeDescriptorMock), (TypeDescriptor) any());
+				verify(conversionServiceMock).canConvert(eq(typeDescriptor2), (TypeDescriptor) any());
 				typeDescriptor.verify(() -> TypeDescriptor.forObject(object), atLeast(1));
 			});
 		}
@@ -210,25 +217,31 @@ class BindConverterSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		ConversionService delegateMock = mock(ConversionService.class, "{}");
+		ConversionService conversionServiceMock = mock(ConversionService.class, "{}");
 		try (MockedStatic<TypeDescriptor> typeDescriptor = mockStatic(TypeDescriptor.class);
 			 MockedStatic<ApplicationConversionService> applicationConversionService = mockStatic(ApplicationConversionService.class)) {
+			TypeDescriptor typeDescriptor2 = new TypeDescriptor((Field) null);
+			doReturn(true).when(delegateMock).canConvert(eq(typeDescriptor2), (TypeDescriptor) any());
+			Object object = new Object();
+			Object object2 = new Object();
+			doReturn(object).when(delegateMock).convert(eq(object2), eq(typeDescriptor2), (TypeDescriptor) any());
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			applicationConversionService.when(() -> ApplicationConversionService.getSharedInstance()).thenReturn(conversionService).thenReturn(conversionServiceMock);
-			doReturn(false).when(conversionServiceMock).canConvert(eq(typeDescriptorMock), (TypeDescriptor) any());
-			Object object = new Object();
-			typeDescriptor.when(() -> TypeDescriptor.forObject(object)).thenReturn(typeDescriptorMock);
+			typeDescriptor.when(() -> TypeDescriptor.forObject(object2)).thenReturn(typeDescriptor2);
 			List<ConversionService> conversionServiceList = new ArrayList<>();
-			conversionServiceList.add(conversionService);
+			conversionServiceList.add(delegateMock);
 			BindConverter target = BindConverter.get(conversionServiceList, (Consumer) null);
 			Annotation[] annotationArray = new Annotation[] {};
 			//Act Statement(s)
-			Object result = target.convert(object, resolvableTypeMock, annotationArray);
+			Object result = target.convert(object2, resolvableTypeMock, annotationArray);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
+				assertThat(result, equalTo(object));
+				verify(delegateMock).canConvert(eq(typeDescriptor2), (TypeDescriptor) any());
+				verify(delegateMock).convert(eq(object2), eq(typeDescriptor2), (TypeDescriptor) any());
 				applicationConversionService.verify(() -> ApplicationConversionService.getSharedInstance(), atLeast(2));
-				verify(conversionServiceMock).canConvert(eq(typeDescriptorMock), (TypeDescriptor) any());
-				typeDescriptor.verify(() -> TypeDescriptor.forObject(object), atLeast(1));
+				typeDescriptor.verify(() -> TypeDescriptor.forObject(object2), atLeast(1));
 			});
 		}
 	}

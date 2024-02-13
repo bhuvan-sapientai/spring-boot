@@ -39,9 +39,9 @@ import org.junit.jupiter.api.Disabled;
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataImporterSapientGeneratedTest {
 
-	private final ConfigDataLocationResolvers resolversMock = mock(ConfigDataLocationResolvers.class, "[ConfigDataResolutionResult]");
+	private final ConfigDataLocationResolvers resolversMock = mock(ConfigDataLocationResolvers.class, "resolvers");
 
-	private final ConfigDataLoaders loadersMock = mock(ConfigDataLoaders.class, "ConfigData");
+	private final ConfigDataLoaders loadersMock = mock(ConfigDataLoaders.class, "loaders");
 
 	private final ConfigDataActivationContext activationContextMock = mock(ConfigDataActivationContext.class);
 
@@ -111,7 +111,7 @@ class ConfigDataImporterSapientGeneratedTest {
 		ConfigDataActivationContext configDataActivationContext = null;
 		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
 		IOException iOException = new IOException();
-		IllegalStateException illegalStateException = new IllegalStateException("message1", iOException);
+		IllegalStateException illegalStateException = new IllegalStateException("IO error on loading imports from []", iOException);
 		//Act Statement(s)
 		final IllegalStateException result = assertThrows(IllegalStateException.class, () -> {
 			target.resolveAndLoad(configDataActivationContext, configDataLocationResolverContextMock, configDataLoaderContextMock, configDataLocationList);
@@ -229,32 +229,19 @@ class ConfigDataImporterSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigDataActivationContext activationContextMock = mock(ConfigDataActivationContext.class, "Profiles");
-		Profiles profilesMock = mock(Profiles.class, "Profiles");
-		DeferredLogFactory logFactoryMock = mock(DeferredLogFactory.class, "Log");
-		LogMessage logMessageMock = mock(LogMessage.class, "LogMessage");
-		ConfigDataLocationResolverContext configDataLocationResolverContextMock = mock(ConfigDataLocationResolverContext.class, "[ConfigDataResolutionResult]");
-		ConfigDataLoaderContext configDataLoaderContextMock = mock(ConfigDataLoaderContext.class, "ConfigData");
 		try (MockedStatic<LogMessage> logMessage = mockStatic(LogMessage.class)) {
 			doReturn(profilesMock).when(activationContextMock).getProfiles();
 			//TODO: Needs to return real value
 			doReturn(null).when(logFactoryMock).getLog(ConfigDataImporter.class);
-			ConfigDataLocation configDataLocation = ConfigDataLocation.of("location1");
-			LogMessage logMessage2 = LogMessage.format("Considering resource %s from location %s", configDataResourceMock, configDataLocation);
-			logMessage.when(() -> LogMessage.format(eq("Considering resource %s from location %s"), eq(configDataResourceMock), (ConfigDataLocation) any())).thenReturn(logMessage2);
+			logMessage.when(() -> LogMessage.format("Considering resource %s from location %s", configDataResourceMock, configDataLocationMock)).thenReturn(logMessageMock);
 			doReturn(true).when(configDataResourceMock).isOptional();
-			logMessage.when(() -> LogMessage.format(eq("Loaded resource %s from location %s"), eq(configDataResourceMock), (ConfigDataLocation) any())).thenReturn(logMessageMock);
+			logMessage.when(() -> LogMessage.format("Loaded resource %s from location %s", configDataResourceMock, configDataLocationMock)).thenReturn(logMessageMock2);
 			ConfigDataImporter target = new ConfigDataImporter(logFactoryMock, ConfigDataNotFoundAction.FAIL, resolversMock, loadersMock);
 			List<ConfigDataResolutionResult> configDataResolutionResultList = new ArrayList<>();
-			configDataResolutionResultList.add(configDataResolutionResultMock);
-			doReturn(configDataResolutionResultList).when(resolversMock).resolve(eq(configDataLocationResolverContextMock), (ConfigDataLocation) any(), eq(profilesMock));
-			Collection collection = new ArrayList<>();
-			ConfigData.Option[] optionArray = new ConfigData.Option[] {};
-			ConfigData configData = new ConfigData(collection, optionArray);
-			doReturn(configData).when(loadersMock).load(configDataLoaderContextMock, configDataResourceMock);
-			ConfigDataLocation configDataLocation2 = ConfigDataLocation.of("location1");
+			doReturn(configDataResolutionResultList).when(resolversMock).resolve(configDataLocationResolverContextMock, configDataLocationMock2, profilesMock);
+			doReturn(configDataMock).when(loadersMock).load(configDataLoaderContextMock, configDataResourceMock);
 			List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
-			configDataLocationList.add(configDataLocation2);
+			configDataLocationList.add(configDataLocationMock2);
 			//Act Statement(s)
 			final IllegalStateException result = assertThrows(IllegalStateException.class, () -> {
 				target.resolveAndLoad(activationContextMock, configDataLocationResolverContextMock, configDataLoaderContextMock, configDataLocationList);
@@ -268,10 +255,10 @@ class ConfigDataImporterSapientGeneratedTest {
 				assertThat(result.getCause(), is(instanceOf(iOException.getClass())));
 				verify(activationContextMock).getProfiles();
 				verify(logFactoryMock).getLog(ConfigDataImporter.class);
-				logMessage.verify(() -> LogMessage.format(eq("Considering resource %s from location %s"), eq(configDataResourceMock), (ConfigDataLocation) any()));
+				logMessage.verify(() -> LogMessage.format("Considering resource %s from location %s", configDataResourceMock, configDataLocationMock), atLeast(1));
 				verify(configDataResourceMock).isOptional();
-				logMessage.verify(() -> LogMessage.format(eq("Loaded resource %s from location %s"), eq(configDataResourceMock), (ConfigDataLocation) any()));
-				verify(resolversMock).resolve(eq(configDataLocationResolverContextMock), (ConfigDataLocation) any(), eq(profilesMock));
+				logMessage.verify(() -> LogMessage.format("Loaded resource %s from location %s", configDataResourceMock, configDataLocationMock), atLeast(1));
+				verify(resolversMock).resolve(configDataLocationResolverContextMock, configDataLocationMock2, profilesMock);
 				verify(loadersMock).load(configDataLoaderContextMock, configDataResourceMock);
 			});
 		}

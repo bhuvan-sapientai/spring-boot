@@ -123,7 +123,7 @@ class ConfigTreeConfigDataLocationResolverSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doReturn("return_of_getNonPrefixedValue1").when(locationMock).getNonPrefixedValue("configtree:");
+			doReturn("A").when(locationMock).getNonPrefixedValue("configtree:");
 			_assert.when(() -> Assert.isTrue(eq(false), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
 			ConfigTreeConfigDataLocationResolver target = new ConfigTreeConfigDataLocationResolver(resourceLoaderMock);
 			//Act Statement(s)

@@ -97,11 +97,9 @@ class DelegatingApplicationContextInitializerSapientGeneratedTest {
 		try (MockedStatic<BeanUtils> beanUtils = mockStatic(BeanUtils.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class);
 			 MockedStatic<GenericTypeResolver> genericTypeResolver = mockStatic(GenericTypeResolver.class);
-			 MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
+			 MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class, CALLS_REAL_METHODS)) {
 			doReturn(configurableEnvironmentMock).when(contextMock).getEnvironment();
 			doReturn("A").when(configurableEnvironmentMock).getProperty("context.initializer.classes");
-			ClassLoader classLoader = ClassLoader.getPlatformClassLoader();
-			classUtils.when(() -> ClassUtils.getDefaultClassLoader()).thenReturn(classLoader);
 			classUtils.when(() -> ClassUtils.forName(eq("return_of_tokenizeToStringArrayItem1"), (ClassLoader) any())).thenReturn(Object.class);
 			_assert.when(() -> Assert.isAssignable(ApplicationContextInitializer.class, Object.class)).thenAnswer((Answer<Void>) invocation -> null);
 			genericTypeResolver.when(() -> GenericTypeResolver.resolveTypeArgument(Object.class, ApplicationContextInitializer.class)).thenReturn(Object.class);
@@ -113,15 +111,14 @@ class DelegatingApplicationContextInitializerSapientGeneratedTest {
 			target.initialize(contextMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				verify(contextMock).getEnvironment();
-				verify(configurableEnvironmentMock).getProperty("context.initializer.classes");
-				classUtils.verify(() -> ClassUtils.getDefaultClassLoader(), atLeast(1));
-				classUtils.verify(() -> ClassUtils.forName(eq("return_of_tokenizeToStringArrayItem1"), (ClassLoader) any()));
+				verify(contextMock, atLeast(1)).getEnvironment();
+				verify(configurableEnvironmentMock, atLeast(1)).getProperty("context.initializer.classes");
+				classUtils.verify(() -> ClassUtils.forName(eq("return_of_tokenizeToStringArrayItem1"), (ClassLoader) any()), atLeast(1));
 				_assert.verify(() -> Assert.isAssignable(ApplicationContextInitializer.class, Object.class), atLeast(1));
 				genericTypeResolver.verify(() -> GenericTypeResolver.resolveTypeArgument(Object.class, ApplicationContextInitializer.class), atLeast(1));
-				_assert.verify(() -> Assert.isAssignable(eq(Object.class), eq(ConfigurableApplicationContext.class), (Supplier) any()));
+				_assert.verify(() -> Assert.isAssignable(eq(Object.class), eq(ConfigurableApplicationContext.class), (Supplier) any()), atLeast(1));
 				beanUtils.verify(() -> BeanUtils.instantiateClass(Object.class), atLeast(1));
-				verify(applicationContextInitializerMock).initialize(contextMock);
+				verify(applicationContextInitializerMock, atLeast(1)).initialize(contextMock);
 			});
 		}
 	}

@@ -304,7 +304,13 @@ class MapBinderSapientGeneratedTest {
 		MapBinder target = new MapBinder(binderContextMock);
 		//TODO: Needs initialization with real value
 		Supplier supplier = null;
+		Object object = new Object();
+		Object object2 = new Object();
+		Object object3 = new Object();
+		Object object4 = new Object();
 		Map<Object, Object> objectObjectMap = new HashMap<>();
+		objectObjectMap.put(object, object2);
+		objectObjectMap.put(object3, object4);
 		//Act Statement(s)
 		Map<Object, Object> result = target.merge(supplier, objectObjectMap);
 		//Assert statement(s)

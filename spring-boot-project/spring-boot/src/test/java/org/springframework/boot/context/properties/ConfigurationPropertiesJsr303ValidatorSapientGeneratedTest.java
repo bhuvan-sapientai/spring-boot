@@ -41,7 +41,7 @@ class ConfigurationPropertiesJsr303ValidatorSapientGeneratedTest {
 		//Arrange Statement(s)
 		ConfigurationPropertiesJsr303Validator target = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
 		//Act Statement(s)
-		boolean result = target.supports(Object.class);
+		boolean result = target.supports(String.class);
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(Boolean.TRUE)));
 	}

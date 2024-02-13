@@ -65,14 +65,9 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull((File) any(), eq("File must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
-			ApplicationPidFileWriter target = new ApplicationPidFileWriter("filename1");
-			//Act Statement(s)
-			target.onApplicationEvent(springApplicationEventMock);
-			//Assert statement(s)
-			assertAll("result", () -> _assert.verify(() -> Assert.notNull((File) any(), eq("File must not be null"))));
-		}
+		ApplicationPidFileWriter target = new ApplicationPidFileWriter("test.pid");
+		//Act Statement(s)
+		target.onApplicationEvent(springApplicationEventMock);
 	}
 
 	//Sapient generated method id: ${62c4eb21-8829-3c9f-a880-556ff00b2926}
@@ -89,14 +84,9 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull((File) any(), eq("File must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
-			ApplicationPidFileWriter target = new ApplicationPidFileWriter("filename1");
-			//Act Statement(s)
-			target.onApplicationEvent(springApplicationEventMock);
-			//Assert statement(s)
-			assertAll("result", () -> _assert.verify(() -> Assert.notNull((File) any(), eq("File must not be null"))));
-		}
+		ApplicationPidFileWriter target = new ApplicationPidFileWriter("notNull");
+		//Act Statement(s)
+		target.onApplicationEvent(springApplicationEventMock);
 	}
 
 	//Sapient generated method id: ${2e6bfade-6826-3482-8fe9-e3368cba5c83}

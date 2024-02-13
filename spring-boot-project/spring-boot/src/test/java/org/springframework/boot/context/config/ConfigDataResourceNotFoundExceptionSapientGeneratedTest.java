@@ -120,7 +120,7 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class, "ConfigDataResourceInstance");
+		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class);
 		//TODO: Needs initialization with real value
 		Path path = null;
 		//Act Statement(s)
@@ -139,15 +139,20 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class, "<resource_value>");
-		//TODO: Needs initialization with real value
-		Path path = null;
-		//Act Statement(s)
-		final ConfigDataResourceNotFoundException result = assertThrows(ConfigDataResourceNotFoundException.class, () -> {
-			ConfigDataResourceNotFoundException.throwIfDoesNotExist(configDataResourceMock, path);
-		});
-		//Assert statement(s)
-		assertAll("result", () -> assertThat(result, is(notNullValue())));
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			_assert.when(() -> Assert.notNull(configDataResourceMock, "Resource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			//TODO: Needs initialization with real value
+			Path path = null;
+			//Act Statement(s)
+			final ConfigDataResourceNotFoundException result = assertThrows(ConfigDataResourceNotFoundException.class, () -> {
+				ConfigDataResourceNotFoundException.throwIfDoesNotExist(configDataResourceMock, path);
+			});
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull(configDataResourceMock, "Resource must not be null"), atLeast(1));
+			});
+		}
 	}
 
 	//Sapient generated method id: ${938d5bf5-111a-3abc-9453-0daf6e32f4de}

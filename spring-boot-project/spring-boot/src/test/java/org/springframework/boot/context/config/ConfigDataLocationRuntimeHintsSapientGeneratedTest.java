@@ -46,18 +46,18 @@ class ConfigDataLocationRuntimeHintsSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		RuntimeHints hintsMock = mock(RuntimeHints.class);
-		ResourceHints resourceHintsMock = mock(ResourceHints.class);
 		FilePatternResourceHintsRegistrar.Builder filePatternResourceHintsRegistrarBuilderMock = mock(FilePatternResourceHintsRegistrar.Builder.class);
 		FilePatternResourceHintsRegistrar.Builder filePatternResourceHintsRegistrarBuilderMock2 = mock(FilePatternResourceHintsRegistrar.Builder.class);
 		FilePatternResourceHintsRegistrar.Builder filePatternResourceHintsRegistrarBuilderMock3 = mock(FilePatternResourceHintsRegistrar.Builder.class);
 		try (MockedStatic<FilePatternResourceHintsRegistrar> filePatternResourceHintsRegistrar = mockStatic(FilePatternResourceHintsRegistrar.class)) {
-			doReturn(resourceHintsMock).when(hintsMock).resources();
+			ResourceHints resourceHints = new ResourceHints();
+			doReturn(resourceHints).when(hintsMock).resources();
 			filePatternResourceHintsRegistrar.when(() -> FilePatternResourceHintsRegistrar.forClassPathLocations(anyList())).thenReturn(filePatternResourceHintsRegistrarBuilderMock);
 			List<String> stringList = new ArrayList<>(List.of("application"));
 			doReturn(filePatternResourceHintsRegistrarBuilderMock2).when(filePatternResourceHintsRegistrarBuilderMock).withFilePrefixes(stringList);
 			List<String> stringList2 = new ArrayList<>();
 			doReturn(filePatternResourceHintsRegistrarBuilderMock3).when(filePatternResourceHintsRegistrarBuilderMock2).withFileExtensions(stringList2);
-			doNothing().when(filePatternResourceHintsRegistrarBuilderMock3).registerHints(eq(resourceHintsMock), (ClassLoader) any());
+			doNothing().when(filePatternResourceHintsRegistrarBuilderMock3).registerHints(eq(resourceHints), (ClassLoader) any());
 			ConfigDataLocationRuntimeHints target = spy(new ConfigDataLocationRuntimeHints());
 			List<String> stringList3 = new ArrayList<>();
 			doReturn(stringList3).when(target).getLocations((ClassLoader) any());
@@ -71,7 +71,7 @@ class ConfigDataLocationRuntimeHintsSapientGeneratedTest {
 				filePatternResourceHintsRegistrar.verify(() -> FilePatternResourceHintsRegistrar.forClassPathLocations(anyList()));
 				verify(filePatternResourceHintsRegistrarBuilderMock).withFilePrefixes(stringList);
 				verify(filePatternResourceHintsRegistrarBuilderMock2).withFileExtensions(stringList2);
-				verify(filePatternResourceHintsRegistrarBuilderMock3).registerHints(eq(resourceHintsMock), (ClassLoader) any());
+				verify(filePatternResourceHintsRegistrarBuilderMock3).registerHints(eq(resourceHints), (ClassLoader) any());
 				verify(target).getLocations((ClassLoader) any());
 				verify(target).getExtensions((ClassLoader) any());
 			});

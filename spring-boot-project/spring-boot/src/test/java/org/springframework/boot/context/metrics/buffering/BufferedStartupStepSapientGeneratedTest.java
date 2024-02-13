@@ -112,8 +112,8 @@ class BufferedStartupStepSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Instant instant = Instant.ofEpochSecond(1700000000);
-		BufferedStartupStep target = new BufferedStartupStep(parentMock, "name1", 0L, instant, (Consumer) null);
+		Instant instant = Instant.now();
+		BufferedStartupStep target = new BufferedStartupStep(parentMock, "test", 123L, instant, (Consumer) null);
 		//Act Statement(s)
 		target.end();
 	}

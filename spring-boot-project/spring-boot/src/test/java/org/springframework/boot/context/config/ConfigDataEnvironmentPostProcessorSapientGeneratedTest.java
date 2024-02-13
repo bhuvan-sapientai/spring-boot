@@ -91,13 +91,9 @@ class ConfigDataEnvironmentPostProcessorSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		DeferredLogFactory logFactoryMock = mock(DeferredLogFactory.class, "mockLogFactory");
 		//TODO: Needs to return real value
 		doReturn(null).when(logFactoryMock).getLog(ConfigDataEnvironmentPostProcessor.class);
-		ConfigurableBootstrapContext configurableBootstrapContextMock = mock(ConfigurableBootstrapContext.class, "mockBootstrapContext");
 		ConfigDataEnvironmentPostProcessor target = spy(new ConfigDataEnvironmentPostProcessor(logFactoryMock, configurableBootstrapContextMock));
-		ConfigurableEnvironment configurableEnvironmentMock = mock(ConfigurableEnvironment.class, "mockEnvironment");
-		ResourceLoader resourceLoaderMock = mock(ResourceLoader.class, "nonNullResourceLoader");
 		Collection<String> collection = new ArrayList<>();
 		collection.add("profile1");
 		collection.add("profile2");
@@ -124,14 +120,10 @@ class ConfigDataEnvironmentPostProcessorSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		DeferredLogFactory logFactoryMock = mock(DeferredLogFactory.class, "<any_value>");
 		//TODO: Needs to return real value
 		doReturn(null).when(logFactoryMock).getLog(ConfigDataEnvironmentPostProcessor.class);
-		ConfigurableBootstrapContext configurableBootstrapContextMock = mock(ConfigurableBootstrapContext.class, "<any_value>");
 		ConfigDataEnvironmentPostProcessor target = spy(new ConfigDataEnvironmentPostProcessor(logFactoryMock, configurableBootstrapContextMock));
-		ConfigurableEnvironment configurableEnvironmentMock = mock(ConfigurableEnvironment.class, "<any_value>");
 		Collection<String> collection = new ArrayList<>();
-		collection.add("<any_value>");
 		doReturn(configDataEnvironmentMock).when(target).getConfigDataEnvironment(eq(configurableEnvironmentMock), (DefaultResourceLoader) any(), eq(collection));
 		doNothing().when(configDataEnvironmentMock).processAndApply();
 		ResourceLoader resourceLoader = null;

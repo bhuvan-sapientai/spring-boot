@@ -137,7 +137,6 @@ class ConfigDataEnvironmentSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		//SpringFactoriesLoader springFactoriesLoaderMock3 = mock(SpringFactoriesLoader.class);
         /*try (MockedStatic<SpringFactoriesLoader> springFactoriesLoader = mockStatic(SpringFactoriesLoader.class);
     MockedStatic<ConfigDataEnvironmentContributor> configDataEnvironmentContributor = mockStatic(ConfigDataEnvironmentContributor.class);
     MockedStatic<LogMessage> logMessage = mockStatic(LogMessage.class);
@@ -171,10 +170,12 @@ class ConfigDataEnvironmentSapientGeneratedTest {
 		configDataEnvironmentContributor.when(() -> ConfigDataEnvironmentContributor.ofInitialImport(configDataLocationMock)).thenReturn(configDataEnvironmentContributorMock);
 		logMessage.when(() -> LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock2)).thenReturn(logMessageMock2);
 		configDataEnvironmentContributor.when(() -> ConfigDataEnvironmentContributor.ofInitialImport(configDataLocationMock2)).thenReturn(configDataEnvironmentContributorMock2);
-		logMessage.when(() -> LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock3)).thenReturn(logMessageMock3);
+		LogMessage logMessage2 = LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock3);
+		logMessage.when(() -> LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock3)).thenReturn(logMessage2);
 		configDataEnvironmentContributor.when(() -> ConfigDataEnvironmentContributor.ofInitialImport(configDataLocationMock3)).thenReturn(configDataEnvironmentContributorMock3);
 		configDataEnvironmentContributor.when(() -> ConfigDataEnvironmentContributor.ofExisting(propertySourceMock)).thenReturn(configDataEnvironmentContributorMock4);
-		springFactoriesLoader.when(() -> SpringFactoriesLoader.forDefaultResourceLocation((ClassLoader) any())).thenReturn(springFactoriesLoaderMock).thenReturn(springFactoriesLoaderMock2).thenReturn(springFactoriesLoaderMock3);
+		SpringFactoriesLoader springFactoriesLoader2 = SpringFactoriesLoader.forDefaultResourceLocation(classLoader3);
+		springFactoriesLoader.when(() -> SpringFactoriesLoader.forDefaultResourceLocation((ClassLoader) any())).thenReturn(springFactoriesLoaderMock).thenReturn(springFactoriesLoaderMock2).thenReturn(springFactoriesLoader2);
 		Collection<String> collection = new ArrayList<>();
 		ConfigDataEnvironment target = new ConfigDataEnvironment(logFactoryMock, bootstrapContextMock, environmentMock, resourceLoaderMock, collection, environmentUpdateListenerMock);
 		doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
@@ -182,7 +183,7 @@ class ConfigDataEnvironmentSapientGeneratedTest {
 		doReturn(null).when(mutablePropertySourcesMock).iterator();
 		//Act Statement(s)
 		ConfigDataLocationResolvers result = target.createConfigDataLocationResolvers(logFactoryMock, bootstrapContextMock, binderMock, resourceLoaderMock);
-		ConfigDataLocationResolvers configDataLocationResolvers = new ConfigDataLocationResolvers(logFactoryMock, bootstrapContextMock, binderMock, resourceLoaderMock, springFactoriesLoaderMock3);
+		ConfigDataLocationResolvers configDataLocationResolvers = new ConfigDataLocationResolvers(logFactoryMock, bootstrapContextMock, binderMock, resourceLoaderMock, springFactoriesLoader2);
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataLocationResolvers for verification to succeed or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -249,13 +250,15 @@ class ConfigDataEnvironmentSapientGeneratedTest {
 		");
 		ConfigDataLocation[] configDataLocationArray5 = new ConfigDataLocation[] { configDataLocation, configDataLocation2 };
 		doReturn(configDataLocationArray4).when(bindResultMock4).orElse(configDataLocationArray5);
-		springFactoriesLoader.when(() -> SpringFactoriesLoader.forDefaultResourceLocation((ClassLoader) any())).thenReturn(springFactoriesLoaderMock).thenReturn(springFactoriesLoaderMock2);
+		SpringFactoriesLoader springFactoriesLoader2 = SpringFactoriesLoader.forDefaultResourceLocation(classLoader2);
+		springFactoriesLoader.when(() -> SpringFactoriesLoader.forDefaultResourceLocation((ClassLoader) any())).thenReturn(springFactoriesLoaderMock).thenReturn(springFactoriesLoader2);
 		defaultPropertiesPropertySource.when(() -> DefaultPropertiesPropertySource.hasMatchingName(propertySourceMock)).thenReturn(true);
 		logMessage.when(() -> LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock)).thenReturn(logMessageMock);
 		configDataEnvironmentContributor.when(() -> ConfigDataEnvironmentContributor.ofInitialImport(configDataLocationMock)).thenReturn(configDataEnvironmentContributorMock);
 		logMessage.when(() -> LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock2)).thenReturn(logMessageMock2);
 		configDataEnvironmentContributor.when(() -> ConfigDataEnvironmentContributor.ofInitialImport(configDataLocationMock2)).thenReturn(configDataEnvironmentContributorMock2);
-		logMessage.when(() -> LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock3)).thenReturn(logMessageMock3);
+		LogMessage logMessage2 = LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock3);
+		logMessage.when(() -> LogMessage.format("Adding initial config data import from location '%s'", configDataLocationMock3)).thenReturn(logMessage2);
 		configDataEnvironmentContributor.when(() -> ConfigDataEnvironmentContributor.ofInitialImport(configDataLocationMock3)).thenReturn(configDataEnvironmentContributorMock3);
 		configDataEnvironmentContributor.when(() -> ConfigDataEnvironmentContributor.ofExisting(propertySourceMock)).thenReturn(configDataEnvironmentContributorMock4);
 		Collection<String> collection = new ArrayList<>();

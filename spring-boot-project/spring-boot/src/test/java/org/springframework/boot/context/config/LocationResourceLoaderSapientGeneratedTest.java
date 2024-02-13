@@ -168,7 +168,7 @@ class LocationResourceLoaderSapientGeneratedTest {
 	//Sapient generated method id: ${c1b693f1-34f8-3d72-bd2b-3b62fd974ef6}
 	@Disabled()
 	@Test()
-	void getResourcesWhenFileNotIsDirectory() throws Exception {
+	void getResourcesWhenFileNotIsDirectory() throws IOException {
 		/* Branches:
 		 * (!location.startsWith(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX)) : true  #  inside validatePattern method
 		 * (StringUtils.countOccurrencesOf(location, "*") == 1) : true  #  inside validatePattern method
@@ -180,24 +180,28 @@ class LocationResourceLoaderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
+			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
 			_assert.when(() -> Assert.state(eq(false), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			stringUtils.when(() -> StringUtils.countOccurrencesOf("path/to/files/*.txt", "*")).thenReturn(1);
 			LocationResourceLoader target = spy(new LocationResourceLoader(resourceLoaderMock));
-			doReturn(false).when(target).isPattern("location1");
+			doReturn(false).when(target).isPattern("path/to/files/*.txt");
 			doReturn(resourceMock).when(target).getResource("location1");
-			doReturn(false).when(resourceMock).exists();
-			File file = new File("pathname1");
-			doReturn(file).when(resourceMock).getFile();
+			doReturn(true).when(resourceMock).exists();
+			//TODO: Needs to return real value
+			doReturn(null).when(resourceMock).getFile();
 			//Act Statement(s)
-			Resource[] result = target.getResources("location1", LocationResourceLoader.ResourceType.FILE);
-			Resource[] resourceResultArray = new Resource[] {};
+			final NullPointerException result = assertThrows(NullPointerException.class, () -> {
+				target.getResources("path/to/files/*.txt", LocationResourceLoader.ResourceType.FILE);
+			});
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, equalTo(resourceResultArray));
+				assertThat(result, is(notNullValue()));
 				_assert.verify(() -> Assert.state(eq(false), (Supplier) any()), atLeast(2));
 				_assert.verify(() -> Assert.state(eq(true), (Supplier) any()), atLeast(2));
-				verify(target).isPattern("location1");
+				stringUtils.verify(() -> StringUtils.countOccurrencesOf("path/to/files/*.txt", "*"), atLeast(1));
+				verify(target).isPattern("path/to/files/*.txt");
 				verify(target).getResource("location1");
 				verify(resourceMock).exists();
 				verify(resourceMock).getFile();

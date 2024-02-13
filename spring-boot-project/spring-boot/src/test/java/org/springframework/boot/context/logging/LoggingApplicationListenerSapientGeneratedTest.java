@@ -615,12 +615,15 @@ class LoggingApplicationListenerSapientGeneratedTest {
 	void setLogLevelsWhenThisLoggerGroupsIsNull() {
 		/* Branches:
 		 * (this.loggerGroups != null) : false  #  inside configureLogLevel method
+		 *
+		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		Binder binderMock = mock(Binder.class);
-		ConfigurableEnvironment configurableEnvironmentMock = mock(ConfigurableEnvironment.class, "<ConfigurableEnvironment_instance_placeholder>");
+		ConfigurableEnvironment configurableEnvironmentMock = mock(ConfigurableEnvironment.class);
 		BindResult bindResultMock = mock(BindResult.class);
-		LoggingSystem loggingSystemMock2 = mock(LoggingSystem.class, "<LoggingSystem_instance_placeholder>");
+		LoggingSystem loggingSystemMock2 = mock(LoggingSystem.class);
 		try (MockedStatic<Binder> binder = mockStatic(Binder.class)) {
 			binder.when(() -> Binder.get(configurableEnvironmentMock)).thenReturn(binderMock);
 			doReturn(bindResultMock).when(binderMock).bind((ConfigurationPropertyName) any(), (Bindable) any());

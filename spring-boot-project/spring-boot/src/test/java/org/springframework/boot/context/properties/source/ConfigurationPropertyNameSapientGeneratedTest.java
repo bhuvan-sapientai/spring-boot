@@ -29,6 +29,9 @@ import static org.mockito.Mockito.mockStatic;
 
 import org.junit.jupiter.api.Disabled;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertyNameSapientGeneratedTest {
 
@@ -49,17 +52,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			boolean result = target.isEmpty();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.TRUE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		//Act Statement(s)
+		boolean result = target.isEmpty();
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(Boolean.TRUE)));
 	}
 
 	//Sapient generated method id: ${88fa19c8-e796-3d0d-8b27-4e5e8f3ea28c}
@@ -72,17 +69,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			boolean result = target.isEmpty();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.FALSE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		//Act Statement(s)
+		boolean result = target.isEmpty();
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(Boolean.FALSE)));
 	}
 
 	//Sapient generated method id: ${743bc64a-79ef-32bb-ae4f-d5483ab77361}
@@ -96,19 +87,15 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null));
-			doReturn(true).when(target).isIndexed(0);
-			//Act Statement(s)
-			boolean result = target.isLastElementIndexed();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.TRUE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				verify(target).isIndexed(0);
-			});
-		}
+		ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null));
+		doReturn(true).when(target).isIndexed(0);
+		//Act Statement(s)
+		boolean result = target.isLastElementIndexed();
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, equalTo(Boolean.TRUE));
+			verify(target).isIndexed(0);
+		});
 	}
 
 	//Sapient generated method id: ${dffb566d-1c21-30a4-9f2c-92dbb1cfcf29}
@@ -122,19 +109,15 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null));
-			doReturn(false).when(target).isIndexed(0);
-			//Act Statement(s)
-			boolean result = target.isLastElementIndexed();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.FALSE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				verify(target).isIndexed(0);
-			});
-		}
+		ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null));
+		doReturn(false).when(target).isIndexed(0);
+		//Act Statement(s)
+		boolean result = target.isLastElementIndexed();
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, equalTo(Boolean.FALSE));
+			verify(target).isIndexed(0);
+		});
 	}
 
 	//Sapient generated method id: ${c9915a84-d4e3-3a10-a7ef-8edaf94f1726}
@@ -148,19 +131,15 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null));
-			doReturn(true).when(target).isIndexed(0);
-			//Act Statement(s)
-			boolean result = target.hasIndexedElement();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.TRUE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				verify(target).isIndexed(0);
-			});
-		}
+		ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null));
+		doReturn(true).when(target).isIndexed(0);
+		//Act Statement(s)
+		boolean result = target.hasIndexedElement();
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, equalTo(Boolean.TRUE));
+			verify(target).isIndexed(0);
+		});
 	}
 
 	//Sapient generated method id: ${eca9dbb4-366b-32b0-86e5-571c7d615dc3}
@@ -174,19 +153,15 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null));
-			doReturn(false).when(target).isIndexed(0);
-			//Act Statement(s)
-			boolean result = target.hasIndexedElement();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.FALSE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				verify(target).isIndexed(0);
-			});
-		}
+		ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", '<', (Function) null));
+		doReturn(false).when(target).isIndexed(0);
+		//Act Statement(s)
+		boolean result = target.hasIndexedElement();
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, equalTo(Boolean.FALSE));
+			verify(target).isIndexed(0);
+		});
 	}
 
 	//Sapient generated method id: ${1524a8ad-2b9d-33ba-bc61-f917ca09bee4}
@@ -200,17 +175,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			boolean result = target.isIndexed(0);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.TRUE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		//Act Statement(s)
+		boolean result = target.isIndexed(0);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(Boolean.TRUE)));
 	}
 
 	//Sapient generated method id: ${55125aab-7291-3fd7-a424-cb5c8d9fa8fb}
@@ -223,17 +192,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			boolean result = target.isIndexed(0);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.FALSE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		//Act Statement(s)
+		boolean result = target.isIndexed(0);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(Boolean.FALSE)));
 	}
 
 	//Sapient generated method id: ${99011359-4aa4-3047-95be-fbac1a4c4639}
@@ -247,17 +210,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			boolean result = target.isNumericIndex(0);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.TRUE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		//Act Statement(s)
+		boolean result = target.isNumericIndex(0);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(Boolean.TRUE)));
 	}
 
 	//Sapient generated method id: ${13bf2442-e51c-305b-89ea-aec7a9f5a845}
@@ -270,17 +227,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			boolean result = target.isNumericIndex(0);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(Boolean.FALSE));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", ',', (Function) null);
+		//Act Statement(s)
+		boolean result = target.isNumericIndex(0);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(Boolean.FALSE)));
 	}
 
 	//Sapient generated method id: ${37d3a550-5c79-3b91-8b60-8495b7ec9aab}
@@ -293,19 +244,15 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null));
-			doReturn("return_of_getElement1").when(target).getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
-			//Act Statement(s)
-			String result = target.getLastElement(ConfigurationPropertyName.Form.ORIGINAL);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo("return_of_getElement1"));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				verify(target).getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
-			});
-		}
+		ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null));
+		doReturn("return_of_getElement1").when(target).getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
+		//Act Statement(s)
+		String result = target.getLastElement(ConfigurationPropertyName.Form.ORIGINAL);
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, equalTo("return_of_getElement1"));
+			verify(target).getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
+		});
 	}
 
 	//Sapient generated method id: ${6276f483-19d3-3bf7-9dd1-273b9e311dea}
@@ -319,17 +266,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			String result = target.getLastElement(ConfigurationPropertyName.Form.ORIGINAL);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(""));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '<', (Function) null);
+		//Act Statement(s)
+		String result = target.getLastElement(ConfigurationPropertyName.Form.ORIGINAL);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo("")));
 	}
 
 	//Sapient generated method id: ${606c826e-9e9e-3c25-8425-30dd5468c200}
@@ -343,17 +284,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			String result = target.getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo("result1"));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		//Act Statement(s)
+		String result = target.getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo("result1")));
 	}
 
 	//Sapient generated method id: ${cefa584d-7383-397c-a1a9-7de7a840bafb}
@@ -425,17 +360,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			int result = target.getNumberOfElements();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(0));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '.', (Function) null);
+		//Act Statement(s)
+		int result = target.getNumberOfElements();
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(0)));
 	}
 
 	//Sapient generated method id: ${dad83f36-7c06-367a-aa81-1455798d2513}
@@ -448,18 +377,15 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			stringUtils.when(() -> StringUtils.hasLength("A")).thenReturn(false);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
+			stringUtils.when(() -> StringUtils.hasLength("")).thenReturn(true);
+			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
 			//Act Statement(s)
-			ConfigurationPropertyName result = target.append("A");
+			ConfigurationPropertyName result = target.append("");
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, equalTo(target));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				stringUtils.verify(() -> StringUtils.hasLength("A"), atLeast(1));
+				assertThat(result, is(notNullValue()));
+				stringUtils.verify(() -> StringUtils.hasLength(""), atLeast(1));
 			});
 		}
 	}
@@ -476,18 +402,16 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS);
 			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			stringUtils.when(() -> StringUtils.hasLength((String) null)).thenReturn(true);
 			_assert.when(() -> Assert.isTrue(false, "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", ' ', (Function) null);
 			//Act Statement(s)
 			ConfigurationPropertyName result = target.append((String) null);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
 				stringUtils.verify(() -> StringUtils.hasLength((String) null), atLeast(1));
 				_assert.verify(() -> Assert.isTrue(false, "Name must not be null"), atLeast(1));
 			});
@@ -506,15 +430,15 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
+			stringUtils.when(() -> StringUtils.hasLength("test")).thenReturn(false);
+			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", ' ', (Function) null);
 			//Act Statement(s)
-			ConfigurationPropertyName result = target.append("suffix1");
+			ConfigurationPropertyName result = target.append("test");
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
+				assertThat(result, equalTo(target));
+				stringUtils.verify(() -> StringUtils.hasLength("test"), atLeast(1));
 			});
 		}
 	}
@@ -624,18 +548,12 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			ConfigurationPropertyName configurationPropertyName = null;
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.append(configurationPropertyName);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(target));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		ConfigurationPropertyName configurationPropertyName = null;
+		//Act Statement(s)
+		ConfigurationPropertyName result = target.append(configurationPropertyName);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(target)));
 	}
 
 	//Sapient generated method id: ${a3ce3e9f-8901-315a-95cd-1ffffa2e31d8}
@@ -649,18 +567,12 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("append_configurationPropertyName1-name1");
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.append(configurationPropertyName);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		ConfigurationPropertyName configurationPropertyNameMock = mock(ConfigurationPropertyName.class, "[{type={value=NON_UNIFORM}, value={value=suffix}}]");
+		//Act Statement(s)
+		ConfigurationPropertyName result = target.append(configurationPropertyNameMock);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
 	//Sapient generated method id: ${8d5834e4-e251-3bb2-be8c-b1391d280df5}
@@ -673,18 +585,12 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.getParent();
-			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.EMPTY;
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(configurationPropertyName));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		//Act Statement(s)
+		ConfigurationPropertyName result = target.getParent();
+		ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.EMPTY;
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(configurationPropertyName)));
 	}
 
 	//Sapient generated method id: ${0c679d0a-f36e-3d5d-b93a-4b77d27252ce}
@@ -698,23 +604,18 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null));
-			doReturn(configurationPropertyNameMock).when(target).chop(1);
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.getParent();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(configurationPropertyNameMock));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				verify(target).chop(1);
-			});
-		}
+		ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null));
+		doReturn(configurationPropertyNameMock).when(target).chop(1);
+		//Act Statement(s)
+		ConfigurationPropertyName result = target.getParent();
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, equalTo(configurationPropertyNameMock));
+			verify(target).chop(1);
+		});
 	}
 
 	//Sapient generated method id: ${138a5323-d04f-398a-8780-1815be54bdbe}
-	@Disabled()
 	@Test()
 	void chopWhenSizeGreaterThanOrEqualsToGetNumberOfElements() {
 		/* Branches:
@@ -724,17 +625,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.chop(0);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(target));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		//Act Statement(s)
+		ConfigurationPropertyName result = target.chop(5);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(target)));
 	}
 
 	//Sapient generated method id: ${4fc3e13d-c0f9-396e-9c13-9b47216f0899}
@@ -747,17 +642,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.chop(0);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		//Act Statement(s)
+		ConfigurationPropertyName result = target.chop(2);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
 	//Sapient generated method id: ${347ef665-0662-3396-96f8-476448a15026}
@@ -770,17 +659,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.subName(0);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(target));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '<', (Function) null);
+		//Act Statement(s)
+		ConfigurationPropertyName result = target.subName(0);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(target)));
 	}
 
 	//Sapient generated method id: ${ccf6eec0-f07d-398c-b217-c26a9a6ec34b}
@@ -794,18 +677,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.subName(1);
-			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.EMPTY;
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(configurationPropertyName));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		//Act Statement(s)
+		ConfigurationPropertyName result = target.subName(0);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(target)));
 	}
 
 	//Sapient generated method id: ${f0a05ff4-f4d5-34c6-a323-4109b1b22a7a}
@@ -822,24 +698,21 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			final IndexOutOfBoundsException result = assertThrows(IndexOutOfBoundsException.class, () -> {
-				target.subName(2);
-			});
-			IndexOutOfBoundsException indexOutOfBoundsException = new IndexOutOfBoundsException("Offset: 2, NumberOfElements: 2");
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				assertThat(result.getMessage(), equalTo(indexOutOfBoundsException.getMessage()));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		IndexOutOfBoundsException indexOutOfBoundsException = new IndexOutOfBoundsException("Offset: 1, NumberOfElements: 2");
+		//Act Statement(s)
+		final IndexOutOfBoundsException result = assertThrows(IndexOutOfBoundsException.class, () -> {
+			target.subName(1);
+		});
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, is(notNullValue()));
+			assertThat(result.getMessage(), equalTo(indexOutOfBoundsException.getMessage()));
+		});
 	}
 
 	//Sapient generated method id: ${3b49b001-db6e-3346-813c-51acd4341977}
+	@Disabled()
 	@Test()
 	void subNameWhenOffsetNotGreaterThanGetNumberOfElements() {
 		/* Branches:
@@ -852,20 +725,21 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			ConfigurationPropertyName result = target.subName(1);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		IndexOutOfBoundsException indexOutOfBoundsException = new IndexOutOfBoundsException("Offset: 1, NumberOfElements: 2");
+		//Act Statement(s)
+		final IndexOutOfBoundsException result = assertThrows(IndexOutOfBoundsException.class, () -> {
+			target.subName(1);
+		});
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, is(notNullValue()));
+			assertThat(result.getMessage(), equalTo(indexOutOfBoundsException.getMessage()));
+		});
 	}
 
 	//Sapient generated method id: ${7393e6ef-1cdb-3d7e-a151-69c57ce7ac40}
+	@Disabled()
 	@Test()
 	void isParentOfWhenGetNumberOfElementsNotEqualsNameGetNumberOfElementsMinus1() {
 		/* Branches:
@@ -875,19 +749,16 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doReturn(1).when(nameMock).getNumberOfElements();
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.notNull(nameMock, "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
+			_assert.when(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
+			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '<', (Function) null);
+			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("isParentOf_configurationPropertyName1-name1");
 			//Act Statement(s)
-			boolean result = target.isParentOf(nameMock);
+			boolean result = target.isParentOf(configurationPropertyName);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(Boolean.FALSE));
-				verify(nameMock).getNumberOfElements();
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.notNull(nameMock, "Name must not be null"), atLeast(1));
+				_assert.verify(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null")), atLeast(1));
 			});
 		}
 	}
@@ -904,21 +775,18 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doReturn(1).when(nameMock).getNumberOfElements();
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.notNull(nameMock, "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null));
-			doReturn(true).when(target).isAncestorOf(nameMock);
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
+			_assert.when(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
+			ConfigurationPropertyName target = spy(ConfigurationPropertyName.adapt("adapt_charSequence1", '<', (Function) null));
+			doReturn(true).when(target).isAncestorOf((ConfigurationPropertyName) any());
+			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("isParentOf_configurationPropertyName1-name1");
 			//Act Statement(s)
-			boolean result = target.isParentOf(nameMock);
+			boolean result = target.isParentOf(configurationPropertyName);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(Boolean.TRUE));
-				verify(nameMock).getNumberOfElements();
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.notNull(nameMock, "Name must not be null"), atLeast(1));
-				verify(target).isAncestorOf(nameMock);
+				_assert.verify(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null")), atLeast(1));
+				verify(target, atLeast(1)).isAncestorOf((ConfigurationPropertyName) any());
 			});
 		}
 	}
@@ -955,6 +823,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${3617a22a-65d4-36d5-89eb-fa61397e960a}
+	@Disabled()
 	@Test()
 	void isAncestorOfWhenGetNumberOfElementsGreaterThanOrEqualsToNameGetNumberOfElements() {
 		/* Branches:
@@ -964,19 +833,16 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doReturn(0).when(nameMock).getNumberOfElements();
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.notNull(nameMock, "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
+			_assert.when(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
+			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("isAncestorOf_configurationPropertyName1-name1");
 			//Act Statement(s)
-			boolean result = target.isAncestorOf(nameMock);
+			boolean result = target.isAncestorOf(configurationPropertyName);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(Boolean.FALSE));
-				verify(nameMock).getNumberOfElements();
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.notNull(nameMock, "Name must not be null"), atLeast(1));
+				_assert.verify(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null")), atLeast(1));
 			});
 		}
 	}
@@ -993,11 +859,10 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn(1).when(nameMock).getNumberOfElements();
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(nameMock, "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '.', (Function) null);
 			//Act Statement(s)
 			final NullPointerException result = assertThrows(NullPointerException.class, () -> {
 				target.isAncestorOf(nameMock);
@@ -1005,8 +870,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				verify(nameMock).getNumberOfElements();
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
+				verify(nameMock, atLeast(1)).getNumberOfElements();
 				_assert.verify(() -> Assert.notNull(nameMock, "Name must not be null"), atLeast(1));
 			});
 		}
@@ -1024,25 +888,21 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doReturn(1).when(nameMock).getNumberOfElements();
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.notNull(nameMock, "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
+			_assert.when(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
+			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '.', (Function) null);
+			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("isAncestorOf_configurationPropertyName1-name1");
 			//Act Statement(s)
-			boolean result = target.isAncestorOf(nameMock);
+			boolean result = target.isAncestorOf(configurationPropertyName);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(Boolean.TRUE));
-				verify(nameMock).getNumberOfElements();
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.notNull(nameMock, "Name must not be null"), atLeast(1));
+				_assert.verify(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null")), atLeast(1));
 			});
 		}
 	}
 
 	//Sapient generated method id: ${3f99306f-7f4e-34f3-99ce-51cbd9b067bf}
-	@Disabled()
 	@Test()
 	void compareToWhenI2NotLessThanL2() {
 		/* Branches:
@@ -1053,19 +913,17 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doReturn(0).when(n2Mock).getNumberOfElements();
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			int result = target.compareTo(n2Mock);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(0));
-				verify(n2Mock).getNumberOfElements();
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		doReturn(2).when(n2Mock).getNumberOfElements();
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		//Act Statement(s)
+		final NullPointerException result = assertThrows(NullPointerException.class, () -> {
+			target.compareTo(n2Mock);
+		});
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, is(notNullValue()));
+			verify(n2Mock).getNumberOfElements();
+		});
 	}
 
 	//Sapient generated method id: ${f15ced91-476f-3118-9347-e6d6fe4e136a}
@@ -1081,21 +939,17 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doReturn(1).when(n2Mock).getNumberOfElements();
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			final NullPointerException result = assertThrows(NullPointerException.class, () -> {
-				target.compareTo(n2Mock);
-			});
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				verify(n2Mock).getNumberOfElements();
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		doReturn(1).when(n2Mock).getNumberOfElements();
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", '-', (Function) null);
+		//Act Statement(s)
+		final NullPointerException result = assertThrows(NullPointerException.class, () -> {
+			target.compareTo(n2Mock);
+		});
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, is(notNullValue()));
+			verify(n2Mock).getNumberOfElements();
+		});
 	}
 
 	//Sapient generated method id: ${155368dd-6252-3895-854f-2166addc2cfe}
@@ -1211,17 +1065,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
-			//Act Statement(s)
-			String result = target.toString();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo("buildToString_charSequence1"));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		ConfigurationPropertyName target = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', (Function) null);
+		//Act Statement(s)
+		String result = target.toString();
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo("buildToString_charSequence1")));
 	}
 
 	//Sapient generated method id: ${bdf9caf2-174d-3c0e-8641-ba714d57898e}
@@ -1381,7 +1229,6 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${711901d4-0ed2-36db-a259-022dbc7b914c}
-	@Disabled()
 	@Test()
 	void of1WhenElementsIsNotNull() {
 		/* Branches:
@@ -1393,7 +1240,9 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Act Statement(s)
-		ConfigurationPropertyName result = ConfigurationPropertyName.of("of_charSequence1", false);
+		final InvalidConfigurationPropertyNameException result = assertThrows(InvalidConfigurationPropertyNameException.class, () -> {
+			ConfigurationPropertyName.of((CharSequence) "of_charSequence1", false);
+		});
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
@@ -1535,19 +1384,13 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			//TODO: Needs initialization with real value
-			Function function = null;
-			//Act Statement(s)
-			ConfigurationPropertyName result = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', function);
-			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.EMPTY;
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(configurationPropertyName));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		//TODO: Needs initialization with real value
+		Function<CharSequence, CharSequence> function = null;
+		//Act Statement(s)
+		ConfigurationPropertyName result = ConfigurationPropertyName.adapt((CharSequence) "adapt_charSequence1", '-', function);
+		ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.EMPTY;
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(configurationPropertyName)));
 	}
 
 	//Sapient generated method id: ${305b99c6-6c7c-3b43-afe8-c1aa84b706e9}
@@ -1561,17 +1404,11 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("adapt_charSequence1", "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			//TODO: Needs initialization with real value
-			Function function = null;
-			//Act Statement(s)
-			ConfigurationPropertyName result = ConfigurationPropertyName.adapt("adapt_charSequence1", 'A', function);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.notNull("adapt_charSequence1", "Name must not be null"), atLeast(1));
-			});
-		}
+		//TODO: Needs initialization with real value
+		Function<CharSequence, CharSequence> function = null;
+		//Act Statement(s)
+		ConfigurationPropertyName result = ConfigurationPropertyName.adapt((CharSequence) "adapt_charSequence1", '.', function);
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 }

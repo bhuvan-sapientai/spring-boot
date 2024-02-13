@@ -55,8 +55,10 @@ class ContextIdApplicationContextInitializerSapientGeneratedTest {
 		doReturn(configurableListableBeanFactoryMock).when(applicationContextMock).getBeanFactory();
 		doNothing().when(configurableListableBeanFactoryMock).registerSingleton("org.springframework.boot.context.ContextIdApplicationContextInitializer$ContextId", contextIdApplicationContextInitializerContextIdMock2);
 		ContextIdApplicationContextInitializer target = new ContextIdApplicationContextInitializer();
+
 		//Act Statement(s)
 		target.initialize(applicationContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			verify(applicationContextMock).getParent();
@@ -71,7 +73,6 @@ class ContextIdApplicationContextInitializerSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${c9214af2-c356-3b67-aa39-5cf69748e8a1}
-	@Disabled()
 	@Test()
 	void initializeWhenStringUtilsHasTextName() throws IllegalStateException {
 		/* Branches:
@@ -95,8 +96,10 @@ class ContextIdApplicationContextInitializerSapientGeneratedTest {
 		doReturn(configurableListableBeanFactoryMock).when(applicationContextMock).getBeanFactory();
 		doNothing().when(configurableListableBeanFactoryMock).registerSingleton(eq("org.springframework.boot.context.ContextIdApplicationContextInitializer$ContextId"), (ContextIdApplicationContextInitializer.ContextId) any());
 		ContextIdApplicationContextInitializer target = new ContextIdApplicationContextInitializer();
+
 		//Act Statement(s)
 		target.initialize(applicationContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			verify(applicationContextMock).getParent();
@@ -110,7 +113,6 @@ class ContextIdApplicationContextInitializerSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${a70a1706-b9e8-3079-9212-e6f202c5b3eb}
-	@Disabled()
 	@Test()
 	void initializeWhenParentNotContainsBeanContextIdGetNameAndStringUtilsNotHasTextName() throws IllegalStateException {
 		/* Branches:

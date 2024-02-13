@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Disabled;
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ValidationBindHandlerSapientGeneratedTest {
 
-	private final BindHandler parentMock = mock(BindHandler.class, "<instance_of_BindHandler>");
+	private final BindHandler parentMock = mock(BindHandler.class, "parent");
 
 	private final ConfigurationPropertyName configurationPropertyNameMock = mock(ConfigurationPropertyName.class);
 
@@ -260,31 +260,34 @@ class ValidationBindHandlerSapientGeneratedTest {
 		 * (result != null) : false  #  inside validateAndPush method
 		 * (context.getDepth() == 0) : true  #  inside validate method
 		 * (this.exception != null) : false  #  inside validate method
+		 *
+		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable<?> targetMock = mock(Bindable.class, "<instance_of_Supplier>");
-		//TODO: Needs to return real value
-		doReturn(null).when(targetMock).getValue();
-		doReturn(resolvableTypeMock).when(targetMock).getBoxedType();
-		doReturn(Object.class).when(resolvableTypeMock).resolve();
-		BindContext contextMock = mock(BindContext.class, "0");
-		doReturn(0).when(contextMock).getDepth();
-		Validator[] validatorArray = new Validator[] {};
-		ValidationBindHandler target = new ValidationBindHandler(parentMock, validatorArray);
-		doNothing().when(parentMock).onFinish((ConfigurationPropertyName) any(), eq(targetMock), eq(contextMock), eq((Object) null));
-		ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("onFinish_configurationPropertyName1-name1");
-		//TODO: Needs initialization with real value
-		Object object = null;
-		//Act Statement(s)
-		target.onFinish(configurationPropertyName, targetMock, contextMock, object);
-		//Assert statement(s)
-		assertAll("result", () -> {
-			verify(targetMock).getValue();
-			verify(targetMock).getBoxedType();
-			verify(resolvableTypeMock).resolve();
-			verify(contextMock, times(2)).getDepth();
-			verify(parentMock).onFinish((ConfigurationPropertyName) any(), eq(targetMock), eq(contextMock), eq((Object) null));
-		});
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			//TODO: Needs to return real value
+			doReturn(null).when(targetMock).getValue();
+			doReturn(resolvableTypeMock).when(targetMock).getBoxedType();
+			doReturn(Object.class).when(resolvableTypeMock).resolve();
+			doReturn(0).when(contextMock).getDepth();
+			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			Validator[] validatorArray = new Validator[] {};
+			ValidationBindHandler target = new ValidationBindHandler(parentMock, validatorArray);
+			doNothing().when(parentMock).onFinish(configurationPropertyNameMock, targetMock, contextMock, (Object) null);
+			Object object = null;
+			//Act Statement(s)
+			target.onFinish(configurationPropertyNameMock, targetMock, contextMock, object);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				verify(targetMock, times(2)).getValue();
+				verify(targetMock).getBoxedType();
+				verify(resolvableTypeMock).resolve();
+				verify(contextMock, times(2)).getDepth();
+				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
+				verify(parentMock).onFinish(configurationPropertyNameMock, targetMock, contextMock, (Object) null);
+			});
+		}
 	}
 
 	//Sapient generated method id: ${ea952770-a9fd-328f-9898-aadf4a5cb5cf}

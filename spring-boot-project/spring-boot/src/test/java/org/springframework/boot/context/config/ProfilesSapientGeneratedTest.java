@@ -70,17 +70,15 @@ class ProfilesSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<CollectionUtils> collectionUtils = mockStatic(CollectionUtils.class, CALLS_REAL_METHODS);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
-			doReturn("return_of_getProperty1").when(environmentMock).getProperty("arg0");
+		try (MockedStatic<CollectionUtils> collectionUtils = mockStatic(CollectionUtils.class, CALLS_REAL_METHODS)) {
+			doReturn("").when(environmentMock).getProperty("arg0");
 			doReturn(bindResultMock).when(binderMock).bind("spring.profiles.group", bindableMock);
 			doReturn(multiValueMapMock).when(bindResultMock).orElseGet((Supplier) any());
 			doReturn(false).when(bindResultMock2).isBound();
 			doReturn(bindResultMock2, bindResultMock3).when(binderMock).bind(eq("name1"), (Bindable) any());
 			doReturn(false).when(bindResultMock3).isBound();
-			stringUtils.when(() -> StringUtils.hasLength("return_of_getProperty1")).thenReturn(false);
 			collectionUtils.when(() -> CollectionUtils.isEmpty(anyCollection())).thenReturn(false);
-			collectionUtils.when(() -> CollectionUtils.isEmpty(anyList())).thenReturn(false);
+			collectionUtils.when(() -> CollectionUtils.isEmpty(anyList())).thenReturn(true);
 			Collection<String> collection = new ArrayList<>();
 			Profiles target = spy(new Profiles(environmentMock, binderMock, collection));
 			List<String> stringList = new ArrayList<>();
@@ -98,7 +96,6 @@ class ProfilesSapientGeneratedTest {
 				verify(binderMock, atLeast(2)).bind(eq("name1"), (Bindable) any());
 				verify(bindResultMock2, atLeast(1)).isBound();
 				verify(bindResultMock3, atLeast(1)).isBound();
-				stringUtils.verify(() -> StringUtils.hasLength("return_of_getProperty1"), atLeast(4));
 				collectionUtils.verify(() -> CollectionUtils.isEmpty(anyCollection()), atLeast(1));
 				collectionUtils.verify(() -> CollectionUtils.isEmpty(anyList()), atLeast(2));
 				verify(target, atLeast(1)).getAccepted();
@@ -117,17 +114,15 @@ class ProfilesSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<CollectionUtils> collectionUtils = mockStatic(CollectionUtils.class, CALLS_REAL_METHODS);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
-			doReturn("return_of_getProperty1").when(environmentMock).getProperty("arg0");
+		try (MockedStatic<CollectionUtils> collectionUtils = mockStatic(CollectionUtils.class, CALLS_REAL_METHODS)) {
+			doReturn("").when(environmentMock).getProperty("arg0");
 			doReturn(bindResultMock).when(binderMock).bind("spring.profiles.group", bindableMock);
 			doReturn(multiValueMapMock).when(bindResultMock).orElseGet((Supplier) any());
 			doReturn(false).when(bindResultMock2).isBound();
 			doReturn(bindResultMock2, bindResultMock3).when(binderMock).bind(eq("name1"), (Bindable) any());
 			doReturn(false).when(bindResultMock3).isBound();
-			stringUtils.when(() -> StringUtils.hasLength("return_of_getProperty1")).thenReturn(false);
 			collectionUtils.when(() -> CollectionUtils.isEmpty(anyCollection())).thenReturn(false);
-			collectionUtils.when(() -> CollectionUtils.isEmpty(anyList())).thenReturn(false);
+			collectionUtils.when(() -> CollectionUtils.isEmpty(anyList())).thenReturn(true);
 			Collection<String> collection = new ArrayList<>();
 			Profiles target = new Profiles(environmentMock, binderMock, collection);
 			//Act Statement(s)
@@ -141,7 +136,6 @@ class ProfilesSapientGeneratedTest {
 				verify(binderMock, atLeast(2)).bind(eq("name1"), (Bindable) any());
 				verify(bindResultMock2, atLeast(1)).isBound();
 				verify(bindResultMock3, atLeast(1)).isBound();
-				stringUtils.verify(() -> StringUtils.hasLength("return_of_getProperty1"), atLeast(4));
 				collectionUtils.verify(() -> CollectionUtils.isEmpty(anyCollection()), atLeast(1));
 				collectionUtils.verify(() -> CollectionUtils.isEmpty(anyList()), atLeast(2));
 			});

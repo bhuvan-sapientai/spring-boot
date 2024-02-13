@@ -233,13 +233,14 @@ class CollectionBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Binder.Context binderContextMock = mock(Binder.Context.class, "AnyBinderContext");
 		CollectionBinder target = new CollectionBinder(binderContextMock);
 		//TODO: Needs initialization with real value
 		Supplier supplier = null;
 		Object object = new Object();
+		Object object2 = new Object();
 		Collection<Object> collection = new ArrayList<>();
 		collection.add(object);
+		collection.add(object2);
 		//Act Statement(s)
 		Collection<Object> result = target.merge(supplier, collection);
 		//Assert statement(s)

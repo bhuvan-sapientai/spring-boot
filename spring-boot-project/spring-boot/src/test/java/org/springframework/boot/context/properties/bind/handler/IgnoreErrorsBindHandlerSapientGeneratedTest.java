@@ -39,14 +39,10 @@ class IgnoreErrorsBindHandlerSapientGeneratedTest {
 	private final Bindable<?> targetMock = mock(Bindable.class);
 
 	//Sapient generated method id: ${57ee638d-d52e-33c5-a86e-20fbc238e620}
-	@Disabled()
 	@Test()
 	void onFailureWhenTargetGetValueIsNotNull() throws Exception {
 		/* Branches:
 		 * (target.getValue() != null) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
@@ -57,12 +53,10 @@ class IgnoreErrorsBindHandlerSapientGeneratedTest {
 			Exception exception = new Exception();
 			//Act Statement(s)
 			Object result = target.onFailure(configurationPropertyNameMock, targetMock, bindContextMock, exception);
-			Object object = new Object();
 			//Assert statement(s)
-			//TODO: Please implement equals method in Object for verification to succeed or you need to adjust respective assertion statements
 			assertAll("result", () -> {
-				assertThat(result, equalTo(object));
-				verify(targetMock, times(2)).getValue();
+				assertThat(result, is(nullValue()));
+				verify(targetMock).getValue();
 				_assert.verify(() -> Assert.notNull(bindHandlerMock, "Parent must not be null"), atLeast(1));
 			});
 		}

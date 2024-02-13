@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Disabled;
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class BinderSapientGeneratedTest {
 
-	private final PlaceholdersResolver placeholdersResolverMock = mock(PlaceholdersResolver.class, "null");
+	private final PlaceholdersResolver placeholdersResolverMock = mock(PlaceholdersResolver.class, "placeholdersResolver");
 
 	private final BindConverter bindConverterMock = mock(BindConverter.class);
 
@@ -75,6 +75,8 @@ class BinderSapientGeneratedTest {
 
 	private final Bindable<Object> targetMock = mock(Bindable.class);
 
+	private final BindHandler bindHandlerMock2 = mock(BindHandler.class);
+
 	//Sapient generated method id: ${8fc74088-730a-3b45-8f04-76935a2d0dbc}
 	@Disabled()
 	@Test()
@@ -84,20 +86,29 @@ class BinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConversionService conversionServiceMock = mock(ConversionService.class, "null");
-		BindHandler bindHandlerMock = mock(BindHandler.class, "null");
+		BindConverter bindConverterMock = mock(BindConverter.class, "BindConverter");
 		BindResult bindResultMock = mock(BindResult.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
+			 MockedStatic<BindConverter> bindConverter = mockStatic(BindConverter.class);
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((Iterable) null, "Sources must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements")).thenAnswer((Answer<Void>) invocation -> null);
+			bindConverter.when(() -> BindConverter.get(anyList(), eq((Consumer) null))).thenReturn(bindConverterMock);
+			Object object = new Object();
+			Bindable bindable2 = Bindable.ofInstance(object);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindable2);
 			Binder target = spy(new Binder((Iterable) null, placeholdersResolverMock, conversionServiceMock, (Consumer) null, bindHandlerMock, (BindConstructorProvider) null));
-			doReturn(bindResultMock).when(target).bind(eq("Binder"), (Bindable) any());
+			doReturn(bindResultMock).when(target).bind(eq("<value>"), (Bindable) any());
 			//Act Statement(s)
-			BindResult result = target.bind("Binder", Object.class);
+			BindResult result = target.bind("<value>", Object.class);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(bindResultMock));
 				_assert.verify(() -> Assert.notNull((Iterable) null, "Sources must not be null"), atLeast(1));
-				verify(target).bind(eq("Binder"), (Bindable) any());
+				_assert.verify(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements"), atLeast(1));
+				bindConverter.verify(() -> BindConverter.get(anyList(), eq((Consumer) null)));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(target).bind(eq("<value>"), (Bindable) any());
 			});
 		}
 	}
@@ -112,25 +123,22 @@ class BinderSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		BindResult bindResultMock = mock(BindResult.class);
-		try (MockedStatic<ConfigurationPropertyName> configurationPropertyName = mockStatic(ConfigurationPropertyName.class);
-			 MockedStatic<BindConverter> bindConverter = mockStatic(BindConverter.class);
+		try (MockedStatic<BindConverter> bindConverter = mockStatic(BindConverter.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((Iterable) null, "Sources must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements")).thenAnswer((Answer<Void>) invocation -> null);
 			bindConverter.when(() -> BindConverter.get(anyList(), eq((Consumer) null))).thenReturn(bindConverterMock);
-			configurationPropertyName.when(() -> ConfigurationPropertyName.of("name1")).thenReturn(configurationPropertyNameMock);
 			Binder target = spy(new Binder((Iterable) null, placeholdersResolverMock, conversionServiceMock, (Consumer) null, bindHandlerMock, (BindConstructorProvider) null));
-			doReturn(bindResultMock).when(target).bind(configurationPropertyNameMock, bindableMock, (BindHandler) null);
+			doReturn(bindResultMock).when(target).bind((ConfigurationPropertyName) any(), eq(bindableMock), eq((BindHandler) null));
 			//Act Statement(s)
-			BindResult result = target.bind("name1", bindableMock);
+			BindResult result = target.bind("binder", bindableMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(bindResultMock));
 				_assert.verify(() -> Assert.notNull((Iterable) null, "Sources must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements"), atLeast(1));
 				bindConverter.verify(() -> BindConverter.get(anyList(), eq((Consumer) null)));
-				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("name1"), atLeast(1));
-				verify(target).bind(configurationPropertyNameMock, bindableMock, (BindHandler) null);
+				verify(target).bind((ConfigurationPropertyName) any(), eq(bindableMock), eq((BindHandler) null));
 			});
 		}
 	}
@@ -144,6 +152,7 @@ class BinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		BindConverter bindConverterMock = mock(BindConverter.class, "BindConverter");
 		BindResult bindResultMock = mock(BindResult.class);
 		try (MockedStatic<BindConverter> bindConverter = mockStatic(BindConverter.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
@@ -174,25 +183,27 @@ class BinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConversionService conversionServiceMock = mock(ConversionService.class, "null");
-		BindHandler bindHandlerMock = mock(BindHandler.class, "null");
+		BindConverter bindConverterMock = mock(BindConverter.class, "BindConverter");
 		BindResult bindResultMock = mock(BindResult.class);
-		Bindable<Object> bindableMock = mock(Bindable.class, "void");
-		BindHandler bindHandlerMock2 = mock(BindHandler.class, "null");
 		try (MockedStatic<ConfigurationPropertyName> configurationPropertyName = mockStatic(ConfigurationPropertyName.class);
+			 MockedStatic<BindConverter> bindConverter = mockStatic(BindConverter.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((Iterable) null, "Sources must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements")).thenAnswer((Answer<Void>) invocation -> null);
+			bindConverter.when(() -> BindConverter.get(anyList(), eq((Consumer) null))).thenReturn(bindConverterMock);
 			ConfigurationPropertyName configurationPropertyName2 = ConfigurationPropertyName.of("bind_configurationPropertyName1-name1");
-			configurationPropertyName.when(() -> ConfigurationPropertyName.of("Binder")).thenReturn(configurationPropertyName2);
+			configurationPropertyName.when(() -> ConfigurationPropertyName.of("test")).thenReturn(configurationPropertyName2);
 			Binder target = spy(new Binder((Iterable) null, placeholdersResolverMock, conversionServiceMock, (Consumer) null, bindHandlerMock, (BindConstructorProvider) null));
 			doReturn(bindResultMock).when(target).bind((ConfigurationPropertyName) any(), eq(bindableMock), eq(bindHandlerMock2));
 			//Act Statement(s)
-			BindResult result = target.bind("Binder", bindableMock, bindHandlerMock2);
+			BindResult result = target.bind("test", bindableMock, bindHandlerMock2);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(bindResultMock));
 				_assert.verify(() -> Assert.notNull((Iterable) null, "Sources must not be null"), atLeast(1));
-				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("Binder"), atLeast(1));
+				_assert.verify(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements"), atLeast(1));
+				bindConverter.verify(() -> BindConverter.get(anyList(), eq((Consumer) null)));
+				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("test"), atLeast(1));
 				verify(target).bind((ConfigurationPropertyName) any(), eq(bindableMock), eq(bindHandlerMock2));
 			});
 		}
@@ -1120,26 +1131,29 @@ class BinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		BindConverter bindConverterMock = mock(BindConverter.class, "BindConverter");
 		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<BindConverter> bindConverter = mockStatic(BindConverter.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((Iterable) null, "Sources must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements")).thenAnswer((Answer<Void>) invocation -> null);
 			bindConverter.when(() -> BindConverter.get(anyList(), eq((Consumer) null))).thenReturn(bindConverterMock);
-			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
-			Binder target = spy(new Binder((Iterable) null, placeholdersResolverMock, conversionServiceMock, (Consumer) null, bindHandlerMock, (BindConstructorProvider) null));
 			Object object = new Object();
-			doReturn(object).when(target).bindOrCreate("name1", bindableMock);
+			Bindable bindable2 = Bindable.ofInstance(object);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindable2);
+			Binder target = spy(new Binder((Iterable) null, placeholdersResolverMock, conversionServiceMock, (Consumer) null, bindHandlerMock, (BindConstructorProvider) null));
+			Object object2 = new Object();
+			doReturn(object2).when(target).bindOrCreate(eq("test"), (Bindable) any());
 			//Act Statement(s)
-			Object result = target.bindOrCreate("name1", Object.class);
+			Object result = target.bindOrCreate("test", Object.class);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, equalTo(object));
+				assertThat(result, equalTo(object2));
 				_assert.verify(() -> Assert.notNull((Iterable) null, "Sources must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements"), atLeast(1));
 				bindConverter.verify(() -> BindConverter.get(anyList(), eq((Consumer) null)));
 				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
-				verify(target).bindOrCreate("name1", bindableMock);
+				verify(target).bindOrCreate(eq("test"), (Bindable) any());
 			});
 		}
 	}
@@ -1153,26 +1167,28 @@ class BinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		BindConverter bindConverterMock = mock(BindConverter.class, "BindConverter");
 		try (MockedStatic<ConfigurationPropertyName> configurationPropertyName = mockStatic(ConfigurationPropertyName.class);
 			 MockedStatic<BindConverter> bindConverter = mockStatic(BindConverter.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((Iterable) null, "Sources must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements")).thenAnswer((Answer<Void>) invocation -> null);
 			bindConverter.when(() -> BindConverter.get(anyList(), eq((Consumer) null))).thenReturn(bindConverterMock);
-			configurationPropertyName.when(() -> ConfigurationPropertyName.of("name1")).thenReturn(configurationPropertyNameMock);
+			ConfigurationPropertyName configurationPropertyName2 = ConfigurationPropertyName.of("bindOrCreate_configurationPropertyName1-name1");
+			configurationPropertyName.when(() -> ConfigurationPropertyName.of("test")).thenReturn(configurationPropertyName2);
 			Binder target = spy(new Binder((Iterable) null, placeholdersResolverMock, conversionServiceMock, (Consumer) null, bindHandlerMock, (BindConstructorProvider) null));
 			Object object = new Object();
-			doReturn(object).when(target).bindOrCreate(configurationPropertyNameMock, bindableMock, (BindHandler) null);
+			doReturn(object).when(target).bindOrCreate((ConfigurationPropertyName) any(), eq(bindableMock), eq((BindHandler) null));
 			//Act Statement(s)
-			Object result = target.bindOrCreate("name1", bindableMock);
+			Object result = target.bindOrCreate("test", bindableMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(object));
 				_assert.verify(() -> Assert.notNull((Iterable) null, "Sources must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements"), atLeast(1));
 				bindConverter.verify(() -> BindConverter.get(anyList(), eq((Consumer) null)));
-				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("name1"), atLeast(1));
-				verify(target).bindOrCreate(configurationPropertyNameMock, bindableMock, (BindHandler) null);
+				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("test"), atLeast(1));
+				verify(target).bindOrCreate((ConfigurationPropertyName) any(), eq(bindableMock), eq((BindHandler) null));
 			});
 		}
 	}
@@ -1186,27 +1202,28 @@ class BinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		BindHandler bindHandlerMock2 = mock(BindHandler.class);
+		BindConverter bindConverterMock = mock(BindConverter.class, "BindConverter");
 		try (MockedStatic<ConfigurationPropertyName> configurationPropertyName = mockStatic(ConfigurationPropertyName.class);
 			 MockedStatic<BindConverter> bindConverter = mockStatic(BindConverter.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((Iterable) null, "Sources must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements")).thenAnswer((Answer<Void>) invocation -> null);
 			bindConverter.when(() -> BindConverter.get(anyList(), eq((Consumer) null))).thenReturn(bindConverterMock);
-			configurationPropertyName.when(() -> ConfigurationPropertyName.of("name1")).thenReturn(configurationPropertyNameMock);
+			ConfigurationPropertyName configurationPropertyName2 = ConfigurationPropertyName.of("bindOrCreate_configurationPropertyName1-name1");
+			configurationPropertyName.when(() -> ConfigurationPropertyName.of("<value>")).thenReturn(configurationPropertyName2);
 			Binder target = spy(new Binder((Iterable) null, placeholdersResolverMock, conversionServiceMock, (Consumer) null, bindHandlerMock, (BindConstructorProvider) null));
 			Object object = new Object();
-			doReturn(object).when(target).bindOrCreate(configurationPropertyNameMock, bindableMock, bindHandlerMock2);
+			doReturn(object).when(target).bindOrCreate((ConfigurationPropertyName) any(), eq(bindableMock), eq(bindHandlerMock2));
 			//Act Statement(s)
-			Object result = target.bindOrCreate("name1", bindableMock, bindHandlerMock2);
+			Object result = target.bindOrCreate("<value>", bindableMock, bindHandlerMock2);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(object));
 				_assert.verify(() -> Assert.notNull((Iterable) null, "Sources must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(configurationPropertySourceMock, "Sources must not contain null elements"), atLeast(1));
 				bindConverter.verify(() -> BindConverter.get(anyList(), eq((Consumer) null)));
-				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("name1"), atLeast(1));
-				verify(target).bindOrCreate(configurationPropertyNameMock, bindableMock, bindHandlerMock2);
+				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("<value>"), atLeast(1));
+				verify(target).bindOrCreate((ConfigurationPropertyName) any(), eq(bindableMock), eq(bindHandlerMock2));
 			});
 		}
 	}

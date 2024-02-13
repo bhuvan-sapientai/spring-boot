@@ -802,14 +802,13 @@ class ValueObjectBinderSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
-		Object object = new Object();
-		Bindable bindable = Bindable.ofInstance(object);
+		Bindable<Object> bindableMock = mock(Bindable.class, "java.lang.String");
 		//Act Statement(s)
-		Object result = target.create(bindable, binderContextMock);
-		Object object2 = new Object();
+		Object result = target.create(bindableMock, binderContextMock);
+		Object object = new Object();
 		//Assert statement(s)
 		//TODO: Please implement equals method in Object for verification to succeed or you need to adjust respective assertion statements
-		assertAll("result", () -> assertThat(result, equalTo(object2)));
+		assertAll("result", () -> assertThat(result, equalTo(object)));
 	}
 
 	//Sapient generated method id: ${f7a9c911-158c-3edf-9684-e66e05956f1e}
@@ -828,21 +827,20 @@ class ValueObjectBinderSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		doReturn(bindConverterMock).when(contextMock).getConverter();
-		Object object = new Object();
 		String[] stringArray = new String[] { "return_of_valueItem1" };
 		Annotation[] annotationArray = new Annotation[] { defaultValueMock };
-		doReturn(object).when(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
+		//TODO: Needs to return real value
+		doReturn(null).when(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
 		doReturn(stringArray).when(defaultValueMock).value();
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
-		Object object2 = new Object();
-		Bindable bindable = Bindable.ofInstance(object2);
+		Bindable<Object> bindableMock = mock(Bindable.class, "<Object>");
 		//Act Statement(s)
-		Object result = target.create(bindable, contextMock);
-		Object object3 = new Object();
+		Object result = target.create(bindableMock, contextMock);
+		Object object = new Object();
 		//Assert statement(s)
 		//TODO: Please implement equals method in Object for verification to succeed or you need to adjust respective assertion statements
 		assertAll("result", () -> {
-			assertThat(result, equalTo(object3));
+			assertThat(result, equalTo(object));
 			verify(contextMock).getConverter();
 			verify(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
 			verify(defaultValueMock).value();
@@ -1324,10 +1322,9 @@ class ValueObjectBinderSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
-		Object object = new Object();
-		Bindable bindable = Bindable.ofInstance(object);
+		Bindable<Object> bindableMock = mock(Bindable.class, "<value>");
 		RuntimeException runtimeException = new RuntimeException();
 		//Act Statement(s)
-		target.onUnableToCreateInstance(bindable, binderContextMock, runtimeException);
+		target.onUnableToCreateInstance(bindableMock, binderContextMock, runtimeException);
 	}
 }

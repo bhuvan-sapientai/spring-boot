@@ -574,11 +574,11 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		ConfigDataLocation configDataLocationMock = mock(ConfigDataLocation.class, "<init>_configDataLocation1");
 		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class, "<init>_configDataResource1");
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
-		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.EMPTY_LOCATION, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
 		//Act Statement(s)
 		String result = target.toString();
 		//Assert statement(s)
-		assertAll("result", () -> assertThat(result, equalTo("EMPTY_LOCATION <init>_configDataLocation1 <init>_configDataResource1 <init>_configData.Options1\n")));
+		assertAll("result", () -> assertThat(result, equalTo("ROOT <init>_configDataLocation1 <init>_configDataResource1 <init>_configData.Options1\n")));
 	}
 
 	//Sapient generated method id: ${2e242bfc-9175-3742-b63c-1cb781c17d38}
