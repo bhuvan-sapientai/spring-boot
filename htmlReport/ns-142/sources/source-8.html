@@ -1,0 +1,199 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RemoteHttpClientTransport</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.transport</a>
+</div>
+
+<h1>Coverage Summary for Class: RemoteHttpClientTransport (org.springframework.boot.buildpack.platform.docker.transport)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoteHttpClientTransport</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.transport;
+&nbsp;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import javax.net.ssl.SSLContext;
+&nbsp;
+&nbsp;import org.apache.hc.client5.http.classic.HttpClient;
+&nbsp;import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+&nbsp;import org.apache.hc.client5.http.impl.classic.HttpClients;
+&nbsp;import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+&nbsp;import org.apache.hc.client5.http.socket.LayeredConnectionSocketFactory;
+&nbsp;import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+&nbsp;import org.apache.hc.core5.http.HttpHost;
+&nbsp;import org.apache.hc.core5.http.io.SocketConfig;
+&nbsp;import org.apache.hc.core5.util.Timeout;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.configuration.DockerHost;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.configuration.ResolvedDockerHost;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.ssl.SslContextFactory;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link HttpClientTransport} that talks to a remote Docker.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;final class RemoteHttpClientTransport extends HttpClientTransport {
+&nbsp;
+<b class="nc">&nbsp;	private static final Timeout SOCKET_TIMEOUT = Timeout.of(30, TimeUnit.MINUTES);</b>
+&nbsp;
+&nbsp;	private RemoteHttpClientTransport(HttpClient client, HttpHost host) {
+<b class="nc">&nbsp;		super(client, host);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static RemoteHttpClientTransport createIfPossible(ResolvedDockerHost dockerHost) {
+<b class="nc">&nbsp;		return createIfPossible(dockerHost, new SslContextFactory());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static RemoteHttpClientTransport createIfPossible(ResolvedDockerHost dockerHost,
+&nbsp;			SslContextFactory sslContextFactory) {
+<b class="nc">&nbsp;		if (!dockerHost.isRemote()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return create(dockerHost, sslContextFactory, HttpHost.create(dockerHost.getAddress()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (URISyntaxException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static RemoteHttpClientTransport create(DockerHost host, SslContextFactory sslContextFactory,
+&nbsp;			HttpHost tcpHost) {
+<b class="nc">&nbsp;		SocketConfig socketConfig = SocketConfig.copy(SocketConfig.DEFAULT).setSoTimeout(SOCKET_TIMEOUT).build();</b>
+&nbsp;		PoolingHttpClientConnectionManagerBuilder connectionManagerBuilder = PoolingHttpClientConnectionManagerBuilder
+<b class="nc">&nbsp;			.create()</b>
+<b class="nc">&nbsp;			.setDefaultSocketConfig(socketConfig);</b>
+<b class="nc">&nbsp;		if (host.isSecure()) {</b>
+<b class="nc">&nbsp;			connectionManagerBuilder.setSSLSocketFactory(getSecureConnectionSocketFactory(host, sslContextFactory));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		HttpClientBuilder builder = HttpClients.custom();</b>
+<b class="nc">&nbsp;		builder.setConnectionManager(connectionManagerBuilder.build());</b>
+<b class="nc">&nbsp;		String scheme = host.isSecure() ? &quot;https&quot; : &quot;http&quot;;</b>
+<b class="nc">&nbsp;		HttpHost httpHost = new HttpHost(scheme, tcpHost.getHostName(), tcpHost.getPort());</b>
+<b class="nc">&nbsp;		return new RemoteHttpClientTransport(builder.build(), httpHost);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static LayeredConnectionSocketFactory getSecureConnectionSocketFactory(DockerHost host,
+&nbsp;			SslContextFactory sslContextFactory) {
+<b class="nc">&nbsp;		String directory = host.getCertificatePath();</b>
+<b class="nc">&nbsp;		Assert.hasText(directory,</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Docker host TLS verification requires trust material location to be specified with certificate path&quot;);</b>
+<b class="nc">&nbsp;		SSLContext sslContext = sslContextFactory.forDirectory(directory);</b>
+<b class="nc">&nbsp;		return new SSLConnectionSocketFactory(sslContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

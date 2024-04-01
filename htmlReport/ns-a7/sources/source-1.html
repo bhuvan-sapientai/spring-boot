@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConnectionFactoryHealthIndicator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.r2dbc</a>
+</div>
+
+<h1>Coverage Summary for Class: ConnectionFactoryHealthIndicator (org.springframework.boot.actuate.r2dbc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConnectionFactoryHealthIndicator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.r2dbc;
+&nbsp;
+&nbsp;import io.r2dbc.spi.Connection;
+&nbsp;import io.r2dbc.spi.ConnectionFactory;
+&nbsp;import io.r2dbc.spi.Row;
+&nbsp;import io.r2dbc.spi.RowMetadata;
+&nbsp;import io.r2dbc.spi.ValidationDepth;
+&nbsp;import reactor.core.publisher.Flux;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.health.AbstractReactiveHealthIndicator;
+&nbsp;import org.springframework.boot.actuate.health.Health;
+&nbsp;import org.springframework.boot.actuate.health.Health.Builder;
+&nbsp;import org.springframework.boot.actuate.health.HealthIndicator;
+&nbsp;import org.springframework.boot.actuate.health.Status;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link HealthIndicator} to validate a R2DBC {@link ConnectionFactory}.
+&nbsp; *
+&nbsp; * @author Mark Paluch
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class ConnectionFactoryHealthIndicator extends AbstractReactiveHealthIndicator {
+&nbsp;
+&nbsp;	private final ConnectionFactory connectionFactory;
+&nbsp;
+&nbsp;	private final String validationQuery;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConnectionFactoryHealthIndicator} using the specified
+&nbsp;	 * {@link ConnectionFactory} and no validation query.
+&nbsp;	 * @param connectionFactory the connection factory
+&nbsp;	 * @see Connection#validate(ValidationDepth)
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryHealthIndicator(ConnectionFactory connectionFactory) {
+<b class="nc">&nbsp;		this(connectionFactory, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConnectionFactoryHealthIndicator} using the specified
+&nbsp;	 * {@link ConnectionFactory} and validation query.
+&nbsp;	 * @param connectionFactory the connection factory
+&nbsp;	 * @param validationQuery the validation query, can be {@code null} to use connection
+&nbsp;	 * validation
+&nbsp;	 */
+<b class="nc">&nbsp;	public ConnectionFactoryHealthIndicator(ConnectionFactory connectionFactory, String validationQuery) {</b>
+<b class="nc">&nbsp;		Assert.notNull(connectionFactory, &quot;ConnectionFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.connectionFactory = connectionFactory;</b>
+<b class="nc">&nbsp;		this.validationQuery = validationQuery;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected final Mono&lt;Health&gt; doHealthCheck(Builder builder) {
+<b class="nc">&nbsp;		return validate(builder).defaultIfEmpty(builder.build())</b>
+<b class="nc">&nbsp;			.onErrorResume(Exception.class, (ex) -&gt; Mono.just(builder.down(ex).build()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;Health&gt; validate(Builder builder) {
+<b class="nc">&nbsp;		builder.withDetail(&quot;database&quot;, this.connectionFactory.getMetadata().getName());</b>
+<b class="nc">&nbsp;		return (StringUtils.hasText(this.validationQuery)) ? validateWithQuery(builder)</b>
+<b class="nc">&nbsp;				: validateWithConnectionValidation(builder);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;Health&gt; validateWithQuery(Builder builder) {
+<b class="nc">&nbsp;		builder.withDetail(&quot;validationQuery&quot;, this.validationQuery);</b>
+<b class="nc">&nbsp;		Mono&lt;Object&gt; connectionValidation = Mono.usingWhen(this.connectionFactory.create(),</b>
+<b class="nc">&nbsp;				(conn) -&gt; Flux.from(conn.createStatement(this.validationQuery).execute())</b>
+<b class="nc">&nbsp;					.flatMap((it) -&gt; it.map(this::extractResult))</b>
+<b class="nc">&nbsp;					.next(),</b>
+<b class="nc">&nbsp;				Connection::close, (o, throwable) -&gt; o.close(), Connection::close);</b>
+<b class="nc">&nbsp;		return connectionValidation.map((result) -&gt; builder.up().withDetail(&quot;result&quot;, result).build());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;Health&gt; validateWithConnectionValidation(Builder builder) {
+<b class="nc">&nbsp;		builder.withDetail(&quot;validationQuery&quot;, &quot;validate(REMOTE)&quot;);</b>
+<b class="nc">&nbsp;		Mono&lt;Boolean&gt; connectionValidation = Mono.usingWhen(this.connectionFactory.create(),</b>
+<b class="nc">&nbsp;				(connection) -&gt; Mono.from(connection.validate(ValidationDepth.REMOTE)), Connection::close,</b>
+<b class="nc">&nbsp;				(connection, ex) -&gt; connection.close(), Connection::close);</b>
+<b class="nc">&nbsp;		return connectionValidation.map((valid) -&gt; builder.status((valid) ? Status.UP : Status.DOWN).build());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object extractResult(Row row, RowMetadata metadata) {
+<b class="nc">&nbsp;		return row.get(metadata.getColumnMetadatas().iterator().next().getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

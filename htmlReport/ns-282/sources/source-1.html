@@ -1,0 +1,289 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApplicationPluginAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.plugin</a>
+</div>
+
+<h1>Coverage Summary for Class: ApplicationPluginAction (org.springframework.boot.gradle.plugin)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApplicationPluginAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ApplicationPluginAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.plugin;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.GradleException;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.distribution.Distribution;
+&nbsp;import org.gradle.api.distribution.DistributionContainer;
+&nbsp;import org.gradle.api.file.CopySpec;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.plugins.ApplicationPlugin;
+&nbsp;import org.gradle.api.plugins.JavaApplication;
+&nbsp;import org.gradle.api.tasks.TaskContainer;
+&nbsp;import org.gradle.api.tasks.TaskProvider;
+&nbsp;import org.gradle.jvm.application.scripts.TemplateBasedScriptGenerator;
+&nbsp;import org.gradle.jvm.application.tasks.CreateStartScripts;
+&nbsp;import org.gradle.util.GradleVersion;
+&nbsp;
+&nbsp;import org.springframework.boot.gradle.tasks.run.BootRun;
+&nbsp;
+&nbsp;/**
+&nbsp; * Action that is executed in response to the {@link ApplicationPlugin} being applied.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;final class ApplicationPluginAction implements PluginApplicationAction {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void execute(Project project) {
+<b class="nc">&nbsp;		JavaApplication javaApplication = project.getExtensions().getByType(JavaApplication.class);</b>
+<b class="nc">&nbsp;		DistributionContainer distributions = project.getExtensions().getByType(DistributionContainer.class);</b>
+<b class="nc">&nbsp;		Distribution distribution = distributions.create(&quot;boot&quot;);</b>
+<b class="nc">&nbsp;		distribution.getDistributionBaseName()</b>
+<b class="nc">&nbsp;			.convention((project.provider(() -&gt; javaApplication.getApplicationName() + &quot;-boot&quot;)));</b>
+<b class="nc">&nbsp;		TaskProvider&lt;CreateStartScripts&gt; bootStartScripts = project.getTasks()</b>
+<b class="nc">&nbsp;			.register(&quot;bootStartScripts&quot;, CreateStartScripts.class,</b>
+<b class="nc">&nbsp;					(task) -&gt; configureCreateStartScripts(project, javaApplication, distribution, task));</b>
+<b class="nc">&nbsp;		CopySpec binCopySpec = project.copySpec().into(&quot;bin&quot;).from(bootStartScripts);</b>
+<b class="nc">&nbsp;		configureFilePermissions(binCopySpec, 0755);</b>
+<b class="nc">&nbsp;		distribution.getContents().with(binCopySpec);</b>
+<b class="nc">&nbsp;		applyApplicationDefaultJvmArgsToRunTasks(project.getTasks(), javaApplication);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyApplicationDefaultJvmArgsToRunTasks(TaskContainer tasks, JavaApplication javaApplication) {
+<b class="nc">&nbsp;		applyApplicationDefaultJvmArgsToRunTask(tasks, javaApplication, SpringBootPlugin.BOOT_RUN_TASK_NAME);</b>
+<b class="nc">&nbsp;		applyApplicationDefaultJvmArgsToRunTask(tasks, javaApplication, SpringBootPlugin.BOOT_TEST_RUN_TASK_NAME);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyApplicationDefaultJvmArgsToRunTask(TaskContainer tasks, JavaApplication javaApplication,
+&nbsp;			String taskName) {
+<b class="nc">&nbsp;		tasks.named(taskName, BootRun.class)</b>
+<b class="nc">&nbsp;			.configure((bootRun) -&gt; bootRun.getConventionMapping()</b>
+<b class="nc">&nbsp;				.map(&quot;jvmArgs&quot;, javaApplication::getApplicationDefaultJvmArgs));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureCreateStartScripts(Project project, JavaApplication javaApplication,
+&nbsp;			Distribution distribution, CreateStartScripts createStartScripts) {
+<b class="nc">&nbsp;		createStartScripts</b>
+<b class="nc">&nbsp;			.setDescription(&quot;Generates OS-specific start scripts to run the project as a Spring Boot application.&quot;);</b>
+<b class="nc">&nbsp;		((TemplateBasedScriptGenerator) createStartScripts.getUnixStartScriptGenerator())</b>
+<b class="nc">&nbsp;			.setTemplate(project.getResources().getText().fromString(loadResource(&quot;/unixStartScript.txt&quot;)));</b>
+<b class="nc">&nbsp;		((TemplateBasedScriptGenerator) createStartScripts.getWindowsStartScriptGenerator())</b>
+<b class="nc">&nbsp;			.setTemplate(project.getResources().getText().fromString(loadResource(&quot;/windowsStartScript.txt&quot;)));</b>
+<b class="nc">&nbsp;		project.getConfigurations().all((configuration) -&gt; {</b>
+<b class="nc">&nbsp;			if (&quot;bootArchives&quot;.equals(configuration.getName())) {</b>
+<b class="nc">&nbsp;				distribution.getContents().with(artifactFilesToLibCopySpec(project, configuration));</b>
+<b class="nc">&nbsp;				createStartScripts.setClasspath(configuration.getArtifacts().getFiles());</b>
+&nbsp;			}
+&nbsp;		});
+<b class="nc">&nbsp;		createStartScripts.getConventionMapping()</b>
+<b class="nc">&nbsp;			.map(&quot;outputDir&quot;, () -&gt; project.getLayout().getBuildDirectory().dir(&quot;bootScripts&quot;).get().getAsFile());</b>
+<b class="nc">&nbsp;		createStartScripts.getConventionMapping().map(&quot;applicationName&quot;, javaApplication::getApplicationName);</b>
+<b class="nc">&nbsp;		createStartScripts.getConventionMapping().map(&quot;defaultJvmOpts&quot;, javaApplication::getApplicationDefaultJvmArgs);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CopySpec artifactFilesToLibCopySpec(Project project, Configuration configuration) {
+<b class="nc">&nbsp;		CopySpec copySpec = project.copySpec().into(&quot;lib&quot;).from(artifactFiles(configuration));</b>
+<b class="nc">&nbsp;		configureFilePermissions(copySpec, 0644);</b>
+<b class="nc">&nbsp;		return copySpec;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Callable&lt;FileCollection&gt; artifactFiles(Configuration configuration) {
+<b class="nc">&nbsp;		return () -&gt; configuration.getArtifacts().getFiles();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;? extends Plugin&lt;Project&gt;&gt; getPluginClass() {
+<b class="nc">&nbsp;		return ApplicationPlugin.class;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String loadResource(String name) {
+<b class="nc">&nbsp;		try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream(name))) {</b>
+<b class="nc">&nbsp;			char[] buffer = new char[4096];</b>
+&nbsp;			int read;
+<b class="nc">&nbsp;			StringWriter writer = new StringWriter();</b>
+<b class="nc">&nbsp;			while ((read = reader.read(buffer)) &gt; 0) {</b>
+<b class="nc">&nbsp;				writer.write(buffer, 0, read);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return writer.toString();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new GradleException(&quot;Failed to read &#39;&quot; + name + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureFilePermissions(CopySpec copySpec, int mode) {
+<b class="nc">&nbsp;		if (GradleVersion.current().compareTo(GradleVersion.version(&quot;8.3&quot;)) &gt;= 0) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Method filePermissions = copySpec.getClass().getMethod(&quot;filePermissions&quot;, Action.class);</b>
+<b class="nc">&nbsp;				filePermissions.invoke(copySpec, new Action&lt;&gt;() {</b>
+&nbsp;
+&nbsp;					@Override
+&nbsp;					public void execute(Object filePermissions) {
+<b class="nc">&nbsp;						String unixPermissions = Integer.toString(mode, 8);</b>
+&nbsp;						try {
+<b class="nc">&nbsp;							Method unix = filePermissions.getClass().getMethod(&quot;unix&quot;, String.class);</b>
+<b class="nc">&nbsp;							unix.invoke(filePermissions, unixPermissions);</b>
+&nbsp;						}
+<b class="nc">&nbsp;						catch (Exception ex) {</b>
+<b class="nc">&nbsp;							throw new GradleException(&quot;Failed to set file permissions to &#39;&quot; + unixPermissions + &quot;&#39;&quot;,</b>
+&nbsp;									ex);
+<b class="nc">&nbsp;						}</b>
+&nbsp;					}
+&nbsp;
+&nbsp;				});
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new GradleException(&quot;Failed to set file permissions&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			copySpec.setFileMode(mode);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

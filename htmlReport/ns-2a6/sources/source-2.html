@@ -1,0 +1,330 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CorrelationIdFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: CorrelationIdFormatter (org.springframework.boot.logging)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CorrelationIdFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CorrelationIdFormatter$Part</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.logging;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.function.UnaryOperator;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility class that can be used to format a correlation identifier for logging based on
+&nbsp; * &lt;a href=
+&nbsp; * &quot;https://www.w3.org/TR/trace-context/#examples-of-http-traceparent-headers&quot;&gt;W3C&lt;/a&gt;
+&nbsp; * recommendations.
+&nbsp; * &lt;p&gt;
+&nbsp; * The formatter can be configured with a comma-separated list of names and the expected
+&nbsp; * length of their resolved value. Each item should be specified in the form
+&nbsp; * {@code &quot;&lt;name&gt;(length)&quot;}. For example, {@code &quot;traceId(32),spanId(16)&quot;} specifies the
+&nbsp; * names {@code &quot;traceId&quot;} and {@code &quot;spanId&quot;} with expected lengths of {@code 32} and
+&nbsp; * {@code 16} respectively.
+&nbsp; * &lt;p&gt;
+&nbsp; * Correlation IDs are formatted as dash separated strings surrounded in square brackets.
+&nbsp; * Formatted output is always of a fixed width and with trailing space. Dashes are omitted
+&nbsp; * if none of the named items can be resolved.
+&nbsp; * &lt;p&gt;
+&nbsp; * The following example would return a formatted result of
+&nbsp; * {@code &quot;[01234567890123456789012345678901-0123456789012345] &quot;}: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * CorrelationIdFormatter formatter = CorrelationIdFormatter.of(&quot;traceId(32),spanId(16)&quot;);
+&nbsp; * Map&amp;lt;String, String&amp;gt; mdc = Map.of(&quot;traceId&quot;, &quot;01234567890123456789012345678901&quot;, &quot;spanId&quot;, &quot;0123456789012345&quot;);
+&nbsp; * return formatter.format(mdc::get);
+&nbsp; * &lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * If {@link #of(String)} is called with an empty spec the {@link #DEFAULT} formatter will
+&nbsp; * be used.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.2.0
+&nbsp; * @see #of(String)
+&nbsp; * @see #of(Collection)
+&nbsp; */
+&nbsp;public final class CorrelationIdFormatter {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Default {@link CorrelationIdFormatter}.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static final CorrelationIdFormatter DEFAULT = CorrelationIdFormatter.of(&quot;traceId(32),spanId(16)&quot;);</b>
+&nbsp;
+&nbsp;	private final List&lt;Part&gt; parts;
+&nbsp;
+&nbsp;	private final String blank;
+&nbsp;
+<b class="nc">&nbsp;	private CorrelationIdFormatter(List&lt;Part&gt; parts) {</b>
+<b class="nc">&nbsp;		this.parts = parts;</b>
+<b class="nc">&nbsp;		this.blank = String.format(&quot;[%s] &quot;, parts.stream().map(Part::blank).collect(Collectors.joining(&quot; &quot;)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Format a correlation from the values in the given resolver.
+&nbsp;	 * @param resolver the resolver used to resolve named values
+&nbsp;	 * @return a formatted correlation id
+&nbsp;	 */
+&nbsp;	public String format(UnaryOperator&lt;String&gt; resolver) {
+<b class="nc">&nbsp;		StringBuilder result = new StringBuilder();</b>
+<b class="nc">&nbsp;		formatTo(resolver, result);</b>
+<b class="nc">&nbsp;		return result.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Format a correlation from the values in the given resolver and append it to the
+&nbsp;	 * given {@link Appendable}.
+&nbsp;	 * @param resolver the resolver used to resolve named values
+&nbsp;	 * @param appendable the appendable for the formatted correlation id
+&nbsp;	 */
+&nbsp;	public void formatTo(UnaryOperator&lt;String&gt; resolver, Appendable appendable) {
+<b class="nc">&nbsp;		Predicate&lt;Part&gt; canResolve = (part) -&gt; StringUtils.hasLength(resolver.apply(part.name()));</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			if (this.parts.stream().anyMatch(canResolve)) {</b>
+<b class="nc">&nbsp;				appendable.append(&#39;[&#39;);</b>
+<b class="nc">&nbsp;				for (Iterator&lt;Part&gt; iterator = this.parts.iterator(); iterator.hasNext();) {</b>
+<b class="nc">&nbsp;					appendable.append(iterator.next().resolve(resolver));</b>
+<b class="nc">&nbsp;					if (iterator.hasNext()) {</b>
+<b class="nc">&nbsp;						appendable.append(&#39;-&#39;);</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				appendable.append(&quot;] &quot;);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				appendable.append(this.blank);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new UncheckedIOException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.parts.stream().map(Part::toString).collect(Collectors.joining(&quot;,&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link CorrelationIdFormatter} instance from the given specification.
+&nbsp;	 * @param spec a comma-separated specification
+&nbsp;	 * @return a new {@link CorrelationIdFormatter} instance
+&nbsp;	 */
+&nbsp;	public static CorrelationIdFormatter of(String spec) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return (!StringUtils.hasText(spec)) ? DEFAULT : of(List.of(spec.split(&quot;,&quot;)));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to parse correlation formatter spec &#39;%s&#39;&quot;.formatted(spec), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link CorrelationIdFormatter} instance from the given specification.
+&nbsp;	 * @param spec a pre-separated specification
+&nbsp;	 * @return a new {@link CorrelationIdFormatter} instance
+&nbsp;	 */
+&nbsp;	public static CorrelationIdFormatter of(String[] spec) {
+<b class="nc">&nbsp;		return of((spec != null) ? List.of(spec) : Collections.emptyList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link CorrelationIdFormatter} instance from the given specification.
+&nbsp;	 * @param spec a pre-separated specification
+&nbsp;	 * @return a new {@link CorrelationIdFormatter} instance
+&nbsp;	 */
+&nbsp;	public static CorrelationIdFormatter of(Collection&lt;String&gt; spec) {
+<b class="nc">&nbsp;		if (CollectionUtils.isEmpty(spec)) {</b>
+<b class="nc">&nbsp;			return DEFAULT;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;Part&gt; parts = spec.stream().map(Part::of).toList();</b>
+<b class="nc">&nbsp;		return new CorrelationIdFormatter(parts);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A part of the correlation id.
+&nbsp;	 *
+&nbsp;	 * @param name the name of the correlation part
+&nbsp;	 * @param length the expected length of the correlation part
+&nbsp;	 */
+<b class="nc">&nbsp;	record Part(String name, int length) {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final Pattern pattern = Pattern.compile(&quot;^(.+?)\\((\\d+)\\)$&quot;);</b>
+&nbsp;
+&nbsp;		String resolve(UnaryOperator&lt;String&gt; resolver) {
+<b class="nc">&nbsp;			String resolved = resolver.apply(name());</b>
+<b class="nc">&nbsp;			if (resolved == null) {</b>
+<b class="nc">&nbsp;				return blank();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			int padding = length() - resolved.length();</b>
+<b class="nc">&nbsp;			return (padding &lt;= 0) ? resolved : resolved + &quot; &quot;.repeat(padding);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String blank() {
+<b class="nc">&nbsp;			return &quot; &quot;.repeat(this.length);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return &quot;%s(%s)&quot;.formatted(name(), length());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static Part of(String part) {
+<b class="nc">&nbsp;			Matcher matcher = pattern.matcher(part.trim());</b>
+<b class="nc">&nbsp;			Assert.state(matcher.matches(), () -&gt; &quot;Invalid specification part &#39;%s&#39;&quot;.formatted(part));</b>
+<b class="nc">&nbsp;			String name = matcher.group(1);</b>
+<b class="nc">&nbsp;			int length = Integer.parseInt(matcher.group(2));</b>
+<b class="nc">&nbsp;			return new Part(name, length);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

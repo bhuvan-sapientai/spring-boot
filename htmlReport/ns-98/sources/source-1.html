@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TimedAnnotations</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.metrics.annotation</a>
+</div>
+
+<h1>Coverage Summary for Class: TimedAnnotations (org.springframework.boot.actuate.metrics.annotation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TimedAnnotations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.metrics.annotation;
+&nbsp;
+&nbsp;import java.lang.reflect.AnnotatedElement;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import io.micrometer.core.annotation.Timed;
+&nbsp;
+&nbsp;import org.springframework.core.annotation.MergedAnnotationCollectors;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.util.ConcurrentReferenceHashMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility used to obtain {@link Timed @Timed} annotations from bean methods.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.5.0
+&nbsp; */
+&nbsp;public final class TimedAnnotations {
+&nbsp;
+<b class="nc">&nbsp;	private static final Map&lt;AnnotatedElement, Set&lt;Timed&gt;&gt; cache = new ConcurrentReferenceHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private TimedAnnotations() {
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return {@link Timed} annotations that should be used for the given {@code method}
+&nbsp;	 * and {@code type}.
+&nbsp;	 * @param method the source method
+&nbsp;	 * @param type the source type
+&nbsp;	 * @return the {@link Timed} annotations to use or an empty set
+&nbsp;	 */
+&nbsp;	public static Set&lt;Timed&gt; get(Method method, Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		Set&lt;Timed&gt; methodAnnotations = findTimedAnnotations(method);</b>
+<b class="nc">&nbsp;		if (!methodAnnotations.isEmpty()) {</b>
+<b class="nc">&nbsp;			return methodAnnotations;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return findTimedAnnotations(type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Set&lt;Timed&gt; findTimedAnnotations(AnnotatedElement element) {
+<b class="nc">&nbsp;		if (element == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptySet();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Set&lt;Timed&gt; result = cache.get(element);</b>
+<b class="nc">&nbsp;		if (result != null) {</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		MergedAnnotations annotations = MergedAnnotations.from(element);</b>
+<b class="nc">&nbsp;		result = (!annotations.isPresent(Timed.class)) ? Collections.emptySet()</b>
+<b class="nc">&nbsp;				: annotations.stream(Timed.class).collect(MergedAnnotationCollectors.toAnnotationSet());</b>
+<b class="nc">&nbsp;		cache.put(element, result);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

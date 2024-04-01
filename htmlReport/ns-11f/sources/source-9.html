@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MultipartProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: MultipartProperties (org.springframework.boot.autoconfigure.web.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MultipartProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.servlet;
+&nbsp;
+&nbsp;import jakarta.servlet.MultipartConfigElement;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.web.servlet.MultipartConfigFactory;
+&nbsp;import org.springframework.util.unit.DataSize;
+&nbsp;
+&nbsp;/**
+&nbsp; * Properties to be used in configuring a {@link MultipartConfigElement}.
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@link #getLocation() location} specifies the directory where uploaded files will
+&nbsp; * be stored. When not specified, a temporary directory will be used.&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link #getMaxFileSize() max-file-size} specifies the maximum size permitted for
+&nbsp; * uploaded files. The default is 1MB&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link #getMaxRequestSize() max-request-size} specifies the maximum size allowed
+&nbsp; * for {@literal multipart/form-data} requests. The default is 10MB.&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link #getFileSizeThreshold() file-size-threshold} specifies the size threshold
+&nbsp; * after which files will be written to disk. The default is 0.&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * These properties are ultimately passed to {@link MultipartConfigFactory} which means
+&nbsp; * you may specify numeric values using {@literal long} values or using more readable
+&nbsp; * {@link DataSize} variants.
+&nbsp; *
+&nbsp; * @author Josh Long
+&nbsp; * @author Toshiaki Maki
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Yanming Zhou
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.servlet.multipart&quot;, ignoreUnknownFields = false)
+<b class="nc">&nbsp;public class MultipartProperties {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to enable support of multipart uploads.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean enabled = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Intermediate location of uploaded files.
+&nbsp;	 */
+&nbsp;	private String location;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Max file size.
+&nbsp;	 */
+<b class="nc">&nbsp;	private DataSize maxFileSize = DataSize.ofMegabytes(1);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Max request size.
+&nbsp;	 */
+<b class="nc">&nbsp;	private DataSize maxRequestSize = DataSize.ofMegabytes(10);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Threshold after which files are written to disk.
+&nbsp;	 */
+<b class="nc">&nbsp;	private DataSize fileSizeThreshold = DataSize.ofBytes(0);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to resolve the multipart request lazily at the time of file or parameter
+&nbsp;	 * access.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean resolveLazily = false;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to resolve the multipart request strictly complying with the Servlet
+&nbsp;	 * specification, only to be used for &quot;multipart/form-data&quot; requests.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean strictServletCompliance = false;</b>
+&nbsp;
+&nbsp;	public boolean getEnabled() {
+<b class="nc">&nbsp;		return this.enabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setEnabled(boolean enabled) {
+<b class="nc">&nbsp;		this.enabled = enabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getLocation() {
+<b class="nc">&nbsp;		return this.location;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setLocation(String location) {
+<b class="nc">&nbsp;		this.location = location;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public DataSize getMaxFileSize() {
+<b class="nc">&nbsp;		return this.maxFileSize;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setMaxFileSize(DataSize maxFileSize) {
+<b class="nc">&nbsp;		this.maxFileSize = maxFileSize;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public DataSize getMaxRequestSize() {
+<b class="nc">&nbsp;		return this.maxRequestSize;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setMaxRequestSize(DataSize maxRequestSize) {
+<b class="nc">&nbsp;		this.maxRequestSize = maxRequestSize;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public DataSize getFileSizeThreshold() {
+<b class="nc">&nbsp;		return this.fileSizeThreshold;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setFileSizeThreshold(DataSize fileSizeThreshold) {
+<b class="nc">&nbsp;		this.fileSizeThreshold = fileSizeThreshold;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isResolveLazily() {
+<b class="nc">&nbsp;		return this.resolveLazily;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setResolveLazily(boolean resolveLazily) {
+<b class="nc">&nbsp;		this.resolveLazily = resolveLazily;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isStrictServletCompliance() {
+<b class="nc">&nbsp;		return this.strictServletCompliance;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setStrictServletCompliance(boolean strictServletCompliance) {
+<b class="nc">&nbsp;		this.strictServletCompliance = strictServletCompliance;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link MultipartConfigElement} using the properties.
+&nbsp;	 * @return a new {@link MultipartConfigElement} configured using there properties
+&nbsp;	 */
+&nbsp;	public MultipartConfigElement createMultipartConfig() {
+<b class="nc">&nbsp;		MultipartConfigFactory factory = new MultipartConfigFactory();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(this.fileSizeThreshold).to(factory::setFileSizeThreshold);</b>
+<b class="nc">&nbsp;		map.from(this.location).whenHasText().to(factory::setLocation);</b>
+<b class="nc">&nbsp;		map.from(this.maxRequestSize).to(factory::setMaxRequestSize);</b>
+<b class="nc">&nbsp;		map.from(this.maxFileSize).to(factory::setMaxFileSize);</b>
+<b class="nc">&nbsp;		return factory.createMultipartConfig();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

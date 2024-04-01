@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringBootCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringBootCondition (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringBootCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.context.annotation.Condition;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.core.type.ClassMetadata;
+&nbsp;import org.springframework.core.type.MethodMetadata;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base of all {@link Condition} implementations used with Spring Boot. Provides sensible
+&nbsp; * logging to help the user diagnose what classes are loaded.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Greg Turnquist
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class SpringBootCondition implements Condition {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Log logger = LogFactory.getLog(getClass());</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		String classOrMethodName = getClassOrMethodName(metadata);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			ConditionOutcome outcome = getMatchOutcome(context, metadata);</b>
+<b class="nc">&nbsp;			logOutcome(classOrMethodName, outcome);</b>
+<b class="nc">&nbsp;			recordEvaluation(context, classOrMethodName, outcome);</b>
+<b class="nc">&nbsp;			return outcome.isMatch();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoClassDefFoundError ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Could not evaluate condition on &quot; + classOrMethodName + &quot; due to &quot;</b>
+<b class="nc">&nbsp;					+ ex.getMessage() + &quot; not found. Make sure your own configuration does not rely on &quot;</b>
+&nbsp;					+ &quot;that class. This can also happen if you are &quot;
+&nbsp;					+ &quot;@ComponentScanning a springframework package (e.g. if you &quot;
+&nbsp;					+ &quot;put a @ComponentScan in the default package by mistake)&quot;, ex);
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Error processing condition on &quot; + getName(metadata), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getName(AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		if (metadata instanceof AnnotationMetadata annotationMetadata) {</b>
+<b class="nc">&nbsp;			return annotationMetadata.getClassName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (metadata instanceof MethodMetadata methodMetadata) {</b>
+<b class="nc">&nbsp;			return methodMetadata.getDeclaringClassName() + &quot;.&quot; + methodMetadata.getMethodName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return metadata.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getClassOrMethodName(AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		if (metadata instanceof ClassMetadata classMetadata) {</b>
+<b class="nc">&nbsp;			return classMetadata.getClassName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		MethodMetadata methodMetadata = (MethodMetadata) metadata;</b>
+<b class="nc">&nbsp;		return methodMetadata.getDeclaringClassName() + &quot;#&quot; + methodMetadata.getMethodName();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final void logOutcome(String classOrMethodName, ConditionOutcome outcome) {
+<b class="nc">&nbsp;		if (this.logger.isTraceEnabled()) {</b>
+<b class="nc">&nbsp;			this.logger.trace(getLogMessage(classOrMethodName, outcome));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private StringBuilder getLogMessage(String classOrMethodName, ConditionOutcome outcome) {
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder();</b>
+<b class="nc">&nbsp;		message.append(&quot;Condition &quot;);</b>
+<b class="nc">&nbsp;		message.append(ClassUtils.getShortName(getClass()));</b>
+<b class="nc">&nbsp;		message.append(&quot; on &quot;);</b>
+<b class="nc">&nbsp;		message.append(classOrMethodName);</b>
+<b class="nc">&nbsp;		message.append(outcome.isMatch() ? &quot; matched&quot; : &quot; did not match&quot;);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(outcome.getMessage())) {</b>
+<b class="nc">&nbsp;			message.append(&quot; due to &quot;);</b>
+<b class="nc">&nbsp;			message.append(outcome.getMessage());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return message;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void recordEvaluation(ConditionContext context, String classOrMethodName, ConditionOutcome outcome) {
+<b class="nc">&nbsp;		if (context.getBeanFactory() != null) {</b>
+<b class="nc">&nbsp;			ConditionEvaluationReport.get(context.getBeanFactory())</b>
+<b class="nc">&nbsp;				.recordConditionEvaluation(classOrMethodName, this, outcome);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine the outcome of the match along with suitable log output.
+&nbsp;	 * @param context the condition context
+&nbsp;	 * @param metadata the annotation metadata
+&nbsp;	 * @return the condition outcome
+&nbsp;	 */
+&nbsp;	public abstract ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return true if any of the specified conditions match.
+&nbsp;	 * @param context the context
+&nbsp;	 * @param metadata the annotation meta-data
+&nbsp;	 * @param conditions conditions to test
+&nbsp;	 * @return {@code true} if any condition matches.
+&nbsp;	 */
+&nbsp;	protected final boolean anyMatches(ConditionContext context, AnnotatedTypeMetadata metadata,
+&nbsp;			Condition... conditions) {
+<b class="nc">&nbsp;		for (Condition condition : conditions) {</b>
+<b class="nc">&nbsp;			if (matches(context, metadata, condition)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return true if any of the specified condition matches.
+&nbsp;	 * @param context the context
+&nbsp;	 * @param metadata the annotation meta-data
+&nbsp;	 * @param condition condition to test
+&nbsp;	 * @return {@code true} if the condition matches.
+&nbsp;	 */
+&nbsp;	protected final boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata, Condition condition) {
+<b class="nc">&nbsp;		if (condition instanceof SpringBootCondition springBootCondition) {</b>
+<b class="nc">&nbsp;			return springBootCondition.getMatchOutcome(context, metadata).isMatch();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return condition.matches(context, metadata);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

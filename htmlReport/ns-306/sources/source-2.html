@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MessageSourceMessageInterpolator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.validation</a>
+</div>
+
+<h1>Coverage Summary for Class: MessageSourceMessageInterpolator (org.springframework.boot.validation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MessageSourceMessageInterpolator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.7%
+  </span>
+  <span class="absValue">
+    (3/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.validation;
+&nbsp;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import jakarta.validation.MessageInterpolator;
+&nbsp;
+&nbsp;import org.springframework.context.MessageSource;
+&nbsp;import org.springframework.context.i18n.LocaleContextHolder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Resolves any message parameters through {@link MessageSource} and then interpolates a
+&nbsp; * message using the underlying {@link MessageInterpolator}.
+&nbsp; *
+&nbsp; * @author Dmytro Nosan
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;class MessageSourceMessageInterpolator implements MessageInterpolator {
+&nbsp;
+&nbsp;	private static final char PREFIX = &#39;{&#39;;
+&nbsp;
+&nbsp;	private static final char SUFFIX = &#39;}&#39;;
+&nbsp;
+&nbsp;	private static final char ESCAPE = &#39;\\&#39;;
+&nbsp;
+&nbsp;	private final MessageSource messageSource;
+&nbsp;
+&nbsp;	private final MessageInterpolator messageInterpolator;
+&nbsp;
+<b class="fc">&nbsp;	MessageSourceMessageInterpolator(MessageSource messageSource, MessageInterpolator messageInterpolator) {</b>
+<b class="fc">&nbsp;		this.messageSource = messageSource;</b>
+<b class="fc">&nbsp;		this.messageInterpolator = messageInterpolator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String interpolate(String messageTemplate, Context context) {
+<b class="nc">&nbsp;		return interpolate(messageTemplate, context, LocaleContextHolder.getLocale());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String interpolate(String messageTemplate, Context context, Locale locale) {
+<b class="nc">&nbsp;		String message = replaceParameters(messageTemplate, locale);</b>
+<b class="nc">&nbsp;		return this.messageInterpolator.interpolate(message, context, locale);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Recursively replaces all message parameters.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * The message parameter prefix &lt;code&gt;&amp;#123;&lt;/code&gt; and suffix &lt;code&gt;&amp;#125;&lt;/code&gt; can
+&nbsp;	 * be escaped using {@code \}, e.g. &lt;code&gt;\&amp;#123;escaped\&amp;#125;&lt;/code&gt;.
+&nbsp;	 * @param message the message containing the parameters to be replaced
+&nbsp;	 * @param locale the locale to use when resolving replacements
+&nbsp;	 * @return the message with parameters replaced
+&nbsp;	 */
+&nbsp;	private String replaceParameters(String message, Locale locale) {
+<b class="nc">&nbsp;		return replaceParameters(message, locale, new LinkedHashSet&lt;&gt;(4));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String replaceParameters(String message, Locale locale, Set&lt;String&gt; visitedParameters) {
+<b class="nc">&nbsp;		StringBuilder buf = new StringBuilder(message);</b>
+<b class="nc">&nbsp;		int parentheses = 0;</b>
+<b class="nc">&nbsp;		int startIndex = -1;</b>
+<b class="nc">&nbsp;		int endIndex = -1;</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; buf.length(); i++) {</b>
+<b class="nc">&nbsp;			if (buf.charAt(i) == ESCAPE) {</b>
+<b class="nc">&nbsp;				i++;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (buf.charAt(i) == PREFIX) {</b>
+<b class="nc">&nbsp;				if (startIndex == -1) {</b>
+<b class="nc">&nbsp;					startIndex = i;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				parentheses++;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (buf.charAt(i) == SUFFIX) {</b>
+<b class="nc">&nbsp;				if (parentheses &gt; 0) {</b>
+<b class="nc">&nbsp;					parentheses--;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				endIndex = i;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (parentheses == 0 &amp;&amp; startIndex &lt; endIndex) {</b>
+<b class="nc">&nbsp;				String parameter = buf.substring(startIndex + 1, endIndex);</b>
+<b class="nc">&nbsp;				if (!visitedParameters.add(parameter)) {</b>
+<b class="nc">&nbsp;					throw new IllegalArgumentException(&quot;Circular reference &#39;{&quot; + String.join(&quot; -&gt; &quot;, visitedParameters)</b>
+&nbsp;							+ &quot; -&gt; &quot; + parameter + &quot;}&#39;&quot;);
+&nbsp;				}
+<b class="nc">&nbsp;				String value = replaceParameter(parameter, locale, visitedParameters);</b>
+<b class="nc">&nbsp;				if (value != null) {</b>
+<b class="nc">&nbsp;					buf.replace(startIndex, endIndex + 1, value);</b>
+<b class="nc">&nbsp;					i = startIndex + value.length() - 1;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				visitedParameters.remove(parameter);</b>
+<b class="nc">&nbsp;				startIndex = -1;</b>
+<b class="nc">&nbsp;				endIndex = -1;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return buf.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String replaceParameter(String parameter, Locale locale, Set&lt;String&gt; visitedParameters) {
+<b class="nc">&nbsp;		parameter = replaceParameters(parameter, locale, visitedParameters);</b>
+<b class="nc">&nbsp;		String value = this.messageSource.getMessage(parameter, null, null, locale);</b>
+<b class="nc">&nbsp;		return (value != null &amp;&amp; !isUsingCodeAsDefaultMessage(value, parameter))</b>
+<b class="nc">&nbsp;				? replaceParameters(value, locale, visitedParameters) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isUsingCodeAsDefaultMessage(String value, String parameter) {
+<b class="nc">&nbsp;		return value.equals(parameter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

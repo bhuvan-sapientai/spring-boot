@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Archive</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.archive</a>
+</div>
+
+<h1>Coverage Summary for Class: Archive (org.springframework.boot.loader.archive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Archive</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Archive$Entry</td>
+  </tr>
+  <tr>
+    <td class="name">Archive$EntryFilter</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.archive;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.Launcher;
+&nbsp;
+&nbsp;/**
+&nbsp; * An archive that can be launched by the {@link Launcher}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.0.0
+&nbsp; * @see JarFileArchive
+&nbsp; */
+&nbsp;public interface Archive extends Iterable&lt;Archive.Entry&gt;, AutoCloseable {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a URL that can be used to load the archive.
+&nbsp;	 * @return the archive URL
+&nbsp;	 * @throws MalformedURLException if the URL is malformed
+&nbsp;	 */
+&nbsp;	URL getUrl() throws MalformedURLException;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the manifest of the archive.
+&nbsp;	 * @return the manifest
+&nbsp;	 * @throws IOException if the manifest cannot be read
+&nbsp;	 */
+&nbsp;	Manifest getManifest() throws IOException;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns nested {@link Archive}s for entries that match the specified filters.
+&nbsp;	 * @param searchFilter filter used to limit when additional sub-entry searching is
+&nbsp;	 * required or {@code null} if all entries should be considered.
+&nbsp;	 * @param includeFilter filter used to determine which entries should be included in
+&nbsp;	 * the result or {@code null} if all entries should be included
+&nbsp;	 * @return the nested archives
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	Iterator&lt;Archive&gt; getNestedArchives(EntryFilter searchFilter, EntryFilter includeFilter) throws IOException;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the archive is exploded (already unpacked).
+&nbsp;	 * @return if the archive is exploded
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	default boolean isExploded() {
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Closes the {@code Archive}, releasing any open resources.
+&nbsp;	 * @throws Exception if an error occurs during close processing
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	default void close() throws Exception {
+&nbsp;
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Represents a single entry in the archive.
+&nbsp;	 */
+&nbsp;	interface Entry {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns {@code true} if the entry represents a directory.
+&nbsp;		 * @return if the entry is a directory
+&nbsp;		 */
+&nbsp;		boolean isDirectory();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns the name of the entry.
+&nbsp;		 * @return the name of the entry
+&nbsp;		 */
+&nbsp;		String getName();
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Strategy interface to filter {@link Entry Entries}.
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	interface EntryFilter {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Apply the jar entry filter.
+&nbsp;		 * @param entry the entry to filter
+&nbsp;		 * @return {@code true} if the filter matches
+&nbsp;		 */
+&nbsp;		boolean matches(Entry entry);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,531 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertyMapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertyMapper (org.springframework.boot.context.properties)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertyMapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.2%
+  </span>
+  <span class="absValue">
+    (16/19)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PropertyMapper$NullPointerExceptionSafeSupplier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PropertyMapper$Source</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.2%
+  </span>
+  <span class="absValue">
+    (1/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (4/40)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PropertyMapper$SourceOperator</td>
+  </tr>
+  <tr>
+    <td class="name">PropertyMapper$SourceOperator$MockitoMock$fWYiZwMo</td>
+  </tr>
+  <tr>
+    <td class="name">PropertyMapper$SourceOperator$MockitoMock$fWYiZwMo$auxiliary$Od5733Kn</td>
+  </tr>
+  <tr>
+    <td class="name">PropertyMapper$SourceOperator$MockitoMock$fWYiZwMo$auxiliary$PHDUTaH4</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    35.7%
+  </span>
+  <span class="absValue">
+    (10/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.2%
+  </span>
+  <span class="absValue">
+    (20/64)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties;
+&nbsp;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.util.function.SingletonSupplier;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility that can be used to map values from a supplied source to a destination.
+&nbsp; * Primarily intended to be help when mapping from
+&nbsp; * {@link ConfigurationProperties @ConfigurationProperties} to third-party classes.
+&nbsp; * &lt;p&gt;
+&nbsp; * Can filter values based on predicates and adapt values if needed. For example:
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * PropertyMapper map = PropertyMapper.get();
+&nbsp; * map.from(source::getName)
+&nbsp; *   .to(destination::setName);
+&nbsp; * map.from(source::getTimeout)
+&nbsp; *   .whenNonNull()
+&nbsp; *   .asInt(Duration::getSeconds)
+&nbsp; *   .to(destination::setTimeoutSecs);
+&nbsp; * map.from(source::isEnabled)
+&nbsp; *   .whenFalse().
+&nbsp; *   .toCall(destination::disable);
+&nbsp; * &lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Mappings can ultimately be applied to a {@link Source#to(Consumer) setter}, trigger a
+&nbsp; * {@link Source#toCall(Runnable) method call} or create a
+&nbsp; * {@link Source#toInstance(Function) new instance}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Artsiom Yudovin
+&nbsp; * @author Chris Bono
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public final class PropertyMapper {
+&nbsp;
+<b class="fc">&nbsp;	private static final Predicate&lt;?&gt; ALWAYS = (t) -&gt; true;</b>
+&nbsp;
+<b class="fc">&nbsp;	private static final PropertyMapper INSTANCE = new PropertyMapper(null, null);</b>
+&nbsp;
+&nbsp;	private final PropertyMapper parent;
+&nbsp;
+&nbsp;	private final SourceOperator sourceOperator;
+&nbsp;
+<b class="fc">&nbsp;	private PropertyMapper(PropertyMapper parent, SourceOperator sourceOperator) {</b>
+<b class="fc">&nbsp;		this.parent = parent;</b>
+<b class="fc">&nbsp;		this.sourceOperator = sourceOperator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PropertyMapper} instance that applies
+&nbsp;	 * {@link Source#whenNonNull() whenNonNull} to every source.
+&nbsp;	 * @return a new property mapper instance
+&nbsp;	 */
+&nbsp;	public PropertyMapper alwaysApplyingWhenNonNull() {
+<b class="fc">&nbsp;		return alwaysApplying(this::whenNonNull);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; Source&lt;T&gt; whenNonNull(Source&lt;T&gt; source) {
+<b class="nc">&nbsp;		return source.whenNonNull();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PropertyMapper} instance that applies the given
+&nbsp;	 * {@link SourceOperator} to every source.
+&nbsp;	 * @param operator the source operator to apply
+&nbsp;	 * @return a new property mapper instance
+&nbsp;	 */
+&nbsp;	public PropertyMapper alwaysApplying(SourceOperator operator) {
+<b class="fc">&nbsp;		Assert.notNull(operator, &quot;Operator must not be null&quot;);</b>
+<b class="fc">&nbsp;		return new PropertyMapper(this, operator);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link Source} from the specified value supplier that can be used to
+&nbsp;	 * perform the mapping.
+&nbsp;	 * @param &lt;T&gt; the source type
+&nbsp;	 * @param supplier the value supplier
+&nbsp;	 * @return a {@link Source} that can be used to complete the mapping
+&nbsp;	 * @see #from(Object)
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; Source&lt;T&gt; from(Supplier&lt;T&gt; supplier) {
+<b class="fc">&nbsp;		Assert.notNull(supplier, &quot;Supplier must not be null&quot;);</b>
+<b class="fc">&nbsp;		Source&lt;T&gt; source = getSource(supplier);</b>
+<b class="fc">&nbsp;		if (this.sourceOperator != null) {</b>
+<b class="nc">&nbsp;			source = this.sourceOperator.apply(source);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return source;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link Source} from the specified value that can be used to perform
+&nbsp;	 * the mapping.
+&nbsp;	 * @param &lt;T&gt; the source type
+&nbsp;	 * @param value the value
+&nbsp;	 * @return a {@link Source} that can be used to complete the mapping
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; Source&lt;T&gt; from(T value) {
+<b class="fc">&nbsp;		return from(() -&gt; value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T&gt; Source&lt;T&gt; getSource(Supplier&lt;T&gt; supplier) {
+<b class="fc">&nbsp;		if (this.parent != null) {</b>
+<b class="nc">&nbsp;			return this.parent.from(supplier);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return new Source&lt;&gt;(SingletonSupplier.of(supplier), (Predicate&lt;T&gt;) ALWAYS);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the property mapper.
+&nbsp;	 * @return the property mapper
+&nbsp;	 */
+&nbsp;	public static PropertyMapper get() {
+<b class="fc">&nbsp;		return INSTANCE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An operation that can be applied to a {@link Source}.
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	public interface SourceOperator {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Apply the operation to the given source.
+&nbsp;		 * @param &lt;T&gt; the source type
+&nbsp;		 * @param source the source to operate on
+&nbsp;		 * @return the updated source
+&nbsp;		 */
+&nbsp;		&lt;T&gt; Source&lt;T&gt; apply(Source&lt;T&gt; source);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A source that is in the process of being mapped.
+&nbsp;	 *
+&nbsp;	 * @param &lt;T&gt; the source type
+&nbsp;	 */
+&nbsp;	public static final class Source&lt;T&gt; {
+&nbsp;
+&nbsp;		private final Supplier&lt;T&gt; supplier;
+&nbsp;
+&nbsp;		private final Predicate&lt;T&gt; predicate;
+&nbsp;
+<b class="fc">&nbsp;		private Source(Supplier&lt;T&gt; supplier, Predicate&lt;T&gt; predicate) {</b>
+<b class="fc">&nbsp;			Assert.notNull(predicate, &quot;Predicate must not be null&quot;);</b>
+<b class="fc">&nbsp;			this.supplier = supplier;</b>
+<b class="fc">&nbsp;			this.predicate = predicate;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return an adapted version of the source with {@link Integer} type.
+&nbsp;		 * @param &lt;R&gt; the resulting type
+&nbsp;		 * @param adapter an adapter to convert the current value to a number.
+&nbsp;		 * @return a new adapted source instance
+&nbsp;		 */
+&nbsp;		public &lt;R extends Number&gt; Source&lt;Integer&gt; asInt(Function&lt;T, R&gt; adapter) {
+<b class="nc">&nbsp;			return as(adapter).as(Number::intValue);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return an adapted version of the source changed through the given adapter
+&nbsp;		 * function.
+&nbsp;		 * @param &lt;R&gt; the resulting type
+&nbsp;		 * @param adapter the adapter to apply
+&nbsp;		 * @return a new adapted source instance
+&nbsp;		 */
+&nbsp;		public &lt;R&gt; Source&lt;R&gt; as(Function&lt;T, R&gt; adapter) {
+<b class="nc">&nbsp;			Assert.notNull(adapter, &quot;Adapter must not be null&quot;);</b>
+<b class="nc">&nbsp;			Supplier&lt;Boolean&gt; test = () -&gt; this.predicate.test(this.supplier.get());</b>
+<b class="nc">&nbsp;			Predicate&lt;R&gt; predicate = (t) -&gt; test.get();</b>
+<b class="nc">&nbsp;			Supplier&lt;R&gt; supplier = () -&gt; {</b>
+<b class="nc">&nbsp;				if (test.get()) {</b>
+<b class="nc">&nbsp;					return adapter.apply(this.supplier.get());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			};
+<b class="nc">&nbsp;			return new Source&lt;&gt;(supplier, predicate);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a filtered version of the source that won&#39;t map non-null values or
+&nbsp;		 * suppliers that throw a {@link NullPointerException}.
+&nbsp;		 * @return a new filtered source instance
+&nbsp;		 */
+&nbsp;		public Source&lt;T&gt; whenNonNull() {
+<b class="nc">&nbsp;			return new Source&lt;&gt;(new NullPointerExceptionSafeSupplier&lt;&gt;(this.supplier), Objects::nonNull);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a filtered version of the source that will only map values that are
+&nbsp;		 * {@code true}.
+&nbsp;		 * @return a new filtered source instance
+&nbsp;		 */
+&nbsp;		public Source&lt;T&gt; whenTrue() {
+<b class="nc">&nbsp;			return when(Boolean.TRUE::equals);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a filtered version of the source that will only map values that are
+&nbsp;		 * {@code false}.
+&nbsp;		 * @return a new filtered source instance
+&nbsp;		 */
+&nbsp;		public Source&lt;T&gt; whenFalse() {
+<b class="nc">&nbsp;			return when(Boolean.FALSE::equals);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a filtered version of the source that will only map values that have a
+&nbsp;		 * {@code toString()} containing actual text.
+&nbsp;		 * @return a new filtered source instance
+&nbsp;		 */
+&nbsp;		public Source&lt;T&gt; whenHasText() {
+<b class="nc">&nbsp;			return when((value) -&gt; StringUtils.hasText(Objects.toString(value, null)));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a filtered version of the source that will only map values equal to the
+&nbsp;		 * specified {@code object}.
+&nbsp;		 * @param object the object to match
+&nbsp;		 * @return a new filtered source instance
+&nbsp;		 */
+&nbsp;		public Source&lt;T&gt; whenEqualTo(Object object) {
+<b class="nc">&nbsp;			return when(object::equals);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a filtered version of the source that will only map values that are an
+&nbsp;		 * instance of the given type.
+&nbsp;		 * @param &lt;R&gt; the target type
+&nbsp;		 * @param target the target type to match
+&nbsp;		 * @return a new filtered source instance
+&nbsp;		 */
+&nbsp;		public &lt;R extends T&gt; Source&lt;R&gt; whenInstanceOf(Class&lt;R&gt; target) {
+<b class="nc">&nbsp;			return when(target::isInstance).as(target::cast);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a filtered version of the source that won&#39;t map values that match the
+&nbsp;		 * given predicate.
+&nbsp;		 * @param predicate the predicate used to filter values
+&nbsp;		 * @return a new filtered source instance
+&nbsp;		 */
+&nbsp;		public Source&lt;T&gt; whenNot(Predicate&lt;T&gt; predicate) {
+<b class="nc">&nbsp;			Assert.notNull(predicate, &quot;Predicate must not be null&quot;);</b>
+<b class="nc">&nbsp;			return when(predicate.negate());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a filtered version of the source that won&#39;t map values that don&#39;t match
+&nbsp;		 * the given predicate.
+&nbsp;		 * @param predicate the predicate used to filter values
+&nbsp;		 * @return a new filtered source instance
+&nbsp;		 */
+&nbsp;		public Source&lt;T&gt; when(Predicate&lt;T&gt; predicate) {
+<b class="nc">&nbsp;			Assert.notNull(predicate, &quot;Predicate must not be null&quot;);</b>
+<b class="nc">&nbsp;			return new Source&lt;&gt;(this.supplier, (this.predicate != null) ? this.predicate.and(predicate) : predicate);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Complete the mapping by passing any non-filtered value to the specified
+&nbsp;		 * consumer. The method is designed to be used with mutable objects.
+&nbsp;		 * @param consumer the consumer that should accept the value if it&#39;s not been
+&nbsp;		 * filtered
+&nbsp;		 */
+&nbsp;		public void to(Consumer&lt;T&gt; consumer) {
+<b class="nc">&nbsp;			Assert.notNull(consumer, &quot;Consumer must not be null&quot;);</b>
+<b class="nc">&nbsp;			T value = this.supplier.get();</b>
+<b class="nc">&nbsp;			if (this.predicate.test(value)) {</b>
+<b class="nc">&nbsp;				consumer.accept(value);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Complete the mapping for any non-filtered value by applying the given function
+&nbsp;		 * to an existing instance and returning a new one. For filtered values, the
+&nbsp;		 * {@code instance} parameter is returned unchanged. The method is designed to be
+&nbsp;		 * used with immutable objects.
+&nbsp;		 * @param &lt;R&gt; the result type
+&nbsp;		 * @param instance the current instance
+&nbsp;		 * @param mapper the mapping function
+&nbsp;		 * @return a new mapped instance or the original instance
+&nbsp;		 * @since 3.0.0
+&nbsp;		 */
+&nbsp;		public &lt;R&gt; R to(R instance, BiFunction&lt;R, T, R&gt; mapper) {
+<b class="nc">&nbsp;			Assert.notNull(instance, &quot;Instance must not be null&quot;);</b>
+<b class="nc">&nbsp;			Assert.notNull(mapper, &quot;Mapper must not be null&quot;);</b>
+<b class="nc">&nbsp;			T value = this.supplier.get();</b>
+<b class="nc">&nbsp;			return (!this.predicate.test(value)) ? instance : mapper.apply(instance, value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Complete the mapping by creating a new instance from the non-filtered value.
+&nbsp;		 * @param &lt;R&gt; the resulting type
+&nbsp;		 * @param factory the factory used to create the instance
+&nbsp;		 * @return the instance
+&nbsp;		 * @throws NoSuchElementException if the value has been filtered
+&nbsp;		 */
+&nbsp;		public &lt;R&gt; R toInstance(Function&lt;T, R&gt; factory) {
+<b class="nc">&nbsp;			Assert.notNull(factory, &quot;Factory must not be null&quot;);</b>
+<b class="nc">&nbsp;			T value = this.supplier.get();</b>
+<b class="nc">&nbsp;			if (!this.predicate.test(value)) {</b>
+<b class="nc">&nbsp;				throw new NoSuchElementException(&quot;No value present&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return factory.apply(value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Complete the mapping by calling the specified method when the value has not
+&nbsp;		 * been filtered.
+&nbsp;		 * @param runnable the method to call if the value has not been filtered
+&nbsp;		 */
+&nbsp;		public void toCall(Runnable runnable) {
+<b class="nc">&nbsp;			Assert.notNull(runnable, &quot;Runnable must not be null&quot;);</b>
+<b class="nc">&nbsp;			T value = this.supplier.get();</b>
+<b class="nc">&nbsp;			if (this.predicate.test(value)) {</b>
+<b class="nc">&nbsp;				runnable.run();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Supplier that will catch and ignore any {@link NullPointerException}.
+&nbsp;	 */
+&nbsp;	private static class NullPointerExceptionSafeSupplier&lt;T&gt; implements Supplier&lt;T&gt; {
+&nbsp;
+&nbsp;		private final Supplier&lt;T&gt; supplier;
+&nbsp;
+<b class="nc">&nbsp;		NullPointerExceptionSafeSupplier(Supplier&lt;T&gt; supplier) {</b>
+<b class="nc">&nbsp;			this.supplier = supplier;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public T get() {
+&nbsp;			try {
+<b class="nc">&nbsp;				return this.supplier.get();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NullPointerException ex) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

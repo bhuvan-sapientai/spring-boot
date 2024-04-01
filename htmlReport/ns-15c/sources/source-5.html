@@ -1,0 +1,735 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigDataEnvironmentContributor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.config</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigDataEnvironmentContributor (org.springframework.boot.context.config)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigDataEnvironmentContributor</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (24/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70.9%
+  </span>
+  <span class="absValue">
+    (83/117)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConfigDataEnvironmentContributor$ContributorIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.8%
+  </span>
+  <span class="absValue">
+    (4/27)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigDataEnvironmentContributor$ImportPhase</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigDataEnvironmentContributor$Kind</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    74.4%
+  </span>
+  <span class="absValue">
+    (29/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.8%
+  </span>
+  <span class="absValue">
+    (97/157)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.config;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import java.util.stream.StreamSupport;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.boot.context.properties.bind.PlaceholdersResolver;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A single element that may directly or indirectly contribute configuration data to the
+&nbsp; * {@link Environment}. There are several {@link Kind kinds} of contributor, all are
+&nbsp; * immutable and will be replaced with new versions as imports are processed.
+&nbsp; * &lt;p&gt;
+&nbsp; * Contributors may provide a set of imports that should be processed and ultimately
+&nbsp; * turned into children. There are two distinct import phases:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@link ImportPhase#BEFORE_PROFILE_ACTIVATION Before} profiles have been
+&nbsp; * activated.&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link ImportPhase#AFTER_PROFILE_ACTIVATION After} profiles have been
+&nbsp; * activated.&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; * In each phase &lt;em&gt;all&lt;/em&gt; imports will be resolved before they are loaded.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class ConfigDataEnvironmentContributor implements Iterable&lt;ConfigDataEnvironmentContributor&gt; {
+&nbsp;
+<b class="fc">&nbsp;	private static final ConfigData.Options EMPTY_LOCATION_OPTIONS = ConfigData.Options</b>
+<b class="fc">&nbsp;		.of(ConfigData.Option.IGNORE_IMPORTS);</b>
+&nbsp;
+&nbsp;	private final ConfigDataLocation location;
+&nbsp;
+&nbsp;	private final ConfigDataResource resource;
+&nbsp;
+&nbsp;	private final boolean fromProfileSpecificImport;
+&nbsp;
+&nbsp;	private final PropertySource&lt;?&gt; propertySource;
+&nbsp;
+&nbsp;	private final ConfigurationPropertySource configurationPropertySource;
+&nbsp;
+&nbsp;	private final ConfigDataProperties properties;
+&nbsp;
+&nbsp;	private final ConfigData.Options configDataOptions;
+&nbsp;
+&nbsp;	private final Map&lt;ImportPhase, List&lt;ConfigDataEnvironmentContributor&gt;&gt; children;
+&nbsp;
+&nbsp;	private final Kind kind;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConfigDataEnvironmentContributor} instance.
+&nbsp;	 * @param kind the contributor kind
+&nbsp;	 * @param location the location of this contributor
+&nbsp;	 * @param resource the resource that contributed the data or {@code null}
+&nbsp;	 * @param fromProfileSpecificImport if the contributor is from a profile specific
+&nbsp;	 * import
+&nbsp;	 * @param propertySource the property source for the data or {@code null}
+&nbsp;	 * @param configurationPropertySource the configuration property source for the data
+&nbsp;	 * or {@code null}
+&nbsp;	 * @param properties the config data properties or {@code null}
+&nbsp;	 * @param configDataOptions any config data options that should apply
+&nbsp;	 * @param children the children of this contributor at each {@link ImportPhase}
+&nbsp;	 */
+&nbsp;	ConfigDataEnvironmentContributor(Kind kind, ConfigDataLocation location, ConfigDataResource resource,
+&nbsp;			boolean fromProfileSpecificImport, PropertySource&lt;?&gt; propertySource,
+&nbsp;			ConfigurationPropertySource configurationPropertySource, ConfigDataProperties properties,
+<b class="fc">&nbsp;			ConfigData.Options configDataOptions, Map&lt;ImportPhase, List&lt;ConfigDataEnvironmentContributor&gt;&gt; children) {</b>
+<b class="fc">&nbsp;		this.kind = kind;</b>
+<b class="fc">&nbsp;		this.location = location;</b>
+<b class="fc">&nbsp;		this.resource = resource;</b>
+<b class="fc">&nbsp;		this.fromProfileSpecificImport = fromProfileSpecificImport;</b>
+<b class="fc">&nbsp;		this.properties = properties;</b>
+<b class="fc">&nbsp;		this.propertySource = propertySource;</b>
+<b class="fc">&nbsp;		this.configurationPropertySource = configurationPropertySource;</b>
+<b class="fc">&nbsp;		this.configDataOptions = (configDataOptions != null) ? configDataOptions : ConfigData.Options.NONE;</b>
+<b class="fc">&nbsp;		this.children = (children != null) ? children : Collections.emptyMap();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the contributor kind.
+&nbsp;	 * @return the kind of contributor
+&nbsp;	 */
+&nbsp;	Kind getKind() {
+<b class="nc">&nbsp;		return this.kind;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ConfigDataLocation getLocation() {
+<b class="nc">&nbsp;		return this.location;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if this contributor is currently active.
+&nbsp;	 * @param activationContext the activation context
+&nbsp;	 * @return if the contributor is active
+&nbsp;	 */
+&nbsp;	boolean isActive(ConfigDataActivationContext activationContext) {
+<b class="fc">&nbsp;		if (this.kind == Kind.UNBOUND_IMPORT) {</b>
+<b class="fc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return this.properties == null || this.properties.isActive(activationContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the resource that contributed this instance.
+&nbsp;	 * @return the resource or {@code null}
+&nbsp;	 */
+&nbsp;	ConfigDataResource getResource() {
+<b class="nc">&nbsp;		return this.resource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the contributor is from a profile specific import.
+&nbsp;	 * @return if the contributor is profile specific
+&nbsp;	 */
+&nbsp;	boolean isFromProfileSpecificImport() {
+<b class="nc">&nbsp;		return this.fromProfileSpecificImport;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the property source for this contributor.
+&nbsp;	 * @return the property source or {@code null}
+&nbsp;	 */
+&nbsp;	PropertySource&lt;?&gt; getPropertySource() {
+<b class="nc">&nbsp;		return this.propertySource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the configuration property source for this contributor.
+&nbsp;	 * @return the configuration property source or {@code null}
+&nbsp;	 */
+&nbsp;	ConfigurationPropertySource getConfigurationPropertySource() {
+<b class="fc">&nbsp;		return this.configurationPropertySource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the contributor has a specific config data option.
+&nbsp;	 * @param option the option to check
+&nbsp;	 * @return {@code true} if the option is present
+&nbsp;	 */
+&nbsp;	boolean hasConfigDataOption(ConfigData.Option option) {
+<b class="fc">&nbsp;		return this.configDataOptions.contains(option);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ConfigDataEnvironmentContributor withoutConfigDataOption(ConfigData.Option option) {
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(this.kind, this.location, this.resource,</b>
+&nbsp;				this.fromProfileSpecificImport, this.propertySource, this.configurationPropertySource, this.properties,
+<b class="fc">&nbsp;				this.configDataOptions.without(option), this.children);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return any imports requested by this contributor.
+&nbsp;	 * @return the imports
+&nbsp;	 */
+&nbsp;	List&lt;ConfigDataLocation&gt; getImports() {
+<b class="fc">&nbsp;		return (this.properties != null) ? this.properties.getImports() : Collections.emptyList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return true if this contributor has imports that have not yet been processed in the
+&nbsp;	 * given phase.
+&nbsp;	 * @param importPhase the import phase
+&nbsp;	 * @return if there are unprocessed imports
+&nbsp;	 */
+&nbsp;	boolean hasUnprocessedImports(ImportPhase importPhase) {
+<b class="fc">&nbsp;		if (getImports().isEmpty()) {</b>
+<b class="fc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return !this.children.containsKey(importPhase);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return children of this contributor for the given phase.
+&nbsp;	 * @param importPhase the import phase
+&nbsp;	 * @return a list of children
+&nbsp;	 */
+&nbsp;	List&lt;ConfigDataEnvironmentContributor&gt; getChildren(ImportPhase importPhase) {
+<b class="fc">&nbsp;		return this.children.getOrDefault(importPhase, Collections.emptyList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a {@link Stream} that traverses this contributor and all its children in
+&nbsp;	 * priority order.
+&nbsp;	 * @return the stream
+&nbsp;	 */
+&nbsp;	Stream&lt;ConfigDataEnvironmentContributor&gt; stream() {
+<b class="fc">&nbsp;		return StreamSupport.stream(spliterator(), false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns an {@link Iterator} that traverses this contributor and all its children in
+&nbsp;	 * priority order.
+&nbsp;	 * @return the iterator
+&nbsp;	 * @see java.lang.Iterable#iterator()
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;ConfigDataEnvironmentContributor&gt; iterator() {
+<b class="fc">&nbsp;		return new ContributorIterator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConfigDataEnvironmentContributor} with bound
+&nbsp;	 * {@link ConfigDataProperties}.
+&nbsp;	 * @param contributors the contributors used for binding
+&nbsp;	 * @param activationContext the activation context
+&nbsp;	 * @return a new contributor instance
+&nbsp;	 */
+&nbsp;	ConfigDataEnvironmentContributor withBoundProperties(Iterable&lt;ConfigDataEnvironmentContributor&gt; contributors,
+&nbsp;			ConfigDataActivationContext activationContext) {
+<b class="fc">&nbsp;		Iterable&lt;ConfigurationPropertySource&gt; sources = Collections.singleton(getConfigurationPropertySource());</b>
+<b class="fc">&nbsp;		PlaceholdersResolver placeholdersResolver = new ConfigDataEnvironmentContributorPlaceholdersResolver(</b>
+&nbsp;				contributors, activationContext, this, true);
+<b class="fc">&nbsp;		Binder binder = new Binder(sources, placeholdersResolver, null, null, null);</b>
+<b class="fc">&nbsp;		ConfigDataProperties properties = ConfigDataProperties.get(binder);</b>
+<b class="fc">&nbsp;		if (properties != null &amp;&amp; this.configDataOptions.contains(ConfigData.Option.IGNORE_IMPORTS)) {</b>
+<b class="fc">&nbsp;			properties = properties.withoutImports();</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(Kind.BOUND_IMPORT, this.location, this.resource,</b>
+&nbsp;				this.fromProfileSpecificImport, this.propertySource, this.configurationPropertySource, properties,
+&nbsp;				this.configDataOptions, null);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConfigDataEnvironmentContributor} instance with a new set of
+&nbsp;	 * children for the given phase.
+&nbsp;	 * @param importPhase the import phase
+&nbsp;	 * @param children the new children
+&nbsp;	 * @return a new contributor instance
+&nbsp;	 */
+&nbsp;	ConfigDataEnvironmentContributor withChildren(ImportPhase importPhase,
+&nbsp;			List&lt;ConfigDataEnvironmentContributor&gt; children) {
+<b class="fc">&nbsp;		Map&lt;ImportPhase, List&lt;ConfigDataEnvironmentContributor&gt;&gt; updatedChildren = new LinkedHashMap&lt;&gt;(this.children);</b>
+<b class="fc">&nbsp;		updatedChildren.put(importPhase, children);</b>
+<b class="fc">&nbsp;		if (importPhase == ImportPhase.AFTER_PROFILE_ACTIVATION) {</b>
+<b class="fc">&nbsp;			moveProfileSpecific(updatedChildren);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(this.kind, this.location, this.resource,</b>
+&nbsp;				this.fromProfileSpecificImport, this.propertySource, this.configurationPropertySource, this.properties,
+&nbsp;				this.configDataOptions, updatedChildren);
+&nbsp;	}
+&nbsp;
+&nbsp;	private void moveProfileSpecific(Map&lt;ImportPhase, List&lt;ConfigDataEnvironmentContributor&gt;&gt; children) {
+<b class="fc">&nbsp;		List&lt;ConfigDataEnvironmentContributor&gt; before = children.get(ImportPhase.BEFORE_PROFILE_ACTIVATION);</b>
+<b class="fc">&nbsp;		if (!hasAnyProfileSpecificChildren(before)) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;ConfigDataEnvironmentContributor&gt; updatedBefore = new ArrayList&lt;&gt;(before.size());</b>
+<b class="nc">&nbsp;		List&lt;ConfigDataEnvironmentContributor&gt; updatedAfter = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (ConfigDataEnvironmentContributor contributor : before) {</b>
+<b class="nc">&nbsp;			updatedBefore.add(moveProfileSpecificChildren(contributor, updatedAfter));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		updatedAfter.addAll(children.getOrDefault(ImportPhase.AFTER_PROFILE_ACTIVATION, Collections.emptyList()));</b>
+<b class="nc">&nbsp;		children.put(ImportPhase.BEFORE_PROFILE_ACTIVATION, updatedBefore);</b>
+<b class="nc">&nbsp;		children.put(ImportPhase.AFTER_PROFILE_ACTIVATION, updatedAfter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigDataEnvironmentContributor moveProfileSpecificChildren(ConfigDataEnvironmentContributor contributor,
+&nbsp;			List&lt;ConfigDataEnvironmentContributor&gt; removed) {
+<b class="nc">&nbsp;		for (ImportPhase importPhase : ImportPhase.values()) {</b>
+<b class="nc">&nbsp;			List&lt;ConfigDataEnvironmentContributor&gt; children = contributor.getChildren(importPhase);</b>
+<b class="nc">&nbsp;			List&lt;ConfigDataEnvironmentContributor&gt; updatedChildren = new ArrayList&lt;&gt;(children.size());</b>
+<b class="nc">&nbsp;			for (ConfigDataEnvironmentContributor child : children) {</b>
+<b class="nc">&nbsp;				if (child.hasConfigDataOption(ConfigData.Option.PROFILE_SPECIFIC)) {</b>
+<b class="nc">&nbsp;					removed.add(child.withoutConfigDataOption(ConfigData.Option.PROFILE_SPECIFIC));</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					updatedChildren.add(child);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			contributor = contributor.withChildren(importPhase, updatedChildren);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return contributor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasAnyProfileSpecificChildren(List&lt;ConfigDataEnvironmentContributor&gt; contributors) {
+<b class="fc">&nbsp;		if (CollectionUtils.isEmpty(contributors)) {</b>
+<b class="fc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		for (ConfigDataEnvironmentContributor contributor : contributors) {</b>
+<b class="nc">&nbsp;			for (ImportPhase importPhase : ImportPhase.values()) {</b>
+<b class="nc">&nbsp;				if (contributor.getChildren(importPhase)</b>
+<b class="nc">&nbsp;					.stream()</b>
+<b class="nc">&nbsp;					.anyMatch((child) -&gt; child.hasConfigDataOption(ConfigData.Option.PROFILE_SPECIFIC))) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConfigDataEnvironmentContributor} instance where an existing
+&nbsp;	 * child is replaced.
+&nbsp;	 * @param existing the existing node that should be replaced
+&nbsp;	 * @param replacement the replacement node that should be used instead
+&nbsp;	 * @return a new {@link ConfigDataEnvironmentContributor} instance
+&nbsp;	 */
+&nbsp;	ConfigDataEnvironmentContributor withReplacement(ConfigDataEnvironmentContributor existing,
+&nbsp;			ConfigDataEnvironmentContributor replacement) {
+<b class="fc">&nbsp;		if (this == existing) {</b>
+<b class="fc">&nbsp;			return replacement;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		Map&lt;ImportPhase, List&lt;ConfigDataEnvironmentContributor&gt;&gt; updatedChildren = new LinkedHashMap&lt;&gt;(</b>
+<b class="fc">&nbsp;				this.children.size());</b>
+<b class="fc">&nbsp;		this.children.forEach((importPhase, contributors) -&gt; {</b>
+<b class="fc">&nbsp;			List&lt;ConfigDataEnvironmentContributor&gt; updatedContributors = new ArrayList&lt;&gt;(contributors.size());</b>
+<b class="fc">&nbsp;			for (ConfigDataEnvironmentContributor contributor : contributors) {</b>
+<b class="fc">&nbsp;				updatedContributors.add(contributor.withReplacement(existing, replacement));</b>
+<b class="fc">&nbsp;			}</b>
+<b class="fc">&nbsp;			updatedChildren.put(importPhase, Collections.unmodifiableList(updatedContributors));</b>
+&nbsp;		});
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(this.kind, this.location, this.resource,</b>
+&nbsp;				this.fromProfileSpecificImport, this.propertySource, this.configurationPropertySource, this.properties,
+&nbsp;				this.configDataOptions, updatedChildren);
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="fc">&nbsp;		StringBuilder builder = new StringBuilder();</b>
+<b class="fc">&nbsp;		buildToString(&quot;&quot;, builder);</b>
+<b class="fc">&nbsp;		return builder.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void buildToString(String prefix, StringBuilder builder) {
+<b class="fc">&nbsp;		builder.append(prefix);</b>
+<b class="fc">&nbsp;		builder.append(this.kind);</b>
+<b class="fc">&nbsp;		builder.append(&quot; &quot;);</b>
+<b class="fc">&nbsp;		builder.append(this.location);</b>
+<b class="fc">&nbsp;		builder.append(&quot; &quot;);</b>
+<b class="fc">&nbsp;		builder.append(this.resource);</b>
+<b class="fc">&nbsp;		builder.append(&quot; &quot;);</b>
+<b class="fc">&nbsp;		builder.append(this.configDataOptions);</b>
+<b class="fc">&nbsp;		builder.append(&quot;\n&quot;);</b>
+<b class="fc">&nbsp;		for (ConfigDataEnvironmentContributor child : this.children.getOrDefault(ImportPhase.BEFORE_PROFILE_ACTIVATION,</b>
+<b class="fc">&nbsp;				Collections.emptyList())) {</b>
+<b class="nc">&nbsp;			child.buildToString(prefix + &quot;    &quot;, builder);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="fc">&nbsp;		for (ConfigDataEnvironmentContributor child : this.children.getOrDefault(ImportPhase.AFTER_PROFILE_ACTIVATION,</b>
+<b class="fc">&nbsp;				Collections.emptyList())) {</b>
+<b class="nc">&nbsp;			child.buildToString(prefix + &quot;    &quot;, builder);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a {@link Kind#ROOT root} contributor.
+&nbsp;	 * @param contributors the immediate children of the root
+&nbsp;	 * @return a new {@link ConfigDataEnvironmentContributor} instance
+&nbsp;	 */
+&nbsp;	static ConfigDataEnvironmentContributor of(List&lt;ConfigDataEnvironmentContributor&gt; contributors) {
+<b class="fc">&nbsp;		Map&lt;ImportPhase, List&lt;ConfigDataEnvironmentContributor&gt;&gt; children = new LinkedHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;		children.put(ImportPhase.BEFORE_PROFILE_ACTIVATION, Collections.unmodifiableList(contributors));</b>
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(Kind.ROOT, null, null, false, null, null, null, null, children);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a {@link Kind#INITIAL_IMPORT initial import} contributor.
+&nbsp;	 * This contributor is used to trigger initial imports of additional contributors. It
+&nbsp;	 * does not contribute any properties itself.
+&nbsp;	 * @param initialImport the initial import location (with placeholders resolved)
+&nbsp;	 * @return a new {@link ConfigDataEnvironmentContributor} instance
+&nbsp;	 */
+&nbsp;	static ConfigDataEnvironmentContributor ofInitialImport(ConfigDataLocation initialImport) {
+<b class="fc">&nbsp;		List&lt;ConfigDataLocation&gt; imports = Collections.singletonList(initialImport);</b>
+<b class="fc">&nbsp;		ConfigDataProperties properties = new ConfigDataProperties(imports, null);</b>
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(Kind.INITIAL_IMPORT, null, null, false, null, null, properties,</b>
+&nbsp;				null, null);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a contributor that wraps an {@link Kind#EXISTING existing}
+&nbsp;	 * property source. The contributor provides access to existing properties, but
+&nbsp;	 * doesn&#39;t actively import any additional contributors.
+&nbsp;	 * @param propertySource the property source to wrap
+&nbsp;	 * @return a new {@link ConfigDataEnvironmentContributor} instance
+&nbsp;	 */
+&nbsp;	static ConfigDataEnvironmentContributor ofExisting(PropertySource&lt;?&gt; propertySource) {
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(Kind.EXISTING, null, null, false, propertySource,</b>
+<b class="fc">&nbsp;				ConfigurationPropertySource.from(propertySource), null, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create an {@link Kind#UNBOUND_IMPORT unbound import} contributor.
+&nbsp;	 * This contributor has been actively imported from another contributor and may itself
+&nbsp;	 * import further contributors later.
+&nbsp;	 * @param location the location of this contributor
+&nbsp;	 * @param resource the config data resource
+&nbsp;	 * @param profileSpecific if the contributor is from a profile specific import
+&nbsp;	 * @param configData the config data
+&nbsp;	 * @param propertySourceIndex the index of the property source that should be used
+&nbsp;	 * @return a new {@link ConfigDataEnvironmentContributor} instance
+&nbsp;	 */
+&nbsp;	static ConfigDataEnvironmentContributor ofUnboundImport(ConfigDataLocation location, ConfigDataResource resource,
+&nbsp;			boolean profileSpecific, ConfigData configData, int propertySourceIndex) {
+<b class="fc">&nbsp;		PropertySource&lt;?&gt; propertySource = configData.getPropertySources().get(propertySourceIndex);</b>
+<b class="fc">&nbsp;		ConfigData.Options options = configData.getOptions(propertySource);</b>
+<b class="fc">&nbsp;		ConfigurationPropertySource configurationPropertySource = ConfigurationPropertySource.from(propertySource);</b>
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(Kind.UNBOUND_IMPORT, location, resource, profileSpecific,</b>
+&nbsp;				propertySource, configurationPropertySource, null, options, null);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create an {@link Kind#EMPTY_LOCATION empty location} contributor.
+&nbsp;	 * @param location the location of this contributor
+&nbsp;	 * @param profileSpecific if the contributor is from a profile specific import
+&nbsp;	 * @return a new {@link ConfigDataEnvironmentContributor} instance
+&nbsp;	 */
+&nbsp;	static ConfigDataEnvironmentContributor ofEmptyLocation(ConfigDataLocation location, boolean profileSpecific) {
+<b class="fc">&nbsp;		return new ConfigDataEnvironmentContributor(Kind.EMPTY_LOCATION, location, null, profileSpecific, null, null,</b>
+&nbsp;				null, EMPTY_LOCATION_OPTIONS, null);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The various kinds of contributor.
+&nbsp;	 */
+<b class="fc">&nbsp;	enum Kind {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * A root contributor used contain the initial set of children.
+&nbsp;		 */
+<b class="fc">&nbsp;		ROOT,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * An initial import that needs to be processed.
+&nbsp;		 */
+<b class="fc">&nbsp;		INITIAL_IMPORT,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * An existing property source that contributes properties but no imports.
+&nbsp;		 */
+<b class="fc">&nbsp;		EXISTING,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * A contributor with {@link ConfigData} imported from another contributor but not
+&nbsp;		 * yet bound.
+&nbsp;		 */
+<b class="fc">&nbsp;		UNBOUND_IMPORT,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * A contributor with {@link ConfigData} imported from another contributor that
+&nbsp;		 * has been.
+&nbsp;		 */
+<b class="fc">&nbsp;		BOUND_IMPORT,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * A valid location that contained nothing to load.
+&nbsp;		 */
+<b class="fc">&nbsp;		EMPTY_LOCATION</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Import phases that can be used when obtaining imports.
+&nbsp;	 */
+<b class="fc">&nbsp;	enum ImportPhase {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The phase before profiles have been activated.
+&nbsp;		 */
+<b class="fc">&nbsp;		BEFORE_PROFILE_ACTIVATION,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The phase after profiles have been activated.
+&nbsp;		 */
+<b class="fc">&nbsp;		AFTER_PROFILE_ACTIVATION;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the {@link ImportPhase} based on the given activation context.
+&nbsp;		 * @param activationContext the activation context
+&nbsp;		 * @return the import phase
+&nbsp;		 */
+&nbsp;		static ImportPhase get(ConfigDataActivationContext activationContext) {
+<b class="nc">&nbsp;			if (activationContext != null &amp;&amp; activationContext.getProfiles() != null) {</b>
+<b class="nc">&nbsp;				return AFTER_PROFILE_ACTIVATION;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return BEFORE_PROFILE_ACTIVATION;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Iterator that traverses the contributor tree.
+&nbsp;	 */
+&nbsp;	private final class ContributorIterator implements Iterator&lt;ConfigDataEnvironmentContributor&gt; {
+&nbsp;
+&nbsp;		private ImportPhase phase;
+&nbsp;
+&nbsp;		private Iterator&lt;ConfigDataEnvironmentContributor&gt; children;
+&nbsp;
+&nbsp;		private Iterator&lt;ConfigDataEnvironmentContributor&gt; current;
+&nbsp;
+&nbsp;		private ConfigDataEnvironmentContributor next;
+&nbsp;
+<b class="fc">&nbsp;		private ContributorIterator() {</b>
+<b class="fc">&nbsp;			this.phase = ImportPhase.AFTER_PROFILE_ACTIVATION;</b>
+<b class="fc">&nbsp;			this.children = getChildren(this.phase).iterator();</b>
+<b class="fc">&nbsp;			this.current = Collections.emptyIterator();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean hasNext() {
+<b class="nc">&nbsp;			return fetchIfNecessary() != null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConfigDataEnvironmentContributor next() {
+<b class="nc">&nbsp;			ConfigDataEnvironmentContributor next = fetchIfNecessary();</b>
+<b class="nc">&nbsp;			if (next == null) {</b>
+<b class="nc">&nbsp;				throw new NoSuchElementException();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.next = null;</b>
+<b class="nc">&nbsp;			return next;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConfigDataEnvironmentContributor fetchIfNecessary() {
+<b class="nc">&nbsp;			if (this.next != null) {</b>
+<b class="nc">&nbsp;				return this.next;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.current.hasNext()) {</b>
+<b class="nc">&nbsp;				this.next = this.current.next();</b>
+<b class="nc">&nbsp;				return this.next;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.children.hasNext()) {</b>
+<b class="nc">&nbsp;				this.current = this.children.next().iterator();</b>
+<b class="nc">&nbsp;				return fetchIfNecessary();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.phase == ImportPhase.AFTER_PROFILE_ACTIVATION) {</b>
+<b class="nc">&nbsp;				this.phase = ImportPhase.BEFORE_PROFILE_ACTIVATION;</b>
+<b class="nc">&nbsp;				this.children = getChildren(this.phase).iterator();</b>
+<b class="nc">&nbsp;				return fetchIfNecessary();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.phase == ImportPhase.BEFORE_PROFILE_ACTIVATION) {</b>
+<b class="nc">&nbsp;				this.phase = null;</b>
+<b class="nc">&nbsp;				this.next = ConfigDataEnvironmentContributor.this;</b>
+<b class="nc">&nbsp;				return this.next;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

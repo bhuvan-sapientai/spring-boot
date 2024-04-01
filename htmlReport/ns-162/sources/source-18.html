@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertySourcesPlaceholdersResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertySourcesPlaceholdersResolver (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertySourcesPlaceholdersResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.4%
+  </span>
+  <span class="absValue">
+    (8/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.core.env.PropertySources;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.PropertyPlaceholderHelper;
+&nbsp;import org.springframework.util.SystemPropertyUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link PlaceholdersResolver} to resolve placeholders from {@link PropertySources}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class PropertySourcesPlaceholdersResolver implements PlaceholdersResolver {
+&nbsp;
+&nbsp;	private final Iterable&lt;PropertySource&lt;?&gt;&gt; sources;
+&nbsp;
+&nbsp;	private final PropertyPlaceholderHelper helper;
+&nbsp;
+&nbsp;	public PropertySourcesPlaceholdersResolver(Environment environment) {
+<b class="nc">&nbsp;		this(getSources(environment), null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public PropertySourcesPlaceholdersResolver(Iterable&lt;PropertySource&lt;?&gt;&gt; sources) {
+<b class="nc">&nbsp;		this(sources, null);</b>
+&nbsp;	}
+&nbsp;
+<b class="fc">&nbsp;	public PropertySourcesPlaceholdersResolver(Iterable&lt;PropertySource&lt;?&gt;&gt; sources, PropertyPlaceholderHelper helper) {</b>
+<b class="fc">&nbsp;		this.sources = sources;</b>
+<b class="fc">&nbsp;		this.helper = (helper != null) ? helper : new PropertyPlaceholderHelper(SystemPropertyUtils.PLACEHOLDER_PREFIX,</b>
+&nbsp;				SystemPropertyUtils.PLACEHOLDER_SUFFIX, SystemPropertyUtils.VALUE_SEPARATOR, true);
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object resolvePlaceholders(Object value) {
+<b class="fc">&nbsp;		if (value instanceof String string) {</b>
+<b class="fc">&nbsp;			return this.helper.replacePlaceholders(string, this::resolvePlaceholder);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String resolvePlaceholder(String placeholder) {
+<b class="fc">&nbsp;		if (this.sources != null) {</b>
+<b class="fc">&nbsp;			for (PropertySource&lt;?&gt; source : this.sources) {</b>
+<b class="nc">&nbsp;				Object value = source.getProperty(placeholder);</b>
+<b class="nc">&nbsp;				if (value != null) {</b>
+<b class="nc">&nbsp;					return String.valueOf(value);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PropertySources getSources(Environment environment) {
+<b class="nc">&nbsp;		Assert.notNull(environment, &quot;Environment must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isInstanceOf(ConfigurableEnvironment.class, environment,</b>
+&nbsp;				&quot;Environment must be a ConfigurableEnvironment&quot;);
+<b class="nc">&nbsp;		return ((ConfigurableEnvironment) environment).getPropertySources();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

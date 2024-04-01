@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OnJndiCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: OnJndiCondition (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OnJndiCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OnJndiCondition$JndiLocator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import javax.naming.NamingException;
+&nbsp;
+&nbsp;import org.springframework.context.annotation.Condition;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.AnnotationAttributes;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.jndi.JndiLocatorDelegate;
+&nbsp;import org.springframework.jndi.JndiLocatorSupport;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Condition} that checks for JNDI locations.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @see ConditionalOnJndi
+&nbsp; */
+&nbsp;@Order(Ordered.LOWEST_PRECEDENCE - 20)
+<b class="nc">&nbsp;class OnJndiCondition extends SpringBootCondition {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		AnnotationAttributes annotationAttributes = AnnotationAttributes</b>
+<b class="nc">&nbsp;			.fromMap(metadata.getAnnotationAttributes(ConditionalOnJndi.class.getName()));</b>
+<b class="nc">&nbsp;		String[] locations = annotationAttributes.getStringArray(&quot;value&quot;);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return getMatchOutcome(locations);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoClassDefFoundError ex) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome</b>
+<b class="nc">&nbsp;				.noMatch(ConditionMessage.forCondition(ConditionalOnJndi.class).because(&quot;JNDI class not found&quot;));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConditionOutcome getMatchOutcome(String[] locations) {
+<b class="nc">&nbsp;		if (!isJndiAvailable()) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome</b>
+<b class="nc">&nbsp;				.noMatch(ConditionMessage.forCondition(ConditionalOnJndi.class).notAvailable(&quot;JNDI environment&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (locations.length == 0) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome</b>
+<b class="nc">&nbsp;				.match(ConditionMessage.forCondition(ConditionalOnJndi.class).available(&quot;JNDI environment&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		JndiLocator locator = getJndiLocator(locations);</b>
+<b class="nc">&nbsp;		String location = locator.lookupFirstLocation();</b>
+<b class="nc">&nbsp;		String details = &quot;(&quot; + StringUtils.arrayToCommaDelimitedString(locations) + &quot;)&quot;;</b>
+<b class="nc">&nbsp;		if (location != null) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome.match(ConditionMessage.forCondition(ConditionalOnJndi.class, details)</b>
+<b class="nc">&nbsp;				.foundExactly(&quot;\&quot;&quot; + location + &quot;\&quot;&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnJndi.class, details)</b>
+<b class="nc">&nbsp;			.didNotFind(&quot;any matching JNDI location&quot;)</b>
+<b class="nc">&nbsp;			.atAll());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected boolean isJndiAvailable() {
+<b class="nc">&nbsp;		return JndiLocatorDelegate.isDefaultJndiEnvironmentAvailable();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected JndiLocator getJndiLocator(String[] locations) {
+<b class="nc">&nbsp;		return new JndiLocator(locations);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected static class JndiLocator extends JndiLocatorSupport {
+&nbsp;
+&nbsp;		private final String[] locations;
+&nbsp;
+<b class="nc">&nbsp;		public JndiLocator(String[] locations) {</b>
+<b class="nc">&nbsp;			this.locations = locations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String lookupFirstLocation() {
+<b class="nc">&nbsp;			for (String location : this.locations) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					lookup(location);</b>
+<b class="nc">&nbsp;					return location;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (NamingException ex) {</b>
+&nbsp;					// Swallow and continue
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

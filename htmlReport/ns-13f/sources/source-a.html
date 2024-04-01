@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TotalProgressListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker</a>
+</div>
+
+<h1>Coverage Summary for Class: TotalProgressListener (org.springframework.boot.buildpack.platform.docker)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TotalProgressListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TotalProgressListener$Layer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.ProgressUpdateEvent.ProgressDetail;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link UpdateListener} that calculates the total progress of the entire image operation
+&nbsp; * and publishes {@link TotalProgressEvent}.
+&nbsp; *
+&nbsp; * @param &lt;E&gt; the type of {@link ImageProgressUpdateEvent}
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.4.0
+&nbsp; */
+&nbsp;public abstract class TotalProgressListener&lt;E extends ImageProgressUpdateEvent&gt; implements UpdateListener&lt;E&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, Layer&gt; layers = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private final Consumer&lt;TotalProgressEvent&gt; consumer;
+&nbsp;
+&nbsp;	private final String[] trackedStatusKeys;
+&nbsp;
+&nbsp;	private boolean progressStarted;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link TotalProgressListener} that sends {@link TotalProgressEvent
+&nbsp;	 * events} to the given consumer.
+&nbsp;	 * @param consumer the consumer that receives {@link TotalProgressEvent progress
+&nbsp;	 * events}
+&nbsp;	 * @param trackedStatusKeys a list of status event keys to track the progress of
+&nbsp;	 */
+<b class="nc">&nbsp;	protected TotalProgressListener(Consumer&lt;TotalProgressEvent&gt; consumer, String[] trackedStatusKeys) {</b>
+<b class="nc">&nbsp;		this.consumer = consumer;</b>
+<b class="nc">&nbsp;		this.trackedStatusKeys = trackedStatusKeys;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onStart() {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onUpdate(E event) {
+<b class="nc">&nbsp;		if (event.getId() != null) {</b>
+<b class="nc">&nbsp;			this.layers.computeIfAbsent(event.getId(), (value) -&gt; new Layer(this.trackedStatusKeys)).update(event);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.progressStarted = this.progressStarted || event.getProgress() != null;</b>
+<b class="nc">&nbsp;		if (this.progressStarted) {</b>
+<b class="nc">&nbsp;			publish(0);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onFinish() {
+<b class="nc">&nbsp;		this.layers.values().forEach(Layer::finish);</b>
+<b class="nc">&nbsp;		publish(100);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void publish(int fallback) {
+<b class="nc">&nbsp;		int count = 0;</b>
+<b class="nc">&nbsp;		int total = 0;</b>
+<b class="nc">&nbsp;		for (Layer layer : this.layers.values()) {</b>
+<b class="nc">&nbsp;			count++;</b>
+<b class="nc">&nbsp;			total += layer.getProgress();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		TotalProgressEvent event = new TotalProgressEvent(</b>
+<b class="nc">&nbsp;				(count != 0) ? withinPercentageBounds(total / count) : fallback);</b>
+<b class="nc">&nbsp;		this.consumer.accept(event);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static int withinPercentageBounds(int value) {
+<b class="nc">&nbsp;		if (value &lt; 0) {</b>
+<b class="nc">&nbsp;			return 0;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Math.min(value, 100);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Progress for an individual layer.
+&nbsp;	 */
+&nbsp;	private static class Layer {
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, Integer&gt; progressByStatus = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		Layer(String[] trackedStatusKeys) {</b>
+<b class="nc">&nbsp;			Arrays.stream(trackedStatusKeys).forEach((status) -&gt; this.progressByStatus.put(status, 0));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void update(ImageProgressUpdateEvent event) {
+<b class="nc">&nbsp;			String status = event.getStatus();</b>
+<b class="nc">&nbsp;			if (event.getProgressDetail() != null &amp;&amp; this.progressByStatus.containsKey(status)) {</b>
+<b class="nc">&nbsp;				int current = this.progressByStatus.get(status);</b>
+<b class="nc">&nbsp;				this.progressByStatus.put(status, updateProgress(current, event.getProgressDetail()));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private int updateProgress(int current, ProgressDetail detail) {
+<b class="nc">&nbsp;			int result = withinPercentageBounds((int) ((100.0 / detail.getTotal()) * detail.getCurrent()));</b>
+<b class="nc">&nbsp;			return Math.max(result, current);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void finish() {
+<b class="nc">&nbsp;			this.progressByStatus.keySet().forEach((key) -&gt; this.progressByStatus.put(key, 100));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		int getProgress() {
+<b class="nc">&nbsp;			return withinPercentageBounds((this.progressByStatus.values().stream().mapToInt(Integer::valueOf).sum())</b>
+<b class="nc">&nbsp;					/ this.progressByStatus.size());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

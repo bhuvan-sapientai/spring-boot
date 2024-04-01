@@ -1,0 +1,159 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DockerConnectionException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.transport</a>
+</div>
+
+<h1>Coverage Summary for Class: DockerConnectionException (org.springframework.boot.buildpack.platform.docker.transport)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DockerConnectionException</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.transport;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Exception thrown when connection to the Docker daemon fails.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class DockerConnectionException extends RuntimeException {
+&nbsp;
+&nbsp;	private static final String JNA_EXCEPTION_CLASS_NAME = &quot;com.sun.jna.LastErrorException&quot;;
+&nbsp;
+&nbsp;	public DockerConnectionException(String host, Exception cause) {
+<b class="nc">&nbsp;		super(buildMessage(host, cause), cause);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String buildMessage(String host, Exception cause) {
+<b class="nc">&nbsp;		Assert.notNull(host, &quot;Host must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(cause, &quot;Cause must not be null&quot;);</b>
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder(&quot;Connection to the Docker daemon at &#39;&quot; + host + &quot;&#39; failed&quot;);</b>
+<b class="nc">&nbsp;		String causeMessage = getCauseMessage(cause);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(causeMessage)) {</b>
+<b class="nc">&nbsp;			message.append(&quot; with error \&quot;&quot;).append(causeMessage).append(&quot;\&quot;&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		message.append(&quot;; ensure the Docker daemon is running and accessible&quot;);</b>
+<b class="nc">&nbsp;		return message.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getCauseMessage(Exception cause) {
+<b class="nc">&nbsp;		if (cause.getCause() != null &amp;&amp; cause.getCause().getClass().getName().equals(JNA_EXCEPTION_CLASS_NAME)) {</b>
+<b class="nc">&nbsp;			return cause.getCause().getMessage();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return cause.getMessage();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

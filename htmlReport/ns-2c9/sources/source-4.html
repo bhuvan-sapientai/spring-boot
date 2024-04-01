@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GraphQlTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.autoconfigure.graphql</a>
+</div>
+
+<h1>Coverage Summary for Class: GraphQlTest (org.springframework.boot.test.autoconfigure.graphql)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">GraphQlTest</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2020-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.autoconfigure.graphql;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Inherited;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.junit.jupiter.api.extension.ExtendWith;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.SpringBootApplication;
+&nbsp;import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
+&nbsp;import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
+&nbsp;import org.springframework.boot.test.autoconfigure.filter.TypeExcludeFilters;
+&nbsp;import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
+&nbsp;import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureHttpGraphQlTester;
+&nbsp;import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
+&nbsp;import org.springframework.context.annotation.ComponentScan;
+&nbsp;import org.springframework.core.annotation.AliasFor;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.test.context.BootstrapWith;
+&nbsp;import org.springframework.test.context.junit.jupiter.SpringExtension;
+&nbsp;
+&nbsp;/**
+&nbsp; * Annotation to perform GraphQL tests focusing on GraphQL request execution without a Web
+&nbsp; * layer, and loading only a subset of the application configuration.
+&nbsp; * &lt;p&gt;
+&nbsp; * The annotation disables full auto-configuration and instead loads only components
+&nbsp; * relevant to GraphQL tests, including the following:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@code @Controller}
+&nbsp; * &lt;li&gt;{@code RuntimeWiringConfigurer}
+&nbsp; * &lt;li&gt;{@code @JsonComponent}
+&nbsp; * &lt;li&gt;{@code Converter}
+&nbsp; * &lt;li&gt;{@code GenericConverter}
+&nbsp; * &lt;li&gt;{@code DataFetcherExceptionResolver}
+&nbsp; * &lt;li&gt;{@code Instrumentation}
+&nbsp; * &lt;li&gt;{@code GraphQlSourceBuilderCustomizer}
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The annotation does not automatically load {@code @Component}, {@code @Service},
+&nbsp; * {@code @Repository}, and other beans.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, tests annotated with {@code @GraphQlTest} have a
+&nbsp; * {@link org.springframework.graphql.test.tester.GraphQlTester} configured. For more
+&nbsp; * fine-grained control of the GraphQlTester, use
+&nbsp; * {@link AutoConfigureGraphQlTester @AutoConfigureGraphQlTester}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Typically {@code @GraphQlTest} is used in combination with
+&nbsp; * {@link org.springframework.boot.test.mock.mockito.MockBean @MockBean} or
+&nbsp; * {@link org.springframework.context.annotation.Import @Import} to load any collaborators
+&nbsp; * and other components required for the tests.
+&nbsp; * &lt;p&gt;
+&nbsp; * To load your full application configuration instead and test via
+&nbsp; * {@code HttpGraphQlTester}, consider using
+&nbsp; * {@link org.springframework.boot.test.context.SpringBootTest @SpringBootTest} combined
+&nbsp; * with {@link AutoConfigureHttpGraphQlTester @AutoConfigureHttpGraphQlTester}.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.7.0
+&nbsp; * @see AutoConfigureGraphQlTester
+&nbsp; */
+&nbsp;@Target(ElementType.TYPE)
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Documented
+&nbsp;@Inherited
+&nbsp;@BootstrapWith(GraphQlTestContextBootstrapper.class)
+&nbsp;@ExtendWith(SpringExtension.class)
+&nbsp;@OverrideAutoConfiguration(enabled = false)
+&nbsp;@TypeExcludeFilters(GraphQlTypeExcludeFilter.class)
+&nbsp;@AutoConfigureCache
+&nbsp;@AutoConfigureJson
+&nbsp;@AutoConfigureGraphQl
+&nbsp;@AutoConfigureGraphQlTester
+&nbsp;@ImportAutoConfiguration
+&nbsp;public @interface GraphQlTest {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties in form {@literal key=value} that should be added to the Spring
+&nbsp;	 * {@link Environment} before the test runs.
+&nbsp;	 * @return the properties to add
+&nbsp;	 */
+&nbsp;	String[] properties() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Specifies the controllers to test. This is an alias of {@link #controllers()} which
+&nbsp;	 * can be used for brevity if no other attributes are defined. See
+&nbsp;	 * {@link #controllers()} for details.
+&nbsp;	 * @see #controllers()
+&nbsp;	 * @return the controllers to test
+&nbsp;	 */
+&nbsp;	@AliasFor(&quot;controllers&quot;)
+&nbsp;	Class&lt;?&gt;[] value() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Specifies the controllers to test. May be left blank if all {@code @Controller}
+&nbsp;	 * beans should be added to the application context.
+&nbsp;	 * @see #value()
+&nbsp;	 * @return the controllers to test
+&nbsp;	 */
+&nbsp;	@AliasFor(&quot;value&quot;)
+&nbsp;	Class&lt;?&gt;[] controllers() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determines if default filtering should be used with
+&nbsp;	 * {@link SpringBootApplication @SpringBootApplication}. By default, only
+&nbsp;	 * {@code @Controller} (when no explicit {@link #controllers() controllers} are
+&nbsp;	 * defined), {@code RuntimeWiringConfigurer}, {@code @JsonComponent},
+&nbsp;	 * {@code Converter}, {@code GenericConverter}, {@code DataFetcherExceptionResolver},
+&nbsp;	 * {@code Instrumentation} and {@code GraphQlSourceBuilderCustomizer} beans are
+&nbsp;	 * included.
+&nbsp;	 * @see #includeFilters()
+&nbsp;	 * @see #excludeFilters()
+&nbsp;	 * @return if default filters should be used
+&nbsp;	 */
+&nbsp;	boolean useDefaultFilters() default true;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A set of include filters which can be used to add otherwise filtered beans to the
+&nbsp;	 * application context.
+&nbsp;	 * @return include filters to apply
+&nbsp;	 */
+&nbsp;	ComponentScan.Filter[] includeFilters() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A set of exclude filters which can be used to filter beans that would otherwise be
+&nbsp;	 * added to the application context.
+&nbsp;	 * @return exclude filters to apply
+&nbsp;	 */
+&nbsp;	ComponentScan.Filter[] excludeFilters() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Auto-configuration exclusions that should be applied for this test.
+&nbsp;	 * @return auto-configuration exclusions to apply
+&nbsp;	 */
+&nbsp;	@AliasFor(annotation = ImportAutoConfiguration.class, attribute = &quot;exclude&quot;)
+&nbsp;	Class&lt;?&gt;[] excludeAutoConfiguration() default {};
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

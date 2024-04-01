@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationPropertiesPlugin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.context.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationPropertiesPlugin (org.springframework.boot.build.context.properties)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationPropertiesPlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.context.properties;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.file.RegularFile;
+&nbsp;import org.gradle.api.plugins.JavaPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPluginExtension;
+&nbsp;import org.gradle.api.provider.Provider;
+&nbsp;import org.gradle.api.tasks.PathSensitivity;
+&nbsp;import org.gradle.api.tasks.SourceSet;
+&nbsp;import org.gradle.api.tasks.TaskProvider;
+&nbsp;import org.gradle.api.tasks.compile.JavaCompile;
+&nbsp;import org.gradle.language.base.plugins.LifecycleBasePlugin;
+&nbsp;
+&nbsp;import org.springframework.boot.build.processors.ProcessedAnnotationsPlugin;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Plugin} for projects that define {@code @ConfigurationProperties}. When applied,
+&nbsp; * the plugin reacts to the presence of the {@link JavaPlugin} by:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;Adding a dependency on the configuration properties annotation processor.
+&nbsp; * &lt;li&gt;Disables incremental compilation to avoid property descriptions being lost.
+&nbsp; * &lt;li&gt;Configuring the additional metadata locations annotation processor compiler
+&nbsp; * argument.
+&nbsp; * &lt;li&gt;Adding the outputs of the processResources task as inputs of the compileJava task
+&nbsp; * to ensure that the additional metadata is available when the annotation processor runs.
+&nbsp; * &lt;li&gt;Registering a {@link CheckAdditionalSpringConfigurationMetadata} task and
+&nbsp; * configuring the {@code check} task to depend upon it.
+&nbsp; * &lt;li&gt;Defining an artifact for the resulting configuration property metadata so that it
+&nbsp; * can be consumed by downstream projects.
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class ConfigurationPropertiesPlugin implements Plugin&lt;Project&gt; {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the {@link Configuration} that holds the configuration property metadata
+&nbsp;	 * artifact.
+&nbsp;	 */
+&nbsp;	public static final String CONFIGURATION_PROPERTIES_METADATA_CONFIGURATION_NAME = &quot;configurationPropertiesMetadata&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the {@link CheckAdditionalSpringConfigurationMetadata} task.
+&nbsp;	 */
+&nbsp;	public static final String CHECK_ADDITIONAL_SPRING_CONFIGURATION_METADATA_TASK_NAME = &quot;checkAdditionalSpringConfigurationMetadata&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the {@link CheckAdditionalSpringConfigurationMetadata} task.
+&nbsp;	 */
+&nbsp;	public static final String CHECK_SPRING_CONFIGURATION_METADATA_TASK_NAME = &quot;checkSpringConfigurationMetadata&quot;;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void apply(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -&gt; {</b>
+<b class="nc">&nbsp;			configureConfigurationPropertiesAnnotationProcessor(project);</b>
+<b class="nc">&nbsp;			disableIncrementalCompilation(project);</b>
+<b class="nc">&nbsp;			configureAdditionalMetadataLocationsCompilerArgument(project);</b>
+<b class="nc">&nbsp;			registerCheckAdditionalMetadataTask(project);</b>
+<b class="nc">&nbsp;			registerCheckMetadataTask(project);</b>
+<b class="nc">&nbsp;			addMetadataArtifact(project);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureConfigurationPropertiesAnnotationProcessor(Project project) {
+<b class="nc">&nbsp;		Configuration annotationProcessors = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(JavaPlugin.ANNOTATION_PROCESSOR_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		annotationProcessors.getDependencies()</b>
+<b class="nc">&nbsp;			.add(project.getDependencies()</b>
+<b class="nc">&nbsp;				.project(Collections.singletonMap(&quot;path&quot;,</b>
+&nbsp;						&quot;:spring-boot-project:spring-boot-tools:spring-boot-configuration-processor&quot;)));
+<b class="nc">&nbsp;		project.getPlugins().apply(ProcessedAnnotationsPlugin.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void disableIncrementalCompilation(Project project) {
+<b class="nc">&nbsp;		SourceSet mainSourceSet = project.getExtensions()</b>
+<b class="nc">&nbsp;			.getByType(JavaPluginExtension.class)</b>
+<b class="nc">&nbsp;			.getSourceSets()</b>
+<b class="nc">&nbsp;			.getByName(SourceSet.MAIN_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(mainSourceSet.getCompileJavaTaskName(), JavaCompile.class)</b>
+<b class="nc">&nbsp;			.configure((compileJava) -&gt; compileJava.getOptions().setIncremental(false));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addMetadataArtifact(Project project) {
+<b class="nc">&nbsp;		SourceSet mainSourceSet = project.getExtensions()</b>
+<b class="nc">&nbsp;			.getByType(JavaPluginExtension.class)</b>
+<b class="nc">&nbsp;			.getSourceSets()</b>
+<b class="nc">&nbsp;			.getByName(SourceSet.MAIN_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;		project.getConfigurations().maybeCreate(CONFIGURATION_PROPERTIES_METADATA_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		project.afterEvaluate((evaluatedProject) -&gt; evaluatedProject.getArtifacts()</b>
+<b class="nc">&nbsp;			.add(CONFIGURATION_PROPERTIES_METADATA_CONFIGURATION_NAME,</b>
+<b class="nc">&nbsp;					mainSourceSet.getJava()</b>
+<b class="nc">&nbsp;						.getDestinationDirectory()</b>
+<b class="nc">&nbsp;						.dir(&quot;META-INF/spring-configuration-metadata.json&quot;),</b>
+<b class="nc">&nbsp;					(artifact) -&gt; artifact</b>
+<b class="nc">&nbsp;						.builtBy(evaluatedProject.getTasks().getByName(mainSourceSet.getClassesTaskName()))));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureAdditionalMetadataLocationsCompilerArgument(Project project) {
+<b class="nc">&nbsp;		JavaCompile compileJava = project.getTasks()</b>
+<b class="nc">&nbsp;			.withType(JavaCompile.class)</b>
+<b class="nc">&nbsp;			.getByName(JavaPlugin.COMPILE_JAVA_TASK_NAME);</b>
+<b class="nc">&nbsp;		((Task) compileJava).getInputs()</b>
+<b class="nc">&nbsp;			.files(project.getTasks().getByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME))</b>
+<b class="nc">&nbsp;			.withPathSensitivity(PathSensitivity.RELATIVE)</b>
+<b class="nc">&nbsp;			.withPropertyName(&quot;processed resources&quot;);</b>
+<b class="nc">&nbsp;		SourceSet mainSourceSet = project.getExtensions()</b>
+<b class="nc">&nbsp;			.getByType(JavaPluginExtension.class)</b>
+<b class="nc">&nbsp;			.getSourceSets()</b>
+<b class="nc">&nbsp;			.getByName(SourceSet.MAIN_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;		compileJava.getOptions()</b>
+<b class="nc">&nbsp;			.getCompilerArgs()</b>
+<b class="nc">&nbsp;			.add(&quot;-Aorg.springframework.boot.configurationprocessor.additionalMetadataLocations=&quot;</b>
+<b class="nc">&nbsp;					+ StringUtils.collectionToCommaDelimitedString(mainSourceSet.getResources()</b>
+<b class="nc">&nbsp;						.getSourceDirectories()</b>
+<b class="nc">&nbsp;						.getFiles()</b>
+<b class="nc">&nbsp;						.stream()</b>
+<b class="nc">&nbsp;						.map(project.getRootProject()::relativePath)</b>
+<b class="nc">&nbsp;						.collect(Collectors.toSet())));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerCheckAdditionalMetadataTask(Project project) {
+<b class="nc">&nbsp;		TaskProvider&lt;CheckAdditionalSpringConfigurationMetadata&gt; checkConfigurationMetadata = project.getTasks()</b>
+<b class="nc">&nbsp;			.register(CHECK_ADDITIONAL_SPRING_CONFIGURATION_METADATA_TASK_NAME,</b>
+&nbsp;					CheckAdditionalSpringConfigurationMetadata.class);
+<b class="nc">&nbsp;		checkConfigurationMetadata.configure((check) -&gt; {</b>
+<b class="nc">&nbsp;			SourceSet mainSourceSet = project.getExtensions()</b>
+<b class="nc">&nbsp;				.getByType(JavaPluginExtension.class)</b>
+<b class="nc">&nbsp;				.getSourceSets()</b>
+<b class="nc">&nbsp;				.getByName(SourceSet.MAIN_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;			check.setSource(mainSourceSet.getResources());</b>
+<b class="nc">&nbsp;			check.include(&quot;META-INF/additional-spring-configuration-metadata.json&quot;);</b>
+<b class="nc">&nbsp;			check.getReportLocation()</b>
+<b class="nc">&nbsp;				.set(project.getLayout()</b>
+<b class="nc">&nbsp;					.getBuildDirectory()</b>
+<b class="nc">&nbsp;					.file(&quot;reports/additional-spring-configuration-metadata/check.txt&quot;));</b>
+&nbsp;		});
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(LifecycleBasePlugin.CHECK_TASK_NAME)</b>
+<b class="nc">&nbsp;			.configure((check) -&gt; check.dependsOn(checkConfigurationMetadata));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerCheckMetadataTask(Project project) {
+<b class="nc">&nbsp;		TaskProvider&lt;CheckSpringConfigurationMetadata&gt; checkConfigurationMetadata = project.getTasks()</b>
+<b class="nc">&nbsp;			.register(CHECK_SPRING_CONFIGURATION_METADATA_TASK_NAME, CheckSpringConfigurationMetadata.class);</b>
+<b class="nc">&nbsp;		checkConfigurationMetadata.configure((check) -&gt; {</b>
+<b class="nc">&nbsp;			SourceSet mainSourceSet = project.getExtensions()</b>
+<b class="nc">&nbsp;				.getByType(JavaPluginExtension.class)</b>
+<b class="nc">&nbsp;				.getSourceSets()</b>
+<b class="nc">&nbsp;				.getByName(SourceSet.MAIN_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;			Provider&lt;RegularFile&gt; metadataLocation = project.getTasks()</b>
+<b class="nc">&nbsp;				.named(mainSourceSet.getCompileJavaTaskName(), JavaCompile.class)</b>
+<b class="nc">&nbsp;				.flatMap((javaCompile) -&gt; javaCompile.getDestinationDirectory()</b>
+<b class="nc">&nbsp;					.file(&quot;META-INF/spring-configuration-metadata.json&quot;));</b>
+<b class="nc">&nbsp;			check.getMetadataLocation().set(metadataLocation);</b>
+<b class="nc">&nbsp;			check.getReportLocation()</b>
+<b class="nc">&nbsp;				.set(project.getLayout().getBuildDirectory().file(&quot;reports/spring-configuration-metadata/check.txt&quot;));</b>
+&nbsp;		});
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(LifecycleBasePlugin.CHECK_TASK_NAME)</b>
+<b class="nc">&nbsp;			.configure((check) -&gt; check.dependsOn(checkConfigurationMetadata));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarEntry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: JarEntry (org.springframework.boot.loader.jar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.jar;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.security.CodeSigner;
+&nbsp;import java.security.cert.Certificate;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extended variant of {@link java.util.jar.JarEntry} returned by {@link JarFile}s.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;class JarEntry extends java.util.jar.JarEntry implements FileHeader {
+&nbsp;
+&nbsp;	private final int index;
+&nbsp;
+&nbsp;	private final AsciiBytes name;
+&nbsp;
+&nbsp;	private final AsciiBytes headerName;
+&nbsp;
+&nbsp;	private final JarFile jarFile;
+&nbsp;
+&nbsp;	private final long localHeaderOffset;
+&nbsp;
+&nbsp;	private volatile JarEntryCertification certification;
+&nbsp;
+&nbsp;	JarEntry(JarFile jarFile, int index, CentralDirectoryFileHeader header, AsciiBytes nameAlias) {
+<b class="nc">&nbsp;		super((nameAlias != null) ? nameAlias.toString() : header.getName().toString());</b>
+<b class="nc">&nbsp;		this.index = index;</b>
+<b class="nc">&nbsp;		this.name = (nameAlias != null) ? nameAlias : header.getName();</b>
+<b class="nc">&nbsp;		this.headerName = header.getName();</b>
+<b class="nc">&nbsp;		this.jarFile = jarFile;</b>
+<b class="nc">&nbsp;		this.localHeaderOffset = header.getLocalHeaderOffset();</b>
+<b class="nc">&nbsp;		setCompressedSize(header.getCompressedSize());</b>
+<b class="nc">&nbsp;		setMethod(header.getMethod());</b>
+<b class="nc">&nbsp;		setCrc(header.getCrc());</b>
+<b class="nc">&nbsp;		setComment(header.getComment().toString());</b>
+<b class="nc">&nbsp;		setSize(header.getSize());</b>
+<b class="nc">&nbsp;		setTime(header.getTime());</b>
+<b class="nc">&nbsp;		if (header.hasExtra()) {</b>
+<b class="nc">&nbsp;			setExtra(header.getExtra());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	int getIndex() {
+<b class="nc">&nbsp;		return this.index;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	AsciiBytes getAsciiBytesName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean hasName(CharSequence name, char suffix) {
+<b class="nc">&nbsp;		return this.headerName.matches(name, suffix);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link URL} for this {@link JarEntry}.
+&nbsp;	 * @return the URL for the entry
+&nbsp;	 * @throws MalformedURLException if the URL is not valid
+&nbsp;	 */
+&nbsp;	URL getUrl() throws MalformedURLException {
+<b class="nc">&nbsp;		return new URL(this.jarFile.getUrl(), getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Attributes getAttributes() throws IOException {
+<b class="nc">&nbsp;		Manifest manifest = this.jarFile.getManifest();</b>
+<b class="nc">&nbsp;		return (manifest != null) ? manifest.getAttributes(getName()) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Certificate[] getCertificates() {
+<b class="nc">&nbsp;		return getCertification().getCertificates();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public CodeSigner[] getCodeSigners() {
+<b class="nc">&nbsp;		return getCertification().getCodeSigners();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarEntryCertification getCertification() {
+<b class="nc">&nbsp;		if (!this.jarFile.isSigned()) {</b>
+<b class="nc">&nbsp;			return JarEntryCertification.NONE;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		JarEntryCertification certification = this.certification;</b>
+<b class="nc">&nbsp;		if (certification == null) {</b>
+<b class="nc">&nbsp;			certification = this.jarFile.getCertification(this);</b>
+<b class="nc">&nbsp;			this.certification = certification;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return certification;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public long getLocalHeaderOffset() {
+<b class="nc">&nbsp;		return this.localHeaderOffset;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

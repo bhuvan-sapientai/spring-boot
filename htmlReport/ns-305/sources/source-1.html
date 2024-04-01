@@ -1,0 +1,465 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Instantiator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.util</a>
+</div>
+
+<h1>Coverage Summary for Class: Instantiator (org.springframework.boot.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Instantiator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Instantiator$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Instantiator$AvailableParameters</td>
+  </tr>
+  <tr>
+    <td class="name">Instantiator$FailureHandler</td>
+  </tr>
+  <tr>
+    <td class="name">Instantiator$TypeSupplier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Instantiator$TypeSupplier$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Instantiator$TypeSupplier$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.util;
+&nbsp;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Simple factory used to instantiate objects by injecting available parameters.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type to instantiate
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.4.0
+&nbsp; */
+&nbsp;public class Instantiator&lt;T&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final Comparator&lt;Constructor&lt;?&gt;&gt; CONSTRUCTOR_COMPARATOR = Comparator</b>
+<b class="nc">&nbsp;		.&lt;Constructor&lt;?&gt;&gt;comparingInt(Constructor::getParameterCount)</b>
+<b class="nc">&nbsp;		.reversed();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final FailureHandler throwingFailureHandler = (type, implementationName, failure) -&gt; {</b>
+<b class="nc">&nbsp;		throw new IllegalArgumentException(&quot;Unable to instantiate &quot; + implementationName + &quot; [&quot; + type.getName() + &quot;]&quot;,</b>
+&nbsp;				failure);
+&nbsp;	};
+&nbsp;
+&nbsp;	private final Class&lt;?&gt; type;
+&nbsp;
+&nbsp;	private final Map&lt;Class&lt;?&gt;, Function&lt;Class&lt;?&gt;, Object&gt;&gt; availableParameters;
+&nbsp;
+&nbsp;	private final FailureHandler failureHandler;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Instantiator} instance for the given type.
+&nbsp;	 * @param type the type to instantiate
+&nbsp;	 * @param availableParameters consumer used to register available parameters
+&nbsp;	 */
+&nbsp;	public Instantiator(Class&lt;?&gt; type, Consumer&lt;AvailableParameters&gt; availableParameters) {
+<b class="nc">&nbsp;		this(type, availableParameters, throwingFailureHandler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Instantiator} instance for the given type.
+&nbsp;	 * @param type the type to instantiate
+&nbsp;	 * @param availableParameters consumer used to register available parameters
+&nbsp;	 * @param failureHandler a {@link FailureHandler} that will be called in case of
+&nbsp;	 * failure when instantiating objects
+&nbsp;	 * @since 2.7.0
+&nbsp;	 */
+&nbsp;	public Instantiator(Class&lt;?&gt; type, Consumer&lt;AvailableParameters&gt; availableParameters,
+<b class="nc">&nbsp;			FailureHandler failureHandler) {</b>
+<b class="nc">&nbsp;		this.type = type;</b>
+<b class="nc">&nbsp;		this.availableParameters = getAvailableParameters(availableParameters);</b>
+<b class="nc">&nbsp;		this.failureHandler = failureHandler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;Class&lt;?&gt;, Function&lt;Class&lt;?&gt;, Object&gt;&gt; getAvailableParameters(
+&nbsp;			Consumer&lt;AvailableParameters&gt; availableParameters) {
+<b class="nc">&nbsp;		Map&lt;Class&lt;?&gt;, Function&lt;Class&lt;?&gt;, Object&gt;&gt; result = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		availableParameters.accept(new AvailableParameters() {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void add(Class&lt;?&gt; type, Object instance) {
+<b class="nc">&nbsp;				result.put(type, (factoryType) -&gt; instance);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void add(Class&lt;?&gt; type, Function&lt;Class&lt;?&gt;, Object&gt; factory) {
+<b class="nc">&nbsp;				result.put(type, factory);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		});
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Instantiate the given set of class name, injecting constructor arguments as
+&nbsp;	 * necessary.
+&nbsp;	 * @param names the class names to instantiate
+&nbsp;	 * @return a list of instantiated instances
+&nbsp;	 */
+&nbsp;	public List&lt;T&gt; instantiate(Collection&lt;String&gt; names) {
+<b class="nc">&nbsp;		return instantiate((ClassLoader) null, names);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Instantiate the given set of class name, injecting constructor arguments as
+&nbsp;	 * necessary.
+&nbsp;	 * @param classLoader the source classloader
+&nbsp;	 * @param names the class names to instantiate
+&nbsp;	 * @return a list of instantiated instances
+&nbsp;	 * @since 2.4.8
+&nbsp;	 */
+&nbsp;	public List&lt;T&gt; instantiate(ClassLoader classLoader, Collection&lt;String&gt; names) {
+<b class="nc">&nbsp;		Assert.notNull(names, &quot;Names must not be null&quot;);</b>
+<b class="nc">&nbsp;		return instantiate(names.stream().map((name) -&gt; TypeSupplier.forName(classLoader, name)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Instantiate the given set of classes, injecting constructor arguments as necessary.
+&nbsp;	 * @param types the types to instantiate
+&nbsp;	 * @return a list of instantiated instances
+&nbsp;	 * @since 2.4.8
+&nbsp;	 */
+&nbsp;	public List&lt;T&gt; instantiateTypes(Collection&lt;Class&lt;?&gt;&gt; types) {
+<b class="nc">&nbsp;		Assert.notNull(types, &quot;Types must not be null&quot;);</b>
+<b class="nc">&nbsp;		return instantiate(types.stream().map(TypeSupplier::forType));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;T&gt; instantiate(Stream&lt;TypeSupplier&gt; typeSuppliers) {
+<b class="nc">&nbsp;		return typeSuppliers.map(this::instantiate).sorted(AnnotationAwareOrderComparator.INSTANCE).toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private T instantiate(TypeSupplier typeSupplier) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Class&lt;?&gt; type = typeSupplier.get();</b>
+<b class="nc">&nbsp;			Assert.isAssignable(this.type, type);</b>
+<b class="nc">&nbsp;			return instantiate(type);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			this.failureHandler.handleFailure(this.type, typeSupplier.getName(), ex);</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private T instantiate(Class&lt;?&gt; type) throws Exception {
+<b class="nc">&nbsp;		Constructor&lt;?&gt;[] constructors = type.getDeclaredConstructors();</b>
+<b class="nc">&nbsp;		Arrays.sort(constructors, CONSTRUCTOR_COMPARATOR);</b>
+<b class="nc">&nbsp;		for (Constructor&lt;?&gt; constructor : constructors) {</b>
+<b class="nc">&nbsp;			Object[] args = getArgs(constructor.getParameterTypes());</b>
+<b class="nc">&nbsp;			if (args != null) {</b>
+<b class="nc">&nbsp;				ReflectionUtils.makeAccessible(constructor);</b>
+<b class="nc">&nbsp;				return (T) constructor.newInstance(args);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalAccessException(&quot;Class [&quot; + type.getName() + &quot;] has no suitable constructor&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object[] getArgs(Class&lt;?&gt;[] parameterTypes) {
+<b class="nc">&nbsp;		Object[] args = new Object[parameterTypes.length];</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; parameterTypes.length; i++) {</b>
+<b class="nc">&nbsp;			Function&lt;Class&lt;?&gt;, Object&gt; parameter = getAvailableParameter(parameterTypes[i]);</b>
+<b class="nc">&nbsp;			if (parameter == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			args[i] = parameter.apply(this.type);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return args;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Function&lt;Class&lt;?&gt;, Object&gt; getAvailableParameter(Class&lt;?&gt; parameterType) {
+<b class="nc">&nbsp;		for (Map.Entry&lt;Class&lt;?&gt;, Function&lt;Class&lt;?&gt;, Object&gt;&gt; entry : this.availableParameters.entrySet()) {</b>
+<b class="nc">&nbsp;			if (entry.getKey().isAssignableFrom(parameterType)) {</b>
+<b class="nc">&nbsp;				return entry.getValue();</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Callback used to register available parameters.
+&nbsp;	 */
+&nbsp;	public interface AvailableParameters {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Add a parameter with an instance value.
+&nbsp;		 * @param type the parameter type
+&nbsp;		 * @param instance the instance that should be injected
+&nbsp;		 */
+&nbsp;		void add(Class&lt;?&gt; type, Object instance);
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Add a parameter with an instance factory.
+&nbsp;		 * @param type the parameter type
+&nbsp;		 * @param factory the factory used to create the instance that should be injected
+&nbsp;		 */
+&nbsp;		void add(Class&lt;?&gt; type, Function&lt;Class&lt;?&gt;, Object&gt; factory);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Supplier} that provides a class type.
+&nbsp;	 */
+&nbsp;	private interface TypeSupplier {
+&nbsp;
+&nbsp;		String getName();
+&nbsp;
+&nbsp;		Class&lt;?&gt; get() throws ClassNotFoundException;
+&nbsp;
+&nbsp;		static TypeSupplier forName(ClassLoader classLoader, String name) {
+<b class="nc">&nbsp;			return new TypeSupplier() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public String getName() {
+<b class="nc">&nbsp;					return name;</b>
+&nbsp;				}
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public Class&lt;?&gt; get() throws ClassNotFoundException {
+<b class="nc">&nbsp;					return ClassUtils.forName(name, classLoader);</b>
+&nbsp;				}
+&nbsp;
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		static TypeSupplier forType(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			return new TypeSupplier() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public String getName() {
+<b class="nc">&nbsp;					return type.getName();</b>
+&nbsp;				}
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public Class&lt;?&gt; get() throws ClassNotFoundException {
+<b class="nc">&nbsp;					return type;</b>
+&nbsp;				}
+&nbsp;
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Strategy for handling a failure that occurs when instantiating a type.
+&nbsp;	 *
+&nbsp;	 * @since 2.7.0
+&nbsp;	 */
+&nbsp;	public interface FailureHandler {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Handle the {@code failure} that occurred when instantiating the {@code type}
+&nbsp;		 * that was expected to be of the given {@code typeSupplier}.
+&nbsp;		 * @param type the type
+&nbsp;		 * @param implementationName the name of the implementation type
+&nbsp;		 * @param failure the failure that occurred
+&nbsp;		 */
+&nbsp;		void handleFailure(Class&lt;?&gt; type, String implementationName, Throwable failure);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

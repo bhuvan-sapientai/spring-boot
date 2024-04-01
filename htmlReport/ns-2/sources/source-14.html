@@ -1,0 +1,285 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringApplicationBannerPrinter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringApplicationBannerPrinter (org.springframework.boot)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringApplicationBannerPrinter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpringApplicationBannerPrinter$PrintedBanner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SpringApplicationBannerPrinter$SpringApplicationBannerPrinterRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class used by {@link SpringApplication} to print the application banner.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class SpringApplicationBannerPrinter {
+&nbsp;
+&nbsp;	static final String BANNER_LOCATION_PROPERTY = &quot;spring.banner.location&quot;;
+&nbsp;
+&nbsp;	static final String DEFAULT_BANNER_LOCATION = &quot;banner.txt&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Banner DEFAULT_BANNER = new SpringBootBanner();</b>
+&nbsp;
+&nbsp;	private final ResourceLoader resourceLoader;
+&nbsp;
+&nbsp;	private final Banner fallbackBanner;
+&nbsp;
+<b class="nc">&nbsp;	SpringApplicationBannerPrinter(ResourceLoader resourceLoader, Banner fallbackBanner) {</b>
+<b class="nc">&nbsp;		this.resourceLoader = resourceLoader;</b>
+<b class="nc">&nbsp;		this.fallbackBanner = fallbackBanner;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Banner print(Environment environment, Class&lt;?&gt; sourceClass, Log logger) {
+<b class="nc">&nbsp;		Banner banner = getBanner(environment);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			logger.info(createStringFromBanner(banner, environment, sourceClass));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (UnsupportedEncodingException ex) {</b>
+<b class="nc">&nbsp;			logger.warn(&quot;Failed to create String for banner&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return new PrintedBanner(banner, sourceClass);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Banner print(Environment environment, Class&lt;?&gt; sourceClass, PrintStream out) {
+<b class="nc">&nbsp;		Banner banner = getBanner(environment);</b>
+<b class="nc">&nbsp;		banner.printBanner(environment, sourceClass, out);</b>
+<b class="nc">&nbsp;		return new PrintedBanner(banner, sourceClass);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Banner getBanner(Environment environment) {
+<b class="nc">&nbsp;		Banner textBanner = getTextBanner(environment);</b>
+<b class="nc">&nbsp;		if (textBanner != null) {</b>
+<b class="nc">&nbsp;			return textBanner;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.fallbackBanner != null) {</b>
+<b class="nc">&nbsp;			return this.fallbackBanner;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return DEFAULT_BANNER;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Banner getTextBanner(Environment environment) {
+<b class="nc">&nbsp;		String location = environment.getProperty(BANNER_LOCATION_PROPERTY, DEFAULT_BANNER_LOCATION);</b>
+<b class="nc">&nbsp;		Resource resource = this.resourceLoader.getResource(location);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			if (resource.exists() &amp;&amp; !resource.getURL().toExternalForm().contains(&quot;liquibase-core&quot;)) {</b>
+<b class="nc">&nbsp;				return new ResourceBanner(resource);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+&nbsp;			// Ignore
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String createStringFromBanner(Banner banner, Environment environment, Class&lt;?&gt; mainApplicationClass)
+&nbsp;			throws UnsupportedEncodingException {
+<b class="nc">&nbsp;		ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;		banner.printBanner(environment, mainApplicationClass, new PrintStream(baos));</b>
+<b class="nc">&nbsp;		String charset = environment.getProperty(&quot;spring.banner.charset&quot;, &quot;UTF-8&quot;);</b>
+<b class="nc">&nbsp;		return baos.toString(charset);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Decorator that allows a {@link Banner} to be printed again without needing to
+&nbsp;	 * specify the source class.
+&nbsp;	 */
+&nbsp;	private static class PrintedBanner implements Banner {
+&nbsp;
+&nbsp;		private final Banner banner;
+&nbsp;
+&nbsp;		private final Class&lt;?&gt; sourceClass;
+&nbsp;
+<b class="nc">&nbsp;		PrintedBanner(Banner banner, Class&lt;?&gt; sourceClass) {</b>
+<b class="nc">&nbsp;			this.banner = banner;</b>
+<b class="nc">&nbsp;			this.sourceClass = sourceClass;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void printBanner(Environment environment, Class&lt;?&gt; sourceClass, PrintStream out) {
+<b class="nc">&nbsp;			sourceClass = (sourceClass != null) ? sourceClass : this.sourceClass;</b>
+<b class="nc">&nbsp;			this.banner.printBanner(environment, sourceClass, out);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class SpringApplicationBannerPrinterRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			hints.resources().registerPattern(DEFAULT_BANNER_LOCATION);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

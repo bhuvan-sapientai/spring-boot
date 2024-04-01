@@ -1,0 +1,265 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AssertProviderApplicationContextInvocationHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.context.assertj</a>
+</div>
+
+<h1>Coverage Summary for Class: AssertProviderApplicationContextInvocationHandler (org.springframework.boot.test.context.assertj)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AssertProviderApplicationContextInvocationHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.context.assertj;
+&nbsp;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.InvocationHandler;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.core.style.ToStringCreator;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link InvocationHandler} used by {@link ApplicationContextAssertProvider} generated
+&nbsp; * proxies.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class AssertProviderApplicationContextInvocationHandler implements InvocationHandler {
+&nbsp;
+&nbsp;	private final Class&lt;?&gt; applicationContextType;
+&nbsp;
+&nbsp;	private final ApplicationContext applicationContext;
+&nbsp;
+&nbsp;	private final RuntimeException startupFailure;
+&nbsp;
+<b class="nc">&nbsp;	AssertProviderApplicationContextInvocationHandler(Class&lt;?&gt; applicationContextType, Supplier&lt;?&gt; contextSupplier) {</b>
+<b class="nc">&nbsp;		this.applicationContextType = applicationContextType;</b>
+<b class="nc">&nbsp;		Object contextOrStartupFailure = getContextOrStartupFailure(contextSupplier);</b>
+<b class="nc">&nbsp;		if (contextOrStartupFailure instanceof RuntimeException runtimeException) {</b>
+<b class="nc">&nbsp;			this.applicationContext = null;</b>
+<b class="nc">&nbsp;			this.startupFailure = runtimeException;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			this.applicationContext = (ApplicationContext) contextOrStartupFailure;</b>
+<b class="nc">&nbsp;			this.startupFailure = null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getContextOrStartupFailure(Supplier&lt;?&gt; contextSupplier) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return contextSupplier.get();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			return ex;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+<b class="nc">&nbsp;		if (isToString(method)) {</b>
+<b class="nc">&nbsp;			return toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (isGetSourceContext(method)) {</b>
+<b class="nc">&nbsp;			return getSourceContext(args);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (isGetStartupFailure(method)) {</b>
+<b class="nc">&nbsp;			return getStartupFailure();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (isAssertThat(method)) {</b>
+<b class="nc">&nbsp;			return getAssertThat(proxy);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (isCloseMethod(method)) {</b>
+<b class="nc">&nbsp;			return invokeClose();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return invokeApplicationContextMethod(method, args);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isToString(Method method) {
+<b class="nc">&nbsp;		return (&quot;toString&quot;.equals(method.getName()) &amp;&amp; method.getParameterCount() == 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		if (this.startupFailure != null) {</b>
+<b class="nc">&nbsp;			return &quot;Unstarted application context &quot; + this.applicationContextType.getName() + &quot;[startupFailure=&quot;</b>
+<b class="nc">&nbsp;					+ this.startupFailure.getClass().getName() + &quot;]&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ToStringCreator builder = new ToStringCreator(this.applicationContext)</b>
+<b class="nc">&nbsp;			.append(&quot;id&quot;, this.applicationContext.getId())</b>
+<b class="nc">&nbsp;			.append(&quot;applicationName&quot;, this.applicationContext.getApplicationName())</b>
+<b class="nc">&nbsp;			.append(&quot;beanDefinitionCount&quot;, this.applicationContext.getBeanDefinitionCount());</b>
+<b class="nc">&nbsp;		return &quot;Started application &quot; + builder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isGetSourceContext(Method method) {
+<b class="nc">&nbsp;		return &quot;getSourceApplicationContext&quot;.equals(method.getName()) &amp;&amp; ((method.getParameterCount() == 0)</b>
+<b class="nc">&nbsp;				|| Arrays.equals(new Class&lt;?&gt;[] { Class.class }, method.getParameterTypes()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getSourceContext(Object[] args) {
+<b class="nc">&nbsp;		ApplicationContext context = getStartedApplicationContext();</b>
+<b class="nc">&nbsp;		if (!ObjectUtils.isEmpty(args)) {</b>
+<b class="nc">&nbsp;			Assert.isInstanceOf((Class&lt;?&gt;) args[0], context);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isGetStartupFailure(Method method) {
+<b class="nc">&nbsp;		return (&quot;getStartupFailure&quot;.equals(method.getName()) &amp;&amp; method.getParameterCount() == 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getStartupFailure() {
+<b class="nc">&nbsp;		return this.startupFailure;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isAssertThat(Method method) {
+<b class="nc">&nbsp;		return (&quot;assertThat&quot;.equals(method.getName()) &amp;&amp; method.getParameterCount() == 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getAssertThat(Object proxy) {
+<b class="nc">&nbsp;		return new ApplicationContextAssert&lt;&gt;((ApplicationContext) proxy, this.startupFailure);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isCloseMethod(Method method) {
+<b class="nc">&nbsp;		return (&quot;close&quot;.equals(method.getName()) &amp;&amp; method.getParameterCount() == 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object invokeClose() throws IOException {
+<b class="nc">&nbsp;		if (this.applicationContext instanceof Closeable closeable) {</b>
+<b class="nc">&nbsp;			closeable.close();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object invokeApplicationContextMethod(Method method, Object[] args) throws Throwable {
+&nbsp;		try {
+<b class="nc">&nbsp;			return method.invoke(getStartedApplicationContext(), args);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (InvocationTargetException ex) {</b>
+<b class="nc">&nbsp;			throw ex.getTargetException();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ApplicationContext getStartedApplicationContext() {
+<b class="nc">&nbsp;		if (this.startupFailure != null) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(this + &quot; failed to start&quot;, this.startupFailure);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.applicationContext;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

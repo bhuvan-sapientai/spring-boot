@@ -1,0 +1,329 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TypeElementMembers</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor</a>
+</div>
+
+<h1>Coverage Summary for Class: TypeElementMembers (org.springframework.boot.configurationprocessor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TypeElementMembers</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import javax.lang.model.element.Element;
+&nbsp;import javax.lang.model.element.ExecutableElement;
+&nbsp;import javax.lang.model.element.Modifier;
+&nbsp;import javax.lang.model.element.TypeElement;
+&nbsp;import javax.lang.model.element.VariableElement;
+&nbsp;import javax.lang.model.type.TypeKind;
+&nbsp;import javax.lang.model.type.TypeMirror;
+&nbsp;import javax.lang.model.util.ElementFilter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides access to relevant {@link TypeElement} members.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;class TypeElementMembers {
+&nbsp;
+<b class="nc">&nbsp;	private static final String OBJECT_CLASS_NAME = Object.class.getName();</b>
+&nbsp;
+&nbsp;	private static final String RECORD_CLASS_NAME = &quot;java.lang.Record&quot;;
+&nbsp;
+&nbsp;	private final MetadataGenerationEnvironment env;
+&nbsp;
+&nbsp;	private final TypeElement targetType;
+&nbsp;
+&nbsp;	private final boolean isRecord;
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, VariableElement&gt; fields = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, List&lt;ExecutableElement&gt;&gt; publicGetters = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, List&lt;ExecutableElement&gt;&gt; publicSetters = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	TypeElementMembers(MetadataGenerationEnvironment env, TypeElement targetType) {</b>
+<b class="nc">&nbsp;		this.env = env;</b>
+<b class="nc">&nbsp;		this.targetType = targetType;</b>
+<b class="nc">&nbsp;		this.isRecord = RECORD_CLASS_NAME.equals(targetType.getSuperclass().toString());</b>
+<b class="nc">&nbsp;		process(targetType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void process(TypeElement element) {
+<b class="nc">&nbsp;		for (VariableElement field : ElementFilter.fieldsIn(element.getEnclosedElements())) {</b>
+<b class="nc">&nbsp;			processField(field);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		for (ExecutableElement method : ElementFilter.methodsIn(element.getEnclosedElements())) {</b>
+<b class="nc">&nbsp;			processMethod(method);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		Element superType = this.env.getTypeUtils().asElement(element.getSuperclass());</b>
+<b class="nc">&nbsp;		if (superType instanceof TypeElement &amp;&amp; !OBJECT_CLASS_NAME.equals(superType.toString())</b>
+<b class="nc">&nbsp;				&amp;&amp; !RECORD_CLASS_NAME.equals(superType.toString())) {</b>
+<b class="nc">&nbsp;			process((TypeElement) superType);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processMethod(ExecutableElement method) {
+<b class="nc">&nbsp;		if (isPublic(method)) {</b>
+<b class="nc">&nbsp;			String name = method.getSimpleName().toString();</b>
+<b class="nc">&nbsp;			if (isGetter(method)) {</b>
+<b class="nc">&nbsp;				String propertyName = getAccessorName(name);</b>
+<b class="nc">&nbsp;				List&lt;ExecutableElement&gt; matchingGetters = this.publicGetters.computeIfAbsent(propertyName,</b>
+<b class="nc">&nbsp;						(k) -&gt; new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;				TypeMirror returnType = method.getReturnType();</b>
+<b class="nc">&nbsp;				if (getMatchingGetter(matchingGetters, returnType) == null) {</b>
+<b class="nc">&nbsp;					matchingGetters.add(method);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			else if (isSetter(method)) {</b>
+<b class="nc">&nbsp;				String propertyName = getAccessorName(name);</b>
+<b class="nc">&nbsp;				List&lt;ExecutableElement&gt; matchingSetters = this.publicSetters.computeIfAbsent(propertyName,</b>
+<b class="nc">&nbsp;						(k) -&gt; new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;				TypeMirror paramType = method.getParameters().get(0).asType();</b>
+<b class="nc">&nbsp;				if (getMatchingSetter(matchingSetters, paramType) == null) {</b>
+<b class="nc">&nbsp;					matchingSetters.add(method);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isPublic(ExecutableElement method) {
+<b class="nc">&nbsp;		Set&lt;Modifier&gt; modifiers = method.getModifiers();</b>
+<b class="nc">&nbsp;		return modifiers.contains(Modifier.PUBLIC) &amp;&amp; !modifiers.contains(Modifier.ABSTRACT)</b>
+<b class="nc">&nbsp;				&amp;&amp; !modifiers.contains(Modifier.STATIC);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ExecutableElement getMatchingGetter(List&lt;ExecutableElement&gt; candidates, TypeMirror type) {
+<b class="nc">&nbsp;		return getMatchingAccessor(candidates, type, ExecutableElement::getReturnType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ExecutableElement getMatchingSetter(List&lt;ExecutableElement&gt; candidates, TypeMirror type) {
+<b class="nc">&nbsp;		return getMatchingAccessor(candidates, type, (candidate) -&gt; candidate.getParameters().get(0).asType());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ExecutableElement getMatchingAccessor(List&lt;ExecutableElement&gt; candidates, TypeMirror type,
+&nbsp;			Function&lt;ExecutableElement, TypeMirror&gt; typeExtractor) {
+<b class="nc">&nbsp;		for (ExecutableElement candidate : candidates) {</b>
+<b class="nc">&nbsp;			TypeMirror candidateType = typeExtractor.apply(candidate);</b>
+<b class="nc">&nbsp;			if (this.env.getTypeUtils().isSameType(candidateType, type)) {</b>
+<b class="nc">&nbsp;				return candidate;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isGetter(ExecutableElement method) {
+<b class="nc">&nbsp;		boolean hasParameters = !method.getParameters().isEmpty();</b>
+<b class="nc">&nbsp;		boolean returnsVoid = TypeKind.VOID == method.getReturnType().getKind();</b>
+<b class="nc">&nbsp;		if (hasParameters || returnsVoid) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String name = method.getSimpleName().toString();</b>
+<b class="nc">&nbsp;		if (this.isRecord &amp;&amp; this.fields.containsKey(name)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (name.startsWith(&quot;get&quot;) &amp;&amp; name.length() &gt; 3) || (name.startsWith(&quot;is&quot;) &amp;&amp; name.length() &gt; 2);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isSetter(ExecutableElement method) {
+<b class="nc">&nbsp;		if (this.isRecord) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		final String name = method.getSimpleName().toString();</b>
+<b class="nc">&nbsp;		return (name.startsWith(&quot;set&quot;) &amp;&amp; name.length() &gt; 3 &amp;&amp; method.getParameters().size() == 1</b>
+<b class="nc">&nbsp;				&amp;&amp; isSetterReturnType(method));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isSetterReturnType(ExecutableElement method) {
+<b class="nc">&nbsp;		TypeMirror returnType = method.getReturnType();</b>
+<b class="nc">&nbsp;		if (TypeKind.VOID == returnType.getKind()) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (TypeKind.DECLARED == returnType.getKind()</b>
+<b class="nc">&nbsp;				&amp;&amp; this.env.getTypeUtils().isSameType(method.getEnclosingElement().asType(), returnType)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (TypeKind.TYPEVAR == returnType.getKind()) {</b>
+<b class="nc">&nbsp;			String resolvedType = this.env.getTypeUtils().getType(this.targetType, returnType);</b>
+<b class="nc">&nbsp;			return (resolvedType != null</b>
+<b class="nc">&nbsp;					&amp;&amp; resolvedType.equals(this.env.getTypeUtils().getQualifiedName(this.targetType)));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getAccessorName(String methodName) {
+<b class="nc">&nbsp;		if (this.isRecord &amp;&amp; this.fields.containsKey(methodName)) {</b>
+<b class="nc">&nbsp;			return methodName;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (methodName.startsWith(&quot;is&quot;)) {</b>
+<b class="nc">&nbsp;			return lowerCaseFirstCharacter(methodName.substring(2));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (methodName.startsWith(&quot;get&quot;) || methodName.startsWith(&quot;set&quot;)) {</b>
+<b class="nc">&nbsp;			return lowerCaseFirstCharacter(methodName.substring(3));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;methodName must start with &#39;is&#39;, &#39;get&#39; or &#39;set&#39;, was &#39;&quot; + methodName + &quot;&#39;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String lowerCaseFirstCharacter(String string) {
+<b class="nc">&nbsp;		return Character.toLowerCase(string.charAt(0)) + string.substring(1);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processField(VariableElement field) {
+<b class="nc">&nbsp;		String name = field.getSimpleName().toString();</b>
+<b class="nc">&nbsp;		this.fields.putIfAbsent(name, field);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Map&lt;String, VariableElement&gt; getFields() {
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(this.fields);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Map&lt;String, List&lt;ExecutableElement&gt;&gt; getPublicGetters() {
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(this.publicGetters);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ExecutableElement getPublicGetter(String name, TypeMirror type) {
+<b class="nc">&nbsp;		List&lt;ExecutableElement&gt; candidates = this.publicGetters.get(name);</b>
+<b class="nc">&nbsp;		return getPublicAccessor(candidates, type, (specificType) -&gt; getMatchingGetter(candidates, specificType));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ExecutableElement getPublicSetter(String name, TypeMirror type) {
+<b class="nc">&nbsp;		List&lt;ExecutableElement&gt; candidates = this.publicSetters.get(name);</b>
+<b class="nc">&nbsp;		return getPublicAccessor(candidates, type, (specificType) -&gt; getMatchingSetter(candidates, specificType));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ExecutableElement getPublicAccessor(List&lt;ExecutableElement&gt; candidates, TypeMirror type,
+&nbsp;			Function&lt;TypeMirror, ExecutableElement&gt; matchingAccessorExtractor) {
+<b class="nc">&nbsp;		if (candidates != null) {</b>
+<b class="nc">&nbsp;			ExecutableElement matching = matchingAccessorExtractor.apply(type);</b>
+<b class="nc">&nbsp;			if (matching != null) {</b>
+<b class="nc">&nbsp;				return matching;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			TypeMirror alternative = this.env.getTypeUtils().getWrapperOrPrimitiveFor(type);</b>
+<b class="nc">&nbsp;			if (alternative != null) {</b>
+<b class="nc">&nbsp;				return matchingAccessorExtractor.apply(alternative);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

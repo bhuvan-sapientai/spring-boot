@@ -1,0 +1,399 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractFilterRegistrationBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractFilterRegistrationBean (org.springframework.boot.web.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractFilterRegistrationBean</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import jakarta.servlet.DispatcherType;
+&nbsp;import jakarta.servlet.Filter;
+&nbsp;import jakarta.servlet.FilterRegistration;
+&nbsp;import jakarta.servlet.FilterRegistration.Dynamic;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.filter.OncePerRequestFilter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base {@link ServletContextInitializer} to register {@link Filter}s in a
+&nbsp; * Servlet 3.0+ container.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type of {@link Filter} to register
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 1.5.22
+&nbsp; */
+&nbsp;public abstract class AbstractFilterRegistrationBean&lt;T extends Filter&gt; extends DynamicRegistrationBean&lt;Dynamic&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] DEFAULT_URL_MAPPINGS = { &quot;/*&quot; };</b>
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;ServletRegistrationBean&lt;?&gt;&gt; servletRegistrationBeans = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;String&gt; servletNames = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;String&gt; urlPatterns = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private EnumSet&lt;DispatcherType&gt; dispatcherTypes;
+&nbsp;
+<b class="nc">&nbsp;	private boolean matchAfter = false;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new instance to be registered with the specified
+&nbsp;	 * {@link ServletRegistrationBean}s.
+&nbsp;	 * @param servletRegistrationBeans associate {@link ServletRegistrationBean}s
+&nbsp;	 */
+<b class="nc">&nbsp;	AbstractFilterRegistrationBean(ServletRegistrationBean&lt;?&gt;... servletRegistrationBeans) {</b>
+<b class="nc">&nbsp;		Assert.notNull(servletRegistrationBeans, &quot;ServletRegistrationBeans must not be null&quot;);</b>
+<b class="nc">&nbsp;		Collections.addAll(this.servletRegistrationBeans, servletRegistrationBeans);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link ServletRegistrationBean}s that the filter will be registered against.
+&nbsp;	 * @param servletRegistrationBeans the Servlet registration beans
+&nbsp;	 */
+&nbsp;	public void setServletRegistrationBeans(Collection&lt;? extends ServletRegistrationBean&lt;?&gt;&gt; servletRegistrationBeans) {
+<b class="nc">&nbsp;		Assert.notNull(servletRegistrationBeans, &quot;ServletRegistrationBeans must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.servletRegistrationBeans = new LinkedHashSet&lt;&gt;(servletRegistrationBeans);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a mutable collection of the {@link ServletRegistrationBean} that the filter
+&nbsp;	 * will be registered against. {@link ServletRegistrationBean}s.
+&nbsp;	 * @return the Servlet registration beans
+&nbsp;	 * @see #setServletNames
+&nbsp;	 * @see #setUrlPatterns
+&nbsp;	 */
+&nbsp;	public Collection&lt;ServletRegistrationBean&lt;?&gt;&gt; getServletRegistrationBeans() {
+<b class="nc">&nbsp;		return this.servletRegistrationBeans;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link ServletRegistrationBean}s for the filter.
+&nbsp;	 * @param servletRegistrationBeans the servlet registration beans to add
+&nbsp;	 * @see #setServletRegistrationBeans
+&nbsp;	 */
+&nbsp;	public void addServletRegistrationBeans(ServletRegistrationBean&lt;?&gt;... servletRegistrationBeans) {
+<b class="nc">&nbsp;		Assert.notNull(servletRegistrationBeans, &quot;ServletRegistrationBeans must not be null&quot;);</b>
+<b class="nc">&nbsp;		Collections.addAll(this.servletRegistrationBeans, servletRegistrationBeans);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set servlet names that the filter will be registered against. This will replace any
+&nbsp;	 * previously specified servlet names.
+&nbsp;	 * @param servletNames the servlet names
+&nbsp;	 * @see #setServletRegistrationBeans
+&nbsp;	 * @see #setUrlPatterns
+&nbsp;	 */
+&nbsp;	public void setServletNames(Collection&lt;String&gt; servletNames) {
+<b class="nc">&nbsp;		Assert.notNull(servletNames, &quot;ServletNames must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.servletNames = new LinkedHashSet&lt;&gt;(servletNames);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a mutable collection of servlet names that the filter will be registered
+&nbsp;	 * against.
+&nbsp;	 * @return the servlet names
+&nbsp;	 */
+&nbsp;	public Collection&lt;String&gt; getServletNames() {
+<b class="nc">&nbsp;		return this.servletNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add servlet names for the filter.
+&nbsp;	 * @param servletNames the servlet names to add
+&nbsp;	 */
+&nbsp;	public void addServletNames(String... servletNames) {
+<b class="nc">&nbsp;		Assert.notNull(servletNames, &quot;ServletNames must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.servletNames.addAll(Arrays.asList(servletNames));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the URL patterns that the filter will be registered against. This will replace
+&nbsp;	 * any previously specified URL patterns.
+&nbsp;	 * @param urlPatterns the URL patterns
+&nbsp;	 * @see #setServletRegistrationBeans
+&nbsp;	 * @see #setServletNames
+&nbsp;	 */
+&nbsp;	public void setUrlPatterns(Collection&lt;String&gt; urlPatterns) {
+<b class="nc">&nbsp;		Assert.notNull(urlPatterns, &quot;UrlPatterns must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.urlPatterns = new LinkedHashSet&lt;&gt;(urlPatterns);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a mutable collection of URL patterns, as defined in the Servlet
+&nbsp;	 * specification, that the filter will be registered against.
+&nbsp;	 * @return the URL patterns
+&nbsp;	 */
+&nbsp;	public Collection&lt;String&gt; getUrlPatterns() {
+<b class="nc">&nbsp;		return this.urlPatterns;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add URL patterns, as defined in the Servlet specification, that the filter will be
+&nbsp;	 * registered against.
+&nbsp;	 * @param urlPatterns the URL patterns
+&nbsp;	 */
+&nbsp;	public void addUrlPatterns(String... urlPatterns) {
+<b class="nc">&nbsp;		Assert.notNull(urlPatterns, &quot;UrlPatterns must not be null&quot;);</b>
+<b class="nc">&nbsp;		Collections.addAll(this.urlPatterns, urlPatterns);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determines the {@link DispatcherType dispatcher types} for which the filter should
+&nbsp;	 * be registered. Applies defaults based on the type of filter being registered if
+&nbsp;	 * none have been configured. Modifications to the returned {@link EnumSet} will have
+&nbsp;	 * no effect on the registration.
+&nbsp;	 * @return the dispatcher types, never {@code null}
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public EnumSet&lt;DispatcherType&gt; determineDispatcherTypes() {
+<b class="nc">&nbsp;		if (this.dispatcherTypes == null) {</b>
+<b class="nc">&nbsp;			T filter = getFilter();</b>
+<b class="nc">&nbsp;			if (ClassUtils.isPresent(&quot;org.springframework.web.filter.OncePerRequestFilter&quot;,</b>
+<b class="nc">&nbsp;					filter.getClass().getClassLoader()) &amp;&amp; filter instanceof OncePerRequestFilter) {</b>
+<b class="nc">&nbsp;				return EnumSet.allOf(DispatcherType.class);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				return EnumSet.of(DispatcherType.REQUEST);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return EnumSet.copyOf(this.dispatcherTypes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Convenience method to {@link #setDispatcherTypes(EnumSet) set dispatcher types}
+&nbsp;	 * using the specified elements.
+&nbsp;	 * @param first the first dispatcher type
+&nbsp;	 * @param rest additional dispatcher types
+&nbsp;	 */
+&nbsp;	public void setDispatcherTypes(DispatcherType first, DispatcherType... rest) {
+<b class="nc">&nbsp;		this.dispatcherTypes = EnumSet.of(first, rest);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the dispatcher types that should be used with the registration.
+&nbsp;	 * @param dispatcherTypes the dispatcher types
+&nbsp;	 */
+&nbsp;	public void setDispatcherTypes(EnumSet&lt;DispatcherType&gt; dispatcherTypes) {
+<b class="nc">&nbsp;		this.dispatcherTypes = dispatcherTypes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set if the filter mappings should be matched after any declared filter mappings of
+&nbsp;	 * the ServletContext. Defaults to {@code false} indicating the filters are supposed
+&nbsp;	 * to be matched before any declared filter mappings of the ServletContext.
+&nbsp;	 * @param matchAfter if filter mappings are matched after
+&nbsp;	 */
+&nbsp;	public void setMatchAfter(boolean matchAfter) {
+<b class="nc">&nbsp;		this.matchAfter = matchAfter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if filter mappings should be matched after any declared Filter mappings of
+&nbsp;	 * the ServletContext.
+&nbsp;	 * @return if filter mappings are matched after
+&nbsp;	 */
+&nbsp;	public boolean isMatchAfter() {
+<b class="nc">&nbsp;		return this.matchAfter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String getDescription() {
+<b class="nc">&nbsp;		Filter filter = getFilter();</b>
+<b class="nc">&nbsp;		Assert.notNull(filter, &quot;Filter must not be null&quot;);</b>
+<b class="nc">&nbsp;		return &quot;filter &quot; + getOrDeduceName(filter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Dynamic addRegistration(String description, ServletContext servletContext) {
+<b class="nc">&nbsp;		Filter filter = getFilter();</b>
+<b class="nc">&nbsp;		return servletContext.addFilter(getOrDeduceName(filter), filter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure registration settings. Subclasses can override this method to perform
+&nbsp;	 * additional configuration if required.
+&nbsp;	 * @param registration the registration
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	protected void configure(FilterRegistration.Dynamic registration) {
+<b class="nc">&nbsp;		super.configure(registration);</b>
+<b class="nc">&nbsp;		EnumSet&lt;DispatcherType&gt; dispatcherTypes = determineDispatcherTypes();</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; servletNames = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (ServletRegistrationBean&lt;?&gt; servletRegistrationBean : this.servletRegistrationBeans) {</b>
+<b class="nc">&nbsp;			servletNames.add(servletRegistrationBean.getServletName());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		servletNames.addAll(this.servletNames);</b>
+<b class="nc">&nbsp;		if (servletNames.isEmpty() &amp;&amp; this.urlPatterns.isEmpty()) {</b>
+<b class="nc">&nbsp;			registration.addMappingForUrlPatterns(dispatcherTypes, this.matchAfter, DEFAULT_URL_MAPPINGS);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			if (!servletNames.isEmpty()) {</b>
+<b class="nc">&nbsp;				registration.addMappingForServletNames(dispatcherTypes, this.matchAfter,</b>
+<b class="nc">&nbsp;						StringUtils.toStringArray(servletNames));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (!this.urlPatterns.isEmpty()) {</b>
+<b class="nc">&nbsp;				registration.addMappingForUrlPatterns(dispatcherTypes, this.matchAfter,</b>
+<b class="nc">&nbsp;						StringUtils.toStringArray(this.urlPatterns));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link Filter} to be registered.
+&nbsp;	 * @return the filter
+&nbsp;	 */
+&nbsp;	public abstract T getFilter();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the filter name that will be registered.
+&nbsp;	 * @return the filter name
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public String getFilterName() {
+<b class="nc">&nbsp;		return getOrDeduceName(getFilter());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		StringBuilder builder = new StringBuilder(getOrDeduceName(this));</b>
+<b class="nc">&nbsp;		if (this.servletNames.isEmpty() &amp;&amp; this.urlPatterns.isEmpty()) {</b>
+<b class="nc">&nbsp;			builder.append(&quot; urls=&quot;).append(Arrays.toString(DEFAULT_URL_MAPPINGS));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			if (!this.servletNames.isEmpty()) {</b>
+<b class="nc">&nbsp;				builder.append(&quot; servlets=&quot;).append(this.servletNames);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (!this.urlPatterns.isEmpty()) {</b>
+<b class="nc">&nbsp;				builder.append(&quot; urls=&quot;).append(this.urlPatterns);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		builder.append(&quot; order=&quot;).append(getOrder());</b>
+<b class="nc">&nbsp;		return builder.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

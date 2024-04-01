@@ -1,0 +1,417 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InitCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command.init</a>
+</div>
+
+<h1>Coverage Summary for Class: InitCommand (org.springframework.boot.cli.command.init)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InitCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InitCommand$InitOptionHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/99)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/108)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command.init;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import joptsimple.OptionSet;
+&nbsp;import joptsimple.OptionSpec;
+&nbsp;
+&nbsp;import org.springframework.boot.cli.command.Command;
+&nbsp;import org.springframework.boot.cli.command.HelpExample;
+&nbsp;import org.springframework.boot.cli.command.OptionParsingCommand;
+&nbsp;import org.springframework.boot.cli.command.options.OptionHandler;
+&nbsp;import org.springframework.boot.cli.command.status.ExitStatus;
+&nbsp;import org.springframework.boot.cli.util.Log;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Command} that initializes a project using Spring initializr.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Vignesh Thangavel Ilangovan
+&nbsp; * @since 1.2.0
+&nbsp; */
+&nbsp;public class InitCommand extends OptionParsingCommand {
+&nbsp;
+&nbsp;	public InitCommand() {
+<b class="nc">&nbsp;		this(new InitOptionHandler(new InitializrService()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public InitCommand(InitOptionHandler handler) {
+<b class="nc">&nbsp;		super(&quot;init&quot;, &quot;Initialize a new project using Spring Initializr (start.spring.io)&quot;, handler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getUsageHelp() {
+<b class="nc">&nbsp;		return &quot;[options] [location]&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Collection&lt;HelpExample&gt; getExamples() {
+<b class="nc">&nbsp;		List&lt;HelpExample&gt; examples = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		examples.add(new HelpExample(&quot;To list all the capabilities of the service&quot;, &quot;spring init --list&quot;));</b>
+<b class="nc">&nbsp;		examples.add(new HelpExample(&quot;To creates a default project&quot;, &quot;spring init&quot;));</b>
+<b class="nc">&nbsp;		examples.add(new HelpExample(&quot;To create a web my-app.zip&quot;, &quot;spring init -d=web my-app.zip&quot;));</b>
+<b class="nc">&nbsp;		examples.add(new HelpExample(&quot;To create a web/data-jpa gradle project unpacked&quot;,</b>
+&nbsp;				&quot;spring init -d=web,jpa --build=gradle my-dir&quot;));
+<b class="nc">&nbsp;		return examples;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link OptionHandler} for {@link InitCommand}.
+&nbsp;	 */
+&nbsp;	static class InitOptionHandler extends OptionHandler {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Mapping from camelCase options advertised by the service to our kebab-case
+&nbsp;		 * options.
+&nbsp;		 */
+&nbsp;		private static final Map&lt;String, String&gt; CAMEL_CASE_OPTIONS;
+&nbsp;		static {
+<b class="nc">&nbsp;			Map&lt;String, String&gt; options = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			options.put(&quot;--groupId&quot;, &quot;--group-id&quot;);</b>
+<b class="nc">&nbsp;			options.put(&quot;--artifactId&quot;, &quot;--artifact-id&quot;);</b>
+<b class="nc">&nbsp;			options.put(&quot;--packageName&quot;, &quot;--package-name&quot;);</b>
+<b class="nc">&nbsp;			options.put(&quot;--javaVersion&quot;, &quot;--java-version&quot;);</b>
+<b class="nc">&nbsp;			options.put(&quot;--bootVersion&quot;, &quot;--boot-version&quot;);</b>
+<b class="nc">&nbsp;			CAMEL_CASE_OPTIONS = Collections.unmodifiableMap(options);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private final ServiceCapabilitiesReportGenerator serviceCapabilitiesReport;
+&nbsp;
+&nbsp;		private final ProjectGenerator projectGenerator;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; target;
+&nbsp;
+&nbsp;		private OptionSpec&lt;Void&gt; listCapabilities;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; groupId;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; artifactId;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; version;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; name;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; description;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; packageName;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; type;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; packaging;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; build;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; format;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; javaVersion;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; language;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; bootVersion;
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; dependencies;
+&nbsp;
+&nbsp;		private OptionSpec&lt;Void&gt; extract;
+&nbsp;
+&nbsp;		private OptionSpec&lt;Void&gt; force;
+&nbsp;
+&nbsp;		InitOptionHandler(InitializrService initializrService) {
+<b class="nc">&nbsp;			super(InitOptionHandler::processArgument);</b>
+<b class="nc">&nbsp;			this.serviceCapabilitiesReport = new ServiceCapabilitiesReportGenerator(initializrService);</b>
+<b class="nc">&nbsp;			this.projectGenerator = new ProjectGenerator(initializrService);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected void options() {
+<b class="nc">&nbsp;			this.target = option(Arrays.asList(&quot;target&quot;), &quot;URL of the service to use&quot;).withRequiredArg()</b>
+<b class="nc">&nbsp;				.defaultsTo(ProjectGenerationRequest.DEFAULT_SERVICE_URL);</b>
+<b class="nc">&nbsp;			this.listCapabilities = option(Arrays.asList(&quot;list&quot;),</b>
+&nbsp;					&quot;List the capabilities of the service. Use it to discover the &quot;
+&nbsp;							+ &quot;dependencies and the types that are available&quot;);
+<b class="nc">&nbsp;			projectGenerationOptions();</b>
+<b class="nc">&nbsp;			otherOptions();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void projectGenerationOptions() {
+<b class="nc">&nbsp;			this.groupId = option(Arrays.asList(&quot;group-id&quot;, &quot;g&quot;), &quot;Project coordinates (for example &#39;org.test&#39;)&quot;)</b>
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+<b class="nc">&nbsp;			this.artifactId = option(Arrays.asList(&quot;artifact-id&quot;, &quot;a&quot;),</b>
+&nbsp;					&quot;Project coordinates; infer archive name (for example &#39;test&#39;)&quot;)
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+<b class="nc">&nbsp;			this.version = option(Arrays.asList(&quot;version&quot;, &quot;v&quot;), &quot;Project version (for example &#39;0.0.1-SNAPSHOT&#39;)&quot;)</b>
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+<b class="nc">&nbsp;			this.name = option(Arrays.asList(&quot;name&quot;, &quot;n&quot;), &quot;Project name; infer application name&quot;).withRequiredArg();</b>
+<b class="nc">&nbsp;			this.description = option(&quot;description&quot;, &quot;Project description&quot;).withRequiredArg();</b>
+<b class="nc">&nbsp;			this.packageName = option(Arrays.asList(&quot;package-name&quot;), &quot;Package name&quot;).withRequiredArg();</b>
+<b class="nc">&nbsp;			this.type = option(Arrays.asList(&quot;type&quot;, &quot;t&quot;),</b>
+&nbsp;					&quot;Project type. Not normally needed if you use --build &quot;
+&nbsp;							+ &quot;and/or --format. Check the capabilities of the service (--list) for more details&quot;)
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+<b class="nc">&nbsp;			this.packaging = option(Arrays.asList(&quot;packaging&quot;, &quot;p&quot;), &quot;Project packaging (for example &#39;jar&#39;)&quot;)</b>
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+<b class="nc">&nbsp;			this.build = option(&quot;build&quot;, &quot;Build system to use (for example &#39;maven&#39; or &#39;gradle&#39;)&quot;).withRequiredArg()</b>
+<b class="nc">&nbsp;				.defaultsTo(&quot;maven&quot;);</b>
+<b class="nc">&nbsp;			this.format = option(&quot;format&quot;, &quot;Format of the generated content (for example &#39;build&#39; for a build file, &quot;</b>
+&nbsp;					+ &quot;&#39;project&#39; for a project archive)&quot;)
+<b class="nc">&nbsp;				.withRequiredArg()</b>
+<b class="nc">&nbsp;				.defaultsTo(&quot;project&quot;);</b>
+<b class="nc">&nbsp;			this.javaVersion = option(Arrays.asList(&quot;java-version&quot;, &quot;j&quot;), &quot;Language level (for example &#39;1.8&#39;)&quot;)</b>
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+<b class="nc">&nbsp;			this.language = option(Arrays.asList(&quot;language&quot;, &quot;l&quot;), &quot;Programming language  (for example &#39;java&#39;)&quot;)</b>
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+<b class="nc">&nbsp;			this.bootVersion = option(Arrays.asList(&quot;boot-version&quot;, &quot;b&quot;),</b>
+&nbsp;					&quot;Spring Boot version (for example &#39;1.2.0.RELEASE&#39;)&quot;)
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+<b class="nc">&nbsp;			this.dependencies = option(Arrays.asList(&quot;dependencies&quot;, &quot;d&quot;),</b>
+&nbsp;					&quot;Comma-separated list of dependency identifiers to include in the generated project&quot;)
+<b class="nc">&nbsp;				.withRequiredArg();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void otherOptions() {
+<b class="nc">&nbsp;			this.extract = option(Arrays.asList(&quot;extract&quot;, &quot;x&quot;),</b>
+&nbsp;					&quot;Extract the project archive. Inferred if a location is specified without an extension&quot;);
+<b class="nc">&nbsp;			this.force = option(Arrays.asList(&quot;force&quot;, &quot;f&quot;), &quot;Force overwrite of existing files&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected ExitStatus run(OptionSet options) throws Exception {
+&nbsp;			try {
+<b class="nc">&nbsp;				if (options.has(this.listCapabilities)) {</b>
+<b class="nc">&nbsp;					generateReport(options);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					generateProject(options);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return ExitStatus.OK;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ReportableException ex) {</b>
+<b class="nc">&nbsp;				Log.error(ex.getMessage());</b>
+<b class="nc">&nbsp;				return ExitStatus.ERROR;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				Log.error(ex);</b>
+<b class="nc">&nbsp;				return ExitStatus.ERROR;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void generateReport(OptionSet options) throws IOException {
+<b class="nc">&nbsp;			Log.info(this.serviceCapabilitiesReport.generate(options.valueOf(this.target)));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected void generateProject(OptionSet options) throws IOException {
+<b class="nc">&nbsp;			ProjectGenerationRequest request = createProjectGenerationRequest(options);</b>
+<b class="nc">&nbsp;			this.projectGenerator.generateProject(request, options.has(this.force));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected ProjectGenerationRequest createProjectGenerationRequest(OptionSet options) {
+<b class="nc">&nbsp;			List&lt;?&gt; nonOptionArguments = new ArrayList&lt;Object&gt;(options.nonOptionArguments());</b>
+<b class="nc">&nbsp;			Assert.isTrue(nonOptionArguments.size() &lt;= 1, &quot;Only the target location may be specified&quot;);</b>
+<b class="nc">&nbsp;			ProjectGenerationRequest request = new ProjectGenerationRequest();</b>
+<b class="nc">&nbsp;			request.setServiceUrl(options.valueOf(this.target));</b>
+<b class="nc">&nbsp;			if (options.has(this.bootVersion)) {</b>
+<b class="nc">&nbsp;				request.setBootVersion(options.valueOf(this.bootVersion));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.dependencies)) {</b>
+<b class="nc">&nbsp;				for (String dep : options.valueOf(this.dependencies).split(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;					request.getDependencies().add(dep.trim());</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.javaVersion)) {</b>
+<b class="nc">&nbsp;				request.setJavaVersion(options.valueOf(this.javaVersion));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.packageName)) {</b>
+<b class="nc">&nbsp;				request.setPackageName(options.valueOf(this.packageName));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			request.setBuild(options.valueOf(this.build));</b>
+<b class="nc">&nbsp;			request.setFormat(options.valueOf(this.format));</b>
+<b class="nc">&nbsp;			request.setDetectType(options.has(this.build) || options.has(this.format));</b>
+<b class="nc">&nbsp;			if (options.has(this.type)) {</b>
+<b class="nc">&nbsp;				request.setType(options.valueOf(this.type));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.packaging)) {</b>
+<b class="nc">&nbsp;				request.setPackaging(options.valueOf(this.packaging));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.language)) {</b>
+<b class="nc">&nbsp;				request.setLanguage(options.valueOf(this.language));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.groupId)) {</b>
+<b class="nc">&nbsp;				request.setGroupId(options.valueOf(this.groupId));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.artifactId)) {</b>
+<b class="nc">&nbsp;				request.setArtifactId(options.valueOf(this.artifactId));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.name)) {</b>
+<b class="nc">&nbsp;				request.setName(options.valueOf(this.name));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.version)) {</b>
+<b class="nc">&nbsp;				request.setVersion(options.valueOf(this.version));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (options.has(this.description)) {</b>
+<b class="nc">&nbsp;				request.setDescription(options.valueOf(this.description));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			request.setExtract(options.has(this.extract));</b>
+<b class="nc">&nbsp;			if (nonOptionArguments.size() == 1) {</b>
+<b class="nc">&nbsp;				String output = (String) nonOptionArguments.get(0);</b>
+<b class="nc">&nbsp;				request.setOutput(output);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return request;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static String processArgument(String argument) {
+<b class="nc">&nbsp;			for (Map.Entry&lt;String, String&gt; entry : CAMEL_CASE_OPTIONS.entrySet()) {</b>
+<b class="nc">&nbsp;				String name = entry.getKey();</b>
+<b class="nc">&nbsp;				if (argument.startsWith(name + &quot; &quot;) || argument.startsWith(name + &quot;=&quot;)) {</b>
+<b class="nc">&nbsp;					return entry.getValue() + argument.substring(name.length());</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return argument;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

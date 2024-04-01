@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StartupTimeMetricsListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.metrics.startup</a>
+</div>
+
+<h1>Coverage Summary for Class: StartupTimeMetricsListener (org.springframework.boot.actuate.metrics.startup)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StartupTimeMetricsListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.metrics.startup;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import io.micrometer.core.instrument.MeterRegistry;
+&nbsp;import io.micrometer.core.instrument.Tag;
+&nbsp;import io.micrometer.core.instrument.Tags;
+&nbsp;import io.micrometer.core.instrument.TimeGauge;
+&nbsp;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.context.event.ApplicationReadyEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationStartedEvent;
+&nbsp;import org.springframework.context.ApplicationEvent;
+&nbsp;import org.springframework.context.event.SmartApplicationListener;
+&nbsp;
+&nbsp;/**
+&nbsp; * Binds application startup metrics in response to {@link ApplicationStartedEvent} and
+&nbsp; * {@link ApplicationReadyEvent}.
+&nbsp; *
+&nbsp; * @author Chris Bono
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.6.0
+&nbsp; */
+&nbsp;public class StartupTimeMetricsListener implements SmartApplicationListener {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The default name to use for the application started time metric.
+&nbsp;	 */
+&nbsp;	public static final String APPLICATION_STARTED_TIME_METRIC_NAME = &quot;application.started.time&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The default name to use for the application ready time metric.
+&nbsp;	 */
+&nbsp;	public static final String APPLICATION_READY_TIME_METRIC_NAME = &quot;application.ready.time&quot;;
+&nbsp;
+&nbsp;	private final MeterRegistry meterRegistry;
+&nbsp;
+&nbsp;	private final String startedTimeMetricName;
+&nbsp;
+&nbsp;	private final String readyTimeMetricName;
+&nbsp;
+&nbsp;	private final Tags tags;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new instance using default metric names.
+&nbsp;	 * @param meterRegistry the registry to use
+&nbsp;	 * @see #APPLICATION_STARTED_TIME_METRIC_NAME
+&nbsp;	 * @see #APPLICATION_READY_TIME_METRIC_NAME
+&nbsp;	 */
+&nbsp;	public StartupTimeMetricsListener(MeterRegistry meterRegistry) {
+<b class="nc">&nbsp;		this(meterRegistry, APPLICATION_STARTED_TIME_METRIC_NAME, APPLICATION_READY_TIME_METRIC_NAME,</b>
+<b class="nc">&nbsp;				Collections.emptyList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new instance using the specified options.
+&nbsp;	 * @param meterRegistry the registry to use
+&nbsp;	 * @param startedTimeMetricName the name to use for the application started time
+&nbsp;	 * metric
+&nbsp;	 * @param readyTimeMetricName the name to use for the application ready time metric
+&nbsp;	 * @param tags the tags to associate to application startup metrics
+&nbsp;	 */
+&nbsp;	public StartupTimeMetricsListener(MeterRegistry meterRegistry, String startedTimeMetricName,
+<b class="nc">&nbsp;			String readyTimeMetricName, Iterable&lt;Tag&gt; tags) {</b>
+<b class="nc">&nbsp;		this.meterRegistry = meterRegistry;</b>
+<b class="nc">&nbsp;		this.startedTimeMetricName = startedTimeMetricName;</b>
+<b class="nc">&nbsp;		this.readyTimeMetricName = readyTimeMetricName;</b>
+<b class="nc">&nbsp;		this.tags = Tags.of(tags);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean supportsEventType(Class&lt;? extends ApplicationEvent&gt; eventType) {
+<b class="nc">&nbsp;		return ApplicationStartedEvent.class.isAssignableFrom(eventType)</b>
+<b class="nc">&nbsp;				|| ApplicationReadyEvent.class.isAssignableFrom(eventType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onApplicationEvent(ApplicationEvent event) {
+<b class="nc">&nbsp;		if (event instanceof ApplicationStartedEvent startedEvent) {</b>
+<b class="nc">&nbsp;			onApplicationStarted(startedEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (event instanceof ApplicationReadyEvent readyEvent) {</b>
+<b class="nc">&nbsp;			onApplicationReady(readyEvent);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationStarted(ApplicationStartedEvent event) {
+<b class="nc">&nbsp;		registerGauge(this.startedTimeMetricName, &quot;Time taken to start the application&quot;, event.getTimeTaken(),</b>
+<b class="nc">&nbsp;				event.getSpringApplication());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationReady(ApplicationReadyEvent event) {
+<b class="nc">&nbsp;		registerGauge(this.readyTimeMetricName, &quot;Time taken for the application to be ready to service requests&quot;,</b>
+<b class="nc">&nbsp;				event.getTimeTaken(), event.getSpringApplication());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerGauge(String name, String description, Duration timeTaken,
+&nbsp;			SpringApplication springApplication) {
+<b class="nc">&nbsp;		if (timeTaken != null) {</b>
+<b class="nc">&nbsp;			Iterable&lt;Tag&gt; tags = createTagsFrom(springApplication);</b>
+<b class="nc">&nbsp;			TimeGauge.builder(name, timeTaken::toMillis, TimeUnit.MILLISECONDS)</b>
+<b class="nc">&nbsp;				.tags(tags)</b>
+<b class="nc">&nbsp;				.description(description)</b>
+<b class="nc">&nbsp;				.register(this.meterRegistry);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Iterable&lt;Tag&gt; createTagsFrom(SpringApplication springApplication) {
+<b class="nc">&nbsp;		Class&lt;?&gt; mainClass = springApplication.getMainApplicationClass();</b>
+<b class="nc">&nbsp;		return (mainClass != null) ? this.tags.and(&quot;main.application.class&quot;, mainClass.getName()) : this.tags;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

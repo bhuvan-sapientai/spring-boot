@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ColorConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.logging.logback</a>
+</div>
+
+<h1>Coverage Summary for Class: ColorConverter (org.springframework.boot.logging.logback)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ColorConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.logging.logback;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import ch.qos.logback.classic.Level;
+&nbsp;import ch.qos.logback.classic.spi.ILoggingEvent;
+&nbsp;import ch.qos.logback.core.pattern.CompositeConverter;
+&nbsp;
+&nbsp;import org.springframework.boot.ansi.AnsiColor;
+&nbsp;import org.springframework.boot.ansi.AnsiElement;
+&nbsp;import org.springframework.boot.ansi.AnsiOutput;
+&nbsp;import org.springframework.boot.ansi.AnsiStyle;
+&nbsp;
+&nbsp;/**
+&nbsp; * Logback {@link CompositeConverter} colors output using the {@link AnsiOutput} class. A
+&nbsp; * single &#39;color&#39; option can be provided to the converter, or if not specified color will
+&nbsp; * be picked based on the logging level.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="nc">&nbsp;public class ColorConverter extends CompositeConverter&lt;ILoggingEvent&gt; {</b>
+&nbsp;
+&nbsp;	private static final Map&lt;String, AnsiElement&gt; ELEMENTS;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Map&lt;String, AnsiElement&gt; ansiElements = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;black&quot;, AnsiColor.BLACK);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;white&quot;, AnsiColor.WHITE);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;faint&quot;, AnsiStyle.FAINT);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;red&quot;, AnsiColor.RED);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;green&quot;, AnsiColor.GREEN);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;yellow&quot;, AnsiColor.YELLOW);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;blue&quot;, AnsiColor.BLUE);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;magenta&quot;, AnsiColor.MAGENTA);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;cyan&quot;, AnsiColor.CYAN);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;bright_black&quot;, AnsiColor.BRIGHT_BLACK);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;bright_white&quot;, AnsiColor.BRIGHT_WHITE);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;bright_red&quot;, AnsiColor.BRIGHT_RED);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;bright_green&quot;, AnsiColor.BRIGHT_GREEN);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;bright_yellow&quot;, AnsiColor.BRIGHT_YELLOW);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;bright_blue&quot;, AnsiColor.BRIGHT_BLUE);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;bright_magenta&quot;, AnsiColor.BRIGHT_MAGENTA);</b>
+<b class="nc">&nbsp;		ansiElements.put(&quot;bright_cyan&quot;, AnsiColor.BRIGHT_CYAN);</b>
+<b class="nc">&nbsp;		ELEMENTS = Collections.unmodifiableMap(ansiElements);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final Map&lt;Integer, AnsiElement&gt; LEVELS;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Map&lt;Integer, AnsiElement&gt; ansiLevels = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		ansiLevels.put(Level.ERROR_INTEGER, AnsiColor.RED);</b>
+<b class="nc">&nbsp;		ansiLevels.put(Level.WARN_INTEGER, AnsiColor.YELLOW);</b>
+<b class="nc">&nbsp;		LEVELS = Collections.unmodifiableMap(ansiLevels);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String transform(ILoggingEvent event, String in) {
+<b class="nc">&nbsp;		AnsiElement element = ELEMENTS.get(getFirstOption());</b>
+<b class="nc">&nbsp;		if (element == null) {</b>
+&nbsp;			// Assume highlighting
+<b class="nc">&nbsp;			element = LEVELS.get(event.getLevel().toInteger());</b>
+<b class="nc">&nbsp;			element = (element != null) ? element : AnsiColor.GREEN;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return toAnsiString(in, element);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String toAnsiString(String in, AnsiElement element) {
+<b class="nc">&nbsp;		return AnsiOutput.toString(element, in);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

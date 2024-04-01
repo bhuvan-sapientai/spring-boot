@@ -1,0 +1,366 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CommandLineInvoker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.infrastructure</a>
+</div>
+
+<h1>Coverage Summary for Class: CommandLineInvoker (org.springframework.boot.cli.infrastructure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CommandLineInvoker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CommandLineInvoker$Invocation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CommandLineInvoker$Invocation$StreamReadingRunnable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.infrastructure;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.StringReader;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;import java.util.zip.ZipInputStream;
+&nbsp;
+&nbsp;import org.springframework.boot.testsupport.BuildOutput;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility to invoke the command line in the same way as a user would, i.e. through the
+&nbsp; * shell script in the package&#39;s bin directory.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;public final class CommandLineInvoker {
+&nbsp;
+&nbsp;	private final File workingDirectory;
+&nbsp;
+&nbsp;	private final File temp;
+&nbsp;
+&nbsp;	public CommandLineInvoker(File temp) {
+<b class="nc">&nbsp;		this(new File(&quot;.&quot;), temp);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public CommandLineInvoker(File workingDirectory, File temp) {</b>
+<b class="nc">&nbsp;		this.workingDirectory = workingDirectory;</b>
+<b class="nc">&nbsp;		this.temp = temp;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Invocation invoke(String... args) throws IOException {
+<b class="nc">&nbsp;		return new Invocation(runCliProcess(args));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Process runCliProcess(String... args) throws IOException {
+<b class="nc">&nbsp;		Path m2 = this.temp.toPath().resolve(&quot;.m2&quot;);</b>
+<b class="nc">&nbsp;		Files.createDirectories(m2);</b>
+<b class="nc">&nbsp;		Files.copy(Paths.get(&quot;src&quot;, &quot;intTest&quot;, &quot;resources&quot;, &quot;settings.xml&quot;), m2.resolve(&quot;settings.xml&quot;),</b>
+&nbsp;				StandardCopyOption.REPLACE_EXISTING);
+<b class="nc">&nbsp;		List&lt;String&gt; command = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		command.add(findLaunchScript().getAbsolutePath());</b>
+<b class="nc">&nbsp;		command.addAll(Arrays.asList(args));</b>
+<b class="nc">&nbsp;		ProcessBuilder processBuilder = new ProcessBuilder(command).directory(this.workingDirectory);</b>
+<b class="nc">&nbsp;		processBuilder.environment().put(&quot;JAVA_OPTS&quot;, &quot;-Duser.home=&quot; + this.temp);</b>
+<b class="nc">&nbsp;		processBuilder.environment().put(&quot;JAVA_HOME&quot;, System.getProperty(&quot;java.home&quot;));</b>
+<b class="nc">&nbsp;		return processBuilder.start();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File findLaunchScript() throws IOException {
+<b class="nc">&nbsp;		File unpacked = new File(this.temp, &quot;unpacked-cli&quot;);</b>
+<b class="nc">&nbsp;		if (!unpacked.isDirectory()) {</b>
+<b class="nc">&nbsp;			File zip = new File(new BuildOutput(getClass()).getRootLocation(),</b>
+<b class="nc">&nbsp;					&quot;distributions/spring-boot-cli-&quot; + Versions.getBootVersion() + &quot;-bin.zip&quot;);</b>
+<b class="nc">&nbsp;			try (ZipInputStream input = new ZipInputStream(new FileInputStream(zip))) {</b>
+&nbsp;				ZipEntry entry;
+<b class="nc">&nbsp;				while ((entry = input.getNextEntry()) != null) {</b>
+<b class="nc">&nbsp;					File file = new File(unpacked, entry.getName());</b>
+<b class="nc">&nbsp;					if (entry.isDirectory()) {</b>
+<b class="nc">&nbsp;						file.mkdirs();</b>
+&nbsp;					}
+&nbsp;					else {
+<b class="nc">&nbsp;						file.getParentFile().mkdirs();</b>
+<b class="nc">&nbsp;						try (FileOutputStream output = new FileOutputStream(file)) {</b>
+<b class="nc">&nbsp;							StreamUtils.copy(input, output);</b>
+<b class="nc">&nbsp;							if (entry.getName().endsWith(&quot;/bin/spring&quot;)) {</b>
+<b class="nc">&nbsp;								file.setExecutable(true);</b>
+&nbsp;							}
+<b class="nc">&nbsp;						}</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		File bin = new File(unpacked.listFiles()[0], &quot;bin&quot;);</b>
+<b class="nc">&nbsp;		File launchScript = new File(bin, isWindows() ? &quot;spring.bat&quot; : &quot;spring&quot;);</b>
+<b class="nc">&nbsp;		Assert.state(launchScript.exists() &amp;&amp; launchScript.isFile(),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Could not find CLI launch script &quot; + launchScript.getAbsolutePath());</b>
+<b class="nc">&nbsp;		return launchScript;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isWindows() {
+<b class="nc">&nbsp;		return File.separatorChar == &#39;\\&#39;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An ongoing Process invocation.
+&nbsp;	 */
+&nbsp;	public static final class Invocation {
+&nbsp;
+<b class="nc">&nbsp;		private final StringBuffer err = new StringBuffer();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final StringBuffer out = new StringBuffer();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final StringBuffer combined = new StringBuffer();</b>
+&nbsp;
+&nbsp;		private final Process process;
+&nbsp;
+<b class="nc">&nbsp;		private final List&lt;Thread&gt; streamReaders = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		public Invocation(Process process) {</b>
+<b class="nc">&nbsp;			this.process = process;</b>
+<b class="nc">&nbsp;			this.streamReaders</b>
+<b class="nc">&nbsp;				.add(new Thread(new StreamReadingRunnable(this.process.getErrorStream(), this.err, this.combined)));</b>
+<b class="nc">&nbsp;			this.streamReaders</b>
+<b class="nc">&nbsp;				.add(new Thread(new StreamReadingRunnable(this.process.getInputStream(), this.out, this.combined)));</b>
+<b class="nc">&nbsp;			for (Thread streamReader : this.streamReaders) {</b>
+<b class="nc">&nbsp;				streamReader.start();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getOutput() {
+<b class="nc">&nbsp;			return postProcessLines(getLines(this.combined));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getErrorOutput() {
+<b class="nc">&nbsp;			return postProcessLines(getLines(this.err));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getStandardOutput() {
+<b class="nc">&nbsp;			return postProcessLines(getStandardOutputLines());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public List&lt;String&gt; getStandardOutputLines() {
+<b class="nc">&nbsp;			return getLines(this.out);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String postProcessLines(List&lt;String&gt; lines) {
+<b class="nc">&nbsp;			StringWriter out = new StringWriter();</b>
+<b class="nc">&nbsp;			PrintWriter printOut = new PrintWriter(out);</b>
+<b class="nc">&nbsp;			for (String line : lines) {</b>
+<b class="nc">&nbsp;				if (!line.startsWith(&quot;Maven settings decryption failed&quot;)) {</b>
+<b class="nc">&nbsp;					printOut.println(line);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return out.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private List&lt;String&gt; getLines(StringBuffer buffer) {
+<b class="nc">&nbsp;			BufferedReader reader = new BufferedReader(new StringReader(buffer.toString()));</b>
+<b class="nc">&nbsp;			return reader.lines().filter((line) -&gt; !line.startsWith(&quot;Picked up &quot;)).toList();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public int await() throws InterruptedException {
+<b class="nc">&nbsp;			for (Thread streamReader : this.streamReaders) {</b>
+<b class="nc">&nbsp;				streamReader.join();</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return this.process.waitFor();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * {@link Runnable} to copy stream output.
+&nbsp;		 */
+&nbsp;		private final class StreamReadingRunnable implements Runnable {
+&nbsp;
+&nbsp;			private final InputStream stream;
+&nbsp;
+&nbsp;			private final StringBuffer[] outputs;
+&nbsp;
+<b class="nc">&nbsp;			private final byte[] buffer = new byte[4096];</b>
+&nbsp;
+<b class="nc">&nbsp;			private StreamReadingRunnable(InputStream stream, StringBuffer... outputs) {</b>
+<b class="nc">&nbsp;				this.stream = stream;</b>
+<b class="nc">&nbsp;				this.outputs = outputs;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void run() {
+&nbsp;				int read;
+&nbsp;				try {
+<b class="nc">&nbsp;					while ((read = this.stream.read(this.buffer)) &gt; 0) {</b>
+<b class="nc">&nbsp;						for (StringBuffer output : this.outputs) {</b>
+<b class="nc">&nbsp;							output.append(new String(this.buffer, 0, read));</b>
+&nbsp;						}
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IOException ex) {</b>
+&nbsp;					// Allow thread to die
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

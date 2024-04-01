@@ -1,0 +1,171 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringTransactionProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.jooq</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringTransactionProvider (org.springframework.boot.autoconfigure.jooq)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringTransactionProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.jooq;
+&nbsp;
+&nbsp;import org.jooq.TransactionContext;
+&nbsp;import org.jooq.TransactionProvider;
+&nbsp;
+&nbsp;import org.springframework.transaction.PlatformTransactionManager;
+&nbsp;import org.springframework.transaction.TransactionDefinition;
+&nbsp;import org.springframework.transaction.TransactionStatus;
+&nbsp;import org.springframework.transaction.support.DefaultTransactionDefinition;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows Spring Transaction to be used with JOOQ.
+&nbsp; *
+&nbsp; * @author Lukas Eder
+&nbsp; * @author Andreas Ahlenstorf
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.5.10
+&nbsp; */
+&nbsp;public class SpringTransactionProvider implements TransactionProvider {
+&nbsp;
+&nbsp;	// Based on the jOOQ-spring-example from https://github.com/jOOQ/jOOQ
+&nbsp;
+&nbsp;	private final PlatformTransactionManager transactionManager;
+&nbsp;
+<b class="nc">&nbsp;	public SpringTransactionProvider(PlatformTransactionManager transactionManager) {</b>
+<b class="nc">&nbsp;		this.transactionManager = transactionManager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void begin(TransactionContext context) {
+<b class="nc">&nbsp;		TransactionDefinition definition = new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_NESTED);</b>
+<b class="nc">&nbsp;		TransactionStatus status = this.transactionManager.getTransaction(definition);</b>
+<b class="nc">&nbsp;		context.transaction(new SpringTransaction(status));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void commit(TransactionContext ctx) {
+<b class="nc">&nbsp;		this.transactionManager.commit(getTransactionStatus(ctx));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void rollback(TransactionContext ctx) {
+<b class="nc">&nbsp;		this.transactionManager.rollback(getTransactionStatus(ctx));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TransactionStatus getTransactionStatus(TransactionContext ctx) {
+<b class="nc">&nbsp;		SpringTransaction transaction = (SpringTransaction) ctx.transaction();</b>
+<b class="nc">&nbsp;		return transaction.getTxStatus();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

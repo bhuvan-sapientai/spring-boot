@@ -1,0 +1,320 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MockitoTestExecutionListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.mock.mockito</a>
+</div>
+
+<h1>Coverage Summary for Class: MockitoTestExecutionListener (org.springframework.boot.test.mock.mockito)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MockitoTestExecutionListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MockitoTestExecutionListener$MockitoAnnotationCollection</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MockitoTestExecutionListener$MockitoField</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.mock.mockito;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;
+&nbsp;import org.mockito.Captor;
+&nbsp;import org.mockito.MockitoAnnotations;
+&nbsp;
+&nbsp;import org.springframework.test.context.TestContext;
+&nbsp;import org.springframework.test.context.TestExecutionListener;
+&nbsp;import org.springframework.test.context.support.AbstractTestExecutionListener;
+&nbsp;import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;import org.springframework.util.ReflectionUtils.FieldCallback;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link TestExecutionListener} to enable {@link MockBean @MockBean} and
+&nbsp; * {@link SpyBean @SpyBean} support. Also triggers
+&nbsp; * {@link MockitoAnnotations#openMocks(Object)} when any Mockito annotations used,
+&nbsp; * primarily to allow {@link Captor @Captor} annotations.
+&nbsp; * &lt;p&gt;
+&nbsp; * To use the automatic reset support of {@code @MockBean} and {@code @SpyBean}, configure
+&nbsp; * {@link ResetMocksTestExecutionListener} as well.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 1.4.2
+&nbsp; * @see ResetMocksTestExecutionListener
+&nbsp; */
+<b class="nc">&nbsp;public class MockitoTestExecutionListener extends AbstractTestExecutionListener {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final String MOCKS_ATTRIBUTE_NAME = MockitoTestExecutionListener.class.getName() + &quot;.mocks&quot;;</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final int getOrder() {
+<b class="nc">&nbsp;		return 1950;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void prepareTestInstance(TestContext testContext) throws Exception {
+<b class="nc">&nbsp;		closeMocks(testContext);</b>
+<b class="nc">&nbsp;		initMocks(testContext);</b>
+<b class="nc">&nbsp;		injectFields(testContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void beforeTestMethod(TestContext testContext) throws Exception {
+<b class="nc">&nbsp;		if (Boolean.TRUE.equals(</b>
+<b class="nc">&nbsp;				testContext.getAttribute(DependencyInjectionTestExecutionListener.REINJECT_DEPENDENCIES_ATTRIBUTE))) {</b>
+<b class="nc">&nbsp;			closeMocks(testContext);</b>
+<b class="nc">&nbsp;			initMocks(testContext);</b>
+<b class="nc">&nbsp;			reinjectFields(testContext);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterTestMethod(TestContext testContext) throws Exception {
+<b class="nc">&nbsp;		closeMocks(testContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterTestClass(TestContext testContext) throws Exception {
+<b class="nc">&nbsp;		closeMocks(testContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void initMocks(TestContext testContext) {
+<b class="nc">&nbsp;		if (hasMockitoAnnotations(testContext)) {</b>
+<b class="nc">&nbsp;			testContext.setAttribute(MOCKS_ATTRIBUTE_NAME, MockitoAnnotations.openMocks(testContext.getTestInstance()));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void closeMocks(TestContext testContext) throws Exception {
+<b class="nc">&nbsp;		Object mocks = testContext.getAttribute(MOCKS_ATTRIBUTE_NAME);</b>
+<b class="nc">&nbsp;		if (mocks instanceof AutoCloseable closeable) {</b>
+<b class="nc">&nbsp;			closeable.close();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasMockitoAnnotations(TestContext testContext) {
+<b class="nc">&nbsp;		MockitoAnnotationCollection collector = new MockitoAnnotationCollection();</b>
+<b class="nc">&nbsp;		ReflectionUtils.doWithFields(testContext.getTestClass(), collector);</b>
+<b class="nc">&nbsp;		return collector.hasAnnotations();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void injectFields(TestContext testContext) {
+<b class="nc">&nbsp;		postProcessFields(testContext, (mockitoField, postProcessor) -&gt; postProcessor.inject(mockitoField.field,</b>
+&nbsp;				mockitoField.target, mockitoField.definition));
+&nbsp;	}
+&nbsp;
+&nbsp;	private void reinjectFields(final TestContext testContext) {
+<b class="nc">&nbsp;		postProcessFields(testContext, (mockitoField, postProcessor) -&gt; {</b>
+<b class="nc">&nbsp;			ReflectionUtils.makeAccessible(mockitoField.field);</b>
+<b class="nc">&nbsp;			ReflectionUtils.setField(mockitoField.field, testContext.getTestInstance(), null);</b>
+<b class="nc">&nbsp;			postProcessor.inject(mockitoField.field, mockitoField.target, mockitoField.definition);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void postProcessFields(TestContext testContext, BiConsumer&lt;MockitoField, MockitoPostProcessor&gt; consumer) {
+<b class="nc">&nbsp;		DefinitionsParser parser = new DefinitionsParser();</b>
+<b class="nc">&nbsp;		parser.parse(testContext.getTestClass());</b>
+<b class="nc">&nbsp;		if (!parser.getDefinitions().isEmpty()) {</b>
+<b class="nc">&nbsp;			MockitoPostProcessor postProcessor = testContext.getApplicationContext()</b>
+<b class="nc">&nbsp;				.getBean(MockitoPostProcessor.class);</b>
+<b class="nc">&nbsp;			for (Definition definition : parser.getDefinitions()) {</b>
+<b class="nc">&nbsp;				Field field = parser.getField(definition);</b>
+<b class="nc">&nbsp;				if (field != null) {</b>
+<b class="nc">&nbsp;					consumer.accept(new MockitoField(field, testContext.getTestInstance(), definition), postProcessor);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link FieldCallback} to collect Mockito annotations.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class MockitoAnnotationCollection implements FieldCallback {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Set&lt;Annotation&gt; annotations = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void doWith(Field field) throws IllegalArgumentException {
+<b class="nc">&nbsp;			for (Annotation annotation : field.getDeclaredAnnotations()) {</b>
+<b class="nc">&nbsp;				if (annotation.annotationType().getName().startsWith(&quot;org.mockito&quot;)) {</b>
+<b class="nc">&nbsp;					this.annotations.add(annotation);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean hasAnnotations() {
+<b class="nc">&nbsp;			return !this.annotations.isEmpty();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class MockitoField {
+&nbsp;
+&nbsp;		private final Field field;
+&nbsp;
+&nbsp;		private final Object target;
+&nbsp;
+&nbsp;		private final Definition definition;
+&nbsp;
+<b class="nc">&nbsp;		private MockitoField(Field field, Object instance, Definition definition) {</b>
+<b class="nc">&nbsp;			this.field = field;</b>
+<b class="nc">&nbsp;			this.target = instance;</b>
+<b class="nc">&nbsp;			this.definition = definition;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

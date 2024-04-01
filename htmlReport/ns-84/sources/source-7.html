@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RequestPredicateFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.web.annotation</a>
+</div>
+
+<h1>Coverage Summary for Class: RequestPredicateFactory (org.springframework.boot.actuate.endpoint.web.annotation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RequestPredicateFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.web.annotation;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationType;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.DiscoveredOperationMethod;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Selector;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Selector.Match;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationParameter;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebEndpointHttpMethod;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebOperationRequestPredicate;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Factory to create a {@link WebOperationRequestPredicate}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;class RequestPredicateFactory {
+&nbsp;
+&nbsp;	private final EndpointMediaTypes endpointMediaTypes;
+&nbsp;
+<b class="nc">&nbsp;	RequestPredicateFactory(EndpointMediaTypes endpointMediaTypes) {</b>
+<b class="nc">&nbsp;		Assert.notNull(endpointMediaTypes, &quot;EndpointMediaTypes must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.endpointMediaTypes = endpointMediaTypes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	WebOperationRequestPredicate getRequestPredicate(String rootPath, DiscoveredOperationMethod operationMethod) {
+<b class="nc">&nbsp;		Method method = operationMethod.getMethod();</b>
+<b class="nc">&nbsp;		OperationParameter[] selectorParameters = operationMethod.getParameters()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.filter(this::hasSelector)</b>
+<b class="nc">&nbsp;			.toArray(OperationParameter[]::new);</b>
+<b class="nc">&nbsp;		OperationParameter allRemainingPathSegmentsParameter = getAllRemainingPathSegmentsParameter(selectorParameters);</b>
+<b class="nc">&nbsp;		String path = getPath(rootPath, selectorParameters, allRemainingPathSegmentsParameter != null);</b>
+<b class="nc">&nbsp;		WebEndpointHttpMethod httpMethod = determineHttpMethod(operationMethod.getOperationType());</b>
+<b class="nc">&nbsp;		Collection&lt;String&gt; consumes = getConsumes(httpMethod, method);</b>
+<b class="nc">&nbsp;		Collection&lt;String&gt; produces = getProduces(operationMethod, method);</b>
+<b class="nc">&nbsp;		return new WebOperationRequestPredicate(path, httpMethod, consumes, produces);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private OperationParameter getAllRemainingPathSegmentsParameter(OperationParameter[] selectorParameters) {
+<b class="nc">&nbsp;		OperationParameter trailingPathsParameter = null;</b>
+<b class="nc">&nbsp;		for (OperationParameter selectorParameter : selectorParameters) {</b>
+<b class="nc">&nbsp;			Selector selector = selectorParameter.getAnnotation(Selector.class);</b>
+<b class="nc">&nbsp;			if (selector.match() == Match.ALL_REMAINING) {</b>
+<b class="nc">&nbsp;				Assert.state(trailingPathsParameter == null,</b>
+&nbsp;						&quot;@Selector annotation with Match.ALL_REMAINING must be unique&quot;);
+<b class="nc">&nbsp;				trailingPathsParameter = selectorParameter;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (trailingPathsParameter != null) {</b>
+<b class="nc">&nbsp;			Assert.state(trailingPathsParameter == selectorParameters[selectorParameters.length - 1],</b>
+&nbsp;					&quot;@Selector annotation with Match.ALL_REMAINING must be the last parameter&quot;);
+&nbsp;		}
+<b class="nc">&nbsp;		return trailingPathsParameter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getPath(String rootPath, OperationParameter[] selectorParameters,
+&nbsp;			boolean matchRemainingPathSegments) {
+<b class="nc">&nbsp;		StringBuilder path = new StringBuilder(rootPath);</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; selectorParameters.length; i++) {</b>
+<b class="nc">&nbsp;			path.append((i != 0 || !rootPath.endsWith(&quot;/&quot;)) ? &quot;/{&quot; : &quot;{&quot;);</b>
+<b class="nc">&nbsp;			if (i == selectorParameters.length - 1 &amp;&amp; matchRemainingPathSegments) {</b>
+<b class="nc">&nbsp;				path.append(&quot;*&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			path.append(selectorParameters[i].getName());</b>
+<b class="nc">&nbsp;			path.append(&quot;}&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return path.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasSelector(OperationParameter parameter) {
+<b class="nc">&nbsp;		return parameter.getAnnotation(Selector.class) != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Collection&lt;String&gt; getConsumes(WebEndpointHttpMethod httpMethod, Method method) {
+<b class="nc">&nbsp;		if (WebEndpointHttpMethod.POST == httpMethod &amp;&amp; consumesRequestBody(method)) {</b>
+<b class="nc">&nbsp;			return this.endpointMediaTypes.getConsumed();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.emptyList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Collection&lt;String&gt; getProduces(DiscoveredOperationMethod operationMethod, Method method) {
+<b class="nc">&nbsp;		if (!operationMethod.getProducesMediaTypes().isEmpty()) {</b>
+<b class="nc">&nbsp;			return operationMethod.getProducesMediaTypes();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (Void.class.equals(method.getReturnType()) || void.class.equals(method.getReturnType())) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (producesResource(method)) {</b>
+<b class="nc">&nbsp;			return Collections.singletonList(&quot;application/octet-stream&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.endpointMediaTypes.getProduced();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean producesResource(Method method) {
+<b class="nc">&nbsp;		if (Resource.class.equals(method.getReturnType())) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (WebEndpointResponse.class.isAssignableFrom(method.getReturnType())) {</b>
+<b class="nc">&nbsp;			ResolvableType returnType = ResolvableType.forMethodReturnType(method);</b>
+<b class="nc">&nbsp;			return ResolvableType.forClass(Resource.class).isAssignableFrom(returnType.getGeneric(0));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean consumesRequestBody(Method method) {
+<b class="nc">&nbsp;		return Stream.of(method.getParameters())</b>
+<b class="nc">&nbsp;			.anyMatch((parameter) -&gt; parameter.getAnnotation(Selector.class) == null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private WebEndpointHttpMethod determineHttpMethod(OperationType operationType) {
+<b class="nc">&nbsp;		if (operationType == OperationType.WRITE) {</b>
+<b class="nc">&nbsp;			return WebEndpointHttpMethod.POST;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (operationType == OperationType.DELETE) {</b>
+<b class="nc">&nbsp;			return WebEndpointHttpMethod.DELETE;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return WebEndpointHttpMethod.GET;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

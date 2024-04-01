@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OtlpProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.metrics.export.otlp</a>
+</div>
+
+<h1>Coverage Summary for Class: OtlpProperties (org.springframework.boot.actuate.autoconfigure.metrics.export.otlp)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OtlpProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.metrics.export.otlp;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import io.micrometer.registry.otlp.AggregationTemporality;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.export.properties.StepRegistryProperties;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfigurationProperties @ConfigurationProperties} for configuring OTLP metrics
+&nbsp; * export.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Jonatan Ivanov
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;management.otlp.metrics.export&quot;)
+<b class="nc">&nbsp;public class OtlpProperties extends StepRegistryProperties {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * URI of the OLTP server.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String url = &quot;http://localhost:4318/v1/metrics&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Aggregation temporality of sums. It defines the way additive values are expressed.
+&nbsp;	 * This setting depends on the backend you use, some only support one temporality.
+&nbsp;	 */
+<b class="nc">&nbsp;	private AggregationTemporality aggregationTemporality = AggregationTemporality.CUMULATIVE;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Monitored resource&#39;s attributes.
+&nbsp;	 */
+&nbsp;	private Map&lt;String, String&gt; resourceAttributes;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Headers for the exported metrics.
+&nbsp;	 */
+&nbsp;	private Map&lt;String, String&gt; headers;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Time unit for exported metrics.
+&nbsp;	 */
+<b class="nc">&nbsp;	private TimeUnit baseTimeUnit = TimeUnit.MILLISECONDS;</b>
+&nbsp;
+&nbsp;	public String getUrl() {
+<b class="nc">&nbsp;		return this.url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUrl(String url) {
+<b class="nc">&nbsp;		this.url = url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public AggregationTemporality getAggregationTemporality() {
+<b class="nc">&nbsp;		return this.aggregationTemporality;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setAggregationTemporality(AggregationTemporality aggregationTemporality) {
+<b class="nc">&nbsp;		this.aggregationTemporality = aggregationTemporality;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	@DeprecatedConfigurationProperty(replacement = &quot;management.opentelemetry.resource-attributes&quot;, since = &quot;3.2.0&quot;)
+&nbsp;	public Map&lt;String, String&gt; getResourceAttributes() {
+<b class="nc">&nbsp;		return this.resourceAttributes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public void setResourceAttributes(Map&lt;String, String&gt; resourceAttributes) {
+<b class="nc">&nbsp;		this.resourceAttributes = resourceAttributes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Map&lt;String, String&gt; getHeaders() {
+<b class="nc">&nbsp;		return this.headers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setHeaders(Map&lt;String, String&gt; headers) {
+<b class="nc">&nbsp;		this.headers = headers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public TimeUnit getBaseTimeUnit() {
+<b class="nc">&nbsp;		return this.baseTimeUnit;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBaseTimeUnit(TimeUnit baseTimeUnit) {
+<b class="nc">&nbsp;		this.baseTimeUnit = baseTimeUnit;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

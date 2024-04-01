@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataSourceHealthContributorAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.jdbc</a>
+</div>
+
+<h1>Coverage Summary for Class: DataSourceHealthContributorAutoConfiguration (org.springframework.boot.actuate.autoconfigure.jdbc)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataSourceHealthContributorAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DataSourceHealthContributorAutoConfiguration$RoutingDataSourceHealthContributor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.jdbc;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.InitializingBean;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
+&nbsp;import org.springframework.boot.actuate.health.CompositeHealthContributor;
+&nbsp;import org.springframework.boot.actuate.health.HealthContributor;
+&nbsp;import org.springframework.boot.actuate.health.NamedContributor;
+&nbsp;import org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.jdbc.metadata.CompositeDataSourcePoolMetadataProvider;
+&nbsp;import org.springframework.boot.jdbc.metadata.DataSourcePoolMetadata;
+&nbsp;import org.springframework.boot.jdbc.metadata.DataSourcePoolMetadataProvider;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.jdbc.core.JdbcTemplate;
+&nbsp;import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for
+&nbsp; * {@link DataSourceHealthIndicator}.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Christian Dupuis
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Arthur Kalimullin
+&nbsp; * @author Julio Gomez
+&nbsp; * @author Safeer Ansari
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = DataSourceAutoConfiguration.class)
+&nbsp;@ConditionalOnClass({ JdbcTemplate.class, AbstractRoutingDataSource.class })
+&nbsp;@ConditionalOnBean(DataSource.class)
+&nbsp;@ConditionalOnEnabledHealthIndicator(&quot;db&quot;)
+&nbsp;@EnableConfigurationProperties(DataSourceHealthIndicatorProperties.class)
+&nbsp;public class DataSourceHealthContributorAutoConfiguration implements InitializingBean {
+&nbsp;
+&nbsp;	private final Collection&lt;DataSourcePoolMetadataProvider&gt; metadataProviders;
+&nbsp;
+&nbsp;	private DataSourcePoolMetadataProvider poolMetadataProvider;
+&nbsp;
+&nbsp;	public DataSourceHealthContributorAutoConfiguration(
+<b class="nc">&nbsp;			ObjectProvider&lt;DataSourcePoolMetadataProvider&gt; metadataProviders) {</b>
+<b class="nc">&nbsp;		this.metadataProviders = metadataProviders.orderedStream().toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterPropertiesSet() {
+<b class="nc">&nbsp;		this.poolMetadataProvider = new CompositeDataSourcePoolMetadataProvider(this.metadataProviders);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(name = { &quot;dbHealthIndicator&quot;, &quot;dbHealthContributor&quot; })
+&nbsp;	public HealthContributor dbHealthContributor(Map&lt;String, DataSource&gt; dataSources,
+&nbsp;			DataSourceHealthIndicatorProperties dataSourceHealthIndicatorProperties) {
+<b class="nc">&nbsp;		if (dataSourceHealthIndicatorProperties.isIgnoreRoutingDataSources()) {</b>
+<b class="nc">&nbsp;			Map&lt;String, DataSource&gt; filteredDatasources = dataSources.entrySet()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.filter((e) -&gt; !(e.getValue() instanceof AbstractRoutingDataSource))</b>
+<b class="nc">&nbsp;				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));</b>
+<b class="nc">&nbsp;			return createContributor(filteredDatasources);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return createContributor(dataSources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private HealthContributor createContributor(Map&lt;String, DataSource&gt; beans) {
+<b class="nc">&nbsp;		Assert.notEmpty(beans, &quot;Beans must not be empty&quot;);</b>
+<b class="nc">&nbsp;		if (beans.size() == 1) {</b>
+<b class="nc">&nbsp;			return createContributor(beans.values().iterator().next());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return CompositeHealthContributor.fromMap(beans, this::createContributor);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private HealthContributor createContributor(DataSource source) {
+<b class="nc">&nbsp;		if (source instanceof AbstractRoutingDataSource routingDataSource) {</b>
+<b class="nc">&nbsp;			return new RoutingDataSourceHealthContributor(routingDataSource, this::createContributor);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new DataSourceHealthIndicator(source, getValidationQuery(source));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getValidationQuery(DataSource source) {
+<b class="nc">&nbsp;		DataSourcePoolMetadata poolMetadata = this.poolMetadataProvider.getDataSourcePoolMetadata(source);</b>
+<b class="nc">&nbsp;		return (poolMetadata != null) ? poolMetadata.getValidationQuery() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link CompositeHealthContributor} used for {@link AbstractRoutingDataSource} beans
+&nbsp;	 * where the overall health is composed of a {@link DataSourceHealthIndicator} for
+&nbsp;	 * each routed datasource.
+&nbsp;	 */
+&nbsp;	static class RoutingDataSourceHealthContributor implements CompositeHealthContributor {
+&nbsp;
+&nbsp;		private final CompositeHealthContributor delegate;
+&nbsp;
+&nbsp;		private static final String UNNAMED_DATASOURCE_KEY = &quot;unnamed&quot;;
+&nbsp;
+&nbsp;		RoutingDataSourceHealthContributor(AbstractRoutingDataSource routingDataSource,
+<b class="nc">&nbsp;				Function&lt;DataSource, HealthContributor&gt; contributorFunction) {</b>
+<b class="nc">&nbsp;			Map&lt;String, DataSource&gt; routedDataSources = routingDataSource.getResolvedDataSources()</b>
+<b class="nc">&nbsp;				.entrySet()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.collect(Collectors.toMap((e) -&gt; Objects.toString(e.getKey(), UNNAMED_DATASOURCE_KEY),</b>
+&nbsp;						Map.Entry::getValue));
+<b class="nc">&nbsp;			this.delegate = CompositeHealthContributor.fromMap(routedDataSources, contributorFunction);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public HealthContributor getContributor(String name) {
+<b class="nc">&nbsp;			return this.delegate.getContributor(name);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Iterator&lt;NamedContributor&lt;HealthContributor&gt;&gt; iterator() {
+<b class="nc">&nbsp;			return this.delegate.iterator();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

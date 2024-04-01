@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EndpointLinksResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.web</a>
+</div>
+
+<h1>Coverage Summary for Class: EndpointLinksResolver (org.springframework.boot.actuate.endpoint.web)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EndpointLinksResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.web;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.ExposableEndpoint;
+&nbsp;
+&nbsp;/**
+&nbsp; * A resolver for {@link Link links} to web endpoints.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class EndpointLinksResolver {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(EndpointLinksResolver.class);</b>
+&nbsp;
+&nbsp;	private final Collection&lt;? extends ExposableEndpoint&lt;?&gt;&gt; endpoints;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code EndpointLinksResolver} that will resolve links to the given
+&nbsp;	 * {@code endpoints}.
+&nbsp;	 * @param endpoints the endpoints
+&nbsp;	 */
+<b class="nc">&nbsp;	public EndpointLinksResolver(Collection&lt;? extends ExposableEndpoint&lt;?&gt;&gt; endpoints) {</b>
+<b class="nc">&nbsp;		this.endpoints = endpoints;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code EndpointLinksResolver} that will resolve links to the given
+&nbsp;	 * {@code endpoints} that are exposed beneath the given {@code basePath}.
+&nbsp;	 * @param endpoints the endpoints
+&nbsp;	 * @param basePath the basePath
+&nbsp;	 */
+<b class="nc">&nbsp;	public EndpointLinksResolver(Collection&lt;? extends ExposableEndpoint&lt;?&gt;&gt; endpoints, String basePath) {</b>
+<b class="nc">&nbsp;		this.endpoints = endpoints;</b>
+<b class="nc">&nbsp;		if (logger.isInfoEnabled()) {</b>
+<b class="nc">&nbsp;			String suffix = (endpoints.size() == 1) ? &quot;&quot; : &quot;s&quot;;</b>
+<b class="nc">&nbsp;			logger</b>
+<b class="nc">&nbsp;				.info(&quot;Exposing &quot; + endpoints.size() + &quot; endpoint&quot; + suffix + &quot; beneath base path &#39;&quot; + basePath + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolves links to the known endpoints based on a request with the given
+&nbsp;	 * {@code requestUrl}.
+&nbsp;	 * @param requestUrl the url of the request for the endpoint links
+&nbsp;	 * @return the links
+&nbsp;	 */
+&nbsp;	public Map&lt;String, Link&gt; resolveLinks(String requestUrl) {
+<b class="nc">&nbsp;		String normalizedUrl = normalizeRequestUrl(requestUrl);</b>
+<b class="nc">&nbsp;		Map&lt;String, Link&gt; links = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		links.put(&quot;self&quot;, new Link(normalizedUrl));</b>
+<b class="nc">&nbsp;		for (ExposableEndpoint&lt;?&gt; endpoint : this.endpoints) {</b>
+<b class="nc">&nbsp;			if (endpoint instanceof ExposableWebEndpoint exposableWebEndpoint) {</b>
+<b class="nc">&nbsp;				collectLinks(links, exposableWebEndpoint, normalizedUrl);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (endpoint instanceof PathMappedEndpoint pathMappedEndpoint) {</b>
+<b class="nc">&nbsp;				String rootPath = pathMappedEndpoint.getRootPath();</b>
+<b class="nc">&nbsp;				Link link = createLink(normalizedUrl, rootPath);</b>
+<b class="nc">&nbsp;				links.put(endpoint.getEndpointId().toLowerCaseString(), link);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return links;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String normalizeRequestUrl(String requestUrl) {
+<b class="nc">&nbsp;		if (requestUrl.endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			return requestUrl.substring(0, requestUrl.length() - 1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return requestUrl;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void collectLinks(Map&lt;String, Link&gt; links, ExposableWebEndpoint endpoint, String normalizedUrl) {
+<b class="nc">&nbsp;		for (WebOperation operation : endpoint.getOperations()) {</b>
+<b class="nc">&nbsp;			links.put(operation.getId(), createLink(normalizedUrl, operation));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Link createLink(String requestUrl, WebOperation operation) {
+<b class="nc">&nbsp;		return createLink(requestUrl, operation.getRequestPredicate().getPath());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Link createLink(String requestUrl, String path) {
+<b class="nc">&nbsp;		return new Link(requestUrl + (path.startsWith(&quot;/&quot;) ? path : &quot;/&quot; + path));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

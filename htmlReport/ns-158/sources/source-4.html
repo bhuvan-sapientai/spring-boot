@@ -1,0 +1,965 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JSONObject</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor.json</a>
+</div>
+
+<h1>Coverage Summary for Class: JSONObject (org.springframework.boot.configurationprocessor.json)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JSONObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/186)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JSONObject$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/189)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright (C) 2010 The Android Open Source Project
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor.json;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;// Note: this class was written without inspecting the non-free org.json source code.
+&nbsp;
+&nbsp;/**
+&nbsp; * A modifiable set of name/value mappings. Names are unique, non-null strings. Values may
+&nbsp; * be any mix of {@link JSONObject JSONObjects}, {@link JSONArray JSONArrays}, Strings,
+&nbsp; * Booleans, Integers, Longs, Doubles or {@link #NULL}. Values may not be {@code null},
+&nbsp; * {@link Double#isNaN() NaNs}, {@link Double#isInfinite() infinities}, or of any type not
+&nbsp; * listed here.
+&nbsp; * &lt;p&gt;
+&nbsp; * This class can coerce values to another type when requested.
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;When the requested type is a boolean, strings will be coerced using a
+&nbsp; * case-insensitive comparison to &quot;true&quot; and &quot;false&quot;.
+&nbsp; * &lt;li&gt;When the requested type is a double, other {@link Number} types will be coerced
+&nbsp; * using {@link Number#doubleValue() doubleValue}. Strings that can be coerced using
+&nbsp; * {@link Double#valueOf(String)} will be.
+&nbsp; * &lt;li&gt;When the requested type is an int, other {@link Number} types will be coerced using
+&nbsp; * {@link Number#intValue() intValue}. Strings that can be coerced using
+&nbsp; * {@link Double#valueOf(String)} will be, and then cast to int.
+&nbsp; * &lt;li&gt;&lt;a id=&quot;lossy&quot;&gt;When the requested type is a long, other {@link Number} types will be
+&nbsp; * coerced using {@link Number#longValue() longValue}. Strings that can be coerced using
+&nbsp; * {@link Double#valueOf(String)} will be, and then cast to long. This two-step conversion
+&nbsp; * is lossy for very large values. For example, the string &quot;9223372036854775806&quot; yields
+&nbsp; * the long 9223372036854775807.&lt;/a&gt;
+&nbsp; * &lt;li&gt;When the requested type is a String, other non-null values will be coerced using
+&nbsp; * {@link String#valueOf(Object)}. Although null cannot be coerced, the sentinel value
+&nbsp; * {@link JSONObject#NULL} is coerced to the string &quot;null&quot;.
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * This class can look up both mandatory and optional values:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;Use &lt;code&gt;get&lt;i&gt;Type&lt;/i&gt;()&lt;/code&gt; to retrieve a mandatory value. This fails with a
+&nbsp; * {@code JSONException} if the requested name has no value or if the value cannot be
+&nbsp; * coerced to the requested type.
+&nbsp; * &lt;li&gt;Use &lt;code&gt;opt&lt;i&gt;Type&lt;/i&gt;()&lt;/code&gt; to retrieve an optional value. This returns a
+&nbsp; * system- or user-supplied default if the requested name has no value or if the value
+&nbsp; * cannot be coerced to the requested type.
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;strong&gt;Warning:&lt;/strong&gt; this class represents null in two incompatible ways: the
+&nbsp; * standard Java {@code null} reference, and the sentinel value {@link JSONObject#NULL}.
+&nbsp; * In particular, calling {@code put(name, null)} removes the named entry from the object
+&nbsp; * but {@code put(name, JSONObject.NULL)} stores an entry whose value is
+&nbsp; * {@code JSONObject.NULL}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Instances of this class are not thread safe. Although this class is nonfinal, it was
+&nbsp; * not designed for inheritance and should not be subclassed. In particular, self-use by
+&nbsp; * overrideable methods is not specified. See &lt;i&gt;Effective Java&lt;/i&gt; Item 17, &quot;Design and
+&nbsp; * Document or inheritance or else prohibit it&quot; for further information.
+&nbsp; */
+&nbsp;public class JSONObject {
+&nbsp;
+<b class="nc">&nbsp;	private static final Double NEGATIVE_ZERO = -0d;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A sentinel value used to explicitly define a name with no value. Unlike
+&nbsp;	 * {@code null}, names with this value:
+&nbsp;	 * &lt;ul&gt;
+&nbsp;	 * &lt;li&gt;show up in the {@link #names} array
+&nbsp;	 * &lt;li&gt;show up in the {@link #keys} iterator
+&nbsp;	 * &lt;li&gt;return {@code true} for {@link #has(String)}
+&nbsp;	 * &lt;li&gt;do not throw on {@link #get(String)}
+&nbsp;	 * &lt;li&gt;are included in the encoded JSON string.
+&nbsp;	 * &lt;/ul&gt;
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * This value violates the general contract of {@link Object#equals} by returning true
+&nbsp;	 * when compared to {@code null}. Its {@link #toString} method returns &quot;null&quot;.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static final Object NULL = new Object() {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean equals(Object o) {
+<b class="nc">&nbsp;			return o == this || o == null; // API specifies this broken equals</b>
+&nbsp;											// implementation
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return &quot;null&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	};
+&nbsp;
+&nbsp;	private final Map&lt;String, Object&gt; nameValuePairs;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a {@code JSONObject} with no name/value mappings.
+&nbsp;	 */
+<b class="nc">&nbsp;	public JSONObject() {</b>
+<b class="nc">&nbsp;		this.nameValuePairs = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code JSONObject} by copying all name/value mappings from the given
+&nbsp;	 * map.
+&nbsp;	 * @param copyFrom a map whose keys are of type {@link String} and whose values are of
+&nbsp;	 * supported types.
+&nbsp;	 * @throws NullPointerException if any of the map&#39;s keys are null.
+&nbsp;	 */
+&nbsp;	/* (accept a raw type for API compatibility) */
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	public JSONObject(Map copyFrom) {
+<b class="nc">&nbsp;		this();</b>
+<b class="nc">&nbsp;		Map&lt;?, ?&gt; contentsTyped = copyFrom;</b>
+<b class="nc">&nbsp;		for (Map.Entry&lt;?, ?&gt; entry : contentsTyped.entrySet()) {</b>
+&nbsp;			/*
+&nbsp;			 * Deviate from the original by checking that keys are non-null and of the
+&nbsp;			 * proper type. (We still defer validating the values).
+&nbsp;			 */
+<b class="nc">&nbsp;			String key = (String) entry.getKey();</b>
+<b class="nc">&nbsp;			if (key == null) {</b>
+<b class="nc">&nbsp;				throw new NullPointerException(&quot;key == null&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.nameValuePairs.put(key, wrap(entry.getValue()));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code JSONObject} with name/value mappings from the next object in
+&nbsp;	 * the tokener.
+&nbsp;	 * @param readFrom a tokener whose nextValue() method will yield a {@code JSONObject}.
+&nbsp;	 * @throws JSONException if the parse fails or doesn&#39;t yield a {@code JSONObject}.
+&nbsp;	 */
+<b class="nc">&nbsp;	public JSONObject(JSONTokener readFrom) throws JSONException {</b>
+&nbsp;		/*
+&nbsp;		 * Getting the parser to populate this could get tricky. Instead, just parse to
+&nbsp;		 * temporary JSONObject and then steal the data from that.
+&nbsp;		 */
+<b class="nc">&nbsp;		Object object = readFrom.nextValue();</b>
+<b class="nc">&nbsp;		if (object instanceof JSONObject) {</b>
+<b class="nc">&nbsp;			this.nameValuePairs = ((JSONObject) object).nameValuePairs;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			throw JSON.typeMismatch(object, &quot;JSONObject&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code JSONObject} with name/value mappings from the JSON string.
+&nbsp;	 * @param json a JSON-encoded string containing an object.
+&nbsp;	 * @throws JSONException if the parse fails or doesn&#39;t yield a {@code
+&nbsp;	 *     JSONObject}.
+&nbsp;	 */
+&nbsp;	public JSONObject(String json) throws JSONException {
+<b class="nc">&nbsp;		this(new JSONTokener(json));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code JSONObject} by copying mappings for the listed names from the
+&nbsp;	 * given object. Names that aren&#39;t present in {@code copyFrom} will be skipped.
+&nbsp;	 * @param copyFrom the source
+&nbsp;	 * @param names the property names
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public JSONObject(JSONObject copyFrom, String[] names) throws JSONException {
+<b class="nc">&nbsp;		this();</b>
+<b class="nc">&nbsp;		for (String name : names) {</b>
+<b class="nc">&nbsp;			Object value = copyFrom.opt(name);</b>
+<b class="nc">&nbsp;			if (value != null) {</b>
+<b class="nc">&nbsp;				this.nameValuePairs.put(name, value);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the number of name/value mappings in this object.
+&nbsp;	 * @return the number of name/value mappings in this object
+&nbsp;	 */
+&nbsp;	public int length() {
+<b class="nc">&nbsp;		return this.nameValuePairs.size();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maps {@code name} to {@code value}, clobbering any existing name/value mapping with
+&nbsp;	 * the same name.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param value the value of the property
+&nbsp;	 * @return this object.
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public JSONObject put(String name, boolean value) throws JSONException {
+<b class="nc">&nbsp;		this.nameValuePairs.put(checkName(name), value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maps {@code name} to {@code value}, clobbering any existing name/value mapping with
+&nbsp;	 * the same name.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param value a finite value. May not be {@link Double#isNaN() NaNs} or
+&nbsp;	 * {@link Double#isInfinite() infinities}.
+&nbsp;	 * @return this object.
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public JSONObject put(String name, double value) throws JSONException {
+<b class="nc">&nbsp;		this.nameValuePairs.put(checkName(name), JSON.checkDouble(value));</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maps {@code name} to {@code value}, clobbering any existing name/value mapping with
+&nbsp;	 * the same name.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param value the value of the property
+&nbsp;	 * @return this object.
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public JSONObject put(String name, int value) throws JSONException {
+<b class="nc">&nbsp;		this.nameValuePairs.put(checkName(name), value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maps {@code name} to {@code value}, clobbering any existing name/value mapping with
+&nbsp;	 * the same name.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param value the value of the property
+&nbsp;	 * @return this object.
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public JSONObject put(String name, long value) throws JSONException {
+<b class="nc">&nbsp;		this.nameValuePairs.put(checkName(name), value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maps {@code name} to {@code value}, clobbering any existing name/value mapping with
+&nbsp;	 * the same name. If the value is {@code null}, any existing mapping for {@code name}
+&nbsp;	 * is removed.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param value a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer,
+&nbsp;	 * Long, Double, {@link #NULL}, or {@code null}. May not be {@link Double#isNaN()
+&nbsp;	 * NaNs} or {@link Double#isInfinite() infinities}.
+&nbsp;	 * @return this object.
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public JSONObject put(String name, Object value) throws JSONException {
+<b class="nc">&nbsp;		if (value == null) {</b>
+<b class="nc">&nbsp;			this.nameValuePairs.remove(name);</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (value instanceof Number) {</b>
+&nbsp;			// deviate from the original by checking all Numbers, not just floats &amp;
+&nbsp;			// doubles
+<b class="nc">&nbsp;			JSON.checkDouble(((Number) value).doubleValue());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.nameValuePairs.put(checkName(name), value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Equivalent to {@code put(name, value)} when both parameters are non-null; does
+&nbsp;	 * nothing otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param value the value of the property
+&nbsp;	 * @return this object.
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public JSONObject putOpt(String name, Object value) throws JSONException {
+<b class="nc">&nbsp;		if (name == null || value == null) {</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return put(name, value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Appends {@code value} to the array already mapped to {@code name}. If this object
+&nbsp;	 * has no mapping for {@code name}, this inserts a new mapping. If the mapping exists
+&nbsp;	 * but its value is not an array, the existing and new values are inserted in order
+&nbsp;	 * into a new array which is itself mapped to {@code name}. In aggregate, this allows
+&nbsp;	 * values to be added to a mapping one at a time.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param value a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer,
+&nbsp;	 * Long, Double, {@link #NULL} or null. May not be {@link Double#isNaN() NaNs} or
+&nbsp;	 * {@link Double#isInfinite() infinities}.
+&nbsp;	 * @return this object.
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public JSONObject accumulate(String name, Object value) throws JSONException {
+<b class="nc">&nbsp;		Object current = this.nameValuePairs.get(checkName(name));</b>
+<b class="nc">&nbsp;		if (current == null) {</b>
+<b class="nc">&nbsp;			return put(name, value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		// check in accumulate, since array.put(Object) doesn&#39;t do any checking
+<b class="nc">&nbsp;		if (value instanceof Number) {</b>
+<b class="nc">&nbsp;			JSON.checkDouble(((Number) value).doubleValue());</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (current instanceof JSONArray array) {</b>
+<b class="nc">&nbsp;			array.put(value);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			JSONArray array = new JSONArray();</b>
+<b class="nc">&nbsp;			array.put(current);</b>
+<b class="nc">&nbsp;			array.put(value);</b>
+<b class="nc">&nbsp;			this.nameValuePairs.put(name, array);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String checkName(String name) throws JSONException {
+<b class="nc">&nbsp;		if (name == null) {</b>
+<b class="nc">&nbsp;			throw new JSONException(&quot;Names must be non-null&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Removes the named mapping if it exists; does nothing otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value previously mapped by {@code name}, or null if there was no such
+&nbsp;	 * mapping.
+&nbsp;	 */
+&nbsp;	public Object remove(String name) {
+<b class="nc">&nbsp;		return this.nameValuePairs.remove(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns true if this object has no mapping for {@code name} or if it has a mapping
+&nbsp;	 * whose value is {@link #NULL}.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return true if this object has no mapping for {@code name}
+&nbsp;	 */
+&nbsp;	public boolean isNull(String name) {
+<b class="nc">&nbsp;		Object value = this.nameValuePairs.get(name);</b>
+<b class="nc">&nbsp;		return value == null || value == NULL;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns true if this object has a mapping for {@code name}. The mapping may be
+&nbsp;	 * {@link #NULL}.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return true if this object has a mapping for {@code name}
+&nbsp;	 */
+&nbsp;	public boolean has(String name) {
+<b class="nc">&nbsp;		return this.nameValuePairs.containsKey(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name}.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value
+&nbsp;	 * @throws JSONException if no such mapping exists.
+&nbsp;	 */
+&nbsp;	public Object get(String name) throws JSONException {
+<b class="nc">&nbsp;		Object result = this.nameValuePairs.get(name);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw new JSONException(&quot;No value for &quot; + name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name}, or null if no such mapping exists.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value or {@code null}
+&nbsp;	 */
+&nbsp;	public Object opt(String name) {
+<b class="nc">&nbsp;		return this.nameValuePairs.get(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a boolean or can be
+&nbsp;	 * coerced to a boolean.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value
+&nbsp;	 * @throws JSONException if the mapping doesn&#39;t exist or cannot be coerced to a
+&nbsp;	 * boolean.
+&nbsp;	 */
+&nbsp;	public boolean getBoolean(String name) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(name);</b>
+<b class="nc">&nbsp;		Boolean result = JSON.toBoolean(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(name, object, &quot;boolean&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a boolean or can be
+&nbsp;	 * coerced to a boolean. Returns false otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value or {@code null}
+&nbsp;	 */
+&nbsp;	public boolean optBoolean(String name) {
+<b class="nc">&nbsp;		return optBoolean(name, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a boolean or can be
+&nbsp;	 * coerced to a boolean. Returns {@code fallback} otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param fallback a fallback value
+&nbsp;	 * @return the value or {@code fallback}
+&nbsp;	 */
+&nbsp;	public boolean optBoolean(String name, boolean fallback) {
+<b class="nc">&nbsp;		Object object = opt(name);</b>
+<b class="nc">&nbsp;		Boolean result = JSON.toBoolean(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a double or can be
+&nbsp;	 * coerced to a double.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value
+&nbsp;	 * @throws JSONException if the mapping doesn&#39;t exist or cannot be coerced to a
+&nbsp;	 * double.
+&nbsp;	 */
+&nbsp;	public double getDouble(String name) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(name);</b>
+<b class="nc">&nbsp;		Double result = JSON.toDouble(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(name, object, &quot;double&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a double or can be
+&nbsp;	 * coerced to a double. Returns {@code NaN} otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value or {@code NaN}
+&nbsp;	 */
+&nbsp;	public double optDouble(String name) {
+<b class="nc">&nbsp;		return optDouble(name, Double.NaN);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a double or can be
+&nbsp;	 * coerced to a double. Returns {@code fallback} otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param fallback a fallback value
+&nbsp;	 * @return the value or {@code fallback}
+&nbsp;	 */
+&nbsp;	public double optDouble(String name, double fallback) {
+<b class="nc">&nbsp;		Object object = opt(name);</b>
+<b class="nc">&nbsp;		Double result = JSON.toDouble(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is an int or can be
+&nbsp;	 * coerced to an int.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value
+&nbsp;	 * @throws JSONException if the mapping doesn&#39;t exist or cannot be coerced to an int.
+&nbsp;	 */
+&nbsp;	public int getInt(String name) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(name);</b>
+<b class="nc">&nbsp;		Integer result = JSON.toInteger(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(name, object, &quot;int&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is an int or can be
+&nbsp;	 * coerced to an int. Returns 0 otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value of {@code 0}
+&nbsp;	 */
+&nbsp;	public int optInt(String name) {
+<b class="nc">&nbsp;		return optInt(name, 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is an int or can be
+&nbsp;	 * coerced to an int. Returns {@code fallback} otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param fallback a fallback value
+&nbsp;	 * @return the value or {@code fallback}
+&nbsp;	 */
+&nbsp;	public int optInt(String name, int fallback) {
+<b class="nc">&nbsp;		Object object = opt(name);</b>
+<b class="nc">&nbsp;		Integer result = JSON.toInteger(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a long or can be
+&nbsp;	 * coerced to a long. Note that JSON represents numbers as doubles, so this is
+&nbsp;	 * &lt;a href=&quot;#lossy&quot;&gt;lossy&lt;/a&gt;; use strings to transfer numbers over JSON.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value
+&nbsp;	 * @throws JSONException if the mapping doesn&#39;t exist or cannot be coerced to a long.
+&nbsp;	 */
+&nbsp;	public long getLong(String name) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(name);</b>
+<b class="nc">&nbsp;		Long result = JSON.toLong(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(name, object, &quot;long&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a long or can be
+&nbsp;	 * coerced to a long. Returns 0 otherwise. Note that JSON represents numbers as
+&nbsp;	 * doubles, so this is &lt;a href=&quot;#lossy&quot;&gt;lossy&lt;/a&gt;; use strings to transfer numbers via
+&nbsp;	 * JSON.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value or {@code 0L}
+&nbsp;	 */
+&nbsp;	public long optLong(String name) {
+<b class="nc">&nbsp;		return optLong(name, 0L);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a long or can be
+&nbsp;	 * coerced to a long. Returns {@code fallback} otherwise. Note that JSON represents
+&nbsp;	 * numbers as doubles, so this is &lt;a href=&quot;#lossy&quot;&gt;lossy&lt;/a&gt;; use strings to transfer
+&nbsp;	 * numbers over JSON.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param fallback a fallback value
+&nbsp;	 * @return the value or {@code fallback}
+&nbsp;	 */
+&nbsp;	public long optLong(String name, long fallback) {
+<b class="nc">&nbsp;		Object object = opt(name);</b>
+<b class="nc">&nbsp;		Long result = JSON.toLong(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists, coercing it if necessary.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value
+&nbsp;	 * @throws JSONException if no such mapping exists.
+&nbsp;	 */
+&nbsp;	public String getString(String name) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(name);</b>
+<b class="nc">&nbsp;		String result = JSON.toString(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(name, object, &quot;String&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists, coercing it if necessary.
+&nbsp;	 * Returns the empty string if no such mapping exists.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value or an empty string
+&nbsp;	 */
+&nbsp;	public String optString(String name) {
+<b class="nc">&nbsp;		return optString(name, &quot;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists, coercing it if necessary.
+&nbsp;	 * Returns {@code fallback} if no such mapping exists.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @param fallback a fallback value
+&nbsp;	 * @return the value or {@code fallback}
+&nbsp;	 */
+&nbsp;	public String optString(String name, String fallback) {
+<b class="nc">&nbsp;		Object object = opt(name);</b>
+<b class="nc">&nbsp;		String result = JSON.toString(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a {@code
+&nbsp;	 * JSONArray}.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value
+&nbsp;	 * @throws JSONException if the mapping doesn&#39;t exist or is not a {@code
+&nbsp;	 *     JSONArray}.
+&nbsp;	 */
+&nbsp;	public JSONArray getJSONArray(String name) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(name);</b>
+<b class="nc">&nbsp;		if (object instanceof JSONArray) {</b>
+<b class="nc">&nbsp;			return (JSONArray) object;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			throw JSON.typeMismatch(name, object, &quot;JSONArray&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a {@code
+&nbsp;	 * JSONArray}. Returns null otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value or {@code null}
+&nbsp;	 */
+&nbsp;	public JSONArray optJSONArray(String name) {
+<b class="nc">&nbsp;		Object object = opt(name);</b>
+<b class="nc">&nbsp;		return object instanceof JSONArray ? (JSONArray) object : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a {@code
+&nbsp;	 * JSONObject}.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value
+&nbsp;	 * @throws JSONException if the mapping doesn&#39;t exist or is not a {@code
+&nbsp;	 *     JSONObject}.
+&nbsp;	 */
+&nbsp;	public JSONObject getJSONObject(String name) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(name);</b>
+<b class="nc">&nbsp;		if (object instanceof JSONObject) {</b>
+<b class="nc">&nbsp;			return (JSONObject) object;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			throw JSON.typeMismatch(name, object, &quot;JSONObject&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value mapped by {@code name} if it exists and is a {@code
+&nbsp;	 * JSONObject}. Returns null otherwise.
+&nbsp;	 * @param name the name of the property
+&nbsp;	 * @return the value or {@code null}
+&nbsp;	 */
+&nbsp;	public JSONObject optJSONObject(String name) {
+<b class="nc">&nbsp;		Object object = opt(name);</b>
+<b class="nc">&nbsp;		return object instanceof JSONObject ? (JSONObject) object : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns an array with the values corresponding to {@code names}. The array contains
+&nbsp;	 * null for names that aren&#39;t mapped. This method returns null if {@code names} is
+&nbsp;	 * either null or empty.
+&nbsp;	 * @param names the names of the properties
+&nbsp;	 * @return the array
+&nbsp;	 */
+&nbsp;	public JSONArray toJSONArray(JSONArray names) {
+<b class="nc">&nbsp;		JSONArray result = new JSONArray();</b>
+<b class="nc">&nbsp;		if (names == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int length = names.length();</b>
+<b class="nc">&nbsp;		if (length == 0) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (int i = 0; i &lt; length; i++) {</b>
+<b class="nc">&nbsp;			String name = JSON.toString(names.opt(i));</b>
+<b class="nc">&nbsp;			result.put(opt(name));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns an iterator of the {@code String} names in this object. The returned
+&nbsp;	 * iterator supports {@link Iterator#remove() remove}, which will remove the
+&nbsp;	 * corresponding mapping from this object. If this object is modified after the
+&nbsp;	 * iterator is returned, the iterator&#39;s behavior is undefined. The order of the keys
+&nbsp;	 * is undefined.
+&nbsp;	 * @return the keys
+&nbsp;	 */
+&nbsp;	/* Return a raw type for API compatibility */
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	public Iterator keys() {
+<b class="nc">&nbsp;		return this.nameValuePairs.keySet().iterator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns an array containing the string names in this object. This method returns
+&nbsp;	 * null if this object contains no mappings.
+&nbsp;	 * @return the array
+&nbsp;	 */
+&nbsp;	public JSONArray names() {
+<b class="nc">&nbsp;		return this.nameValuePairs.isEmpty() ? null : new JSONArray(new ArrayList&lt;&gt;(this.nameValuePairs.keySet()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encodes this object as a compact JSON string, such as:
+&nbsp;	 * &lt;pre&gt;{&quot;query&quot;:&quot;Pizza&quot;,&quot;locations&quot;:[94043,90210]}&lt;/pre&gt;
+&nbsp;	 * @return a string representation of the object.
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public String toString() {
+&nbsp;		try {
+<b class="nc">&nbsp;			JSONStringer stringer = new JSONStringer();</b>
+<b class="nc">&nbsp;			writeTo(stringer);</b>
+<b class="nc">&nbsp;			return stringer.toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (JSONException e) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encodes this object as a human-readable JSON string for debugging, such as: &lt;pre&gt;
+&nbsp;	 * {
+&nbsp;	 *     &quot;query&quot;: &quot;Pizza&quot;,
+&nbsp;	 *     &quot;locations&quot;: [
+&nbsp;	 *         94043,
+&nbsp;	 *         90210
+&nbsp;	 *     ]
+&nbsp;	 * }&lt;/pre&gt;
+&nbsp;	 * @param indentSpaces the number of spaces to indent for each level of nesting.
+&nbsp;	 * @return a string representation of the object.
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public String toString(int indentSpaces) throws JSONException {
+<b class="nc">&nbsp;		JSONStringer stringer = new JSONStringer(indentSpaces);</b>
+<b class="nc">&nbsp;		writeTo(stringer);</b>
+<b class="nc">&nbsp;		return stringer.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void writeTo(JSONStringer stringer) throws JSONException {
+<b class="nc">&nbsp;		stringer.object();</b>
+<b class="nc">&nbsp;		for (Map.Entry&lt;String, Object&gt; entry : this.nameValuePairs.entrySet()) {</b>
+<b class="nc">&nbsp;			stringer.key(entry.getKey()).value(entry.getValue());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		stringer.endObject();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encodes the number as a JSON string.
+&nbsp;	 * @param number a finite value. May not be {@link Double#isNaN() NaNs} or
+&nbsp;	 * {@link Double#isInfinite() infinities}.
+&nbsp;	 * @return the encoded value
+&nbsp;	 * @throws JSONException if an error occurs
+&nbsp;	 */
+&nbsp;	public static String numberToString(Number number) throws JSONException {
+<b class="nc">&nbsp;		if (number == null) {</b>
+<b class="nc">&nbsp;			throw new JSONException(&quot;Number must be non-null&quot;);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		double doubleValue = number.doubleValue();</b>
+<b class="nc">&nbsp;		JSON.checkDouble(doubleValue);</b>
+&nbsp;
+&nbsp;		// the original returns &quot;-0&quot; instead of &quot;-0.0&quot; for negative zero
+<b class="nc">&nbsp;		if (number.equals(NEGATIVE_ZERO)) {</b>
+<b class="nc">&nbsp;			return &quot;-0&quot;;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		long longValue = number.longValue();</b>
+<b class="nc">&nbsp;		if (doubleValue == longValue) {</b>
+<b class="nc">&nbsp;			return Long.toString(longValue);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		return number.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encodes {@code data} as a JSON string. This applies quotes and any necessary
+&nbsp;	 * character escaping.
+&nbsp;	 * @param data the string to encode. Null will be interpreted as an empty string.
+&nbsp;	 * @return the quoted value
+&nbsp;	 */
+&nbsp;	public static String quote(String data) {
+<b class="nc">&nbsp;		if (data == null) {</b>
+<b class="nc">&nbsp;			return &quot;\&quot;\&quot;&quot;;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			JSONStringer stringer = new JSONStringer();</b>
+<b class="nc">&nbsp;			stringer.open(JSONStringer.Scope.NULL, &quot;&quot;);</b>
+<b class="nc">&nbsp;			stringer.value(data);</b>
+<b class="nc">&nbsp;			stringer.close(JSONStringer.Scope.NULL, JSONStringer.Scope.NULL, &quot;&quot;);</b>
+<b class="nc">&nbsp;			return stringer.toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (JSONException e) {</b>
+<b class="nc">&nbsp;			throw new AssertionError();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Wraps the given object if necessary.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * If the object is null or , returns {@link #NULL}. If the object is a
+&nbsp;	 * {@code JSONArray} or {@code JSONObject}, no wrapping is necessary. If the object is
+&nbsp;	 * {@code NULL}, no wrapping is necessary. If the object is an array or
+&nbsp;	 * {@code Collection}, returns an equivalent {@code JSONArray}. If the object is a
+&nbsp;	 * {@code Map}, returns an equivalent {@code JSONObject}. If the object is a primitive
+&nbsp;	 * wrapper type or {@code String}, returns the object. Otherwise if the object is from
+&nbsp;	 * a {@code java} package, returns the result of {@code toString}. If wrapping fails,
+&nbsp;	 * returns null.
+&nbsp;	 * @param o the object to wrap
+&nbsp;	 * @return the wrapped object
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	public static Object wrap(Object o) {
+<b class="nc">&nbsp;		if (o == null) {</b>
+<b class="nc">&nbsp;			return NULL;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (o instanceof JSONArray || o instanceof JSONObject) {</b>
+<b class="nc">&nbsp;			return o;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (o.equals(NULL)) {</b>
+<b class="nc">&nbsp;			return o;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			if (o instanceof Collection) {</b>
+<b class="nc">&nbsp;				return new JSONArray((Collection) o);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (o.getClass().isArray()) {</b>
+<b class="nc">&nbsp;				return new JSONArray(o);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (o instanceof Map) {</b>
+<b class="nc">&nbsp;				return new JSONObject((Map) o);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (o instanceof Boolean || o instanceof Byte || o instanceof Character || o instanceof Double</b>
+&nbsp;					|| o instanceof Float || o instanceof Integer || o instanceof Long || o instanceof Short
+&nbsp;					|| o instanceof String) {
+<b class="nc">&nbsp;				return o;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (o.getClass().getPackage().getName().startsWith(&quot;java.&quot;)) {</b>
+<b class="nc">&nbsp;				return o.toString();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ignored) {</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

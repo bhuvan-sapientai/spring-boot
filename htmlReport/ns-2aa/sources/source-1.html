@@ -1,0 +1,370 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractAotMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractAotMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractAotMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractAotMojo$Errors</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import javax.tools.Diagnostic;
+&nbsp;import javax.tools.DiagnosticListener;
+&nbsp;import javax.tools.JavaCompiler;
+&nbsp;import javax.tools.JavaCompiler.CompilationTask;
+&nbsp;import javax.tools.JavaFileObject;
+&nbsp;import javax.tools.StandardJavaFileManager;
+&nbsp;import javax.tools.ToolProvider;
+&nbsp;
+&nbsp;import org.apache.maven.execution.MavenSession;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;import org.apache.maven.plugin.MojoFailureException;
+&nbsp;import org.apache.maven.plugins.annotations.Component;
+&nbsp;import org.apache.maven.plugins.annotations.Parameter;
+&nbsp;import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
+&nbsp;import org.apache.maven.toolchain.ToolchainManager;
+&nbsp;
+&nbsp;import org.springframework.boot.maven.CommandLineBuilder.ClasspathBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base class for AOT processing MOJOs.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Omar YAYA
+&nbsp; * @since 3.0.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AbstractAotMojo extends AbstractDependencyFilterMojo {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The current Maven session. This is used for toolchain manager API calls.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${session}&quot;, readonly = true)
+&nbsp;	private MavenSession session;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The toolchain manager to use to locate a custom JDK.
+&nbsp;	 */
+&nbsp;	@Component
+&nbsp;	private ToolchainManager toolchainManager;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Skip the execution.
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.aot.skip&quot;, defaultValue = &quot;false&quot;)
+&nbsp;	private boolean skip;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * List of JVM system properties to pass to the AOT process.
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private Map&lt;String, String&gt; systemPropertyVariables;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * JVM arguments that should be associated with the AOT process. On command line, make
+&nbsp;	 * sure to wrap multiple values between quotes.
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.aot.jvmArguments&quot;)
+&nbsp;	private String jvmArguments;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Arguments that should be provided to the AOT compile process. On command line, make
+&nbsp;	 * sure to wrap multiple values between quotes.
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.aot.compilerArguments&quot;)
+&nbsp;	private String compilerArguments;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return Maven execution session.
+&nbsp;	 * @return session
+&nbsp;	 * @since 3.0.10
+&nbsp;	 */
+&nbsp;	protected final MavenSession getSession() {
+<b class="nc">&nbsp;		return this.session;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void execute() throws MojoExecutionException, MojoFailureException {
+<b class="nc">&nbsp;		if (this.skip) {</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;Skipping AOT execution as per configuration&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			executeAot();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(ex.getMessage(), ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected abstract void executeAot() throws Exception;
+&nbsp;
+&nbsp;	protected void generateAotAssets(URL[] classPath, String processorClassName, String... arguments) throws Exception {
+<b class="nc">&nbsp;		List&lt;String&gt; command = CommandLineBuilder.forMainClass(processorClassName)</b>
+<b class="nc">&nbsp;			.withSystemProperties(this.systemPropertyVariables)</b>
+<b class="nc">&nbsp;			.withJvmArguments(new RunArguments(this.jvmArguments).asArray())</b>
+<b class="nc">&nbsp;			.withClasspath(classPath)</b>
+<b class="nc">&nbsp;			.withArguments(arguments)</b>
+<b class="nc">&nbsp;			.build();</b>
+<b class="nc">&nbsp;		if (getLog().isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;Generating AOT assets using command: &quot; + command);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		JavaProcessExecutor processExecutor = new JavaProcessExecutor(this.session, this.toolchainManager);</b>
+<b class="nc">&nbsp;		processExecutor.run(this.project.getBasedir(), command, Collections.emptyMap());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final void compileSourceFiles(URL[] classPath, File sourcesDirectory, File outputDirectory)
+&nbsp;			throws Exception {
+&nbsp;		List&lt;Path&gt; sourceFiles;
+<b class="nc">&nbsp;		try (Stream&lt;Path&gt; pathStream = Files.walk(sourcesDirectory.toPath())) {</b>
+<b class="nc">&nbsp;			sourceFiles = pathStream.filter(Files::isRegularFile).toList();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (sourceFiles.isEmpty()) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();</b>
+<b class="nc">&nbsp;		try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {</b>
+<b class="nc">&nbsp;			JavaCompilerPluginConfiguration compilerConfiguration = new JavaCompilerPluginConfiguration(this.project);</b>
+<b class="nc">&nbsp;			List&lt;String&gt; options = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			options.add(&quot;-cp&quot;);</b>
+<b class="nc">&nbsp;			options.add(ClasspathBuilder.build(Arrays.asList(classPath)));</b>
+<b class="nc">&nbsp;			options.add(&quot;-d&quot;);</b>
+<b class="nc">&nbsp;			options.add(outputDirectory.toPath().toAbsolutePath().toString());</b>
+<b class="nc">&nbsp;			String releaseVersion = compilerConfiguration.getReleaseVersion();</b>
+<b class="nc">&nbsp;			if (releaseVersion != null) {</b>
+<b class="nc">&nbsp;				options.add(&quot;--release&quot;);</b>
+<b class="nc">&nbsp;				options.add(releaseVersion);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				String source = compilerConfiguration.getSourceMajorVersion();</b>
+<b class="nc">&nbsp;				if (source != null) {</b>
+<b class="nc">&nbsp;					options.add(&quot;--source&quot;);</b>
+<b class="nc">&nbsp;					options.add(source);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				String target = compilerConfiguration.getTargetMajorVersion();</b>
+<b class="nc">&nbsp;				if (target != null) {</b>
+<b class="nc">&nbsp;					options.add(&quot;--target&quot;);</b>
+<b class="nc">&nbsp;					options.add(target);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			options.addAll(new RunArguments(this.compilerArguments).getArgs());</b>
+<b class="nc">&nbsp;			Iterable&lt;? extends JavaFileObject&gt; compilationUnits = fileManager.getJavaFileObjectsFromPaths(sourceFiles);</b>
+<b class="nc">&nbsp;			Errors errors = new Errors();</b>
+<b class="nc">&nbsp;			CompilationTask task = compiler.getTask(null, fileManager, errors, options, null, compilationUnits);</b>
+<b class="nc">&nbsp;			boolean result = task.call();</b>
+<b class="nc">&nbsp;			if (!result || errors.hasReportedErrors()) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Unable to compile generated source&quot; + errors);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final URL[] getClassPath(File[] directories, ArtifactsFilter... artifactFilters)
+&nbsp;			throws MojoExecutionException {
+<b class="nc">&nbsp;		List&lt;URL&gt; urls = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		Arrays.stream(directories).map(this::toURL).forEach(urls::add);</b>
+<b class="nc">&nbsp;		urls.addAll(getDependencyURLs(artifactFilters));</b>
+<b class="nc">&nbsp;		return urls.toArray(URL[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final void copyAll(Path from, Path to) throws IOException {
+<b class="nc">&nbsp;		if (!Files.exists(from)) {</b>
+&nbsp;			return;
+&nbsp;		}
+&nbsp;		List&lt;Path&gt; files;
+<b class="nc">&nbsp;		try (Stream&lt;Path&gt; pathStream = Files.walk(from)) {</b>
+<b class="nc">&nbsp;			files = pathStream.filter(Files::isRegularFile).toList();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		for (Path file : files) {</b>
+<b class="nc">&nbsp;			String relativeFileName = file.subpath(from.getNameCount(), file.getNameCount()).toString();</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;Copying &#39;&quot; + relativeFileName + &quot;&#39; to &quot; + to);</b>
+<b class="nc">&nbsp;			Path target = to.resolve(relativeFileName);</b>
+<b class="nc">&nbsp;			Files.createDirectories(target.getParent());</b>
+<b class="nc">&nbsp;			Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link DiagnosticListener} used to collect errors.
+&nbsp;	 */
+<b class="nc">&nbsp;	protected static class Errors implements DiagnosticListener&lt;JavaFileObject&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final StringBuilder message = new StringBuilder();</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void report(Diagnostic&lt;? extends JavaFileObject&gt; diagnostic) {
+<b class="nc">&nbsp;			if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {</b>
+<b class="nc">&nbsp;				this.message.append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;				this.message.append(diagnostic.getMessage(Locale.getDefault()));</b>
+<b class="nc">&nbsp;				if (diagnostic.getSource() != null) {</b>
+<b class="nc">&nbsp;					this.message.append(&quot; &quot;);</b>
+<b class="nc">&nbsp;					this.message.append(diagnostic.getSource().getName());</b>
+<b class="nc">&nbsp;					this.message.append(&quot; &quot;);</b>
+<b class="nc">&nbsp;					this.message.append(diagnostic.getLineNumber()).append(&quot;:&quot;).append(diagnostic.getColumnNumber());</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean hasReportedErrors() {
+<b class="nc">&nbsp;			return !this.message.isEmpty();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return this.message.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

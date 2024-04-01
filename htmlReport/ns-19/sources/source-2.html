@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConditionalOnAvailableEndpoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.endpoint.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionalOnAvailableEndpoint (org.springframework.boot.actuate.autoconfigure.endpoint.condition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ConditionalOnAvailableEndpoint</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.endpoint.condition;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.expose.EndpointExposure;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.EndpointExtension;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Conditional @Conditional} that checks whether an endpoint is available. An
+&nbsp; * endpoint is considered available if it is both enabled and exposed on the specified
+&nbsp; * technologies. Matches enablement according to the endpoints specific
+&nbsp; * {@link Environment} property, falling back to
+&nbsp; * {@code management.endpoints.enabled-by-default} or failing that
+&nbsp; * {@link Endpoint#enableByDefault()}. Matches exposure according to any of the
+&nbsp; * {@code management.endpoints.web.exposure.&lt;id&gt;} or
+&nbsp; * {@code management.endpoints.jmx.exposure.&lt;id&gt;} specific properties or failing that to
+&nbsp; * whether the application runs on
+&nbsp; * {@link org.springframework.boot.cloud.CloudPlatform#CLOUD_FOUNDRY}. Both those
+&nbsp; * conditions should match for the endpoint to be considered available.
+&nbsp; * &lt;p&gt;
+&nbsp; * When placed on a {@code @Bean} method, the endpoint defaults to the return type of the
+&nbsp; * factory method:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;Configuration
+&nbsp; * public class MyConfiguration {
+&nbsp; *
+&nbsp; *     &amp;#064;ConditionalOnAvailableEndpoint
+&nbsp; *     &amp;#064;Bean
+&nbsp; *     public MyEndpoint myEndpoint() {
+&nbsp; *         ...
+&nbsp; *     }
+&nbsp; *
+&nbsp; * }&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * It is also possible to use the same mechanism for extensions:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;Configuration
+&nbsp; * public class MyConfiguration {
+&nbsp; *
+&nbsp; *     &amp;#064;ConditionalOnAvailableEndpoint
+&nbsp; *     &amp;#064;Bean
+&nbsp; *     public MyEndpointWebExtension myEndpointWebExtension() {
+&nbsp; *         ...
+&nbsp; *     }
+&nbsp; *
+&nbsp; * }&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * In the sample above, {@code MyEndpointWebExtension} will be created if the endpoint is
+&nbsp; * available as defined by the rules above. {@code MyEndpointWebExtension} must be a
+&nbsp; * regular extension that refers to an endpoint, something like:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;EndpointWebExtension(endpoint = MyEndpoint.class)
+&nbsp; * public class MyEndpointWebExtension {
+&nbsp; *
+&nbsp; * }&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Alternatively, the target endpoint can be manually specified for components that should
+&nbsp; * only be created when a given endpoint is available:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;Configuration
+&nbsp; * public class MyConfiguration {
+&nbsp; *
+&nbsp; *     &amp;#064;ConditionalOnAvailableEndpoint(endpoint = MyEndpoint.class)
+&nbsp; *     &amp;#064;Bean
+&nbsp; *     public MyComponent myComponent() {
+&nbsp; *         ...
+&nbsp; *     }
+&nbsp; *
+&nbsp; * }&lt;/pre&gt;
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.2.0
+&nbsp; * @see Endpoint
+&nbsp; */
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Target({ ElementType.METHOD, ElementType.TYPE })
+&nbsp;@Documented
+&nbsp;@Conditional(OnAvailableEndpointCondition.class)
+&nbsp;public @interface ConditionalOnAvailableEndpoint {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The endpoint type that should be checked. Inferred when the return type of the
+&nbsp;	 * {@code @Bean} method is either an {@link Endpoint @Endpoint} or an
+&nbsp;	 * {@link EndpointExtension @EndpointExtension}.
+&nbsp;	 * @return the endpoint type to check
+&nbsp;	 */
+&nbsp;	Class&lt;?&gt; endpoint() default Void.class;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Technologies to check the exposure of the endpoint on while considering it to be
+&nbsp;	 * available.
+&nbsp;	 * @return the technologies to check
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	EndpointExposure[] exposure() default {};
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

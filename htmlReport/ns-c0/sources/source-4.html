@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MessageSourceAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.context</a>
+</div>
+
+<h1>Coverage Summary for Class: MessageSourceAutoConfiguration (org.springframework.boot.autoconfigure.context)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MessageSourceAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MessageSourceAutoConfiguration$MessageSourceRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MessageSourceAutoConfiguration$ResourceBundleCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.context;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+&nbsp;import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration.MessageSourceRuntimeHints;
+&nbsp;import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration.ResourceBundleCondition;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.MessageSource;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;import org.springframework.context.support.AbstractApplicationContext;
+&nbsp;import org.springframework.context.support.ResourceBundleMessageSource;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.util.ConcurrentReferenceHashMap;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for {@link MessageSource}.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Marc Becker
+&nbsp; * @since 1.5.0
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@ConditionalOnMissingBean(name = AbstractApplicationContext.MESSAGE_SOURCE_BEAN_NAME, search = SearchStrategy.CURRENT)
+&nbsp;@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
+&nbsp;@Conditional(ResourceBundleCondition.class)
+&nbsp;@EnableConfigurationProperties
+&nbsp;@ImportRuntimeHints(MessageSourceRuntimeHints.class)
+<b class="nc">&nbsp;public class MessageSourceAutoConfiguration {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Resource[] NO_RESOURCES = {};</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConfigurationProperties(prefix = &quot;spring.messages&quot;)
+&nbsp;	public MessageSourceProperties messageSourceProperties() {
+<b class="nc">&nbsp;		return new MessageSourceProperties();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	public MessageSource messageSource(MessageSourceProperties properties) {
+<b class="nc">&nbsp;		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(properties.getBasename())) {</b>
+<b class="nc">&nbsp;			messageSource.setBasenames(StringUtils</b>
+<b class="nc">&nbsp;				.commaDelimitedListToStringArray(StringUtils.trimAllWhitespace(properties.getBasename())));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (properties.getEncoding() != null) {</b>
+<b class="nc">&nbsp;			messageSource.setDefaultEncoding(properties.getEncoding().name());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		messageSource.setFallbackToSystemLocale(properties.isFallbackToSystemLocale());</b>
+<b class="nc">&nbsp;		Duration cacheDuration = properties.getCacheDuration();</b>
+<b class="nc">&nbsp;		if (cacheDuration != null) {</b>
+<b class="nc">&nbsp;			messageSource.setCacheMillis(cacheDuration.toMillis());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		messageSource.setAlwaysUseMessageFormat(properties.isAlwaysUseMessageFormat());</b>
+<b class="nc">&nbsp;		messageSource.setUseCodeAsDefaultMessage(properties.isUseCodeAsDefaultMessage());</b>
+<b class="nc">&nbsp;		return messageSource;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	protected static class ResourceBundleCondition extends SpringBootCondition {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final ConcurrentReferenceHashMap&lt;String, ConditionOutcome&gt; cache = new ConcurrentReferenceHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;			String basename = context.getEnvironment().getProperty(&quot;spring.messages.basename&quot;, &quot;messages&quot;);</b>
+<b class="nc">&nbsp;			ConditionOutcome outcome = cache.get(basename);</b>
+<b class="nc">&nbsp;			if (outcome == null) {</b>
+<b class="nc">&nbsp;				outcome = getMatchOutcomeForBasename(context, basename);</b>
+<b class="nc">&nbsp;				cache.put(basename, outcome);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return outcome;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConditionOutcome getMatchOutcomeForBasename(ConditionContext context, String basename) {
+<b class="nc">&nbsp;			ConditionMessage.Builder message = ConditionMessage.forCondition(&quot;ResourceBundle&quot;);</b>
+<b class="nc">&nbsp;			for (String name : StringUtils.commaDelimitedListToStringArray(StringUtils.trimAllWhitespace(basename))) {</b>
+<b class="nc">&nbsp;				for (Resource resource : getResources(context.getClassLoader(), name)) {</b>
+<b class="nc">&nbsp;					if (resource.exists()) {</b>
+<b class="nc">&nbsp;						return ConditionOutcome.match(message.found(&quot;bundle&quot;).items(resource));</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return ConditionOutcome.noMatch(message.didNotFind(&quot;bundle with basename &quot; + basename).atAll());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Resource[] getResources(ClassLoader classLoader, String name) {
+<b class="nc">&nbsp;			String target = name.replace(&#39;.&#39;, &#39;/&#39;);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return new PathMatchingResourcePatternResolver(classLoader)</b>
+<b class="nc">&nbsp;					.getResources(&quot;classpath*:&quot; + target + &quot;.properties&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				return NO_RESOURCES;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class MessageSourceRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			hints.resources().registerPattern(&quot;messages.properties&quot;).registerPattern(&quot;messages_*.properties&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

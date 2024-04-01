@@ -1,0 +1,591 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PrivateKeyParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: PrivateKeyParser (org.springframework.boot.buildpack.platform.docker.ssl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PrivateKeyParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PrivateKeyParser$DerElement</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PrivateKeyParser$DerElement$TagType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PrivateKeyParser$DerElement$ValueType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PrivateKeyParser$DerEncoder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PrivateKeyParser$PemParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/138)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.ssl;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.security.KeyFactory;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.security.PrivateKey;
+&nbsp;import java.security.spec.InvalidKeySpecException;
+&nbsp;import java.security.spec.PKCS8EncodedKeySpec;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.ssl.PrivateKeyParser.DerElement.TagType;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.ssl.PrivateKeyParser.DerElement.ValueType;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Parser for PKCS private key files in PEM format.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;final class PrivateKeyParser {
+&nbsp;
+&nbsp;	private static final String PKCS1_RSA_HEADER = &quot;-+BEGIN\\s+RSA\\s+PRIVATE\\s+KEY[^-]*-+(?:\\s|\\r|\\n)+&quot;;
+&nbsp;
+&nbsp;	private static final String PKCS1_RSA_FOOTER = &quot;-+END\\s+RSA\\s+PRIVATE\\s+KEY[^-]*-+&quot;;
+&nbsp;
+&nbsp;	private static final String PKCS8_HEADER = &quot;-+BEGIN\\s+PRIVATE\\s+KEY[^-]*-+(?:\\s|\\r|\\n)+&quot;;
+&nbsp;
+&nbsp;	private static final String PKCS8_FOOTER = &quot;-+END\\s+PRIVATE\\s+KEY[^-]*-+&quot;;
+&nbsp;
+&nbsp;	private static final String SEC1_EC_HEADER = &quot;-+BEGIN\\s+EC\\s+PRIVATE\\s+KEY[^-]*-+(?:\\s|\\r|\\n)+&quot;;
+&nbsp;
+&nbsp;	private static final String SEC1_EC_FOOTER = &quot;-+END\\s+EC\\s+PRIVATE\\s+KEY[^-]*-+&quot;;
+&nbsp;
+&nbsp;	private static final String BASE64_TEXT = &quot;([a-z0-9+/=\\r\\n]+)&quot;;
+&nbsp;
+&nbsp;	private static final List&lt;PemParser&gt; PEM_PARSERS;
+&nbsp;	static {
+<b class="nc">&nbsp;		List&lt;PemParser&gt; parsers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		parsers</b>
+<b class="nc">&nbsp;			.add(new PemParser(PKCS1_RSA_HEADER, PKCS1_RSA_FOOTER, PrivateKeyParser::createKeySpecForPkcs1Rsa, &quot;RSA&quot;));</b>
+<b class="nc">&nbsp;		parsers.add(new PemParser(SEC1_EC_HEADER, SEC1_EC_FOOTER, PrivateKeyParser::createKeySpecForSec1Ec, &quot;EC&quot;));</b>
+<b class="nc">&nbsp;		parsers.add(new PemParser(PKCS8_HEADER, PKCS8_FOOTER, PKCS8EncodedKeySpec::new, &quot;RSA&quot;, &quot;RSASSA-PSS&quot;, &quot;EC&quot;,</b>
+&nbsp;				&quot;DSA&quot;, &quot;EdDSA&quot;, &quot;XDH&quot;));
+<b class="nc">&nbsp;		PEM_PARSERS = Collections.unmodifiableList(parsers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * ASN.1 encoded object identifier {@literal 1.2.840.113549.1.1.1}.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final int[] RSA_ALGORITHM = { 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01 };</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * ASN.1 encoded object identifier {@literal 1.2.840.10045.2.1}.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final int[] EC_ALGORITHM = { 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01 };</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * ASN.1 encoded object identifier {@literal 1.3.132.0.34}.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final int[] EC_PARAMETERS = { 0x2b, 0x81, 0x04, 0x00, 0x22 };</b>
+&nbsp;
+&nbsp;	private PrivateKeyParser() {
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PKCS8EncodedKeySpec createKeySpecForPkcs1Rsa(byte[] bytes) {
+<b class="nc">&nbsp;		return createKeySpecForAlgorithm(bytes, RSA_ALGORITHM, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PKCS8EncodedKeySpec createKeySpecForSec1Ec(byte[] bytes) {
+<b class="nc">&nbsp;		DerElement ecPrivateKey = DerElement.of(bytes);</b>
+<b class="nc">&nbsp;		Assert.state(ecPrivateKey.isType(ValueType.ENCODED, TagType.SEQUENCE),</b>
+&nbsp;				&quot;Key spec should be an ASN.1 encoded sequence&quot;);
+<b class="nc">&nbsp;		DerElement version = DerElement.of(ecPrivateKey.getContents());</b>
+<b class="nc">&nbsp;		Assert.state(version != null &amp;&amp; version.isType(ValueType.PRIMITIVE, TagType.INTEGER),</b>
+&nbsp;				&quot;Key spec should start with version&quot;);
+<b class="nc">&nbsp;		Assert.state(version.getContents().remaining() == 1 &amp;&amp; version.getContents().get() == 1,</b>
+&nbsp;				&quot;Key spec version must be 1&quot;);
+<b class="nc">&nbsp;		DerElement privateKey = DerElement.of(ecPrivateKey.getContents());</b>
+<b class="nc">&nbsp;		Assert.state(privateKey != null &amp;&amp; privateKey.isType(ValueType.PRIMITIVE, TagType.OCTET_STRING),</b>
+&nbsp;				&quot;Key spec should contain private key&quot;);
+<b class="nc">&nbsp;		DerElement parameters = DerElement.of(ecPrivateKey.getContents());</b>
+<b class="nc">&nbsp;		return createKeySpecForAlgorithm(bytes, EC_ALGORITHM, getEcParameters(parameters));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static int[] getEcParameters(DerElement parameters) {
+<b class="nc">&nbsp;		if (parameters == null) {</b>
+<b class="nc">&nbsp;			return EC_PARAMETERS;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Assert.state(parameters.isType(ValueType.ENCODED), &quot;Key spec should contain encoded parameters&quot;);</b>
+<b class="nc">&nbsp;		DerElement contents = DerElement.of(parameters.getContents());</b>
+<b class="nc">&nbsp;		Assert.state(contents.isType(ValueType.PRIMITIVE, TagType.OBJECT_IDENTIFIER),</b>
+&nbsp;				&quot;Key spec parameters should contain object identifier&quot;);
+<b class="nc">&nbsp;		return getEcParameters(contents.getContents());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static int[] getEcParameters(ByteBuffer bytes) {
+<b class="nc">&nbsp;		int[] result = new int[bytes.remaining()];</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; result.length; i++) {</b>
+<b class="nc">&nbsp;			result[i] = bytes.get() &amp; 0xFF;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PKCS8EncodedKeySpec createKeySpecForAlgorithm(byte[] bytes, int[] algorithm, int[] parameters) {
+&nbsp;		try {
+<b class="nc">&nbsp;			DerEncoder encoder = new DerEncoder();</b>
+<b class="nc">&nbsp;			encoder.integer(0x00); // Version 0</b>
+<b class="nc">&nbsp;			DerEncoder algorithmIdentifier = new DerEncoder();</b>
+<b class="nc">&nbsp;			algorithmIdentifier.objectIdentifier(algorithm);</b>
+<b class="nc">&nbsp;			algorithmIdentifier.objectIdentifier(parameters);</b>
+<b class="nc">&nbsp;			byte[] byteArray = algorithmIdentifier.toByteArray();</b>
+<b class="nc">&nbsp;			encoder.sequence(byteArray);</b>
+<b class="nc">&nbsp;			encoder.octetString(bytes);</b>
+<b class="nc">&nbsp;			return new PKCS8EncodedKeySpec(encoder.toSequence());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load a private key from the specified file paths.
+&nbsp;	 * @param path the path to the private key file
+&nbsp;	 * @return private key from specified file path
+&nbsp;	 */
+&nbsp;	static PrivateKey parse(Path path) {
+&nbsp;		try {
+<b class="nc">&nbsp;			String text = Files.readString(path);</b>
+<b class="nc">&nbsp;			for (PemParser pemParser : PEM_PARSERS) {</b>
+<b class="nc">&nbsp;				PrivateKey privateKey = pemParser.parse(text);</b>
+<b class="nc">&nbsp;				if (privateKey != null) {</b>
+<b class="nc">&nbsp;					return privateKey;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unrecognized private key format&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Error loading private key file &quot; + path, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Parser for a specific PEM format.
+&nbsp;	 */
+&nbsp;	private static class PemParser {
+&nbsp;
+&nbsp;		private final Pattern pattern;
+&nbsp;
+&nbsp;		private final Function&lt;byte[], PKCS8EncodedKeySpec&gt; keySpecFactory;
+&nbsp;
+&nbsp;		private final String[] algorithms;
+&nbsp;
+&nbsp;		PemParser(String header, String footer, Function&lt;byte[], PKCS8EncodedKeySpec&gt; keySpecFactory,
+<b class="nc">&nbsp;				String... algorithms) {</b>
+<b class="nc">&nbsp;			this.pattern = Pattern.compile(header + BASE64_TEXT + footer, Pattern.CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;			this.algorithms = algorithms;</b>
+<b class="nc">&nbsp;			this.keySpecFactory = keySpecFactory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		PrivateKey parse(String text) {
+<b class="nc">&nbsp;			Matcher matcher = this.pattern.matcher(text);</b>
+<b class="nc">&nbsp;			return (!matcher.find()) ? null : parse(decodeBase64(matcher.group(1)));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static byte[] decodeBase64(String content) {
+<b class="nc">&nbsp;			byte[] contentBytes = content.replaceAll(&quot;\r&quot;, &quot;&quot;).replaceAll(&quot;\n&quot;, &quot;&quot;).getBytes();</b>
+<b class="nc">&nbsp;			return Base64.getDecoder().decode(contentBytes);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private PrivateKey parse(byte[] bytes) {
+<b class="nc">&nbsp;			PKCS8EncodedKeySpec keySpec = this.keySpecFactory.apply(bytes);</b>
+<b class="nc">&nbsp;			for (String algorithm : this.algorithms) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					KeyFactory keyFactory = KeyFactory.getInstance(algorithm);</b>
+<b class="nc">&nbsp;					return keyFactory.generatePrivate(keySpec);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Simple ASN.1 DER encoder.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class DerEncoder {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final ByteArrayOutputStream stream = new ByteArrayOutputStream();</b>
+&nbsp;
+&nbsp;		void objectIdentifier(int... encodedObjectIdentifier) throws IOException {
+<b class="nc">&nbsp;			int code = (encodedObjectIdentifier != null) ? 0x06 : 0x05;</b>
+<b class="nc">&nbsp;			codeLengthBytes(code, bytes(encodedObjectIdentifier));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void integer(int... encodedInteger) throws IOException {
+<b class="nc">&nbsp;			codeLengthBytes(0x02, bytes(encodedInteger));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void octetString(byte[] bytes) throws IOException {
+<b class="nc">&nbsp;			codeLengthBytes(0x04, bytes);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void sequence(int... elements) throws IOException {
+<b class="nc">&nbsp;			sequence(bytes(elements));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void sequence(byte[] bytes) throws IOException {
+<b class="nc">&nbsp;			codeLengthBytes(0x30, bytes);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void codeLengthBytes(int code, byte[] bytes) throws IOException {
+<b class="nc">&nbsp;			this.stream.write(code);</b>
+<b class="nc">&nbsp;			int length = (bytes != null) ? bytes.length : 0;</b>
+<b class="nc">&nbsp;			if (length &lt;= 127) {</b>
+<b class="nc">&nbsp;				this.stream.write(length &amp; 0xFF);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				ByteArrayOutputStream lengthStream = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;				while (length != 0) {</b>
+<b class="nc">&nbsp;					lengthStream.write(length &amp; 0xFF);</b>
+<b class="nc">&nbsp;					length = length &gt;&gt; 8;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				byte[] lengthBytes = lengthStream.toByteArray();</b>
+<b class="nc">&nbsp;				this.stream.write(0x80 | lengthBytes.length);</b>
+<b class="nc">&nbsp;				for (int i = lengthBytes.length - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;					this.stream.write(lengthBytes[i]);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			if (bytes != null) {</b>
+<b class="nc">&nbsp;				this.stream.write(bytes);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private static byte[] bytes(int... elements) {
+<b class="nc">&nbsp;			if (elements == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			byte[] result = new byte[elements.length];</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; elements.length; i++) {</b>
+<b class="nc">&nbsp;				result[i] = (byte) elements[i];</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		byte[] toSequence() throws IOException {
+<b class="nc">&nbsp;			DerEncoder sequenceEncoder = new DerEncoder();</b>
+<b class="nc">&nbsp;			sequenceEncoder.sequence(toByteArray());</b>
+<b class="nc">&nbsp;			return sequenceEncoder.toByteArray();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		byte[] toByteArray() {
+<b class="nc">&nbsp;			return this.stream.toByteArray();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An ASN.1 DER encoded element.
+&nbsp;	 */
+&nbsp;	static final class DerElement {
+&nbsp;
+&nbsp;		private final ValueType valueType;
+&nbsp;
+&nbsp;		private final long tagType;
+&nbsp;
+&nbsp;		private final ByteBuffer contents;
+&nbsp;
+<b class="nc">&nbsp;		private DerElement(ByteBuffer bytes) {</b>
+<b class="nc">&nbsp;			byte b = bytes.get();</b>
+<b class="nc">&nbsp;			this.valueType = ((b &amp; 0x20) == 0) ? ValueType.PRIMITIVE : ValueType.ENCODED;</b>
+<b class="nc">&nbsp;			this.tagType = decodeTagType(b, bytes);</b>
+<b class="nc">&nbsp;			int length = decodeLength(bytes);</b>
+<b class="nc">&nbsp;			bytes.limit(bytes.position() + length);</b>
+<b class="nc">&nbsp;			this.contents = bytes.slice();</b>
+<b class="nc">&nbsp;			bytes.limit(bytes.capacity());</b>
+<b class="nc">&nbsp;			bytes.position(bytes.position() + length);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private long decodeTagType(byte b, ByteBuffer bytes) {
+<b class="nc">&nbsp;			long tagType = (b &amp; 0x1F);</b>
+<b class="nc">&nbsp;			if (tagType != 0x1F) {</b>
+<b class="nc">&nbsp;				return tagType;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			tagType = 0;</b>
+<b class="nc">&nbsp;			b = bytes.get();</b>
+<b class="nc">&nbsp;			while ((b &amp; 0x80) != 0) {</b>
+<b class="nc">&nbsp;				tagType &lt;&lt;= 7;</b>
+<b class="nc">&nbsp;				tagType = tagType | (b &amp; 0x7F);</b>
+<b class="nc">&nbsp;				b = bytes.get();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return tagType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int decodeLength(ByteBuffer bytes) {
+<b class="nc">&nbsp;			byte b = bytes.get();</b>
+<b class="nc">&nbsp;			if ((b &amp; 0x80) == 0) {</b>
+<b class="nc">&nbsp;				return b &amp; 0x7F;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			int numberOfLengthBytes = (b &amp; 0x7F);</b>
+<b class="nc">&nbsp;			Assert.state(numberOfLengthBytes != 0, &quot;Infinite length encoding is not supported&quot;);</b>
+<b class="nc">&nbsp;			Assert.state(numberOfLengthBytes != 0x7F, &quot;Reserved length encoding is not supported&quot;);</b>
+<b class="nc">&nbsp;			Assert.state(numberOfLengthBytes &lt;= 4, &quot;Length overflow&quot;);</b>
+<b class="nc">&nbsp;			int length = 0;</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; numberOfLengthBytes; i++) {</b>
+<b class="nc">&nbsp;				length &lt;&lt;= 8;</b>
+<b class="nc">&nbsp;				length |= (bytes.get() &amp; 0xFF);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return length;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isType(ValueType valueType) {
+<b class="nc">&nbsp;			return this.valueType == valueType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isType(ValueType valueType, TagType tagType) {
+<b class="nc">&nbsp;			return this.valueType == valueType &amp;&amp; this.tagType == tagType.getNumber();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ByteBuffer getContents() {
+<b class="nc">&nbsp;			return this.contents;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static DerElement of(byte[] bytes) {
+<b class="nc">&nbsp;			return of(ByteBuffer.wrap(bytes));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static DerElement of(ByteBuffer bytes) {
+<b class="nc">&nbsp;			return (bytes.remaining() &gt; 0) ? new DerElement(bytes) : null;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		enum ValueType {</b>
+&nbsp;
+<b class="nc">&nbsp;			PRIMITIVE, ENCODED</b>
+&nbsp;
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		enum TagType {</b>
+&nbsp;
+<b class="nc">&nbsp;			INTEGER(0x02), OCTET_STRING(0x04), OBJECT_IDENTIFIER(0x06), SEQUENCE(0x10);</b>
+&nbsp;
+&nbsp;			private final int number;
+&nbsp;
+<b class="nc">&nbsp;			TagType(int number) {</b>
+<b class="nc">&nbsp;				this.number = number;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			int getNumber() {
+<b class="nc">&nbsp;				return this.number;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

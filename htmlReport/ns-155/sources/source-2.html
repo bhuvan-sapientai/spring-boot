@@ -1,0 +1,359 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConstructorParameterPropertyDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor</a>
+</div>
+
+<h1>Coverage Summary for Class: ConstructorParameterPropertyDescriptor (org.springframework.boot.configurationprocessor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConstructorParameterPropertyDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConstructorParameterPropertyDescriptor$DefaultPrimitiveTypeVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConstructorParameterPropertyDescriptor$DefaultValueCoercionTypeVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import javax.lang.model.element.AnnotationMirror;
+&nbsp;import javax.lang.model.element.Element;
+&nbsp;import javax.lang.model.element.ExecutableElement;
+&nbsp;import javax.lang.model.element.TypeElement;
+&nbsp;import javax.lang.model.element.VariableElement;
+&nbsp;import javax.lang.model.type.PrimitiveType;
+&nbsp;import javax.lang.model.type.TypeMirror;
+&nbsp;import javax.lang.model.util.TypeKindVisitor8;
+&nbsp;import javax.tools.Diagnostic.Kind;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link PropertyDescriptor} for a constructor parameter.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;class ConstructorParameterPropertyDescriptor extends PropertyDescriptor&lt;VariableElement&gt; {
+&nbsp;
+&nbsp;	ConstructorParameterPropertyDescriptor(TypeElement ownerElement, ExecutableElement factoryMethod,
+&nbsp;			VariableElement source, String name, TypeMirror type, VariableElement field, ExecutableElement getter,
+&nbsp;			ExecutableElement setter) {
+<b class="nc">&nbsp;		super(ownerElement, factoryMethod, source, name, type, field, getter, setter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isProperty(MetadataGenerationEnvironment env) {
+&nbsp;		// If it&#39;s a constructor parameter, it doesn&#39;t matter as we must be able to bind
+&nbsp;		// it to build the object.
+<b class="nc">&nbsp;		return !isNested(env);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Object resolveDefaultValue(MetadataGenerationEnvironment environment) {
+<b class="nc">&nbsp;		Object defaultValue = getDefaultValueFromAnnotation(environment, getSource());</b>
+<b class="nc">&nbsp;		if (defaultValue != null) {</b>
+<b class="nc">&nbsp;			return defaultValue;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getSource().asType().accept(DefaultPrimitiveTypeVisitor.INSTANCE, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getDefaultValueFromAnnotation(MetadataGenerationEnvironment environment, Element element) {
+<b class="nc">&nbsp;		AnnotationMirror annotation = environment.getDefaultValueAnnotation(element);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; defaultValue = getDefaultValue(environment, annotation);</b>
+<b class="nc">&nbsp;		if (defaultValue != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				TypeMirror specificType = determineSpecificType(environment);</b>
+<b class="nc">&nbsp;				if (defaultValue.size() == 1) {</b>
+<b class="nc">&nbsp;					return coerceValue(specificType, defaultValue.get(0));</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return defaultValue.stream().map((value) -&gt; coerceValue(specificType, value)).toList();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IllegalArgumentException ex) {</b>
+<b class="nc">&nbsp;				environment.getMessager().printMessage(Kind.ERROR, ex.getMessage(), element, annotation);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private List&lt;String&gt; getDefaultValue(MetadataGenerationEnvironment environment, AnnotationMirror annotation) {
+<b class="nc">&nbsp;		if (annotation == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; values = environment.getAnnotationElementValues(annotation);</b>
+<b class="nc">&nbsp;		return (List&lt;String&gt;) values.get(&quot;value&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TypeMirror determineSpecificType(MetadataGenerationEnvironment environment) {
+<b class="nc">&nbsp;		TypeMirror candidate = getSource().asType();</b>
+<b class="nc">&nbsp;		TypeMirror elementCandidate = environment.getTypeUtils().extractElementType(candidate);</b>
+<b class="nc">&nbsp;		if (elementCandidate != null) {</b>
+<b class="nc">&nbsp;			candidate = elementCandidate;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		PrimitiveType primitiveType = environment.getTypeUtils().getPrimitiveType(candidate);</b>
+<b class="nc">&nbsp;		return (primitiveType != null) ? primitiveType : candidate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object coerceValue(TypeMirror type, String value) {
+<b class="nc">&nbsp;		Object coercedValue = type.accept(DefaultValueCoercionTypeVisitor.INSTANCE, value);</b>
+<b class="nc">&nbsp;		return (coercedValue != null) ? coercedValue : value;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class DefaultValueCoercionTypeVisitor extends TypeKindVisitor8&lt;Object, String&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final DefaultValueCoercionTypeVisitor INSTANCE = new DefaultValueCoercionTypeVisitor();</b>
+&nbsp;
+&nbsp;		private &lt;T extends Number&gt; T parseNumber(String value, Function&lt;String, T&gt; parser,
+&nbsp;				PrimitiveType primitiveType) {
+&nbsp;			try {
+<b class="nc">&nbsp;				return parser.apply(value);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NumberFormatException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(</b>
+<b class="nc">&nbsp;						String.format(&quot;Invalid %s representation &#39;%s&#39;&quot;, primitiveType, value));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsBoolean(PrimitiveType t, String value) {
+<b class="nc">&nbsp;			return Boolean.parseBoolean(value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsByte(PrimitiveType t, String value) {
+<b class="nc">&nbsp;			return parseNumber(value, Byte::parseByte, t);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsShort(PrimitiveType t, String value) {
+<b class="nc">&nbsp;			return parseNumber(value, Short::parseShort, t);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsInt(PrimitiveType t, String value) {
+<b class="nc">&nbsp;			return parseNumber(value, Integer::parseInt, t);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsLong(PrimitiveType t, String value) {
+<b class="nc">&nbsp;			return parseNumber(value, Long::parseLong, t);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsChar(PrimitiveType t, String value) {
+<b class="nc">&nbsp;			if (value.length() &gt; 1) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(String.format(&quot;Invalid character representation &#39;%s&#39;&quot;, value));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return value;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsFloat(PrimitiveType t, String value) {
+<b class="nc">&nbsp;			return parseNumber(value, Float::parseFloat, t);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsDouble(PrimitiveType t, String value) {
+<b class="nc">&nbsp;			return parseNumber(value, Double::parseDouble, t);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class DefaultPrimitiveTypeVisitor extends TypeKindVisitor8&lt;Object, Void&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final DefaultPrimitiveTypeVisitor INSTANCE = new DefaultPrimitiveTypeVisitor();</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsBoolean(PrimitiveType t, Void ignore) {
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsByte(PrimitiveType t, Void ignore) {
+<b class="nc">&nbsp;			return (byte) 0;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsShort(PrimitiveType t, Void ignore) {
+<b class="nc">&nbsp;			return (short) 0;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsInt(PrimitiveType t, Void ignore) {
+<b class="nc">&nbsp;			return 0;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsLong(PrimitiveType t, Void ignore) {
+<b class="nc">&nbsp;			return 0L;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsChar(PrimitiveType t, Void ignore) {
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsFloat(PrimitiveType t, Void ignore) {
+<b class="nc">&nbsp;			return 0F;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object visitPrimitiveAsDouble(PrimitiveType t, Void ignore) {
+<b class="nc">&nbsp;			return 0D;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

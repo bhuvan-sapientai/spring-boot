@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultRestartInitializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.restart</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultRestartInitializer (org.springframework.boot.devtools.restart)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultRestartInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.restart;
+&nbsp;
+&nbsp;import java.net.URL;
+&nbsp;
+&nbsp;import org.springframework.boot.devtools.system.DevToolsEnablementDeducer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default {@link RestartInitializer} that only enable initial restart when running a
+&nbsp; * standard &quot;main&quot; method. Skips initialization when running &quot;fat&quot; jars (included
+&nbsp; * exploded) or when running from a test.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.3.0
+&nbsp; */
+<b class="nc">&nbsp;public class DefaultRestartInitializer implements RestartInitializer {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URL[] getInitialUrls(Thread thread) {
+<b class="nc">&nbsp;		if (!isMain(thread)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!DevToolsEnablementDeducer.shouldEnable(thread)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getUrls(thread);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if the thread is for a main invocation. By default {@link #isMain(Thread)
+&nbsp;	 * checks the name of the thread} and {@link #isDevelopmentClassLoader(ClassLoader)
+&nbsp;	 * the context classloader}.
+&nbsp;	 * @param thread the thread to check
+&nbsp;	 * @return {@code true} if the thread is a main invocation
+&nbsp;	 * @see #isMainThread
+&nbsp;	 * @see #isDevelopmentClassLoader(ClassLoader)
+&nbsp;	 */
+&nbsp;	protected boolean isMain(Thread thread) {
+<b class="nc">&nbsp;		return isMainThread(thread) &amp;&amp; isDevelopmentClassLoader(thread.getContextClassLoader());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the given {@code thread} is considered to be the main thread.
+&nbsp;	 * @param thread the thread to check
+&nbsp;	 * @return {@code true} if it&#39;s the main thread, otherwise {@code false}
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	protected boolean isMainThread(Thread thread) {
+<b class="nc">&nbsp;		return thread.getName().equals(&quot;main&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the given {@code classLoader} is one that is typically used during
+&nbsp;	 * development.
+&nbsp;	 * @param classLoader the ClassLoader to check
+&nbsp;	 * @return {@code true} if it&#39;s a ClassLoader typically used during development,
+&nbsp;	 * otherwise {@code false}
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	protected boolean isDevelopmentClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		return classLoader.getClass().getName().contains(&quot;AppClassLoader&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the URLs that should be used with initialization.
+&nbsp;	 * @param thread the source thread
+&nbsp;	 * @return the URLs
+&nbsp;	 */
+&nbsp;	protected URL[] getUrls(Thread thread) {
+<b class="nc">&nbsp;		return ChangeableUrls.fromClassLoader(thread.getContextClassLoader()).toArray();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

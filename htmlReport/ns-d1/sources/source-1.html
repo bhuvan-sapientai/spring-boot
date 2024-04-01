@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntityScanPackages</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.domain</a>
+</div>
+
+<h1>Coverage Summary for Class: EntityScanPackages (org.springframework.boot.autoconfigure.domain)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntityScanPackages</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EntityScanPackages$EntityScanPackagesBeanDefinition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EntityScanPackages$Registrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.domain;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.GenericBeanDefinition;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+&nbsp;import org.springframework.core.annotation.AnnotationAttributes;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class for storing {@link EntityScan @EntityScan} specified packages for reference later
+&nbsp; * (e.g. by JPA auto-configuration).
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; * @see EntityScan
+&nbsp; * @see EntityScanner
+&nbsp; */
+&nbsp;public class EntityScanPackages {
+&nbsp;
+<b class="nc">&nbsp;	private static final String BEAN = EntityScanPackages.class.getName();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final EntityScanPackages NONE = new EntityScanPackages();</b>
+&nbsp;
+&nbsp;	private final List&lt;String&gt; packageNames;
+&nbsp;
+<b class="nc">&nbsp;	EntityScanPackages(String... packageNames) {</b>
+<b class="nc">&nbsp;		List&lt;String&gt; packages = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String name : packageNames) {</b>
+<b class="nc">&nbsp;			if (StringUtils.hasText(name)) {</b>
+<b class="nc">&nbsp;				packages.add(name);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		this.packageNames = Collections.unmodifiableList(packages);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the package names specified from all {@link EntityScan @EntityScan}
+&nbsp;	 * annotations.
+&nbsp;	 * @return the entity scan package names
+&nbsp;	 */
+&nbsp;	public List&lt;String&gt; getPackageNames() {
+<b class="nc">&nbsp;		return this.packageNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link EntityScanPackages} for the given bean factory.
+&nbsp;	 * @param beanFactory the source bean factory
+&nbsp;	 * @return the {@link EntityScanPackages} for the bean factory (never {@code null})
+&nbsp;	 */
+&nbsp;	public static EntityScanPackages get(BeanFactory beanFactory) {
+&nbsp;		// Currently we only store a single base package, but we return a list to
+&nbsp;		// allow this to change in the future if needed
+&nbsp;		try {
+<b class="nc">&nbsp;			return beanFactory.getBean(BEAN, EntityScanPackages.class);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			return NONE;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified entity scan packages with the system.
+&nbsp;	 * @param registry the source registry
+&nbsp;	 * @param packageNames the package names to register
+&nbsp;	 */
+&nbsp;	public static void register(BeanDefinitionRegistry registry, String... packageNames) {
+<b class="nc">&nbsp;		Assert.notNull(registry, &quot;Registry must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(packageNames, &quot;PackageNames must not be null&quot;);</b>
+<b class="nc">&nbsp;		register(registry, Arrays.asList(packageNames));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified entity scan packages with the system.
+&nbsp;	 * @param registry the source registry
+&nbsp;	 * @param packageNames the package names to register
+&nbsp;	 */
+&nbsp;	public static void register(BeanDefinitionRegistry registry, Collection&lt;String&gt; packageNames) {
+<b class="nc">&nbsp;		Assert.notNull(registry, &quot;Registry must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(packageNames, &quot;PackageNames must not be null&quot;);</b>
+<b class="nc">&nbsp;		if (registry.containsBeanDefinition(BEAN)) {</b>
+<b class="nc">&nbsp;			EntityScanPackagesBeanDefinition beanDefinition = (EntityScanPackagesBeanDefinition) registry</b>
+<b class="nc">&nbsp;				.getBeanDefinition(BEAN);</b>
+<b class="nc">&nbsp;			beanDefinition.addPackageNames(packageNames);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			registry.registerBeanDefinition(BEAN, new EntityScanPackagesBeanDefinition(packageNames));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ImportBeanDefinitionRegistrar} to store the base package from the importing
+&nbsp;	 * configuration.
+&nbsp;	 */
+&nbsp;	static class Registrar implements ImportBeanDefinitionRegistrar {
+&nbsp;
+&nbsp;		private final Environment environment;
+&nbsp;
+<b class="nc">&nbsp;		Registrar(Environment environment) {</b>
+<b class="nc">&nbsp;			this.environment = environment;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;			register(registry, getPackagesToScan(metadata));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Set&lt;String&gt; getPackagesToScan(AnnotationMetadata metadata) {
+<b class="nc">&nbsp;			AnnotationAttributes attributes = AnnotationAttributes</b>
+<b class="nc">&nbsp;				.fromMap(metadata.getAnnotationAttributes(EntityScan.class.getName()));</b>
+<b class="nc">&nbsp;			Set&lt;String&gt; packagesToScan = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (String basePackage : attributes.getStringArray(&quot;basePackages&quot;)) {</b>
+<b class="nc">&nbsp;				String[] tokenized = StringUtils.tokenizeToStringArray(</b>
+<b class="nc">&nbsp;						this.environment.resolvePlaceholders(basePackage),</b>
+&nbsp;						ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+<b class="nc">&nbsp;				Collections.addAll(packagesToScan, tokenized);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (Class&lt;?&gt; basePackageClass : attributes.getClassArray(&quot;basePackageClasses&quot;)) {</b>
+<b class="nc">&nbsp;				packagesToScan.add(this.environment.resolvePlaceholders(ClassUtils.getPackageName(basePackageClass)));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (packagesToScan.isEmpty()) {</b>
+<b class="nc">&nbsp;				String packageName = ClassUtils.getPackageName(metadata.getClassName());</b>
+<b class="nc">&nbsp;				Assert.state(StringUtils.hasLength(packageName), &quot;@EntityScan cannot be used with the default package&quot;);</b>
+<b class="nc">&nbsp;				return Collections.singleton(packageName);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return packagesToScan;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static class EntityScanPackagesBeanDefinition extends GenericBeanDefinition {
+&nbsp;
+<b class="nc">&nbsp;		private final Set&lt;String&gt; packageNames = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		EntityScanPackagesBeanDefinition(Collection&lt;String&gt; packageNames) {</b>
+<b class="nc">&nbsp;			setBeanClass(EntityScanPackages.class);</b>
+<b class="nc">&nbsp;			setRole(BeanDefinition.ROLE_INFRASTRUCTURE);</b>
+<b class="nc">&nbsp;			addPackageNames(packageNames);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addPackageNames(Collection&lt;String&gt; additionalPackageNames) {
+<b class="nc">&nbsp;			this.packageNames.addAll(additionalPackageNames);</b>
+<b class="nc">&nbsp;			getConstructorArgumentValues().addIndexedArgumentValue(0, StringUtils.toStringArray(this.packageNames));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

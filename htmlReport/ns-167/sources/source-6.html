@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DelimitedStringToArrayConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.convert</a>
+</div>
+
+<h1>Coverage Summary for Class: DelimitedStringToArrayConverter (org.springframework.boot.convert)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DelimitedStringToArrayConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.1%
+  </span>
+  <span class="absValue">
+    (4/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.convert;
+&nbsp;
+&nbsp;import java.lang.reflect.Array;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.core.convert.ConversionService;
+&nbsp;import org.springframework.core.convert.TypeDescriptor;
+&nbsp;import org.springframework.core.convert.converter.ConditionalGenericConverter;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Converts a {@link Delimiter delimited} String to an Array.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;final class DelimitedStringToArrayConverter implements ConditionalGenericConverter {
+&nbsp;
+&nbsp;	private final ConversionService conversionService;
+&nbsp;
+<b class="fc">&nbsp;	DelimitedStringToArrayConverter(ConversionService conversionService) {</b>
+<b class="fc">&nbsp;		Assert.notNull(conversionService, &quot;ConversionService must not be null&quot;);</b>
+<b class="fc">&nbsp;		this.conversionService = conversionService;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Set&lt;ConvertiblePair&gt; getConvertibleTypes() {
+<b class="fc">&nbsp;		return Collections.singleton(new ConvertiblePair(String.class, Object[].class));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
+<b class="nc">&nbsp;		return targetType.getElementTypeDescriptor() == null</b>
+<b class="nc">&nbsp;				|| this.conversionService.canConvert(sourceType, targetType.getElementTypeDescriptor());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+<b class="nc">&nbsp;		if (source == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return convert((String) source, sourceType, targetType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object convert(String source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+<b class="nc">&nbsp;		Delimiter delimiter = targetType.getAnnotation(Delimiter.class);</b>
+<b class="nc">&nbsp;		String[] elements = getElements(source, (delimiter != null) ? delimiter.value() : &quot;,&quot;);</b>
+<b class="nc">&nbsp;		TypeDescriptor elementDescriptor = targetType.getElementTypeDescriptor();</b>
+<b class="nc">&nbsp;		Object target = Array.newInstance(elementDescriptor.getType(), elements.length);</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; elements.length; i++) {</b>
+<b class="nc">&nbsp;			String sourceElement = elements[i];</b>
+<b class="nc">&nbsp;			Object targetElement = this.conversionService.convert(sourceElement.trim(), sourceType, elementDescriptor);</b>
+<b class="nc">&nbsp;			Array.set(target, i, targetElement);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return target;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String[] getElements(String source, String delimiter) {
+<b class="nc">&nbsp;		return StringUtils.delimitedListToStringArray(source, Delimiter.NONE.equals(delimiter) ? null : delimiter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

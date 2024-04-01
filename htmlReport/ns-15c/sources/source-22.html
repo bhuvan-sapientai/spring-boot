@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InvalidConfigDataPropertyException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.config</a>
+</div>
+
+<h1>Coverage Summary for Class: InvalidConfigDataPropertyException (org.springframework.boot.context.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InvalidConfigDataPropertyException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.4%
+  </span>
+  <span class="absValue">
+    (16/51)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.config;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.core.env.AbstractEnvironment;
+&nbsp;
+&nbsp;/**
+&nbsp; * Exception thrown if an invalid property is found when processing config data.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.4.0
+&nbsp; */
+&nbsp;public class InvalidConfigDataPropertyException extends ConfigDataException {
+&nbsp;
+&nbsp;	private static final Map&lt;ConfigurationPropertyName, ConfigurationPropertyName&gt; ERRORS;
+&nbsp;	static {
+<b class="fc">&nbsp;		Map&lt;ConfigurationPropertyName, ConfigurationPropertyName&gt; errors = new LinkedHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;		errors.put(ConfigurationPropertyName.of(&quot;spring.profiles&quot;),</b>
+<b class="fc">&nbsp;				ConfigurationPropertyName.of(&quot;spring.config.activate.on-profile&quot;));</b>
+<b class="fc">&nbsp;		errors.put(ConfigurationPropertyName.of(&quot;spring.profiles[0]&quot;),</b>
+<b class="fc">&nbsp;				ConfigurationPropertyName.of(&quot;spring.config.activate.on-profile&quot;));</b>
+<b class="fc">&nbsp;		ERRORS = Collections.unmodifiableMap(errors);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final Set&lt;ConfigurationPropertyName&gt; PROFILE_SPECIFIC_ERRORS;
+&nbsp;	static {
+<b class="fc">&nbsp;		Set&lt;ConfigurationPropertyName&gt; errors = new LinkedHashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;		errors.add(Profiles.INCLUDE_PROFILES);</b>
+<b class="fc">&nbsp;		errors.add(Profiles.INCLUDE_PROFILES.append(&quot;[0]&quot;));</b>
+<b class="fc">&nbsp;		errors.add(ConfigurationPropertyName.of(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME));</b>
+<b class="fc">&nbsp;		errors.add(ConfigurationPropertyName.of(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME + &quot;[0]&quot;));</b>
+<b class="fc">&nbsp;		errors.add(ConfigurationPropertyName.of(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME));</b>
+<b class="fc">&nbsp;		errors.add(ConfigurationPropertyName.of(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME + &quot;[0]&quot;));</b>
+<b class="fc">&nbsp;		PROFILE_SPECIFIC_ERRORS = Collections.unmodifiableSet(errors);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final ConfigurationProperty property;
+&nbsp;
+&nbsp;	private final ConfigurationPropertyName replacement;
+&nbsp;
+&nbsp;	private final ConfigDataResource location;
+&nbsp;
+&nbsp;	InvalidConfigDataPropertyException(ConfigurationProperty property, boolean profileSpecific,
+&nbsp;			ConfigurationPropertyName replacement, ConfigDataResource location) {
+<b class="nc">&nbsp;		super(getMessage(property, profileSpecific, replacement, location), null);</b>
+<b class="nc">&nbsp;		this.property = property;</b>
+<b class="nc">&nbsp;		this.replacement = replacement;</b>
+<b class="nc">&nbsp;		this.location = location;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return source property that caused the exception.
+&nbsp;	 * @return the invalid property
+&nbsp;	 */
+&nbsp;	public ConfigurationProperty getProperty() {
+<b class="nc">&nbsp;		return this.property;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link ConfigDataResource} of the invalid property or {@code null} if
+&nbsp;	 * the source was not loaded from {@link ConfigData}.
+&nbsp;	 * @return the config data location or {@code null}
+&nbsp;	 */
+&nbsp;	public ConfigDataResource getLocation() {
+<b class="nc">&nbsp;		return this.location;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the replacement property that should be used instead or {@code null} if not
+&nbsp;	 * replacement is available.
+&nbsp;	 * @return the replacement property name
+&nbsp;	 */
+&nbsp;	public ConfigurationPropertyName getReplacement() {
+<b class="nc">&nbsp;		return this.replacement;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Throw an {@link InvalidConfigDataPropertyException} if the given
+&nbsp;	 * {@link ConfigDataEnvironmentContributor} contains any invalid property.
+&nbsp;	 * @param contributor the contributor to check
+&nbsp;	 */
+&nbsp;	static void throwIfPropertyFound(ConfigDataEnvironmentContributor contributor) {
+<b class="fc">&nbsp;		ConfigurationPropertySource propertySource = contributor.getConfigurationPropertySource();</b>
+<b class="fc">&nbsp;		if (propertySource != null) {</b>
+<b class="nc">&nbsp;			ERRORS.forEach((name, replacement) -&gt; {</b>
+<b class="nc">&nbsp;				ConfigurationProperty property = propertySource.getConfigurationProperty(name);</b>
+<b class="nc">&nbsp;				if (property != null) {</b>
+<b class="nc">&nbsp;					throw new InvalidConfigDataPropertyException(property, false, replacement,</b>
+<b class="nc">&nbsp;							contributor.getResource());</b>
+&nbsp;				}
+&nbsp;			});
+<b class="nc">&nbsp;			if (contributor.isFromProfileSpecificImport()</b>
+<b class="nc">&nbsp;					&amp;&amp; !contributor.hasConfigDataOption(ConfigData.Option.IGNORE_PROFILES)) {</b>
+<b class="nc">&nbsp;				PROFILE_SPECIFIC_ERRORS.forEach((name) -&gt; {</b>
+<b class="nc">&nbsp;					ConfigurationProperty property = propertySource.getConfigurationProperty(name);</b>
+<b class="nc">&nbsp;					if (property != null) {</b>
+<b class="nc">&nbsp;						throw new InvalidConfigDataPropertyException(property, true, null, contributor.getResource());</b>
+&nbsp;					}
+&nbsp;				});
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getMessage(ConfigurationProperty property, boolean profileSpecific,
+&nbsp;			ConfigurationPropertyName replacement, ConfigDataResource location) {
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder(&quot;Property &#39;&quot;);</b>
+<b class="nc">&nbsp;		message.append(property.getName());</b>
+<b class="nc">&nbsp;		if (location != null) {</b>
+<b class="nc">&nbsp;			message.append(&quot;&#39; imported from location &#39;&quot;);</b>
+<b class="nc">&nbsp;			message.append(location);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		message.append(&quot;&#39; is invalid&quot;);</b>
+<b class="nc">&nbsp;		if (profileSpecific) {</b>
+<b class="nc">&nbsp;			message.append(&quot; in a profile specific resource&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (replacement != null) {</b>
+<b class="nc">&nbsp;			message.append(&quot; and should be replaced with &#39;&quot;);</b>
+<b class="nc">&nbsp;			message.append(replacement);</b>
+<b class="nc">&nbsp;			message.append(&quot;&#39;&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (property.getOrigin() != null) {</b>
+<b class="nc">&nbsp;			message.append(&quot; [origin: &quot;);</b>
+<b class="nc">&nbsp;			message.append(property.getOrigin());</b>
+<b class="nc">&nbsp;			message.append(&quot;]&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return message.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

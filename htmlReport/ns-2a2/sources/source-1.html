@@ -1,0 +1,652 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractJarWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractJarWriter (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractJarWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/93)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractJarWriter$CrcAndSize</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractJarWriter$EntryTransformer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractJarWriter$InputStreamEntryWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractJarWriter$LibraryUnpackHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractJarWriter$UnpackHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractJarWriter$UnpackHandler$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/123)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.BufferedInputStream;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.jar.JarEntry;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.JarInputStream;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import java.util.zip.CRC32;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;
+&nbsp;import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.zip.UnixStat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base class for JAR writers.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.3.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AbstractJarWriter implements LoaderClassesWriter {</b>
+&nbsp;
+&nbsp;	private static final int BUFFER_SIZE = 32 * 1024;
+&nbsp;
+&nbsp;	private static final int UNIX_FILE_MODE = UnixStat.FILE_FLAG | UnixStat.DEFAULT_FILE_PERM;
+&nbsp;
+&nbsp;	private static final int UNIX_DIR_MODE = UnixStat.DIR_FLAG | UnixStat.DEFAULT_DIR_PERM;
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;String&gt; writtenEntries = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private Layers layers;
+&nbsp;
+&nbsp;	private LayersIndex layersIndex;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update this writer to use specific layers.
+&nbsp;	 * @param layers the layers to use
+&nbsp;	 * @param layersIndex the layers index to update
+&nbsp;	 */
+&nbsp;	void useLayers(Layers layers, LayersIndex layersIndex) {
+<b class="nc">&nbsp;		this.layers = layers;</b>
+<b class="nc">&nbsp;		this.layersIndex = layersIndex;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Write the specified manifest.
+&nbsp;	 * @param manifest the manifest to write
+&nbsp;	 * @throws IOException of the manifest cannot be written
+&nbsp;	 */
+&nbsp;	public void writeManifest(Manifest manifest) throws IOException {
+<b class="nc">&nbsp;		JarArchiveEntry entry = new JarArchiveEntry(&quot;META-INF/MANIFEST.MF&quot;);</b>
+<b class="nc">&nbsp;		writeEntry(entry, manifest::write);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	final void writeEntries(JarFile jarFile, EntryTransformer entryTransformer, UnpackHandler unpackHandler,
+&nbsp;			Function&lt;JarEntry, Library&gt; libraryLookup) throws IOException {
+<b class="nc">&nbsp;		Enumeration&lt;JarEntry&gt; entries = jarFile.entries();</b>
+<b class="nc">&nbsp;		while (entries.hasMoreElements()) {</b>
+<b class="nc">&nbsp;			JarEntry entry = entries.nextElement();</b>
+<b class="nc">&nbsp;			Library library = libraryLookup.apply(entry);</b>
+<b class="nc">&nbsp;			if (library == null || library.isIncluded()) {</b>
+<b class="nc">&nbsp;				writeEntry(jarFile, entryTransformer, unpackHandler, new JarArchiveEntry(entry), library);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeEntry(JarFile jarFile, EntryTransformer entryTransformer, UnpackHandler unpackHandler,
+&nbsp;			JarArchiveEntry entry, Library library) throws IOException {
+<b class="nc">&nbsp;		setUpEntry(jarFile, entry);</b>
+<b class="nc">&nbsp;		try (ZipHeaderPeekInputStream inputStream = new ZipHeaderPeekInputStream(jarFile.getInputStream(entry))) {</b>
+<b class="nc">&nbsp;			EntryWriter entryWriter = new InputStreamEntryWriter(inputStream);</b>
+<b class="nc">&nbsp;			JarArchiveEntry transformedEntry = entryTransformer.transform(entry);</b>
+<b class="nc">&nbsp;			if (transformedEntry != null) {</b>
+<b class="nc">&nbsp;				writeEntry(transformedEntry, library, entryWriter, unpackHandler);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setUpEntry(JarFile jarFile, JarArchiveEntry entry) throws IOException {
+<b class="nc">&nbsp;		try (ZipHeaderPeekInputStream inputStream = new ZipHeaderPeekInputStream(jarFile.getInputStream(entry))) {</b>
+<b class="nc">&nbsp;			if (inputStream.hasZipHeader() &amp;&amp; entry.getMethod() != ZipEntry.STORED) {</b>
+<b class="nc">&nbsp;				new CrcAndSize(inputStream).setupStoredEntry(entry);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				entry.setCompressedSize(-1);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Writes an entry. The {@code inputStream} is closed once the entry has been written
+&nbsp;	 * @param entryName the name of the entry
+&nbsp;	 * @param inputStream the stream from which the entry&#39;s data can be read
+&nbsp;	 * @throws IOException if the write fails
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void writeEntry(String entryName, InputStream inputStream) throws IOException {
+<b class="nc">&nbsp;		try (inputStream) {</b>
+<b class="nc">&nbsp;			writeEntry(entryName, new InputStreamEntryWriter(inputStream));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Writes an entry. The {@code inputStream} is closed once the entry has been written
+&nbsp;	 * @param entryName the name of the entry
+&nbsp;	 * @param entryWriter the entry writer
+&nbsp;	 * @throws IOException if the write fails
+&nbsp;	 */
+&nbsp;	public void writeEntry(String entryName, EntryWriter entryWriter) throws IOException {
+<b class="nc">&nbsp;		JarArchiveEntry entry = new JarArchiveEntry(entryName);</b>
+<b class="nc">&nbsp;		writeEntry(entry, entryWriter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Write a nested library.
+&nbsp;	 * @param location the destination of the library
+&nbsp;	 * @param library the library
+&nbsp;	 * @throws IOException if the write fails
+&nbsp;	 */
+&nbsp;	public void writeNestedLibrary(String location, Library library) throws IOException {
+<b class="nc">&nbsp;		JarArchiveEntry entry = new JarArchiveEntry(location + library.getName());</b>
+<b class="nc">&nbsp;		entry.setTime(getNestedLibraryTime(library));</b>
+<b class="nc">&nbsp;		new CrcAndSize(library::openStream).setupStoredEntry(entry);</b>
+<b class="nc">&nbsp;		try (InputStream inputStream = library.openStream()) {</b>
+<b class="nc">&nbsp;			writeEntry(entry, library, new InputStreamEntryWriter(inputStream), new LibraryUnpackHandler(library));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Write a simple index file containing the specified UTF-8 lines.
+&nbsp;	 * @param location the location of the index file
+&nbsp;	 * @param lines the lines to write
+&nbsp;	 * @throws IOException if the write fails
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	public void writeIndexFile(String location, Collection&lt;String&gt; lines) throws IOException {
+<b class="nc">&nbsp;		if (location != null) {</b>
+<b class="nc">&nbsp;			JarArchiveEntry entry = new JarArchiveEntry(location);</b>
+<b class="nc">&nbsp;			writeEntry(entry, (outputStream) -&gt; {</b>
+<b class="nc">&nbsp;				BufferedWriter writer = new BufferedWriter(</b>
+&nbsp;						new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+<b class="nc">&nbsp;				for (String line : lines) {</b>
+<b class="nc">&nbsp;					writer.write(line);</b>
+<b class="nc">&nbsp;					writer.write(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				writer.flush();</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private long getNestedLibraryTime(Library library) {
+&nbsp;		try {
+<b class="nc">&nbsp;			try (JarInputStream jarStream = new JarInputStream(library.openStream())) {</b>
+<b class="nc">&nbsp;				JarEntry entry = jarStream.getNextJarEntry();</b>
+<b class="nc">&nbsp;				while (entry != null) {</b>
+<b class="nc">&nbsp;					if (!entry.isDirectory()) {</b>
+<b class="nc">&nbsp;						return entry.getTime();</b>
+&nbsp;					}
+<b class="nc">&nbsp;					entry = jarStream.getNextJarEntry();</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+&nbsp;			// Ignore and just use the library timestamp
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return library.getLastModified();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void writeLoaderClasses() throws IOException {
+<b class="nc">&nbsp;		writeLoaderClasses(LoaderImplementation.DEFAULT);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void writeLoaderClasses(LoaderImplementation loaderImplementation) throws IOException {
+<b class="nc">&nbsp;		writeLoaderClasses((loaderImplementation != null) ? loaderImplementation.getJarResourceName()</b>
+<b class="nc">&nbsp;				: LoaderImplementation.DEFAULT.getJarResourceName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Write the required spring-boot-loader classes to the JAR.
+&nbsp;	 * @param loaderJarResourceName the name of the resource containing the loader classes
+&nbsp;	 * to be written
+&nbsp;	 * @throws IOException if the classes cannot be written
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void writeLoaderClasses(String loaderJarResourceName) throws IOException {
+<b class="nc">&nbsp;		URL loaderJar = getClass().getClassLoader().getResource(loaderJarResourceName);</b>
+<b class="nc">&nbsp;		try (JarInputStream inputStream = new JarInputStream(new BufferedInputStream(loaderJar.openStream()))) {</b>
+&nbsp;			JarEntry entry;
+<b class="nc">&nbsp;			while ((entry = inputStream.getNextJarEntry()) != null) {</b>
+<b class="nc">&nbsp;				if (isDirectoryEntry(entry) || isClassEntry(entry) || isServicesEntry(entry)) {</b>
+<b class="nc">&nbsp;					writeEntry(new JarArchiveEntry(entry), new InputStreamEntryWriter(inputStream));</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isDirectoryEntry(JarEntry entry) {
+<b class="nc">&nbsp;		return entry.isDirectory() &amp;&amp; !entry.getName().equals(&quot;META-INF/&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isClassEntry(JarEntry entry) {
+<b class="nc">&nbsp;		return entry.getName().endsWith(&quot;.class&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isServicesEntry(JarEntry entry) {
+<b class="nc">&nbsp;		return !entry.isDirectory() &amp;&amp; entry.getName().startsWith(&quot;META-INF/services/&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeEntry(JarArchiveEntry entry, EntryWriter entryWriter) throws IOException {
+<b class="nc">&nbsp;		writeEntry(entry, null, entryWriter, UnpackHandler.NEVER);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Perform the actual write of a {@link JarEntry}. All other write methods delegate to
+&nbsp;	 * this one.
+&nbsp;	 * @param entry the entry to write
+&nbsp;	 * @param library the library for the entry or {@code null}
+&nbsp;	 * @param entryWriter the entry writer or {@code null} if there is no content
+&nbsp;	 * @param unpackHandler handles possible unpacking for the entry
+&nbsp;	 * @throws IOException in case of I/O errors
+&nbsp;	 */
+&nbsp;	private void writeEntry(JarArchiveEntry entry, Library library, EntryWriter entryWriter,
+&nbsp;			UnpackHandler unpackHandler) throws IOException {
+<b class="nc">&nbsp;		String name = entry.getName();</b>
+<b class="nc">&nbsp;		if (this.writtenEntries.add(name)) {</b>
+<b class="nc">&nbsp;			writeParentDirectoryEntries(name);</b>
+<b class="nc">&nbsp;			entry.setUnixMode(name.endsWith(&quot;/&quot;) ? UNIX_DIR_MODE : UNIX_FILE_MODE);</b>
+<b class="nc">&nbsp;			entry.getGeneralPurposeBit().useUTF8ForNames(true);</b>
+<b class="nc">&nbsp;			if (!entry.isDirectory() &amp;&amp; entry.getSize() == -1) {</b>
+<b class="nc">&nbsp;				entryWriter = SizeCalculatingEntryWriter.get(entryWriter);</b>
+<b class="nc">&nbsp;				entry.setSize(entryWriter.size());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			entryWriter = addUnpackCommentIfNecessary(entry, entryWriter, unpackHandler);</b>
+<b class="nc">&nbsp;			updateLayerIndex(entry, library);</b>
+<b class="nc">&nbsp;			writeToArchive(entry, entryWriter);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void updateLayerIndex(JarArchiveEntry entry, Library library) {
+<b class="nc">&nbsp;		if (this.layers != null &amp;&amp; !entry.getName().endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			Layer layer = (library != null) ? this.layers.getLayer(library) : this.layers.getLayer(entry.getName());</b>
+<b class="nc">&nbsp;			this.layersIndex.add(layer, entry.getName());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected abstract void writeToArchive(ZipEntry entry, EntryWriter entryWriter) throws IOException;
+&nbsp;
+&nbsp;	private void writeParentDirectoryEntries(String name) throws IOException {
+<b class="nc">&nbsp;		String parent = name.endsWith(&quot;/&quot;) ? name.substring(0, name.length() - 1) : name;</b>
+<b class="nc">&nbsp;		while (parent.lastIndexOf(&#39;/&#39;) != -1) {</b>
+<b class="nc">&nbsp;			parent = parent.substring(0, parent.lastIndexOf(&#39;/&#39;));</b>
+<b class="nc">&nbsp;			if (!parent.isEmpty()) {</b>
+<b class="nc">&nbsp;				writeEntry(new JarArchiveEntry(parent + &quot;/&quot;), null, null, UnpackHandler.NEVER);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private EntryWriter addUnpackCommentIfNecessary(JarArchiveEntry entry, EntryWriter entryWriter,
+&nbsp;			UnpackHandler unpackHandler) throws IOException {
+<b class="nc">&nbsp;		if (entryWriter == null || !unpackHandler.requiresUnpack(entry.getName())) {</b>
+<b class="nc">&nbsp;			return entryWriter;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ByteArrayOutputStream output = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;		entryWriter.write(output);</b>
+<b class="nc">&nbsp;		entry.setComment(&quot;UNPACK:&quot; + unpackHandler.sha1Hash(entry.getName()));</b>
+<b class="nc">&nbsp;		return new InputStreamEntryWriter(new ByteArrayInputStream(output.toByteArray()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link EntryWriter} that writes content from an {@link InputStream}.
+&nbsp;	 */
+&nbsp;	private static class InputStreamEntryWriter implements EntryWriter {
+&nbsp;
+&nbsp;		private final InputStream inputStream;
+&nbsp;
+<b class="nc">&nbsp;		InputStreamEntryWriter(InputStream inputStream) {</b>
+<b class="nc">&nbsp;			this.inputStream = inputStream;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void write(OutputStream outputStream) throws IOException {
+<b class="nc">&nbsp;			byte[] buffer = new byte[BUFFER_SIZE];</b>
+&nbsp;			int bytesRead;
+<b class="nc">&nbsp;			while ((bytesRead = this.inputStream.read(buffer)) != -1) {</b>
+<b class="nc">&nbsp;				outputStream.write(buffer, 0, bytesRead);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			outputStream.flush();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Data holder for CRC and Size.
+&nbsp;	 */
+&nbsp;	private static class CrcAndSize {
+&nbsp;
+<b class="nc">&nbsp;		private final CRC32 crc = new CRC32();</b>
+&nbsp;
+&nbsp;		private long size;
+&nbsp;
+<b class="nc">&nbsp;		CrcAndSize(InputStreamSupplier supplier) throws IOException {</b>
+<b class="nc">&nbsp;			try (InputStream inputStream = supplier.openStream()) {</b>
+<b class="nc">&nbsp;				load(inputStream);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		CrcAndSize(InputStream inputStream) throws IOException {</b>
+<b class="nc">&nbsp;			load(inputStream);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void load(InputStream inputStream) throws IOException {
+<b class="nc">&nbsp;			byte[] buffer = new byte[BUFFER_SIZE];</b>
+&nbsp;			int bytesRead;
+<b class="nc">&nbsp;			while ((bytesRead = inputStream.read(buffer)) != -1) {</b>
+<b class="nc">&nbsp;				this.crc.update(buffer, 0, bytesRead);</b>
+<b class="nc">&nbsp;				this.size += bytesRead;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		void setupStoredEntry(JarArchiveEntry entry) {
+<b class="nc">&nbsp;			entry.setSize(this.size);</b>
+<b class="nc">&nbsp;			entry.setCompressedSize(this.size);</b>
+<b class="nc">&nbsp;			entry.setCrc(this.crc.getValue());</b>
+<b class="nc">&nbsp;			entry.setMethod(ZipEntry.STORED);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An {@code EntryTransformer} enables the transformation of {@link JarEntry jar
+&nbsp;	 * entries} during the writing process.
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	interface EntryTransformer {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * No-op entity transformer.
+&nbsp;		 */
+<b class="nc">&nbsp;		EntryTransformer NONE = (jarEntry) -&gt; jarEntry;</b>
+&nbsp;
+&nbsp;		JarArchiveEntry transform(JarArchiveEntry jarEntry);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An {@code UnpackHandler} determines whether unpacking is required and provides a
+&nbsp;	 * SHA-1 hash if required.
+&nbsp;	 */
+&nbsp;	interface UnpackHandler {
+&nbsp;
+<b class="nc">&nbsp;		UnpackHandler NEVER = new UnpackHandler() {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public boolean requiresUnpack(String name) {
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public String sha1Hash(String name) throws IOException {
+<b class="nc">&nbsp;				throw new UnsupportedOperationException();</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+&nbsp;
+&nbsp;		boolean requiresUnpack(String name);
+&nbsp;
+&nbsp;		String sha1Hash(String name) throws IOException;
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link UnpackHandler} backed by a {@link Library}.
+&nbsp;	 */
+&nbsp;	private static final class LibraryUnpackHandler implements UnpackHandler {
+&nbsp;
+&nbsp;		private final Library library;
+&nbsp;
+<b class="nc">&nbsp;		private LibraryUnpackHandler(Library library) {</b>
+<b class="nc">&nbsp;			this.library = library;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean requiresUnpack(String name) {
+<b class="nc">&nbsp;			return this.library.isUnpackRequired();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String sha1Hash(String name) throws IOException {
+<b class="nc">&nbsp;			return Digest.sha1(this.library::openStream);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

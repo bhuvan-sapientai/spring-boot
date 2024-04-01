@@ -1,0 +1,405 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringBootServletInitializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet.support</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringBootServletInitializer (org.springframework.boot.web.servlet.support)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringBootServletInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpringBootServletInitializer$SpringBootContextLoaderListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SpringBootServletInitializer$WebEnvironmentPropertySourceInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet.support;
+&nbsp;
+&nbsp;import java.sql.Driver;
+&nbsp;import java.sql.DriverManager;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.Collections;
+&nbsp;
+&nbsp;import jakarta.servlet.Filter;
+&nbsp;import jakarta.servlet.Servlet;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;import jakarta.servlet.ServletContextEvent;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.builder.ParentContextApplicationContextInitializer;
+&nbsp;import org.springframework.boot.builder.SpringApplicationBuilder;
+&nbsp;import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
+&nbsp;import org.springframework.boot.context.logging.LoggingApplicationListener;
+&nbsp;import org.springframework.boot.web.servlet.ServletContextInitializer;
+&nbsp;import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.WebApplicationInitializer;
+&nbsp;import org.springframework.web.context.ConfigurableWebEnvironment;
+&nbsp;import org.springframework.web.context.ContextLoaderListener;
+&nbsp;import org.springframework.web.context.WebApplicationContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * An opinionated {@link WebApplicationInitializer} to run a {@link SpringApplication}
+&nbsp; * from a traditional WAR deployment. Binds {@link Servlet}, {@link Filter} and
+&nbsp; * {@link ServletContextInitializer} beans from the application context to the server.
+&nbsp; * &lt;p&gt;
+&nbsp; * To configure the application either override the
+&nbsp; * {@link #configure(SpringApplicationBuilder)} method (calling
+&nbsp; * {@link SpringApplicationBuilder#sources(Class...)}) or make the initializer itself a
+&nbsp; * {@code @Configuration}. If you are using {@link SpringBootServletInitializer} in
+&nbsp; * combination with other {@link WebApplicationInitializer WebApplicationInitializers} you
+&nbsp; * might also want to add an {@code @Ordered} annotation to configure a specific startup
+&nbsp; * order.
+&nbsp; * &lt;p&gt;
+&nbsp; * Note that a WebApplicationInitializer is only needed if you are building a war file and
+&nbsp; * deploying it. If you prefer to run an embedded web server then you won&#39;t need this at
+&nbsp; * all.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; * @see #configure(SpringApplicationBuilder)
+&nbsp; */
+<b class="nc">&nbsp;public abstract class SpringBootServletInitializer implements WebApplicationInitializer {</b>
+&nbsp;
+&nbsp;	protected Log logger; // Don&#39;t initialize early
+&nbsp;
+<b class="nc">&nbsp;	private boolean registerErrorPageFilter = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set if the {@link ErrorPageFilter} should be registered. Set to {@code false} if
+&nbsp;	 * error page mappings should be handled through the server and not Spring Boot.
+&nbsp;	 * @param registerErrorPageFilter if the {@link ErrorPageFilter} should be registered.
+&nbsp;	 */
+&nbsp;	protected final void setRegisterErrorPageFilter(boolean registerErrorPageFilter) {
+<b class="nc">&nbsp;		this.registerErrorPageFilter = registerErrorPageFilter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onStartup(ServletContext servletContext) throws ServletException {
+<b class="nc">&nbsp;		servletContext.setAttribute(LoggingApplicationListener.REGISTER_SHUTDOWN_HOOK_PROPERTY, false);</b>
+&nbsp;		// Logger initialization is deferred in case an ordered
+&nbsp;		// LogServletContextInitializer is being used
+<b class="nc">&nbsp;		this.logger = LogFactory.getLog(getClass());</b>
+<b class="nc">&nbsp;		WebApplicationContext rootApplicationContext = createRootApplicationContext(servletContext);</b>
+<b class="nc">&nbsp;		if (rootApplicationContext != null) {</b>
+<b class="nc">&nbsp;			servletContext.addListener(new SpringBootContextLoaderListener(rootApplicationContext, servletContext));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			this.logger.debug(&quot;No ContextLoaderListener registered, as createRootApplicationContext() did not &quot;</b>
+&nbsp;					+ &quot;return an application context&quot;);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Deregisters the JDBC drivers that were registered by the application represented by
+&nbsp;	 * the given {@code servletContext}. The default implementation
+&nbsp;	 * {@link DriverManager#deregisterDriver(Driver) deregisters} every {@link Driver}
+&nbsp;	 * that was loaded by the {@link ServletContext#getClassLoader web application&#39;s class
+&nbsp;	 * loader}.
+&nbsp;	 * @param servletContext the web application&#39;s servlet context
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	protected void deregisterJdbcDrivers(ServletContext servletContext) {
+<b class="nc">&nbsp;		for (Driver driver : Collections.list(DriverManager.getDrivers())) {</b>
+<b class="nc">&nbsp;			if (driver.getClass().getClassLoader() == servletContext.getClassLoader()) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					DriverManager.deregisterDriver(driver);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (SQLException ex) {</b>
+&nbsp;					// Continue
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected WebApplicationContext createRootApplicationContext(ServletContext servletContext) {
+<b class="nc">&nbsp;		SpringApplicationBuilder builder = createSpringApplicationBuilder();</b>
+<b class="nc">&nbsp;		builder.main(getClass());</b>
+<b class="nc">&nbsp;		ApplicationContext parent = getExistingRootWebApplicationContext(servletContext);</b>
+<b class="nc">&nbsp;		if (parent != null) {</b>
+<b class="nc">&nbsp;			this.logger.info(&quot;Root context already created (using as parent).&quot;);</b>
+<b class="nc">&nbsp;			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, null);</b>
+<b class="nc">&nbsp;			builder.initializers(new ParentContextApplicationContextInitializer(parent));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		builder.initializers(new ServletContextApplicationContextInitializer(servletContext));</b>
+<b class="nc">&nbsp;		builder.contextFactory((webApplicationType) -&gt; new AnnotationConfigServletWebServerApplicationContext());</b>
+<b class="nc">&nbsp;		builder = configure(builder);</b>
+<b class="nc">&nbsp;		builder.listeners(new WebEnvironmentPropertySourceInitializer(servletContext));</b>
+<b class="nc">&nbsp;		SpringApplication application = builder.build();</b>
+<b class="nc">&nbsp;		if (application.getAllSources().isEmpty()</b>
+<b class="nc">&nbsp;				&amp;&amp; MergedAnnotations.from(getClass(), SearchStrategy.TYPE_HIERARCHY).isPresent(Configuration.class)) {</b>
+<b class="nc">&nbsp;			application.addPrimarySources(Collections.singleton(getClass()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Assert.state(!application.getAllSources().isEmpty(),</b>
+&nbsp;				&quot;No SpringApplication sources have been defined. Either override the &quot;
+&nbsp;						+ &quot;configure method or add an @Configuration annotation&quot;);
+&nbsp;		// Ensure error pages are registered
+<b class="nc">&nbsp;		if (this.registerErrorPageFilter) {</b>
+<b class="nc">&nbsp;			application.addPrimarySources(Collections.singleton(ErrorPageFilterConfiguration.class));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		application.setRegisterShutdownHook(false);</b>
+<b class="nc">&nbsp;		return run(application);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@code SpringApplicationBuilder} that is used to configure and create
+&nbsp;	 * the {@link SpringApplication}. The default implementation returns a new
+&nbsp;	 * {@code SpringApplicationBuilder} in its default state.
+&nbsp;	 * @return the {@code SpringApplicationBuilder}.
+&nbsp;	 * @since 1.3.0
+&nbsp;	 */
+&nbsp;	protected SpringApplicationBuilder createSpringApplicationBuilder() {
+<b class="nc">&nbsp;		return new SpringApplicationBuilder();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Called to run a fully configured {@link SpringApplication}.
+&nbsp;	 * @param application the application to run
+&nbsp;	 * @return the {@link WebApplicationContext}
+&nbsp;	 */
+&nbsp;	protected WebApplicationContext run(SpringApplication application) {
+<b class="nc">&nbsp;		return (WebApplicationContext) application.run();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ApplicationContext getExistingRootWebApplicationContext(ServletContext servletContext) {
+<b class="nc">&nbsp;		Object context = servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);</b>
+<b class="nc">&nbsp;		if (context instanceof ApplicationContext applicationContext) {</b>
+<b class="nc">&nbsp;			return applicationContext;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the application. Normally all you would need to do is to add sources
+&nbsp;	 * (e.g. config classes) because other settings have sensible defaults. You might
+&nbsp;	 * choose (for instance) to add default command line arguments, or set an active
+&nbsp;	 * Spring profile.
+&nbsp;	 * @param builder a builder for the application context
+&nbsp;	 * @return the application builder
+&nbsp;	 * @see SpringApplicationBuilder
+&nbsp;	 */
+&nbsp;	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+<b class="nc">&nbsp;		return builder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ApplicationListener} to trigger
+&nbsp;	 * {@link ConfigurableWebEnvironment#initPropertySources(ServletContext, jakarta.servlet.ServletConfig)}.
+&nbsp;	 */
+&nbsp;	private static final class WebEnvironmentPropertySourceInitializer
+&nbsp;			implements ApplicationListener&lt;ApplicationEnvironmentPreparedEvent&gt;, Ordered {
+&nbsp;
+&nbsp;		private final ServletContext servletContext;
+&nbsp;
+<b class="nc">&nbsp;		private WebEnvironmentPropertySourceInitializer(ServletContext servletContext) {</b>
+<b class="nc">&nbsp;			this.servletContext = servletContext;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
+<b class="nc">&nbsp;			ConfigurableEnvironment environment = event.getEnvironment();</b>
+<b class="nc">&nbsp;			if (environment instanceof ConfigurableWebEnvironment configurableWebEnvironment) {</b>
+<b class="nc">&nbsp;				configurableWebEnvironment.initPropertySources(this.servletContext, null);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getOrder() {
+<b class="nc">&nbsp;			return Ordered.HIGHEST_PRECEDENCE;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ContextLoaderListener} for the initialized context.
+&nbsp;	 */
+&nbsp;	private class SpringBootContextLoaderListener extends ContextLoaderListener {
+&nbsp;
+&nbsp;		private final ServletContext servletContext;
+&nbsp;
+<b class="nc">&nbsp;		SpringBootContextLoaderListener(WebApplicationContext applicationContext, ServletContext servletContext) {</b>
+<b class="nc">&nbsp;			super(applicationContext);</b>
+<b class="nc">&nbsp;			this.servletContext = servletContext;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void contextInitialized(ServletContextEvent event) {
+&nbsp;			// no-op because the application context is already initialized
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void contextDestroyed(ServletContextEvent event) {
+&nbsp;			try {
+<b class="nc">&nbsp;				super.contextDestroyed(event);</b>
+&nbsp;			}
+&nbsp;			finally {
+&nbsp;				// Use original context so that the classloader can be accessed
+<b class="nc">&nbsp;				deregisterJdbcDrivers(this.servletContext);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

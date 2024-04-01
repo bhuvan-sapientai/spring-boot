@@ -1,0 +1,284 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PulsarConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.pulsar</a>
+</div>
+
+<h1>Coverage Summary for Class: PulsarConfiguration (org.springframework.boot.autoconfigure.pulsar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PulsarConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.pulsar;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.apache.pulsar.client.admin.PulsarAdminBuilder;
+&nbsp;import org.apache.pulsar.client.api.ClientBuilder;
+&nbsp;import org.apache.pulsar.client.api.PulsarClient;
+&nbsp;import org.apache.pulsar.client.api.PulsarClientException;
+&nbsp;import org.apache.pulsar.client.api.Schema;
+&nbsp;import org.apache.pulsar.common.schema.SchemaType;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.pulsar.PulsarProperties.Defaults.SchemaInfo;
+&nbsp;import org.springframework.boot.autoconfigure.pulsar.PulsarProperties.Defaults.TypeMapping;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.util.LambdaSafe;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.pulsar.core.DefaultPulsarClientFactory;
+&nbsp;import org.springframework.pulsar.core.DefaultSchemaResolver;
+&nbsp;import org.springframework.pulsar.core.DefaultTopicResolver;
+&nbsp;import org.springframework.pulsar.core.PulsarAdminBuilderCustomizer;
+&nbsp;import org.springframework.pulsar.core.PulsarAdministration;
+&nbsp;import org.springframework.pulsar.core.PulsarClientBuilderCustomizer;
+&nbsp;import org.springframework.pulsar.core.PulsarClientFactory;
+&nbsp;import org.springframework.pulsar.core.SchemaResolver;
+&nbsp;import org.springframework.pulsar.core.SchemaResolver.SchemaResolverCustomizer;
+&nbsp;import org.springframework.pulsar.core.TopicResolver;
+&nbsp;import org.springframework.pulsar.function.PulsarFunction;
+&nbsp;import org.springframework.pulsar.function.PulsarFunctionAdministration;
+&nbsp;import org.springframework.pulsar.function.PulsarSink;
+&nbsp;import org.springframework.pulsar.function.PulsarSource;
+&nbsp;
+&nbsp;/**
+&nbsp; * Common configuration used by both {@link PulsarAutoConfiguration} and
+&nbsp; * {@link PulsarReactiveAutoConfiguration}. A separate configuration class is used so that
+&nbsp; * {@link PulsarAutoConfiguration} can be excluded for reactive only application.
+&nbsp; *
+&nbsp; * @author Chris Bono
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@EnableConfigurationProperties(PulsarProperties.class)
+&nbsp;class PulsarConfiguration {
+&nbsp;
+&nbsp;	private final PulsarProperties properties;
+&nbsp;
+&nbsp;	private final PulsarPropertiesMapper propertiesMapper;
+&nbsp;
+<b class="nc">&nbsp;	PulsarConfiguration(PulsarProperties properties) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+<b class="nc">&nbsp;		this.propertiesMapper = new PulsarPropertiesMapper(properties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(PulsarConnectionDetails.class)
+&nbsp;	PropertiesPulsarConnectionDetails pulsarConnectionDetails() {
+<b class="nc">&nbsp;		return new PropertiesPulsarConnectionDetails(this.properties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(PulsarClientFactory.class)
+&nbsp;	DefaultPulsarClientFactory pulsarClientFactory(PulsarConnectionDetails connectionDetails,
+&nbsp;			ObjectProvider&lt;PulsarClientBuilderCustomizer&gt; customizersProvider) {
+<b class="nc">&nbsp;		List&lt;PulsarClientBuilderCustomizer&gt; allCustomizers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		allCustomizers.add((builder) -&gt; this.propertiesMapper.customizeClientBuilder(builder, connectionDetails));</b>
+<b class="nc">&nbsp;		allCustomizers.addAll(customizersProvider.orderedStream().toList());</b>
+<b class="nc">&nbsp;		DefaultPulsarClientFactory clientFactory = new DefaultPulsarClientFactory(</b>
+<b class="nc">&nbsp;				(clientBuilder) -&gt; applyClientBuilderCustomizers(allCustomizers, clientBuilder));</b>
+<b class="nc">&nbsp;		return clientFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyClientBuilderCustomizers(List&lt;PulsarClientBuilderCustomizer&gt; customizers,
+&nbsp;			ClientBuilder clientBuilder) {
+<b class="nc">&nbsp;		customizers.forEach((customizer) -&gt; customizer.customize(clientBuilder));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	PulsarClient pulsarClient(PulsarClientFactory clientFactory) throws PulsarClientException {
+<b class="nc">&nbsp;		return clientFactory.createClient();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	PulsarAdministration pulsarAdministration(PulsarConnectionDetails connectionDetails,
+&nbsp;			ObjectProvider&lt;PulsarAdminBuilderCustomizer&gt; pulsarAdminBuilderCustomizers) {
+<b class="nc">&nbsp;		List&lt;PulsarAdminBuilderCustomizer&gt; allCustomizers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		allCustomizers.add((builder) -&gt; this.propertiesMapper.customizeAdminBuilder(builder, connectionDetails));</b>
+<b class="nc">&nbsp;		allCustomizers.addAll(pulsarAdminBuilderCustomizers.orderedStream().toList());</b>
+<b class="nc">&nbsp;		return new PulsarAdministration((adminBuilder) -&gt; applyAdminBuilderCustomizers(allCustomizers, adminBuilder));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyAdminBuilderCustomizers(List&lt;PulsarAdminBuilderCustomizer&gt; customizers,
+&nbsp;			PulsarAdminBuilder adminBuilder) {
+<b class="nc">&nbsp;		customizers.forEach((customizer) -&gt; customizer.customize(adminBuilder));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(SchemaResolver.class)
+&nbsp;	DefaultSchemaResolver pulsarSchemaResolver(ObjectProvider&lt;SchemaResolverCustomizer&lt;?&gt;&gt; schemaResolverCustomizers) {
+<b class="nc">&nbsp;		DefaultSchemaResolver schemaResolver = new DefaultSchemaResolver();</b>
+<b class="nc">&nbsp;		addCustomSchemaMappings(schemaResolver, this.properties.getDefaults().getTypeMappings());</b>
+<b class="nc">&nbsp;		applySchemaResolverCustomizers(schemaResolverCustomizers.orderedStream().toList(), schemaResolver);</b>
+<b class="nc">&nbsp;		return schemaResolver;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addCustomSchemaMappings(DefaultSchemaResolver schemaResolver, List&lt;TypeMapping&gt; typeMappings) {
+<b class="nc">&nbsp;		if (typeMappings != null) {</b>
+<b class="nc">&nbsp;			typeMappings.forEach((typeMapping) -&gt; addCustomSchemaMapping(schemaResolver, typeMapping));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addCustomSchemaMapping(DefaultSchemaResolver schemaResolver, TypeMapping typeMapping) {
+<b class="nc">&nbsp;		SchemaInfo schemaInfo = typeMapping.schemaInfo();</b>
+<b class="nc">&nbsp;		if (schemaInfo != null) {</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; messageType = typeMapping.messageType();</b>
+<b class="nc">&nbsp;			SchemaType schemaType = schemaInfo.schemaType();</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; messageKeyType = schemaInfo.messageKeyType();</b>
+<b class="nc">&nbsp;			Schema&lt;?&gt; schema = schemaResolver.resolveSchema(schemaType, messageType, messageKeyType).orElseThrow();</b>
+<b class="nc">&nbsp;			schemaResolver.addCustomSchemaMapping(typeMapping.messageType(), schema);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private void applySchemaResolverCustomizers(List&lt;SchemaResolverCustomizer&lt;?&gt;&gt; customizers,
+&nbsp;			DefaultSchemaResolver schemaResolver) {
+<b class="nc">&nbsp;		LambdaSafe.callbacks(SchemaResolverCustomizer.class, customizers, schemaResolver)</b>
+<b class="nc">&nbsp;			.invoke((customizer) -&gt; customizer.customize(schemaResolver));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(TopicResolver.class)
+&nbsp;	DefaultTopicResolver pulsarTopicResolver() {
+<b class="nc">&nbsp;		DefaultTopicResolver topicResolver = new DefaultTopicResolver();</b>
+<b class="nc">&nbsp;		List&lt;TypeMapping&gt; typeMappings = this.properties.getDefaults().getTypeMappings();</b>
+<b class="nc">&nbsp;		if (typeMappings != null) {</b>
+<b class="nc">&nbsp;			typeMappings.forEach((typeMapping) -&gt; addCustomTopicMapping(topicResolver, typeMapping));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return topicResolver;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addCustomTopicMapping(DefaultTopicResolver topicResolver, TypeMapping typeMapping) {
+<b class="nc">&nbsp;		String topicName = typeMapping.topicName();</b>
+<b class="nc">&nbsp;		if (topicName != null) {</b>
+<b class="nc">&nbsp;			topicResolver.addCustomTopicMapping(typeMapping.messageType(), topicName);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	@ConditionalOnProperty(name = &quot;spring.pulsar.function.enabled&quot;, havingValue = &quot;true&quot;, matchIfMissing = true)
+&nbsp;	PulsarFunctionAdministration pulsarFunctionAdministration(PulsarAdministration pulsarAdministration,
+&nbsp;			ObjectProvider&lt;PulsarFunction&gt; pulsarFunctions, ObjectProvider&lt;PulsarSink&gt; pulsarSinks,
+&nbsp;			ObjectProvider&lt;PulsarSource&gt; pulsarSources) {
+<b class="nc">&nbsp;		PulsarProperties.Function properties = this.properties.getFunction();</b>
+<b class="nc">&nbsp;		return new PulsarFunctionAdministration(pulsarAdministration, pulsarFunctions, pulsarSinks, pulsarSources,</b>
+<b class="nc">&nbsp;				properties.isFailFast(), properties.isPropagateFailures(), properties.isPropagateStopFailures());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

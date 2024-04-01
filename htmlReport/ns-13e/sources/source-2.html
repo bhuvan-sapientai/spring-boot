@@ -1,0 +1,254 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApiVersion</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: ApiVersion (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApiVersion</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * API Version number comprised of a major and minor value.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;final class ApiVersion {
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern PATTERN = Pattern.compile(&quot;^v?(\\d+)\\.(\\d*)$&quot;);</b>
+&nbsp;
+&nbsp;	private final int major;
+&nbsp;
+&nbsp;	private final int minor;
+&nbsp;
+<b class="nc">&nbsp;	private ApiVersion(int major, int minor) {</b>
+<b class="nc">&nbsp;		this.major = major;</b>
+<b class="nc">&nbsp;		this.minor = minor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the major version number.
+&nbsp;	 * @return the major version
+&nbsp;	 */
+&nbsp;	int getMajor() {
+<b class="nc">&nbsp;		return this.major;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the minor version number.
+&nbsp;	 * @return the minor version
+&nbsp;	 */
+&nbsp;	int getMinor() {
+<b class="nc">&nbsp;		return this.minor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Assert that this API version supports the specified version.
+&nbsp;	 * @param other the version to check against
+&nbsp;	 * @see #supports(ApiVersion)
+&nbsp;	 */
+&nbsp;	void assertSupports(ApiVersion other) {
+<b class="nc">&nbsp;		if (!supports(other)) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(</b>
+&nbsp;					&quot;Detected platform API version &#39;&quot; + other + &quot;&#39; does not match supported version &#39;&quot; + this + &quot;&#39;&quot;);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if this API version supports the given version. A {@code 0.x} matches only
+&nbsp;	 * the same version number. A 1.x or higher release matches when the versions have the
+&nbsp;	 * same major version and a minor that is equal or greater.
+&nbsp;	 * @param other the version to check against
+&nbsp;	 * @return if the specified API version is supported
+&nbsp;	 * @see #assertSupports(ApiVersion)
+&nbsp;	 */
+&nbsp;	boolean supports(ApiVersion other) {
+<b class="nc">&nbsp;		if (equals(other)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.major == 0 || this.major != other.major) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.minor &gt;= other.minor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if this API version supports any of the given versions.
+&nbsp;	 * @param others the versions to check against
+&nbsp;	 * @return if any of the specified API versions are supported
+&nbsp;	 * @see #supports(ApiVersion)
+&nbsp;	 */
+&nbsp;	boolean supportsAny(ApiVersion... others) {
+<b class="nc">&nbsp;		for (ApiVersion other : others) {</b>
+<b class="nc">&nbsp;			if (supports(other)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ApiVersion other = (ApiVersion) obj;</b>
+<b class="nc">&nbsp;		return (this.major == other.major) &amp;&amp; (this.minor == other.minor);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return this.major * 31 + this.minor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.major + &quot;.&quot; + this.minor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to parse a string into an {@link ApiVersion} instance.
+&nbsp;	 * @param value the value to parse.
+&nbsp;	 * @return the corresponding {@link ApiVersion}
+&nbsp;	 * @throws IllegalArgumentException if the value could not be parsed
+&nbsp;	 */
+&nbsp;	static ApiVersion parse(String value) {
+<b class="nc">&nbsp;		Assert.hasText(value, &quot;Value must not be empty&quot;);</b>
+<b class="nc">&nbsp;		Matcher matcher = PATTERN.matcher(value);</b>
+<b class="nc">&nbsp;		Assert.isTrue(matcher.matches(), () -&gt; &quot;Malformed version number &#39;&quot; + value + &quot;&#39;&quot;);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			int major = Integer.parseInt(matcher.group(1));</b>
+<b class="nc">&nbsp;			int minor = Integer.parseInt(matcher.group(2));</b>
+<b class="nc">&nbsp;			return new ApiVersion(major, minor);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NumberFormatException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Malformed version number &#39;&quot; + value + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	static ApiVersion of(int major, int minor) {
+<b class="nc">&nbsp;		return new ApiVersion(major, minor);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

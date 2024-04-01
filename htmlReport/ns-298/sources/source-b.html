@@ -1,0 +1,697 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarFileEntries</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: JarFileEntries (org.springframework.boot.loader.jar)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarFileEntries</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/157)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JarFileEntries$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JarFileEntries$EntryIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JarFileEntries$Offsets</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JarFileEntries$Zip64Offsets</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JarFileEntries$ZipOffsets</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/183)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.jar;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.Attributes.Name;
+&nbsp;import java.util.jar.JarInputStream;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.data.RandomAccessData;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides access to entries from a {@link JarFile}. In order to reduce memory
+&nbsp; * consumption entry details are stored using arrays. The {@code hashCodes} array stores
+&nbsp; * the hash code of the entry name, the {@code centralDirectoryOffsets} provides the
+&nbsp; * offset to the central directory record and {@code positions} provides the original
+&nbsp; * order position of the entry. The arrays are stored in hashCode order so that a binary
+&nbsp; * search can be used to find a name.
+&nbsp; * &lt;p&gt;
+&nbsp; * A typical Spring Boot application will have somewhere in the region of 10,500 entries
+&nbsp; * which should consume about 122K.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;class JarFileEntries implements CentralDirectoryVisitor, Iterable&lt;JarEntry&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final Runnable NO_VALIDATION = () -&gt; {</b>
+<b class="nc">&nbsp;	};</b>
+&nbsp;
+&nbsp;	private static final String META_INF_PREFIX = &quot;META-INF/&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Name MULTI_RELEASE = new Name(&quot;Multi-Release&quot;);</b>
+&nbsp;
+&nbsp;	private static final int BASE_VERSION = 8;
+&nbsp;
+<b class="nc">&nbsp;	private static final int RUNTIME_VERSION = Runtime.version().feature();</b>
+&nbsp;
+&nbsp;	private static final long LOCAL_FILE_HEADER_SIZE = 30;
+&nbsp;
+&nbsp;	private static final char SLASH = &#39;/&#39;;
+&nbsp;
+&nbsp;	private static final char NO_SUFFIX = 0;
+&nbsp;
+&nbsp;	protected static final int ENTRY_CACHE_SIZE = 25;
+&nbsp;
+&nbsp;	private final JarFile jarFile;
+&nbsp;
+&nbsp;	private final JarEntryFilter filter;
+&nbsp;
+&nbsp;	private RandomAccessData centralDirectoryData;
+&nbsp;
+&nbsp;	private int size;
+&nbsp;
+&nbsp;	private int[] hashCodes;
+&nbsp;
+&nbsp;	private Offsets centralDirectoryOffsets;
+&nbsp;
+&nbsp;	private int[] positions;
+&nbsp;
+&nbsp;	private Boolean multiReleaseJar;
+&nbsp;
+&nbsp;	private JarEntryCertification[] certifications;
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;Integer, FileHeader&gt; entriesCache = Collections</b>
+<b class="nc">&nbsp;		.synchronizedMap(new LinkedHashMap&lt;&gt;(16, 0.75f, true) {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			protected boolean removeEldestEntry(Map.Entry&lt;Integer, FileHeader&gt; eldest) {
+<b class="nc">&nbsp;				return size() &gt;= ENTRY_CACHE_SIZE;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		});
+&nbsp;
+<b class="nc">&nbsp;	JarFileEntries(JarFile jarFile, JarEntryFilter filter) {</b>
+<b class="nc">&nbsp;		this.jarFile = jarFile;</b>
+<b class="nc">&nbsp;		this.filter = filter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void visitStart(CentralDirectoryEndRecord endRecord, RandomAccessData centralDirectoryData) {
+<b class="nc">&nbsp;		int maxSize = endRecord.getNumberOfRecords();</b>
+<b class="nc">&nbsp;		this.centralDirectoryData = centralDirectoryData;</b>
+<b class="nc">&nbsp;		this.hashCodes = new int[maxSize];</b>
+<b class="nc">&nbsp;		this.centralDirectoryOffsets = Offsets.from(endRecord);</b>
+<b class="nc">&nbsp;		this.positions = new int[maxSize];</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void visitFileHeader(CentralDirectoryFileHeader fileHeader, long dataOffset) {
+<b class="nc">&nbsp;		AsciiBytes name = applyFilter(fileHeader.getName());</b>
+<b class="nc">&nbsp;		if (name != null) {</b>
+<b class="nc">&nbsp;			add(name, dataOffset);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void add(AsciiBytes name, long dataOffset) {
+<b class="nc">&nbsp;		this.hashCodes[this.size] = name.hashCode();</b>
+<b class="nc">&nbsp;		this.centralDirectoryOffsets.set(this.size, dataOffset);</b>
+<b class="nc">&nbsp;		this.positions[this.size] = this.size;</b>
+<b class="nc">&nbsp;		this.size++;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void visitEnd() {
+<b class="nc">&nbsp;		sort(0, this.size - 1);</b>
+<b class="nc">&nbsp;		int[] positions = this.positions;</b>
+<b class="nc">&nbsp;		this.positions = new int[positions.length];</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; this.size; i++) {</b>
+<b class="nc">&nbsp;			this.positions[positions[i]] = i;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	int getSize() {
+<b class="nc">&nbsp;		return this.size;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void sort(int left, int right) {
+&nbsp;		// Quick sort algorithm, uses hashCodes as the source but sorts all arrays
+<b class="nc">&nbsp;		if (left &lt; right) {</b>
+<b class="nc">&nbsp;			int pivot = this.hashCodes[left + (right - left) / 2];</b>
+<b class="nc">&nbsp;			int i = left;</b>
+<b class="nc">&nbsp;			int j = right;</b>
+<b class="nc">&nbsp;			while (i &lt;= j) {</b>
+<b class="nc">&nbsp;				while (this.hashCodes[i] &lt; pivot) {</b>
+<b class="nc">&nbsp;					i++;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				while (this.hashCodes[j] &gt; pivot) {</b>
+<b class="nc">&nbsp;					j--;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (i &lt;= j) {</b>
+<b class="nc">&nbsp;					swap(i, j);</b>
+<b class="nc">&nbsp;					i++;</b>
+<b class="nc">&nbsp;					j--;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			if (left &lt; j) {</b>
+<b class="nc">&nbsp;				sort(left, j);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (right &gt; i) {</b>
+<b class="nc">&nbsp;				sort(i, right);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void swap(int i, int j) {
+<b class="nc">&nbsp;		swap(this.hashCodes, i, j);</b>
+<b class="nc">&nbsp;		this.centralDirectoryOffsets.swap(i, j);</b>
+<b class="nc">&nbsp;		swap(this.positions, i, j);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;JarEntry&gt; iterator() {
+<b class="nc">&nbsp;		return new EntryIterator(NO_VALIDATION);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Iterator&lt;JarEntry&gt; iterator(Runnable validator) {
+<b class="nc">&nbsp;		return new EntryIterator(validator);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean containsEntry(CharSequence name) {
+<b class="nc">&nbsp;		return getEntry(name, FileHeader.class, true) != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	JarEntry getEntry(CharSequence name) {
+<b class="nc">&nbsp;		return getEntry(name, JarEntry.class, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	InputStream getInputStream(String name) throws IOException {
+<b class="nc">&nbsp;		FileHeader entry = getEntry(name, FileHeader.class, false);</b>
+<b class="nc">&nbsp;		return getInputStream(entry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	InputStream getInputStream(FileHeader entry) throws IOException {
+<b class="nc">&nbsp;		if (entry == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		InputStream inputStream = getEntryData(entry).getInputStream();</b>
+<b class="nc">&nbsp;		if (entry.getMethod() == ZipEntry.DEFLATED) {</b>
+<b class="nc">&nbsp;			inputStream = new ZipInflaterInputStream(inputStream, (int) entry.getSize());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return inputStream;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	RandomAccessData getEntryData(String name) throws IOException {
+<b class="nc">&nbsp;		FileHeader entry = getEntry(name, FileHeader.class, false);</b>
+<b class="nc">&nbsp;		if (entry == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getEntryData(entry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private RandomAccessData getEntryData(FileHeader entry) throws IOException {
+&nbsp;		// aspectjrt-1.7.4.jar has a different ext bytes length in the
+&nbsp;		// local directory to the central directory. We need to re-read
+&nbsp;		// here to skip them
+<b class="nc">&nbsp;		RandomAccessData data = this.jarFile.getData();</b>
+<b class="nc">&nbsp;		byte[] localHeader = data.read(entry.getLocalHeaderOffset(), LOCAL_FILE_HEADER_SIZE);</b>
+<b class="nc">&nbsp;		long nameLength = Bytes.littleEndianValue(localHeader, 26, 2);</b>
+<b class="nc">&nbsp;		long extraLength = Bytes.littleEndianValue(localHeader, 28, 2);</b>
+<b class="nc">&nbsp;		return data.getSubsection(entry.getLocalHeaderOffset() + LOCAL_FILE_HEADER_SIZE + nameLength + extraLength,</b>
+<b class="nc">&nbsp;				entry.getCompressedSize());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends FileHeader&gt; T getEntry(CharSequence name, Class&lt;T&gt; type, boolean cacheEntry) {
+<b class="nc">&nbsp;		T entry = doGetEntry(name, type, cacheEntry, null);</b>
+<b class="nc">&nbsp;		if (!isMetaInfEntry(name) &amp;&amp; isMultiReleaseJar()) {</b>
+<b class="nc">&nbsp;			int version = RUNTIME_VERSION;</b>
+<b class="nc">&nbsp;			AsciiBytes nameAlias = (entry instanceof JarEntry jarEntry) ? jarEntry.getAsciiBytesName()</b>
+<b class="nc">&nbsp;					: new AsciiBytes(name.toString());</b>
+<b class="nc">&nbsp;			while (version &gt; BASE_VERSION) {</b>
+<b class="nc">&nbsp;				T versionedEntry = doGetEntry(&quot;META-INF/versions/&quot; + version + &quot;/&quot; + name, type, cacheEntry, nameAlias);</b>
+<b class="nc">&nbsp;				if (versionedEntry != null) {</b>
+<b class="nc">&nbsp;					return versionedEntry;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				version--;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return entry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isMetaInfEntry(CharSequence name) {
+<b class="nc">&nbsp;		return name.toString().startsWith(META_INF_PREFIX);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isMultiReleaseJar() {
+<b class="nc">&nbsp;		Boolean multiRelease = this.multiReleaseJar;</b>
+<b class="nc">&nbsp;		if (multiRelease != null) {</b>
+<b class="nc">&nbsp;			return multiRelease;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			Manifest manifest = this.jarFile.getManifest();</b>
+<b class="nc">&nbsp;			if (manifest == null) {</b>
+<b class="nc">&nbsp;				multiRelease = false;</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				Attributes attributes = manifest.getMainAttributes();</b>
+<b class="nc">&nbsp;				multiRelease = attributes.containsKey(MULTI_RELEASE);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			multiRelease = false;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		this.multiReleaseJar = multiRelease;</b>
+<b class="nc">&nbsp;		return multiRelease;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends FileHeader&gt; T doGetEntry(CharSequence name, Class&lt;T&gt; type, boolean cacheEntry,
+&nbsp;			AsciiBytes nameAlias) {
+<b class="nc">&nbsp;		int hashCode = AsciiBytes.hashCode(name);</b>
+<b class="nc">&nbsp;		T entry = getEntry(hashCode, name, NO_SUFFIX, type, cacheEntry, nameAlias);</b>
+<b class="nc">&nbsp;		if (entry == null) {</b>
+<b class="nc">&nbsp;			hashCode = AsciiBytes.hashCode(hashCode, SLASH);</b>
+<b class="nc">&nbsp;			entry = getEntry(hashCode, name, SLASH, type, cacheEntry, nameAlias);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return entry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends FileHeader&gt; T getEntry(int hashCode, CharSequence name, char suffix, Class&lt;T&gt; type,
+&nbsp;			boolean cacheEntry, AsciiBytes nameAlias) {
+<b class="nc">&nbsp;		int index = getFirstIndex(hashCode);</b>
+<b class="nc">&nbsp;		while (index &gt;= 0 &amp;&amp; index &lt; this.size &amp;&amp; this.hashCodes[index] == hashCode) {</b>
+<b class="nc">&nbsp;			T entry = getEntry(index, type, cacheEntry, nameAlias);</b>
+<b class="nc">&nbsp;			if (entry.hasName(name, suffix)) {</b>
+<b class="nc">&nbsp;				return entry;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			index++;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T extends FileHeader&gt; T getEntry(int index, Class&lt;T&gt; type, boolean cacheEntry, AsciiBytes nameAlias) {
+&nbsp;		try {
+<b class="nc">&nbsp;			long offset = this.centralDirectoryOffsets.get(index);</b>
+<b class="nc">&nbsp;			FileHeader cached = this.entriesCache.get(index);</b>
+<b class="nc">&nbsp;			FileHeader entry = (cached != null) ? cached</b>
+<b class="nc">&nbsp;					: CentralDirectoryFileHeader.fromRandomAccessData(this.centralDirectoryData, offset, this.filter);</b>
+<b class="nc">&nbsp;			if (CentralDirectoryFileHeader.class.equals(entry.getClass()) &amp;&amp; type.equals(JarEntry.class)) {</b>
+<b class="nc">&nbsp;				entry = new JarEntry(this.jarFile, index, (CentralDirectoryFileHeader) entry, nameAlias);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (cacheEntry &amp;&amp; cached != entry) {</b>
+<b class="nc">&nbsp;				this.entriesCache.put(index, entry);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return (T) entry;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private int getFirstIndex(int hashCode) {
+<b class="nc">&nbsp;		int index = Arrays.binarySearch(this.hashCodes, 0, this.size, hashCode);</b>
+<b class="nc">&nbsp;		if (index &lt; 0) {</b>
+<b class="nc">&nbsp;			return -1;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		while (index &gt; 0 &amp;&amp; this.hashCodes[index - 1] == hashCode) {</b>
+<b class="nc">&nbsp;			index--;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return index;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void clearCache() {
+<b class="nc">&nbsp;		this.entriesCache.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private AsciiBytes applyFilter(AsciiBytes name) {
+<b class="nc">&nbsp;		return (this.filter != null) ? this.filter.apply(name) : name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	JarEntryCertification getCertification(JarEntry entry) throws IOException {
+<b class="nc">&nbsp;		JarEntryCertification[] certifications = this.certifications;</b>
+<b class="nc">&nbsp;		if (certifications == null) {</b>
+<b class="nc">&nbsp;			certifications = new JarEntryCertification[this.size];</b>
+&nbsp;			// We fall back to use JarInputStream to obtain the certs. This isn&#39;t that
+&nbsp;			// fast, but hopefully doesn&#39;t happen too often.
+<b class="nc">&nbsp;			try (JarInputStream certifiedJarStream = new JarInputStream(this.jarFile.getData().getInputStream())) {</b>
+&nbsp;				java.util.jar.JarEntry certifiedEntry;
+<b class="nc">&nbsp;				while ((certifiedEntry = certifiedJarStream.getNextJarEntry()) != null) {</b>
+&nbsp;					// Entry must be closed to trigger a read and set entry certificates
+<b class="nc">&nbsp;					certifiedJarStream.closeEntry();</b>
+<b class="nc">&nbsp;					int index = getEntryIndex(certifiedEntry.getName());</b>
+<b class="nc">&nbsp;					if (index != -1) {</b>
+<b class="nc">&nbsp;						certifications[index] = JarEntryCertification.from(certifiedEntry);</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			this.certifications = certifications;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		JarEntryCertification certification = certifications[entry.getIndex()];</b>
+<b class="nc">&nbsp;		return (certification != null) ? certification : JarEntryCertification.NONE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int getEntryIndex(CharSequence name) {
+<b class="nc">&nbsp;		int hashCode = AsciiBytes.hashCode(name);</b>
+<b class="nc">&nbsp;		int index = getFirstIndex(hashCode);</b>
+<b class="nc">&nbsp;		while (index &gt;= 0 &amp;&amp; index &lt; this.size &amp;&amp; this.hashCodes[index] == hashCode) {</b>
+<b class="nc">&nbsp;			FileHeader candidate = getEntry(index, FileHeader.class, false, null);</b>
+<b class="nc">&nbsp;			if (candidate.hasName(name, NO_SUFFIX)) {</b>
+<b class="nc">&nbsp;				return index;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			index++;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return -1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void swap(int[] array, int i, int j) {
+<b class="nc">&nbsp;		int temp = array[i];</b>
+<b class="nc">&nbsp;		array[i] = array[j];</b>
+<b class="nc">&nbsp;		array[j] = temp;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void swap(long[] array, int i, int j) {
+<b class="nc">&nbsp;		long temp = array[i];</b>
+<b class="nc">&nbsp;		array[i] = array[j];</b>
+<b class="nc">&nbsp;		array[j] = temp;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Iterator for contained entries.
+&nbsp;	 */
+&nbsp;	private final class EntryIterator implements Iterator&lt;JarEntry&gt; {
+&nbsp;
+&nbsp;		private final Runnable validator;
+&nbsp;
+<b class="nc">&nbsp;		private int index = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;		private EntryIterator(Runnable validator) {</b>
+<b class="nc">&nbsp;			this.validator = validator;</b>
+<b class="nc">&nbsp;			validator.run();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean hasNext() {
+<b class="nc">&nbsp;			this.validator.run();</b>
+<b class="nc">&nbsp;			return this.index &lt; JarFileEntries.this.size;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public JarEntry next() {
+<b class="nc">&nbsp;			this.validator.run();</b>
+<b class="nc">&nbsp;			if (!hasNext()) {</b>
+<b class="nc">&nbsp;				throw new NoSuchElementException();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			int entryIndex = JarFileEntries.this.positions[this.index];</b>
+<b class="nc">&nbsp;			this.index++;</b>
+<b class="nc">&nbsp;			return getEntry(entryIndex, JarEntry.class, false, null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Interface to manage offsets to central directory records. Regular zip files are
+&nbsp;	 * backed by an {@code int[]} based implementation, Zip64 files are backed by a
+&nbsp;	 * {@code long[]} and will consume more memory.
+&nbsp;	 */
+&nbsp;	private interface Offsets {
+&nbsp;
+&nbsp;		void set(int index, long value);
+&nbsp;
+&nbsp;		long get(int index);
+&nbsp;
+&nbsp;		void swap(int i, int j);
+&nbsp;
+&nbsp;		static Offsets from(CentralDirectoryEndRecord endRecord) {
+<b class="nc">&nbsp;			int size = endRecord.getNumberOfRecords();</b>
+<b class="nc">&nbsp;			return endRecord.isZip64() ? new Zip64Offsets(size) : new ZipOffsets(size);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Offsets} implementation for regular zip files.
+&nbsp;	 */
+&nbsp;	private static final class ZipOffsets implements Offsets {
+&nbsp;
+&nbsp;		private final int[] offsets;
+&nbsp;
+<b class="nc">&nbsp;		private ZipOffsets(int size) {</b>
+<b class="nc">&nbsp;			this.offsets = new int[size];</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void swap(int i, int j) {
+<b class="nc">&nbsp;			JarFileEntries.swap(this.offsets, i, j);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void set(int index, long value) {
+<b class="nc">&nbsp;			this.offsets[index] = (int) value;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public long get(int index) {
+<b class="nc">&nbsp;			return this.offsets[index];</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Offsets} implementation for zip64 files.
+&nbsp;	 */
+&nbsp;	private static final class Zip64Offsets implements Offsets {
+&nbsp;
+&nbsp;		private final long[] offsets;
+&nbsp;
+<b class="nc">&nbsp;		private Zip64Offsets(int size) {</b>
+<b class="nc">&nbsp;			this.offsets = new long[size];</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void swap(int i, int j) {
+<b class="nc">&nbsp;			JarFileEntries.swap(this.offsets, i, j);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void set(int index, long value) {
+<b class="nc">&nbsp;			this.offsets[index] = value;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public long get(int index) {
+<b class="nc">&nbsp;			return this.offsets[index];</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

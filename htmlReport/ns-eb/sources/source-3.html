@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ArtemisConnectionFactoryFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.jms.artemis</a>
+</div>
+
+<h1>Coverage Summary for Class: ArtemisConnectionFactoryFactory (org.springframework.boot.autoconfigure.jms.artemis)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArtemisConnectionFactoryFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.jms.artemis;
+&nbsp;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;
+&nbsp;import org.apache.activemq.artemis.api.core.TransportConfiguration;
+&nbsp;import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
+&nbsp;import org.apache.activemq.artemis.api.core.client.ServerLocator;
+&nbsp;import org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory;
+&nbsp;import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Factory to create an Artemis {@link ActiveMQConnectionFactory} instance from properties
+&nbsp; * defined in {@link ArtemisProperties}.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Justin Bertram
+&nbsp; */
+&nbsp;class ArtemisConnectionFactoryFactory {
+&nbsp;
+&nbsp;	private static final String DEFAULT_BROKER_URL = &quot;tcp://localhost:61616&quot;;
+&nbsp;
+<b class="nc">&nbsp;	static final String[] EMBEDDED_JMS_CLASSES = { &quot;org.apache.activemq.artemis.jms.server.embedded.EmbeddedJMS&quot;,</b>
+&nbsp;			&quot;org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ&quot; };
+&nbsp;
+&nbsp;	private final ArtemisProperties properties;
+&nbsp;
+&nbsp;	private final ArtemisConnectionDetails connectionDetails;
+&nbsp;
+&nbsp;	private final ListableBeanFactory beanFactory;
+&nbsp;
+&nbsp;	ArtemisConnectionFactoryFactory(ListableBeanFactory beanFactory, ArtemisProperties properties,
+<b class="nc">&nbsp;			ArtemisConnectionDetails connectionDetails) {</b>
+<b class="nc">&nbsp;		Assert.notNull(beanFactory, &quot;BeanFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(properties, &quot;Properties must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(connectionDetails, &quot;ConnectionDetails must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.beanFactory = beanFactory;</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+<b class="nc">&nbsp;		this.connectionDetails = connectionDetails;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	&lt;T extends ActiveMQConnectionFactory&gt; T createConnectionFactory(Class&lt;T&gt; factoryClass) {
+&nbsp;		try {
+<b class="nc">&nbsp;			startEmbeddedJms();</b>
+<b class="nc">&nbsp;			return doCreateConnectionFactory(factoryClass);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to create ActiveMQConnectionFactory&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void startEmbeddedJms() {
+<b class="nc">&nbsp;		for (String embeddedJmsClass : EMBEDDED_JMS_CLASSES) {</b>
+<b class="nc">&nbsp;			if (ClassUtils.isPresent(embeddedJmsClass, null)) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					this.beanFactory.getBeansOfType(Class.forName(embeddedJmsClass));</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (Exception ex) {</b>
+&nbsp;					// Ignore
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends ActiveMQConnectionFactory&gt; T doCreateConnectionFactory(Class&lt;T&gt; factoryClass) throws Exception {
+<b class="nc">&nbsp;		ArtemisMode mode = this.connectionDetails.getMode();</b>
+<b class="nc">&nbsp;		if (mode == null) {</b>
+<b class="nc">&nbsp;			mode = deduceMode();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (mode == ArtemisMode.EMBEDDED) {</b>
+<b class="nc">&nbsp;			return createEmbeddedConnectionFactory(factoryClass);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return createNativeConnectionFactory(factoryClass);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Deduce the {@link ArtemisMode} to use if none has been set.
+&nbsp;	 * @return the mode
+&nbsp;	 */
+&nbsp;	private ArtemisMode deduceMode() {
+<b class="nc">&nbsp;		if (this.properties.getEmbedded().isEnabled() &amp;&amp; isEmbeddedJmsClassPresent()) {</b>
+<b class="nc">&nbsp;			return ArtemisMode.EMBEDDED;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ArtemisMode.NATIVE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isEmbeddedJmsClassPresent() {
+<b class="nc">&nbsp;		for (String embeddedJmsClass : EMBEDDED_JMS_CLASSES) {</b>
+<b class="nc">&nbsp;			if (ClassUtils.isPresent(embeddedJmsClass, null)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends ActiveMQConnectionFactory&gt; T createEmbeddedConnectionFactory(Class&lt;T&gt; factoryClass)
+&nbsp;			throws Exception {
+&nbsp;		try {
+<b class="nc">&nbsp;			TransportConfiguration transportConfiguration = new TransportConfiguration(</b>
+<b class="nc">&nbsp;					InVMConnectorFactory.class.getName(), this.properties.getEmbedded().generateTransportParameters());</b>
+<b class="nc">&nbsp;			ServerLocator serviceLocator = ActiveMQClient.createServerLocatorWithoutHA(transportConfiguration);</b>
+<b class="nc">&nbsp;			return factoryClass.getConstructor(ServerLocator.class).newInstance(serviceLocator);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoClassDefFoundError ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to create InVM &quot;</b>
+&nbsp;					+ &quot;Artemis connection, ensure that artemis-jms-server.jar is in the classpath&quot;, ex);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends ActiveMQConnectionFactory&gt; T createNativeConnectionFactory(Class&lt;T&gt; factoryClass)
+&nbsp;			throws Exception {
+<b class="nc">&nbsp;		T connectionFactory = newNativeConnectionFactory(factoryClass);</b>
+<b class="nc">&nbsp;		String user = this.connectionDetails.getUser();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(user)) {</b>
+<b class="nc">&nbsp;			connectionFactory.setUser(user);</b>
+<b class="nc">&nbsp;			connectionFactory.setPassword(this.connectionDetails.getPassword());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return connectionFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends ActiveMQConnectionFactory&gt; T newNativeConnectionFactory(Class&lt;T&gt; factoryClass) throws Exception {
+<b class="nc">&nbsp;		String brokerUrl = StringUtils.hasText(this.connectionDetails.getBrokerUrl())</b>
+<b class="nc">&nbsp;				? this.connectionDetails.getBrokerUrl() : DEFAULT_BROKER_URL;</b>
+<b class="nc">&nbsp;		Constructor&lt;T&gt; constructor = factoryClass.getConstructor(String.class);</b>
+<b class="nc">&nbsp;		return constructor.newInstance(brokerUrl);</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

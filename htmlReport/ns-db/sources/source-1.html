@@ -1,0 +1,288 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GroovyTemplateAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.groovy.template</a>
+</div>
+
+<h1>Coverage Summary for Class: GroovyTemplateAutoConfiguration (org.springframework.boot.autoconfigure.groovy.template)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroovyTemplateAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GroovyTemplateAutoConfiguration$GroovyMarkupConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GroovyTemplateAutoConfiguration$GroovyWebConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.groovy.template;
+&nbsp;
+&nbsp;import java.security.CodeSource;
+&nbsp;import java.security.ProtectionDomain;
+&nbsp;
+&nbsp;import groovy.text.markup.MarkupTemplateEngine;
+&nbsp;import jakarta.servlet.Servlet;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+&nbsp;import org.springframework.boot.autoconfigure.template.TemplateLocation;
+&nbsp;import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.i18n.LocaleContextHolder;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.web.servlet.view.UrlBasedViewResolver;
+&nbsp;import org.springframework.web.servlet.view.groovy.GroovyMarkupConfig;
+&nbsp;import org.springframework.web.servlet.view.groovy.GroovyMarkupConfigurer;
+&nbsp;import org.springframework.web.servlet.view.groovy.GroovyMarkupViewResolver;
+&nbsp;
+&nbsp;/**
+&nbsp; * Auto-configuration support for Groovy templates in MVC. By default creates a
+&nbsp; * {@link MarkupTemplateEngine} configured from {@link GroovyTemplateProperties}, but you
+&nbsp; * can override that by providing your own {@link GroovyMarkupConfig} or even a
+&nbsp; * {@link MarkupTemplateEngine} of a different type.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 1.1.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = WebMvcAutoConfiguration.class)
+&nbsp;@ConditionalOnClass(MarkupTemplateEngine.class)
+&nbsp;@EnableConfigurationProperties(GroovyTemplateProperties.class)
+<b class="nc">&nbsp;public class GroovyTemplateAutoConfiguration {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(GroovyTemplateAutoConfiguration.class);</b>
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass(GroovyMarkupConfigurer.class)
+&nbsp;	public static class GroovyMarkupConfiguration {
+&nbsp;
+&nbsp;		private final ApplicationContext applicationContext;
+&nbsp;
+&nbsp;		private final GroovyTemplateProperties properties;
+&nbsp;
+<b class="nc">&nbsp;		public GroovyMarkupConfiguration(ApplicationContext applicationContext, GroovyTemplateProperties properties) {</b>
+<b class="nc">&nbsp;			this.applicationContext = applicationContext;</b>
+<b class="nc">&nbsp;			this.properties = properties;</b>
+<b class="nc">&nbsp;			checkTemplateLocationExists();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void checkTemplateLocationExists() {
+<b class="nc">&nbsp;			if (this.properties.isCheckTemplateLocation() &amp;&amp; !isUsingGroovyAllJar()) {</b>
+<b class="nc">&nbsp;				TemplateLocation location = new TemplateLocation(this.properties.getResourceLoaderPath());</b>
+<b class="nc">&nbsp;				if (!location.exists(this.applicationContext)) {</b>
+<b class="nc">&nbsp;					logger.warn(LogMessage.format(</b>
+&nbsp;							&quot;Cannot find template location: %s (please add some templates, check your Groovy &quot;
+&nbsp;									+ &quot;configuration, or set spring.groovy.template.check-template-location=false)&quot;,
+&nbsp;							location));
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * MarkupTemplateEngine could be loaded from groovy-templates or groovy-all.
+&nbsp;		 * Unfortunately it&#39;s quite common for people to use groovy-all and not actually
+&nbsp;		 * need templating support. This method attempts to check the source jar so that
+&nbsp;		 * we can skip the {@code /template} directory check for such cases.
+&nbsp;		 * @return true if the groovy-all jar is used
+&nbsp;		 */
+&nbsp;		private boolean isUsingGroovyAllJar() {
+&nbsp;			try {
+<b class="nc">&nbsp;				ProtectionDomain domain = MarkupTemplateEngine.class.getProtectionDomain();</b>
+<b class="nc">&nbsp;				CodeSource codeSource = domain.getCodeSource();</b>
+<b class="nc">&nbsp;				return codeSource != null &amp;&amp; codeSource.getLocation().toString().contains(&quot;-all&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(GroovyMarkupConfig.class)
+&nbsp;		@ConfigurationProperties(prefix = &quot;spring.groovy.template.configuration&quot;)
+&nbsp;		public GroovyMarkupConfigurer groovyMarkupConfigurer(ObjectProvider&lt;MarkupTemplateEngine&gt; templateEngine) {
+<b class="nc">&nbsp;			GroovyMarkupConfigurer configurer = new GroovyMarkupConfigurer();</b>
+<b class="nc">&nbsp;			configurer.setResourceLoaderPath(this.properties.getResourceLoaderPath());</b>
+<b class="nc">&nbsp;			configurer.setCacheTemplates(this.properties.isCache());</b>
+<b class="nc">&nbsp;			templateEngine.ifAvailable(configurer::setTemplateEngine);</b>
+<b class="nc">&nbsp;			return configurer;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass({ Servlet.class, LocaleContextHolder.class, UrlBasedViewResolver.class })
+&nbsp;	@ConditionalOnWebApplication(type = Type.SERVLET)
+&nbsp;	@ConditionalOnProperty(name = &quot;spring.groovy.template.enabled&quot;, matchIfMissing = true)
+<b class="nc">&nbsp;	public static class GroovyWebConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(name = &quot;groovyMarkupViewResolver&quot;)
+&nbsp;		public GroovyMarkupViewResolver groovyMarkupViewResolver(GroovyTemplateProperties properties) {
+<b class="nc">&nbsp;			GroovyMarkupViewResolver resolver = new GroovyMarkupViewResolver();</b>
+<b class="nc">&nbsp;			properties.applyToMvcViewResolver(resolver);</b>
+<b class="nc">&nbsp;			return resolver;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

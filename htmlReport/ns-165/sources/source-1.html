@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertiesMigrationListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.migrator</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertiesMigrationListener (org.springframework.boot.context.properties.migrator)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertiesMigrationListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.migrator;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepository;
+&nbsp;import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepositoryJsonBuilder;
+&nbsp;import org.springframework.boot.context.event.ApplicationFailedEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationPreparedEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationReadyEvent;
+&nbsp;import org.springframework.boot.context.event.SpringApplicationEvent;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link ApplicationListener} that inspects the {@link ConfigurableEnvironment
+&nbsp; * environment} for configuration keys that need to be migrated. Automatically renames the
+&nbsp; * keys that have a matching replacement and logs a report of what was discovered.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+<b class="nc">&nbsp;class PropertiesMigrationListener implements ApplicationListener&lt;SpringApplicationEvent&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(PropertiesMigrationListener.class);</b>
+&nbsp;
+&nbsp;	private PropertiesMigrationReport report;
+&nbsp;
+&nbsp;	private boolean reported;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onApplicationEvent(SpringApplicationEvent event) {
+<b class="nc">&nbsp;		if (event instanceof ApplicationPreparedEvent preparedEvent) {</b>
+<b class="nc">&nbsp;			onApplicationPreparedEvent(preparedEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (event instanceof ApplicationReadyEvent || event instanceof ApplicationFailedEvent) {</b>
+<b class="nc">&nbsp;			logLegacyPropertiesReport();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationPreparedEvent(ApplicationPreparedEvent event) {
+<b class="nc">&nbsp;		ConfigurationMetadataRepository repository = loadRepository();</b>
+<b class="nc">&nbsp;		PropertiesMigrationReporter reporter = new PropertiesMigrationReporter(repository,</b>
+<b class="nc">&nbsp;				event.getApplicationContext().getEnvironment());</b>
+<b class="nc">&nbsp;		this.report = reporter.getReport();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurationMetadataRepository loadRepository() {
+&nbsp;		try {
+<b class="nc">&nbsp;			return loadRepository(ConfigurationMetadataRepositoryJsonBuilder.create());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Failed to load metadata&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurationMetadataRepository loadRepository(ConfigurationMetadataRepositoryJsonBuilder builder)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		Resource[] resources = new PathMatchingResourcePatternResolver()</b>
+<b class="nc">&nbsp;			.getResources(&quot;classpath*:/META-INF/spring-configuration-metadata.json&quot;);</b>
+<b class="nc">&nbsp;		for (Resource resource : resources) {</b>
+<b class="nc">&nbsp;			try (InputStream inputStream = resource.getInputStream()) {</b>
+<b class="nc">&nbsp;				builder.withJsonResource(inputStream);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logLegacyPropertiesReport() {
+<b class="nc">&nbsp;		if (this.report == null || this.reported) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		String warningReport = this.report.getWarningReport();</b>
+<b class="nc">&nbsp;		if (warningReport != null) {</b>
+<b class="nc">&nbsp;			logger.warn(warningReport);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String errorReport = this.report.getErrorReport();</b>
+<b class="nc">&nbsp;		if (errorReport != null) {</b>
+<b class="nc">&nbsp;			logger.error(errorReport);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.reported = true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

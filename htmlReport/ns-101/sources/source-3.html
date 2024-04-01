@@ -1,0 +1,250 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OAuth2ClientPropertiesMapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.security.oauth2.client</a>
+</div>
+
+<h1>Coverage Summary for Class: OAuth2ClientPropertiesMapper (org.springframework.boot.autoconfigure.security.oauth2.client)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OAuth2ClientPropertiesMapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.security.oauth2.client;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties.Provider;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.convert.ApplicationConversionService;
+&nbsp;import org.springframework.core.convert.ConversionException;
+&nbsp;import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+&nbsp;import org.springframework.security.oauth2.client.registration.ClientRegistration;
+&nbsp;import org.springframework.security.oauth2.client.registration.ClientRegistration.Builder;
+&nbsp;import org.springframework.security.oauth2.client.registration.ClientRegistrations;
+&nbsp;import org.springframework.security.oauth2.core.AuthenticationMethod;
+&nbsp;import org.springframework.security.oauth2.core.AuthorizationGrantType;
+&nbsp;import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Maps {@link OAuth2ClientProperties} to {@link ClientRegistration ClientRegistrations}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Thiago Hirata
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author MyeongHyeon Lee
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 3.1.0
+&nbsp; */
+&nbsp;public final class OAuth2ClientPropertiesMapper {
+&nbsp;
+&nbsp;	private final OAuth2ClientProperties properties;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new mapper for the given {@code properties}.
+&nbsp;	 * @param properties the properties to map
+&nbsp;	 */
+<b class="nc">&nbsp;	public OAuth2ClientPropertiesMapper(OAuth2ClientProperties properties) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maps the properties to {@link ClientRegistration ClientRegistrations}.
+&nbsp;	 * @return the mapped {@code ClientRegistrations}
+&nbsp;	 */
+&nbsp;	public Map&lt;String, ClientRegistration&gt; asClientRegistrations() {
+<b class="nc">&nbsp;		Map&lt;String, ClientRegistration&gt; clientRegistrations = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		this.properties.getRegistration()</b>
+<b class="nc">&nbsp;			.forEach((key, value) -&gt; clientRegistrations.put(key,</b>
+<b class="nc">&nbsp;					getClientRegistration(key, value, this.properties.getProvider())));</b>
+<b class="nc">&nbsp;		return clientRegistrations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ClientRegistration getClientRegistration(String registrationId,
+&nbsp;			OAuth2ClientProperties.Registration properties, Map&lt;String, Provider&gt; providers) {
+<b class="nc">&nbsp;		Builder builder = getBuilderFromIssuerIfPossible(registrationId, properties.getProvider(), providers);</b>
+<b class="nc">&nbsp;		if (builder == null) {</b>
+<b class="nc">&nbsp;			builder = getBuilder(registrationId, properties.getProvider(), providers);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getClientId).to(builder::clientId);</b>
+<b class="nc">&nbsp;		map.from(properties::getClientSecret).to(builder::clientSecret);</b>
+<b class="nc">&nbsp;		map.from(properties::getClientAuthenticationMethod)</b>
+<b class="nc">&nbsp;			.as(ClientAuthenticationMethod::new)</b>
+<b class="nc">&nbsp;			.to(builder::clientAuthenticationMethod);</b>
+<b class="nc">&nbsp;		map.from(properties::getAuthorizationGrantType)</b>
+<b class="nc">&nbsp;			.as(AuthorizationGrantType::new)</b>
+<b class="nc">&nbsp;			.to(builder::authorizationGrantType);</b>
+<b class="nc">&nbsp;		map.from(properties::getRedirectUri).to(builder::redirectUri);</b>
+<b class="nc">&nbsp;		map.from(properties::getScope).as(StringUtils::toStringArray).to(builder::scope);</b>
+<b class="nc">&nbsp;		map.from(properties::getClientName).to(builder::clientName);</b>
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Builder getBuilderFromIssuerIfPossible(String registrationId, String configuredProviderId,
+&nbsp;			Map&lt;String, Provider&gt; providers) {
+<b class="nc">&nbsp;		String providerId = (configuredProviderId != null) ? configuredProviderId : registrationId;</b>
+<b class="nc">&nbsp;		if (providers.containsKey(providerId)) {</b>
+<b class="nc">&nbsp;			Provider provider = providers.get(providerId);</b>
+<b class="nc">&nbsp;			String issuer = provider.getIssuerUri();</b>
+<b class="nc">&nbsp;			if (issuer != null) {</b>
+<b class="nc">&nbsp;				Builder builder = ClientRegistrations.fromIssuerLocation(issuer).registrationId(registrationId);</b>
+<b class="nc">&nbsp;				return getBuilder(builder, provider);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Builder getBuilder(String registrationId, String configuredProviderId,
+&nbsp;			Map&lt;String, Provider&gt; providers) {
+<b class="nc">&nbsp;		String providerId = (configuredProviderId != null) ? configuredProviderId : registrationId;</b>
+<b class="nc">&nbsp;		CommonOAuth2Provider provider = getCommonProvider(providerId);</b>
+<b class="nc">&nbsp;		if (provider == null &amp;&amp; !providers.containsKey(providerId)) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(getErrorMessage(configuredProviderId, registrationId));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Builder builder = (provider != null) ? provider.getBuilder(registrationId)</b>
+<b class="nc">&nbsp;				: ClientRegistration.withRegistrationId(registrationId);</b>
+<b class="nc">&nbsp;		if (providers.containsKey(providerId)) {</b>
+<b class="nc">&nbsp;			return getBuilder(builder, providers.get(providerId));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return builder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getErrorMessage(String configuredProviderId, String registrationId) {
+<b class="nc">&nbsp;		return ((configuredProviderId != null) ? &quot;Unknown provider ID &#39;&quot; + configuredProviderId + &quot;&#39;&quot;</b>
+<b class="nc">&nbsp;				: &quot;Provider ID must be specified for client registration &#39;&quot; + registrationId + &quot;&#39;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Builder getBuilder(Builder builder, Provider provider) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(provider::getAuthorizationUri).to(builder::authorizationUri);</b>
+<b class="nc">&nbsp;		map.from(provider::getTokenUri).to(builder::tokenUri);</b>
+<b class="nc">&nbsp;		map.from(provider::getUserInfoUri).to(builder::userInfoUri);</b>
+<b class="nc">&nbsp;		map.from(provider::getUserInfoAuthenticationMethod)</b>
+<b class="nc">&nbsp;			.as(AuthenticationMethod::new)</b>
+<b class="nc">&nbsp;			.to(builder::userInfoAuthenticationMethod);</b>
+<b class="nc">&nbsp;		map.from(provider::getJwkSetUri).to(builder::jwkSetUri);</b>
+<b class="nc">&nbsp;		map.from(provider::getUserNameAttribute).to(builder::userNameAttributeName);</b>
+<b class="nc">&nbsp;		return builder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static CommonOAuth2Provider getCommonProvider(String providerId) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return ApplicationConversionService.getSharedInstance().convert(providerId, CommonOAuth2Provider.class);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ConversionException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

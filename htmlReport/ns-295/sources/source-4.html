@@ -1,0 +1,515 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LaunchedURLClassLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: LaunchedURLClassLoader (org.springframework.boot.loader)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LaunchedURLClassLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/106)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LaunchedURLClassLoader$DefinePackageCallType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LaunchedURLClassLoader$UseFastConnectionExceptionsEnumeration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/119)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.JarURLConnection;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.archive.Archive;
+&nbsp;import org.springframework.boot.loader.jar.Handler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ClassLoader} used by the {@link Launcher}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class LaunchedURLClassLoader extends URLClassLoader {
+&nbsp;
+&nbsp;	private static final int BUFFER_SIZE = 4096;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		ClassLoader.registerAsParallelCapable();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final boolean exploded;
+&nbsp;
+&nbsp;	private final Archive rootArchive;
+&nbsp;
+<b class="nc">&nbsp;	private final Object packageLock = new Object();</b>
+&nbsp;
+&nbsp;	private volatile DefinePackageCallType definePackageCallType;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LaunchedURLClassLoader} instance.
+&nbsp;	 * @param urls the URLs from which to load classes and resources
+&nbsp;	 * @param parent the parent class loader for delegation
+&nbsp;	 */
+&nbsp;	public LaunchedURLClassLoader(URL[] urls, ClassLoader parent) {
+<b class="nc">&nbsp;		this(false, urls, parent);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LaunchedURLClassLoader} instance.
+&nbsp;	 * @param exploded if the underlying archive is exploded
+&nbsp;	 * @param urls the URLs from which to load classes and resources
+&nbsp;	 * @param parent the parent class loader for delegation
+&nbsp;	 */
+&nbsp;	public LaunchedURLClassLoader(boolean exploded, URL[] urls, ClassLoader parent) {
+<b class="nc">&nbsp;		this(exploded, null, urls, parent);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LaunchedURLClassLoader} instance.
+&nbsp;	 * @param exploded if the underlying archive is exploded
+&nbsp;	 * @param rootArchive the root archive or {@code null}
+&nbsp;	 * @param urls the URLs from which to load classes and resources
+&nbsp;	 * @param parent the parent class loader for delegation
+&nbsp;	 * @since 2.3.1
+&nbsp;	 */
+&nbsp;	public LaunchedURLClassLoader(boolean exploded, Archive rootArchive, URL[] urls, ClassLoader parent) {
+<b class="nc">&nbsp;		super(urls, parent);</b>
+<b class="nc">&nbsp;		this.exploded = exploded;</b>
+<b class="nc">&nbsp;		this.rootArchive = rootArchive;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URL findResource(String name) {
+<b class="nc">&nbsp;		if (this.exploded) {</b>
+<b class="nc">&nbsp;			return super.findResource(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Handler.setUseFastConnectionExceptions(true);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return super.findResource(name);</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			Handler.setUseFastConnectionExceptions(false);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Enumeration&lt;URL&gt; findResources(String name) throws IOException {
+<b class="nc">&nbsp;		if (this.exploded) {</b>
+<b class="nc">&nbsp;			return super.findResources(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Handler.setUseFastConnectionExceptions(true);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return new UseFastConnectionExceptionsEnumeration(super.findResources(name));</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			Handler.setUseFastConnectionExceptions(false);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+<b class="nc">&nbsp;		if (name.startsWith(&quot;org.springframework.boot.loader.jarmode.&quot;)) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Class&lt;?&gt; result = loadClassInLaunchedClassLoader(name);</b>
+<b class="nc">&nbsp;				if (resolve) {</b>
+<b class="nc">&nbsp;					resolveClass(result);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return result;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ClassNotFoundException ex) {</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.exploded) {</b>
+<b class="nc">&nbsp;			return super.loadClass(name, resolve);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Handler.setUseFastConnectionExceptions(true);</b>
+&nbsp;		try {
+&nbsp;			try {
+<b class="nc">&nbsp;				definePackageIfNecessary(name);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IllegalArgumentException ex) {</b>
+&nbsp;				// Tolerate race condition due to being parallel capable
+<b class="nc">&nbsp;				if (getDefinedPackage(name) == null) {</b>
+&nbsp;					// This should never happen as the IllegalArgumentException indicates
+&nbsp;					// that the package has already been defined and, therefore,
+&nbsp;					// getDefinedPackage(name) should not return null.
+<b class="nc">&nbsp;					throw new AssertionError(&quot;Package &quot; + name + &quot; has already been defined but it could not be found&quot;);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return super.loadClass(name, resolve);</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			Handler.setUseFastConnectionExceptions(false);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Class&lt;?&gt; loadClassInLaunchedClassLoader(String name) throws ClassNotFoundException {
+<b class="nc">&nbsp;		String internalName = name.replace(&#39;.&#39;, &#39;/&#39;) + &quot;.class&quot;;</b>
+<b class="nc">&nbsp;		InputStream inputStream = getParent().getResourceAsStream(internalName);</b>
+<b class="nc">&nbsp;		if (inputStream == null) {</b>
+<b class="nc">&nbsp;			throw new ClassNotFoundException(name);</b>
+&nbsp;		}
+&nbsp;		try {
+&nbsp;			try {
+<b class="nc">&nbsp;				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;				byte[] buffer = new byte[BUFFER_SIZE];</b>
+<b class="nc">&nbsp;				int bytesRead = -1;</b>
+<b class="nc">&nbsp;				while ((bytesRead = inputStream.read(buffer)) != -1) {</b>
+<b class="nc">&nbsp;					outputStream.write(buffer, 0, bytesRead);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				inputStream.close();</b>
+<b class="nc">&nbsp;				byte[] bytes = outputStream.toByteArray();</b>
+<b class="nc">&nbsp;				Class&lt;?&gt; definedClass = defineClass(name, bytes, 0, bytes.length);</b>
+<b class="nc">&nbsp;				definePackageIfNecessary(name);</b>
+<b class="nc">&nbsp;				return definedClass;</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				inputStream.close();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new ClassNotFoundException(&quot;Cannot load resource for class [&quot; + name + &quot;]&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Define a package before a {@code findClass} call is made. This is necessary to
+&nbsp;	 * ensure that the appropriate manifest for nested JARs is associated with the
+&nbsp;	 * package.
+&nbsp;	 * @param className the class name being found
+&nbsp;	 */
+&nbsp;	private void definePackageIfNecessary(String className) {
+<b class="nc">&nbsp;		int lastDot = className.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;		if (lastDot &gt;= 0) {</b>
+<b class="nc">&nbsp;			String packageName = className.substring(0, lastDot);</b>
+<b class="nc">&nbsp;			if (getDefinedPackage(packageName) == null) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					definePackage(className, packageName);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IllegalArgumentException ex) {</b>
+&nbsp;					// Tolerate race condition due to being parallel capable
+<b class="nc">&nbsp;					if (getDefinedPackage(packageName) == null) {</b>
+&nbsp;						// This should never happen as the IllegalArgumentException
+&nbsp;						// indicates that the package has already been defined and,
+&nbsp;						// therefore, getDefinedPackage(name) should not have returned
+&nbsp;						// null.
+<b class="nc">&nbsp;						throw new AssertionError(</b>
+&nbsp;								&quot;Package &quot; + packageName + &quot; has already been defined but it could not be found&quot;);
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void definePackage(String className, String packageName) {
+<b class="nc">&nbsp;		String packageEntryName = packageName.replace(&#39;.&#39;, &#39;/&#39;) + &quot;/&quot;;</b>
+<b class="nc">&nbsp;		String classEntryName = className.replace(&#39;.&#39;, &#39;/&#39;) + &quot;.class&quot;;</b>
+<b class="nc">&nbsp;		for (URL url : getURLs()) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				URLConnection connection = url.openConnection();</b>
+<b class="nc">&nbsp;				if (connection instanceof JarURLConnection jarURLConnection) {</b>
+<b class="nc">&nbsp;					JarFile jarFile = jarURLConnection.getJarFile();</b>
+<b class="nc">&nbsp;					if (jarFile.getEntry(classEntryName) != null &amp;&amp; jarFile.getEntry(packageEntryName) != null</b>
+<b class="nc">&nbsp;							&amp;&amp; jarFile.getManifest() != null) {</b>
+<b class="nc">&nbsp;						definePackage(packageName, jarFile.getManifest(), url);</b>
+&nbsp;						return;
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+&nbsp;				// Ignore
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Package definePackage(String name, Manifest man, URL url) throws IllegalArgumentException {
+<b class="nc">&nbsp;		if (!this.exploded) {</b>
+<b class="nc">&nbsp;			return super.definePackage(name, man, url);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		synchronized (this.packageLock) {</b>
+<b class="nc">&nbsp;			return doDefinePackage(DefinePackageCallType.MANIFEST, () -&gt; super.definePackage(name, man, url));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Package definePackage(String name, String specTitle, String specVersion, String specVendor,
+&nbsp;			String implTitle, String implVersion, String implVendor, URL sealBase) throws IllegalArgumentException {
+<b class="nc">&nbsp;		if (!this.exploded) {</b>
+<b class="nc">&nbsp;			return super.definePackage(name, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor,</b>
+&nbsp;					sealBase);
+&nbsp;		}
+<b class="nc">&nbsp;		synchronized (this.packageLock) {</b>
+<b class="nc">&nbsp;			if (this.definePackageCallType == null) {</b>
+&nbsp;				// We&#39;re not part of a call chain which means that the URLClassLoader
+&nbsp;				// is trying to define a package for our exploded JAR. We use the
+&nbsp;				// manifest version to ensure package attributes are set
+<b class="nc">&nbsp;				Manifest manifest = getManifest(this.rootArchive);</b>
+<b class="nc">&nbsp;				if (manifest != null) {</b>
+<b class="nc">&nbsp;					return definePackage(name, manifest, sealBase);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return doDefinePackage(DefinePackageCallType.ATTRIBUTES, () -&gt; super.definePackage(name, specTitle,</b>
+&nbsp;					specVersion, specVendor, implTitle, implVersion, implVendor, sealBase));
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Manifest getManifest(Archive archive) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return (archive != null) ? archive.getManifest() : null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T doDefinePackage(DefinePackageCallType type, Supplier&lt;T&gt; call) {
+<b class="nc">&nbsp;		DefinePackageCallType existingType = this.definePackageCallType;</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			this.definePackageCallType = type;</b>
+<b class="nc">&nbsp;			return call.get();</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			this.definePackageCallType = existingType;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clear URL caches.
+&nbsp;	 */
+&nbsp;	public void clearCache() {
+<b class="nc">&nbsp;		if (this.exploded) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		for (URL url : getURLs()) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				URLConnection connection = url.openConnection();</b>
+<b class="nc">&nbsp;				if (connection instanceof JarURLConnection) {</b>
+<b class="nc">&nbsp;					clearCache(connection);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+&nbsp;				// Ignore
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private void clearCache(URLConnection connection) throws IOException {
+<b class="nc">&nbsp;		Object jarFile = ((JarURLConnection) connection).getJarFile();</b>
+<b class="nc">&nbsp;		if (jarFile instanceof org.springframework.boot.loader.jar.JarFile) {</b>
+<b class="nc">&nbsp;			((org.springframework.boot.loader.jar.JarFile) jarFile).clearCache();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class UseFastConnectionExceptionsEnumeration implements Enumeration&lt;URL&gt; {
+&nbsp;
+&nbsp;		private final Enumeration&lt;URL&gt; delegate;
+&nbsp;
+<b class="nc">&nbsp;		UseFastConnectionExceptionsEnumeration(Enumeration&lt;URL&gt; delegate) {</b>
+<b class="nc">&nbsp;			this.delegate = delegate;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean hasMoreElements() {
+<b class="nc">&nbsp;			Handler.setUseFastConnectionExceptions(true);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return this.delegate.hasMoreElements();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				Handler.setUseFastConnectionExceptions(false);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public URL nextElement() {
+<b class="nc">&nbsp;			Handler.setUseFastConnectionExceptions(true);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return this.delegate.nextElement();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				Handler.setUseFastConnectionExceptions(false);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The different types of call made to define a package. We track these for exploded
+&nbsp;	 * jars so that we can detect packages that should have manifest attributes applied.
+&nbsp;	 */
+<b class="nc">&nbsp;	private enum DefinePackageCallType {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * A define package call from a resource that has a manifest.
+&nbsp;		 */
+<b class="nc">&nbsp;		MANIFEST,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * A define package call with a direct set of attributes.
+&nbsp;		 */
+<b class="nc">&nbsp;		ATTRIBUTES</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

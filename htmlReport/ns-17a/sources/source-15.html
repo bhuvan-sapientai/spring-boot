@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImageName</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.core</a>
+</div>
+
+<h1>Coverage Summary for Class: ImageName (org.springframework.boot.docker.compose.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImageName</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.core;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * A Docker image name of the form {@literal &quot;docker.io/library/ubuntu&quot;}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;class ImageName {
+&nbsp;
+&nbsp;	private static final String DEFAULT_DOMAIN = &quot;docker.io&quot;;
+&nbsp;
+&nbsp;	private static final String OFFICIAL_REPOSITORY_NAME = &quot;library&quot;;
+&nbsp;
+&nbsp;	private static final String LEGACY_DOMAIN = &quot;index.docker.io&quot;;
+&nbsp;
+&nbsp;	private final String domain;
+&nbsp;
+&nbsp;	private final String name;
+&nbsp;
+&nbsp;	private final String string;
+&nbsp;
+<b class="nc">&nbsp;	ImageName(String domain, String path) {</b>
+<b class="nc">&nbsp;		Assert.hasText(path, &quot;Path must not be empty&quot;);</b>
+<b class="nc">&nbsp;		this.domain = getDomainOrDefault(domain);</b>
+<b class="nc">&nbsp;		this.name = getNameWithDefaultPath(this.domain, path);</b>
+<b class="nc">&nbsp;		this.string = this.domain + &quot;/&quot; + this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the domain for this image name.
+&nbsp;	 * @return the domain
+&nbsp;	 */
+&nbsp;	String getDomain() {
+<b class="nc">&nbsp;		return this.domain;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of this image.
+&nbsp;	 * @return the image name
+&nbsp;	 */
+&nbsp;	String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ImageName other = (ImageName) obj;</b>
+<b class="nc">&nbsp;		boolean result = true;</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; this.domain.equals(other.domain);</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; this.name.equals(other.name);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		final int prime = 31;</b>
+<b class="nc">&nbsp;		int result = 1;</b>
+<b class="nc">&nbsp;		result = prime * result + this.domain.hashCode();</b>
+<b class="nc">&nbsp;		result = prime * result + this.name.hashCode();</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.string;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getDomainOrDefault(String domain) {
+<b class="nc">&nbsp;		if (domain == null || LEGACY_DOMAIN.equals(domain)) {</b>
+<b class="nc">&nbsp;			return DEFAULT_DOMAIN;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return domain;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getNameWithDefaultPath(String domain, String name) {
+<b class="nc">&nbsp;		if (DEFAULT_DOMAIN.equals(domain) &amp;&amp; !name.contains(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			return OFFICIAL_REPOSITORY_NAME + &quot;/&quot; + name;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static String parseDomain(String value) {
+<b class="nc">&nbsp;		int firstSlash = value.indexOf(&#39;/&#39;);</b>
+<b class="nc">&nbsp;		String candidate = (firstSlash != -1) ? value.substring(0, firstSlash) : null;</b>
+<b class="nc">&nbsp;		if (candidate != null &amp;&amp; Regex.DOMAIN.matcher(candidate).matches()) {</b>
+<b class="nc">&nbsp;			return candidate;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static ImageName of(String value) {
+<b class="nc">&nbsp;		Assert.hasText(value, &quot;Value must not be empty&quot;);</b>
+<b class="nc">&nbsp;		String domain = parseDomain(value);</b>
+<b class="nc">&nbsp;		String path = (domain != null) ? value.substring(domain.length() + 1) : value;</b>
+<b class="nc">&nbsp;		Assert.isTrue(Regex.PATH.matcher(path).matches(),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Unable to parse name \&quot;&quot; + value + &quot;\&quot;. &quot;</b>
+&nbsp;						+ &quot;Image name must be in the form &#39;[domainHost:port/][path/]name&#39;, &quot;
+&nbsp;						+ &quot;with &#39;path&#39; and &#39;name&#39; containing only [a-z0-9][.][_][-]&quot;);
+<b class="nc">&nbsp;		return new ImageName(domain, path);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

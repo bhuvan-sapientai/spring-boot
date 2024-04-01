@@ -1,0 +1,626 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UndertowWebServer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.undertow</a>
+</div>
+
+<h1>Coverage Summary for Class: UndertowWebServer (org.springframework.boot.web.embedded.undertow)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UndertowWebServer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/133)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UndertowWebServer$CloseableHttpHandler</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowWebServer$CloseableHttpHandlerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowWebServer$CloseableHttpHandlerFactory$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowWebServer$Port</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowWebServer$UndertowWebServerRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/165)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.undertow;
+&nbsp;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.net.SocketAddress;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;
+&nbsp;import io.undertow.Undertow;
+&nbsp;import io.undertow.server.HttpHandler;
+&nbsp;import io.undertow.server.HttpServerExchange;
+&nbsp;import io.undertow.server.handlers.GracefulShutdownHandler;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import org.xnio.channels.BoundChannel;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.boot.web.server.GracefulShutdownCallback;
+&nbsp;import org.springframework.boot.web.server.GracefulShutdownResult;
+&nbsp;import org.springframework.boot.web.server.PortInUseException;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.boot.web.server.WebServerException;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link WebServer} that can be used to control an Undertow web server. Usually this
+&nbsp; * class should be created using the {@link UndertowReactiveWebServerFactory} and not
+&nbsp; * directly.
+&nbsp; *
+&nbsp; * @author Ivan Sopov
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Christoph Dreis
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class UndertowWebServer implements WebServer {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(UndertowWebServer.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final AtomicReference&lt;GracefulShutdownCallback&gt; gracefulShutdownCallback = new AtomicReference&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Object monitor = new Object();</b>
+&nbsp;
+&nbsp;	private final Undertow.Builder builder;
+&nbsp;
+&nbsp;	private final Iterable&lt;HttpHandlerFactory&gt; httpHandlerFactories;
+&nbsp;
+&nbsp;	private final boolean autoStart;
+&nbsp;
+&nbsp;	private Undertow undertow;
+&nbsp;
+<b class="nc">&nbsp;	private volatile boolean started = false;</b>
+&nbsp;
+&nbsp;	private volatile GracefulShutdownHandler gracefulShutdown;
+&nbsp;
+&nbsp;	private volatile List&lt;Closeable&gt; closeables;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link UndertowWebServer} instance.
+&nbsp;	 * @param builder the builder
+&nbsp;	 * @param autoStart if the server should be started
+&nbsp;	 */
+&nbsp;	public UndertowWebServer(Undertow.Builder builder, boolean autoStart) {
+<b class="nc">&nbsp;		this(builder, Collections.singleton(new CloseableHttpHandlerFactory(null)), autoStart);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link UndertowWebServer} instance.
+&nbsp;	 * @param builder the builder
+&nbsp;	 * @param httpHandlerFactories the handler factories
+&nbsp;	 * @param autoStart if the server should be started
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	public UndertowWebServer(Undertow.Builder builder, Iterable&lt;HttpHandlerFactory&gt; httpHandlerFactories,
+<b class="nc">&nbsp;			boolean autoStart) {</b>
+<b class="nc">&nbsp;		this.builder = builder;</b>
+<b class="nc">&nbsp;		this.httpHandlerFactories = httpHandlerFactories;</b>
+<b class="nc">&nbsp;		this.autoStart = autoStart;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void start() throws WebServerException {
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			if (this.started) {</b>
+<b class="nc">&nbsp;				return;</b>
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				if (!this.autoStart) {</b>
+<b class="nc">&nbsp;					return;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (this.undertow == null) {</b>
+<b class="nc">&nbsp;					this.undertow = createUndertowServer();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				this.undertow.start();</b>
+<b class="nc">&nbsp;				this.started = true;</b>
+<b class="nc">&nbsp;				String message = getStartLogMessage();</b>
+<b class="nc">&nbsp;				logger.info(message);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					PortInUseException.ifPortBindingException(ex, (bindException) -&gt; {</b>
+<b class="nc">&nbsp;						List&lt;Port&gt; failedPorts = getConfiguredPorts();</b>
+<b class="nc">&nbsp;						failedPorts.removeAll(getActualPorts());</b>
+<b class="nc">&nbsp;						if (failedPorts.size() == 1) {</b>
+<b class="nc">&nbsp;							throw new PortInUseException(failedPorts.get(0).getNumber());</b>
+&nbsp;						}
+&nbsp;					});
+<b class="nc">&nbsp;					throw new WebServerException(&quot;Unable to start embedded Undertow&quot;, ex);</b>
+&nbsp;				}
+&nbsp;				finally {
+<b class="nc">&nbsp;					destroySilently();</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void destroySilently() {
+&nbsp;		try {
+<b class="nc">&nbsp;			if (this.undertow != null) {</b>
+<b class="nc">&nbsp;				this.undertow.stop();</b>
+<b class="nc">&nbsp;				this.closeables.forEach(this::closeSilently);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+&nbsp;			// Ignore
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void closeSilently(Closeable closeable) {
+&nbsp;		try {
+<b class="nc">&nbsp;			closeable.close();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Undertow createUndertowServer() {
+<b class="nc">&nbsp;		this.closeables = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		this.gracefulShutdown = null;</b>
+<b class="nc">&nbsp;		HttpHandler handler = createHttpHandler();</b>
+<b class="nc">&nbsp;		this.builder.setHandler(handler);</b>
+<b class="nc">&nbsp;		return this.builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected HttpHandler createHttpHandler() {
+<b class="nc">&nbsp;		HttpHandler handler = null;</b>
+<b class="nc">&nbsp;		for (HttpHandlerFactory factory : this.httpHandlerFactories) {</b>
+<b class="nc">&nbsp;			handler = factory.getHandler(handler);</b>
+<b class="nc">&nbsp;			if (handler instanceof Closeable closeable) {</b>
+<b class="nc">&nbsp;				this.closeables.add(closeable);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (handler instanceof GracefulShutdownHandler shutdownHandler) {</b>
+<b class="nc">&nbsp;				Assert.isNull(this.gracefulShutdown, &quot;Only a single GracefulShutdownHandler can be defined&quot;);</b>
+<b class="nc">&nbsp;				this.gracefulShutdown = shutdownHandler;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return handler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getPortsDescription() {
+<b class="nc">&nbsp;		StringBuilder description = new StringBuilder();</b>
+<b class="nc">&nbsp;		List&lt;UndertowWebServer.Port&gt; ports = getActualPorts();</b>
+<b class="nc">&nbsp;		description.append(&quot;port&quot;);</b>
+<b class="nc">&nbsp;		if (ports.size() != 1) {</b>
+<b class="nc">&nbsp;			description.append(&quot;s&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		description.append(&quot; &quot;);</b>
+<b class="nc">&nbsp;		if (!ports.isEmpty()) {</b>
+<b class="nc">&nbsp;			description.append(StringUtils.collectionToDelimitedString(ports, &quot;, &quot;));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			description.append(&quot;unknown&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return description.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Port&gt; getActualPorts() {
+<b class="nc">&nbsp;		List&lt;Port&gt; ports = new ArrayList&lt;&gt;();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			if (!this.autoStart) {</b>
+<b class="nc">&nbsp;				ports.add(new Port(-1, &quot;unknown&quot;));</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				for (BoundChannel channel : extractChannels()) {</b>
+<b class="nc">&nbsp;					ports.add(getPortFromChannel(channel));</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+&nbsp;			// Continue
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return ports;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private List&lt;BoundChannel&gt; extractChannels() {
+<b class="nc">&nbsp;		Field channelsField = ReflectionUtils.findField(Undertow.class, &quot;channels&quot;);</b>
+<b class="nc">&nbsp;		ReflectionUtils.makeAccessible(channelsField);</b>
+<b class="nc">&nbsp;		return (List&lt;BoundChannel&gt;) ReflectionUtils.getField(channelsField, this.undertow);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private UndertowWebServer.Port getPortFromChannel(BoundChannel channel) {
+<b class="nc">&nbsp;		SocketAddress socketAddress = channel.getLocalAddress();</b>
+<b class="nc">&nbsp;		if (socketAddress instanceof InetSocketAddress inetSocketAddress) {</b>
+<b class="nc">&nbsp;			Field sslField = ReflectionUtils.findField(channel.getClass(), &quot;ssl&quot;);</b>
+<b class="nc">&nbsp;			String protocol = (sslField != null) ? &quot;https&quot; : &quot;http&quot;;</b>
+<b class="nc">&nbsp;			return new UndertowWebServer.Port(inetSocketAddress.getPort(), protocol);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;UndertowWebServer.Port&gt; getConfiguredPorts() {
+<b class="nc">&nbsp;		List&lt;Port&gt; ports = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Object listener : extractListeners()) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Port port = getPortFromListener(listener);</b>
+<b class="nc">&nbsp;				if (port.getNumber() != 0) {</b>
+<b class="nc">&nbsp;					ports.add(port);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+&nbsp;				// Continue
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return ports;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private List&lt;Object&gt; extractListeners() {
+<b class="nc">&nbsp;		Field listenersField = ReflectionUtils.findField(Undertow.class, &quot;listeners&quot;);</b>
+<b class="nc">&nbsp;		ReflectionUtils.makeAccessible(listenersField);</b>
+<b class="nc">&nbsp;		return (List&lt;Object&gt;) ReflectionUtils.getField(listenersField, this.undertow);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private UndertowWebServer.Port getPortFromListener(Object listener) {
+<b class="nc">&nbsp;		Field typeField = ReflectionUtils.findField(listener.getClass(), &quot;type&quot;);</b>
+<b class="nc">&nbsp;		ReflectionUtils.makeAccessible(typeField);</b>
+<b class="nc">&nbsp;		String protocol = ReflectionUtils.getField(typeField, listener).toString();</b>
+<b class="nc">&nbsp;		Field portField = ReflectionUtils.findField(listener.getClass(), &quot;port&quot;);</b>
+<b class="nc">&nbsp;		ReflectionUtils.makeAccessible(portField);</b>
+<b class="nc">&nbsp;		int port = (Integer) ReflectionUtils.getField(portField, listener);</b>
+<b class="nc">&nbsp;		return new UndertowWebServer.Port(port, protocol);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void stop() throws WebServerException {
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			if (!this.started) {</b>
+<b class="nc">&nbsp;				return;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.started = false;</b>
+<b class="nc">&nbsp;			if (this.gracefulShutdown != null) {</b>
+<b class="nc">&nbsp;				notifyGracefulCallback(false);</b>
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				this.undertow.stop();</b>
+<b class="nc">&nbsp;				for (Closeable closeable : this.closeables) {</b>
+<b class="nc">&nbsp;					closeable.close();</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new WebServerException(&quot;Unable to stop Undertow&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getPort() {
+<b class="nc">&nbsp;		List&lt;Port&gt; ports = getActualPorts();</b>
+<b class="nc">&nbsp;		if (ports.isEmpty()) {</b>
+<b class="nc">&nbsp;			return -1;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ports.get(0).getNumber();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void shutDownGracefully(GracefulShutdownCallback callback) {
+<b class="nc">&nbsp;		if (this.gracefulShutdown == null) {</b>
+<b class="nc">&nbsp;			callback.shutdownComplete(GracefulShutdownResult.IMMEDIATE);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		logger.info(&quot;Commencing graceful shutdown. Waiting for active requests to complete&quot;);</b>
+<b class="nc">&nbsp;		this.gracefulShutdownCallback.set(callback);</b>
+<b class="nc">&nbsp;		this.gracefulShutdown.shutdown();</b>
+<b class="nc">&nbsp;		this.gracefulShutdown.addShutdownListener(this::notifyGracefulCallback);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void notifyGracefulCallback(boolean success) {
+<b class="nc">&nbsp;		GracefulShutdownCallback callback = this.gracefulShutdownCallback.getAndSet(null);</b>
+<b class="nc">&nbsp;		if (callback != null) {</b>
+<b class="nc">&nbsp;			if (success) {</b>
+<b class="nc">&nbsp;				logger.info(&quot;Graceful shutdown complete&quot;);</b>
+<b class="nc">&nbsp;				callback.shutdownComplete(GracefulShutdownResult.IDLE);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				logger.info(&quot;Graceful shutdown aborted with one or more requests still active&quot;);</b>
+<b class="nc">&nbsp;				callback.shutdownComplete(GracefulShutdownResult.REQUESTS_ACTIVE);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String getStartLogMessage() {
+<b class="nc">&nbsp;		return &quot;Undertow started on &quot; + getPortsDescription();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An active Undertow port.
+&nbsp;	 */
+&nbsp;	private static final class Port {
+&nbsp;
+&nbsp;		private final int number;
+&nbsp;
+&nbsp;		private final String protocol;
+&nbsp;
+<b class="nc">&nbsp;		private Port(int number, String protocol) {</b>
+<b class="nc">&nbsp;			this.number = number;</b>
+<b class="nc">&nbsp;			this.protocol = protocol;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		int getNumber() {
+<b class="nc">&nbsp;			return this.number;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean equals(Object obj) {
+<b class="nc">&nbsp;			if (this == obj) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (obj == null) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			UndertowWebServer.Port other = (UndertowWebServer.Port) obj;</b>
+<b class="nc">&nbsp;			return this.number == other.number;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int hashCode() {
+<b class="nc">&nbsp;			return this.number;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return this.number + &quot; (&quot; + this.protocol + &quot;)&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link HttpHandlerFactory} to wrap a closable.
+&nbsp;	 */
+&nbsp;	private static final class CloseableHttpHandlerFactory implements HttpHandlerFactory {
+&nbsp;
+&nbsp;		private final Closeable closeable;
+&nbsp;
+<b class="nc">&nbsp;		private CloseableHttpHandlerFactory(Closeable closeable) {</b>
+<b class="nc">&nbsp;			this.closeable = closeable;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public HttpHandler getHandler(HttpHandler next) {
+<b class="nc">&nbsp;			if (this.closeable == null) {</b>
+<b class="nc">&nbsp;				return next;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new CloseableHttpHandler() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public void handleRequest(HttpServerExchange exchange) throws Exception {
+<b class="nc">&nbsp;					next.handleRequest(exchange);</b>
+&nbsp;				}
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public void close() throws IOException {
+<b class="nc">&nbsp;					CloseableHttpHandlerFactory.this.closeable.close();</b>
+&nbsp;				}
+&nbsp;
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Closeable} {@link HttpHandler}.
+&nbsp;	 */
+&nbsp;	private interface CloseableHttpHandler extends HttpHandler, Closeable {
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link RuntimeHintsRegistrar} that allows Undertow&#39;s configured and actual ports to
+&nbsp;	 * be retrieved at runtime in a native image.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class UndertowWebServerRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			hints.reflection()</b>
+<b class="nc">&nbsp;				.registerTypeIfPresent(classLoader, &quot;io.undertow.Undertow&quot;,</b>
+<b class="nc">&nbsp;						(hint) -&gt; hint.withField(&quot;listeners&quot;).withField(&quot;channels&quot;));</b>
+<b class="nc">&nbsp;			hints.reflection()</b>
+<b class="nc">&nbsp;				.registerTypeIfPresent(classLoader, &quot;io.undertow.Undertow$ListenerConfig&quot;,</b>
+<b class="nc">&nbsp;						(hint) -&gt; hint.withField(&quot;type&quot;).withField(&quot;port&quot;));</b>
+<b class="nc">&nbsp;			hints.reflection()</b>
+<b class="nc">&nbsp;				.registerTypeIfPresent(classLoader, &quot;io.undertow.protocols.ssl.UndertowAcceptingSslChannel&quot;,</b>
+<b class="nc">&nbsp;						(hint) -&gt; hint.withField(&quot;ssl&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,354 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DiscoveredJmxOperation</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.jmx.annotation</a>
+</div>
+
+<h1>Coverage Summary for Class: DiscoveredJmxOperation (org.springframework.boot.actuate.endpoint.jmx.annotation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DiscoveredJmxOperation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DiscoveredJmxOperation$DiscoveredJmxOperationParameter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DiscoveredJmxOperation$JmxType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.jmx.annotation;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.EndpointId;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.AbstractDiscoveredOperation;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.DiscoveredOperationMethod;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationInvoker;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationParameter;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationParameters;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.reflect.OperationMethod;
+&nbsp;import org.springframework.boot.actuate.endpoint.jmx.JmxOperation;
+&nbsp;import org.springframework.boot.actuate.endpoint.jmx.JmxOperationParameter;
+&nbsp;import org.springframework.core.style.ToStringCreator;
+&nbsp;import org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource;
+&nbsp;import org.springframework.jmx.export.metadata.JmxAttributeSource;
+&nbsp;import org.springframework.jmx.export.metadata.ManagedOperation;
+&nbsp;import org.springframework.jmx.export.metadata.ManagedOperationParameter;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A discovered {@link JmxOperation JMX operation}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class DiscoveredJmxOperation extends AbstractDiscoveredOperation implements JmxOperation {
+&nbsp;
+<b class="nc">&nbsp;	private static final JmxAttributeSource jmxAttributeSource = new AnnotationJmxAttributeSource();</b>
+&nbsp;
+&nbsp;	private final String name;
+&nbsp;
+&nbsp;	private final Class&lt;?&gt; outputType;
+&nbsp;
+&nbsp;	private final String description;
+&nbsp;
+&nbsp;	private final List&lt;JmxOperationParameter&gt; parameters;
+&nbsp;
+&nbsp;	DiscoveredJmxOperation(EndpointId endpointId, DiscoveredOperationMethod operationMethod, OperationInvoker invoker) {
+<b class="nc">&nbsp;		super(operationMethod, invoker);</b>
+<b class="nc">&nbsp;		Method method = operationMethod.getMethod();</b>
+<b class="nc">&nbsp;		this.name = method.getName();</b>
+<b class="nc">&nbsp;		this.outputType = JmxType.get(method.getReturnType());</b>
+<b class="nc">&nbsp;		this.description = getDescription(method, () -&gt; &quot;Invoke &quot; + this.name + &quot; for endpoint &quot; + endpointId);</b>
+<b class="nc">&nbsp;		this.parameters = getParameters(operationMethod);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getDescription(Method method, Supplier&lt;String&gt; fallback) {
+<b class="nc">&nbsp;		ManagedOperation managed = jmxAttributeSource.getManagedOperation(method);</b>
+<b class="nc">&nbsp;		if (managed != null &amp;&amp; StringUtils.hasText(managed.getDescription())) {</b>
+<b class="nc">&nbsp;			return managed.getDescription();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return fallback.get();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;JmxOperationParameter&gt; getParameters(OperationMethod operationMethod) {
+<b class="nc">&nbsp;		if (!operationMethod.getParameters().hasParameters()) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Method method = operationMethod.getMethod();</b>
+<b class="nc">&nbsp;		ManagedOperationParameter[] managed = jmxAttributeSource.getManagedOperationParameters(method);</b>
+<b class="nc">&nbsp;		if (managed.length == 0) {</b>
+<b class="nc">&nbsp;			Stream&lt;JmxOperationParameter&gt; parameters = operationMethod.getParameters()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.map(DiscoveredJmxOperationParameter::new);</b>
+<b class="nc">&nbsp;			return parameters.toList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return mergeParameters(operationMethod.getParameters(), managed);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;JmxOperationParameter&gt; mergeParameters(OperationParameters operationParameters,
+&nbsp;			ManagedOperationParameter[] managedParameters) {
+<b class="nc">&nbsp;		List&lt;JmxOperationParameter&gt; merged = new ArrayList&lt;&gt;(managedParameters.length);</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; managedParameters.length; i++) {</b>
+<b class="nc">&nbsp;			merged.add(new DiscoveredJmxOperationParameter(managedParameters[i], operationParameters.get(i)));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.unmodifiableList(merged);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;?&gt; getOutputType() {
+<b class="nc">&nbsp;		return this.outputType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getDescription() {
+<b class="nc">&nbsp;		return this.description;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public List&lt;JmxOperationParameter&gt; getParameters() {
+<b class="nc">&nbsp;		return this.parameters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void appendFields(ToStringCreator creator) {
+<b class="nc">&nbsp;		creator.append(&quot;name&quot;, this.name)</b>
+<b class="nc">&nbsp;			.append(&quot;outputType&quot;, this.outputType)</b>
+<b class="nc">&nbsp;			.append(&quot;description&quot;, this.description)</b>
+<b class="nc">&nbsp;			.append(&quot;parameters&quot;, this.parameters);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A discovered {@link JmxOperationParameter}.
+&nbsp;	 */
+&nbsp;	private static class DiscoveredJmxOperationParameter implements JmxOperationParameter {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final Class&lt;?&gt; type;
+&nbsp;
+&nbsp;		private final String description;
+&nbsp;
+<b class="nc">&nbsp;		DiscoveredJmxOperationParameter(OperationParameter operationParameter) {</b>
+<b class="nc">&nbsp;			this.name = operationParameter.getName();</b>
+<b class="nc">&nbsp;			this.type = JmxType.get(operationParameter.getType());</b>
+<b class="nc">&nbsp;			this.description = null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		DiscoveredJmxOperationParameter(ManagedOperationParameter managedParameter,
+<b class="nc">&nbsp;				OperationParameter operationParameter) {</b>
+<b class="nc">&nbsp;			this.name = managedParameter.getName();</b>
+<b class="nc">&nbsp;			this.type = JmxType.get(operationParameter.getType());</b>
+<b class="nc">&nbsp;			this.description = managedParameter.getDescription();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getName() {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Class&lt;?&gt; getType() {
+<b class="nc">&nbsp;			return this.type;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getDescription() {
+<b class="nc">&nbsp;			return this.description;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			StringBuilder result = new StringBuilder(this.name);</b>
+<b class="nc">&nbsp;			if (this.description != null) {</b>
+<b class="nc">&nbsp;				result.append(&quot; (&quot;).append(this.description).append(&quot;)&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			result.append(&quot;:&quot;).append(this.type);</b>
+<b class="nc">&nbsp;			return result.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility to convert to JMX supported types.
+&nbsp;	 */
+&nbsp;	private static final class JmxType {
+&nbsp;
+&nbsp;		static Class&lt;?&gt; get(Class&lt;?&gt; source) {
+<b class="nc">&nbsp;			if (source.isEnum()) {</b>
+<b class="nc">&nbsp;				return String.class;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (Date.class.isAssignableFrom(source) || Instant.class.isAssignableFrom(source)) {</b>
+<b class="nc">&nbsp;				return String.class;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (source.getName().startsWith(&quot;java.&quot;)) {</b>
+<b class="nc">&nbsp;				return source;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (source.equals(Void.TYPE)) {</b>
+<b class="nc">&nbsp;				return source;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return Object.class;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

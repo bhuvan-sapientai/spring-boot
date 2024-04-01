@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IncludeExcludeGroupMemberPredicate</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.health</a>
+</div>
+
+<h1>Coverage Summary for Class: IncludeExcludeGroupMemberPredicate (org.springframework.boot.actuate.autoconfigure.health)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IncludeExcludeGroupMemberPredicate</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.health;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;/**
+&nbsp; * Member predicate that matches based on {@code include} and {@code exclude} sets.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class IncludeExcludeGroupMemberPredicate implements Predicate&lt;String&gt; {
+&nbsp;
+&nbsp;	private final Set&lt;String&gt; include;
+&nbsp;
+&nbsp;	private final Set&lt;String&gt; exclude;
+&nbsp;
+<b class="nc">&nbsp;	IncludeExcludeGroupMemberPredicate(Set&lt;String&gt; include, Set&lt;String&gt; exclude) {</b>
+<b class="nc">&nbsp;		this.include = clean(include);</b>
+<b class="nc">&nbsp;		this.exclude = clean(exclude);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean test(String name) {
+<b class="nc">&nbsp;		name = clean(name);</b>
+<b class="nc">&nbsp;		return isIncluded(name) &amp;&amp; !isExcluded(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isIncluded(String name) {
+<b class="nc">&nbsp;		return this.include.isEmpty() || this.include.contains(&quot;*&quot;) || isIncludedName(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isIncludedName(String name) {
+<b class="nc">&nbsp;		if (this.include.contains(name)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (name.contains(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			String parent = name.substring(0, name.lastIndexOf(&quot;/&quot;));</b>
+<b class="nc">&nbsp;			return isIncludedName(parent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isExcluded(String name) {
+<b class="nc">&nbsp;		return this.exclude.contains(&quot;*&quot;) || isExcludedName(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isExcludedName(String name) {
+<b class="nc">&nbsp;		if (this.exclude.contains(name)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (name.contains(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			String parent = name.substring(0, name.lastIndexOf(&quot;/&quot;));</b>
+<b class="nc">&nbsp;			return isExcludedName(parent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Set&lt;String&gt; clean(Set&lt;String&gt; names) {
+<b class="nc">&nbsp;		if (names == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptySet();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Set&lt;String&gt; cleaned = names.stream().map(this::clean).collect(Collectors.toCollection(LinkedHashSet::new));</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableSet(cleaned);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String clean(String name) {
+<b class="nc">&nbsp;		return (name != null) ? name.trim() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

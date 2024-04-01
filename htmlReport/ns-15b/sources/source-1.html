@@ -1,0 +1,250 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Configurations</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.annotation</a>
+</div>
+
+<h1>Coverage Summary for Class: Configurations (org.springframework.boot.context.annotation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Configurations</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (4/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25.9%
+  </span>
+  <span class="absValue">
+    (7/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.annotation;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.ImportSelector;
+&nbsp;import org.springframework.core.OrderComparator;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.test.context.junit4.SpringRunner;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A set of {@link Configuration @Configuration} classes that can be registered in
+&nbsp; * {@link ApplicationContext}. Classes can be returned from one or more
+&nbsp; * {@link Configurations} instances by using {@link #getClasses(Configurations[])}. The
+&nbsp; * resulting array follows the ordering rules usually applied by the
+&nbsp; * {@link ApplicationContext} and/or custom {@link ImportSelector} implementations.
+&nbsp; * &lt;p&gt;
+&nbsp; * This class is primarily intended for use with tests that need to specify configuration
+&nbsp; * classes but can&#39;t use {@link SpringRunner}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementations of this class should be annotated with {@link Order @Order} or
+&nbsp; * implement {@link Ordered}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; * @see UserConfigurations
+&nbsp; */
+&nbsp;public abstract class Configurations {
+&nbsp;
+<b class="fc">&nbsp;	private static final Comparator&lt;Object&gt; COMPARATOR = OrderComparator.INSTANCE</b>
+<b class="fc">&nbsp;		.thenComparing((other) -&gt; other.getClass().getName());</b>
+&nbsp;
+&nbsp;	private final Set&lt;Class&lt;?&gt;&gt; classes;
+&nbsp;
+<b class="fc">&nbsp;	protected Configurations(Collection&lt;Class&lt;?&gt;&gt; classes) {</b>
+<b class="fc">&nbsp;		Assert.notNull(classes, &quot;Classes must not be null&quot;);</b>
+<b class="fc">&nbsp;		Collection&lt;Class&lt;?&gt;&gt; sorted = sort(classes);</b>
+<b class="fc">&nbsp;		this.classes = Collections.unmodifiableSet(new LinkedHashSet&lt;&gt;(sorted));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sort configuration classes into the order that they should be applied.
+&nbsp;	 * @param classes the classes to sort
+&nbsp;	 * @return a sorted set of classes
+&nbsp;	 */
+&nbsp;	protected Collection&lt;Class&lt;?&gt;&gt; sort(Collection&lt;Class&lt;?&gt;&gt; classes) {
+<b class="fc">&nbsp;		return classes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final Set&lt;Class&lt;?&gt;&gt; getClasses() {
+<b class="nc">&nbsp;		return this.classes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Merge configurations from another source of the same type.
+&nbsp;	 * @param other the other {@link Configurations} (must be of the same type as this
+&nbsp;	 * instance)
+&nbsp;	 * @return a new configurations instance (must be of the same type as this instance)
+&nbsp;	 */
+&nbsp;	protected Configurations merge(Configurations other) {
+<b class="nc">&nbsp;		Set&lt;Class&lt;?&gt;&gt; mergedClasses = new LinkedHashSet&lt;&gt;(getClasses());</b>
+<b class="nc">&nbsp;		mergedClasses.addAll(other.getClasses());</b>
+<b class="nc">&nbsp;		return merge(mergedClasses);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Merge configurations.
+&nbsp;	 * @param mergedClasses the merged classes
+&nbsp;	 * @return a new configurations instance (must be of the same type as this instance)
+&nbsp;	 */
+&nbsp;	protected abstract Configurations merge(Set&lt;Class&lt;?&gt;&gt; mergedClasses);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the classes from all the specified configurations in the order that they
+&nbsp;	 * would be registered.
+&nbsp;	 * @param configurations the source configuration
+&nbsp;	 * @return configuration classes in registration order
+&nbsp;	 */
+&nbsp;	public static Class&lt;?&gt;[] getClasses(Configurations... configurations) {
+<b class="nc">&nbsp;		return getClasses(Arrays.asList(configurations));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the classes from all the specified configurations in the order that they
+&nbsp;	 * would be registered.
+&nbsp;	 * @param configurations the source configuration
+&nbsp;	 * @return configuration classes in registration order
+&nbsp;	 */
+&nbsp;	public static Class&lt;?&gt;[] getClasses(Collection&lt;Configurations&gt; configurations) {
+<b class="nc">&nbsp;		List&lt;Configurations&gt; ordered = new ArrayList&lt;&gt;(configurations);</b>
+<b class="nc">&nbsp;		ordered.sort(COMPARATOR);</b>
+<b class="nc">&nbsp;		List&lt;Configurations&gt; collated = collate(ordered);</b>
+<b class="nc">&nbsp;		LinkedHashSet&lt;Class&lt;?&gt;&gt; classes = collated.stream()</b>
+<b class="nc">&nbsp;			.flatMap(Configurations::streamClasses)</b>
+<b class="nc">&nbsp;			.collect(Collectors.toCollection(LinkedHashSet::new));</b>
+<b class="nc">&nbsp;		return ClassUtils.toClassArray(classes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Stream&lt;Class&lt;?&gt;&gt; streamClasses(Configurations configurations) {
+<b class="nc">&nbsp;		return configurations.getClasses().stream();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;Configurations&gt; collate(List&lt;Configurations&gt; orderedConfigurations) {
+<b class="nc">&nbsp;		LinkedList&lt;Configurations&gt; collated = new LinkedList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Configurations item : orderedConfigurations) {</b>
+<b class="nc">&nbsp;			if (collated.isEmpty() || collated.getLast().getClass() != item.getClass()) {</b>
+<b class="nc">&nbsp;				collated.add(item);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				collated.set(collated.size() - 1, collated.getLast().merge(item));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return collated;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

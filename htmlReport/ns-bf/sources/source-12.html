@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OnPropertyCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: OnPropertyCondition (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OnPropertyCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OnPropertyCondition$Spec</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage.Style;
+&nbsp;import org.springframework.context.annotation.Condition;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.AnnotationAttributes;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotationPredicates;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.env.PropertyResolver;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Condition} that checks if properties are defined in environment.
+&nbsp; *
+&nbsp; * @author Maciej Walkowiak
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @see ConditionalOnProperty
+&nbsp; */
+&nbsp;@Order(Ordered.HIGHEST_PRECEDENCE + 40)
+<b class="nc">&nbsp;class OnPropertyCondition extends SpringBootCondition {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		List&lt;AnnotationAttributes&gt; allAnnotationAttributes = metadata.getAnnotations()</b>
+<b class="nc">&nbsp;			.stream(ConditionalOnProperty.class.getName())</b>
+<b class="nc">&nbsp;			.filter(MergedAnnotationPredicates.unique(MergedAnnotation::getMetaTypes))</b>
+<b class="nc">&nbsp;			.map(MergedAnnotation::asAnnotationAttributes)</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		List&lt;ConditionMessage&gt; noMatch = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		List&lt;ConditionMessage&gt; match = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (AnnotationAttributes annotationAttributes : allAnnotationAttributes) {</b>
+<b class="nc">&nbsp;			ConditionOutcome outcome = determineOutcome(annotationAttributes, context.getEnvironment());</b>
+<b class="nc">&nbsp;			(outcome.isMatch() ? match : noMatch).add(outcome.getConditionMessage());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (!noMatch.isEmpty()) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome.noMatch(ConditionMessage.of(noMatch));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConditionOutcome.match(ConditionMessage.of(match));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConditionOutcome determineOutcome(AnnotationAttributes annotationAttributes, PropertyResolver resolver) {
+<b class="nc">&nbsp;		Spec spec = new Spec(annotationAttributes);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; missingProperties = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		List&lt;String&gt; nonMatchingProperties = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		spec.collectProperties(resolver, missingProperties, nonMatchingProperties);</b>
+<b class="nc">&nbsp;		if (!missingProperties.isEmpty()) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnProperty.class, spec)</b>
+<b class="nc">&nbsp;				.didNotFind(&quot;property&quot;, &quot;properties&quot;)</b>
+<b class="nc">&nbsp;				.items(Style.QUOTE, missingProperties));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!nonMatchingProperties.isEmpty()) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnProperty.class, spec)</b>
+<b class="nc">&nbsp;				.found(&quot;different value in property&quot;, &quot;different value in properties&quot;)</b>
+<b class="nc">&nbsp;				.items(Style.QUOTE, nonMatchingProperties));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConditionOutcome</b>
+<b class="nc">&nbsp;			.match(ConditionMessage.forCondition(ConditionalOnProperty.class, spec).because(&quot;matched&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class Spec {
+&nbsp;
+&nbsp;		private final String prefix;
+&nbsp;
+&nbsp;		private final String havingValue;
+&nbsp;
+&nbsp;		private final String[] names;
+&nbsp;
+&nbsp;		private final boolean matchIfMissing;
+&nbsp;
+<b class="nc">&nbsp;		Spec(AnnotationAttributes annotationAttributes) {</b>
+<b class="nc">&nbsp;			String prefix = annotationAttributes.getString(&quot;prefix&quot;).trim();</b>
+<b class="nc">&nbsp;			if (StringUtils.hasText(prefix) &amp;&amp; !prefix.endsWith(&quot;.&quot;)) {</b>
+<b class="nc">&nbsp;				prefix = prefix + &quot;.&quot;;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.prefix = prefix;</b>
+<b class="nc">&nbsp;			this.havingValue = annotationAttributes.getString(&quot;havingValue&quot;);</b>
+<b class="nc">&nbsp;			this.names = getNames(annotationAttributes);</b>
+<b class="nc">&nbsp;			this.matchIfMissing = annotationAttributes.getBoolean(&quot;matchIfMissing&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String[] getNames(Map&lt;String, Object&gt; annotationAttributes) {
+<b class="nc">&nbsp;			String[] value = (String[]) annotationAttributes.get(&quot;value&quot;);</b>
+<b class="nc">&nbsp;			String[] name = (String[]) annotationAttributes.get(&quot;name&quot;);</b>
+<b class="nc">&nbsp;			Assert.state(value.length &gt; 0 || name.length &gt; 0,</b>
+&nbsp;					&quot;The name or value attribute of @ConditionalOnProperty must be specified&quot;);
+<b class="nc">&nbsp;			Assert.state(value.length == 0 || name.length == 0,</b>
+&nbsp;					&quot;The name and value attributes of @ConditionalOnProperty are exclusive&quot;);
+<b class="nc">&nbsp;			return (value.length &gt; 0) ? value : name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void collectProperties(PropertyResolver resolver, List&lt;String&gt; missing, List&lt;String&gt; nonMatching) {
+<b class="nc">&nbsp;			for (String name : this.names) {</b>
+<b class="nc">&nbsp;				String key = this.prefix + name;</b>
+<b class="nc">&nbsp;				if (resolver.containsProperty(key)) {</b>
+<b class="nc">&nbsp;					if (!isMatch(resolver.getProperty(key), this.havingValue)) {</b>
+<b class="nc">&nbsp;						nonMatching.add(name);</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					if (!this.matchIfMissing) {</b>
+<b class="nc">&nbsp;						missing.add(name);</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isMatch(String value, String requiredValue) {
+<b class="nc">&nbsp;			if (StringUtils.hasLength(requiredValue)) {</b>
+<b class="nc">&nbsp;				return requiredValue.equalsIgnoreCase(value);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return !&quot;false&quot;.equalsIgnoreCase(value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			StringBuilder result = new StringBuilder();</b>
+<b class="nc">&nbsp;			result.append(&quot;(&quot;);</b>
+<b class="nc">&nbsp;			result.append(this.prefix);</b>
+<b class="nc">&nbsp;			if (this.names.length == 1) {</b>
+<b class="nc">&nbsp;				result.append(this.names[0]);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				result.append(&quot;[&quot;);</b>
+<b class="nc">&nbsp;				result.append(StringUtils.arrayToCommaDelimitedString(this.names));</b>
+<b class="nc">&nbsp;				result.append(&quot;]&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (StringUtils.hasLength(this.havingValue)) {</b>
+<b class="nc">&nbsp;				result.append(&quot;=&quot;).append(this.havingValue);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			result.append(&quot;)&quot;);</b>
+<b class="nc">&nbsp;			return result.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

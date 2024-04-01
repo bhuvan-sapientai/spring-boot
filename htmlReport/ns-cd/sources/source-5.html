@@ -1,0 +1,371 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RedisConnectionConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.data.redis</a>
+</div>
+
+<h1>Coverage Summary for Class: RedisConnectionConfiguration (org.springframework.boot.autoconfigure.data.redis)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RedisConnectionConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/79)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RedisConnectionConfiguration$ConnectionInfo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.data.redis;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.data.redis.RedisConnectionDetails.Cluster;
+&nbsp;import org.springframework.boot.autoconfigure.data.redis.RedisConnectionDetails.Node;
+&nbsp;import org.springframework.boot.autoconfigure.data.redis.RedisConnectionDetails.Sentinel;
+&nbsp;import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Pool;
+&nbsp;import org.springframework.boot.ssl.SslBundles;
+&nbsp;import org.springframework.data.redis.connection.RedisClusterConfiguration;
+&nbsp;import org.springframework.data.redis.connection.RedisNode;
+&nbsp;import org.springframework.data.redis.connection.RedisPassword;
+&nbsp;import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+&nbsp;import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base Redis connection configuration.
+&nbsp; *
+&nbsp; * @author Mark Paluch
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Alen Turkovic
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;abstract class RedisConnectionConfiguration {
+&nbsp;
+<b class="nc">&nbsp;	private static final boolean COMMONS_POOL2_AVAILABLE = ClassUtils.isPresent(&quot;org.apache.commons.pool2.ObjectPool&quot;,</b>
+<b class="nc">&nbsp;			RedisConnectionConfiguration.class.getClassLoader());</b>
+&nbsp;
+&nbsp;	private final RedisProperties properties;
+&nbsp;
+&nbsp;	private final RedisStandaloneConfiguration standaloneConfiguration;
+&nbsp;
+&nbsp;	private final RedisSentinelConfiguration sentinelConfiguration;
+&nbsp;
+&nbsp;	private final RedisClusterConfiguration clusterConfiguration;
+&nbsp;
+&nbsp;	private final RedisConnectionDetails connectionDetails;
+&nbsp;
+&nbsp;	private final SslBundles sslBundles;
+&nbsp;
+&nbsp;	protected RedisConnectionConfiguration(RedisProperties properties, RedisConnectionDetails connectionDetails,
+&nbsp;			ObjectProvider&lt;RedisStandaloneConfiguration&gt; standaloneConfigurationProvider,
+&nbsp;			ObjectProvider&lt;RedisSentinelConfiguration&gt; sentinelConfigurationProvider,
+&nbsp;			ObjectProvider&lt;RedisClusterConfiguration&gt; clusterConfigurationProvider,
+<b class="nc">&nbsp;			ObjectProvider&lt;SslBundles&gt; sslBundles) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+<b class="nc">&nbsp;		this.standaloneConfiguration = standaloneConfigurationProvider.getIfAvailable();</b>
+<b class="nc">&nbsp;		this.sentinelConfiguration = sentinelConfigurationProvider.getIfAvailable();</b>
+<b class="nc">&nbsp;		this.clusterConfiguration = clusterConfigurationProvider.getIfAvailable();</b>
+<b class="nc">&nbsp;		this.connectionDetails = connectionDetails;</b>
+<b class="nc">&nbsp;		this.sslBundles = sslBundles.getIfAvailable();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final RedisStandaloneConfiguration getStandaloneConfig() {
+<b class="nc">&nbsp;		if (this.standaloneConfiguration != null) {</b>
+<b class="nc">&nbsp;			return this.standaloneConfiguration;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();</b>
+<b class="nc">&nbsp;		config.setHostName(this.connectionDetails.getStandalone().getHost());</b>
+<b class="nc">&nbsp;		config.setPort(this.connectionDetails.getStandalone().getPort());</b>
+<b class="nc">&nbsp;		config.setUsername(this.connectionDetails.getUsername());</b>
+<b class="nc">&nbsp;		config.setPassword(RedisPassword.of(this.connectionDetails.getPassword()));</b>
+<b class="nc">&nbsp;		config.setDatabase(this.connectionDetails.getStandalone().getDatabase());</b>
+<b class="nc">&nbsp;		return config;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final RedisSentinelConfiguration getSentinelConfig() {
+<b class="nc">&nbsp;		if (this.sentinelConfiguration != null) {</b>
+<b class="nc">&nbsp;			return this.sentinelConfiguration;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.connectionDetails.getSentinel() != null) {</b>
+<b class="nc">&nbsp;			RedisSentinelConfiguration config = new RedisSentinelConfiguration();</b>
+<b class="nc">&nbsp;			config.master(this.connectionDetails.getSentinel().getMaster());</b>
+<b class="nc">&nbsp;			config.setSentinels(createSentinels(this.connectionDetails.getSentinel()));</b>
+<b class="nc">&nbsp;			config.setUsername(this.connectionDetails.getUsername());</b>
+<b class="nc">&nbsp;			String password = this.connectionDetails.getPassword();</b>
+<b class="nc">&nbsp;			if (password != null) {</b>
+<b class="nc">&nbsp;				config.setPassword(RedisPassword.of(password));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			config.setSentinelUsername(this.connectionDetails.getSentinel().getUsername());</b>
+<b class="nc">&nbsp;			String sentinelPassword = this.connectionDetails.getSentinel().getPassword();</b>
+<b class="nc">&nbsp;			if (sentinelPassword != null) {</b>
+<b class="nc">&nbsp;				config.setSentinelPassword(RedisPassword.of(sentinelPassword));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			config.setDatabase(this.connectionDetails.getSentinel().getDatabase());</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link RedisClusterConfiguration} if necessary.
+&nbsp;	 * @return {@literal null} if no cluster settings are set.
+&nbsp;	 */
+&nbsp;	protected final RedisClusterConfiguration getClusterConfiguration() {
+<b class="nc">&nbsp;		if (this.clusterConfiguration != null) {</b>
+<b class="nc">&nbsp;			return this.clusterConfiguration;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		RedisProperties.Cluster clusterProperties = this.properties.getCluster();</b>
+<b class="nc">&nbsp;		if (this.connectionDetails.getCluster() != null) {</b>
+<b class="nc">&nbsp;			RedisClusterConfiguration config = new RedisClusterConfiguration(</b>
+<b class="nc">&nbsp;					getNodes(this.connectionDetails.getCluster()));</b>
+<b class="nc">&nbsp;			if (clusterProperties != null &amp;&amp; clusterProperties.getMaxRedirects() != null) {</b>
+<b class="nc">&nbsp;				config.setMaxRedirects(clusterProperties.getMaxRedirects());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			config.setUsername(this.connectionDetails.getUsername());</b>
+<b class="nc">&nbsp;			String password = this.connectionDetails.getPassword();</b>
+<b class="nc">&nbsp;			if (password != null) {</b>
+<b class="nc">&nbsp;				config.setPassword(RedisPassword.of(password));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; getNodes(Cluster cluster) {
+<b class="nc">&nbsp;		return cluster.getNodes().stream().map((node) -&gt; &quot;%s:%d&quot;.formatted(node.host(), node.port())).toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final RedisProperties getProperties() {
+<b class="nc">&nbsp;		return this.properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected SslBundles getSslBundles() {
+<b class="nc">&nbsp;		return this.sslBundles;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected boolean isSslEnabled() {
+<b class="nc">&nbsp;		return getProperties().getSsl().isEnabled();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected boolean isPoolEnabled(Pool pool) {
+<b class="nc">&nbsp;		Boolean enabled = pool.getEnabled();</b>
+<b class="nc">&nbsp;		return (enabled != null) ? enabled : COMMONS_POOL2_AVAILABLE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;RedisNode&gt; createSentinels(Sentinel sentinel) {
+<b class="nc">&nbsp;		List&lt;RedisNode&gt; nodes = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Node node : sentinel.getNodes()) {</b>
+<b class="nc">&nbsp;			nodes.add(new RedisNode(node.host(), node.port()));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return nodes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final boolean urlUsesSsl() {
+<b class="nc">&nbsp;		return parseUrl(this.properties.getUrl()).isUseSsl();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final RedisConnectionDetails getConnectionDetails() {
+<b class="nc">&nbsp;		return this.connectionDetails;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static ConnectionInfo parseUrl(String url) {
+&nbsp;		try {
+<b class="nc">&nbsp;			URI uri = new URI(url);</b>
+<b class="nc">&nbsp;			String scheme = uri.getScheme();</b>
+<b class="nc">&nbsp;			if (!&quot;redis&quot;.equals(scheme) &amp;&amp; !&quot;rediss&quot;.equals(scheme)) {</b>
+<b class="nc">&nbsp;				throw new RedisUrlSyntaxException(url);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			boolean useSsl = (&quot;rediss&quot;.equals(scheme));</b>
+<b class="nc">&nbsp;			String username = null;</b>
+<b class="nc">&nbsp;			String password = null;</b>
+<b class="nc">&nbsp;			if (uri.getUserInfo() != null) {</b>
+<b class="nc">&nbsp;				String candidate = uri.getUserInfo();</b>
+<b class="nc">&nbsp;				int index = candidate.indexOf(&#39;:&#39;);</b>
+<b class="nc">&nbsp;				if (index &gt;= 0) {</b>
+<b class="nc">&nbsp;					username = candidate.substring(0, index);</b>
+<b class="nc">&nbsp;					password = candidate.substring(index + 1);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					password = candidate;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return new ConnectionInfo(uri, useSsl, username, password);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (URISyntaxException ex) {</b>
+<b class="nc">&nbsp;			throw new RedisUrlSyntaxException(url, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	static class ConnectionInfo {
+&nbsp;
+&nbsp;		private final URI uri;
+&nbsp;
+&nbsp;		private final boolean useSsl;
+&nbsp;
+&nbsp;		private final String username;
+&nbsp;
+&nbsp;		private final String password;
+&nbsp;
+<b class="nc">&nbsp;		ConnectionInfo(URI uri, boolean useSsl, String username, String password) {</b>
+<b class="nc">&nbsp;			this.uri = uri;</b>
+<b class="nc">&nbsp;			this.useSsl = useSsl;</b>
+<b class="nc">&nbsp;			this.username = username;</b>
+<b class="nc">&nbsp;			this.password = password;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		URI getUri() {
+<b class="nc">&nbsp;			return this.uri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isUseSsl() {
+<b class="nc">&nbsp;			return this.useSsl;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getUsername() {
+<b class="nc">&nbsp;			return this.username;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getPassword() {
+<b class="nc">&nbsp;			return this.password;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

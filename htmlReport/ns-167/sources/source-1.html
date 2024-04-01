@@ -1,0 +1,403 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApplicationConversionService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.convert</a>
+</div>
+
+<h1>Coverage Summary for Class: ApplicationConversionService (org.springframework.boot.convert)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApplicationConversionService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.6%
+  </span>
+  <span class="absValue">
+    (16/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.8%
+  </span>
+  <span class="absValue">
+    (59/94)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.convert;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.core.convert.ConversionService;
+&nbsp;import org.springframework.core.convert.TypeDescriptor;
+&nbsp;import org.springframework.core.convert.converter.Converter;
+&nbsp;import org.springframework.core.convert.converter.ConverterFactory;
+&nbsp;import org.springframework.core.convert.converter.ConverterRegistry;
+&nbsp;import org.springframework.core.convert.converter.GenericConverter;
+&nbsp;import org.springframework.core.convert.converter.GenericConverter.ConvertiblePair;
+&nbsp;import org.springframework.core.convert.support.ConfigurableConversionService;
+&nbsp;import org.springframework.core.convert.support.DefaultConversionService;
+&nbsp;import org.springframework.format.AnnotationFormatterFactory;
+&nbsp;import org.springframework.format.Formatter;
+&nbsp;import org.springframework.format.FormatterRegistry;
+&nbsp;import org.springframework.format.Parser;
+&nbsp;import org.springframework.format.Printer;
+&nbsp;import org.springframework.format.support.DefaultFormattingConversionService;
+&nbsp;import org.springframework.format.support.FormattingConversionService;
+&nbsp;import org.springframework.util.StringValueResolver;
+&nbsp;
+&nbsp;/**
+&nbsp; * A specialization of {@link FormattingConversionService} configured by default with
+&nbsp; * converters and formatters appropriate for most Spring Boot applications.
+&nbsp; * &lt;p&gt;
+&nbsp; * Designed for direct instantiation but also exposes the static
+&nbsp; * {@link #addApplicationConverters} and
+&nbsp; * {@link #addApplicationFormatters(FormatterRegistry)} utility methods for ad-hoc use
+&nbsp; * against registry instance.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class ApplicationConversionService extends FormattingConversionService {
+&nbsp;
+&nbsp;	private static volatile ApplicationConversionService sharedInstance;
+&nbsp;
+&nbsp;	private final boolean unmodifiable;
+&nbsp;
+&nbsp;	public ApplicationConversionService() {
+<b class="nc">&nbsp;		this(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public ApplicationConversionService(StringValueResolver embeddedValueResolver) {
+<b class="nc">&nbsp;		this(embeddedValueResolver, false);</b>
+&nbsp;	}
+&nbsp;
+<b class="fc">&nbsp;	private ApplicationConversionService(StringValueResolver embeddedValueResolver, boolean unmodifiable) {</b>
+<b class="fc">&nbsp;		if (embeddedValueResolver != null) {</b>
+<b class="nc">&nbsp;			setEmbeddedValueResolver(embeddedValueResolver);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		configure(this);</b>
+<b class="fc">&nbsp;		this.unmodifiable = unmodifiable;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addPrinter(Printer&lt;?&gt; printer) {
+<b class="nc">&nbsp;		assertModifiable();</b>
+<b class="nc">&nbsp;		super.addPrinter(printer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addParser(Parser&lt;?&gt; parser) {
+<b class="nc">&nbsp;		assertModifiable();</b>
+<b class="nc">&nbsp;		super.addParser(parser);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addFormatter(Formatter&lt;?&gt; formatter) {
+<b class="fc">&nbsp;		assertModifiable();</b>
+<b class="fc">&nbsp;		super.addFormatter(formatter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addFormatterForFieldType(Class&lt;?&gt; fieldType, Formatter&lt;?&gt; formatter) {
+<b class="fc">&nbsp;		assertModifiable();</b>
+<b class="fc">&nbsp;		super.addFormatterForFieldType(fieldType, formatter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addConverter(Converter&lt;?, ?&gt; converter) {
+<b class="fc">&nbsp;		assertModifiable();</b>
+<b class="fc">&nbsp;		super.addConverter(converter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addFormatterForFieldType(Class&lt;?&gt; fieldType, Printer&lt;?&gt; printer, Parser&lt;?&gt; parser) {
+<b class="fc">&nbsp;		assertModifiable();</b>
+<b class="fc">&nbsp;		super.addFormatterForFieldType(fieldType, printer, parser);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addFormatterForFieldAnnotation(
+&nbsp;			AnnotationFormatterFactory&lt;? extends Annotation&gt; annotationFormatterFactory) {
+<b class="fc">&nbsp;		assertModifiable();</b>
+<b class="fc">&nbsp;		super.addFormatterForFieldAnnotation(annotationFormatterFactory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;S, T&gt; void addConverter(Class&lt;S&gt; sourceType, Class&lt;T&gt; targetType,
+&nbsp;			Converter&lt;? super S, ? extends T&gt; converter) {
+<b class="fc">&nbsp;		assertModifiable();</b>
+<b class="fc">&nbsp;		super.addConverter(sourceType, targetType, converter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addConverter(GenericConverter converter) {
+<b class="fc">&nbsp;		assertModifiable();</b>
+<b class="fc">&nbsp;		super.addConverter(converter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addConverterFactory(ConverterFactory&lt;?, ?&gt; factory) {
+<b class="fc">&nbsp;		assertModifiable();</b>
+<b class="fc">&nbsp;		super.addConverterFactory(factory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void removeConvertible(Class&lt;?&gt; sourceType, Class&lt;?&gt; targetType) {
+<b class="nc">&nbsp;		assertModifiable();</b>
+<b class="nc">&nbsp;		super.removeConvertible(sourceType, targetType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertModifiable() {
+<b class="fc">&nbsp;		if (this.unmodifiable) {</b>
+<b class="nc">&nbsp;			throw new UnsupportedOperationException(&quot;This ApplicationConversionService cannot be modified&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return {@code true} if objects of {@code sourceType} can be converted to the
+&nbsp;	 * {@code targetType} and the converter has {@code Object.class} as a supported source
+&nbsp;	 * type.
+&nbsp;	 * @param sourceType the source type to test
+&nbsp;	 * @param targetType the target type to test
+&nbsp;	 * @return if conversion happens through an {@code ObjectTo...} converter
+&nbsp;	 * @since 2.4.3
+&nbsp;	 */
+&nbsp;	public boolean isConvertViaObjectSourceType(TypeDescriptor sourceType, TypeDescriptor targetType) {
+<b class="nc">&nbsp;		GenericConverter converter = getConverter(sourceType, targetType);</b>
+<b class="nc">&nbsp;		Set&lt;ConvertiblePair&gt; pairs = (converter != null) ? converter.getConvertibleTypes() : null;</b>
+<b class="nc">&nbsp;		if (pairs != null) {</b>
+<b class="nc">&nbsp;			for (ConvertiblePair pair : pairs) {</b>
+<b class="nc">&nbsp;				if (Object.class.equals(pair.getSourceType())) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a shared default application {@code ConversionService} instance, lazily
+&nbsp;	 * building it once needed.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Note: This method actually returns an {@link ApplicationConversionService}
+&nbsp;	 * instance. However, the {@code ConversionService} signature has been preserved for
+&nbsp;	 * binary compatibility.
+&nbsp;	 * @return the shared {@code ApplicationConversionService} instance (never
+&nbsp;	 * {@code null})
+&nbsp;	 */
+&nbsp;	public static ConversionService getSharedInstance() {
+<b class="fc">&nbsp;		ApplicationConversionService sharedInstance = ApplicationConversionService.sharedInstance;</b>
+<b class="fc">&nbsp;		if (sharedInstance == null) {</b>
+<b class="fc">&nbsp;			synchronized (ApplicationConversionService.class) {</b>
+<b class="fc">&nbsp;				sharedInstance = ApplicationConversionService.sharedInstance;</b>
+<b class="fc">&nbsp;				if (sharedInstance == null) {</b>
+<b class="fc">&nbsp;					sharedInstance = new ApplicationConversionService(null, true);</b>
+<b class="fc">&nbsp;					ApplicationConversionService.sharedInstance = sharedInstance;</b>
+&nbsp;				}
+<b class="fc">&nbsp;			}</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return sharedInstance;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the given {@link FormatterRegistry} with formatters and converters
+&nbsp;	 * appropriate for most Spring Boot applications.
+&nbsp;	 * @param registry the registry of converters to add to (must also be castable to
+&nbsp;	 * ConversionService, e.g. being a {@link ConfigurableConversionService})
+&nbsp;	 * @throws ClassCastException if the given FormatterRegistry could not be cast to a
+&nbsp;	 * ConversionService
+&nbsp;	 */
+&nbsp;	public static void configure(FormatterRegistry registry) {
+<b class="fc">&nbsp;		DefaultConversionService.addDefaultConverters(registry);</b>
+<b class="fc">&nbsp;		DefaultFormattingConversionService.addDefaultFormatters(registry);</b>
+<b class="fc">&nbsp;		addApplicationFormatters(registry);</b>
+<b class="fc">&nbsp;		addApplicationConverters(registry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add converters useful for most Spring Boot applications.
+&nbsp;	 * @param registry the registry of converters to add to (must also be castable to
+&nbsp;	 * ConversionService, e.g. being a {@link ConfigurableConversionService})
+&nbsp;	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a
+&nbsp;	 * ConversionService
+&nbsp;	 */
+&nbsp;	public static void addApplicationConverters(ConverterRegistry registry) {
+<b class="fc">&nbsp;		addDelimitedStringConverters(registry);</b>
+<b class="fc">&nbsp;		registry.addConverter(new StringToDurationConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new DurationToStringConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new NumberToDurationConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new DurationToNumberConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new StringToPeriodConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new PeriodToStringConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new NumberToPeriodConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new StringToDataSizeConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new NumberToDataSizeConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new StringToFileConverter());</b>
+<b class="fc">&nbsp;		registry.addConverter(new InputStreamSourceToByteArrayConverter());</b>
+<b class="fc">&nbsp;		registry.addConverterFactory(new LenientStringToEnumConverterFactory());</b>
+<b class="fc">&nbsp;		registry.addConverterFactory(new LenientBooleanToEnumConverterFactory());</b>
+<b class="fc">&nbsp;		if (registry instanceof ConversionService conversionService) {</b>
+<b class="fc">&nbsp;			addApplicationConverters(registry, conversionService);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void addApplicationConverters(ConverterRegistry registry, ConversionService conversionService) {
+<b class="fc">&nbsp;		registry.addConverter(new CharSequenceToObjectConverter(conversionService));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add converters to support delimited strings.
+&nbsp;	 * @param registry the registry of converters to add to (must also be castable to
+&nbsp;	 * ConversionService, e.g. being a {@link ConfigurableConversionService})
+&nbsp;	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a
+&nbsp;	 * ConversionService
+&nbsp;	 */
+&nbsp;	public static void addDelimitedStringConverters(ConverterRegistry registry) {
+<b class="fc">&nbsp;		ConversionService service = (ConversionService) registry;</b>
+<b class="fc">&nbsp;		registry.addConverter(new ArrayToDelimitedStringConverter(service));</b>
+<b class="fc">&nbsp;		registry.addConverter(new CollectionToDelimitedStringConverter(service));</b>
+<b class="fc">&nbsp;		registry.addConverter(new DelimitedStringToArrayConverter(service));</b>
+<b class="fc">&nbsp;		registry.addConverter(new DelimitedStringToCollectionConverter(service));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add formatters useful for most Spring Boot applications.
+&nbsp;	 * @param registry the service to register default formatters with
+&nbsp;	 */
+&nbsp;	public static void addApplicationFormatters(FormatterRegistry registry) {
+<b class="fc">&nbsp;		registry.addFormatter(new CharArrayFormatter());</b>
+<b class="fc">&nbsp;		registry.addFormatter(new InetAddressFormatter());</b>
+<b class="fc">&nbsp;		registry.addFormatter(new IsoOffsetFormatter());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link GenericConverter}, {@link Converter}, {@link Printer}, {@link Parser}
+&nbsp;	 * and {@link Formatter} beans from the specified context.
+&nbsp;	 * @param registry the service to register beans with
+&nbsp;	 * @param beanFactory the bean factory to get the beans from
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public static void addBeans(FormatterRegistry registry, ListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;		Set&lt;Object&gt; beans = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		beans.addAll(beanFactory.getBeansOfType(GenericConverter.class).values());</b>
+<b class="nc">&nbsp;		beans.addAll(beanFactory.getBeansOfType(Converter.class).values());</b>
+<b class="nc">&nbsp;		beans.addAll(beanFactory.getBeansOfType(Printer.class).values());</b>
+<b class="nc">&nbsp;		beans.addAll(beanFactory.getBeansOfType(Parser.class).values());</b>
+<b class="nc">&nbsp;		for (Object bean : beans) {</b>
+<b class="nc">&nbsp;			if (bean instanceof GenericConverter) {</b>
+<b class="nc">&nbsp;				registry.addConverter((GenericConverter) bean);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (bean instanceof Converter) {</b>
+<b class="nc">&nbsp;				registry.addConverter((Converter&lt;?, ?&gt;) bean);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (bean instanceof Formatter) {</b>
+<b class="nc">&nbsp;				registry.addFormatter((Formatter&lt;?&gt;) bean);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (bean instanceof Printer) {</b>
+<b class="nc">&nbsp;				registry.addPrinter((Printer&lt;?&gt;) bean);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (bean instanceof Parser) {</b>
+<b class="nc">&nbsp;				registry.addParser((Parser&lt;?&gt;) bean);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

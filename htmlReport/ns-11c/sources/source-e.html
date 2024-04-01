@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WelcomePageRouterFunctionFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: WelcomePageRouterFunctionFactory (org.springframework.boot.autoconfigure.web.reactive)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WelcomePageRouterFunctionFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.reactive;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.template.TemplateAvailabilityProviders;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.http.MediaType;
+&nbsp;import org.springframework.web.reactive.function.server.RouterFunction;
+&nbsp;import org.springframework.web.reactive.function.server.RouterFunctions;
+&nbsp;import org.springframework.web.reactive.function.server.ServerResponse;
+&nbsp;
+&nbsp;import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+&nbsp;import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link RouterFunction} factory for an application&#39;s welcome page. Supports both
+&nbsp; * static and templated files. If both a static and templated index page are available,
+&nbsp; * the static page is preferred.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; */
+&nbsp;final class WelcomePageRouterFunctionFactory {
+&nbsp;
+&nbsp;	private final String staticPathPattern;
+&nbsp;
+&nbsp;	private final Resource welcomePage;
+&nbsp;
+&nbsp;	private final boolean welcomePageTemplateExists;
+&nbsp;
+&nbsp;	WelcomePageRouterFunctionFactory(TemplateAvailabilityProviders templateAvailabilityProviders,
+<b class="nc">&nbsp;			ApplicationContext applicationContext, String[] staticLocations, String staticPathPattern) {</b>
+<b class="nc">&nbsp;		this.staticPathPattern = staticPathPattern;</b>
+<b class="nc">&nbsp;		this.welcomePage = getWelcomePage(applicationContext, staticLocations);</b>
+<b class="nc">&nbsp;		this.welcomePageTemplateExists = welcomeTemplateExists(templateAvailabilityProviders, applicationContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Resource getWelcomePage(ResourceLoader resourceLoader, String[] staticLocations) {
+<b class="nc">&nbsp;		return Arrays.stream(staticLocations)</b>
+<b class="nc">&nbsp;			.map((location) -&gt; getIndexHtml(resourceLoader, location))</b>
+<b class="nc">&nbsp;			.filter(this::isReadable)</b>
+<b class="nc">&nbsp;			.findFirst()</b>
+<b class="nc">&nbsp;			.orElse(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Resource getIndexHtml(ResourceLoader resourceLoader, String location) {
+<b class="nc">&nbsp;		return resourceLoader.getResource(location + &quot;index.html&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isReadable(Resource resource) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return resource.exists() &amp;&amp; (resource.getURL() != null);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean welcomeTemplateExists(TemplateAvailabilityProviders templateAvailabilityProviders,
+&nbsp;			ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		return templateAvailabilityProviders.getProvider(&quot;index&quot;, applicationContext) != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	RouterFunction&lt;ServerResponse&gt; createRouterFunction() {
+<b class="nc">&nbsp;		if (this.welcomePage != null &amp;&amp; &quot;/**&quot;.equals(this.staticPathPattern)) {</b>
+<b class="nc">&nbsp;			return RouterFunctions.route(GET(&quot;/&quot;).and(accept(MediaType.TEXT_HTML)),</b>
+<b class="nc">&nbsp;					(req) -&gt; ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(this.welcomePage));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (this.welcomePageTemplateExists) {</b>
+<b class="nc">&nbsp;			return RouterFunctions.route(GET(&quot;/&quot;).and(accept(MediaType.TEXT_HTML)),</b>
+<b class="nc">&nbsp;					(req) -&gt; ServerResponse.ok().render(&quot;index&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

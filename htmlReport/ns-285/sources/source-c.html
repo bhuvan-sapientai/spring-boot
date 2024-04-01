@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoaderZipEntries</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.tasks.bundling</a>
+</div>
+
+<h1>Coverage Summary for Class: LoaderZipEntries (org.springframework.boot.gradle.tasks.bundling)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoaderZipEntries</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoaderZipEntries$WrittenEntries</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.tasks.bundling;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;import java.util.zip.ZipInputStream;
+&nbsp;
+&nbsp;import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+&nbsp;import org.gradle.api.file.FileTreeElement;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.LoaderImplementation;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Internal utility used to copy entries from the {@code spring-boot-loader.jar}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;class LoaderZipEntries {
+&nbsp;
+&nbsp;	private final LoaderImplementation loaderImplementation;
+&nbsp;
+&nbsp;	private final Long entryTime;
+&nbsp;
+&nbsp;	private final int dirMode;
+&nbsp;
+&nbsp;	private final int fileMode;
+&nbsp;
+<b class="nc">&nbsp;	LoaderZipEntries(Long entryTime, int dirMode, int fileMode, LoaderImplementation loaderImplementation) {</b>
+<b class="nc">&nbsp;		this.entryTime = entryTime;</b>
+<b class="nc">&nbsp;		this.dirMode = dirMode;</b>
+<b class="nc">&nbsp;		this.fileMode = fileMode;</b>
+<b class="nc">&nbsp;		this.loaderImplementation = (loaderImplementation != null) ? loaderImplementation</b>
+<b class="nc">&nbsp;				: LoaderImplementation.DEFAULT;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	WrittenEntries writeTo(ZipArchiveOutputStream out) throws IOException {
+<b class="nc">&nbsp;		WrittenEntries written = new WrittenEntries();</b>
+<b class="nc">&nbsp;		try (ZipInputStream loaderJar = new ZipInputStream(</b>
+<b class="nc">&nbsp;				getClass().getResourceAsStream(&quot;/&quot; + this.loaderImplementation.getJarResourceName()))) {</b>
+<b class="nc">&nbsp;			java.util.zip.ZipEntry entry = loaderJar.getNextEntry();</b>
+<b class="nc">&nbsp;			while (entry != null) {</b>
+<b class="nc">&nbsp;				if (entry.isDirectory() &amp;&amp; !entry.getName().equals(&quot;META-INF/&quot;)) {</b>
+<b class="nc">&nbsp;					writeDirectory(new ZipArchiveEntry(entry), out);</b>
+<b class="nc">&nbsp;					written.addDirectory(entry);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				else if (entry.getName().endsWith(&quot;.class&quot;) || entry.getName().startsWith(&quot;META-INF/services/&quot;)) {</b>
+<b class="nc">&nbsp;					writeFile(new ZipArchiveEntry(entry), loaderJar, out);</b>
+<b class="nc">&nbsp;					written.addFile(entry);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				entry = loaderJar.getNextEntry();</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return written;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeDirectory(ZipArchiveEntry entry, ZipArchiveOutputStream out) throws IOException {
+<b class="nc">&nbsp;		prepareEntry(entry, this.dirMode);</b>
+<b class="nc">&nbsp;		out.putArchiveEntry(entry);</b>
+<b class="nc">&nbsp;		out.closeArchiveEntry();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeFile(ZipArchiveEntry entry, ZipInputStream in, ZipArchiveOutputStream out) throws IOException {
+<b class="nc">&nbsp;		prepareEntry(entry, this.fileMode);</b>
+<b class="nc">&nbsp;		out.putArchiveEntry(entry);</b>
+<b class="nc">&nbsp;		copy(in, out);</b>
+<b class="nc">&nbsp;		out.closeArchiveEntry();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void prepareEntry(ZipArchiveEntry entry, int unixMode) {
+<b class="nc">&nbsp;		if (this.entryTime != null) {</b>
+<b class="nc">&nbsp;			entry.setTime(DefaultTimeZoneOffset.INSTANCE.removeFrom(this.entryTime));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		entry.setUnixMode(unixMode);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void copy(InputStream in, OutputStream out) throws IOException {
+<b class="nc">&nbsp;		StreamUtils.copy(in, out);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Tracks entries that have been written.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class WrittenEntries {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Set&lt;String&gt; directories = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Set&lt;String&gt; files = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private void addDirectory(ZipEntry entry) {
+<b class="nc">&nbsp;			this.directories.add(entry.getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addFile(ZipEntry entry) {
+<b class="nc">&nbsp;			this.files.add(entry.getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isWrittenDirectory(FileTreeElement element) {
+<b class="nc">&nbsp;			String path = element.getRelativePath().getPathString();</b>
+<b class="nc">&nbsp;			if (element.isDirectory() &amp;&amp; !path.endsWith((&quot;/&quot;))) {</b>
+<b class="nc">&nbsp;				path += &quot;/&quot;;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.directories.contains(path);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;String&gt; getFiles() {
+<b class="nc">&nbsp;			return this.files;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

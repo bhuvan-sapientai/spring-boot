@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TestRestTemplateContextCustomizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.web.client</a>
+</div>
+
+<h1>Coverage Summary for Class: TestRestTemplateContextCustomizer (org.springframework.boot.test.web.client)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestRestTemplateContextCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TestRestTemplateContextCustomizer$TestRestTemplateFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TestRestTemplateContextCustomizer$TestRestTemplateRegistrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.web.client;
+&nbsp;
+&nbsp;import org.springframework.aot.AotDetector;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.BeanFactoryAware;
+&nbsp;import org.springframework.beans.factory.BeanFactoryUtils;
+&nbsp;import org.springframework.beans.factory.FactoryBean;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+&nbsp;import org.springframework.beans.factory.support.RootBeanDefinition;
+&nbsp;import org.springframework.boot.test.context.SpringBootTest;
+&nbsp;import org.springframework.boot.test.web.client.TestRestTemplate.HttpClientOption;
+&nbsp;import org.springframework.boot.web.client.RestTemplateBuilder;
+&nbsp;import org.springframework.boot.web.servlet.server.AbstractServletWebServerFactory;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContextAware;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.annotation.ConfigurationClassPostProcessor;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.test.context.ContextCustomizer;
+&nbsp;import org.springframework.test.context.MergedContextConfiguration;
+&nbsp;import org.springframework.test.context.TestContextAnnotationUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ContextCustomizer} for {@link TestRestTemplate}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;class TestRestTemplateContextCustomizer implements ContextCustomizer {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void customizeContext(ConfigurableApplicationContext context,
+&nbsp;			MergedContextConfiguration mergedContextConfiguration) {
+<b class="nc">&nbsp;		if (AotDetector.useGeneratedArtifacts()) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		SpringBootTest springBootTest = TestContextAnnotationUtils</b>
+<b class="nc">&nbsp;			.findMergedAnnotation(mergedContextConfiguration.getTestClass(), SpringBootTest.class);</b>
+<b class="nc">&nbsp;		if (springBootTest.webEnvironment().isEmbedded()) {</b>
+<b class="nc">&nbsp;			registerTestRestTemplate(context);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerTestRestTemplate(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();</b>
+<b class="nc">&nbsp;		if (beanFactory instanceof BeanDefinitionRegistry registry) {</b>
+<b class="nc">&nbsp;			registerTestRestTemplate(registry);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerTestRestTemplate(BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;		RootBeanDefinition definition = new RootBeanDefinition(TestRestTemplateRegistrar.class);</b>
+<b class="nc">&nbsp;		definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);</b>
+<b class="nc">&nbsp;		registry.registerBeanDefinition(TestRestTemplateRegistrar.class.getName(), definition);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		return (obj != null) &amp;&amp; (obj.getClass() == getClass());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return getClass().hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BeanDefinitionRegistryPostProcessor} that runs after the
+&nbsp;	 * {@link ConfigurationClassPostProcessor} and add a {@link TestRestTemplateFactory}
+&nbsp;	 * bean definition when a {@link TestRestTemplate} hasn&#39;t already been registered.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class TestRestTemplateRegistrar implements BeanDefinitionRegistryPostProcessor, Ordered, BeanFactoryAware {</b>
+&nbsp;
+&nbsp;		private BeanFactory beanFactory;
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;			this.beanFactory = beanFactory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getOrder() {
+<b class="nc">&nbsp;			return Ordered.LOWEST_PRECEDENCE;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+<b class="nc">&nbsp;			if (AotDetector.useGeneratedArtifacts()) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			if (BeanFactoryUtils.beanNamesForTypeIncludingAncestors((ListableBeanFactory) this.beanFactory,</b>
+&nbsp;					TestRestTemplate.class, false, false).length == 0) {
+<b class="nc">&nbsp;				registry.registerBeanDefinition(TestRestTemplate.class.getName(),</b>
+&nbsp;						new RootBeanDefinition(TestRestTemplateFactory.class));
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link FactoryBean} used to create and configure a {@link TestRestTemplate}.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class TestRestTemplateFactory implements FactoryBean&lt;TestRestTemplate&gt;, ApplicationContextAware {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final HttpClientOption[] DEFAULT_OPTIONS = {};</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final HttpClientOption[] SSL_OPTIONS = { HttpClientOption.SSL };</b>
+&nbsp;
+&nbsp;		private TestRestTemplate template;
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+<b class="nc">&nbsp;			RestTemplateBuilder builder = getRestTemplateBuilder(applicationContext);</b>
+<b class="nc">&nbsp;			boolean sslEnabled = isSslEnabled(applicationContext);</b>
+<b class="nc">&nbsp;			TestRestTemplate template = new TestRestTemplate(builder, null, null,</b>
+<b class="nc">&nbsp;					sslEnabled ? SSL_OPTIONS : DEFAULT_OPTIONS);</b>
+<b class="nc">&nbsp;			LocalHostUriTemplateHandler handler = new LocalHostUriTemplateHandler(applicationContext.getEnvironment(),</b>
+<b class="nc">&nbsp;					sslEnabled ? &quot;https&quot; : &quot;http&quot;);</b>
+<b class="nc">&nbsp;			template.setUriTemplateHandler(handler);</b>
+<b class="nc">&nbsp;			this.template = template;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isSslEnabled(ApplicationContext context) {
+&nbsp;			try {
+<b class="nc">&nbsp;				AbstractServletWebServerFactory webServerFactory = context</b>
+<b class="nc">&nbsp;					.getBean(AbstractServletWebServerFactory.class);</b>
+<b class="nc">&nbsp;				return webServerFactory.getSsl() != null &amp;&amp; webServerFactory.getSsl().isEnabled();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private RestTemplateBuilder getRestTemplateBuilder(ApplicationContext applicationContext) {
+&nbsp;			try {
+<b class="nc">&nbsp;				return applicationContext.getBean(RestTemplateBuilder.class);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;				return new RestTemplateBuilder();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isSingleton() {
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Class&lt;?&gt; getObjectType() {
+<b class="nc">&nbsp;			return TestRestTemplate.class;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public TestRestTemplate getObject() throws Exception {
+<b class="nc">&nbsp;			return this.template;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

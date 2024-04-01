@@ -1,0 +1,787 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Binder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: Binder (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Binder</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (18/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.8%
+  </span>
+  <span class="absValue">
+    (61/146)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Binder$Context</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (6/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.3%
+  </span>
+  <span class="absValue">
+    (12/35)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    44.4%
+  </span>
+  <span class="absValue">
+    (24/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40.3%
+  </span>
+  <span class="absValue">
+    (73/181)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import java.util.ArrayDeque;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Deque;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.beans.PropertyEditorRegistry;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable.BindRestriction;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyState;
+&nbsp;import org.springframework.boot.convert.ApplicationConversionService;
+&nbsp;import org.springframework.core.convert.ConversionService;
+&nbsp;import org.springframework.core.convert.ConverterNotFoundException;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.format.support.DefaultFormattingConversionService;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * A container object which Binds objects from one or more
+&nbsp; * {@link ConfigurationPropertySource ConfigurationPropertySources}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class Binder {
+&nbsp;
+<b class="fc">&nbsp;	private static final Set&lt;Class&lt;?&gt;&gt; NON_BEAN_CLASSES = Collections</b>
+<b class="fc">&nbsp;		.unmodifiableSet(new HashSet&lt;&gt;(Arrays.asList(Object.class, Class.class)));</b>
+&nbsp;
+&nbsp;	private final Iterable&lt;ConfigurationPropertySource&gt; sources;
+&nbsp;
+&nbsp;	private final PlaceholdersResolver placeholdersResolver;
+&nbsp;
+&nbsp;	private final BindConverter bindConverter;
+&nbsp;
+&nbsp;	private final BindHandler defaultBindHandler;
+&nbsp;
+&nbsp;	private final Map&lt;BindMethod, List&lt;DataObjectBinder&gt;&gt; dataObjectBinders;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance for the specified sources. A
+&nbsp;	 * {@link DefaultFormattingConversionService} will be used for all conversion.
+&nbsp;	 * @param sources the sources used for binding
+&nbsp;	 */
+&nbsp;	public Binder(ConfigurationPropertySource... sources) {
+<b class="fc">&nbsp;		this((sources != null) ? Arrays.asList(sources) : null, null, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance for the specified sources. A
+&nbsp;	 * {@link DefaultFormattingConversionService} will be used for all conversion.
+&nbsp;	 * @param sources the sources used for binding
+&nbsp;	 */
+&nbsp;	public Binder(Iterable&lt;ConfigurationPropertySource&gt; sources) {
+<b class="nc">&nbsp;		this(sources, null, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance for the specified sources.
+&nbsp;	 * @param sources the sources used for binding
+&nbsp;	 * @param placeholdersResolver strategy to resolve any property placeholders
+&nbsp;	 */
+&nbsp;	public Binder(Iterable&lt;ConfigurationPropertySource&gt; sources, PlaceholdersResolver placeholdersResolver) {
+<b class="nc">&nbsp;		this(sources, placeholdersResolver, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance for the specified sources.
+&nbsp;	 * @param sources the sources used for binding
+&nbsp;	 * @param placeholdersResolver strategy to resolve any property placeholders
+&nbsp;	 * @param conversionService the conversion service to convert values (or {@code null}
+&nbsp;	 * to use {@link ApplicationConversionService})
+&nbsp;	 */
+&nbsp;	public Binder(Iterable&lt;ConfigurationPropertySource&gt; sources, PlaceholdersResolver placeholdersResolver,
+&nbsp;			ConversionService conversionService) {
+<b class="nc">&nbsp;		this(sources, placeholdersResolver, conversionService, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance for the specified sources.
+&nbsp;	 * @param sources the sources used for binding
+&nbsp;	 * @param placeholdersResolver strategy to resolve any property placeholders
+&nbsp;	 * @param conversionService the conversion service to convert values (or {@code null}
+&nbsp;	 * to use {@link ApplicationConversionService})
+&nbsp;	 * @param propertyEditorInitializer initializer used to configure the property editors
+&nbsp;	 * that can convert values (or {@code null} if no initialization is required). Often
+&nbsp;	 * used to call {@link ConfigurableListableBeanFactory#copyRegisteredEditorsTo}.
+&nbsp;	 */
+&nbsp;	public Binder(Iterable&lt;ConfigurationPropertySource&gt; sources, PlaceholdersResolver placeholdersResolver,
+&nbsp;			ConversionService conversionService, Consumer&lt;PropertyEditorRegistry&gt; propertyEditorInitializer) {
+<b class="fc">&nbsp;		this(sources, placeholdersResolver, conversionService, propertyEditorInitializer, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance for the specified sources.
+&nbsp;	 * @param sources the sources used for binding
+&nbsp;	 * @param placeholdersResolver strategy to resolve any property placeholders
+&nbsp;	 * @param conversionService the conversion service to convert values (or {@code null}
+&nbsp;	 * to use {@link ApplicationConversionService})
+&nbsp;	 * @param propertyEditorInitializer initializer used to configure the property editors
+&nbsp;	 * that can convert values (or {@code null} if no initialization is required). Often
+&nbsp;	 * used to call {@link ConfigurableListableBeanFactory#copyRegisteredEditorsTo}.
+&nbsp;	 * @param defaultBindHandler the default bind handler to use if none is specified when
+&nbsp;	 * binding
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public Binder(Iterable&lt;ConfigurationPropertySource&gt; sources, PlaceholdersResolver placeholdersResolver,
+&nbsp;			ConversionService conversionService, Consumer&lt;PropertyEditorRegistry&gt; propertyEditorInitializer,
+&nbsp;			BindHandler defaultBindHandler) {
+<b class="fc">&nbsp;		this(sources, placeholdersResolver, conversionService, propertyEditorInitializer, defaultBindHandler, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance for the specified sources.
+&nbsp;	 * @param sources the sources used for binding
+&nbsp;	 * @param placeholdersResolver strategy to resolve any property placeholders
+&nbsp;	 * @param conversionService the conversion service to convert values (or {@code null}
+&nbsp;	 * to use {@link ApplicationConversionService})
+&nbsp;	 * @param propertyEditorInitializer initializer used to configure the property editors
+&nbsp;	 * that can convert values (or {@code null} if no initialization is required). Often
+&nbsp;	 * used to call {@link ConfigurableListableBeanFactory#copyRegisteredEditorsTo}.
+&nbsp;	 * @param defaultBindHandler the default bind handler to use if none is specified when
+&nbsp;	 * binding
+&nbsp;	 * @param constructorProvider the constructor provider which provides the bind
+&nbsp;	 * constructor to use when binding
+&nbsp;	 * @since 2.2.1
+&nbsp;	 */
+&nbsp;	public Binder(Iterable&lt;ConfigurationPropertySource&gt; sources, PlaceholdersResolver placeholdersResolver,
+&nbsp;			ConversionService conversionService, Consumer&lt;PropertyEditorRegistry&gt; propertyEditorInitializer,
+&nbsp;			BindHandler defaultBindHandler, BindConstructorProvider constructorProvider) {
+<b class="fc">&nbsp;		this(sources, placeholdersResolver,</b>
+<b class="fc">&nbsp;				(conversionService != null) ? Collections.singletonList(conversionService)</b>
+<b class="fc">&nbsp;						: (List&lt;ConversionService&gt;) null,</b>
+&nbsp;				propertyEditorInitializer, defaultBindHandler, constructorProvider);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance for the specified sources.
+&nbsp;	 * @param sources the sources used for binding
+&nbsp;	 * @param placeholdersResolver strategy to resolve any property placeholders
+&nbsp;	 * @param conversionServices the conversion services to convert values (or
+&nbsp;	 * {@code null} to use {@link ApplicationConversionService})
+&nbsp;	 * @param propertyEditorInitializer initializer used to configure the property editors
+&nbsp;	 * that can convert values (or {@code null} if no initialization is required). Often
+&nbsp;	 * used to call {@link ConfigurableListableBeanFactory#copyRegisteredEditorsTo}.
+&nbsp;	 * @param defaultBindHandler the default bind handler to use if none is specified when
+&nbsp;	 * binding
+&nbsp;	 * @param constructorProvider the constructor provider which provides the bind
+&nbsp;	 * constructor to use when binding
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public Binder(Iterable&lt;ConfigurationPropertySource&gt; sources, PlaceholdersResolver placeholdersResolver,
+&nbsp;			List&lt;ConversionService&gt; conversionServices, Consumer&lt;PropertyEditorRegistry&gt; propertyEditorInitializer,
+<b class="fc">&nbsp;			BindHandler defaultBindHandler, BindConstructorProvider constructorProvider) {</b>
+<b class="fc">&nbsp;		Assert.notNull(sources, &quot;Sources must not be null&quot;);</b>
+<b class="fc">&nbsp;		for (ConfigurationPropertySource source : sources) {</b>
+<b class="fc">&nbsp;			Assert.notNull(source, &quot;Sources must not contain null elements&quot;);</b>
+<b class="fc">&nbsp;		}</b>
+<b class="fc">&nbsp;		this.sources = sources;</b>
+<b class="fc">&nbsp;		this.placeholdersResolver = (placeholdersResolver != null) ? placeholdersResolver : PlaceholdersResolver.NONE;</b>
+<b class="fc">&nbsp;		this.bindConverter = BindConverter.get(conversionServices, propertyEditorInitializer);</b>
+<b class="fc">&nbsp;		this.defaultBindHandler = (defaultBindHandler != null) ? defaultBindHandler : BindHandler.DEFAULT;</b>
+<b class="fc">&nbsp;		if (constructorProvider == null) {</b>
+<b class="fc">&nbsp;			constructorProvider = BindConstructorProvider.DEFAULT;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		ValueObjectBinder valueObjectBinder = new ValueObjectBinder(constructorProvider);</b>
+<b class="fc">&nbsp;		JavaBeanBinder javaBeanBinder = JavaBeanBinder.INSTANCE;</b>
+<b class="fc">&nbsp;		Map&lt;BindMethod, List&lt;DataObjectBinder&gt;&gt; dataObjectBinders = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;		dataObjectBinders.put(BindMethod.VALUE_OBJECT, List.of(valueObjectBinder));</b>
+<b class="fc">&nbsp;		dataObjectBinders.put(BindMethod.JAVA_BEAN, List.of(javaBeanBinder));</b>
+<b class="fc">&nbsp;		dataObjectBinders.put(null, List.of(valueObjectBinder, javaBeanBinder));</b>
+<b class="fc">&nbsp;		this.dataObjectBinders = Collections.unmodifiableMap(dataObjectBinders);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Class} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target class
+&nbsp;	 * @param &lt;T&gt; the bound type
+&nbsp;	 * @return the binding result (never {@code null})
+&nbsp;	 * @see #bind(ConfigurationPropertyName, Bindable, BindHandler)
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; BindResult&lt;T&gt; bind(String name, Class&lt;T&gt; target) {
+<b class="fc">&nbsp;		return bind(name, Bindable.of(target));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Bindable} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target bindable
+&nbsp;	 * @param &lt;T&gt; the bound type
+&nbsp;	 * @return the binding result (never {@code null})
+&nbsp;	 * @see #bind(ConfigurationPropertyName, Bindable, BindHandler)
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; BindResult&lt;T&gt; bind(String name, Bindable&lt;T&gt; target) {
+<b class="fc">&nbsp;		return bind(ConfigurationPropertyName.of(name), target, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Bindable} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target bindable
+&nbsp;	 * @param &lt;T&gt; the bound type
+&nbsp;	 * @return the binding result (never {@code null})
+&nbsp;	 * @see #bind(ConfigurationPropertyName, Bindable, BindHandler)
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; BindResult&lt;T&gt; bind(ConfigurationPropertyName name, Bindable&lt;T&gt; target) {
+<b class="nc">&nbsp;		return bind(name, target, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Bindable} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target bindable
+&nbsp;	 * @param handler the bind handler (may be {@code null})
+&nbsp;	 * @param &lt;T&gt; the bound type
+&nbsp;	 * @return the binding result (never {@code null})
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; BindResult&lt;T&gt; bind(String name, Bindable&lt;T&gt; target, BindHandler handler) {
+<b class="nc">&nbsp;		return bind(ConfigurationPropertyName.of(name), target, handler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Bindable} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target bindable
+&nbsp;	 * @param handler the bind handler (may be {@code null})
+&nbsp;	 * @param &lt;T&gt; the bound type
+&nbsp;	 * @return the binding result (never {@code null})
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; BindResult&lt;T&gt; bind(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindHandler handler) {
+<b class="fc">&nbsp;		T bound = bind(name, target, handler, false);</b>
+<b class="fc">&nbsp;		return BindResult.of(bound);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Class} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources} or create a new instance using
+&nbsp;	 * the type of the {@link Bindable} if the result of the binding is {@code null}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target class
+&nbsp;	 * @param &lt;T&gt; the bound type
+&nbsp;	 * @return the bound or created object
+&nbsp;	 * @since 2.2.0
+&nbsp;	 * @see #bind(ConfigurationPropertyName, Bindable, BindHandler)
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; T bindOrCreate(String name, Class&lt;T&gt; target) {
+<b class="nc">&nbsp;		return bindOrCreate(name, Bindable.of(target));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Bindable} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources} or create a new instance using
+&nbsp;	 * the type of the {@link Bindable} if the result of the binding is {@code null}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target bindable
+&nbsp;	 * @param &lt;T&gt; the bound type
+&nbsp;	 * @return the bound or created object
+&nbsp;	 * @since 2.2.0
+&nbsp;	 * @see #bindOrCreate(ConfigurationPropertyName, Bindable, BindHandler)
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; T bindOrCreate(String name, Bindable&lt;T&gt; target) {
+<b class="nc">&nbsp;		return bindOrCreate(ConfigurationPropertyName.of(name), target, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Bindable} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources} or create a new instance using
+&nbsp;	 * the type of the {@link Bindable} if the result of the binding is {@code null}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target bindable
+&nbsp;	 * @param handler the bind handler
+&nbsp;	 * @param &lt;T&gt; the bound type
+&nbsp;	 * @return the bound or created object
+&nbsp;	 * @since 2.2.0
+&nbsp;	 * @see #bindOrCreate(ConfigurationPropertyName, Bindable, BindHandler)
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; T bindOrCreate(String name, Bindable&lt;T&gt; target, BindHandler handler) {
+<b class="nc">&nbsp;		return bindOrCreate(ConfigurationPropertyName.of(name), target, handler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind the specified target {@link Bindable} using this binder&#39;s
+&nbsp;	 * {@link ConfigurationPropertySource property sources} or create a new instance using
+&nbsp;	 * the type of the {@link Bindable} if the result of the binding is {@code null}.
+&nbsp;	 * @param name the configuration property name to bind
+&nbsp;	 * @param target the target bindable
+&nbsp;	 * @param handler the bind handler (may be {@code null})
+&nbsp;	 * @param &lt;T&gt; the bound or created type
+&nbsp;	 * @return the bound or created object
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; T bindOrCreate(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindHandler handler) {
+<b class="nc">&nbsp;		return bind(name, target, handler, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T bind(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindHandler handler, boolean create) {
+<b class="fc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="fc">&nbsp;		Assert.notNull(target, &quot;Target must not be null&quot;);</b>
+<b class="fc">&nbsp;		handler = (handler != null) ? handler : this.defaultBindHandler;</b>
+<b class="fc">&nbsp;		Context context = new Context();</b>
+<b class="fc">&nbsp;		return bind(name, target, handler, context, false, create);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T bind(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindHandler handler, Context context,
+&nbsp;			boolean allowRecursiveBinding, boolean create) {
+&nbsp;		try {
+<b class="fc">&nbsp;			Bindable&lt;T&gt; replacementTarget = handler.onStart(name, target, context);</b>
+<b class="fc">&nbsp;			if (replacementTarget == null) {</b>
+<b class="nc">&nbsp;				return handleBindResult(name, target, handler, context, null, create);</b>
+&nbsp;			}
+<b class="fc">&nbsp;			target = replacementTarget;</b>
+<b class="fc">&nbsp;			Object bound = bindObject(name, target, handler, context, allowRecursiveBinding);</b>
+<b class="fc">&nbsp;			return handleBindResult(name, target, handler, context, bound, create);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return handleBindError(name, target, handler, context, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T handleBindResult(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindHandler handler,
+&nbsp;			Context context, Object result, boolean create) throws Exception {
+<b class="fc">&nbsp;		if (result != null) {</b>
+<b class="nc">&nbsp;			result = handler.onSuccess(name, target, context, result);</b>
+<b class="nc">&nbsp;			result = context.getConverter().convert(result, target);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (result == null &amp;&amp; create) {</b>
+<b class="nc">&nbsp;			result = fromDataObjectBinders(target.getBindMethod(),</b>
+<b class="nc">&nbsp;					(dataObjectBinder) -&gt; dataObjectBinder.create(target, context));</b>
+<b class="nc">&nbsp;			result = handler.onCreate(name, target, context, result);</b>
+<b class="nc">&nbsp;			result = context.getConverter().convert(result, target);</b>
+<b class="nc">&nbsp;			if (result == null) {</b>
+<b class="nc">&nbsp;				IllegalStateException ex = new IllegalStateException(</b>
+<b class="nc">&nbsp;						&quot;Unable to create instance for &quot; + target.getType());</b>
+<b class="nc">&nbsp;				this.dataObjectBinders.get(target.getBindMethod())</b>
+<b class="nc">&nbsp;					.forEach((dataObjectBinder) -&gt; dataObjectBinder.onUnableToCreateInstance(target, context, ex));</b>
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="fc">&nbsp;		handler.onFinish(name, target, context, result);</b>
+<b class="fc">&nbsp;		return context.getConverter().convert(result, target);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T handleBindError(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindHandler handler,
+&nbsp;			Context context, Exception error) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Object result = handler.onFailure(name, target, context, error);</b>
+<b class="nc">&nbsp;			return context.getConverter().convert(result, target);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			if (ex instanceof BindException bindException) {</b>
+<b class="nc">&nbsp;				throw bindException;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new BindException(name, target, context.getConfigurationProperty(), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; Object bindObject(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindHandler handler,
+&nbsp;			Context context, boolean allowRecursiveBinding) {
+<b class="fc">&nbsp;		ConfigurationProperty property = findProperty(name, target, context);</b>
+<b class="fc">&nbsp;		if (property == null &amp;&amp; context.depth != 0 &amp;&amp; containsNoDescendantOf(context.getSources(), name)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		AggregateBinder&lt;?&gt; aggregateBinder = getAggregateBinder(target, context);</b>
+<b class="fc">&nbsp;		if (aggregateBinder != null) {</b>
+<b class="fc">&nbsp;			return bindAggregate(name, target, handler, context, aggregateBinder);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (property != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return bindProperty(target, context, property);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ConverterNotFoundException ex) {</b>
+&nbsp;				// We might still be able to bind it using the recursive binders
+<b class="nc">&nbsp;				Object instance = bindDataObject(name, target, handler, context, allowRecursiveBinding);</b>
+<b class="nc">&nbsp;				if (instance != null) {</b>
+<b class="nc">&nbsp;					return instance;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return bindDataObject(name, target, handler, context, allowRecursiveBinding);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private AggregateBinder&lt;?&gt; getAggregateBinder(Bindable&lt;?&gt; target, Context context) {
+<b class="fc">&nbsp;		Class&lt;?&gt; resolvedType = target.getType().resolve(Object.class);</b>
+<b class="fc">&nbsp;		if (Map.class.isAssignableFrom(resolvedType)) {</b>
+<b class="nc">&nbsp;			return new MapBinder(context);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (Collection.class.isAssignableFrom(resolvedType)) {</b>
+<b class="nc">&nbsp;			return new CollectionBinder(context);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (target.getType().isArray()) {</b>
+<b class="fc">&nbsp;			return new ArrayBinder(context);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; Object bindAggregate(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindHandler handler,
+&nbsp;			Context context, AggregateBinder&lt;?&gt; aggregateBinder) {
+<b class="fc">&nbsp;		AggregateElementBinder elementBinder = (itemName, itemTarget, source) -&gt; {</b>
+<b class="nc">&nbsp;			boolean allowRecursiveBinding = aggregateBinder.isAllowRecursiveBinding(source);</b>
+<b class="nc">&nbsp;			Supplier&lt;?&gt; supplier = () -&gt; bind(itemName, itemTarget, handler, context, allowRecursiveBinding, false);</b>
+<b class="nc">&nbsp;			return context.withSource(source, supplier);</b>
+&nbsp;		};
+<b class="fc">&nbsp;		return context.withIncreasedDepth(() -&gt; aggregateBinder.bind(name, target, elementBinder));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; ConfigurationProperty findProperty(ConfigurationPropertyName name, Bindable&lt;T&gt; target,
+&nbsp;			Context context) {
+<b class="fc">&nbsp;		if (name.isEmpty() || target.hasBindRestriction(BindRestriction.NO_DIRECT_PROPERTY)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		for (ConfigurationPropertySource source : context.getSources()) {</b>
+<b class="nc">&nbsp;			ConfigurationProperty property = source.getConfigurationProperty(name);</b>
+<b class="nc">&nbsp;			if (property != null) {</b>
+<b class="nc">&nbsp;				return property;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="fc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; Object bindProperty(Bindable&lt;T&gt; target, Context context, ConfigurationProperty property) {
+<b class="nc">&nbsp;		context.setConfigurationProperty(property);</b>
+<b class="nc">&nbsp;		Object result = property.getValue();</b>
+<b class="nc">&nbsp;		result = this.placeholdersResolver.resolvePlaceholders(result);</b>
+<b class="nc">&nbsp;		result = context.getConverter().convert(result, target);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object bindDataObject(ConfigurationPropertyName name, Bindable&lt;?&gt; target, BindHandler handler,
+&nbsp;			Context context, boolean allowRecursiveBinding) {
+<b class="nc">&nbsp;		if (isUnbindableBean(name, target, context)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Class&lt;?&gt; type = target.getType().resolve(Object.class);</b>
+<b class="nc">&nbsp;		BindMethod bindMethod = target.getBindMethod();</b>
+<b class="nc">&nbsp;		if (!allowRecursiveBinding &amp;&amp; context.isBindingDataObject(type)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		DataObjectPropertyBinder propertyBinder = (propertyName, propertyTarget) -&gt; bind(name.append(propertyName),</b>
+&nbsp;				propertyTarget, handler, context, false, false);
+<b class="nc">&nbsp;		return context.withDataObject(type, () -&gt; fromDataObjectBinders(bindMethod,</b>
+<b class="nc">&nbsp;				(dataObjectBinder) -&gt; dataObjectBinder.bind(name, target, context, propertyBinder)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object fromDataObjectBinders(BindMethod bindMethod, Function&lt;DataObjectBinder, Object&gt; operation) {
+<b class="nc">&nbsp;		return this.dataObjectBinders.get(bindMethod)</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map(operation)</b>
+<b class="nc">&nbsp;			.filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;			.findFirst()</b>
+<b class="nc">&nbsp;			.orElse(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isUnbindableBean(ConfigurationPropertyName name, Bindable&lt;?&gt; target, Context context) {
+<b class="nc">&nbsp;		for (ConfigurationPropertySource source : context.getSources()) {</b>
+<b class="nc">&nbsp;			if (source.containsDescendantOf(name) == ConfigurationPropertyState.PRESENT) {</b>
+&nbsp;				// We know there are properties to bind so we can&#39;t bypass anything
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		Class&lt;?&gt; resolved = target.getType().resolve(Object.class);</b>
+<b class="nc">&nbsp;		if (resolved.isPrimitive() || NON_BEAN_CLASSES.contains(resolved)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return resolved.getName().startsWith(&quot;java.&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean containsNoDescendantOf(Iterable&lt;ConfigurationPropertySource&gt; sources,
+&nbsp;			ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		for (ConfigurationPropertySource source : sources) {</b>
+<b class="nc">&nbsp;			if (source.containsDescendantOf(name) != ConfigurationPropertyState.ABSENT) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance from the specified environment.
+&nbsp;	 * @param environment the environment source (must have attached
+&nbsp;	 * {@link ConfigurationPropertySources})
+&nbsp;	 * @return a {@link Binder} instance
+&nbsp;	 */
+&nbsp;	public static Binder get(Environment environment) {
+<b class="fc">&nbsp;		return get(environment, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Binder} instance from the specified environment.
+&nbsp;	 * @param environment the environment source (must have attached
+&nbsp;	 * {@link ConfigurationPropertySources})
+&nbsp;	 * @param defaultBindHandler the default bind handler to use if none is specified when
+&nbsp;	 * binding
+&nbsp;	 * @return a {@link Binder} instance
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public static Binder get(Environment environment, BindHandler defaultBindHandler) {
+<b class="fc">&nbsp;		Iterable&lt;ConfigurationPropertySource&gt; sources = ConfigurationPropertySources.get(environment);</b>
+<b class="nc">&nbsp;		PropertySourcesPlaceholdersResolver placeholdersResolver = new PropertySourcesPlaceholdersResolver(environment);</b>
+<b class="nc">&nbsp;		return new Binder(sources, placeholdersResolver, null, null, defaultBindHandler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Context used when binding and the {@link BindContext} implementation.
+&nbsp;	 */
+<b class="fc">&nbsp;	final class Context implements BindContext {</b>
+&nbsp;
+&nbsp;		private int depth;
+&nbsp;
+<b class="fc">&nbsp;		private final List&lt;ConfigurationPropertySource&gt; source = Arrays.asList((ConfigurationPropertySource) null);</b>
+&nbsp;
+&nbsp;		private int sourcePushCount;
+&nbsp;
+<b class="fc">&nbsp;		private final Deque&lt;Class&lt;?&gt;&gt; dataObjectBindings = new ArrayDeque&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;		private final Deque&lt;Class&lt;?&gt;&gt; constructorBindings = new ArrayDeque&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private ConfigurationProperty configurationProperty;
+&nbsp;
+&nbsp;		private void increaseDepth() {
+<b class="fc">&nbsp;			this.depth++;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void decreaseDepth() {
+<b class="fc">&nbsp;			this.depth--;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; T withSource(ConfigurationPropertySource source, Supplier&lt;T&gt; supplier) {
+<b class="nc">&nbsp;			if (source == null) {</b>
+<b class="nc">&nbsp;				return supplier.get();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.source.set(0, source);</b>
+<b class="nc">&nbsp;			this.sourcePushCount++;</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return supplier.get();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				this.sourcePushCount--;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; T withDataObject(Class&lt;?&gt; type, Supplier&lt;T&gt; supplier) {
+<b class="nc">&nbsp;			this.dataObjectBindings.push(type);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return withIncreasedDepth(supplier);</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				this.dataObjectBindings.pop();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isBindingDataObject(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			return this.dataObjectBindings.contains(type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; T withIncreasedDepth(Supplier&lt;T&gt; supplier) {
+<b class="fc">&nbsp;			increaseDepth();</b>
+&nbsp;			try {
+<b class="fc">&nbsp;				return supplier.get();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="fc">&nbsp;				decreaseDepth();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void setConfigurationProperty(ConfigurationProperty configurationProperty) {
+<b class="nc">&nbsp;			this.configurationProperty = configurationProperty;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void clearConfigurationProperty() {
+<b class="nc">&nbsp;			this.configurationProperty = null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void pushConstructorBoundTypes(Class&lt;?&gt; value) {
+<b class="nc">&nbsp;			this.constructorBindings.push(value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isNestedConstructorBinding() {
+<b class="nc">&nbsp;			return !this.constructorBindings.isEmpty();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void popConstructorBoundTypes() {
+<b class="nc">&nbsp;			this.constructorBindings.pop();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		PlaceholdersResolver getPlaceholdersResolver() {
+<b class="nc">&nbsp;			return Binder.this.placeholdersResolver;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BindConverter getConverter() {
+<b class="fc">&nbsp;			return Binder.this.bindConverter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Binder getBinder() {
+<b class="nc">&nbsp;			return Binder.this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getDepth() {
+<b class="nc">&nbsp;			return this.depth;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Iterable&lt;ConfigurationPropertySource&gt; getSources() {
+<b class="fc">&nbsp;			if (this.sourcePushCount &gt; 0) {</b>
+<b class="nc">&nbsp;				return this.source;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			return Binder.this.sources;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConfigurationProperty getConfigurationProperty() {
+<b class="nc">&nbsp;			return this.configurationProperty;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

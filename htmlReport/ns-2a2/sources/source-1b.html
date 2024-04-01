@@ -1,0 +1,630 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MainClassFinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: MainClassFinder (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainClassFinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MainClassFinder$ClassDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MainClassFinder$ClassEntryComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MainClassFinder$MainClass</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MainClassFinder$MainClassCallback</td>
+  </tr>
+  <tr>
+    <td class="name">MainClassFinder$SingleMainClassCallback</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/130)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.BufferedInputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileFilter;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.ArrayDeque;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Deque;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.jar.JarEntry;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;import org.springframework.asm.AnnotationVisitor;
+&nbsp;import org.springframework.asm.ClassReader;
+&nbsp;import org.springframework.asm.ClassVisitor;
+&nbsp;import org.springframework.asm.MethodVisitor;
+&nbsp;import org.springframework.asm.Opcodes;
+&nbsp;import org.springframework.asm.SpringAsmInfo;
+&nbsp;import org.springframework.asm.Type;
+&nbsp;
+&nbsp;/**
+&nbsp; * Finds any class with a {@code public static main} method by performing a breadth first
+&nbsp; * search.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class MainClassFinder {</b>
+&nbsp;
+&nbsp;	private static final String DOT_CLASS = &quot;.class&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Type STRING_ARRAY_TYPE = Type.getType(String[].class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Type MAIN_METHOD_TYPE = Type.getMethodType(Type.VOID_TYPE, STRING_ARRAY_TYPE);</b>
+&nbsp;
+&nbsp;	private static final String MAIN_METHOD_NAME = &quot;main&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final FileFilter CLASS_FILE_FILTER = MainClassFinder::isClassFile;</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final FileFilter PACKAGE_DIRECTORY_FILTER = MainClassFinder::isPackageDirectory;</b>
+&nbsp;
+&nbsp;	private static boolean isClassFile(File file) {
+<b class="nc">&nbsp;		return file.isFile() &amp;&amp; file.getName().endsWith(DOT_CLASS);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isPackageDirectory(File file) {
+<b class="nc">&nbsp;		return file.isDirectory() &amp;&amp; !file.getName().startsWith(&quot;.&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find the main class from a given directory.
+&nbsp;	 * @param rootDirectory the root directory to search
+&nbsp;	 * @return the main class or {@code null}
+&nbsp;	 * @throws IOException if the directory cannot be read
+&nbsp;	 */
+&nbsp;	public static String findMainClass(File rootDirectory) throws IOException {
+<b class="nc">&nbsp;		return doWithMainClasses(rootDirectory, MainClass::getName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find a single main class from the given {@code rootDirectory}.
+&nbsp;	 * @param rootDirectory the root directory to search
+&nbsp;	 * @return the main class or {@code null}
+&nbsp;	 * @throws IOException if the directory cannot be read
+&nbsp;	 */
+&nbsp;	public static String findSingleMainClass(File rootDirectory) throws IOException {
+<b class="nc">&nbsp;		return findSingleMainClass(rootDirectory, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find a single main class from the given {@code rootDirectory}. A main class
+&nbsp;	 * annotated with an annotation with the given {@code annotationName} will be
+&nbsp;	 * preferred over a main class with no such annotation.
+&nbsp;	 * @param rootDirectory the root directory to search
+&nbsp;	 * @param annotationName the name of the annotation that may be present on the main
+&nbsp;	 * class
+&nbsp;	 * @return the main class or {@code null}
+&nbsp;	 * @throws IOException if the directory cannot be read
+&nbsp;	 */
+&nbsp;	public static String findSingleMainClass(File rootDirectory, String annotationName) throws IOException {
+<b class="nc">&nbsp;		SingleMainClassCallback callback = new SingleMainClassCallback(annotationName);</b>
+<b class="nc">&nbsp;		MainClassFinder.doWithMainClasses(rootDirectory, callback);</b>
+<b class="nc">&nbsp;		return callback.getMainClassName();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Perform the given callback operation on all main classes from the given root
+&nbsp;	 * directory.
+&nbsp;	 * @param &lt;T&gt; the result type
+&nbsp;	 * @param rootDirectory the root directory
+&nbsp;	 * @param callback the callback
+&nbsp;	 * @return the first callback result or {@code null}
+&nbsp;	 * @throws IOException in case of I/O errors
+&nbsp;	 */
+&nbsp;	static &lt;T&gt; T doWithMainClasses(File rootDirectory, MainClassCallback&lt;T&gt; callback) throws IOException {
+<b class="nc">&nbsp;		if (!rootDirectory.exists()) {</b>
+<b class="nc">&nbsp;			return null; // nothing to do</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!rootDirectory.isDirectory()) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Invalid root directory &#39;&quot; + rootDirectory + &quot;&#39;&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String prefix = rootDirectory.getAbsolutePath() + &quot;/&quot;;</b>
+<b class="nc">&nbsp;		Deque&lt;File&gt; stack = new ArrayDeque&lt;&gt;();</b>
+<b class="nc">&nbsp;		stack.push(rootDirectory);</b>
+<b class="nc">&nbsp;		while (!stack.isEmpty()) {</b>
+<b class="nc">&nbsp;			File file = stack.pop();</b>
+<b class="nc">&nbsp;			if (file.isFile()) {</b>
+<b class="nc">&nbsp;				try (InputStream inputStream = new FileInputStream(file)) {</b>
+<b class="nc">&nbsp;					ClassDescriptor classDescriptor = createClassDescriptor(inputStream);</b>
+<b class="nc">&nbsp;					if (classDescriptor != null &amp;&amp; classDescriptor.isMainMethodFound()) {</b>
+<b class="nc">&nbsp;						String className = convertToClassName(file.getAbsolutePath(), prefix);</b>
+<b class="nc">&nbsp;						T result = callback.doWith(new MainClass(className, classDescriptor.getAnnotationNames()));</b>
+<b class="nc">&nbsp;						if (result != null) {</b>
+<b class="nc">&nbsp;							return result;</b>
+&nbsp;						}
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (file.isDirectory()) {</b>
+<b class="nc">&nbsp;				pushAllSorted(stack, file.listFiles(PACKAGE_DIRECTORY_FILTER));</b>
+<b class="nc">&nbsp;				pushAllSorted(stack, file.listFiles(CLASS_FILE_FILTER));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void pushAllSorted(Deque&lt;File&gt; stack, File[] files) {
+<b class="nc">&nbsp;		Arrays.sort(files, Comparator.comparing(File::getName));</b>
+<b class="nc">&nbsp;		for (File file : files) {</b>
+<b class="nc">&nbsp;			stack.push(file);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find the main class in a given jar file.
+&nbsp;	 * @param jarFile the jar file to search
+&nbsp;	 * @param classesLocation the location within the jar containing classes
+&nbsp;	 * @return the main class or {@code null}
+&nbsp;	 * @throws IOException if the jar file cannot be read
+&nbsp;	 */
+&nbsp;	public static String findMainClass(JarFile jarFile, String classesLocation) throws IOException {
+<b class="nc">&nbsp;		return doWithMainClasses(jarFile, classesLocation, MainClass::getName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find a single main class in a given jar file.
+&nbsp;	 * @param jarFile the jar file to search
+&nbsp;	 * @param classesLocation the location within the jar containing classes
+&nbsp;	 * @return the main class or {@code null}
+&nbsp;	 * @throws IOException if the jar file cannot be read
+&nbsp;	 */
+&nbsp;	public static String findSingleMainClass(JarFile jarFile, String classesLocation) throws IOException {
+<b class="nc">&nbsp;		return findSingleMainClass(jarFile, classesLocation, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find a single main class in a given jar file. A main class annotated with an
+&nbsp;	 * annotation with the given {@code annotationName} will be preferred over a main
+&nbsp;	 * class with no such annotation.
+&nbsp;	 * @param jarFile the jar file to search
+&nbsp;	 * @param classesLocation the location within the jar containing classes
+&nbsp;	 * @param annotationName the name of the annotation that may be present on the main
+&nbsp;	 * class
+&nbsp;	 * @return the main class or {@code null}
+&nbsp;	 * @throws IOException if the jar file cannot be read
+&nbsp;	 */
+&nbsp;	public static String findSingleMainClass(JarFile jarFile, String classesLocation, String annotationName)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		SingleMainClassCallback callback = new SingleMainClassCallback(annotationName);</b>
+<b class="nc">&nbsp;		MainClassFinder.doWithMainClasses(jarFile, classesLocation, callback);</b>
+<b class="nc">&nbsp;		return callback.getMainClassName();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Perform the given callback operation on all main classes from the given jar.
+&nbsp;	 * @param &lt;T&gt; the result type
+&nbsp;	 * @param jarFile the jar file to search
+&nbsp;	 * @param classesLocation the location within the jar containing classes
+&nbsp;	 * @param callback the callback
+&nbsp;	 * @return the first callback result or {@code null}
+&nbsp;	 * @throws IOException in case of I/O errors
+&nbsp;	 */
+&nbsp;	static &lt;T&gt; T doWithMainClasses(JarFile jarFile, String classesLocation, MainClassCallback&lt;T&gt; callback)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		List&lt;JarEntry&gt; classEntries = getClassEntries(jarFile, classesLocation);</b>
+<b class="nc">&nbsp;		classEntries.sort(new ClassEntryComparator());</b>
+<b class="nc">&nbsp;		for (JarEntry entry : classEntries) {</b>
+<b class="nc">&nbsp;			try (InputStream inputStream = new BufferedInputStream(jarFile.getInputStream(entry))) {</b>
+<b class="nc">&nbsp;				ClassDescriptor classDescriptor = createClassDescriptor(inputStream);</b>
+<b class="nc">&nbsp;				if (classDescriptor != null &amp;&amp; classDescriptor.isMainMethodFound()) {</b>
+<b class="nc">&nbsp;					String className = convertToClassName(entry.getName(), classesLocation);</b>
+<b class="nc">&nbsp;					T result = callback.doWith(new MainClass(className, classDescriptor.getAnnotationNames()));</b>
+<b class="nc">&nbsp;					if (result != null) {</b>
+<b class="nc">&nbsp;						return result;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String convertToClassName(String name, String prefix) {
+<b class="nc">&nbsp;		name = name.replace(&#39;/&#39;, &#39;.&#39;);</b>
+<b class="nc">&nbsp;		name = name.replace(&#39;\\&#39;, &#39;.&#39;);</b>
+<b class="nc">&nbsp;		name = name.substring(0, name.length() - DOT_CLASS.length());</b>
+<b class="nc">&nbsp;		if (prefix != null) {</b>
+<b class="nc">&nbsp;			name = name.substring(prefix.length());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;JarEntry&gt; getClassEntries(JarFile source, String classesLocation) {
+<b class="nc">&nbsp;		classesLocation = (classesLocation != null) ? classesLocation : &quot;&quot;;</b>
+<b class="nc">&nbsp;		Enumeration&lt;JarEntry&gt; sourceEntries = source.entries();</b>
+<b class="nc">&nbsp;		List&lt;JarEntry&gt; classEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		while (sourceEntries.hasMoreElements()) {</b>
+<b class="nc">&nbsp;			JarEntry entry = sourceEntries.nextElement();</b>
+<b class="nc">&nbsp;			if (entry.getName().startsWith(classesLocation) &amp;&amp; entry.getName().endsWith(DOT_CLASS)) {</b>
+<b class="nc">&nbsp;				classEntries.add(entry);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return classEntries;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ClassDescriptor createClassDescriptor(InputStream inputStream) {
+&nbsp;		try {
+<b class="nc">&nbsp;			ClassReader classReader = new ClassReader(inputStream);</b>
+<b class="nc">&nbsp;			ClassDescriptor classDescriptor = new ClassDescriptor();</b>
+<b class="nc">&nbsp;			classReader.accept(classDescriptor, ClassReader.SKIP_CODE);</b>
+<b class="nc">&nbsp;			return classDescriptor;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class ClassEntryComparator implements Comparator&lt;JarEntry&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int compare(JarEntry o1, JarEntry o2) {
+<b class="nc">&nbsp;			Integer d1 = getDepth(o1);</b>
+<b class="nc">&nbsp;			Integer d2 = getDepth(o2);</b>
+<b class="nc">&nbsp;			int depthCompare = d1.compareTo(d2);</b>
+<b class="nc">&nbsp;			if (depthCompare != 0) {</b>
+<b class="nc">&nbsp;				return depthCompare;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return o1.getName().compareTo(o2.getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int getDepth(JarEntry entry) {
+<b class="nc">&nbsp;			return entry.getName().split(&quot;/&quot;).length;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class ClassDescriptor extends ClassVisitor {
+&nbsp;
+<b class="nc">&nbsp;		private final Set&lt;String&gt; annotationNames = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private boolean mainMethodFound;
+&nbsp;
+&nbsp;		ClassDescriptor() {
+<b class="nc">&nbsp;			super(SpringAsmInfo.ASM_VERSION);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+<b class="nc">&nbsp;			this.annotationNames.add(Type.getType(desc).getClassName());</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+<b class="nc">&nbsp;			if (isAccess(access, Opcodes.ACC_PUBLIC, Opcodes.ACC_STATIC) &amp;&amp; MAIN_METHOD_NAME.equals(name)</b>
+<b class="nc">&nbsp;					&amp;&amp; MAIN_METHOD_TYPE.getDescriptor().equals(desc)) {</b>
+<b class="nc">&nbsp;				this.mainMethodFound = true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isAccess(int access, int... requiredOpsCodes) {
+<b class="nc">&nbsp;			for (int requiredOpsCode : requiredOpsCodes) {</b>
+<b class="nc">&nbsp;				if ((access &amp; requiredOpsCode) == 0) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isMainMethodFound() {
+<b class="nc">&nbsp;			return this.mainMethodFound;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;String&gt; getAnnotationNames() {
+<b class="nc">&nbsp;			return this.annotationNames;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Callback for handling {@link MainClass MainClasses}.
+&nbsp;	 *
+&nbsp;	 * @param &lt;T&gt; the callback&#39;s return type
+&nbsp;	 */
+&nbsp;	interface MainClassCallback&lt;T&gt; {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Handle the specified main class.
+&nbsp;		 * @param mainClass the main class
+&nbsp;		 * @return a non-null value if processing should end or {@code null} to continue
+&nbsp;		 */
+&nbsp;		T doWith(MainClass mainClass);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A class with a {@code main} method.
+&nbsp;	 */
+&nbsp;	static final class MainClass {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final Set&lt;String&gt; annotationNames;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Creates a new {@code MainClass} rather represents the main class with the given
+&nbsp;		 * {@code name}. The class is annotated with the annotations with the given
+&nbsp;		 * {@code annotationNames}.
+&nbsp;		 * @param name the name of the class
+&nbsp;		 * @param annotationNames the names of the annotations on the class
+&nbsp;		 */
+<b class="nc">&nbsp;		MainClass(String name, Set&lt;String&gt; annotationNames) {</b>
+<b class="nc">&nbsp;			this.name = name;</b>
+<b class="nc">&nbsp;			this.annotationNames = Collections.unmodifiableSet(new HashSet&lt;&gt;(annotationNames));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getName() {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;String&gt; getAnnotationNames() {
+<b class="nc">&nbsp;			return this.annotationNames;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean equals(Object obj) {
+<b class="nc">&nbsp;			if (this == obj) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (obj == null) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			MainClass other = (MainClass) obj;</b>
+<b class="nc">&nbsp;			return this.name.equals(other.name);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int hashCode() {
+<b class="nc">&nbsp;			return this.name.hashCode();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find a single main class, throwing an {@link IllegalStateException} if multiple
+&nbsp;	 * candidates exist.
+&nbsp;	 */
+&nbsp;	private static final class SingleMainClassCallback implements MainClassCallback&lt;Object&gt; {
+&nbsp;
+<b class="nc">&nbsp;		private final Set&lt;MainClass&gt; mainClasses = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private final String annotationName;
+&nbsp;
+<b class="nc">&nbsp;		private SingleMainClassCallback(String annotationName) {</b>
+<b class="nc">&nbsp;			this.annotationName = annotationName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object doWith(MainClass mainClass) {
+<b class="nc">&nbsp;			this.mainClasses.add(mainClass);</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getMainClassName() {
+<b class="nc">&nbsp;			Set&lt;MainClass&gt; matchingMainClasses = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			if (this.annotationName != null) {</b>
+<b class="nc">&nbsp;				for (MainClass mainClass : this.mainClasses) {</b>
+<b class="nc">&nbsp;					if (mainClass.getAnnotationNames().contains(this.annotationName)) {</b>
+<b class="nc">&nbsp;						matchingMainClasses.add(mainClass);</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (matchingMainClasses.isEmpty()) {</b>
+<b class="nc">&nbsp;				matchingMainClasses.addAll(this.mainClasses);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (matchingMainClasses.size() &gt; 1) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(</b>
+&nbsp;						&quot;Unable to find a single main class from the following candidates &quot; + matchingMainClasses);
+&nbsp;			}
+<b class="nc">&nbsp;			return (matchingMainClasses.isEmpty() ? null : matchingMainClasses.iterator().next().getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

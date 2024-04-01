@@ -1,0 +1,203 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MBeanInfoFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.jmx</a>
+</div>
+
+<h1>Coverage Summary for Class: MBeanInfoFactory (org.springframework.boot.actuate.endpoint.jmx)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MBeanInfoFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.jmx;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javax.management.MBeanInfo;
+&nbsp;import javax.management.MBeanOperationInfo;
+&nbsp;import javax.management.MBeanParameterInfo;
+&nbsp;import javax.management.modelmbean.ModelMBeanAttributeInfo;
+&nbsp;import javax.management.modelmbean.ModelMBeanConstructorInfo;
+&nbsp;import javax.management.modelmbean.ModelMBeanInfoSupport;
+&nbsp;import javax.management.modelmbean.ModelMBeanNotificationInfo;
+&nbsp;import javax.management.modelmbean.ModelMBeanOperationInfo;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationType;
+&nbsp;
+&nbsp;/**
+&nbsp; * Factory to create {@link MBeanInfo} from an {@link ExposableJmxEndpoint}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class MBeanInfoFactory {
+&nbsp;
+<b class="nc">&nbsp;	private static final ModelMBeanAttributeInfo[] NO_ATTRIBUTES = new ModelMBeanAttributeInfo[0];</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final ModelMBeanConstructorInfo[] NO_CONSTRUCTORS = new ModelMBeanConstructorInfo[0];</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final ModelMBeanNotificationInfo[] NO_NOTIFICATIONS = new ModelMBeanNotificationInfo[0];</b>
+&nbsp;
+&nbsp;	private final JmxOperationResponseMapper responseMapper;
+&nbsp;
+<b class="nc">&nbsp;	MBeanInfoFactory(JmxOperationResponseMapper responseMapper) {</b>
+<b class="nc">&nbsp;		this.responseMapper = responseMapper;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	MBeanInfo getMBeanInfo(ExposableJmxEndpoint endpoint) {
+<b class="nc">&nbsp;		String className = EndpointMBean.class.getName();</b>
+<b class="nc">&nbsp;		String description = getDescription(endpoint);</b>
+<b class="nc">&nbsp;		ModelMBeanOperationInfo[] operations = getMBeanOperations(endpoint);</b>
+<b class="nc">&nbsp;		return new ModelMBeanInfoSupport(className, description, NO_ATTRIBUTES, NO_CONSTRUCTORS, operations,</b>
+&nbsp;				NO_NOTIFICATIONS);
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getDescription(ExposableJmxEndpoint endpoint) {
+<b class="nc">&nbsp;		return &quot;MBean operations for endpoint &quot; + endpoint.getEndpointId();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ModelMBeanOperationInfo[] getMBeanOperations(ExposableJmxEndpoint endpoint) {
+<b class="nc">&nbsp;		return endpoint.getOperations().stream().map(this::getMBeanOperation).toArray(ModelMBeanOperationInfo[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ModelMBeanOperationInfo getMBeanOperation(JmxOperation operation) {
+<b class="nc">&nbsp;		String name = operation.getName();</b>
+<b class="nc">&nbsp;		String description = operation.getDescription();</b>
+<b class="nc">&nbsp;		MBeanParameterInfo[] signature = getSignature(operation.getParameters());</b>
+<b class="nc">&nbsp;		String type = getType(operation.getOutputType());</b>
+<b class="nc">&nbsp;		int impact = getImpact(operation.getType());</b>
+<b class="nc">&nbsp;		return new ModelMBeanOperationInfo(name, description, signature, type, impact);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private MBeanParameterInfo[] getSignature(List&lt;JmxOperationParameter&gt; parameters) {
+<b class="nc">&nbsp;		return parameters.stream().map(this::getMBeanParameter).toArray(MBeanParameterInfo[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private MBeanParameterInfo getMBeanParameter(JmxOperationParameter parameter) {
+<b class="nc">&nbsp;		return new MBeanParameterInfo(parameter.getName(), parameter.getType().getName(), parameter.getDescription());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int getImpact(OperationType operationType) {
+<b class="nc">&nbsp;		if (operationType == OperationType.READ) {</b>
+<b class="nc">&nbsp;			return MBeanOperationInfo.INFO;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (operationType == OperationType.WRITE || operationType == OperationType.DELETE) {</b>
+<b class="nc">&nbsp;			return MBeanOperationInfo.ACTION;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return MBeanOperationInfo.UNKNOWN;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getType(Class&lt;?&gt; outputType) {
+<b class="nc">&nbsp;		return this.responseMapper.mapResponseType(outputType).getName();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

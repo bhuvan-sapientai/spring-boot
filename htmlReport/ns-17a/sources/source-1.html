@@ -1,0 +1,280 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultConnectionPorts</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultConnectionPorts (org.springframework.boot.docker.compose.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultConnectionPorts</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DefaultConnectionPorts$ContainerPort</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.core;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.docker.compose.core.DockerCliInspectResponse.Config;
+&nbsp;import org.springframework.boot.docker.compose.core.DockerCliInspectResponse.HostConfig;
+&nbsp;import org.springframework.boot.docker.compose.core.DockerCliInspectResponse.HostPort;
+&nbsp;import org.springframework.boot.docker.compose.core.DockerCliInspectResponse.NetworkSettings;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default {@link ConnectionPorts} implementation backed by {@link DockerCli} responses.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class DefaultConnectionPorts implements ConnectionPorts {
+&nbsp;
+&nbsp;	private final Map&lt;ContainerPort, Integer&gt; mappings;
+&nbsp;
+&nbsp;	private final Map&lt;Integer, Integer&gt; portMappings;
+&nbsp;
+<b class="nc">&nbsp;	DefaultConnectionPorts(DockerCliInspectResponse inspectResponse) {</b>
+<b class="nc">&nbsp;		this.mappings = !isHostNetworkMode(inspectResponse)</b>
+<b class="nc">&nbsp;				? buildMappingsForNetworkSettings(inspectResponse.networkSettings())</b>
+<b class="nc">&nbsp;				: buildMappingsForHostNetworking(inspectResponse.config());</b>
+<b class="nc">&nbsp;		Map&lt;Integer, Integer&gt; portMappings = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		this.mappings.forEach((containerPort, hostPort) -&gt; portMappings.put(containerPort.number(), hostPort));</b>
+<b class="nc">&nbsp;		this.portMappings = Collections.unmodifiableMap(portMappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isHostNetworkMode(DockerCliInspectResponse inspectResponse) {
+<b class="nc">&nbsp;		HostConfig config = inspectResponse.hostConfig();</b>
+<b class="nc">&nbsp;		return (config != null) &amp;&amp; &quot;host&quot;.equals(config.networkMode());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;ContainerPort, Integer&gt; buildMappingsForNetworkSettings(NetworkSettings networkSettings) {
+<b class="nc">&nbsp;		if (networkSettings == null || CollectionUtils.isEmpty(networkSettings.ports())) {</b>
+<b class="nc">&nbsp;			return Collections.emptyMap();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Map&lt;ContainerPort, Integer&gt; mappings = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		networkSettings.ports().forEach((containerPortString, hostPorts) -&gt; {</b>
+<b class="nc">&nbsp;			if (!CollectionUtils.isEmpty(hostPorts)) {</b>
+<b class="nc">&nbsp;				ContainerPort containerPort = ContainerPort.parse(containerPortString);</b>
+<b class="nc">&nbsp;				hostPorts.stream()</b>
+<b class="nc">&nbsp;					.filter(this::isIpV4)</b>
+<b class="nc">&nbsp;					.forEach((hostPort) -&gt; mappings.put(containerPort, getPortNumber(hostPort)));</b>
+&nbsp;			}
+&nbsp;		});
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(mappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isIpV4(HostPort hostPort) {
+<b class="nc">&nbsp;		String ip = (hostPort != null) ? hostPort.hostIp() : null;</b>
+<b class="nc">&nbsp;		return !StringUtils.hasLength(ip) || ip.contains(&quot;.&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static int getPortNumber(HostPort hostPort) {
+<b class="nc">&nbsp;		return Integer.parseInt(hostPort.hostPort());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;ContainerPort, Integer&gt; buildMappingsForHostNetworking(Config config) {
+<b class="nc">&nbsp;		if (CollectionUtils.isEmpty(config.exposedPorts())) {</b>
+<b class="nc">&nbsp;			return Collections.emptyMap();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Map&lt;ContainerPort, Integer&gt; mappings = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String entry : config.exposedPorts().keySet()) {</b>
+<b class="nc">&nbsp;			ContainerPort containerPort = ContainerPort.parse(entry);</b>
+<b class="nc">&nbsp;			mappings.put(containerPort, containerPort.number());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(mappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int get(int containerPort) {
+<b class="nc">&nbsp;		Integer hostPort = this.portMappings.get(containerPort);</b>
+<b class="nc">&nbsp;		Assert.state(hostPort != null, &quot;No host port mapping found for container port %s&quot;.formatted(containerPort));</b>
+<b class="nc">&nbsp;		return hostPort;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public List&lt;Integer&gt; getAll() {
+<b class="nc">&nbsp;		return getAll(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public List&lt;Integer&gt; getAll(String protocol) {
+<b class="nc">&nbsp;		List&lt;Integer&gt; hostPorts = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		this.mappings.forEach((containerPort, hostPort) -&gt; {</b>
+<b class="nc">&nbsp;			if (protocol == null || protocol.equalsIgnoreCase(containerPort.protocol())) {</b>
+<b class="nc">&nbsp;				hostPorts.add(hostPort);</b>
+&nbsp;			}
+&nbsp;		});
+<b class="nc">&nbsp;		return Collections.unmodifiableList(hostPorts);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Map&lt;ContainerPort, Integer&gt; getMappings() {
+<b class="nc">&nbsp;		return this.mappings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A container port consisting of a number and protocol.
+&nbsp;	 *
+&nbsp;	 * @param number the port number
+&nbsp;	 * @param protocol the protocol (e.g. tcp)
+&nbsp;	 */
+<b class="nc">&nbsp;	record ContainerPort(int number, String protocol) {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return &quot;%d/%s&quot;.formatted(this.number, this.protocol);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static ContainerPort parse(String value) {
+&nbsp;			try {
+<b class="nc">&nbsp;				String[] parts = value.split(&quot;/&quot;);</b>
+<b class="nc">&nbsp;				Assert.state(parts.length == 2, &quot;Unable to split string&quot;);</b>
+<b class="nc">&nbsp;				return new ContainerPort(Integer.parseInt(parts[0]), parts[1]);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Unable to parse container port &#39;%s&#39;&quot;.formatted(value), ex);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,437 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImageArchive</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.type</a>
+</div>
+
+<h1>Coverage Summary for Class: ImageArchive (org.springframework.boot.buildpack.platform.docker.type)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImageArchive</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ImageArchive$Update</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.type;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.OffsetDateTime;
+&nbsp;import java.time.ZoneOffset;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.node.ArrayNode;
+&nbsp;import com.fasterxml.jackson.databind.node.ObjectNode;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.io.Content;
+&nbsp;import org.springframework.boot.buildpack.platform.io.IOConsumer;
+&nbsp;import org.springframework.boot.buildpack.platform.io.InspectedContent;
+&nbsp;import org.springframework.boot.buildpack.platform.io.Layout;
+&nbsp;import org.springframework.boot.buildpack.platform.io.Owner;
+&nbsp;import org.springframework.boot.buildpack.platform.io.TarArchive;
+&nbsp;import org.springframework.boot.buildpack.platform.json.SharedObjectMapper;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * An image archive that can be loaded into Docker.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.3.0
+&nbsp; * @see #from(Image, IOConsumer)
+&nbsp; * @see &lt;a href=&quot;https://github.com/moby/moby/blob/master/image/spec/v1.2.md&quot;&gt;Docker Image
+&nbsp; * Specification&lt;/a&gt;
+&nbsp; */
+&nbsp;public class ImageArchive implements TarArchive {
+&nbsp;
+<b class="nc">&nbsp;	private static final Instant WINDOWS_EPOCH_PLUS_SECOND = OffsetDateTime.of(1980, 1, 1, 0, 0, 1, 0, ZoneOffset.UTC)</b>
+<b class="nc">&nbsp;		.toInstant();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_ZONED_DATE_TIME</b>
+<b class="nc">&nbsp;		.withZone(ZoneOffset.UTC);</b>
+&nbsp;
+&nbsp;	private static final String EMPTY_LAYER_NAME_PREFIX = &quot;blank_&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final IOConsumer&lt;Update&gt; NO_UPDATES = (update) -&gt; {</b>
+<b class="nc">&nbsp;	};</b>
+&nbsp;
+&nbsp;	private final ObjectMapper objectMapper;
+&nbsp;
+&nbsp;	private final ImageConfig imageConfig;
+&nbsp;
+&nbsp;	private final Instant createDate;
+&nbsp;
+&nbsp;	private final ImageReference tag;
+&nbsp;
+&nbsp;	private final String os;
+&nbsp;
+&nbsp;	private final List&lt;LayerId&gt; existingLayers;
+&nbsp;
+&nbsp;	private final List&lt;Layer&gt; newLayers;
+&nbsp;
+&nbsp;	ImageArchive(ObjectMapper objectMapper, ImageConfig imageConfig, Instant createDate, ImageReference tag, String os,
+<b class="nc">&nbsp;			List&lt;LayerId&gt; existingLayers, List&lt;Layer&gt; newLayers) {</b>
+<b class="nc">&nbsp;		this.objectMapper = objectMapper;</b>
+<b class="nc">&nbsp;		this.imageConfig = imageConfig;</b>
+<b class="nc">&nbsp;		this.createDate = createDate;</b>
+<b class="nc">&nbsp;		this.tag = tag;</b>
+<b class="nc">&nbsp;		this.os = os;</b>
+<b class="nc">&nbsp;		this.existingLayers = existingLayers;</b>
+<b class="nc">&nbsp;		this.newLayers = newLayers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the image config for the archive.
+&nbsp;	 * @return the image config
+&nbsp;	 */
+&nbsp;	public ImageConfig getImageConfig() {
+<b class="nc">&nbsp;		return this.imageConfig;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the create date of the archive.
+&nbsp;	 * @return the create date
+&nbsp;	 */
+&nbsp;	public Instant getCreateDate() {
+<b class="nc">&nbsp;		return this.createDate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the tag of the archive.
+&nbsp;	 * @return the tag
+&nbsp;	 */
+&nbsp;	public ImageReference getTag() {
+<b class="nc">&nbsp;		return this.tag;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void writeTo(OutputStream outputStream) throws IOException {
+<b class="nc">&nbsp;		TarArchive.of(this::write).writeTo(outputStream);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void write(Layout writer) throws IOException {
+<b class="nc">&nbsp;		List&lt;LayerId&gt; writtenLayers = writeLayers(writer);</b>
+<b class="nc">&nbsp;		String config = writeConfig(writer, writtenLayers);</b>
+<b class="nc">&nbsp;		writeManifest(writer, config, writtenLayers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;LayerId&gt; writeLayers(Layout writer) throws IOException {
+<b class="nc">&nbsp;		for (int i = 0; i &lt; this.existingLayers.size(); i++) {</b>
+<b class="nc">&nbsp;			writeEmptyLayer(writer, EMPTY_LAYER_NAME_PREFIX + i);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;LayerId&gt; writtenLayers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Layer layer : this.newLayers) {</b>
+<b class="nc">&nbsp;			writtenLayers.add(writeLayer(writer, layer));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableList(writtenLayers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeEmptyLayer(Layout writer, String name) throws IOException {
+<b class="nc">&nbsp;		writer.file(name, Owner.ROOT, Content.of(&quot;&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private LayerId writeLayer(Layout writer, Layer layer) throws IOException {
+<b class="nc">&nbsp;		LayerId id = layer.getId();</b>
+<b class="nc">&nbsp;		writer.file(id.getHash() + &quot;.tar&quot;, Owner.ROOT, layer);</b>
+<b class="nc">&nbsp;		return id;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String writeConfig(Layout writer, List&lt;LayerId&gt; writtenLayers) throws IOException {
+&nbsp;		try {
+<b class="nc">&nbsp;			ObjectNode config = createConfig(writtenLayers);</b>
+<b class="nc">&nbsp;			String json = this.objectMapper.writeValueAsString(config).replace(&quot;\r\n&quot;, &quot;\n&quot;);</b>
+<b class="nc">&nbsp;			MessageDigest digest = MessageDigest.getInstance(&quot;SHA-256&quot;);</b>
+<b class="nc">&nbsp;			InspectedContent content = InspectedContent.of(Content.of(json), digest::update);</b>
+<b class="nc">&nbsp;			String name = LayerId.ofSha256Digest(digest.digest()).getHash() + &quot;.json&quot;;</b>
+<b class="nc">&nbsp;			writer.file(name, Owner.ROOT, content);</b>
+<b class="nc">&nbsp;			return name;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchAlgorithmException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ObjectNode createConfig(List&lt;LayerId&gt; writtenLayers) {
+<b class="nc">&nbsp;		ObjectNode config = this.objectMapper.createObjectNode();</b>
+<b class="nc">&nbsp;		config.set(&quot;config&quot;, this.imageConfig.getNodeCopy());</b>
+<b class="nc">&nbsp;		config.set(&quot;created&quot;, config.textNode(getCreatedDate()));</b>
+<b class="nc">&nbsp;		config.set(&quot;history&quot;, createHistory(writtenLayers));</b>
+<b class="nc">&nbsp;		config.set(&quot;os&quot;, config.textNode(this.os));</b>
+<b class="nc">&nbsp;		config.set(&quot;rootfs&quot;, createRootFs(writtenLayers));</b>
+<b class="nc">&nbsp;		return config;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getCreatedDate() {
+<b class="nc">&nbsp;		return DATE_FORMATTER.format(this.createDate);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JsonNode createHistory(List&lt;LayerId&gt; writtenLayers) {
+<b class="nc">&nbsp;		ArrayNode history = this.objectMapper.createArrayNode();</b>
+<b class="nc">&nbsp;		int size = this.existingLayers.size() + writtenLayers.size();</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; size; i++) {</b>
+<b class="nc">&nbsp;			history.addObject();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return history;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JsonNode createRootFs(List&lt;LayerId&gt; writtenLayers) {
+<b class="nc">&nbsp;		ObjectNode rootFs = this.objectMapper.createObjectNode();</b>
+<b class="nc">&nbsp;		ArrayNode diffIds = rootFs.putArray(&quot;diff_ids&quot;);</b>
+<b class="nc">&nbsp;		this.existingLayers.stream().map(Object::toString).forEach(diffIds::add);</b>
+<b class="nc">&nbsp;		writtenLayers.stream().map(Object::toString).forEach(diffIds::add);</b>
+<b class="nc">&nbsp;		return rootFs;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeManifest(Layout writer, String config, List&lt;LayerId&gt; writtenLayers) throws IOException {
+<b class="nc">&nbsp;		ArrayNode manifest = createManifest(config, writtenLayers);</b>
+<b class="nc">&nbsp;		String manifestJson = this.objectMapper.writeValueAsString(manifest);</b>
+<b class="nc">&nbsp;		writer.file(&quot;manifest.json&quot;, Owner.ROOT, Content.of(manifestJson));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArrayNode createManifest(String config, List&lt;LayerId&gt; writtenLayers) {
+<b class="nc">&nbsp;		ArrayNode manifest = this.objectMapper.createArrayNode();</b>
+<b class="nc">&nbsp;		ObjectNode entry = manifest.addObject();</b>
+<b class="nc">&nbsp;		entry.set(&quot;Config&quot;, entry.textNode(config));</b>
+<b class="nc">&nbsp;		entry.set(&quot;Layers&quot;, getManifestLayers(writtenLayers));</b>
+<b class="nc">&nbsp;		if (this.tag != null) {</b>
+<b class="nc">&nbsp;			entry.set(&quot;RepoTags&quot;, entry.arrayNode().add(this.tag.toString()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return manifest;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArrayNode getManifestLayers(List&lt;LayerId&gt; writtenLayers) {
+<b class="nc">&nbsp;		ArrayNode layers = this.objectMapper.createArrayNode();</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; this.existingLayers.size(); i++) {</b>
+<b class="nc">&nbsp;			layers.add(EMPTY_LAYER_NAME_PREFIX + i);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		writtenLayers.stream().map((id) -&gt; id.getHash() + &quot;.tar&quot;).forEach(layers::add);</b>
+<b class="nc">&nbsp;		return layers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ImageArchive} based on an existing {@link Image}.
+&nbsp;	 * @param image the image that this archive is based on
+&nbsp;	 * @return the new image archive.
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public static ImageArchive from(Image image) throws IOException {
+<b class="nc">&nbsp;		return from(image, NO_UPDATES);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ImageArchive} based on an existing {@link Image}.
+&nbsp;	 * @param image the image that this archive is based on
+&nbsp;	 * @param update consumer to apply updates
+&nbsp;	 * @return the new image archive.
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public static ImageArchive from(Image image, IOConsumer&lt;Update&gt; update) throws IOException {
+<b class="nc">&nbsp;		return new Update(image).applyTo(update);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update class used to change data when creating an image archive.
+&nbsp;	 */
+&nbsp;	public static final class Update {
+&nbsp;
+&nbsp;		private final Image image;
+&nbsp;
+&nbsp;		private ImageConfig config;
+&nbsp;
+&nbsp;		private Instant createDate;
+&nbsp;
+&nbsp;		private ImageReference tag;
+&nbsp;
+<b class="nc">&nbsp;		private final List&lt;Layer&gt; newLayers = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		private Update(Image image) {</b>
+<b class="nc">&nbsp;			this.image = image;</b>
+<b class="nc">&nbsp;			this.config = image.getConfig();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ImageArchive applyTo(IOConsumer&lt;Update&gt; update) throws IOException {
+<b class="nc">&nbsp;			update.accept(this);</b>
+<b class="nc">&nbsp;			Instant createDate = (this.createDate != null) ? this.createDate : WINDOWS_EPOCH_PLUS_SECOND;</b>
+<b class="nc">&nbsp;			return new ImageArchive(SharedObjectMapper.get(), this.config, createDate, this.tag, this.image.getOs(),</b>
+<b class="nc">&nbsp;					this.image.getLayers(), Collections.unmodifiableList(this.newLayers));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Apply updates to the {@link ImageConfig}.
+&nbsp;		 * @param update consumer to apply updates
+&nbsp;		 */
+&nbsp;		public void withUpdatedConfig(Consumer&lt;ImageConfig.Update&gt; update) {
+<b class="nc">&nbsp;			this.config = this.config.copy(update);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Add a new layer to the image archive.
+&nbsp;		 * @param layer the layer to add
+&nbsp;		 */
+&nbsp;		public void withNewLayer(Layer layer) {
+<b class="nc">&nbsp;			Assert.notNull(layer, &quot;Layer must not be null&quot;);</b>
+<b class="nc">&nbsp;			this.newLayers.add(layer);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Set the create date for the image archive.
+&nbsp;		 * @param createDate the create date
+&nbsp;		 */
+&nbsp;		public void withCreateDate(Instant createDate) {
+<b class="nc">&nbsp;			Assert.notNull(createDate, &quot;CreateDate must not be null&quot;);</b>
+<b class="nc">&nbsp;			this.createDate = createDate;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Set the tag for the image archive.
+&nbsp;		 * @param tag the tag
+&nbsp;		 */
+&nbsp;		public void withTag(ImageReference tag) {
+<b class="nc">&nbsp;			Assert.notNull(tag, &quot;Tag must not be null&quot;);</b>
+<b class="nc">&nbsp;			this.tag = tag.inTaggedForm();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

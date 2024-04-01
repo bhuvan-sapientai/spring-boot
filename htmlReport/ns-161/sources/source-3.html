@@ -1,0 +1,408 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationPropertiesBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationPropertiesBean (org.springframework.boot.context.properties)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationPropertiesBean</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64%
+  </span>
+  <span class="absValue">
+    (16/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    49.4%
+  </span>
+  <span class="absValue">
+    (44/89)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.AnnotatedElement;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.aop.support.AopUtils;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.BeanPostProcessor;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.RootBeanDefinition;
+&nbsp;import org.springframework.boot.context.properties.bind.BindConstructorProvider;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.validation.annotation.Validated;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides access to {@link ConfigurationProperties @ConfigurationProperties} bean
+&nbsp; * details, regardless of if the annotation was used directly or on a {@link Bean @Bean}
+&nbsp; * factory method. This class can be used to access {@link #getAll(ApplicationContext)
+&nbsp; * all} configuration properties beans in an ApplicationContext, or
+&nbsp; * {@link #get(ApplicationContext, Object, String) individual beans} on a case-by-case
+&nbsp; * basis (for example, in a {@link BeanPostProcessor}).
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.2.0
+&nbsp; * @see #getAll(ApplicationContext)
+&nbsp; * @see #get(ApplicationContext, Object, String)
+&nbsp; */
+&nbsp;public final class ConfigurationPropertiesBean {
+&nbsp;
+<b class="fc">&nbsp;	private static final org.springframework.boot.context.properties.bind.BindMethod JAVA_BEAN_BIND_METHOD = //</b>
+&nbsp;			org.springframework.boot.context.properties.bind.BindMethod.JAVA_BEAN;
+&nbsp;
+<b class="fc">&nbsp;	private static final org.springframework.boot.context.properties.bind.BindMethod VALUE_OBJECT_BIND_METHOD = //</b>
+&nbsp;			org.springframework.boot.context.properties.bind.BindMethod.VALUE_OBJECT;
+&nbsp;
+&nbsp;	private final String name;
+&nbsp;
+&nbsp;	private final Object instance;
+&nbsp;
+&nbsp;	private final Bindable&lt;?&gt; bindTarget;
+&nbsp;
+<b class="nc">&nbsp;	private ConfigurationPropertiesBean(String name, Object instance, Bindable&lt;?&gt; bindTarget) {</b>
+<b class="nc">&nbsp;		this.name = name;</b>
+<b class="nc">&nbsp;		this.instance = instance;</b>
+<b class="nc">&nbsp;		this.bindTarget = bindTarget;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of the Spring bean.
+&nbsp;	 * @return the bean name
+&nbsp;	 */
+&nbsp;	public String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the actual Spring bean instance.
+&nbsp;	 * @return the bean instance
+&nbsp;	 */
+&nbsp;	public Object getInstance() {
+<b class="nc">&nbsp;		return this.instance;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the bean type.
+&nbsp;	 * @return the bean type
+&nbsp;	 */
+&nbsp;	Class&lt;?&gt; getType() {
+<b class="nc">&nbsp;		return this.bindTarget.getType().resolve();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link ConfigurationProperties} annotation for the bean. The annotation
+&nbsp;	 * may be defined on the bean itself or from the factory method that create the bean
+&nbsp;	 * (usually a {@link Bean @Bean} method).
+&nbsp;	 * @return the configuration properties annotation
+&nbsp;	 */
+&nbsp;	public ConfigurationProperties getAnnotation() {
+<b class="nc">&nbsp;		return this.bindTarget.getAnnotation(ConfigurationProperties.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link Bindable} instance suitable that can be used as a target for the
+&nbsp;	 * {@link Binder}.
+&nbsp;	 * @return a bind target for use with the {@link Binder}
+&nbsp;	 */
+&nbsp;	public Bindable&lt;?&gt; asBindTarget() {
+<b class="nc">&nbsp;		return this.bindTarget;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return all {@link ConfigurationProperties @ConfigurationProperties} beans contained
+&nbsp;	 * in the given application context. Both directly annotated beans, as well as beans
+&nbsp;	 * that have {@link ConfigurationProperties @ConfigurationProperties} annotated
+&nbsp;	 * factory methods are included.
+&nbsp;	 * @param applicationContext the source application context
+&nbsp;	 * @return a map of all configuration properties beans keyed by the bean name
+&nbsp;	 */
+&nbsp;	public static Map&lt;String, ConfigurationPropertiesBean&gt; getAll(ApplicationContext applicationContext) {
+<b class="fc">&nbsp;		Assert.notNull(applicationContext, &quot;ApplicationContext must not be null&quot;);</b>
+<b class="fc">&nbsp;		if (applicationContext instanceof ConfigurableApplicationContext configurableContext) {</b>
+<b class="fc">&nbsp;			return getAll(configurableContext);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		Map&lt;String, ConfigurationPropertiesBean&gt; propertiesBeans = new LinkedHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;		applicationContext.getBeansWithAnnotation(ConfigurationProperties.class).forEach((name, instance) -&gt; {</b>
+<b class="fc">&nbsp;			ConfigurationPropertiesBean propertiesBean = get(applicationContext, instance, name);</b>
+<b class="fc">&nbsp;			if (propertiesBean != null) {</b>
+<b class="fc">&nbsp;				propertiesBeans.put(name, propertiesBean);</b>
+&nbsp;			}
+&nbsp;		});
+<b class="fc">&nbsp;		return propertiesBeans;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Map&lt;String, ConfigurationPropertiesBean&gt; getAll(ConfigurableApplicationContext applicationContext) {
+<b class="fc">&nbsp;		Map&lt;String, ConfigurationPropertiesBean&gt; propertiesBeans = new LinkedHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;		ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();</b>
+<b class="fc">&nbsp;		Iterator&lt;String&gt; beanNames = beanFactory.getBeanNamesIterator();</b>
+<b class="nc">&nbsp;		while (beanNames.hasNext()) {</b>
+<b class="nc">&nbsp;			String beanName = beanNames.next();</b>
+<b class="nc">&nbsp;			if (isConfigurationPropertiesBean(beanFactory, beanName)) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					Object bean = beanFactory.getBean(beanName);</b>
+<b class="nc">&nbsp;					ConfigurationPropertiesBean propertiesBean = get(applicationContext, bean, beanName);</b>
+<b class="nc">&nbsp;					if (propertiesBean != null) {</b>
+<b class="nc">&nbsp;						propertiesBeans.put(beanName, propertiesBean);</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				catch (Exception ex) {</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return propertiesBeans;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isConfigurationPropertiesBean(ConfigurableListableBeanFactory beanFactory, String beanName) {
+&nbsp;		try {
+<b class="nc">&nbsp;			if (beanFactory.getBeanDefinition(beanName).isAbstract()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (beanFactory.findAnnotationOnBean(beanName, ConfigurationProperties.class) != null) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Method factoryMethod = findFactoryMethod(beanFactory, beanName);</b>
+<b class="nc">&nbsp;			return findMergedAnnotation(factoryMethod, ConfigurationProperties.class).isPresent();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link ConfigurationPropertiesBean @ConfigurationPropertiesBean} instance
+&nbsp;	 * for the given bean details or {@code null} if the bean is not a
+&nbsp;	 * {@link ConfigurationProperties @ConfigurationProperties} object. Annotations are
+&nbsp;	 * considered both on the bean itself, as well as any factory method (for example a
+&nbsp;	 * {@link Bean @Bean} method).
+&nbsp;	 * @param applicationContext the source application context
+&nbsp;	 * @param bean the bean to consider
+&nbsp;	 * @param beanName the bean name
+&nbsp;	 * @return a configuration properties bean or {@code null} if the neither the bean nor
+&nbsp;	 * factory method are annotated with
+&nbsp;	 * {@link ConfigurationProperties @ConfigurationProperties}
+&nbsp;	 */
+&nbsp;	public static ConfigurationPropertiesBean get(ApplicationContext applicationContext, Object bean, String beanName) {
+<b class="fc">&nbsp;		Method factoryMethod = findFactoryMethod(applicationContext, beanName);</b>
+<b class="fc">&nbsp;		Bindable&lt;Object&gt; bindTarget = createBindTarget(bean, bean.getClass(), factoryMethod);</b>
+<b class="fc">&nbsp;		if (bindTarget == null) {</b>
+<b class="fc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		bindTarget = bindTarget.withBindMethod(BindMethodAttribute.get(applicationContext, beanName));</b>
+<b class="nc">&nbsp;		if (bindTarget.getBindMethod() == null &amp;&amp; factoryMethod != null) {</b>
+<b class="nc">&nbsp;			bindTarget = bindTarget.withBindMethod(JAVA_BEAN_BIND_METHOD);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (bindTarget.getBindMethod() != VALUE_OBJECT_BIND_METHOD) {</b>
+<b class="nc">&nbsp;			bindTarget = bindTarget.withExistingValue(bean);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return create(beanName, bean, bindTarget);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Method findFactoryMethod(ApplicationContext applicationContext, String beanName) {
+<b class="fc">&nbsp;		if (applicationContext instanceof ConfigurableApplicationContext configurableContext) {</b>
+<b class="fc">&nbsp;			return findFactoryMethod(configurableContext, beanName);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Method findFactoryMethod(ConfigurableApplicationContext applicationContext, String beanName) {
+<b class="fc">&nbsp;		return findFactoryMethod(applicationContext.getBeanFactory(), beanName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Method findFactoryMethod(ConfigurableListableBeanFactory beanFactory, String beanName) {
+<b class="fc">&nbsp;		if (beanFactory.containsBeanDefinition(beanName)) {</b>
+<b class="nc">&nbsp;			BeanDefinition beanDefinition = beanFactory.getMergedBeanDefinition(beanName);</b>
+<b class="nc">&nbsp;			if (beanDefinition instanceof RootBeanDefinition rootBeanDefinition) {</b>
+<b class="nc">&nbsp;				return rootBeanDefinition.getResolvedFactoryMethod();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static ConfigurationPropertiesBean forValueObject(Class&lt;?&gt; beanType, String beanName) {
+<b class="fc">&nbsp;		Bindable&lt;Object&gt; bindTarget = createBindTarget(null, beanType, null);</b>
+<b class="fc">&nbsp;		Assert.state(bindTarget != null &amp;&amp; deduceBindMethod(bindTarget) == VALUE_OBJECT_BIND_METHOD,</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Bean &#39;&quot; + beanName + &quot;&#39; is not a @ConfigurationProperties value object&quot;);</b>
+<b class="fc">&nbsp;		return create(beanName, null, bindTarget.withBindMethod(VALUE_OBJECT_BIND_METHOD));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Bindable&lt;Object&gt; createBindTarget(Object bean, Class&lt;?&gt; beanType, Method factoryMethod) {
+<b class="fc">&nbsp;		ResolvableType type = (factoryMethod != null) ? ResolvableType.forMethodReturnType(factoryMethod)</b>
+<b class="fc">&nbsp;				: ResolvableType.forClass(beanType);</b>
+<b class="fc">&nbsp;		Annotation[] annotations = findAnnotations(bean, beanType, factoryMethod);</b>
+<b class="fc">&nbsp;		return (annotations != null) ? Bindable.of(type).withAnnotations(annotations) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Annotation[] findAnnotations(Object instance, Class&lt;?&gt; type, Method factory) {
+<b class="fc">&nbsp;		ConfigurationProperties annotation = findAnnotation(instance, type, factory, ConfigurationProperties.class);</b>
+<b class="fc">&nbsp;		if (annotation == null) {</b>
+<b class="fc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Validated validated = findAnnotation(instance, type, factory, Validated.class);</b>
+<b class="nc">&nbsp;		return (validated != null) ? new Annotation[] { annotation, validated } : new Annotation[] { annotation };</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static &lt;A extends Annotation&gt; A findAnnotation(Object instance, Class&lt;?&gt; type, Method factory,
+&nbsp;			Class&lt;A&gt; annotationType) {
+<b class="fc">&nbsp;		MergedAnnotation&lt;A&gt; annotation = MergedAnnotation.missing();</b>
+<b class="fc">&nbsp;		if (factory != null) {</b>
+<b class="nc">&nbsp;			annotation = findMergedAnnotation(factory, annotationType);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (!annotation.isPresent()) {</b>
+<b class="fc">&nbsp;			annotation = findMergedAnnotation(type, annotationType);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (!annotation.isPresent() &amp;&amp; AopUtils.isAopProxy(instance)) {</b>
+<b class="nc">&nbsp;			annotation = MergedAnnotations.from(AopUtils.getTargetClass(instance), SearchStrategy.TYPE_HIERARCHY)</b>
+<b class="nc">&nbsp;				.get(annotationType);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return annotation.isPresent() ? annotation.synthesize() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static &lt;A extends Annotation&gt; MergedAnnotation&lt;A&gt; findMergedAnnotation(AnnotatedElement element,
+&nbsp;			Class&lt;A&gt; annotationType) {
+<b class="fc">&nbsp;		return (element != null) ? MergedAnnotations.from(element, SearchStrategy.TYPE_HIERARCHY).get(annotationType)</b>
+<b class="fc">&nbsp;				: MergedAnnotation.missing();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ConfigurationPropertiesBean create(String name, Object instance, Bindable&lt;Object&gt; bindTarget) {
+<b class="nc">&nbsp;		return (bindTarget != null) ? new ConfigurationPropertiesBean(name, instance, bindTarget) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Deduce the {@code BindMethod} that should be used for the given type.
+&nbsp;	 * @param type the source type
+&nbsp;	 * @return the bind method to use
+&nbsp;	 */
+&nbsp;	static org.springframework.boot.context.properties.bind.BindMethod deduceBindMethod(Class&lt;?&gt; type) {
+<b class="fc">&nbsp;		return deduceBindMethod(BindConstructorProvider.DEFAULT.getBindConstructor(type, false));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Deduce the {@code BindMethod} that should be used for the given {@link Bindable}.
+&nbsp;	 * @param bindable the source bindable
+&nbsp;	 * @return the bind method to use
+&nbsp;	 */
+&nbsp;	static org.springframework.boot.context.properties.bind.BindMethod deduceBindMethod(Bindable&lt;Object&gt; bindable) {
+<b class="fc">&nbsp;		return deduceBindMethod(BindConstructorProvider.DEFAULT.getBindConstructor(bindable, false));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static org.springframework.boot.context.properties.bind.BindMethod deduceBindMethod(
+&nbsp;			Constructor&lt;?&gt; bindConstructor) {
+<b class="fc">&nbsp;		return (bindConstructor != null) ? VALUE_OBJECT_BIND_METHOD : JAVA_BEAN_BIND_METHOD;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

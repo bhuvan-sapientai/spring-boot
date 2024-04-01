@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServletListenerRegistrationBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: ServletListenerRegistrationBean (org.springframework.boot.web.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServletListenerRegistrationBean</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EventListener;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;import jakarta.servlet.ServletContextAttributeListener;
+&nbsp;import jakarta.servlet.ServletContextListener;
+&nbsp;import jakarta.servlet.ServletRequestAttributeListener;
+&nbsp;import jakarta.servlet.ServletRequestListener;
+&nbsp;import jakarta.servlet.http.HttpSessionAttributeListener;
+&nbsp;import jakarta.servlet.http.HttpSessionIdListener;
+&nbsp;import jakarta.servlet.http.HttpSessionListener;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link ServletContextInitializer} to register {@link EventListener}s in a Servlet
+&nbsp; * 3.0+ container. Similar to the {@link ServletContext#addListener(EventListener)
+&nbsp; * registration} features provided by {@link ServletContext} but with a Spring Bean
+&nbsp; * friendly design.
+&nbsp; *
+&nbsp; * This bean can be used to register the following types of listener:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@link ServletContextAttributeListener}&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link ServletRequestListener}&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link ServletRequestAttributeListener}&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link HttpSessionAttributeListener}&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link HttpSessionIdListener}&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link HttpSessionListener}&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@link ServletContextListener}&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type of listener
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;public class ServletListenerRegistrationBean&lt;T extends EventListener&gt; extends RegistrationBean {
+&nbsp;
+&nbsp;	private static final Set&lt;Class&lt;?&gt;&gt; SUPPORTED_TYPES;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Set&lt;Class&lt;?&gt;&gt; types = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		types.add(ServletContextAttributeListener.class);</b>
+<b class="nc">&nbsp;		types.add(ServletRequestListener.class);</b>
+<b class="nc">&nbsp;		types.add(ServletRequestAttributeListener.class);</b>
+<b class="nc">&nbsp;		types.add(HttpSessionAttributeListener.class);</b>
+<b class="nc">&nbsp;		types.add(HttpSessionIdListener.class);</b>
+<b class="nc">&nbsp;		types.add(HttpSessionListener.class);</b>
+<b class="nc">&nbsp;		types.add(ServletContextListener.class);</b>
+<b class="nc">&nbsp;		SUPPORTED_TYPES = Collections.unmodifiableSet(types);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private T listener;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ServletListenerRegistrationBean} instance.
+&nbsp;	 */
+<b class="nc">&nbsp;	public ServletListenerRegistrationBean() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ServletListenerRegistrationBean} instance.
+&nbsp;	 * @param listener the listener to register
+&nbsp;	 */
+<b class="nc">&nbsp;	public ServletListenerRegistrationBean(T listener) {</b>
+<b class="nc">&nbsp;		Assert.notNull(listener, &quot;Listener must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(isSupportedType(listener), &quot;Listener is not of a supported type&quot;);</b>
+<b class="nc">&nbsp;		this.listener = listener;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the listener that will be registered.
+&nbsp;	 * @param listener the listener to register
+&nbsp;	 */
+&nbsp;	public void setListener(T listener) {
+<b class="nc">&nbsp;		Assert.notNull(listener, &quot;Listener must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(isSupportedType(listener), &quot;Listener is not of a supported type&quot;);</b>
+<b class="nc">&nbsp;		this.listener = listener;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the listener to be registered.
+&nbsp;	 * @return the listener to be registered
+&nbsp;	 */
+&nbsp;	public T getListener() {
+<b class="nc">&nbsp;		return this.listener;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String getDescription() {
+<b class="nc">&nbsp;		Assert.notNull(this.listener, &quot;Listener must not be null&quot;);</b>
+<b class="nc">&nbsp;		return &quot;listener &quot; + this.listener;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void register(String description, ServletContext servletContext) {
+&nbsp;		try {
+<b class="nc">&nbsp;			servletContext.addListener(this.listener);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Failed to add listener &#39;&quot; + this.listener + &quot;&#39; to servlet context&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns {@code true} if the specified listener is one of the supported types.
+&nbsp;	 * @param listener the listener to test
+&nbsp;	 * @return if the listener is of a supported type
+&nbsp;	 */
+&nbsp;	public static boolean isSupportedType(EventListener listener) {
+<b class="nc">&nbsp;		for (Class&lt;?&gt; type : SUPPORTED_TYPES) {</b>
+<b class="nc">&nbsp;			if (ClassUtils.isAssignableValue(type, listener)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the supported types for this registration.
+&nbsp;	 * @return the supported types
+&nbsp;	 */
+&nbsp;	public static Set&lt;Class&lt;?&gt;&gt; getSupportedTypes() {
+<b class="nc">&nbsp;		return SUPPORTED_TYPES;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

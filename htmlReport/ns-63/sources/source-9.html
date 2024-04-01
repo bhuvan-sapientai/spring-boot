@@ -1,0 +1,331 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenTelemetryAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.tracing</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenTelemetryAutoConfiguration (org.springframework.boot.actuate.autoconfigure.tracing)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenTelemetryAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OpenTelemetryAutoConfiguration$OTelEventPublisher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.tracing;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import io.micrometer.tracing.SpanCustomizer;
+&nbsp;import io.micrometer.tracing.exporter.SpanExportingPredicate;
+&nbsp;import io.micrometer.tracing.exporter.SpanFilter;
+&nbsp;import io.micrometer.tracing.exporter.SpanReporter;
+&nbsp;import io.micrometer.tracing.otel.bridge.CompositeSpanExporter;
+&nbsp;import io.micrometer.tracing.otel.bridge.EventListener;
+&nbsp;import io.micrometer.tracing.otel.bridge.EventPublishingContextWrapper;
+&nbsp;import io.micrometer.tracing.otel.bridge.OtelBaggageManager;
+&nbsp;import io.micrometer.tracing.otel.bridge.OtelCurrentTraceContext;
+&nbsp;import io.micrometer.tracing.otel.bridge.OtelPropagator;
+&nbsp;import io.micrometer.tracing.otel.bridge.OtelSpanCustomizer;
+&nbsp;import io.micrometer.tracing.otel.bridge.OtelTracer;
+&nbsp;import io.micrometer.tracing.otel.bridge.OtelTracer.EventPublisher;
+&nbsp;import io.micrometer.tracing.otel.bridge.Slf4JEventListener;
+&nbsp;import io.opentelemetry.api.OpenTelemetry;
+&nbsp;import io.opentelemetry.api.metrics.MeterProvider;
+&nbsp;import io.opentelemetry.api.trace.Tracer;
+&nbsp;import io.opentelemetry.context.ContextStorage;
+&nbsp;import io.opentelemetry.context.propagation.ContextPropagators;
+&nbsp;import io.opentelemetry.context.propagation.TextMapPropagator;
+&nbsp;import io.opentelemetry.sdk.resources.Resource;
+&nbsp;import io.opentelemetry.sdk.trace.SdkTracerProvider;
+&nbsp;import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
+&nbsp;import io.opentelemetry.sdk.trace.SpanProcessor;
+&nbsp;import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+&nbsp;import io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder;
+&nbsp;import io.opentelemetry.sdk.trace.export.SpanExporter;
+&nbsp;import io.opentelemetry.sdk.trace.samplers.Sampler;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.SpringBootVersion;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for OpenTelemetry tracing.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Marcin Grzejszczak
+&nbsp; * @author Yanming Zhou
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration(value = &quot;openTelemetryTracingAutoConfiguration&quot;,
+&nbsp;		before = { MicrometerTracingAutoConfiguration.class, NoopTracerAutoConfiguration.class })
+&nbsp;@ConditionalOnClass({ OtelTracer.class, SdkTracerProvider.class, OpenTelemetry.class })
+&nbsp;@EnableConfigurationProperties(TracingProperties.class)
+&nbsp;@Import({ OpenTelemetryPropagationConfigurations.PropagationWithoutBaggage.class,
+&nbsp;		OpenTelemetryPropagationConfigurations.PropagationWithBaggage.class,
+&nbsp;		OpenTelemetryPropagationConfigurations.NoPropagation.class })
+&nbsp;public class OpenTelemetryAutoConfiguration {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(OpenTelemetryAutoConfiguration.class);</b>
+&nbsp;
+&nbsp;	private final TracingProperties tracingProperties;
+&nbsp;
+<b class="nc">&nbsp;	OpenTelemetryAutoConfiguration(TracingProperties tracingProperties) {</b>
+<b class="nc">&nbsp;		this.tracingProperties = tracingProperties;</b>
+<b class="nc">&nbsp;		if (!CollectionUtils.isEmpty(this.tracingProperties.getBaggage().getLocalFields())) {</b>
+<b class="nc">&nbsp;			logger.warn(&quot;Local fields are not supported when using OpenTelemetry!&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	SdkTracerProvider otelSdkTracerProvider(Resource resource, SpanProcessors spanProcessors, Sampler sampler,
+&nbsp;			ObjectProvider&lt;SdkTracerProviderBuilderCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		SdkTracerProviderBuilder builder = SdkTracerProvider.builder().setSampler(sampler).setResource(resource);</b>
+<b class="nc">&nbsp;		spanProcessors.forEach(builder::addSpanProcessor);</b>
+<b class="nc">&nbsp;		customizers.orderedStream().forEach((customizer) -&gt; customizer.customize(builder));</b>
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	ContextPropagators otelContextPropagators(ObjectProvider&lt;TextMapPropagator&gt; textMapPropagators) {
+<b class="nc">&nbsp;		return ContextPropagators.create(TextMapPropagator.composite(textMapPropagators.orderedStream().toList()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	Sampler otelSampler() {
+<b class="nc">&nbsp;		Sampler rootSampler = Sampler.traceIdRatioBased(this.tracingProperties.getSampling().getProbability());</b>
+<b class="nc">&nbsp;		return Sampler.parentBased(rootSampler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	SpanProcessors spanProcessors(ObjectProvider&lt;SpanProcessor&gt; spanProcessors) {
+<b class="nc">&nbsp;		return SpanProcessors.of(spanProcessors.orderedStream().toList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	BatchSpanProcessor otelSpanProcessor(SpanExporters spanExporters,
+&nbsp;			ObjectProvider&lt;SpanExportingPredicate&gt; spanExportingPredicates, ObjectProvider&lt;SpanReporter&gt; spanReporters,
+&nbsp;			ObjectProvider&lt;SpanFilter&gt; spanFilters, ObjectProvider&lt;MeterProvider&gt; meterProvider) {
+<b class="nc">&nbsp;		BatchSpanProcessorBuilder builder = BatchSpanProcessor</b>
+<b class="nc">&nbsp;			.builder(new CompositeSpanExporter(spanExporters.list(), spanExportingPredicates.orderedStream().toList(),</b>
+<b class="nc">&nbsp;					spanReporters.orderedStream().toList(), spanFilters.orderedStream().toList()));</b>
+<b class="nc">&nbsp;		meterProvider.ifAvailable(builder::setMeterProvider);</b>
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	SpanExporters spanExporters(ObjectProvider&lt;SpanExporter&gt; spanExporters) {
+<b class="nc">&nbsp;		return SpanExporters.of(spanExporters.orderedStream().toList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	Tracer otelTracer(OpenTelemetry openTelemetry) {
+<b class="nc">&nbsp;		return openTelemetry.getTracer(&quot;org.springframework.boot&quot;, SpringBootVersion.getVersion());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(io.micrometer.tracing.Tracer.class)
+&nbsp;	OtelTracer micrometerOtelTracer(Tracer tracer, EventPublisher eventPublisher,
+&nbsp;			OtelCurrentTraceContext otelCurrentTraceContext) {
+<b class="nc">&nbsp;		List&lt;String&gt; remoteFields = this.tracingProperties.getBaggage().getRemoteFields();</b>
+<b class="nc">&nbsp;		List&lt;String&gt; tagFields = this.tracingProperties.getBaggage().getTagFields();</b>
+<b class="nc">&nbsp;		return new OtelTracer(tracer, otelCurrentTraceContext, eventPublisher,</b>
+&nbsp;				new OtelBaggageManager(otelCurrentTraceContext, remoteFields, tagFields));
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	OtelPropagator otelPropagator(ContextPropagators contextPropagators, Tracer tracer) {
+<b class="nc">&nbsp;		return new OtelPropagator(contextPropagators, tracer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	EventPublisher otelTracerEventPublisher(List&lt;EventListener&gt; eventListeners) {
+<b class="nc">&nbsp;		return new OTelEventPublisher(eventListeners);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	OtelCurrentTraceContext otelCurrentTraceContext(EventPublisher publisher) {
+<b class="nc">&nbsp;		ContextStorage.addWrapper(new EventPublishingContextWrapper(publisher));</b>
+<b class="nc">&nbsp;		return new OtelCurrentTraceContext();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	Slf4JEventListener otelSlf4JEventListener() {
+<b class="nc">&nbsp;		return new Slf4JEventListener();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(SpanCustomizer.class)
+&nbsp;	OtelSpanCustomizer otelSpanCustomizer() {
+<b class="nc">&nbsp;		return new OtelSpanCustomizer();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static class OTelEventPublisher implements EventPublisher {
+&nbsp;
+&nbsp;		private final List&lt;EventListener&gt; listeners;
+&nbsp;
+<b class="nc">&nbsp;		OTelEventPublisher(List&lt;EventListener&gt; listeners) {</b>
+<b class="nc">&nbsp;			this.listeners = listeners;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void publishEvent(Object event) {
+<b class="nc">&nbsp;			for (EventListener listener : this.listeners) {</b>
+<b class="nc">&nbsp;				listener.onEvent(event);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

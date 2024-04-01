@@ -1,0 +1,570 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Handler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: Handler (org.springframework.boot.loader.jar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Handler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/182)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.jar;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.ref.SoftReference;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.net.URLStreamHandler;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link URLStreamHandler} for Spring Boot loader {@link JarFile}s.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.0.0
+&nbsp; * @see JarFile#registerUrlProtocolHandler()
+&nbsp; */
+&nbsp;public class Handler extends URLStreamHandler {
+&nbsp;
+&nbsp;	// NOTE: in order to be found as a URL protocol handler, this class must be public,
+&nbsp;	// must be named Handler and must be in a package ending &#39;.jar&#39;
+&nbsp;
+&nbsp;	private static final String JAR_PROTOCOL = &quot;jar:&quot;;
+&nbsp;
+&nbsp;	private static final String FILE_PROTOCOL = &quot;file:&quot;;
+&nbsp;
+&nbsp;	private static final String TOMCAT_WARFILE_PROTOCOL = &quot;war:file:&quot;;
+&nbsp;
+&nbsp;	private static final String SEPARATOR = &quot;!/&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern SEPARATOR_PATTERN = Pattern.compile(SEPARATOR, Pattern.LITERAL);</b>
+&nbsp;
+&nbsp;	private static final String CURRENT_DIR = &quot;/./&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern CURRENT_DIR_PATTERN = Pattern.compile(CURRENT_DIR, Pattern.LITERAL);</b>
+&nbsp;
+&nbsp;	private static final String PARENT_DIR = &quot;/../&quot;;
+&nbsp;
+&nbsp;	private static final String PROTOCOL_HANDLER = &quot;java.protocol.handler.pkgs&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] FALLBACK_HANDLERS = { &quot;sun.net.www.protocol.jar.Handler&quot; };</b>
+&nbsp;
+&nbsp;	private static URL jarContextUrl;
+&nbsp;
+&nbsp;	private static SoftReference&lt;Map&lt;File, JarFile&gt;&gt; rootFileCache;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		rootFileCache = new SoftReference&lt;&gt;(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final JarFile jarFile;
+&nbsp;
+&nbsp;	private URLStreamHandler fallbackHandler;
+&nbsp;
+&nbsp;	public Handler() {
+<b class="nc">&nbsp;		this(null);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public Handler(JarFile jarFile) {</b>
+<b class="nc">&nbsp;		this.jarFile = jarFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected URLConnection openConnection(URL url) throws IOException {
+<b class="nc">&nbsp;		if (this.jarFile != null &amp;&amp; isUrlInJarFile(url, this.jarFile)) {</b>
+<b class="nc">&nbsp;			return JarURLConnection.get(url, this.jarFile);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return JarURLConnection.get(url, getRootJarFileFromUrl(url));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return openFallbackConnection(url, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isUrlInJarFile(URL url, JarFile jarFile) throws MalformedURLException {
+&nbsp;		// Try the path first to save building a new url string each time
+<b class="nc">&nbsp;		return url.getPath().startsWith(jarFile.getUrl().getPath())</b>
+<b class="nc">&nbsp;				&amp;&amp; url.toString().startsWith(jarFile.getUrlString());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private URLConnection openFallbackConnection(URL url, Exception reason) throws IOException {
+&nbsp;		try {
+<b class="nc">&nbsp;			URLConnection connection = openFallbackTomcatConnection(url);</b>
+<b class="nc">&nbsp;			connection = (connection != null) ? connection : openFallbackContextConnection(url);</b>
+<b class="nc">&nbsp;			return (connection != null) ? connection : openFallbackHandlerConnection(url);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			if (reason instanceof IOException ioException) {</b>
+<b class="nc">&nbsp;				log(false, &quot;Unable to open fallback handler&quot;, ex);</b>
+<b class="nc">&nbsp;				throw ioException;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			log(true, &quot;Unable to open fallback handler&quot;, ex);</b>
+<b class="nc">&nbsp;			if (reason instanceof RuntimeException runtimeException) {</b>
+<b class="nc">&nbsp;				throw runtimeException;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new IllegalStateException(reason);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Attempt to open a Tomcat formatted &#39;jar:war:file:...&#39; URL. This method allows us to
+&nbsp;	 * use our own nested JAR support to open the content rather than the logic in
+&nbsp;	 * {@code sun.net.www.protocol.jar.URLJarFile} which will extract the nested jar to
+&nbsp;	 * the temp folder to that its content can be accessed.
+&nbsp;	 * @param url the URL to open
+&nbsp;	 * @return a {@link URLConnection} or {@code null}
+&nbsp;	 */
+&nbsp;	private URLConnection openFallbackTomcatConnection(URL url) {
+<b class="nc">&nbsp;		String file = url.getFile();</b>
+<b class="nc">&nbsp;		if (isTomcatWarUrl(file)) {</b>
+<b class="nc">&nbsp;			file = file.substring(TOMCAT_WARFILE_PROTOCOL.length());</b>
+<b class="nc">&nbsp;			file = file.replaceFirst(&quot;\\*/&quot;, &quot;!/&quot;);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				URLConnection connection = openConnection(new URL(&quot;jar:file:&quot; + file));</b>
+<b class="nc">&nbsp;				connection.getInputStream().close();</b>
+<b class="nc">&nbsp;				return connection;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isTomcatWarUrl(String file) {
+<b class="nc">&nbsp;		if (file.startsWith(TOMCAT_WARFILE_PROTOCOL) || !file.contains(&quot;*/&quot;)) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				URLConnection connection = new URL(file).openConnection();</b>
+<b class="nc">&nbsp;				if (connection.getClass().getName().startsWith(&quot;org.apache.catalina&quot;)) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Attempt to open a fallback connection by using a context URL captured before the
+&nbsp;	 * jar handler was replaced with our own version. Since this method doesn&#39;t use
+&nbsp;	 * reflection it won&#39;t trigger &quot;illegal reflective access operation has occurred&quot;
+&nbsp;	 * warnings on Java 13+.
+&nbsp;	 * @param url the URL to open
+&nbsp;	 * @return a {@link URLConnection} or {@code null}
+&nbsp;	 */
+&nbsp;	private URLConnection openFallbackContextConnection(URL url) {
+&nbsp;		try {
+<b class="nc">&nbsp;			if (jarContextUrl != null) {</b>
+<b class="nc">&nbsp;				return new URL(jarContextUrl, url.toExternalForm()).openConnection();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Attempt to open a fallback connection by using reflection to access Java&#39;s default
+&nbsp;	 * jar {@link URLStreamHandler}.
+&nbsp;	 * @param url the URL to open
+&nbsp;	 * @return the {@link URLConnection}
+&nbsp;	 * @throws Exception if not connection could be opened
+&nbsp;	 */
+&nbsp;	private URLConnection openFallbackHandlerConnection(URL url) throws Exception {
+<b class="nc">&nbsp;		URLStreamHandler fallbackHandler = getFallbackHandler();</b>
+<b class="nc">&nbsp;		return new URL(null, url.toExternalForm(), fallbackHandler).openConnection();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private URLStreamHandler getFallbackHandler() {
+<b class="nc">&nbsp;		if (this.fallbackHandler != null) {</b>
+<b class="nc">&nbsp;			return this.fallbackHandler;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (String handlerClassName : FALLBACK_HANDLERS) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Class&lt;?&gt; handlerClass = Class.forName(handlerClassName);</b>
+<b class="nc">&nbsp;				this.fallbackHandler = (URLStreamHandler) handlerClass.getDeclaredConstructor().newInstance();</b>
+<b class="nc">&nbsp;				return this.fallbackHandler;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+&nbsp;				// Ignore
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;Unable to find fallback handler&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void log(boolean warning, String message, Exception cause) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Level level = warning ? Level.WARNING : Level.FINEST;</b>
+<b class="nc">&nbsp;			Logger.getLogger(getClass().getName()).log(level, message, cause);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			if (warning) {</b>
+<b class="nc">&nbsp;				System.err.println(&quot;WARNING: &quot; + message);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void parseURL(URL context, String spec, int start, int limit) {
+<b class="nc">&nbsp;		if (spec.regionMatches(true, 0, JAR_PROTOCOL, 0, JAR_PROTOCOL.length())) {</b>
+<b class="nc">&nbsp;			setFile(context, getFileFromSpec(spec.substring(start, limit)));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			setFile(context, getFileFromContext(context, spec.substring(start, limit)));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getFileFromSpec(String spec) {
+<b class="nc">&nbsp;		int separatorIndex = spec.lastIndexOf(&quot;!/&quot;);</b>
+<b class="nc">&nbsp;		if (separatorIndex == -1) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;No !/ in spec &#39;&quot; + spec + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			new URL(spec.substring(0, separatorIndex));</b>
+<b class="nc">&nbsp;			return spec;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedURLException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Invalid spec URL &#39;&quot; + spec + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getFileFromContext(URL context, String spec) {
+<b class="nc">&nbsp;		String file = context.getFile();</b>
+<b class="nc">&nbsp;		if (spec.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			return trimToJarRoot(file) + SEPARATOR + spec.substring(1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (file.endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			return file + spec;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int lastSlashIndex = file.lastIndexOf(&#39;/&#39;);</b>
+<b class="nc">&nbsp;		if (lastSlashIndex == -1) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;No / found in context URL&#39;s file &#39;&quot; + file + &quot;&#39;&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return file.substring(0, lastSlashIndex + 1) + spec;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String trimToJarRoot(String file) {
+<b class="nc">&nbsp;		int lastSeparatorIndex = file.lastIndexOf(SEPARATOR);</b>
+<b class="nc">&nbsp;		if (lastSeparatorIndex == -1) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;No !/ found in context URL&#39;s file &#39;&quot; + file + &quot;&#39;&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return file.substring(0, lastSeparatorIndex);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setFile(URL context, String file) {
+<b class="nc">&nbsp;		String path = normalize(file);</b>
+<b class="nc">&nbsp;		String query = null;</b>
+<b class="nc">&nbsp;		int queryIndex = path.lastIndexOf(&#39;?&#39;);</b>
+<b class="nc">&nbsp;		if (queryIndex != -1) {</b>
+<b class="nc">&nbsp;			query = path.substring(queryIndex + 1);</b>
+<b class="nc">&nbsp;			path = path.substring(0, queryIndex);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		setURL(context, JAR_PROTOCOL, null, -1, null, null, path, query, context.getRef());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String normalize(String file) {
+<b class="nc">&nbsp;		if (!file.contains(CURRENT_DIR) &amp;&amp; !file.contains(PARENT_DIR)) {</b>
+<b class="nc">&nbsp;			return file;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int afterLastSeparatorIndex = file.lastIndexOf(SEPARATOR) + SEPARATOR.length();</b>
+<b class="nc">&nbsp;		String afterSeparator = file.substring(afterLastSeparatorIndex);</b>
+<b class="nc">&nbsp;		afterSeparator = replaceParentDir(afterSeparator);</b>
+<b class="nc">&nbsp;		afterSeparator = replaceCurrentDir(afterSeparator);</b>
+<b class="nc">&nbsp;		return file.substring(0, afterLastSeparatorIndex) + afterSeparator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String replaceParentDir(String file) {
+&nbsp;		int parentDirIndex;
+<b class="nc">&nbsp;		while ((parentDirIndex = file.indexOf(PARENT_DIR)) &gt;= 0) {</b>
+<b class="nc">&nbsp;			int precedingSlashIndex = file.lastIndexOf(&#39;/&#39;, parentDirIndex - 1);</b>
+<b class="nc">&nbsp;			if (precedingSlashIndex &gt;= 0) {</b>
+<b class="nc">&nbsp;				file = file.substring(0, precedingSlashIndex) + file.substring(parentDirIndex + 3);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				file = file.substring(parentDirIndex + 4);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return file;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String replaceCurrentDir(String file) {
+<b class="nc">&nbsp;		return CURRENT_DIR_PATTERN.matcher(file).replaceAll(&quot;/&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected int hashCode(URL u) {
+<b class="nc">&nbsp;		return hashCode(u.getProtocol(), u.getFile());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int hashCode(String protocol, String file) {
+<b class="nc">&nbsp;		int result = (protocol != null) ? protocol.hashCode() : 0;</b>
+<b class="nc">&nbsp;		int separatorIndex = file.indexOf(SEPARATOR);</b>
+<b class="nc">&nbsp;		if (separatorIndex == -1) {</b>
+<b class="nc">&nbsp;			return result + file.hashCode();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String source = file.substring(0, separatorIndex);</b>
+<b class="nc">&nbsp;		String entry = canonicalize(file.substring(separatorIndex + 2));</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			result += new URL(source).hashCode();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedURLException ex) {</b>
+<b class="nc">&nbsp;			result += source.hashCode();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		result += entry.hashCode();</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean sameFile(URL u1, URL u2) {
+<b class="nc">&nbsp;		if (!u1.getProtocol().equals(&quot;jar&quot;) || !u2.getProtocol().equals(&quot;jar&quot;)) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int separator1 = u1.getFile().indexOf(SEPARATOR);</b>
+<b class="nc">&nbsp;		int separator2 = u2.getFile().indexOf(SEPARATOR);</b>
+<b class="nc">&nbsp;		if (separator1 == -1 || separator2 == -1) {</b>
+<b class="nc">&nbsp;			return super.sameFile(u1, u2);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String nested1 = u1.getFile().substring(separator1 + SEPARATOR.length());</b>
+<b class="nc">&nbsp;		String nested2 = u2.getFile().substring(separator2 + SEPARATOR.length());</b>
+<b class="nc">&nbsp;		if (!nested1.equals(nested2)) {</b>
+<b class="nc">&nbsp;			String canonical1 = canonicalize(nested1);</b>
+<b class="nc">&nbsp;			String canonical2 = canonicalize(nested2);</b>
+<b class="nc">&nbsp;			if (!canonical1.equals(canonical2)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		String root1 = u1.getFile().substring(0, separator1);</b>
+<b class="nc">&nbsp;		String root2 = u2.getFile().substring(0, separator2);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return super.sameFile(new URL(root1), new URL(root2));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedURLException ex) {</b>
+&nbsp;			// Continue
+&nbsp;		}
+<b class="nc">&nbsp;		return super.sameFile(u1, u2);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String canonicalize(String path) {
+<b class="nc">&nbsp;		return SEPARATOR_PATTERN.matcher(path).replaceAll(&quot;/&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public JarFile getRootJarFileFromUrl(URL url) throws IOException {
+<b class="nc">&nbsp;		String spec = url.getFile();</b>
+<b class="nc">&nbsp;		int separatorIndex = spec.indexOf(SEPARATOR);</b>
+<b class="nc">&nbsp;		if (separatorIndex == -1) {</b>
+<b class="nc">&nbsp;			throw new MalformedURLException(&quot;Jar URL does not contain !/ separator&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String name = spec.substring(0, separatorIndex);</b>
+<b class="nc">&nbsp;		return getRootJarFile(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarFile getRootJarFile(String name) throws IOException {
+&nbsp;		try {
+<b class="nc">&nbsp;			if (!name.startsWith(FILE_PROTOCOL)) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Not a file URL&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			File file = new File(URI.create(name));</b>
+<b class="nc">&nbsp;			Map&lt;File, JarFile&gt; cache = rootFileCache.get();</b>
+<b class="nc">&nbsp;			JarFile result = (cache != null) ? cache.get(file) : null;</b>
+<b class="nc">&nbsp;			if (result == null) {</b>
+<b class="nc">&nbsp;				result = new JarFile(file);</b>
+<b class="nc">&nbsp;				addToRootFileCache(file, result);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IOException(&quot;Unable to open root Jar file &#39;&quot; + name + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add the given {@link JarFile} to the root file cache.
+&nbsp;	 * @param sourceFile the source file to add
+&nbsp;	 * @param jarFile the jar file.
+&nbsp;	 */
+&nbsp;	static void addToRootFileCache(File sourceFile, JarFile jarFile) {
+<b class="nc">&nbsp;		Map&lt;File, JarFile&gt; cache = rootFileCache.get();</b>
+<b class="nc">&nbsp;		if (cache == null) {</b>
+<b class="nc">&nbsp;			cache = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			rootFileCache = new SoftReference&lt;&gt;(cache);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		cache.put(sourceFile, jarFile);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * If possible, capture a URL that is configured with the original jar handler so that
+&nbsp;	 * we can use it as a fallback context later. We can only do this if we know that we
+&nbsp;	 * can reset the handlers after.
+&nbsp;	 */
+&nbsp;	static void captureJarContextUrl() {
+<b class="nc">&nbsp;		if (canResetCachedUrlHandlers()) {</b>
+<b class="nc">&nbsp;			String handlers = System.getProperty(PROTOCOL_HANDLER);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				System.clearProperty(PROTOCOL_HANDLER);</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					resetCachedUrlHandlers();</b>
+<b class="nc">&nbsp;					jarContextUrl = new URL(&quot;jar:file:context.jar!/&quot;);</b>
+<b class="nc">&nbsp;					URLConnection connection = jarContextUrl.openConnection();</b>
+<b class="nc">&nbsp;					if (connection instanceof JarURLConnection) {</b>
+<b class="nc">&nbsp;						jarContextUrl = null;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				catch (Exception ex) {</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				if (handlers == null) {</b>
+<b class="nc">&nbsp;					System.clearProperty(PROTOCOL_HANDLER);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					System.setProperty(PROTOCOL_HANDLER, handlers);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			resetCachedUrlHandlers();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean canResetCachedUrlHandlers() {
+&nbsp;		try {
+<b class="nc">&nbsp;			resetCachedUrlHandlers();</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Error ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void resetCachedUrlHandlers() {
+<b class="nc">&nbsp;		URL.setURLStreamHandlerFactory(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set if a generic static exception can be thrown when a URL cannot be connected.
+&nbsp;	 * This optimization is used during class loading to save creating lots of exceptions
+&nbsp;	 * which are then swallowed.
+&nbsp;	 * @param useFastConnectionExceptions if fast connection exceptions can be used.
+&nbsp;	 */
+&nbsp;	public static void setUseFastConnectionExceptions(boolean useFastConnectionExceptions) {
+<b class="nc">&nbsp;		JarURLConnection.setUseFastExceptions(useFastConnectionExceptions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

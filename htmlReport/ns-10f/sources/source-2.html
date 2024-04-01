@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OnDatabaseInitializationCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.sql.init</a>
+</div>
+
+<h1>Coverage Summary for Class: OnDatabaseInitializationCondition (org.springframework.boot.autoconfigure.sql.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OnDatabaseInitializationCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.sql.init;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+&nbsp;import org.springframework.boot.sql.init.DatabaseInitializationMode;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Condition that checks if the database initialization of a particular component should
+&nbsp; * be considered.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.6.2
+&nbsp; * @see DatabaseInitializationMode
+&nbsp; */
+&nbsp;public class OnDatabaseInitializationCondition extends SpringBootCondition {
+&nbsp;
+&nbsp;	private final String name;
+&nbsp;
+&nbsp;	private final String[] propertyNames;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new instance with the name of the component and the property names to
+&nbsp;	 * check, in order. If a property is set, its value is used to determine the outcome
+&nbsp;	 * and remaining properties are not tested.
+&nbsp;	 * @param name the name of the component
+&nbsp;	 * @param propertyNames the properties to check (in order)
+&nbsp;	 */
+<b class="nc">&nbsp;	public OnDatabaseInitializationCondition(String name, String... propertyNames) {</b>
+<b class="nc">&nbsp;		this.name = name;</b>
+<b class="nc">&nbsp;		this.propertyNames = propertyNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		Environment environment = context.getEnvironment();</b>
+<b class="nc">&nbsp;		String propertyName = getConfiguredProperty(environment);</b>
+<b class="nc">&nbsp;		DatabaseInitializationMode mode = getDatabaseInitializationMode(environment, propertyName);</b>
+<b class="nc">&nbsp;		boolean match = match(mode);</b>
+<b class="nc">&nbsp;		String messagePrefix = (propertyName != null) ? propertyName : &quot;default value&quot;;</b>
+<b class="nc">&nbsp;		return new ConditionOutcome(match, ConditionMessage.forCondition(this.name + &quot;Database Initialization&quot;)</b>
+<b class="nc">&nbsp;			.because(messagePrefix + &quot; is &quot; + mode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean match(DatabaseInitializationMode mode) {
+<b class="nc">&nbsp;		return !mode.equals(DatabaseInitializationMode.NEVER);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private DatabaseInitializationMode getDatabaseInitializationMode(Environment environment, String propertyName) {
+<b class="nc">&nbsp;		if (StringUtils.hasText(propertyName)) {</b>
+<b class="nc">&nbsp;			String candidate = environment.getProperty(propertyName, &quot;embedded&quot;).toUpperCase(Locale.ENGLISH);</b>
+<b class="nc">&nbsp;			if (StringUtils.hasText(candidate)) {</b>
+<b class="nc">&nbsp;				return DatabaseInitializationMode.valueOf(candidate);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return DatabaseInitializationMode.EMBEDDED;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getConfiguredProperty(Environment environment) {
+<b class="nc">&nbsp;		for (String propertyName : this.propertyNames) {</b>
+<b class="nc">&nbsp;			if (environment.containsProperty(propertyName)) {</b>
+<b class="nc">&nbsp;				return propertyName;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

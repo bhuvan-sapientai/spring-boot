@@ -1,0 +1,682 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoConfigurationImportSelector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoConfigurationImportSelector (org.springframework.boot.autoconfigure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoConfigurationImportSelector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/100)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoConfigurationImportSelector$AutoConfigurationEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoConfigurationImportSelector$AutoConfigurationGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoConfigurationImportSelector$ConfigurationClassFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/170)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.Aware;
+&nbsp;import org.springframework.beans.factory.BeanClassLoaderAware;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.BeanFactoryAware;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.boot.context.annotation.ImportCandidates;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.context.EnvironmentAware;
+&nbsp;import org.springframework.context.ResourceLoaderAware;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.DeferredImportSelector;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.AnnotationAttributes;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.core.io.support.SpringFactoriesLoader;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+&nbsp;import org.springframework.core.type.classreading.MetadataReaderFactory;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link DeferredImportSelector} to handle {@link EnableAutoConfiguration
+&nbsp; * auto-configuration}. This class can also be subclassed if a custom variant of
+&nbsp; * {@link EnableAutoConfiguration @EnableAutoConfiguration} is needed.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.3.0
+&nbsp; * @see EnableAutoConfiguration
+&nbsp; */
+<b class="nc">&nbsp;public class AutoConfigurationImportSelector implements DeferredImportSelector, BeanClassLoaderAware,</b>
+&nbsp;		ResourceLoaderAware, BeanFactoryAware, EnvironmentAware, Ordered {
+&nbsp;
+<b class="nc">&nbsp;	private static final AutoConfigurationEntry EMPTY_ENTRY = new AutoConfigurationEntry();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] NO_IMPORTS = {};</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(AutoConfigurationImportSelector.class);</b>
+&nbsp;
+&nbsp;	private static final String PROPERTY_NAME_AUTOCONFIGURE_EXCLUDE = &quot;spring.autoconfigure.exclude&quot;;
+&nbsp;
+&nbsp;	private ConfigurableListableBeanFactory beanFactory;
+&nbsp;
+&nbsp;	private Environment environment;
+&nbsp;
+&nbsp;	private ClassLoader beanClassLoader;
+&nbsp;
+&nbsp;	private ResourceLoader resourceLoader;
+&nbsp;
+&nbsp;	private ConfigurationClassFilter configurationClassFilter;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String[] selectImports(AnnotationMetadata annotationMetadata) {
+<b class="nc">&nbsp;		if (!isEnabled(annotationMetadata)) {</b>
+<b class="nc">&nbsp;			return NO_IMPORTS;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);</b>
+<b class="nc">&nbsp;		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Predicate&lt;String&gt; getExclusionFilter() {
+<b class="nc">&nbsp;		return this::shouldExclude;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean shouldExclude(String configurationClassName) {
+<b class="nc">&nbsp;		return getConfigurationClassFilter().filter(Collections.singletonList(configurationClassName)).isEmpty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link AutoConfigurationEntry} based on the {@link AnnotationMetadata}
+&nbsp;	 * of the importing {@link Configuration @Configuration} class.
+&nbsp;	 * @param annotationMetadata the annotation metadata of the configuration class
+&nbsp;	 * @return the auto-configurations that should be imported
+&nbsp;	 */
+&nbsp;	protected AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
+<b class="nc">&nbsp;		if (!isEnabled(annotationMetadata)) {</b>
+<b class="nc">&nbsp;			return EMPTY_ENTRY;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		AnnotationAttributes attributes = getAttributes(annotationMetadata);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; configurations = getCandidateConfigurations(annotationMetadata, attributes);</b>
+<b class="nc">&nbsp;		configurations = removeDuplicates(configurations);</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; exclusions = getExclusions(annotationMetadata, attributes);</b>
+<b class="nc">&nbsp;		checkExcludedClasses(configurations, exclusions);</b>
+<b class="nc">&nbsp;		configurations.removeAll(exclusions);</b>
+<b class="nc">&nbsp;		configurations = getConfigurationClassFilter().filter(configurations);</b>
+<b class="nc">&nbsp;		fireAutoConfigurationImportEvents(configurations, exclusions);</b>
+<b class="nc">&nbsp;		return new AutoConfigurationEntry(configurations, exclusions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;? extends Group&gt; getImportGroup() {
+<b class="nc">&nbsp;		return AutoConfigurationGroup.class;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected boolean isEnabled(AnnotationMetadata metadata) {
+<b class="nc">&nbsp;		if (getClass() == AutoConfigurationImportSelector.class) {</b>
+<b class="nc">&nbsp;			return getEnvironment().getProperty(EnableAutoConfiguration.ENABLED_OVERRIDE_PROPERTY, Boolean.class, true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the appropriate {@link AnnotationAttributes} from the
+&nbsp;	 * {@link AnnotationMetadata}. By default this method will return attributes for
+&nbsp;	 * {@link #getAnnotationClass()}.
+&nbsp;	 * @param metadata the annotation metadata
+&nbsp;	 * @return annotation attributes
+&nbsp;	 */
+&nbsp;	protected AnnotationAttributes getAttributes(AnnotationMetadata metadata) {
+<b class="nc">&nbsp;		String name = getAnnotationClass().getName();</b>
+<b class="nc">&nbsp;		AnnotationAttributes attributes = AnnotationAttributes.fromMap(metadata.getAnnotationAttributes(name, true));</b>
+<b class="nc">&nbsp;		Assert.notNull(attributes, () -&gt; &quot;No auto-configuration attributes found. Is &quot; + metadata.getClassName()</b>
+<b class="nc">&nbsp;				+ &quot; annotated with &quot; + ClassUtils.getShortName(name) + &quot;?&quot;);</b>
+<b class="nc">&nbsp;		return attributes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the source annotation class used by the selector.
+&nbsp;	 * @return the annotation class
+&nbsp;	 */
+&nbsp;	protected Class&lt;?&gt; getAnnotationClass() {
+<b class="nc">&nbsp;		return EnableAutoConfiguration.class;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the auto-configuration class names that should be considered. By default,
+&nbsp;	 * this method will load candidates using {@link ImportCandidates}.
+&nbsp;	 * @param metadata the source metadata
+&nbsp;	 * @param attributes the {@link #getAttributes(AnnotationMetadata) annotation
+&nbsp;	 * attributes}
+&nbsp;	 * @return a list of candidate configurations
+&nbsp;	 */
+&nbsp;	protected List&lt;String&gt; getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+<b class="nc">&nbsp;		List&lt;String&gt; configurations = ImportCandidates.load(AutoConfiguration.class, getBeanClassLoader())</b>
+<b class="nc">&nbsp;			.getCandidates();</b>
+<b class="nc">&nbsp;		Assert.notEmpty(configurations,</b>
+&nbsp;				&quot;No auto configuration classes found in &quot;
+&nbsp;						+ &quot;META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports. If you &quot;
+&nbsp;						+ &quot;are using a custom packaging, make sure that file is correct.&quot;);
+<b class="nc">&nbsp;		return configurations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkExcludedClasses(List&lt;String&gt; configurations, Set&lt;String&gt; exclusions) {
+<b class="nc">&nbsp;		List&lt;String&gt; invalidExcludes = new ArrayList&lt;&gt;(exclusions.size());</b>
+<b class="nc">&nbsp;		for (String exclusion : exclusions) {</b>
+<b class="nc">&nbsp;			if (ClassUtils.isPresent(exclusion, getClass().getClassLoader()) &amp;&amp; !configurations.contains(exclusion)) {</b>
+<b class="nc">&nbsp;				invalidExcludes.add(exclusion);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (!invalidExcludes.isEmpty()) {</b>
+<b class="nc">&nbsp;			handleInvalidExcludes(invalidExcludes);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Handle any invalid excludes that have been specified.
+&nbsp;	 * @param invalidExcludes the list of invalid excludes (will always have at least one
+&nbsp;	 * element)
+&nbsp;	 */
+&nbsp;	protected void handleInvalidExcludes(List&lt;String&gt; invalidExcludes) {
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder();</b>
+<b class="nc">&nbsp;		for (String exclude : invalidExcludes) {</b>
+<b class="nc">&nbsp;			message.append(&quot;\t- &quot;).append(exclude).append(String.format(&quot;%n&quot;));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		throw new IllegalStateException(String.format(</b>
+&nbsp;				&quot;The following classes could not be excluded because they are not auto-configuration classes:%n%s&quot;,
+&nbsp;				message));
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return any exclusions that limit the candidate configurations.
+&nbsp;	 * @param metadata the source metadata
+&nbsp;	 * @param attributes the {@link #getAttributes(AnnotationMetadata) annotation
+&nbsp;	 * attributes}
+&nbsp;	 * @return exclusions or an empty set
+&nbsp;	 */
+&nbsp;	protected Set&lt;String&gt; getExclusions(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+<b class="nc">&nbsp;		Set&lt;String&gt; excluded = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		excluded.addAll(asList(attributes, &quot;exclude&quot;));</b>
+<b class="nc">&nbsp;		excluded.addAll(asList(attributes, &quot;excludeName&quot;));</b>
+<b class="nc">&nbsp;		excluded.addAll(getExcludeAutoConfigurationsProperty());</b>
+<b class="nc">&nbsp;		return excluded;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the auto-configurations excluded by the
+&nbsp;	 * {@code spring.autoconfigure.exclude} property.
+&nbsp;	 * @return excluded auto-configurations
+&nbsp;	 * @since 2.3.2
+&nbsp;	 */
+&nbsp;	protected List&lt;String&gt; getExcludeAutoConfigurationsProperty() {
+<b class="nc">&nbsp;		Environment environment = getEnvironment();</b>
+<b class="nc">&nbsp;		if (environment == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (environment instanceof ConfigurableEnvironment) {</b>
+<b class="nc">&nbsp;			Binder binder = Binder.get(environment);</b>
+<b class="nc">&nbsp;			return binder.bind(PROPERTY_NAME_AUTOCONFIGURE_EXCLUDE, String[].class)</b>
+<b class="nc">&nbsp;				.map(Arrays::asList)</b>
+<b class="nc">&nbsp;				.orElse(Collections.emptyList());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String[] excludes = environment.getProperty(PROPERTY_NAME_AUTOCONFIGURE_EXCLUDE, String[].class);</b>
+<b class="nc">&nbsp;		return (excludes != null) ? Arrays.asList(excludes) : Collections.emptyList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected List&lt;AutoConfigurationImportFilter&gt; getAutoConfigurationImportFilters() {
+<b class="nc">&nbsp;		return SpringFactoriesLoader.loadFactories(AutoConfigurationImportFilter.class, this.beanClassLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurationClassFilter getConfigurationClassFilter() {
+<b class="nc">&nbsp;		if (this.configurationClassFilter == null) {</b>
+<b class="nc">&nbsp;			List&lt;AutoConfigurationImportFilter&gt; filters = getAutoConfigurationImportFilters();</b>
+<b class="nc">&nbsp;			for (AutoConfigurationImportFilter filter : filters) {</b>
+<b class="nc">&nbsp;				invokeAwareMethods(filter);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			this.configurationClassFilter = new ConfigurationClassFilter(this.beanClassLoader, filters);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.configurationClassFilter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final &lt;T&gt; List&lt;T&gt; removeDuplicates(List&lt;T&gt; list) {
+<b class="nc">&nbsp;		return new ArrayList&lt;&gt;(new LinkedHashSet&lt;&gt;(list));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final List&lt;String&gt; asList(AnnotationAttributes attributes, String name) {
+<b class="nc">&nbsp;		String[] value = attributes.getStringArray(name);</b>
+<b class="nc">&nbsp;		return Arrays.asList(value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void fireAutoConfigurationImportEvents(List&lt;String&gt; configurations, Set&lt;String&gt; exclusions) {
+<b class="nc">&nbsp;		List&lt;AutoConfigurationImportListener&gt; listeners = getAutoConfigurationImportListeners();</b>
+<b class="nc">&nbsp;		if (!listeners.isEmpty()) {</b>
+<b class="nc">&nbsp;			AutoConfigurationImportEvent event = new AutoConfigurationImportEvent(this, configurations, exclusions);</b>
+<b class="nc">&nbsp;			for (AutoConfigurationImportListener listener : listeners) {</b>
+<b class="nc">&nbsp;				invokeAwareMethods(listener);</b>
+<b class="nc">&nbsp;				listener.onAutoConfigurationImportEvent(event);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected List&lt;AutoConfigurationImportListener&gt; getAutoConfigurationImportListeners() {
+<b class="nc">&nbsp;		return SpringFactoriesLoader.loadFactories(AutoConfigurationImportListener.class, this.beanClassLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void invokeAwareMethods(Object instance) {
+<b class="nc">&nbsp;		if (instance instanceof Aware) {</b>
+<b class="nc">&nbsp;			if (instance instanceof BeanClassLoaderAware beanClassLoaderAwareInstance) {</b>
+<b class="nc">&nbsp;				beanClassLoaderAwareInstance.setBeanClassLoader(this.beanClassLoader);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (instance instanceof BeanFactoryAware beanFactoryAwareInstance) {</b>
+<b class="nc">&nbsp;				beanFactoryAwareInstance.setBeanFactory(this.beanFactory);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (instance instanceof EnvironmentAware environmentAwareInstance) {</b>
+<b class="nc">&nbsp;				environmentAwareInstance.setEnvironment(this.environment);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (instance instanceof ResourceLoaderAware resourceLoaderAwareInstance) {</b>
+<b class="nc">&nbsp;				resourceLoaderAwareInstance.setResourceLoader(this.resourceLoader);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;		Assert.isInstanceOf(ConfigurableListableBeanFactory.class, beanFactory);</b>
+<b class="nc">&nbsp;		this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final ConfigurableListableBeanFactory getBeanFactory() {
+<b class="nc">&nbsp;		return this.beanFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		this.beanClassLoader = classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected ClassLoader getBeanClassLoader() {
+<b class="nc">&nbsp;		return this.beanClassLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setEnvironment(Environment environment) {
+<b class="nc">&nbsp;		this.environment = environment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final Environment getEnvironment() {
+<b class="nc">&nbsp;		return this.environment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setResourceLoader(ResourceLoader resourceLoader) {
+<b class="nc">&nbsp;		this.resourceLoader = resourceLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final ResourceLoader getResourceLoader() {
+<b class="nc">&nbsp;		return this.resourceLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return Ordered.LOWEST_PRECEDENCE - 1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class ConfigurationClassFilter {
+&nbsp;
+&nbsp;		private final AutoConfigurationMetadata autoConfigurationMetadata;
+&nbsp;
+&nbsp;		private final List&lt;AutoConfigurationImportFilter&gt; filters;
+&nbsp;
+<b class="nc">&nbsp;		ConfigurationClassFilter(ClassLoader classLoader, List&lt;AutoConfigurationImportFilter&gt; filters) {</b>
+<b class="nc">&nbsp;			this.autoConfigurationMetadata = AutoConfigurationMetadataLoader.loadMetadata(classLoader);</b>
+<b class="nc">&nbsp;			this.filters = filters;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		List&lt;String&gt; filter(List&lt;String&gt; configurations) {
+<b class="nc">&nbsp;			long startTime = System.nanoTime();</b>
+<b class="nc">&nbsp;			String[] candidates = StringUtils.toStringArray(configurations);</b>
+<b class="nc">&nbsp;			boolean skipped = false;</b>
+<b class="nc">&nbsp;			for (AutoConfigurationImportFilter filter : this.filters) {</b>
+<b class="nc">&nbsp;				boolean[] match = filter.match(candidates, this.autoConfigurationMetadata);</b>
+<b class="nc">&nbsp;				for (int i = 0; i &lt; match.length; i++) {</b>
+<b class="nc">&nbsp;					if (!match[i]) {</b>
+<b class="nc">&nbsp;						candidates[i] = null;</b>
+<b class="nc">&nbsp;						skipped = true;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			if (!skipped) {</b>
+<b class="nc">&nbsp;				return configurations;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			List&lt;String&gt; result = new ArrayList&lt;&gt;(candidates.length);</b>
+<b class="nc">&nbsp;			for (String candidate : candidates) {</b>
+<b class="nc">&nbsp;				if (candidate != null) {</b>
+<b class="nc">&nbsp;					result.add(candidate);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			if (logger.isTraceEnabled()) {</b>
+<b class="nc">&nbsp;				int numberFiltered = configurations.size() - result.size();</b>
+<b class="nc">&nbsp;				logger.trace(&quot;Filtered &quot; + numberFiltered + &quot; auto configuration class in &quot;</b>
+<b class="nc">&nbsp;						+ TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) + &quot; ms&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class AutoConfigurationGroup</b>
+&nbsp;			implements DeferredImportSelector.Group, BeanClassLoaderAware, BeanFactoryAware, ResourceLoaderAware {
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, AnnotationMetadata&gt; entries = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final List&lt;AutoConfigurationEntry&gt; autoConfigurationEntries = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private ClassLoader beanClassLoader;
+&nbsp;
+&nbsp;		private BeanFactory beanFactory;
+&nbsp;
+&nbsp;		private ResourceLoader resourceLoader;
+&nbsp;
+&nbsp;		private AutoConfigurationMetadata autoConfigurationMetadata;
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setBeanClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;			this.beanClassLoader = classLoader;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setBeanFactory(BeanFactory beanFactory) {
+<b class="nc">&nbsp;			this.beanFactory = beanFactory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setResourceLoader(ResourceLoader resourceLoader) {
+<b class="nc">&nbsp;			this.resourceLoader = resourceLoader;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void process(AnnotationMetadata annotationMetadata, DeferredImportSelector deferredImportSelector) {
+<b class="nc">&nbsp;			Assert.state(deferredImportSelector instanceof AutoConfigurationImportSelector,</b>
+<b class="nc">&nbsp;					() -&gt; String.format(&quot;Only %s implementations are supported, got %s&quot;,</b>
+<b class="nc">&nbsp;							AutoConfigurationImportSelector.class.getSimpleName(),</b>
+<b class="nc">&nbsp;							deferredImportSelector.getClass().getName()));</b>
+<b class="nc">&nbsp;			AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector) deferredImportSelector)</b>
+<b class="nc">&nbsp;				.getAutoConfigurationEntry(annotationMetadata);</b>
+<b class="nc">&nbsp;			this.autoConfigurationEntries.add(autoConfigurationEntry);</b>
+<b class="nc">&nbsp;			for (String importClassName : autoConfigurationEntry.getConfigurations()) {</b>
+<b class="nc">&nbsp;				this.entries.putIfAbsent(importClassName, annotationMetadata);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Iterable&lt;Entry&gt; selectImports() {
+<b class="nc">&nbsp;			if (this.autoConfigurationEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;				return Collections.emptyList();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Set&lt;String&gt; allExclusions = this.autoConfigurationEntries.stream()</b>
+<b class="nc">&nbsp;				.map(AutoConfigurationEntry::getExclusions)</b>
+<b class="nc">&nbsp;				.flatMap(Collection::stream)</b>
+<b class="nc">&nbsp;				.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;			Set&lt;String&gt; processedConfigurations = this.autoConfigurationEntries.stream()</b>
+<b class="nc">&nbsp;				.map(AutoConfigurationEntry::getConfigurations)</b>
+<b class="nc">&nbsp;				.flatMap(Collection::stream)</b>
+<b class="nc">&nbsp;				.collect(Collectors.toCollection(LinkedHashSet::new));</b>
+<b class="nc">&nbsp;			processedConfigurations.removeAll(allExclusions);</b>
+&nbsp;
+<b class="nc">&nbsp;			return sortAutoConfigurations(processedConfigurations, getAutoConfigurationMetadata()).stream()</b>
+<b class="nc">&nbsp;				.map((importClassName) -&gt; new Entry(this.entries.get(importClassName), importClassName))</b>
+<b class="nc">&nbsp;				.toList();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private AutoConfigurationMetadata getAutoConfigurationMetadata() {
+<b class="nc">&nbsp;			if (this.autoConfigurationMetadata == null) {</b>
+<b class="nc">&nbsp;				this.autoConfigurationMetadata = AutoConfigurationMetadataLoader.loadMetadata(this.beanClassLoader);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.autoConfigurationMetadata;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private List&lt;String&gt; sortAutoConfigurations(Set&lt;String&gt; configurations,
+&nbsp;				AutoConfigurationMetadata autoConfigurationMetadata) {
+<b class="nc">&nbsp;			return new AutoConfigurationSorter(getMetadataReaderFactory(), autoConfigurationMetadata)</b>
+<b class="nc">&nbsp;				.getInPriorityOrder(configurations);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private MetadataReaderFactory getMetadataReaderFactory() {
+&nbsp;			try {
+<b class="nc">&nbsp;				return this.beanFactory.getBean(SharedMetadataReaderFactoryContextInitializer.BEAN_NAME,</b>
+&nbsp;						MetadataReaderFactory.class);
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;				return new CachingMetadataReaderFactory(this.resourceLoader);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	protected static class AutoConfigurationEntry {
+&nbsp;
+&nbsp;		private final List&lt;String&gt; configurations;
+&nbsp;
+&nbsp;		private final Set&lt;String&gt; exclusions;
+&nbsp;
+<b class="nc">&nbsp;		private AutoConfigurationEntry() {</b>
+<b class="nc">&nbsp;			this.configurations = Collections.emptyList();</b>
+<b class="nc">&nbsp;			this.exclusions = Collections.emptySet();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Create an entry with the configurations that were contributed and their
+&nbsp;		 * exclusions.
+&nbsp;		 * @param configurations the configurations that should be imported
+&nbsp;		 * @param exclusions the exclusions that were applied to the original list
+&nbsp;		 */
+<b class="nc">&nbsp;		AutoConfigurationEntry(Collection&lt;String&gt; configurations, Collection&lt;String&gt; exclusions) {</b>
+<b class="nc">&nbsp;			this.configurations = new ArrayList&lt;&gt;(configurations);</b>
+<b class="nc">&nbsp;			this.exclusions = new HashSet&lt;&gt;(exclusions);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public List&lt;String&gt; getConfigurations() {
+<b class="nc">&nbsp;			return this.configurations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Set&lt;String&gt; getExclusions() {
+<b class="nc">&nbsp;			return this.exclusions;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

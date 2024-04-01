@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApplicationTemp</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.system</a>
+</div>
+
+<h1>Coverage Summary for Class: ApplicationTemp (org.springframework.boot.system)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApplicationTemp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.system;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.FileSystem;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.nio.file.attribute.FileAttribute;
+&nbsp;import java.nio.file.attribute.PosixFilePermission;
+&nbsp;import java.nio.file.attribute.PosixFilePermissions;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HexFormat;
+&nbsp;import java.util.concurrent.locks.Lock;
+&nbsp;import java.util.concurrent.locks.ReentrantLock;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides access to an application specific temporary directory. Generally speaking
+&nbsp; * different Spring Boot applications will get different locations, however, simply
+&nbsp; * restarting an application will give the same location.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class ApplicationTemp {
+&nbsp;
+<b class="nc">&nbsp;	private static final FileAttribute&lt;?&gt;[] NO_FILE_ATTRIBUTES = {};</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final EnumSet&lt;PosixFilePermission&gt; DIRECTORY_PERMISSIONS = EnumSet.of(PosixFilePermission.OWNER_READ,</b>
+&nbsp;			PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE);
+&nbsp;
+&nbsp;	private final Class&lt;?&gt; sourceClass;
+&nbsp;
+<b class="nc">&nbsp;	private final Lock pathLock = new ReentrantLock();</b>
+&nbsp;
+&nbsp;	private volatile Path path;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ApplicationTemp} instance.
+&nbsp;	 */
+&nbsp;	public ApplicationTemp() {
+<b class="nc">&nbsp;		this(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ApplicationTemp} instance for the specified source class.
+&nbsp;	 * @param sourceClass the source class or {@code null}
+&nbsp;	 */
+<b class="nc">&nbsp;	public ApplicationTemp(Class&lt;?&gt; sourceClass) {</b>
+<b class="nc">&nbsp;		this.sourceClass = sourceClass;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return getDir().getAbsolutePath();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the directory to be used for application specific temp files.
+&nbsp;	 * @return the application temp directory
+&nbsp;	 */
+&nbsp;	public File getDir() {
+<b class="nc">&nbsp;		return getPath().toFile();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a subdirectory of the application temp.
+&nbsp;	 * @param subDir the subdirectory name
+&nbsp;	 * @return a subdirectory
+&nbsp;	 */
+&nbsp;	public File getDir(String subDir) {
+<b class="nc">&nbsp;		return createDirectory(getPath().resolve(subDir)).toFile();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Path getPath() {
+<b class="nc">&nbsp;		if (this.path == null) {</b>
+<b class="nc">&nbsp;			this.pathLock.lock();</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				if (this.path == null) {</b>
+<b class="nc">&nbsp;					String hash = HexFormat.of().withUpperCase().formatHex(generateHash(this.sourceClass));</b>
+<b class="nc">&nbsp;					this.path = createDirectory(getTempDirectory().resolve(hash));</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				this.pathLock.unlock();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.path;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Path createDirectory(Path path) {
+&nbsp;		try {
+<b class="nc">&nbsp;			if (!Files.exists(path)) {</b>
+<b class="nc">&nbsp;				Files.createDirectory(path, getFileAttributes(path.getFileSystem(), DIRECTORY_PERMISSIONS));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return path;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to create application temp directory &quot; + path, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private FileAttribute&lt;?&gt;[] getFileAttributes(FileSystem fileSystem, EnumSet&lt;PosixFilePermission&gt; ownerReadWrite) {
+<b class="nc">&nbsp;		if (!fileSystem.supportedFileAttributeViews().contains(&quot;posix&quot;)) {</b>
+<b class="nc">&nbsp;			return NO_FILE_ATTRIBUTES;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new FileAttribute&lt;?&gt;[] { PosixFilePermissions.asFileAttribute(ownerReadWrite) };</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Path getTempDirectory() {
+<b class="nc">&nbsp;		String property = System.getProperty(&quot;java.io.tmpdir&quot;);</b>
+<b class="nc">&nbsp;		Assert.state(StringUtils.hasLength(property), &quot;No &#39;java.io.tmpdir&#39; property set&quot;);</b>
+<b class="nc">&nbsp;		Path tempDirectory = Paths.get(property);</b>
+<b class="nc">&nbsp;		Assert.state(Files.exists(tempDirectory), () -&gt; &quot;Temp directory &#39;&quot; + tempDirectory + &quot;&#39; does not exist&quot;);</b>
+<b class="nc">&nbsp;		Assert.state(Files.isDirectory(tempDirectory),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Temp location &#39;&quot; + tempDirectory + &quot;&#39; is not a directory&quot;);</b>
+<b class="nc">&nbsp;		return tempDirectory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private byte[] generateHash(Class&lt;?&gt; sourceClass) {
+<b class="nc">&nbsp;		ApplicationHome home = new ApplicationHome(sourceClass);</b>
+&nbsp;		MessageDigest digest;
+&nbsp;		try {
+<b class="nc">&nbsp;			digest = MessageDigest.getInstance(&quot;SHA-1&quot;);</b>
+<b class="nc">&nbsp;			update(digest, home.getSource());</b>
+<b class="nc">&nbsp;			update(digest, home.getDir());</b>
+<b class="nc">&nbsp;			update(digest, System.getProperty(&quot;user.dir&quot;));</b>
+<b class="nc">&nbsp;			update(digest, System.getProperty(&quot;java.home&quot;));</b>
+<b class="nc">&nbsp;			update(digest, System.getProperty(&quot;java.class.path&quot;));</b>
+<b class="nc">&nbsp;			update(digest, System.getProperty(&quot;sun.java.command&quot;));</b>
+<b class="nc">&nbsp;			update(digest, System.getProperty(&quot;sun.boot.class.path&quot;));</b>
+<b class="nc">&nbsp;			return digest.digest();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void update(MessageDigest digest, Object source) {
+<b class="nc">&nbsp;		if (source != null) {</b>
+<b class="nc">&nbsp;			digest.update(getUpdateSourceBytes(source));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private byte[] getUpdateSourceBytes(Object source) {
+<b class="nc">&nbsp;		if (source instanceof File file) {</b>
+<b class="nc">&nbsp;			return getUpdateSourceBytes(file.getAbsolutePath());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return source.toString().getBytes();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,385 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OnClassCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: OnClassCondition (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OnClassCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OnClassCondition$OutcomesResolver</td>
+  </tr>
+  <tr>
+    <td class="name">OnClassCondition$StandardOutcomesResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OnClassCondition$ThreadedOutcomesResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/90)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfigurationImportFilter;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfigurationMetadata;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage.Style;
+&nbsp;import org.springframework.context.annotation.Condition;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.util.MultiValueMap;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Condition} and {@link AutoConfigurationImportFilter} that checks for the
+&nbsp; * presence or absence of specific classes.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @see ConditionalOnClass
+&nbsp; * @see ConditionalOnMissingClass
+&nbsp; */
+&nbsp;@Order(Ordered.HIGHEST_PRECEDENCE)
+<b class="nc">&nbsp;class OnClassCondition extends FilteringSpringBootCondition {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
+&nbsp;			AutoConfigurationMetadata autoConfigurationMetadata) {
+&nbsp;		// Split the work and perform half in a background thread if more than one
+&nbsp;		// processor is available. Using a single additional thread seems to offer the
+&nbsp;		// best performance. More threads make things worse.
+<b class="nc">&nbsp;		if (autoConfigurationClasses.length &gt; 1 &amp;&amp; Runtime.getRuntime().availableProcessors() &gt; 1) {</b>
+<b class="nc">&nbsp;			return resolveOutcomesThreaded(autoConfigurationClasses, autoConfigurationMetadata);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			OutcomesResolver outcomesResolver = new StandardOutcomesResolver(autoConfigurationClasses, 0,</b>
+<b class="nc">&nbsp;					autoConfigurationClasses.length, autoConfigurationMetadata, getBeanClassLoader());</b>
+<b class="nc">&nbsp;			return outcomesResolver.resolveOutcomes();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConditionOutcome[] resolveOutcomesThreaded(String[] autoConfigurationClasses,
+&nbsp;			AutoConfigurationMetadata autoConfigurationMetadata) {
+<b class="nc">&nbsp;		int split = autoConfigurationClasses.length / 2;</b>
+<b class="nc">&nbsp;		OutcomesResolver firstHalfResolver = createOutcomesResolver(autoConfigurationClasses, 0, split,</b>
+&nbsp;				autoConfigurationMetadata);
+<b class="nc">&nbsp;		OutcomesResolver secondHalfResolver = new StandardOutcomesResolver(autoConfigurationClasses, split,</b>
+<b class="nc">&nbsp;				autoConfigurationClasses.length, autoConfigurationMetadata, getBeanClassLoader());</b>
+<b class="nc">&nbsp;		ConditionOutcome[] secondHalf = secondHalfResolver.resolveOutcomes();</b>
+<b class="nc">&nbsp;		ConditionOutcome[] firstHalf = firstHalfResolver.resolveOutcomes();</b>
+<b class="nc">&nbsp;		ConditionOutcome[] outcomes = new ConditionOutcome[autoConfigurationClasses.length];</b>
+<b class="nc">&nbsp;		System.arraycopy(firstHalf, 0, outcomes, 0, firstHalf.length);</b>
+<b class="nc">&nbsp;		System.arraycopy(secondHalf, 0, outcomes, split, secondHalf.length);</b>
+<b class="nc">&nbsp;		return outcomes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private OutcomesResolver createOutcomesResolver(String[] autoConfigurationClasses, int start, int end,
+&nbsp;			AutoConfigurationMetadata autoConfigurationMetadata) {
+<b class="nc">&nbsp;		OutcomesResolver outcomesResolver = new StandardOutcomesResolver(autoConfigurationClasses, start, end,</b>
+<b class="nc">&nbsp;				autoConfigurationMetadata, getBeanClassLoader());</b>
+<b class="nc">&nbsp;		return new ThreadedOutcomesResolver(outcomesResolver);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		ClassLoader classLoader = context.getClassLoader();</b>
+<b class="nc">&nbsp;		ConditionMessage matchMessage = ConditionMessage.empty();</b>
+<b class="nc">&nbsp;		List&lt;String&gt; onClasses = getCandidates(metadata, ConditionalOnClass.class);</b>
+<b class="nc">&nbsp;		if (onClasses != null) {</b>
+<b class="nc">&nbsp;			List&lt;String&gt; missing = filter(onClasses, ClassNameFilter.MISSING, classLoader);</b>
+<b class="nc">&nbsp;			if (!missing.isEmpty()) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnClass.class)</b>
+<b class="nc">&nbsp;					.didNotFind(&quot;required class&quot;, &quot;required classes&quot;)</b>
+<b class="nc">&nbsp;					.items(Style.QUOTE, missing));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			matchMessage = matchMessage.andCondition(ConditionalOnClass.class)</b>
+<b class="nc">&nbsp;				.found(&quot;required class&quot;, &quot;required classes&quot;)</b>
+<b class="nc">&nbsp;				.items(Style.QUOTE, filter(onClasses, ClassNameFilter.PRESENT, classLoader));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;String&gt; onMissingClasses = getCandidates(metadata, ConditionalOnMissingClass.class);</b>
+<b class="nc">&nbsp;		if (onMissingClasses != null) {</b>
+<b class="nc">&nbsp;			List&lt;String&gt; present = filter(onMissingClasses, ClassNameFilter.PRESENT, classLoader);</b>
+<b class="nc">&nbsp;			if (!present.isEmpty()) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnMissingClass.class)</b>
+<b class="nc">&nbsp;					.found(&quot;unwanted class&quot;, &quot;unwanted classes&quot;)</b>
+<b class="nc">&nbsp;					.items(Style.QUOTE, present));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			matchMessage = matchMessage.andCondition(ConditionalOnMissingClass.class)</b>
+<b class="nc">&nbsp;				.didNotFind(&quot;unwanted class&quot;, &quot;unwanted classes&quot;)</b>
+<b class="nc">&nbsp;				.items(Style.QUOTE, filter(onMissingClasses, ClassNameFilter.MISSING, classLoader));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConditionOutcome.match(matchMessage);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; getCandidates(AnnotatedTypeMetadata metadata, Class&lt;?&gt; annotationType) {
+<b class="nc">&nbsp;		MultiValueMap&lt;String, Object&gt; attributes = metadata.getAllAnnotationAttributes(annotationType.getName(), true);</b>
+<b class="nc">&nbsp;		if (attributes == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;String&gt; candidates = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		addAll(candidates, attributes.get(&quot;value&quot;));</b>
+<b class="nc">&nbsp;		addAll(candidates, attributes.get(&quot;name&quot;));</b>
+<b class="nc">&nbsp;		return candidates;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addAll(List&lt;String&gt; list, List&lt;Object&gt; itemsToAdd) {
+<b class="nc">&nbsp;		if (itemsToAdd != null) {</b>
+<b class="nc">&nbsp;			for (Object item : itemsToAdd) {</b>
+<b class="nc">&nbsp;				Collections.addAll(list, (String[]) item);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private interface OutcomesResolver {
+&nbsp;
+&nbsp;		ConditionOutcome[] resolveOutcomes();
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class ThreadedOutcomesResolver implements OutcomesResolver {
+&nbsp;
+&nbsp;		private final Thread thread;
+&nbsp;
+&nbsp;		private volatile ConditionOutcome[] outcomes;
+&nbsp;
+<b class="nc">&nbsp;		private ThreadedOutcomesResolver(OutcomesResolver outcomesResolver) {</b>
+<b class="nc">&nbsp;			this.thread = new Thread(() -&gt; this.outcomes = outcomesResolver.resolveOutcomes());</b>
+<b class="nc">&nbsp;			this.thread.start();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConditionOutcome[] resolveOutcomes() {
+&nbsp;			try {
+<b class="nc">&nbsp;				this.thread.join();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return this.outcomes;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class StandardOutcomesResolver implements OutcomesResolver {
+&nbsp;
+&nbsp;		private final String[] autoConfigurationClasses;
+&nbsp;
+&nbsp;		private final int start;
+&nbsp;
+&nbsp;		private final int end;
+&nbsp;
+&nbsp;		private final AutoConfigurationMetadata autoConfigurationMetadata;
+&nbsp;
+&nbsp;		private final ClassLoader beanClassLoader;
+&nbsp;
+&nbsp;		private StandardOutcomesResolver(String[] autoConfigurationClasses, int start, int end,
+<b class="nc">&nbsp;				AutoConfigurationMetadata autoConfigurationMetadata, ClassLoader beanClassLoader) {</b>
+<b class="nc">&nbsp;			this.autoConfigurationClasses = autoConfigurationClasses;</b>
+<b class="nc">&nbsp;			this.start = start;</b>
+<b class="nc">&nbsp;			this.end = end;</b>
+<b class="nc">&nbsp;			this.autoConfigurationMetadata = autoConfigurationMetadata;</b>
+<b class="nc">&nbsp;			this.beanClassLoader = beanClassLoader;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConditionOutcome[] resolveOutcomes() {
+<b class="nc">&nbsp;			return getOutcomes(this.autoConfigurationClasses, this.start, this.end, this.autoConfigurationMetadata);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses, int start, int end,
+&nbsp;				AutoConfigurationMetadata autoConfigurationMetadata) {
+<b class="nc">&nbsp;			ConditionOutcome[] outcomes = new ConditionOutcome[end - start];</b>
+<b class="nc">&nbsp;			for (int i = start; i &lt; end; i++) {</b>
+<b class="nc">&nbsp;				String autoConfigurationClass = autoConfigurationClasses[i];</b>
+<b class="nc">&nbsp;				if (autoConfigurationClass != null) {</b>
+<b class="nc">&nbsp;					String candidates = autoConfigurationMetadata.get(autoConfigurationClass, &quot;ConditionalOnClass&quot;);</b>
+<b class="nc">&nbsp;					if (candidates != null) {</b>
+<b class="nc">&nbsp;						outcomes[i - start] = getOutcome(candidates);</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return outcomes;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConditionOutcome getOutcome(String candidates) {
+&nbsp;			try {
+<b class="nc">&nbsp;				if (!candidates.contains(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;					return getOutcome(candidates, this.beanClassLoader);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				for (String candidate : StringUtils.commaDelimitedListToStringArray(candidates)) {</b>
+<b class="nc">&nbsp;					ConditionOutcome outcome = getOutcome(candidate, this.beanClassLoader);</b>
+<b class="nc">&nbsp;					if (outcome != null) {</b>
+<b class="nc">&nbsp;						return outcome;</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+&nbsp;				// We&#39;ll get another chance later
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConditionOutcome getOutcome(String className, ClassLoader classLoader) {
+<b class="nc">&nbsp;			if (ClassNameFilter.MISSING.matches(className, classLoader)) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnClass.class)</b>
+<b class="nc">&nbsp;					.didNotFind(&quot;required class&quot;)</b>
+<b class="nc">&nbsp;					.items(Style.QUOTE, className));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

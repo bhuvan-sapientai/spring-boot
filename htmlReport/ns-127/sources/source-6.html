@@ -1,0 +1,402 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JavaConventions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build</a>
+</div>
+
+<h1>Coverage Summary for Class: JavaConventions (org.springframework.boot.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JavaConventions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/119)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import com.gradle.enterprise.gradleplugin.testretry.TestRetryExtension;
+&nbsp;import com.gradle.enterprise.gradleplugin.testselection.PredictiveTestSelectionExtension;
+&nbsp;import io.spring.javaformat.gradle.SpringJavaFormatPlugin;
+&nbsp;import io.spring.javaformat.gradle.tasks.CheckFormat;
+&nbsp;import io.spring.javaformat.gradle.tasks.Format;
+&nbsp;import org.gradle.api.JavaVersion;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.artifacts.ConfigurationContainer;
+&nbsp;import org.gradle.api.artifacts.Dependency;
+&nbsp;import org.gradle.api.artifacts.DependencySet;
+&nbsp;import org.gradle.api.plugins.JavaBasePlugin;
+&nbsp;import org.gradle.api.plugins.JavaPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPluginExtension;
+&nbsp;import org.gradle.api.plugins.quality.Checkstyle;
+&nbsp;import org.gradle.api.plugins.quality.CheckstyleExtension;
+&nbsp;import org.gradle.api.plugins.quality.CheckstylePlugin;
+&nbsp;import org.gradle.api.tasks.SourceSet;
+&nbsp;import org.gradle.api.tasks.SourceSetContainer;
+&nbsp;import org.gradle.api.tasks.bundling.Jar;
+&nbsp;import org.gradle.api.tasks.compile.JavaCompile;
+&nbsp;import org.gradle.api.tasks.javadoc.Javadoc;
+&nbsp;import org.gradle.api.tasks.testing.Test;
+&nbsp;import org.gradle.external.javadoc.CoreJavadocOptions;
+&nbsp;
+&nbsp;import org.springframework.boot.build.architecture.ArchitecturePlugin;
+&nbsp;import org.springframework.boot.build.classpath.CheckClasspathForProhibitedDependencies;
+&nbsp;import org.springframework.boot.build.optional.OptionalDependenciesPlugin;
+&nbsp;import org.springframework.boot.build.testing.TestFailuresPlugin;
+&nbsp;import org.springframework.boot.build.toolchain.ToolchainPlugin;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Conventions that are applied in the presence of the {@link JavaBasePlugin}. When the
+&nbsp; * plugin is applied:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;The project is configured with source and target compatibility of 17
+&nbsp; * &lt;li&gt;{@link SpringJavaFormatPlugin Spring Java Format}, {@link CheckstylePlugin
+&nbsp; * Checkstyle}, {@link TestFailuresPlugin Test Failures}, and {@link ArchitecturePlugin
+&nbsp; * Architecture} plugins are applied
+&nbsp; * &lt;li&gt;{@link Test} tasks are configured:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;to use JUnit Platform
+&nbsp; * &lt;li&gt;with a max heap of 1024M
+&nbsp; * &lt;li&gt;to run after any Checkstyle and format checking tasks
+&nbsp; * &lt;li&gt;to enable retries with a maximum of three attempts when running on CI
+&nbsp; * &lt;li&gt;to use predictive test selection when the value of the
+&nbsp; * {@code ENABLE_PREDICTIVE_TEST_SELECTION} environment variable is {@code true}
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;li&gt;A {@code testRuntimeOnly} dependency upon
+&nbsp; * {@code org.junit.platform:junit-platform-launcher} is added to projects with the
+&nbsp; * {@link JavaPlugin} applied
+&nbsp; * &lt;li&gt;{@link JavaCompile}, {@link Javadoc}, and {@link Format} tasks are configured to
+&nbsp; * use UTF-8 encoding
+&nbsp; * &lt;li&gt;{@link JavaCompile} tasks are configured to:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;Use {@code -parameters}.
+&nbsp; * &lt;li&gt;Treat warnings as errors
+&nbsp; * &lt;li&gt;Enable {@code unchecked}, {@code deprecation}, {@code rawtypes}, and {@code varags}
+&nbsp; * warnings
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;li&gt;{@link Jar} tasks are configured to produce jars with LICENSE.txt and NOTICE.txt
+&nbsp; * files and the following manifest entries:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@code Automatic-Module-Name}
+&nbsp; * &lt;li&gt;{@code Build-Jdk-Spec}
+&nbsp; * &lt;li&gt;{@code Built-By}
+&nbsp; * &lt;li&gt;{@code Implementation-Title}
+&nbsp; * &lt;li&gt;{@code Implementation-Version}
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;li&gt;{@code spring-boot-parent} is used for dependency management&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;p/&gt;
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Christoph Dreis
+&nbsp; * @author Mike Smithson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+<b class="nc">&nbsp;class JavaConventions {</b>
+&nbsp;
+&nbsp;	private static final String SOURCE_AND_TARGET_COMPATIBILITY = &quot;17&quot;;
+&nbsp;
+&nbsp;	void apply(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().withType(JavaBasePlugin.class, (java) -&gt; {</b>
+<b class="nc">&nbsp;			project.getPlugins().apply(TestFailuresPlugin.class);</b>
+<b class="nc">&nbsp;			project.getPlugins().apply(ArchitecturePlugin.class);</b>
+<b class="nc">&nbsp;			configureSpringJavaFormat(project);</b>
+<b class="nc">&nbsp;			configureJavaConventions(project);</b>
+<b class="nc">&nbsp;			configureJavadocConventions(project);</b>
+<b class="nc">&nbsp;			configureTestConventions(project);</b>
+<b class="nc">&nbsp;			configureJarManifestConventions(project);</b>
+<b class="nc">&nbsp;			configureDependencyManagement(project);</b>
+<b class="nc">&nbsp;			configureToolchain(project);</b>
+<b class="nc">&nbsp;			configureProhibitedDependencyChecks(project);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureJarManifestConventions(Project project) {
+<b class="nc">&nbsp;		ExtractResources extractLegalResources = project.getTasks()</b>
+<b class="nc">&nbsp;			.create(&quot;extractLegalResources&quot;, ExtractResources.class);</b>
+<b class="nc">&nbsp;		extractLegalResources.getDestinationDirectory().set(project.getLayout().getBuildDirectory().dir(&quot;legal&quot;));</b>
+<b class="nc">&nbsp;		extractLegalResources.setResourcesNames(Arrays.asList(&quot;LICENSE.txt&quot;, &quot;NOTICE.txt&quot;));</b>
+<b class="nc">&nbsp;		extractLegalResources.property(&quot;version&quot;, project.getVersion().toString());</b>
+<b class="nc">&nbsp;		SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; sourceJarTaskNames = sourceSets.stream()</b>
+<b class="nc">&nbsp;			.map(SourceSet::getSourcesJarTaskName)</b>
+<b class="nc">&nbsp;			.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; javadocJarTaskNames = sourceSets.stream()</b>
+<b class="nc">&nbsp;			.map(SourceSet::getJavadocJarTaskName)</b>
+<b class="nc">&nbsp;			.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;		project.getTasks().withType(Jar.class, (jar) -&gt; project.afterEvaluate((evaluated) -&gt; {</b>
+<b class="nc">&nbsp;			jar.metaInf((metaInf) -&gt; metaInf.from(extractLegalResources));</b>
+<b class="nc">&nbsp;			jar.manifest((manifest) -&gt; {</b>
+<b class="nc">&nbsp;				Map&lt;String, Object&gt; attributes = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;				attributes.put(&quot;Automatic-Module-Name&quot;, project.getName().replace(&quot;-&quot;, &quot;.&quot;));</b>
+<b class="nc">&nbsp;				attributes.put(&quot;Build-Jdk-Spec&quot;, SOURCE_AND_TARGET_COMPATIBILITY);</b>
+<b class="nc">&nbsp;				attributes.put(&quot;Built-By&quot;, &quot;Spring&quot;);</b>
+<b class="nc">&nbsp;				attributes.put(&quot;Implementation-Title&quot;,</b>
+<b class="nc">&nbsp;						determineImplementationTitle(project, sourceJarTaskNames, javadocJarTaskNames, jar));</b>
+<b class="nc">&nbsp;				attributes.put(&quot;Implementation-Version&quot;, project.getVersion());</b>
+<b class="nc">&nbsp;				manifest.attributes(attributes);</b>
+&nbsp;			});
+&nbsp;		}));
+&nbsp;	}
+&nbsp;
+&nbsp;	private String determineImplementationTitle(Project project, Set&lt;String&gt; sourceJarTaskNames,
+&nbsp;			Set&lt;String&gt; javadocJarTaskNames, Jar jar) {
+<b class="nc">&nbsp;		if (sourceJarTaskNames.contains(jar.getName())) {</b>
+<b class="nc">&nbsp;			return &quot;Source for &quot; + project.getName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (javadocJarTaskNames.contains(jar.getName())) {</b>
+<b class="nc">&nbsp;			return &quot;Javadoc for &quot; + project.getName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return project.getDescription();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureTestConventions(Project project) {
+<b class="nc">&nbsp;		project.getTasks().withType(Test.class, (test) -&gt; {</b>
+<b class="nc">&nbsp;			test.useJUnitPlatform();</b>
+<b class="nc">&nbsp;			test.setMaxHeapSize(&quot;1024M&quot;);</b>
+<b class="nc">&nbsp;			project.getTasks().withType(Checkstyle.class, test::mustRunAfter);</b>
+<b class="nc">&nbsp;			project.getTasks().withType(CheckFormat.class, test::mustRunAfter);</b>
+<b class="nc">&nbsp;			configureTestRetries(test);</b>
+<b class="nc">&nbsp;			configurePredictiveTestSelection(test);</b>
+&nbsp;		});
+<b class="nc">&nbsp;		project.getPlugins()</b>
+<b class="nc">&nbsp;			.withType(JavaPlugin.class, (javaPlugin) -&gt; project.getDependencies()</b>
+<b class="nc">&nbsp;				.add(JavaPlugin.TEST_RUNTIME_ONLY_CONFIGURATION_NAME, &quot;org.junit.platform:junit-platform-launcher&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureTestRetries(Test test) {
+<b class="nc">&nbsp;		TestRetryExtension testRetry = test.getExtensions().getByType(TestRetryExtension.class);</b>
+<b class="nc">&nbsp;		testRetry.getFailOnPassedAfterRetry().set(false);</b>
+<b class="nc">&nbsp;		testRetry.getMaxRetries().set(isCi() ? 3 : 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isCi() {
+<b class="nc">&nbsp;		return Boolean.parseBoolean(System.getenv(&quot;CI&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configurePredictiveTestSelection(Test test) {
+<b class="nc">&nbsp;		if (isPredictiveTestSelectionEnabled()) {</b>
+<b class="nc">&nbsp;			PredictiveTestSelectionExtension predictiveTestSelection = test.getExtensions()</b>
+<b class="nc">&nbsp;				.getByType(PredictiveTestSelectionExtension.class);</b>
+<b class="nc">&nbsp;			predictiveTestSelection.getEnabled().convention(true);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isPredictiveTestSelectionEnabled() {
+<b class="nc">&nbsp;		return Boolean.parseBoolean(System.getenv(&quot;ENABLE_PREDICTIVE_TEST_SELECTION&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureJavadocConventions(Project project) {
+<b class="nc">&nbsp;		project.getTasks().withType(Javadoc.class, (javadoc) -&gt; {</b>
+<b class="nc">&nbsp;			CoreJavadocOptions options = (CoreJavadocOptions) javadoc.getOptions();</b>
+<b class="nc">&nbsp;			options.source(&quot;17&quot;);</b>
+<b class="nc">&nbsp;			options.encoding(&quot;UTF-8&quot;);</b>
+<b class="nc">&nbsp;			options.addStringOption(&quot;Xdoclint:none&quot;, &quot;-quiet&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureJavaConventions(Project project) {
+<b class="nc">&nbsp;		if (!project.hasProperty(&quot;toolchainVersion&quot;)) {</b>
+<b class="nc">&nbsp;			JavaPluginExtension javaPluginExtension = project.getExtensions().getByType(JavaPluginExtension.class);</b>
+<b class="nc">&nbsp;			javaPluginExtension.setSourceCompatibility(JavaVersion.toVersion(SOURCE_AND_TARGET_COMPATIBILITY));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		project.getTasks().withType(JavaCompile.class, (compile) -&gt; {</b>
+<b class="nc">&nbsp;			compile.getOptions().setEncoding(&quot;UTF-8&quot;);</b>
+<b class="nc">&nbsp;			List&lt;String&gt; args = compile.getOptions().getCompilerArgs();</b>
+<b class="nc">&nbsp;			if (!args.contains(&quot;-parameters&quot;)) {</b>
+<b class="nc">&nbsp;				args.add(&quot;-parameters&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (project.hasProperty(&quot;toolchainVersion&quot;)) {</b>
+<b class="nc">&nbsp;				compile.setSourceCompatibility(SOURCE_AND_TARGET_COMPATIBILITY);</b>
+<b class="nc">&nbsp;				compile.setTargetCompatibility(SOURCE_AND_TARGET_COMPATIBILITY);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (buildingWithJava17(project)) {</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean buildingWithJava17(Project project) {
+<b class="nc">&nbsp;		return !project.hasProperty(&quot;toolchainVersion&quot;) &amp;&amp; JavaVersion.current() == JavaVersion.VERSION_17;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureSpringJavaFormat(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().apply(SpringJavaFormatPlugin.class);</b>
+<b class="nc">&nbsp;		project.getTasks().withType(Format.class, (Format) -&gt; Format.setEncoding(&quot;UTF-8&quot;));</b>
+<b class="nc">&nbsp;		project.getPlugins().apply(CheckstylePlugin.class);</b>
+<b class="nc">&nbsp;		CheckstyleExtension checkstyle = project.getExtensions().getByType(CheckstyleExtension.class);</b>
+<b class="nc">&nbsp;		checkstyle.setToolVersion(&quot;10.12.4&quot;);</b>
+<b class="nc">&nbsp;		checkstyle.getConfigDirectory().set(project.getRootProject().file(&quot;src/checkstyle&quot;));</b>
+<b class="nc">&nbsp;		String version = SpringJavaFormatPlugin.class.getPackage().getImplementationVersion();</b>
+<b class="nc">&nbsp;		DependencySet checkstyleDependencies = project.getConfigurations().getByName(&quot;checkstyle&quot;).getDependencies();</b>
+<b class="nc">&nbsp;		checkstyleDependencies</b>
+<b class="nc">&nbsp;			.add(project.getDependencies().create(&quot;com.puppycrawl.tools:checkstyle:&quot; + checkstyle.getToolVersion()));</b>
+<b class="nc">&nbsp;		checkstyleDependencies</b>
+<b class="nc">&nbsp;			.add(project.getDependencies().create(&quot;io.spring.javaformat:spring-javaformat-checkstyle:&quot; + version));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureDependencyManagement(Project project) {
+<b class="nc">&nbsp;		ConfigurationContainer configurations = project.getConfigurations();</b>
+<b class="nc">&nbsp;		Configuration dependencyManagement = configurations.create(&quot;dependencyManagement&quot;, (configuration) -&gt; {</b>
+<b class="nc">&nbsp;			configuration.setVisible(false);</b>
+<b class="nc">&nbsp;			configuration.setCanBeConsumed(false);</b>
+<b class="nc">&nbsp;			configuration.setCanBeResolved(false);</b>
+&nbsp;		});
+<b class="nc">&nbsp;		configurations</b>
+<b class="nc">&nbsp;			.matching((configuration) -&gt; configuration.getName().endsWith(&quot;Classpath&quot;)</b>
+<b class="nc">&nbsp;					|| JavaPlugin.ANNOTATION_PROCESSOR_CONFIGURATION_NAME.equals(configuration.getName()))</b>
+<b class="nc">&nbsp;			.all((configuration) -&gt; configuration.extendsFrom(dependencyManagement));</b>
+<b class="nc">&nbsp;		Dependency springBootParent = project.getDependencies()</b>
+<b class="nc">&nbsp;			.enforcedPlatform(project.getDependencies()</b>
+<b class="nc">&nbsp;				.project(Collections.singletonMap(&quot;path&quot;, &quot;:spring-boot-project:spring-boot-parent&quot;)));</b>
+<b class="nc">&nbsp;		dependencyManagement.getDependencies().add(springBootParent);</b>
+<b class="nc">&nbsp;		project.getPlugins()</b>
+<b class="nc">&nbsp;			.withType(OptionalDependenciesPlugin.class,</b>
+<b class="nc">&nbsp;					(optionalDependencies) -&gt; configurations</b>
+<b class="nc">&nbsp;						.getByName(OptionalDependenciesPlugin.OPTIONAL_CONFIGURATION_NAME)</b>
+<b class="nc">&nbsp;						.extendsFrom(dependencyManagement));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureToolchain(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().apply(ToolchainPlugin.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureProhibitedDependencyChecks(Project project) {
+<b class="nc">&nbsp;		SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);</b>
+<b class="nc">&nbsp;		sourceSets.all((sourceSet) -&gt; createProhibitedDependenciesChecks(project,</b>
+<b class="nc">&nbsp;				sourceSet.getCompileClasspathConfigurationName(), sourceSet.getRuntimeClasspathConfigurationName()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createProhibitedDependenciesChecks(Project project, String... configurationNames) {
+<b class="nc">&nbsp;		ConfigurationContainer configurations = project.getConfigurations();</b>
+<b class="nc">&nbsp;		for (String configurationName : configurationNames) {</b>
+<b class="nc">&nbsp;			Configuration configuration = configurations.getByName(configurationName);</b>
+<b class="nc">&nbsp;			createProhibitedDependenciesCheck(configuration, project);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createProhibitedDependenciesCheck(Configuration classpath, Project project) {
+<b class="nc">&nbsp;		CheckClasspathForProhibitedDependencies checkClasspathForProhibitedDependencies = project.getTasks()</b>
+<b class="nc">&nbsp;			.create(&quot;check&quot; + StringUtils.capitalize(classpath.getName() + &quot;ForProhibitedDependencies&quot;),</b>
+&nbsp;					CheckClasspathForProhibitedDependencies.class);
+<b class="nc">&nbsp;		checkClasspathForProhibitedDependencies.setClasspath(classpath);</b>
+<b class="nc">&nbsp;		project.getTasks().getByName(JavaBasePlugin.CHECK_TASK_NAME).dependsOn(checkClasspathForProhibitedDependencies);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MetadataStore</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor</a>
+</div>
+
+<h1>Coverage Summary for Class: MetadataStore (org.springframework.boot.configurationprocessor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MetadataStore</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;
+&nbsp;import javax.annotation.processing.ProcessingEnvironment;
+&nbsp;import javax.tools.Diagnostic;
+&nbsp;import javax.tools.FileObject;
+&nbsp;import javax.tools.StandardLocation;
+&nbsp;
+&nbsp;import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
+&nbsp;import org.springframework.boot.configurationprocessor.metadata.InvalidConfigurationMetadataException;
+&nbsp;import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@code MetadataStore} is responsible for the storage of metadata on the filesystem.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.2.2
+&nbsp; */
+&nbsp;public class MetadataStore {
+&nbsp;
+&nbsp;	static final String METADATA_PATH = &quot;META-INF/spring-configuration-metadata.json&quot;;
+&nbsp;
+&nbsp;	private static final String ADDITIONAL_METADATA_PATH = &quot;META-INF/additional-spring-configuration-metadata.json&quot;;
+&nbsp;
+&nbsp;	private static final String RESOURCES_DIRECTORY = &quot;resources&quot;;
+&nbsp;
+&nbsp;	private static final String CLASSES_DIRECTORY = &quot;classes&quot;;
+&nbsp;
+&nbsp;	private final ProcessingEnvironment environment;
+&nbsp;
+<b class="nc">&nbsp;	public MetadataStore(ProcessingEnvironment environment) {</b>
+<b class="nc">&nbsp;		this.environment = environment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public ConfigurationMetadata readMetadata() {
+&nbsp;		try {
+<b class="nc">&nbsp;			return readMetadata(getMetadataResource().openInputStream());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public void writeMetadata(ConfigurationMetadata metadata) throws IOException {
+<b class="nc">&nbsp;		if (!metadata.getItems().isEmpty()) {</b>
+<b class="nc">&nbsp;			try (OutputStream outputStream = createMetadataResource().openOutputStream()) {</b>
+<b class="nc">&nbsp;				new JsonMarshaller().write(metadata, outputStream);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public ConfigurationMetadata readAdditionalMetadata() throws IOException {
+<b class="nc">&nbsp;		return readMetadata(getAdditionalMetadataStream());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurationMetadata readMetadata(InputStream in) {
+<b class="nc">&nbsp;		try (in) {</b>
+<b class="nc">&nbsp;			return new JsonMarshaller().read(in);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new InvalidConfigurationMetadataException(</b>
+<b class="nc">&nbsp;					&quot;Invalid additional meta-data in &#39;&quot; + METADATA_PATH + &quot;&#39;: &quot; + ex.getMessage(),</b>
+&nbsp;					Diagnostic.Kind.ERROR);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private FileObject getMetadataResource() throws IOException {
+<b class="nc">&nbsp;		return this.environment.getFiler().getResource(StandardLocation.CLASS_OUTPUT, &quot;&quot;, METADATA_PATH);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private FileObject createMetadataResource() throws IOException {
+<b class="nc">&nbsp;		return this.environment.getFiler().createResource(StandardLocation.CLASS_OUTPUT, &quot;&quot;, METADATA_PATH);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private InputStream getAdditionalMetadataStream() throws IOException {
+&nbsp;		// Most build systems will have copied the file to the class output location
+<b class="nc">&nbsp;		FileObject fileObject = this.environment.getFiler()</b>
+<b class="nc">&nbsp;			.getResource(StandardLocation.CLASS_OUTPUT, &quot;&quot;, ADDITIONAL_METADATA_PATH);</b>
+<b class="nc">&nbsp;		InputStream inputStream = getMetadataStream(fileObject);</b>
+<b class="nc">&nbsp;		if (inputStream != null) {</b>
+<b class="nc">&nbsp;			return inputStream;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			File file = locateAdditionalMetadataFile(new File(fileObject.toUri()));</b>
+<b class="nc">&nbsp;			return (file.exists() ? new FileInputStream(file) : fileObject.toUri().toURL().openStream());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new FileNotFoundException();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private InputStream getMetadataStream(FileObject fileObject) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return fileObject.openInputStream();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	File locateAdditionalMetadataFile(File standardLocation) throws IOException {
+<b class="nc">&nbsp;		if (standardLocation.exists()) {</b>
+<b class="nc">&nbsp;			return standardLocation;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String locations = this.environment.getOptions()</b>
+<b class="nc">&nbsp;			.get(ConfigurationMetadataAnnotationProcessor.ADDITIONAL_METADATA_LOCATIONS_OPTION);</b>
+<b class="nc">&nbsp;		if (locations != null) {</b>
+<b class="nc">&nbsp;			for (String location : locations.split(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;				File candidate = new File(location, ADDITIONAL_METADATA_PATH);</b>
+<b class="nc">&nbsp;				if (candidate.isFile()) {</b>
+<b class="nc">&nbsp;					return candidate;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return new File(locateGradleResourcesDirectory(standardLocation), ADDITIONAL_METADATA_PATH);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File locateGradleResourcesDirectory(File standardAdditionalMetadataLocation) throws FileNotFoundException {
+<b class="nc">&nbsp;		String path = standardAdditionalMetadataLocation.getPath();</b>
+<b class="nc">&nbsp;		int index = path.lastIndexOf(CLASSES_DIRECTORY);</b>
+<b class="nc">&nbsp;		if (index &lt; 0) {</b>
+<b class="nc">&nbsp;			throw new FileNotFoundException();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String buildDirectoryPath = path.substring(0, index);</b>
+<b class="nc">&nbsp;		File classOutputLocation = standardAdditionalMetadataLocation.getParentFile().getParentFile();</b>
+<b class="nc">&nbsp;		return new File(buildDirectoryPath, RESOURCES_DIRECTORY + &#39;/&#39; + classOutputLocation.getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

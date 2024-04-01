@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarLauncher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: JarLauncher (org.springframework.boot.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarLauncher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.archive.Archive;
+&nbsp;import org.springframework.boot.loader.archive.Archive.EntryFilter;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Launcher} for JAR based archives. This launcher assumes that dependency jars are
+&nbsp; * included inside a {@code /BOOT-INF/lib} directory and that application classes are
+&nbsp; * included inside a {@code /BOOT-INF/classes} directory.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class JarLauncher extends ExecutableArchiveLauncher {
+&nbsp;
+<b class="nc">&nbsp;	static final EntryFilter NESTED_ARCHIVE_ENTRY_FILTER = (entry) -&gt; {</b>
+<b class="nc">&nbsp;		if (entry.isDirectory()) {</b>
+<b class="nc">&nbsp;			return entry.getName().equals(&quot;BOOT-INF/classes/&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return entry.getName().startsWith(&quot;BOOT-INF/lib/&quot;);</b>
+&nbsp;	};
+&nbsp;
+<b class="nc">&nbsp;	public JarLauncher() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected JarLauncher(Archive archive) {
+<b class="nc">&nbsp;		super(archive);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isPostProcessingClassPathArchives() {
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isNestedArchive(Archive.Entry entry) {
+<b class="nc">&nbsp;		return NESTED_ARCHIVE_ENTRY_FILTER.matches(entry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String getArchiveEntryPathPrefix() {
+<b class="nc">&nbsp;		return &quot;BOOT-INF/&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public static void main(String[] args) throws Exception {
+<b class="nc">&nbsp;		new JarLauncher().launch(args);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

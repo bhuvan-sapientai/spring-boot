@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationPropertySourcesPropertyResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.source</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationPropertySourcesPropertyResolver (org.springframework.boot.context.properties.source)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationPropertySourcesPropertyResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.1%
+  </span>
+  <span class="absValue">
+    (32/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConfigurationPropertySourcesPropertyResolver$DefaultResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.4%
+  </span>
+  <span class="absValue">
+    (34/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.source;
+&nbsp;
+&nbsp;import org.springframework.core.env.AbstractPropertyResolver;
+&nbsp;import org.springframework.core.env.MutablePropertySources;
+&nbsp;import org.springframework.core.env.PropertySources;
+&nbsp;import org.springframework.core.env.PropertySourcesPropertyResolver;
+&nbsp;
+&nbsp;/**
+&nbsp; * Alternative {@link PropertySourcesPropertyResolver} implementation that recognizes
+&nbsp; * {@link ConfigurationPropertySourcesPropertySource} and saves duplicate calls to the
+&nbsp; * underlying sources if the name is a value {@link ConfigurationPropertyName}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ConfigurationPropertySourcesPropertyResolver extends AbstractPropertyResolver {
+&nbsp;
+&nbsp;	private final MutablePropertySources propertySources;
+&nbsp;
+&nbsp;	private final DefaultResolver defaultResolver;
+&nbsp;
+<b class="fc">&nbsp;	ConfigurationPropertySourcesPropertyResolver(MutablePropertySources propertySources) {</b>
+<b class="fc">&nbsp;		this.propertySources = propertySources;</b>
+<b class="fc">&nbsp;		this.defaultResolver = new DefaultResolver(propertySources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean containsProperty(String key) {
+<b class="fc">&nbsp;		ConfigurationPropertySourcesPropertySource attached = getAttached();</b>
+<b class="fc">&nbsp;		if (attached != null) {</b>
+<b class="fc">&nbsp;			ConfigurationPropertyName name = ConfigurationPropertyName.of(key, true);</b>
+<b class="fc">&nbsp;			if (name != null) {</b>
+&nbsp;				try {
+<b class="fc">&nbsp;					return attached.findConfigurationProperty(name) != null;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (Exception ex) {</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="fc">&nbsp;		return this.defaultResolver.containsProperty(key);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getProperty(String key) {
+<b class="fc">&nbsp;		return getProperty(key, String.class, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;T&gt; T getProperty(String key, Class&lt;T&gt; targetValueType) {
+<b class="fc">&nbsp;		return getProperty(key, targetValueType, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String getPropertyAsRawString(String key) {
+<b class="fc">&nbsp;		return getProperty(key, String.class, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T getProperty(String key, Class&lt;T&gt; targetValueType, boolean resolveNestedPlaceholders) {
+<b class="fc">&nbsp;		Object value = findPropertyValue(key);</b>
+<b class="fc">&nbsp;		if (value == null) {</b>
+<b class="fc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (resolveNestedPlaceholders &amp;&amp; value instanceof String string) {</b>
+<b class="fc">&nbsp;			value = resolveNestedPlaceholders(string);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return convertValueIfNecessary(value, targetValueType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object findPropertyValue(String key) {
+<b class="fc">&nbsp;		ConfigurationPropertySourcesPropertySource attached = getAttached();</b>
+<b class="fc">&nbsp;		if (attached != null) {</b>
+<b class="fc">&nbsp;			ConfigurationPropertyName name = ConfigurationPropertyName.of(key, true);</b>
+<b class="fc">&nbsp;			if (name != null) {</b>
+&nbsp;				try {
+<b class="fc">&nbsp;					ConfigurationProperty configurationProperty = attached.findConfigurationProperty(name);</b>
+<b class="fc">&nbsp;					return (configurationProperty != null) ? configurationProperty.getValue() : null;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (Exception ex) {</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="fc">&nbsp;		return this.defaultResolver.getProperty(key, Object.class, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurationPropertySourcesPropertySource getAttached() {
+<b class="fc">&nbsp;		ConfigurationPropertySourcesPropertySource attached = (ConfigurationPropertySourcesPropertySource) ConfigurationPropertySources</b>
+<b class="fc">&nbsp;			.getAttached(this.propertySources);</b>
+<b class="fc">&nbsp;		Iterable&lt;ConfigurationPropertySource&gt; attachedSource = (attached != null) ? attached.getSource() : null;</b>
+<b class="fc">&nbsp;		if ((attachedSource instanceof SpringConfigurationPropertySources springSource)</b>
+<b class="fc">&nbsp;				&amp;&amp; springSource.isUsingSources(this.propertySources)) {</b>
+<b class="fc">&nbsp;			return attached;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Default {@link PropertySourcesPropertyResolver} used if
+&nbsp;	 * {@link ConfigurationPropertySources} is not attached.
+&nbsp;	 */
+&nbsp;	static class DefaultResolver extends PropertySourcesPropertyResolver {
+&nbsp;
+&nbsp;		DefaultResolver(PropertySources propertySources) {
+<b class="fc">&nbsp;			super(propertySources);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public &lt;T&gt; T getProperty(String key, Class&lt;T&gt; targetValueType, boolean resolveNestedPlaceholders) {
+<b class="fc">&nbsp;			return super.getProperty(key, targetValueType, resolveNestedPlaceholders);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

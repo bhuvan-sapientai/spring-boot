@@ -1,0 +1,363 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PrometheusPushGatewayManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.metrics.export.prometheus</a>
+</div>
+
+<h1>Coverage Summary for Class: PrometheusPushGatewayManager (org.springframework.boot.actuate.metrics.export.prometheus)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PrometheusPushGatewayManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PrometheusPushGatewayManager$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PrometheusPushGatewayManager$PushGatewayTaskScheduler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PrometheusPushGatewayManager$ShutdownOperation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.metrics.export.prometheus;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;import java.util.concurrent.ScheduledExecutorService;
+&nbsp;import java.util.concurrent.ScheduledFuture;
+&nbsp;
+&nbsp;import io.prometheus.client.CollectorRegistry;
+&nbsp;import io.prometheus.client.exporter.PushGateway;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.scheduling.TaskScheduler;
+&nbsp;import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class that can be used to manage the pushing of metrics to a {@link PushGateway
+&nbsp; * Prometheus PushGateway}. Handles the scheduling of push operations, error handling and
+&nbsp; * shutdown operations.
+&nbsp; *
+&nbsp; * @author David J. M. Karlsen
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.1.0
+&nbsp; */
+&nbsp;public class PrometheusPushGatewayManager {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(PrometheusPushGatewayManager.class);</b>
+&nbsp;
+&nbsp;	private final PushGateway pushGateway;
+&nbsp;
+&nbsp;	private final CollectorRegistry registry;
+&nbsp;
+&nbsp;	private final String job;
+&nbsp;
+&nbsp;	private final Map&lt;String, String&gt; groupingKey;
+&nbsp;
+&nbsp;	private final ShutdownOperation shutdownOperation;
+&nbsp;
+&nbsp;	private final TaskScheduler scheduler;
+&nbsp;
+&nbsp;	private final ScheduledFuture&lt;?&gt; scheduled;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link PrometheusPushGatewayManager} instance using a single threaded
+&nbsp;	 * {@link TaskScheduler}.
+&nbsp;	 * @param pushGateway the source push gateway
+&nbsp;	 * @param registry the collector registry to push
+&nbsp;	 * @param pushRate the rate at which push operations occur
+&nbsp;	 * @param job the job ID for the operation
+&nbsp;	 * @param groupingKeys an optional set of grouping keys for the operation
+&nbsp;	 * @param shutdownOperation the shutdown operation that should be performed when
+&nbsp;	 * context is closed.
+&nbsp;	 */
+&nbsp;	public PrometheusPushGatewayManager(PushGateway pushGateway, CollectorRegistry registry, Duration pushRate,
+&nbsp;			String job, Map&lt;String, String&gt; groupingKeys, ShutdownOperation shutdownOperation) {
+<b class="nc">&nbsp;		this(pushGateway, registry, new PushGatewayTaskScheduler(), pushRate, job, groupingKeys, shutdownOperation);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link PrometheusPushGatewayManager} instance.
+&nbsp;	 * @param pushGateway the source push gateway
+&nbsp;	 * @param registry the collector registry to push
+&nbsp;	 * @param scheduler the scheduler used for operations
+&nbsp;	 * @param pushRate the rate at which push operations occur
+&nbsp;	 * @param job the job ID for the operation
+&nbsp;	 * @param groupingKey an optional set of grouping keys for the operation
+&nbsp;	 * @param shutdownOperation the shutdown operation that should be performed when
+&nbsp;	 * context is closed.
+&nbsp;	 */
+&nbsp;	public PrometheusPushGatewayManager(PushGateway pushGateway, CollectorRegistry registry, TaskScheduler scheduler,
+<b class="nc">&nbsp;			Duration pushRate, String job, Map&lt;String, String&gt; groupingKey, ShutdownOperation shutdownOperation) {</b>
+<b class="nc">&nbsp;		Assert.notNull(pushGateway, &quot;PushGateway must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(registry, &quot;Registry must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(scheduler, &quot;Scheduler must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(pushRate, &quot;PushRate must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.hasLength(job, &quot;Job must not be empty&quot;);</b>
+<b class="nc">&nbsp;		this.pushGateway = pushGateway;</b>
+<b class="nc">&nbsp;		this.registry = registry;</b>
+<b class="nc">&nbsp;		this.job = job;</b>
+<b class="nc">&nbsp;		this.groupingKey = groupingKey;</b>
+<b class="nc">&nbsp;		this.shutdownOperation = (shutdownOperation != null) ? shutdownOperation : ShutdownOperation.NONE;</b>
+<b class="nc">&nbsp;		this.scheduler = scheduler;</b>
+<b class="nc">&nbsp;		this.scheduled = this.scheduler.scheduleAtFixedRate(this::post, pushRate);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void post() {
+&nbsp;		try {
+<b class="nc">&nbsp;			this.pushGateway.pushAdd(this.registry, this.job, this.groupingKey);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			logger.warn(&quot;Unexpected exception thrown by POST of metrics to Prometheus Pushgateway&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void put() {
+&nbsp;		try {
+<b class="nc">&nbsp;			this.pushGateway.push(this.registry, this.job, this.groupingKey);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			logger.warn(&quot;Unexpected exception thrown by PUT of metrics to Prometheus Pushgateway&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void delete() {
+&nbsp;		try {
+<b class="nc">&nbsp;			this.pushGateway.delete(this.job, this.groupingKey);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			logger.warn(&quot;Unexpected exception thrown by DELETE of metrics from Prometheus Pushgateway&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Shutdown the manager, running any {@link ShutdownOperation}.
+&nbsp;	 */
+&nbsp;	public void shutdown() {
+<b class="nc">&nbsp;		shutdown(this.shutdownOperation);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void shutdown(ShutdownOperation shutdownOperation) {
+<b class="nc">&nbsp;		if (this.scheduler instanceof PushGatewayTaskScheduler pushGatewayTaskScheduler) {</b>
+<b class="nc">&nbsp;			pushGatewayTaskScheduler.shutdown();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.scheduled.cancel(false);</b>
+<b class="nc">&nbsp;		switch (shutdownOperation) {</b>
+<b class="nc">&nbsp;			case POST -&gt; post();</b>
+<b class="nc">&nbsp;			case PUT -&gt; put();</b>
+<b class="nc">&nbsp;			case DELETE -&gt; delete();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The operation that should be performed on shutdown.
+&nbsp;	 */
+<b class="nc">&nbsp;	public enum ShutdownOperation {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Don&#39;t perform any shutdown operation.
+&nbsp;		 */
+<b class="nc">&nbsp;		NONE,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Perform a POST before shutdown.
+&nbsp;		 */
+<b class="nc">&nbsp;		POST,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Perform a PUT before shutdown.
+&nbsp;		 */
+<b class="nc">&nbsp;		PUT,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Perform a DELETE before shutdown.
+&nbsp;		 */
+<b class="nc">&nbsp;		DELETE</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link TaskScheduler} used when the user doesn&#39;t specify one.
+&nbsp;	 */
+&nbsp;	static class PushGatewayTaskScheduler extends ThreadPoolTaskScheduler {
+&nbsp;
+<b class="nc">&nbsp;		PushGatewayTaskScheduler() {</b>
+<b class="nc">&nbsp;			setPoolSize(1);</b>
+<b class="nc">&nbsp;			setDaemon(true);</b>
+<b class="nc">&nbsp;			setThreadGroupName(&quot;prometheus-push-gateway&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ScheduledExecutorService getScheduledExecutor() throws IllegalStateException {
+<b class="nc">&nbsp;			return Executors.newSingleThreadScheduledExecutor(this::newThread);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

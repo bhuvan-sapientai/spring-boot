@@ -1,0 +1,545 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TypeUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor</a>
+</div>
+
+<h1>Coverage Summary for Class: TypeUtils (org.springframework.boot.configurationprocessor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TypeUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TypeUtils$TypeDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TypeUtils$TypeExtractor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/145)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.annotation.processing.ProcessingEnvironment;
+&nbsp;import javax.lang.model.element.Element;
+&nbsp;import javax.lang.model.element.TypeElement;
+&nbsp;import javax.lang.model.type.ArrayType;
+&nbsp;import javax.lang.model.type.DeclaredType;
+&nbsp;import javax.lang.model.type.PrimitiveType;
+&nbsp;import javax.lang.model.type.TypeKind;
+&nbsp;import javax.lang.model.type.TypeMirror;
+&nbsp;import javax.lang.model.type.TypeVariable;
+&nbsp;import javax.lang.model.util.SimpleTypeVisitor8;
+&nbsp;import javax.lang.model.util.Types;
+&nbsp;
+&nbsp;/**
+&nbsp; * Type Utilities.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class TypeUtils {
+&nbsp;
+&nbsp;	private static final Map&lt;TypeKind, Class&lt;?&gt;&gt; PRIMITIVE_WRAPPERS;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Map&lt;TypeKind, Class&lt;?&gt;&gt; wrappers = new EnumMap&lt;&gt;(TypeKind.class);</b>
+<b class="nc">&nbsp;		wrappers.put(TypeKind.BOOLEAN, Boolean.class);</b>
+<b class="nc">&nbsp;		wrappers.put(TypeKind.BYTE, Byte.class);</b>
+<b class="nc">&nbsp;		wrappers.put(TypeKind.CHAR, Character.class);</b>
+<b class="nc">&nbsp;		wrappers.put(TypeKind.DOUBLE, Double.class);</b>
+<b class="nc">&nbsp;		wrappers.put(TypeKind.FLOAT, Float.class);</b>
+<b class="nc">&nbsp;		wrappers.put(TypeKind.INT, Integer.class);</b>
+<b class="nc">&nbsp;		wrappers.put(TypeKind.LONG, Long.class);</b>
+<b class="nc">&nbsp;		wrappers.put(TypeKind.SHORT, Short.class);</b>
+<b class="nc">&nbsp;		PRIMITIVE_WRAPPERS = Collections.unmodifiableMap(wrappers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final Map&lt;String, TypeKind&gt; WRAPPER_TO_PRIMITIVE;
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern NEW_LINE_PATTERN = Pattern.compile(&quot;[\r\n]+&quot;);</b>
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Map&lt;String, TypeKind&gt; primitives = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		PRIMITIVE_WRAPPERS.forEach((kind, wrapperClass) -&gt; primitives.put(wrapperClass.getName(), kind));</b>
+<b class="nc">&nbsp;		WRAPPER_TO_PRIMITIVE = primitives;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final ProcessingEnvironment env;
+&nbsp;
+&nbsp;	private final Types types;
+&nbsp;
+&nbsp;	private final TypeExtractor typeExtractor;
+&nbsp;
+&nbsp;	private final TypeMirror collectionType;
+&nbsp;
+&nbsp;	private final TypeMirror mapType;
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;TypeElement, TypeDescriptor&gt; typeDescriptors = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	TypeUtils(ProcessingEnvironment env) {</b>
+<b class="nc">&nbsp;		this.env = env;</b>
+<b class="nc">&nbsp;		this.types = env.getTypeUtils();</b>
+<b class="nc">&nbsp;		this.typeExtractor = new TypeExtractor(this.types);</b>
+<b class="nc">&nbsp;		this.collectionType = getDeclaredType(this.types, Collection.class, 1);</b>
+<b class="nc">&nbsp;		this.mapType = getDeclaredType(this.types, Map.class, 2);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TypeMirror getDeclaredType(Types types, Class&lt;?&gt; typeClass, int numberOfTypeArgs) {
+<b class="nc">&nbsp;		TypeMirror[] typeArgs = new TypeMirror[numberOfTypeArgs];</b>
+<b class="nc">&nbsp;		Arrays.setAll(typeArgs, (i) -&gt; types.getWildcardType(null, null));</b>
+<b class="nc">&nbsp;		TypeElement typeElement = this.env.getElementUtils().getTypeElement(typeClass.getName());</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return types.getDeclaredType(typeElement, typeArgs);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IllegalArgumentException ex) {</b>
+&nbsp;			// Try again without generics for older Java versions
+<b class="nc">&nbsp;			return types.getDeclaredType(typeElement);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isSameType(TypeMirror t1, TypeMirror t2) {
+<b class="nc">&nbsp;		return this.types.isSameType(t1, t2);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Element asElement(TypeMirror type) {
+<b class="nc">&nbsp;		return this.types.asElement(type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the qualified name of the specified element.
+&nbsp;	 * @param element the element to handle
+&nbsp;	 * @return the fully qualified name of the element, suitable for a call to
+&nbsp;	 * {@link Class#forName(String)}
+&nbsp;	 */
+&nbsp;	String getQualifiedName(Element element) {
+<b class="nc">&nbsp;		return this.typeExtractor.getQualifiedName(element);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the type of the specified {@link TypeMirror} including all its generic
+&nbsp;	 * information.
+&nbsp;	 * @param element the {@link TypeElement} in which this {@code type} is declared
+&nbsp;	 * @param type the type to handle
+&nbsp;	 * @return a representation of the type including all its generic information
+&nbsp;	 */
+&nbsp;	String getType(TypeElement element, TypeMirror type) {
+<b class="nc">&nbsp;		if (type == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return type.accept(this.typeExtractor, createTypeDescriptor(element));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the target element type from the specified container type or {@code null}
+&nbsp;	 * if no element type was found.
+&nbsp;	 * @param type a type, potentially wrapping an element type
+&nbsp;	 * @return the element type or {@code null} if no specific type was found
+&nbsp;	 */
+&nbsp;	TypeMirror extractElementType(TypeMirror type) {
+<b class="nc">&nbsp;		if (!this.env.getTypeUtils().isAssignable(type, this.collectionType)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getCollectionElementType(type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TypeMirror getCollectionElementType(TypeMirror type) {
+<b class="nc">&nbsp;		if (((TypeElement) this.types.asElement(type)).getQualifiedName().contentEquals(Collection.class.getName())) {</b>
+<b class="nc">&nbsp;			DeclaredType declaredType = (DeclaredType) type;</b>
+&nbsp;			// raw type, just &quot;Collection&quot;
+<b class="nc">&nbsp;			if (declaredType.getTypeArguments().isEmpty()) {</b>
+<b class="nc">&nbsp;				return this.types.getDeclaredType(this.env.getElementUtils().getTypeElement(Object.class.getName()));</b>
+&nbsp;			}
+&nbsp;			// return type argument to Collection&lt;...&gt;
+<b class="nc">&nbsp;			return declaredType.getTypeArguments().get(0);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		// recursively walk the supertypes, looking for Collection&lt;...&gt;
+<b class="nc">&nbsp;		for (TypeMirror superType : this.env.getTypeUtils().directSupertypes(type)) {</b>
+<b class="nc">&nbsp;			if (this.types.isAssignable(superType, this.collectionType)) {</b>
+<b class="nc">&nbsp;				return getCollectionElementType(superType);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isCollectionOrMap(TypeMirror type) {
+<b class="nc">&nbsp;		return this.env.getTypeUtils().isAssignable(type, this.collectionType)</b>
+<b class="nc">&nbsp;				|| this.env.getTypeUtils().isAssignable(type, this.mapType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getJavaDoc(Element element) {
+<b class="nc">&nbsp;		String javadoc = (element != null) ? this.env.getElementUtils().getDocComment(element) : null;</b>
+<b class="nc">&nbsp;		if (javadoc != null) {</b>
+<b class="nc">&nbsp;			javadoc = NEW_LINE_PATTERN.matcher(javadoc).replaceAll(&quot;&quot;).trim();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (javadoc == null || javadoc.isEmpty()) ? null : javadoc;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link PrimitiveType} of the specified type or {@code null} if the type
+&nbsp;	 * does not represent a valid wrapper type.
+&nbsp;	 * @param typeMirror a type
+&nbsp;	 * @return the primitive type or {@code null} if the type is not a wrapper type
+&nbsp;	 */
+&nbsp;	PrimitiveType getPrimitiveType(TypeMirror typeMirror) {
+<b class="nc">&nbsp;		if (getPrimitiveFor(typeMirror) != null) {</b>
+<b class="nc">&nbsp;			return this.types.unboxedType(typeMirror);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	TypeMirror getWrapperOrPrimitiveFor(TypeMirror typeMirror) {
+<b class="nc">&nbsp;		Class&lt;?&gt; candidate = getWrapperFor(typeMirror);</b>
+<b class="nc">&nbsp;		if (candidate != null) {</b>
+<b class="nc">&nbsp;			return this.env.getElementUtils().getTypeElement(candidate.getName()).asType();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		TypeKind primitiveKind = getPrimitiveFor(typeMirror);</b>
+<b class="nc">&nbsp;		if (primitiveKind != null) {</b>
+<b class="nc">&nbsp;			return this.env.getTypeUtils().getPrimitiveType(primitiveKind);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Class&lt;?&gt; getWrapperFor(TypeMirror type) {
+<b class="nc">&nbsp;		return PRIMITIVE_WRAPPERS.get(type.getKind());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TypeKind getPrimitiveFor(TypeMirror type) {
+<b class="nc">&nbsp;		return WRAPPER_TO_PRIMITIVE.get(type.toString());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	TypeDescriptor resolveTypeDescriptor(TypeElement element) {
+<b class="nc">&nbsp;		if (this.typeDescriptors.containsKey(element)) {</b>
+<b class="nc">&nbsp;			return this.typeDescriptors.get(element);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return createTypeDescriptor(element);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TypeDescriptor createTypeDescriptor(TypeElement element) {
+<b class="nc">&nbsp;		TypeDescriptor descriptor = new TypeDescriptor();</b>
+<b class="nc">&nbsp;		process(descriptor, element.asType());</b>
+<b class="nc">&nbsp;		this.typeDescriptors.put(element, descriptor);</b>
+<b class="nc">&nbsp;		return descriptor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void process(TypeDescriptor descriptor, TypeMirror type) {
+<b class="nc">&nbsp;		if (type.getKind() == TypeKind.DECLARED) {</b>
+<b class="nc">&nbsp;			DeclaredType declaredType = (DeclaredType) type;</b>
+<b class="nc">&nbsp;			DeclaredType freshType = (DeclaredType) this.env.getElementUtils()</b>
+<b class="nc">&nbsp;				.getTypeElement(this.types.asElement(type).toString())</b>
+<b class="nc">&nbsp;				.asType();</b>
+<b class="nc">&nbsp;			List&lt;? extends TypeMirror&gt; arguments = declaredType.getTypeArguments();</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; arguments.size(); i++) {</b>
+<b class="nc">&nbsp;				TypeMirror specificType = arguments.get(i);</b>
+<b class="nc">&nbsp;				TypeMirror signatureType = freshType.getTypeArguments().get(i);</b>
+<b class="nc">&nbsp;				descriptor.registerIfNecessary(signatureType, specificType);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			TypeElement element = (TypeElement) this.types.asElement(type);</b>
+<b class="nc">&nbsp;			process(descriptor, element.getSuperclass());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A visitor that extracts the fully qualified name of a type, including generic
+&nbsp;	 * information.
+&nbsp;	 */
+&nbsp;	private static class TypeExtractor extends SimpleTypeVisitor8&lt;String, TypeDescriptor&gt; {
+&nbsp;
+&nbsp;		private final Types types;
+&nbsp;
+<b class="nc">&nbsp;		TypeExtractor(Types types) {</b>
+<b class="nc">&nbsp;			this.types = types;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String visitDeclared(DeclaredType type, TypeDescriptor descriptor) {
+<b class="nc">&nbsp;			TypeElement enclosingElement = getEnclosingTypeElement(type);</b>
+<b class="nc">&nbsp;			String qualifiedName = determineQualifiedName(type, enclosingElement);</b>
+<b class="nc">&nbsp;			if (type.getTypeArguments().isEmpty()) {</b>
+<b class="nc">&nbsp;				return qualifiedName;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			StringBuilder name = new StringBuilder();</b>
+<b class="nc">&nbsp;			name.append(qualifiedName);</b>
+<b class="nc">&nbsp;			name.append(&quot;&lt;&quot;)</b>
+<b class="nc">&nbsp;				.append(type.getTypeArguments()</b>
+<b class="nc">&nbsp;					.stream()</b>
+<b class="nc">&nbsp;					.map((t) -&gt; visit(t, descriptor))</b>
+<b class="nc">&nbsp;					.collect(Collectors.joining(&quot;,&quot;)))</b>
+<b class="nc">&nbsp;				.append(&quot;&gt;&quot;);</b>
+<b class="nc">&nbsp;			return name.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String determineQualifiedName(DeclaredType type, TypeElement enclosingElement) {
+<b class="nc">&nbsp;			if (enclosingElement != null) {</b>
+<b class="nc">&nbsp;				return getQualifiedName(enclosingElement) + &quot;$&quot; + type.asElement().getSimpleName();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return getQualifiedName(type.asElement());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String visitTypeVariable(TypeVariable t, TypeDescriptor descriptor) {
+<b class="nc">&nbsp;			TypeMirror typeMirror = descriptor.resolveGeneric(t);</b>
+<b class="nc">&nbsp;			if (typeMirror != null) {</b>
+<b class="nc">&nbsp;				if (typeMirror instanceof TypeVariable typeVariable) {</b>
+&nbsp;					// Still unresolved, let&#39;s use the upper bound, checking first if
+&nbsp;					// a cycle may exist
+<b class="nc">&nbsp;					if (!hasCycle(typeVariable)) {</b>
+<b class="nc">&nbsp;						return visit(typeVariable.getUpperBound(), descriptor);</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					return visit(typeMirror, descriptor);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;			// Fallback to simple representation of the upper bound
+<b class="nc">&nbsp;			return defaultAction(t.getUpperBound(), descriptor);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean hasCycle(TypeVariable variable) {
+<b class="nc">&nbsp;			TypeMirror upperBound = variable.getUpperBound();</b>
+<b class="nc">&nbsp;			if (upperBound instanceof DeclaredType declaredType) {</b>
+<b class="nc">&nbsp;				return declaredType.getTypeArguments().stream().anyMatch((candidate) -&gt; candidate.equals(variable));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String visitArray(ArrayType t, TypeDescriptor descriptor) {
+<b class="nc">&nbsp;			return t.getComponentType().accept(this, descriptor) + &quot;[]&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String visitPrimitive(PrimitiveType t, TypeDescriptor descriptor) {
+<b class="nc">&nbsp;			return this.types.boxedClass(t).getQualifiedName().toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected String defaultAction(TypeMirror t, TypeDescriptor descriptor) {
+<b class="nc">&nbsp;			return t.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getQualifiedName(Element element) {
+<b class="nc">&nbsp;			if (element == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			TypeElement enclosingElement = getEnclosingTypeElement(element.asType());</b>
+<b class="nc">&nbsp;			if (enclosingElement != null) {</b>
+<b class="nc">&nbsp;				return getQualifiedName(enclosingElement) + &quot;$&quot;</b>
+<b class="nc">&nbsp;						+ ((DeclaredType) element.asType()).asElement().getSimpleName();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (element instanceof TypeElement typeElement) {</b>
+<b class="nc">&nbsp;				return typeElement.getQualifiedName().toString();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Could not extract qualified name from &quot; + element);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private TypeElement getEnclosingTypeElement(TypeMirror type) {
+<b class="nc">&nbsp;			if (type instanceof DeclaredType declaredType) {</b>
+<b class="nc">&nbsp;				Element enclosingElement = declaredType.asElement().getEnclosingElement();</b>
+<b class="nc">&nbsp;				if (enclosingElement instanceof TypeElement typeElement) {</b>
+<b class="nc">&nbsp;					return typeElement;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Descriptor for a given type.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class TypeDescriptor {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;TypeVariable, TypeMirror&gt; generics = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		Map&lt;TypeVariable, TypeMirror&gt; getGenerics() {
+<b class="nc">&nbsp;			return Collections.unmodifiableMap(this.generics);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		TypeMirror resolveGeneric(TypeVariable typeVariable) {
+<b class="nc">&nbsp;			return resolveGeneric(getParameterName(typeVariable));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		TypeMirror resolveGeneric(String parameterName) {
+<b class="nc">&nbsp;			return this.generics.entrySet()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.filter((e) -&gt; getParameterName(e.getKey()).equals(parameterName))</b>
+<b class="nc">&nbsp;				.findFirst()</b>
+<b class="nc">&nbsp;				.map(Entry::getValue)</b>
+<b class="nc">&nbsp;				.orElse(null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void registerIfNecessary(TypeMirror variable, TypeMirror resolution) {
+<b class="nc">&nbsp;			if (variable instanceof TypeVariable typeVariable) {</b>
+<b class="nc">&nbsp;				if (this.generics.keySet()</b>
+<b class="nc">&nbsp;					.stream()</b>
+<b class="nc">&nbsp;					.noneMatch((candidate) -&gt; getParameterName(candidate).equals(getParameterName(typeVariable)))) {</b>
+<b class="nc">&nbsp;					this.generics.put(typeVariable, resolution);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getParameterName(TypeVariable typeVariable) {
+<b class="nc">&nbsp;			return typeVariable.asElement().getSimpleName().toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

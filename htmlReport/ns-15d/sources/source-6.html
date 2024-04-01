@@ -1,0 +1,192 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EmbeddedServletContainerJarPackagingIntegrationTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.embedded</a>
+</div>
+
+<h1>Coverage Summary for Class: EmbeddedServletContainerJarPackagingIntegrationTests (org.springframework.boot.context.embedded)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmbeddedServletContainerJarPackagingIntegrationTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.embedded;
+&nbsp;
+&nbsp;import org.junit.jupiter.api.TestTemplate;
+&nbsp;import org.junit.jupiter.api.condition.DisabledOnOs;
+&nbsp;import org.junit.jupiter.api.condition.OS;
+&nbsp;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests for Spring Boot&#39;s embedded servlet container support using jar
+&nbsp; * packaging.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;@EmbeddedServletContainerTest(packaging = &quot;jar&quot;,
+&nbsp;		launchers = { PackagedApplicationLauncher.class, ExplodedApplicationLauncher.class })
+<b class="nc">&nbsp;class EmbeddedServletContainerJarPackagingIntegrationTests {</b>
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void nestedMetaInfResourceIsAvailableViaHttp(RestTemplate rest) {
+<b class="nc">&nbsp;		ResponseEntity&lt;String&gt; entity = rest.getForEntity(&quot;/nested-meta-inf-resource.txt&quot;, String.class);</b>
+<b class="nc">&nbsp;		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	@DisabledOnOs(OS.WINDOWS)
+&nbsp;	void nestedMetaInfResourceWithNameThatContainsReservedCharactersIsAvailableViaHttp(RestTemplate rest) {
+<b class="nc">&nbsp;		ResponseEntity&lt;String&gt; entity = rest.getForEntity(</b>
+&nbsp;				&quot;/nested-reserved-%21%23%24%25%26%28%29%2A%2B%2C%3A%3D%3F%40%5B%5D-meta-inf-resource.txt&quot;,
+&nbsp;				String.class);
+<b class="nc">&nbsp;		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);</b>
+<b class="nc">&nbsp;		assertThat(entity.getBody()).isEqualTo(&quot;encoded-name&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void nestedMetaInfResourceIsAvailableViaServletContext(RestTemplate rest) {
+<b class="nc">&nbsp;		ResponseEntity&lt;String&gt; entity = rest.getForEntity(&quot;/servletContext?/nested-meta-inf-resource.txt&quot;,</b>
+&nbsp;				String.class);
+<b class="nc">&nbsp;		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void nestedJarIsNotAvailableViaHttp(RestTemplate rest) {
+<b class="nc">&nbsp;		ResponseEntity&lt;String&gt; entity = rest.getForEntity(&quot;/BOOT-INF/lib/resources-1.0.jar&quot;, String.class);</b>
+<b class="nc">&nbsp;		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void applicationClassesAreNotAvailableViaHttp(RestTemplate rest) {
+<b class="nc">&nbsp;		ResponseEntity&lt;String&gt; entity = rest</b>
+<b class="nc">&nbsp;			.getForEntity(&quot;/BOOT-INF/classes/com/example/ResourceHandlingApplication.class&quot;, String.class);</b>
+<b class="nc">&nbsp;		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void launcherIsNotAvailableViaHttp(RestTemplate rest) {
+<b class="nc">&nbsp;		ResponseEntity&lt;String&gt; entity = rest.getForEntity(&quot;/org/springframework/boot/loader/Launcher.class&quot;,</b>
+&nbsp;				String.class);
+<b class="nc">&nbsp;		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void conditionalOnWarDeploymentBeanIsNotAvailableForEmbeddedServer(RestTemplate rest) {
+<b class="nc">&nbsp;		ResponseEntity&lt;String&gt; entity = rest.getForEntity(&quot;/war&quot;, String.class);</b>
+<b class="nc">&nbsp;		assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

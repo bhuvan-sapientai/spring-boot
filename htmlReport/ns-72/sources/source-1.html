@@ -1,0 +1,424 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CachesEndpoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.cache</a>
+</div>
+
+<h1>Coverage Summary for Class: CachesEndpoint (org.springframework.boot.actuate.cache)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CachesEndpoint</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CachesEndpoint$CacheDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CachesEndpoint$CacheEntryDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CachesEndpoint$CacheManagerDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CachesEndpoint$CachesDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.cache;
+&nbsp;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationResponseBody;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.DeleteOperation;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Selector;
+&nbsp;import org.springframework.cache.Cache;
+&nbsp;import org.springframework.cache.CacheManager;
+&nbsp;import org.springframework.lang.Nullable;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Endpoint @Endpoint} to expose available {@link Cache caches}.
+&nbsp; *
+&nbsp; * @author Johannes Edmeier
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.1.0
+&nbsp; */
+&nbsp;@Endpoint(id = &quot;caches&quot;)
+&nbsp;public class CachesEndpoint {
+&nbsp;
+&nbsp;	private final Map&lt;String, CacheManager&gt; cacheManagers;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new endpoint with the {@link CacheManager} instances to use.
+&nbsp;	 * @param cacheManagers the cache managers to use, indexed by name
+&nbsp;	 */
+<b class="nc">&nbsp;	public CachesEndpoint(Map&lt;String, CacheManager&gt; cacheManagers) {</b>
+<b class="nc">&nbsp;		this.cacheManagers = new LinkedHashMap&lt;&gt;(cacheManagers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link CachesDescriptor} of all available {@link Cache caches}.
+&nbsp;	 * @return a caches reports
+&nbsp;	 */
+&nbsp;	@ReadOperation
+&nbsp;	public CachesDescriptor caches() {
+<b class="nc">&nbsp;		Map&lt;String, Map&lt;String, CacheDescriptor&gt;&gt; descriptors = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		getCacheEntries(matchAll(), matchAll()).forEach((entry) -&gt; {</b>
+<b class="nc">&nbsp;			String cacheName = entry.getName();</b>
+<b class="nc">&nbsp;			String cacheManager = entry.getCacheManager();</b>
+<b class="nc">&nbsp;			Map&lt;String, CacheDescriptor&gt; cacheManagerDescriptors = descriptors.computeIfAbsent(cacheManager,</b>
+<b class="nc">&nbsp;					(key) -&gt; new LinkedHashMap&lt;&gt;());</b>
+<b class="nc">&nbsp;			cacheManagerDescriptors.put(cacheName, new CacheDescriptor(entry.getTarget()));</b>
+&nbsp;		});
+<b class="nc">&nbsp;		Map&lt;String, CacheManagerDescriptor&gt; cacheManagerDescriptors = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		descriptors.forEach((name, entries) -&gt; cacheManagerDescriptors.put(name, new CacheManagerDescriptor(entries)));</b>
+<b class="nc">&nbsp;		return new CachesDescriptor(cacheManagerDescriptors);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link CacheDescriptor} for the specified cache.
+&nbsp;	 * @param cache the name of the cache
+&nbsp;	 * @param cacheManager the name of the cacheManager (can be {@code null}
+&nbsp;	 * @return the descriptor of the cache or {@code null} if no such cache exists
+&nbsp;	 * @throws NonUniqueCacheException if more than one cache with that name exists and no
+&nbsp;	 * {@code cacheManager} was provided to identify a unique candidate
+&nbsp;	 */
+&nbsp;	@ReadOperation
+&nbsp;	public CacheEntryDescriptor cache(@Selector String cache, @Nullable String cacheManager) {
+<b class="nc">&nbsp;		return extractUniqueCacheEntry(cache, getCacheEntries((name) -&gt; name.equals(cache), isNameMatch(cacheManager)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clear all the available {@link Cache caches}.
+&nbsp;	 */
+&nbsp;	@DeleteOperation
+&nbsp;	public void clearCaches() {
+<b class="nc">&nbsp;		getCacheEntries(matchAll(), matchAll()).forEach(this::clearCache);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clear the specific {@link Cache}.
+&nbsp;	 * @param cache the name of the cache
+&nbsp;	 * @param cacheManager the name of the cacheManager (can be {@code null} to match all)
+&nbsp;	 * @return {@code true} if the cache was cleared or {@code false} if no such cache
+&nbsp;	 * exists
+&nbsp;	 * @throws NonUniqueCacheException if more than one cache with that name exists and no
+&nbsp;	 * {@code cacheManager} was provided to identify a unique candidate
+&nbsp;	 */
+&nbsp;	@DeleteOperation
+&nbsp;	public boolean clearCache(@Selector String cache, @Nullable String cacheManager) {
+<b class="nc">&nbsp;		CacheEntryDescriptor entry = extractUniqueCacheEntry(cache,</b>
+<b class="nc">&nbsp;				getCacheEntries((name) -&gt; name.equals(cache), isNameMatch(cacheManager)));</b>
+<b class="nc">&nbsp;		return (entry != null &amp;&amp; clearCache(entry));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;CacheEntryDescriptor&gt; getCacheEntries(Predicate&lt;String&gt; cacheNamePredicate,
+&nbsp;			Predicate&lt;String&gt; cacheManagerNamePredicate) {
+<b class="nc">&nbsp;		return this.cacheManagers.keySet()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.filter(cacheManagerNamePredicate)</b>
+<b class="nc">&nbsp;			.flatMap((cacheManagerName) -&gt; getCacheEntries(cacheManagerName, cacheNamePredicate).stream())</b>
+<b class="nc">&nbsp;			.toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;CacheEntryDescriptor&gt; getCacheEntries(String cacheManagerName, Predicate&lt;String&gt; cacheNamePredicate) {
+<b class="nc">&nbsp;		CacheManager cacheManager = this.cacheManagers.get(cacheManagerName);</b>
+<b class="nc">&nbsp;		return cacheManager.getCacheNames()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.filter(cacheNamePredicate)</b>
+<b class="nc">&nbsp;			.map(cacheManager::getCache)</b>
+<b class="nc">&nbsp;			.filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;			.map((cache) -&gt; new CacheEntryDescriptor(cache, cacheManagerName))</b>
+<b class="nc">&nbsp;			.toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CacheEntryDescriptor extractUniqueCacheEntry(String cache, List&lt;CacheEntryDescriptor&gt; entries) {
+<b class="nc">&nbsp;		if (entries.size() &gt; 1) {</b>
+<b class="nc">&nbsp;			throw new NonUniqueCacheException(cache,</b>
+<b class="nc">&nbsp;					entries.stream().map(CacheEntryDescriptor::getCacheManager).distinct().toList());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (!entries.isEmpty() ? entries.get(0) : null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean clearCache(CacheEntryDescriptor entry) {
+<b class="nc">&nbsp;		String cacheName = entry.getName();</b>
+<b class="nc">&nbsp;		String cacheManager = entry.getCacheManager();</b>
+<b class="nc">&nbsp;		Cache cache = this.cacheManagers.get(cacheManager).getCache(cacheName);</b>
+<b class="nc">&nbsp;		if (cache != null) {</b>
+<b class="nc">&nbsp;			cache.clear();</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Predicate&lt;String&gt; isNameMatch(String name) {
+<b class="nc">&nbsp;		return (name != null) ? ((requested) -&gt; requested.equals(name)) : matchAll();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Predicate&lt;String&gt; matchAll() {
+<b class="nc">&nbsp;		return (name) -&gt; true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of the caches.
+&nbsp;	 */
+&nbsp;	public static final class CachesDescriptor implements OperationResponseBody {
+&nbsp;
+&nbsp;		private final Map&lt;String, CacheManagerDescriptor&gt; cacheManagers;
+&nbsp;
+<b class="nc">&nbsp;		public CachesDescriptor(Map&lt;String, CacheManagerDescriptor&gt; cacheManagers) {</b>
+<b class="nc">&nbsp;			this.cacheManagers = cacheManagers;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, CacheManagerDescriptor&gt; getCacheManagers() {
+<b class="nc">&nbsp;			return this.cacheManagers;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a {@link CacheManager}.
+&nbsp;	 */
+&nbsp;	public static final class CacheManagerDescriptor {
+&nbsp;
+&nbsp;		private final Map&lt;String, CacheDescriptor&gt; caches;
+&nbsp;
+<b class="nc">&nbsp;		public CacheManagerDescriptor(Map&lt;String, CacheDescriptor&gt; caches) {</b>
+<b class="nc">&nbsp;			this.caches = caches;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, CacheDescriptor&gt; getCaches() {
+<b class="nc">&nbsp;			return this.caches;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a {@link Cache}.
+&nbsp;	 */
+&nbsp;	public static class CacheDescriptor implements OperationResponseBody {
+&nbsp;
+&nbsp;		private final String target;
+&nbsp;
+<b class="nc">&nbsp;		public CacheDescriptor(String target) {</b>
+<b class="nc">&nbsp;			this.target = target;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the fully qualified name of the native cache.
+&nbsp;		 * @return the fully qualified name of the native cache
+&nbsp;		 */
+&nbsp;		public String getTarget() {
+<b class="nc">&nbsp;			return this.target;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a {@link Cache} entry.
+&nbsp;	 */
+&nbsp;	public static final class CacheEntryDescriptor extends CacheDescriptor {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final String cacheManager;
+&nbsp;
+&nbsp;		public CacheEntryDescriptor(Cache cache, String cacheManager) {
+<b class="nc">&nbsp;			super(cache.getNativeCache().getClass().getName());</b>
+<b class="nc">&nbsp;			this.name = cache.getName();</b>
+<b class="nc">&nbsp;			this.cacheManager = cacheManager;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getName() {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getCacheManager() {
+<b class="nc">&nbsp;			return this.cacheManager;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

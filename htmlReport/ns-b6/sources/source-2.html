@@ -1,0 +1,176 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoConfigurationExcludeFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoConfigurationExcludeFilter (org.springframework.boot.autoconfigure)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoConfigurationExcludeFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanClassLoaderAware;
+&nbsp;import org.springframework.boot.context.annotation.ImportCandidates;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.type.classreading.MetadataReader;
+&nbsp;import org.springframework.core.type.classreading.MetadataReaderFactory;
+&nbsp;import org.springframework.core.type.filter.TypeFilter;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link TypeFilter} implementation that matches registered auto-configuration classes.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.5.0
+&nbsp; */
+<b class="nc">&nbsp;public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoaderAware {</b>
+&nbsp;
+&nbsp;	private ClassLoader beanClassLoader;
+&nbsp;
+&nbsp;	private volatile List&lt;String&gt; autoConfigurations;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanClassLoader(ClassLoader beanClassLoader) {
+<b class="nc">&nbsp;		this.beanClassLoader = beanClassLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		return isConfiguration(metadataReader) &amp;&amp; isAutoConfiguration(metadataReader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isConfiguration(MetadataReader metadataReader) {
+<b class="nc">&nbsp;		return metadataReader.getAnnotationMetadata().isAnnotated(Configuration.class.getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isAutoConfiguration(MetadataReader metadataReader) {
+<b class="nc">&nbsp;		boolean annotatedWithAutoConfiguration = metadataReader.getAnnotationMetadata()</b>
+<b class="nc">&nbsp;			.isAnnotated(AutoConfiguration.class.getName());</b>
+<b class="nc">&nbsp;		return annotatedWithAutoConfiguration</b>
+<b class="nc">&nbsp;				|| getAutoConfigurations().contains(metadataReader.getClassMetadata().getClassName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected List&lt;String&gt; getAutoConfigurations() {
+<b class="nc">&nbsp;		if (this.autoConfigurations == null) {</b>
+<b class="nc">&nbsp;			this.autoConfigurations = ImportCandidates.load(AutoConfiguration.class, this.beanClassLoader)</b>
+<b class="nc">&nbsp;				.getCandidates();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.autoConfigurations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,250 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MavenRepositoryPlugin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build</a>
+</div>
+
+<h1>Coverage Summary for Class: MavenRepositoryPlugin (org.springframework.boot.build)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MavenRepositoryPlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MavenRepositoryPlugin$CleanAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.artifacts.DependencySet;
+&nbsp;import org.gradle.api.artifacts.ProjectDependency;
+&nbsp;import org.gradle.api.plugins.JavaLibraryPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPlatformPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPlugin;
+&nbsp;import org.gradle.api.publish.PublishingExtension;
+&nbsp;import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
+&nbsp;
+&nbsp;/**
+&nbsp; * A plugin to make a project&#39;s {@code deployment} publication available as a Maven
+&nbsp; * repository. The repository can be consumed by depending upon the project using the
+&nbsp; * {@code mavenRepository} configuration.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class MavenRepositoryPlugin implements Plugin&lt;Project&gt; {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the {@code mavenRepository} configuration.
+&nbsp;	 */
+&nbsp;	public static final String MAVEN_REPOSITORY_CONFIGURATION_NAME = &quot;mavenRepository&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the task that publishes to the project repository.
+&nbsp;	 */
+&nbsp;	public static final String PUBLISH_TO_PROJECT_REPOSITORY_TASK_NAME = &quot;publishMavenPublicationToProjectRepository&quot;;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void apply(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().apply(MavenPublishPlugin.class);</b>
+<b class="nc">&nbsp;		PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);</b>
+<b class="nc">&nbsp;		File repositoryLocation = new File(project.getBuildDir(), &quot;maven-repository&quot;);</b>
+<b class="nc">&nbsp;		publishing.getRepositories().maven((mavenRepository) -&gt; {</b>
+<b class="nc">&nbsp;			mavenRepository.setName(&quot;project&quot;);</b>
+<b class="nc">&nbsp;			mavenRepository.setUrl(repositoryLocation.toURI());</b>
+&nbsp;		});
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.matching((task) -&gt; task.getName().equals(PUBLISH_TO_PROJECT_REPOSITORY_TASK_NAME))</b>
+<b class="nc">&nbsp;			.all((task) -&gt; setUpProjectRepository(project, task, repositoryLocation));</b>
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.matching((task) -&gt; task.getName().equals(&quot;publishPluginMavenPublicationToProjectRepository&quot;))</b>
+<b class="nc">&nbsp;			.all((task) -&gt; setUpProjectRepository(project, task, repositoryLocation));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setUpProjectRepository(Project project, Task publishTask, File repositoryLocation) {
+<b class="nc">&nbsp;		publishTask.doFirst(new CleanAction(repositoryLocation));</b>
+<b class="nc">&nbsp;		Configuration projectRepository = project.getConfigurations().create(MAVEN_REPOSITORY_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		project.getArtifacts()</b>
+<b class="nc">&nbsp;			.add(projectRepository.getName(), repositoryLocation, (artifact) -&gt; artifact.builtBy(publishTask));</b>
+<b class="nc">&nbsp;		DependencySet target = projectRepository.getDependencies();</b>
+<b class="nc">&nbsp;		project.getPlugins()</b>
+<b class="nc">&nbsp;			.withType(JavaPlugin.class)</b>
+<b class="nc">&nbsp;			.all((javaPlugin) -&gt; addMavenRepositoryDependencies(project, JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME,</b>
+&nbsp;					target));
+<b class="nc">&nbsp;		project.getPlugins()</b>
+<b class="nc">&nbsp;			.withType(JavaLibraryPlugin.class)</b>
+<b class="nc">&nbsp;			.all((javaLibraryPlugin) -&gt; addMavenRepositoryDependencies(project, JavaPlugin.API_CONFIGURATION_NAME,</b>
+&nbsp;					target));
+<b class="nc">&nbsp;		project.getPlugins()</b>
+<b class="nc">&nbsp;			.withType(JavaPlatformPlugin.class)</b>
+<b class="nc">&nbsp;			.all((javaPlugin) -&gt; addMavenRepositoryDependencies(project, JavaPlatformPlugin.API_CONFIGURATION_NAME,</b>
+&nbsp;					target));
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addMavenRepositoryDependencies(Project project, String sourceConfigurationName, DependencySet target) {
+<b class="nc">&nbsp;		project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(sourceConfigurationName)</b>
+<b class="nc">&nbsp;			.getDependencies()</b>
+<b class="nc">&nbsp;			.withType(ProjectDependency.class)</b>
+<b class="nc">&nbsp;			.all((dependency) -&gt; {</b>
+<b class="nc">&nbsp;				Map&lt;String, String&gt; dependencyDescriptor = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;				dependencyDescriptor.put(&quot;path&quot;, dependency.getDependencyProject().getPath());</b>
+<b class="nc">&nbsp;				dependencyDescriptor.put(&quot;configuration&quot;, MAVEN_REPOSITORY_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;				target.add(project.getDependencies().project(dependencyDescriptor));</b>
+&nbsp;			});
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class CleanAction implements Action&lt;Task&gt; {
+&nbsp;
+&nbsp;		private final File location;
+&nbsp;
+<b class="nc">&nbsp;		private CleanAction(File location) {</b>
+<b class="nc">&nbsp;			this.location = location;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void execute(Task task) {
+<b class="nc">&nbsp;			task.getProject().delete(this.location);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

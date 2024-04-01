@@ -1,0 +1,422 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JpaBaseConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.orm.jpa</a>
+</div>
+
+<h1>Coverage Summary for Class: JpaBaseConfiguration (org.springframework.boot.autoconfigure.orm.jpa)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JpaBaseConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JpaBaseConfiguration$JpaWebConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JpaBaseConfiguration$JpaWebConfiguration$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JpaBaseConfiguration$PersistenceManagedTypesConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.orm.jpa;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import jakarta.persistence.EntityManagerFactory;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+&nbsp;import org.springframework.boot.autoconfigure.domain.EntityScanPackages;
+&nbsp;import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizers;
+&nbsp;import org.springframework.boot.autoconfigure.web.servlet.ConditionalOnMissingFilterBean;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Primary;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.orm.jpa.JpaTransactionManager;
+&nbsp;import org.springframework.orm.jpa.JpaVendorAdapter;
+&nbsp;import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+&nbsp;import org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypes;
+&nbsp;import org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypesScanner;
+&nbsp;import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
+&nbsp;import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
+&nbsp;import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
+&nbsp;import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
+&nbsp;import org.springframework.transaction.PlatformTransactionManager;
+&nbsp;import org.springframework.transaction.TransactionManager;
+&nbsp;import org.springframework.transaction.jta.JtaTransactionManager;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+&nbsp;import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base {@link EnableAutoConfiguration Auto-configuration} for JPA.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Oliver Gierke
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Kazuki Shimizu
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@EnableConfigurationProperties(JpaProperties.class)
+&nbsp;public abstract class JpaBaseConfiguration {
+&nbsp;
+&nbsp;	private final DataSource dataSource;
+&nbsp;
+&nbsp;	private final JpaProperties properties;
+&nbsp;
+&nbsp;	private final JtaTransactionManager jtaTransactionManager;
+&nbsp;
+&nbsp;	protected JpaBaseConfiguration(DataSource dataSource, JpaProperties properties,
+<b class="nc">&nbsp;			ObjectProvider&lt;JtaTransactionManager&gt; jtaTransactionManager) {</b>
+<b class="nc">&nbsp;		this.dataSource = dataSource;</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+<b class="nc">&nbsp;		this.jtaTransactionManager = jtaTransactionManager.getIfAvailable();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(TransactionManager.class)
+&nbsp;	public PlatformTransactionManager transactionManager(
+&nbsp;			ObjectProvider&lt;TransactionManagerCustomizers&gt; transactionManagerCustomizers) {
+<b class="nc">&nbsp;		JpaTransactionManager transactionManager = new JpaTransactionManager();</b>
+<b class="nc">&nbsp;		transactionManagerCustomizers</b>
+<b class="nc">&nbsp;			.ifAvailable((customizers) -&gt; customizers.customize((TransactionManager) transactionManager));</b>
+<b class="nc">&nbsp;		return transactionManager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public JpaVendorAdapter jpaVendorAdapter() {
+<b class="nc">&nbsp;		AbstractJpaVendorAdapter adapter = createJpaVendorAdapter();</b>
+<b class="nc">&nbsp;		adapter.setShowSql(this.properties.isShowSql());</b>
+<b class="nc">&nbsp;		if (this.properties.getDatabase() != null) {</b>
+<b class="nc">&nbsp;			adapter.setDatabase(this.properties.getDatabase());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.properties.getDatabasePlatform() != null) {</b>
+<b class="nc">&nbsp;			adapter.setDatabasePlatform(this.properties.getDatabasePlatform());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		adapter.setGenerateDdl(this.properties.isGenerateDdl());</b>
+<b class="nc">&nbsp;		return adapter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public EntityManagerFactoryBuilder entityManagerFactoryBuilder(JpaVendorAdapter jpaVendorAdapter,
+&nbsp;			ObjectProvider&lt;PersistenceUnitManager&gt; persistenceUnitManager,
+&nbsp;			ObjectProvider&lt;EntityManagerFactoryBuilderCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilder(jpaVendorAdapter,</b>
+<b class="nc">&nbsp;				this.properties.getProperties(), persistenceUnitManager.getIfAvailable());</b>
+<b class="nc">&nbsp;		customizers.orderedStream().forEach((customizer) -&gt; customizer.customize(builder));</b>
+<b class="nc">&nbsp;		return builder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@Primary
+&nbsp;	@ConditionalOnMissingBean({ LocalContainerEntityManagerFactoryBean.class, EntityManagerFactory.class })
+&nbsp;	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder,
+&nbsp;			PersistenceManagedTypes persistenceManagedTypes) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; vendorProperties = getVendorProperties();</b>
+<b class="nc">&nbsp;		customizeVendorProperties(vendorProperties);</b>
+<b class="nc">&nbsp;		return factoryBuilder.dataSource(this.dataSource)</b>
+<b class="nc">&nbsp;			.managedTypes(persistenceManagedTypes)</b>
+<b class="nc">&nbsp;			.properties(vendorProperties)</b>
+<b class="nc">&nbsp;			.mappingResources(getMappingResources())</b>
+<b class="nc">&nbsp;			.jta(isJta())</b>
+<b class="nc">&nbsp;			.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected abstract AbstractJpaVendorAdapter createJpaVendorAdapter();
+&nbsp;
+&nbsp;	protected abstract Map&lt;String, Object&gt; getVendorProperties();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Customize vendor properties before they are used. Allows for post-processing (for
+&nbsp;	 * example to configure JTA specific settings).
+&nbsp;	 * @param vendorProperties the vendor properties to customize
+&nbsp;	 */
+&nbsp;	protected void customizeVendorProperties(Map&lt;String, Object&gt; vendorProperties) {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	private String[] getMappingResources() {
+<b class="nc">&nbsp;		List&lt;String&gt; mappingResources = this.properties.getMappingResources();</b>
+<b class="nc">&nbsp;		return (!ObjectUtils.isEmpty(mappingResources) ? StringUtils.toStringArray(mappingResources) : null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the JTA transaction manager.
+&nbsp;	 * @return the transaction manager or {@code null}
+&nbsp;	 */
+&nbsp;	protected JtaTransactionManager getJtaTransactionManager() {
+<b class="nc">&nbsp;		return this.jtaTransactionManager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if a JTA {@link PlatformTransactionManager} is being used.
+&nbsp;	 * @return if a JTA transaction manager is being used
+&nbsp;	 */
+&nbsp;	protected final boolean isJta() {
+<b class="nc">&nbsp;		return (this.jtaTransactionManager != null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link JpaProperties}.
+&nbsp;	 * @return the properties
+&nbsp;	 */
+&nbsp;	protected final JpaProperties getProperties() {
+<b class="nc">&nbsp;		return this.properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link DataSource}.
+&nbsp;	 * @return the data source
+&nbsp;	 */
+&nbsp;	protected final DataSource getDataSource() {
+<b class="nc">&nbsp;		return this.dataSource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnMissingBean({ LocalContainerEntityManagerFactoryBean.class, EntityManagerFactory.class })
+<b class="nc">&nbsp;	static class PersistenceManagedTypesConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@Primary
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		static PersistenceManagedTypes persistenceManagedTypes(BeanFactory beanFactory, ResourceLoader resourceLoader) {
+<b class="nc">&nbsp;			String[] packagesToScan = getPackagesToScan(beanFactory);</b>
+<b class="nc">&nbsp;			return new PersistenceManagedTypesScanner(resourceLoader).scan(packagesToScan);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static String[] getPackagesToScan(BeanFactory beanFactory) {
+<b class="nc">&nbsp;			List&lt;String&gt; packages = EntityScanPackages.get(beanFactory).getPackageNames();</b>
+<b class="nc">&nbsp;			if (packages.isEmpty() &amp;&amp; AutoConfigurationPackages.has(beanFactory)) {</b>
+<b class="nc">&nbsp;				packages = AutoConfigurationPackages.get(beanFactory);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return StringUtils.toStringArray(packages);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnWebApplication(type = Type.SERVLET)
+&nbsp;	@ConditionalOnClass(WebMvcConfigurer.class)
+&nbsp;	@ConditionalOnMissingBean({ OpenEntityManagerInViewInterceptor.class, OpenEntityManagerInViewFilter.class })
+&nbsp;	@ConditionalOnMissingFilterBean(OpenEntityManagerInViewFilter.class)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;spring.jpa&quot;, name = &quot;open-in-view&quot;, havingValue = &quot;true&quot;, matchIfMissing = true)
+&nbsp;	protected static class JpaWebConfiguration {
+&nbsp;
+<b class="nc">&nbsp;		private static final Log logger = LogFactory.getLog(JpaWebConfiguration.class);</b>
+&nbsp;
+&nbsp;		private final JpaProperties jpaProperties;
+&nbsp;
+<b class="nc">&nbsp;		protected JpaWebConfiguration(JpaProperties jpaProperties) {</b>
+<b class="nc">&nbsp;			this.jpaProperties = jpaProperties;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		public OpenEntityManagerInViewInterceptor openEntityManagerInViewInterceptor() {
+<b class="nc">&nbsp;			if (this.jpaProperties.getOpenInView() == null) {</b>
+<b class="nc">&nbsp;				logger.warn(&quot;spring.jpa.open-in-view is enabled by default. &quot;</b>
+&nbsp;						+ &quot;Therefore, database queries may be performed during view &quot;
+&nbsp;						+ &quot;rendering. Explicitly configure spring.jpa.open-in-view to disable this warning&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			return new OpenEntityManagerInViewInterceptor();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		public WebMvcConfigurer openEntityManagerInViewInterceptorConfigurer(
+&nbsp;				OpenEntityManagerInViewInterceptor interceptor) {
+<b class="nc">&nbsp;			return new WebMvcConfigurer() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public void addInterceptors(InterceptorRegistry registry) {
+<b class="nc">&nbsp;					registry.addWebRequestInterceptor(interceptor);</b>
+&nbsp;				}
+&nbsp;
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

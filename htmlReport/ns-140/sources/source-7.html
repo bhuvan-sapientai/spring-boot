@@ -1,0 +1,219 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ResolvedDockerHost</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.configuration</a>
+</div>
+
+<h1>Coverage Summary for Class: ResolvedDockerHost (org.springframework.boot.buildpack.platform.docker.configuration)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResolvedDockerHost</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.configuration;
+&nbsp;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Paths;
+&nbsp;
+&nbsp;import com.sun.jna.Platform;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.configuration.DockerConfiguration.DockerHostConfiguration;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.configuration.DockerConfigurationMetadata.DockerContext;
+&nbsp;import org.springframework.boot.buildpack.platform.system.Environment;
+&nbsp;
+&nbsp;/**
+&nbsp; * Resolves a {@link DockerHost} from the environment, configuration, or using defaults.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.7.0
+&nbsp; */
+&nbsp;public class ResolvedDockerHost extends DockerHost {
+&nbsp;
+&nbsp;	private static final String UNIX_SOCKET_PREFIX = &quot;unix://&quot;;
+&nbsp;
+&nbsp;	private static final String DOMAIN_SOCKET_PATH = &quot;/var/run/docker.sock&quot;;
+&nbsp;
+&nbsp;	private static final String WINDOWS_NAMED_PIPE_PATH = &quot;//./pipe/docker_engine&quot;;
+&nbsp;
+&nbsp;	private static final String DOCKER_HOST = &quot;DOCKER_HOST&quot;;
+&nbsp;
+&nbsp;	private static final String DOCKER_TLS_VERIFY = &quot;DOCKER_TLS_VERIFY&quot;;
+&nbsp;
+&nbsp;	private static final String DOCKER_CERT_PATH = &quot;DOCKER_CERT_PATH&quot;;
+&nbsp;
+&nbsp;	private static final String DOCKER_CONTEXT = &quot;DOCKER_CONTEXT&quot;;
+&nbsp;
+&nbsp;	ResolvedDockerHost(String address) {
+<b class="nc">&nbsp;		super(address);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ResolvedDockerHost(String address, boolean secure, String certificatePath) {
+<b class="nc">&nbsp;		super(address, secure, certificatePath);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getAddress() {
+<b class="nc">&nbsp;		return super.getAddress().startsWith(UNIX_SOCKET_PREFIX)</b>
+<b class="nc">&nbsp;				? super.getAddress().substring(UNIX_SOCKET_PREFIX.length()) : super.getAddress();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isRemote() {
+<b class="nc">&nbsp;		return getAddress().startsWith(&quot;http&quot;) || getAddress().startsWith(&quot;tcp&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isLocalFileReference() {
+&nbsp;		try {
+<b class="nc">&nbsp;			return Files.exists(Paths.get(getAddress()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public static ResolvedDockerHost from(DockerHostConfiguration dockerHost) {
+<b class="nc">&nbsp;		return from(Environment.SYSTEM, dockerHost);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static ResolvedDockerHost from(Environment environment, DockerHostConfiguration dockerHost) {
+<b class="nc">&nbsp;		DockerConfigurationMetadata config = DockerConfigurationMetadata.from(environment);</b>
+<b class="nc">&nbsp;		if (environment.get(DOCKER_CONTEXT) != null) {</b>
+<b class="nc">&nbsp;			DockerContext context = config.forContext(environment.get(DOCKER_CONTEXT));</b>
+<b class="nc">&nbsp;			return new ResolvedDockerHost(context.getDockerHost(), context.isTlsVerify(), context.getTlsPath());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (dockerHost != null &amp;&amp; dockerHost.getContext() != null) {</b>
+<b class="nc">&nbsp;			DockerContext context = config.forContext(dockerHost.getContext());</b>
+<b class="nc">&nbsp;			return new ResolvedDockerHost(context.getDockerHost(), context.isTlsVerify(), context.getTlsPath());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (environment.get(DOCKER_HOST) != null) {</b>
+<b class="nc">&nbsp;			return new ResolvedDockerHost(environment.get(DOCKER_HOST), isTrue(environment.get(DOCKER_TLS_VERIFY)),</b>
+<b class="nc">&nbsp;					environment.get(DOCKER_CERT_PATH));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (dockerHost != null &amp;&amp; dockerHost.getAddress() != null) {</b>
+<b class="nc">&nbsp;			return new ResolvedDockerHost(dockerHost.getAddress(), dockerHost.isSecure(),</b>
+<b class="nc">&nbsp;					dockerHost.getCertificatePath());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (config.getContext().getDockerHost() != null) {</b>
+<b class="nc">&nbsp;			DockerContext context = config.getContext();</b>
+<b class="nc">&nbsp;			return new ResolvedDockerHost(context.getDockerHost(), context.isTlsVerify(), context.getTlsPath());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ResolvedDockerHost(Platform.isWindows() ? WINDOWS_NAMED_PIPE_PATH : DOMAIN_SOCKET_PATH);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isTrue(String value) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return (value != null) &amp;&amp; (Integer.parseInt(value) == 1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NumberFormatException ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

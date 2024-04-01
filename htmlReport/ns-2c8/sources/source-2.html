@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FilterAnnotations</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.autoconfigure.filter</a>
+</div>
+
+<h1>Coverage Summary for Class: FilterAnnotations (org.springframework.boot.test.autoconfigure.filter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FilterAnnotations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FilterAnnotations$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.autoconfigure.filter;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.context.annotation.ComponentScan.Filter;
+&nbsp;import org.springframework.context.annotation.FilterType;
+&nbsp;import org.springframework.core.type.classreading.MetadataReader;
+&nbsp;import org.springframework.core.type.classreading.MetadataReaderFactory;
+&nbsp;import org.springframework.core.type.filter.AnnotationTypeFilter;
+&nbsp;import org.springframework.core.type.filter.AspectJTypeFilter;
+&nbsp;import org.springframework.core.type.filter.AssignableTypeFilter;
+&nbsp;import org.springframework.core.type.filter.RegexPatternTypeFilter;
+&nbsp;import org.springframework.core.type.filter.TypeFilter;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility to load {@link TypeFilter TypeFilters} from {@link Filter @Filter} annotations.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;public class FilterAnnotations implements Iterable&lt;TypeFilter&gt; {
+&nbsp;
+&nbsp;	private final ClassLoader classLoader;
+&nbsp;
+&nbsp;	private final List&lt;TypeFilter&gt; filters;
+&nbsp;
+<b class="nc">&nbsp;	public FilterAnnotations(ClassLoader classLoader, Filter[] filters) {</b>
+<b class="nc">&nbsp;		Assert.notNull(filters, &quot;Filters must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.classLoader = classLoader;</b>
+<b class="nc">&nbsp;		this.filters = createTypeFilters(filters);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;TypeFilter&gt; createTypeFilters(Filter[] filters) {
+<b class="nc">&nbsp;		List&lt;TypeFilter&gt; typeFilters = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Filter filter : filters) {</b>
+<b class="nc">&nbsp;			for (Class&lt;?&gt; filterClass : filter.classes()) {</b>
+<b class="nc">&nbsp;				typeFilters.add(createTypeFilter(filter.type(), filterClass));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (String pattern : filter.pattern()) {</b>
+<b class="nc">&nbsp;				typeFilters.add(createTypeFilter(filter.type(), pattern));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.unmodifiableList(typeFilters);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private TypeFilter createTypeFilter(FilterType filterType, Class&lt;?&gt; filterClass) {
+<b class="nc">&nbsp;		return switch (filterType) {</b>
+&nbsp;			case ANNOTATION -&gt; {
+<b class="nc">&nbsp;				Assert.isAssignable(Annotation.class, filterClass,</b>
+&nbsp;						&quot;An error occurred while processing an ANNOTATION type filter: &quot;);
+<b class="nc">&nbsp;				yield new AnnotationTypeFilter((Class&lt;Annotation&gt;) filterClass);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			case ASSIGNABLE_TYPE -&gt; new AssignableTypeFilter(filterClass);</b>
+&nbsp;			case CUSTOM -&gt; {
+<b class="nc">&nbsp;				Assert.isAssignable(TypeFilter.class, filterClass,</b>
+&nbsp;						&quot;An error occurred while processing a CUSTOM type filter: &quot;);
+<b class="nc">&nbsp;				yield BeanUtils.instantiateClass(filterClass, TypeFilter.class);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			default -&gt; throw new IllegalArgumentException(&quot;Filter type not supported with Class value: &quot; + filterType);</b>
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	private TypeFilter createTypeFilter(FilterType filterType, String pattern) {
+<b class="nc">&nbsp;		return switch (filterType) {</b>
+<b class="nc">&nbsp;			case ASPECTJ -&gt; new AspectJTypeFilter(pattern, this.classLoader);</b>
+<b class="nc">&nbsp;			case REGEX -&gt; new RegexPatternTypeFilter(Pattern.compile(pattern));</b>
+&nbsp;			default -&gt;
+<b class="nc">&nbsp;				throw new IllegalArgumentException(&quot;Filter type not supported with String pattern: &quot; + filterType);</b>
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;TypeFilter&gt; iterator() {
+<b class="nc">&nbsp;		return this.filters.iterator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean anyMatches(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		for (TypeFilter filter : this) {</b>
+<b class="nc">&nbsp;			if (filter.match(metadataReader, metadataReaderFactory)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

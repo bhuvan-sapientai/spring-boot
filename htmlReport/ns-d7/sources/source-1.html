@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GraphQlWebFluxAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.graphql.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: GraphQlWebFluxAutoConfiguration (org.springframework.boot.autoconfigure.graphql.reactive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GraphQlWebFluxAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GraphQlWebFluxAutoConfiguration$GraphiQlResourceHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GraphQlWebFluxAutoConfiguration$GraphQlEndpointCorsConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GraphQlWebFluxAutoConfiguration$WebSocketConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.graphql.reactive;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;
+&nbsp;import graphql.GraphQL;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.autoconfigure.graphql.GraphQlAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.graphql.GraphQlCorsProperties;
+&nbsp;import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.graphql.ExecutionGraphQlService;
+&nbsp;import org.springframework.graphql.execution.GraphQlSource;
+&nbsp;import org.springframework.graphql.server.WebGraphQlHandler;
+&nbsp;import org.springframework.graphql.server.WebGraphQlInterceptor;
+&nbsp;import org.springframework.graphql.server.webflux.GraphQlHttpHandler;
+&nbsp;import org.springframework.graphql.server.webflux.GraphQlWebSocketHandler;
+&nbsp;import org.springframework.graphql.server.webflux.GraphiQlHandler;
+&nbsp;import org.springframework.graphql.server.webflux.SchemaHandler;
+&nbsp;import org.springframework.http.HttpHeaders;
+&nbsp;import org.springframework.http.HttpMethod;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.MediaType;
+&nbsp;import org.springframework.http.codec.ServerCodecConfigurer;
+&nbsp;import org.springframework.web.cors.CorsConfiguration;
+&nbsp;import org.springframework.web.reactive.HandlerMapping;
+&nbsp;import org.springframework.web.reactive.config.CorsRegistry;
+&nbsp;import org.springframework.web.reactive.config.WebFluxConfigurer;
+&nbsp;import org.springframework.web.reactive.function.server.RequestPredicate;
+&nbsp;import org.springframework.web.reactive.function.server.RouterFunction;
+&nbsp;import org.springframework.web.reactive.function.server.RouterFunctions;
+&nbsp;import org.springframework.web.reactive.function.server.ServerRequest;
+&nbsp;import org.springframework.web.reactive.function.server.ServerResponse;
+&nbsp;import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
+&nbsp;import org.springframework.web.reactive.socket.server.support.WebSocketUpgradeHandlerPredicate;
+&nbsp;
+&nbsp;import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+&nbsp;import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for enabling Spring GraphQL over
+&nbsp; * WebFlux.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.7.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = GraphQlAutoConfiguration.class)
+&nbsp;@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+&nbsp;@ConditionalOnClass({ GraphQL.class, GraphQlHttpHandler.class })
+&nbsp;@ConditionalOnBean(ExecutionGraphQlService.class)
+&nbsp;@EnableConfigurationProperties(GraphQlCorsProperties.class)
+&nbsp;@ImportRuntimeHints(GraphQlWebFluxAutoConfiguration.GraphiQlResourceHints.class)
+<b class="nc">&nbsp;public class GraphQlWebFluxAutoConfiguration {</b>
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;removal&quot;)
+<b class="nc">&nbsp;	private static final RequestPredicate SUPPORTS_MEDIATYPES = accept(MediaType.APPLICATION_GRAPHQL_RESPONSE,</b>
+&nbsp;			MediaType.APPLICATION_JSON, MediaType.APPLICATION_GRAPHQL)
+<b class="nc">&nbsp;		.and(contentType(MediaType.APPLICATION_JSON));</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(GraphQlWebFluxAutoConfiguration.class);</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public GraphQlHttpHandler graphQlHttpHandler(WebGraphQlHandler webGraphQlHandler) {
+<b class="nc">&nbsp;		return new GraphQlHttpHandler(webGraphQlHandler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public WebGraphQlHandler webGraphQlHandler(ExecutionGraphQlService service,
+&nbsp;			ObjectProvider&lt;WebGraphQlInterceptor&gt; interceptors) {
+<b class="nc">&nbsp;		return WebGraphQlHandler.builder(service).interceptors(interceptors.orderedStream().toList()).build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@Order(0)
+&nbsp;	public RouterFunction&lt;ServerResponse&gt; graphQlRouterFunction(GraphQlHttpHandler httpHandler,
+&nbsp;			GraphQlSource graphQlSource, GraphQlProperties properties) {
+<b class="nc">&nbsp;		String path = properties.getPath();</b>
+<b class="nc">&nbsp;		logger.info(LogMessage.format(&quot;GraphQL endpoint HTTP POST %s&quot;, path));</b>
+<b class="nc">&nbsp;		RouterFunctions.Builder builder = RouterFunctions.route();</b>
+<b class="nc">&nbsp;		builder = builder.GET(path, this::onlyAllowPost);</b>
+<b class="nc">&nbsp;		builder = builder.POST(path, SUPPORTS_MEDIATYPES, httpHandler::handleRequest);</b>
+<b class="nc">&nbsp;		if (properties.getGraphiql().isEnabled()) {</b>
+<b class="nc">&nbsp;			GraphiQlHandler graphQlHandler = new GraphiQlHandler(path, properties.getWebsocket().getPath());</b>
+<b class="nc">&nbsp;			builder = builder.GET(properties.getGraphiql().getPath(), graphQlHandler::handleRequest);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (properties.getSchema().getPrinter().isEnabled()) {</b>
+<b class="nc">&nbsp;			SchemaHandler schemaHandler = new SchemaHandler(graphQlSource);</b>
+<b class="nc">&nbsp;			builder = builder.GET(path + &quot;/schema&quot;, schemaHandler::handleRequest);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;ServerResponse&gt; onlyAllowPost(ServerRequest request) {
+<b class="nc">&nbsp;		return ServerResponse.status(HttpStatus.METHOD_NOT_ALLOWED).headers(this::onlyAllowPost).build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onlyAllowPost(HttpHeaders headers) {
+<b class="nc">&nbsp;		headers.setAllow(Collections.singleton(HttpMethod.POST));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	public static class GraphQlEndpointCorsConfiguration implements WebFluxConfigurer {
+&nbsp;
+&nbsp;		final GraphQlProperties graphQlProperties;
+&nbsp;
+&nbsp;		final GraphQlCorsProperties corsProperties;
+&nbsp;
+<b class="nc">&nbsp;		public GraphQlEndpointCorsConfiguration(GraphQlProperties graphQlProps, GraphQlCorsProperties corsProps) {</b>
+<b class="nc">&nbsp;			this.graphQlProperties = graphQlProps;</b>
+<b class="nc">&nbsp;			this.corsProperties = corsProps;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void addCorsMappings(CorsRegistry registry) {
+<b class="nc">&nbsp;			CorsConfiguration configuration = this.corsProperties.toCorsConfiguration();</b>
+<b class="nc">&nbsp;			if (configuration != null) {</b>
+<b class="nc">&nbsp;				registry.addMapping(this.graphQlProperties.getPath()).combine(configuration);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;spring.graphql.websocket&quot;, name = &quot;path&quot;)
+<b class="nc">&nbsp;	public static class WebSocketConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public GraphQlWebSocketHandler graphQlWebSocketHandler(WebGraphQlHandler webGraphQlHandler,
+&nbsp;				GraphQlProperties properties, ServerCodecConfigurer configurer) {
+<b class="nc">&nbsp;			return new GraphQlWebSocketHandler(webGraphQlHandler, configurer,</b>
+<b class="nc">&nbsp;					properties.getWebsocket().getConnectionInitTimeout());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		public HandlerMapping graphQlWebSocketEndpoint(GraphQlWebSocketHandler graphQlWebSocketHandler,
+&nbsp;				GraphQlProperties properties) {
+<b class="nc">&nbsp;			String path = properties.getWebsocket().getPath();</b>
+<b class="nc">&nbsp;			logger.info(LogMessage.format(&quot;GraphQL endpoint WebSocket %s&quot;, path));</b>
+<b class="nc">&nbsp;			SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();</b>
+<b class="nc">&nbsp;			mapping.setHandlerPredicate(new WebSocketUpgradeHandlerPredicate());</b>
+<b class="nc">&nbsp;			mapping.setUrlMap(Collections.singletonMap(path, graphQlWebSocketHandler));</b>
+<b class="nc">&nbsp;			mapping.setOrder(-2); // Ahead of HTTP endpoint (&quot;routerFunctionMapping&quot; bean)</b>
+<b class="nc">&nbsp;			return mapping;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class GraphiQlResourceHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			hints.resources().registerPattern(&quot;graphiql/index.html&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: FileUtils (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utilities for manipulating files and directories in Spring Boot tooling.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class FileUtils {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility to remove duplicate files from an &quot;output&quot; directory if they already exist
+&nbsp;	 * in an &quot;origin&quot;. Recursively scans the origin directory looking for files (not
+&nbsp;	 * directories) that exist in both places and deleting the copy.
+&nbsp;	 * @param outputDirectory the output directory
+&nbsp;	 * @param originDirectory the origin directory
+&nbsp;	 */
+&nbsp;	public static void removeDuplicatesFromOutputDirectory(File outputDirectory, File originDirectory) {
+<b class="nc">&nbsp;		if (originDirectory.isDirectory()) {</b>
+<b class="nc">&nbsp;			for (String name : originDirectory.list()) {</b>
+<b class="nc">&nbsp;				File targetFile = new File(outputDirectory, name);</b>
+<b class="nc">&nbsp;				if (targetFile.exists() &amp;&amp; targetFile.canWrite()) {</b>
+<b class="nc">&nbsp;					if (!targetFile.isDirectory()) {</b>
+<b class="nc">&nbsp;						targetFile.delete();</b>
+&nbsp;					}
+&nbsp;					else {
+<b class="nc">&nbsp;						FileUtils.removeDuplicatesFromOutputDirectory(targetFile, new File(originDirectory, name));</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Generate a SHA-1 Hash for a given file.
+&nbsp;	 * @param file the file to hash
+&nbsp;	 * @return the hash value as a String
+&nbsp;	 * @throws IOException if the file cannot be read
+&nbsp;	 */
+&nbsp;	public static String sha1Hash(File file) throws IOException {
+<b class="nc">&nbsp;		return Digest.sha1(InputStreamSupplier.forFile(file));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns {@code true} if the given jar file has been signed.
+&nbsp;	 * @param file the file to check
+&nbsp;	 * @return if the file has been signed
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public static boolean isSignedJarFile(File file) throws IOException {
+<b class="nc">&nbsp;		try (JarFile jarFile = new JarFile(file)) {</b>
+<b class="nc">&nbsp;			if (hasDigestEntry(jarFile.getManifest())) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean hasDigestEntry(Manifest manifest) {
+<b class="nc">&nbsp;		return (manifest != null) &amp;&amp; manifest.getEntries().values().stream().anyMatch(FileUtils::hasDigestName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean hasDigestName(Attributes attributes) {
+<b class="nc">&nbsp;		return attributes.keySet().stream().anyMatch(FileUtils::isDigestName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isDigestName(Object name) {
+<b class="nc">&nbsp;		return String.valueOf(name).toUpperCase().endsWith(&quot;-DIGEST&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

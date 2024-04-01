@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MySqlR2dbcDockerComposeConnectionDetailsFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.service.connection.mysql</a>
+</div>
+
+<h1>Coverage Summary for Class: MySqlR2dbcDockerComposeConnectionDetailsFactory (org.springframework.boot.docker.compose.service.connection.mysql)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MySqlR2dbcDockerComposeConnectionDetailsFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MySqlR2dbcDockerComposeConnectionDetailsFactory$MySqlR2dbcDockerComposeConnectionDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.service.connection.mysql;
+&nbsp;
+&nbsp;import io.r2dbc.spi.ConnectionFactoryOptions;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.r2dbc.R2dbcConnectionDetails;
+&nbsp;import org.springframework.boot.docker.compose.core.RunningService;
+&nbsp;import org.springframework.boot.docker.compose.service.connection.DockerComposeConnectionDetailsFactory;
+&nbsp;import org.springframework.boot.docker.compose.service.connection.DockerComposeConnectionSource;
+&nbsp;import org.springframework.boot.docker.compose.service.connection.r2dbc.ConnectionFactoryOptionsBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link DockerComposeConnectionDetailsFactory} to create {@link R2dbcConnectionDetails}
+&nbsp; * for a {@code mysql} service.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class MySqlR2dbcDockerComposeConnectionDetailsFactory
+&nbsp;		extends DockerComposeConnectionDetailsFactory&lt;R2dbcConnectionDetails&gt; {
+&nbsp;
+&nbsp;	MySqlR2dbcDockerComposeConnectionDetailsFactory() {
+<b class="nc">&nbsp;		super(&quot;mysql&quot;, &quot;io.r2dbc.spi.ConnectionFactoryOptions&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected R2dbcConnectionDetails getDockerComposeConnectionDetails(DockerComposeConnectionSource source) {
+<b class="nc">&nbsp;		return new MySqlR2dbcDockerComposeConnectionDetails(source.getRunningService());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link R2dbcConnectionDetails} backed by a {@code mysql} {@link RunningService}.
+&nbsp;	 */
+&nbsp;	static class MySqlR2dbcDockerComposeConnectionDetails extends DockerComposeConnectionDetails
+&nbsp;			implements R2dbcConnectionDetails {
+&nbsp;
+<b class="nc">&nbsp;		private static final ConnectionFactoryOptionsBuilder connectionFactoryOptionsBuilder = new ConnectionFactoryOptionsBuilder(</b>
+&nbsp;				&quot;mysql&quot;, 3306);
+&nbsp;
+&nbsp;		private final ConnectionFactoryOptions connectionFactoryOptions;
+&nbsp;
+&nbsp;		MySqlR2dbcDockerComposeConnectionDetails(RunningService service) {
+<b class="nc">&nbsp;			super(service);</b>
+<b class="nc">&nbsp;			MySqlEnvironment environment = new MySqlEnvironment(service.env());</b>
+<b class="nc">&nbsp;			this.connectionFactoryOptions = connectionFactoryOptionsBuilder.build(service, environment.getDatabase(),</b>
+<b class="nc">&nbsp;					environment.getUsername(), environment.getPassword());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConnectionFactoryOptions getConnectionFactoryOptions() {
+<b class="nc">&nbsp;			return this.connectionFactoryOptions;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

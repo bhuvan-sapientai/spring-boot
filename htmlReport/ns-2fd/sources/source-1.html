@@ -1,0 +1,470 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ModifiedClassPathClassLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testsupport.classpath</a>
+</div>
+
+<h1>Coverage Summary for Class: ModifiedClassPathClassLoader (org.springframework.boot.testsupport.classpath)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ModifiedClassPathClassLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/122)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ModifiedClassPathClassLoader$ClassPathEntryFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/143)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testsupport.classpath;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;import java.lang.reflect.AnnotatedElement;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+&nbsp;import org.eclipse.aether.DefaultRepositorySystemSession;
+&nbsp;import org.eclipse.aether.RepositorySystem;
+&nbsp;import org.eclipse.aether.artifact.DefaultArtifact;
+&nbsp;import org.eclipse.aether.collection.CollectRequest;
+&nbsp;import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
+&nbsp;import org.eclipse.aether.graph.Dependency;
+&nbsp;import org.eclipse.aether.repository.LocalRepository;
+&nbsp;import org.eclipse.aether.repository.RemoteRepository;
+&nbsp;import org.eclipse.aether.resolution.ArtifactResult;
+&nbsp;import org.eclipse.aether.resolution.DependencyRequest;
+&nbsp;import org.eclipse.aether.resolution.DependencyResult;
+&nbsp;import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
+&nbsp;import org.eclipse.aether.spi.connector.transport.TransporterFactory;
+&nbsp;import org.eclipse.aether.transport.http.HttpTransporterFactory;
+&nbsp;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.util.AntPathMatcher;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ConcurrentReferenceHashMap;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Custom {@link URLClassLoader} that modifies the class path.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Christoph Dreis
+&nbsp; */
+&nbsp;final class ModifiedClassPathClassLoader extends URLClassLoader {
+&nbsp;
+<b class="nc">&nbsp;	private static final Map&lt;List&lt;AnnotatedElement&gt;, ModifiedClassPathClassLoader&gt; cache = new ConcurrentReferenceHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern INTELLIJ_CLASSPATH_JAR_PATTERN = Pattern.compile(&quot;.*classpath(\\d+)?\\.jar&quot;);</b>
+&nbsp;
+&nbsp;	private static final int MAX_RESOLUTION_ATTEMPTS = 5;
+&nbsp;
+&nbsp;	private final Set&lt;String&gt; excludedPackages;
+&nbsp;
+&nbsp;	private final ClassLoader junitLoader;
+&nbsp;
+&nbsp;	ModifiedClassPathClassLoader(URL[] urls, Set&lt;String&gt; excludedPackages, ClassLoader parent,
+&nbsp;			ClassLoader junitLoader) {
+<b class="nc">&nbsp;		super(urls, parent);</b>
+<b class="nc">&nbsp;		this.excludedPackages = excludedPackages;</b>
+<b class="nc">&nbsp;		this.junitLoader = junitLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;?&gt; loadClass(String name) throws ClassNotFoundException {
+<b class="nc">&nbsp;		if (name.startsWith(&quot;org.junit&quot;) || name.startsWith(&quot;org.hamcrest&quot;)</b>
+<b class="nc">&nbsp;				|| name.startsWith(&quot;io.netty.internal.tcnative&quot;)) {</b>
+<b class="nc">&nbsp;			return Class.forName(name, false, this.junitLoader);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String packageName = ClassUtils.getPackageName(name);</b>
+<b class="nc">&nbsp;		if (this.excludedPackages.contains(packageName)) {</b>
+<b class="nc">&nbsp;			throw new ClassNotFoundException();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return super.loadClass(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static ModifiedClassPathClassLoader get(Class&lt;?&gt; testClass, Method testMethod, List&lt;Object&gt; arguments) {
+<b class="nc">&nbsp;		Set&lt;AnnotatedElement&gt; candidates = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		candidates.add(testClass);</b>
+<b class="nc">&nbsp;		candidates.add(testMethod);</b>
+<b class="nc">&nbsp;		candidates.addAll(getAnnotatedElements(arguments.toArray()));</b>
+<b class="nc">&nbsp;		List&lt;AnnotatedElement&gt; annotatedElements = candidates.stream()</b>
+<b class="nc">&nbsp;			.filter(ModifiedClassPathClassLoader::hasAnnotation)</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		if (annotatedElements.isEmpty()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return cache.computeIfAbsent(annotatedElements, (key) -&gt; compute(testClass.getClassLoader(), key));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Collection&lt;AnnotatedElement&gt; getAnnotatedElements(Object[] array) {
+<b class="nc">&nbsp;		Set&lt;AnnotatedElement&gt; result = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Object item : array) {</b>
+<b class="nc">&nbsp;			if (item instanceof AnnotatedElement) {</b>
+<b class="nc">&nbsp;				result.add((AnnotatedElement) item);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (ObjectUtils.isArray(item)) {</b>
+<b class="nc">&nbsp;				result.addAll(getAnnotatedElements(ObjectUtils.toObjectArray(item)));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean hasAnnotation(AnnotatedElement element) {
+<b class="nc">&nbsp;		MergedAnnotations annotations = MergedAnnotations.from(element,</b>
+&nbsp;				MergedAnnotations.SearchStrategy.TYPE_HIERARCHY);
+<b class="nc">&nbsp;		return annotations.isPresent(ForkedClassPath.class) || annotations.isPresent(ClassPathOverrides.class)</b>
+<b class="nc">&nbsp;				|| annotations.isPresent(ClassPathExclusions.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ModifiedClassPathClassLoader compute(ClassLoader classLoader,
+&nbsp;			List&lt;AnnotatedElement&gt; annotatedClasses) {
+<b class="nc">&nbsp;		List&lt;MergedAnnotations&gt; annotations = annotatedClasses.stream()</b>
+<b class="nc">&nbsp;			.map((source) -&gt; MergedAnnotations.from(source, MergedAnnotations.SearchStrategy.TYPE_HIERARCHY))</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		return new ModifiedClassPathClassLoader(processUrls(extractUrls(classLoader), annotations),</b>
+<b class="nc">&nbsp;				excludedPackages(annotations), classLoader.getParent(), classLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static URL[] extractUrls(ClassLoader classLoader) {
+<b class="nc">&nbsp;		List&lt;URL&gt; extractedUrls = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		doExtractUrls(classLoader).forEach((URL url) -&gt; {</b>
+<b class="nc">&nbsp;			if (isManifestOnlyJar(url)) {</b>
+<b class="nc">&nbsp;				extractedUrls.addAll(extractUrlsFromManifestClassPath(url));</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				extractedUrls.add(url);</b>
+&nbsp;			}
+&nbsp;		});
+<b class="nc">&nbsp;		return extractedUrls.toArray(new URL[0]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Stream&lt;URL&gt; doExtractUrls(ClassLoader classLoader) {
+<b class="nc">&nbsp;		if (classLoader instanceof URLClassLoader urlClassLoader) {</b>
+<b class="nc">&nbsp;			return Stream.of(urlClassLoader.getURLs());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Stream.of(ManagementFactory.getRuntimeMXBean().getClassPath().split(File.pathSeparator))</b>
+<b class="nc">&nbsp;			.map(ModifiedClassPathClassLoader::toURL);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static URL toURL(String entry) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return new File(entry).toURI().toURL();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isManifestOnlyJar(URL url) {
+<b class="nc">&nbsp;		return isShortenedIntelliJJar(url);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isShortenedIntelliJJar(URL url) {
+<b class="nc">&nbsp;		String urlPath = url.getPath();</b>
+<b class="nc">&nbsp;		boolean isCandidate = INTELLIJ_CLASSPATH_JAR_PATTERN.matcher(urlPath).matches();</b>
+<b class="nc">&nbsp;		if (isCandidate) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Attributes attributes = getManifestMainAttributesFromUrl(url);</b>
+<b class="nc">&nbsp;				String createdBy = attributes.getValue(&quot;Created-By&quot;);</b>
+<b class="nc">&nbsp;				return createdBy != null &amp;&amp; createdBy.contains(&quot;IntelliJ&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;URL&gt; extractUrlsFromManifestClassPath(URL booterJar) {
+<b class="nc">&nbsp;		List&lt;URL&gt; urls = new ArrayList&lt;&gt;();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			for (String entry : getClassPath(booterJar)) {</b>
+<b class="nc">&nbsp;				urls.add(new URL(entry));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return urls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String[] getClassPath(URL booterJar) throws Exception {
+<b class="nc">&nbsp;		Attributes attributes = getManifestMainAttributesFromUrl(booterJar);</b>
+<b class="nc">&nbsp;		return StringUtils.delimitedListToStringArray(attributes.getValue(Attributes.Name.CLASS_PATH), &quot; &quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Attributes getManifestMainAttributesFromUrl(URL url) throws Exception {
+<b class="nc">&nbsp;		try (JarFile jarFile = new JarFile(new File(url.toURI()))) {</b>
+<b class="nc">&nbsp;			return jarFile.getManifest().getMainAttributes();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static URL[] processUrls(URL[] urls, List&lt;MergedAnnotations&gt; annotations) {
+<b class="nc">&nbsp;		ClassPathEntryFilter filter = new ClassPathEntryFilter(annotations);</b>
+<b class="nc">&nbsp;		List&lt;URL&gt; additionalUrls = getAdditionalUrls(annotations);</b>
+<b class="nc">&nbsp;		List&lt;URL&gt; processedUrls = new ArrayList&lt;&gt;(additionalUrls);</b>
+<b class="nc">&nbsp;		for (URL url : urls) {</b>
+<b class="nc">&nbsp;			if (!filter.isExcluded(url)) {</b>
+<b class="nc">&nbsp;				processedUrls.add(url);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return processedUrls.toArray(new URL[0]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;URL&gt; getAdditionalUrls(List&lt;MergedAnnotations&gt; annotations) {
+<b class="nc">&nbsp;		Set&lt;URL&gt; urls = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (MergedAnnotations candidate : annotations) {</b>
+<b class="nc">&nbsp;			MergedAnnotation&lt;ClassPathOverrides&gt; annotation = candidate.get(ClassPathOverrides.class);</b>
+<b class="nc">&nbsp;			if (annotation.isPresent()) {</b>
+<b class="nc">&nbsp;				urls.addAll(resolveCoordinates(annotation.getStringArray(MergedAnnotation.VALUE)));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return urls.stream().toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;URL&gt; resolveCoordinates(String[] coordinates) {
+<b class="nc">&nbsp;		Exception latestFailure = null;</b>
+<b class="nc">&nbsp;		RepositorySystem repositorySystem = createRepositorySystem();</b>
+<b class="nc">&nbsp;		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();</b>
+<b class="nc">&nbsp;		session.setSystemProperties(System.getProperties());</b>
+<b class="nc">&nbsp;		LocalRepository localRepository = new LocalRepository(System.getProperty(&quot;user.home&quot;) + &quot;/.m2/repository&quot;);</b>
+<b class="nc">&nbsp;		RemoteRepository remoteRepository = new RemoteRepository.Builder(&quot;central&quot;, &quot;default&quot;,</b>
+&nbsp;				&quot;https://repo.maven.apache.org/maven2&quot;)
+<b class="nc">&nbsp;			.build();</b>
+<b class="nc">&nbsp;		session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(session, localRepository));</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; MAX_RESOLUTION_ATTEMPTS; i++) {</b>
+<b class="nc">&nbsp;			CollectRequest collectRequest = new CollectRequest(null, Arrays.asList(remoteRepository));</b>
+<b class="nc">&nbsp;			collectRequest.setDependencies(createDependencies(coordinates));</b>
+<b class="nc">&nbsp;			DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, null);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				DependencyResult result = repositorySystem.resolveDependencies(session, dependencyRequest);</b>
+<b class="nc">&nbsp;				List&lt;URL&gt; resolvedArtifacts = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;				for (ArtifactResult artifact : result.getArtifactResults()) {</b>
+<b class="nc">&nbsp;					resolvedArtifacts.add(artifact.getArtifact().getFile().toURI().toURL());</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				return resolvedArtifacts;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				latestFailure = ex;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;Resolution failed after &quot; + MAX_RESOLUTION_ATTEMPTS + &quot; attempts&quot;,</b>
+&nbsp;				latestFailure);
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;	private static RepositorySystem createRepositorySystem() {
+<b class="nc">&nbsp;		org.eclipse.aether.impl.DefaultServiceLocator serviceLocator = MavenRepositorySystemUtils.newServiceLocator();</b>
+<b class="nc">&nbsp;		serviceLocator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);</b>
+<b class="nc">&nbsp;		serviceLocator.addService(TransporterFactory.class, HttpTransporterFactory.class);</b>
+<b class="nc">&nbsp;		RepositorySystem repositorySystem = serviceLocator.getService(RepositorySystem.class);</b>
+<b class="nc">&nbsp;		return repositorySystem;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;Dependency&gt; createDependencies(String[] allCoordinates) {
+<b class="nc">&nbsp;		List&lt;Dependency&gt; dependencies = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String coordinate : allCoordinates) {</b>
+<b class="nc">&nbsp;			dependencies.add(new Dependency(new DefaultArtifact(coordinate), null));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return dependencies;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Set&lt;String&gt; excludedPackages(List&lt;MergedAnnotations&gt; annotations) {
+<b class="nc">&nbsp;		Set&lt;String&gt; excludedPackages = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (MergedAnnotations candidate : annotations) {</b>
+<b class="nc">&nbsp;			MergedAnnotation&lt;ClassPathExclusions&gt; annotation = candidate.get(ClassPathExclusions.class);</b>
+<b class="nc">&nbsp;			if (annotation.isPresent()) {</b>
+<b class="nc">&nbsp;				excludedPackages.addAll(Arrays.asList(annotation.getStringArray(&quot;packages&quot;)));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return excludedPackages;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Filter for class path entries.
+&nbsp;	 */
+&nbsp;	private static final class ClassPathEntryFilter {
+&nbsp;
+&nbsp;		private final List&lt;String&gt; exclusions;
+&nbsp;
+<b class="nc">&nbsp;		private final AntPathMatcher matcher = new AntPathMatcher();</b>
+&nbsp;
+<b class="nc">&nbsp;		private ClassPathEntryFilter(List&lt;MergedAnnotations&gt; annotations) {</b>
+<b class="nc">&nbsp;			Set&lt;String&gt; exclusions = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (MergedAnnotations candidate : annotations) {</b>
+<b class="nc">&nbsp;				MergedAnnotation&lt;ClassPathExclusions&gt; annotation = candidate.get(ClassPathExclusions.class);</b>
+<b class="nc">&nbsp;				if (annotation.isPresent()) {</b>
+<b class="nc">&nbsp;					exclusions.addAll(Arrays.asList(annotation.getStringArray(MergedAnnotation.VALUE)));</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			this.exclusions = exclusions.stream().toList();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isExcluded(URL url) {
+<b class="nc">&nbsp;			if (&quot;file&quot;.equals(url.getProtocol())) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					URI uri = url.toURI();</b>
+<b class="nc">&nbsp;					File file = new File(uri);</b>
+<b class="nc">&nbsp;					String name = (!uri.toString().endsWith(&quot;/&quot;)) ? file.getName()</b>
+<b class="nc">&nbsp;							: file.getParentFile().getParentFile().getName();</b>
+<b class="nc">&nbsp;					for (String exclusion : this.exclusions) {</b>
+<b class="nc">&nbsp;						if (this.matcher.match(exclusion, name)) {</b>
+<b class="nc">&nbsp;							return true;</b>
+&nbsp;						}
+<b class="nc">&nbsp;					}</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (URISyntaxException ex) {</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

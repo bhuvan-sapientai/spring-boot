@@ -1,0 +1,417 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > R2dbcProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.r2dbc</a>
+</div>
+
+<h1>Coverage Summary for Class: R2dbcProperties (org.springframework.boot.autoconfigure.r2dbc)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">R2dbcProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">R2dbcProperties$Pool</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.r2dbc;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;import io.r2dbc.spi.ValidationDepth;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration properties for R2DBC.
+&nbsp; *
+&nbsp; * @author Mark Paluch
+&nbsp; * @author Andreas Killaitis
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Rodolpho S. Couto
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.r2dbc&quot;)
+<b class="nc">&nbsp;public class R2dbcProperties {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Database name. Set if no name is specified in the url. Default to &quot;testdb&quot; when
+&nbsp;	 * using an embedded database.
+&nbsp;	 */
+&nbsp;	private String name;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to generate a random database name. Ignore any configured name when
+&nbsp;	 * enabled.
+&nbsp;	 */
+&nbsp;	private boolean generateUniqueName;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * R2DBC URL of the database. database name, username, password and pooling options
+&nbsp;	 * specified in the url take precedence over individual options.
+&nbsp;	 */
+&nbsp;	private String url;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login username of the database. Set if no username is specified in the url.
+&nbsp;	 */
+&nbsp;	private String username;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login password of the database. Set if no password is specified in the url.
+&nbsp;	 */
+&nbsp;	private String password;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Additional R2DBC options.
+&nbsp;	 */
+<b class="nc">&nbsp;	private final Map&lt;String, String&gt; properties = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Pool pool = new Pool();</b>
+&nbsp;
+&nbsp;	private String uniqueName;
+&nbsp;
+&nbsp;	public String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setName(String name) {
+<b class="nc">&nbsp;		this.name = name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isGenerateUniqueName() {
+<b class="nc">&nbsp;		return this.generateUniqueName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setGenerateUniqueName(boolean generateUniqueName) {
+<b class="nc">&nbsp;		this.generateUniqueName = generateUniqueName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUrl() {
+<b class="nc">&nbsp;		return this.url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUrl(String url) {
+<b class="nc">&nbsp;		this.url = url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUsername() {
+<b class="nc">&nbsp;		return this.username;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUsername(String username) {
+<b class="nc">&nbsp;		this.username = username;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getPassword() {
+<b class="nc">&nbsp;		return this.password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPassword(String password) {
+<b class="nc">&nbsp;		this.password = password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Map&lt;String, String&gt; getProperties() {
+<b class="nc">&nbsp;		return this.properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Pool getPool() {
+<b class="nc">&nbsp;		return this.pool;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Provide a unique name specific to this instance. Calling this method several times
+&nbsp;	 * return the same unique name.
+&nbsp;	 * @return a unique name for this instance
+&nbsp;	 */
+&nbsp;	public String determineUniqueName() {
+<b class="nc">&nbsp;		if (this.uniqueName == null) {</b>
+<b class="nc">&nbsp;			this.uniqueName = UUID.randomUUID().toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.uniqueName;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public static class Pool {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Minimal number of idle connections.
+&nbsp;		 */
+<b class="nc">&nbsp;		private int minIdle = 0;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Maximum amount of time that a connection is allowed to sit idle in the pool.
+&nbsp;		 */
+<b class="nc">&nbsp;		private Duration maxIdleTime = Duration.ofMinutes(30);</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Maximum lifetime of a connection in the pool. By default, connections have an
+&nbsp;		 * infinite lifetime.
+&nbsp;		 */
+&nbsp;		private Duration maxLifeTime;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Maximum time to acquire a connection from the pool. By default, wait
+&nbsp;		 * indefinitely.
+&nbsp;		 */
+&nbsp;		private Duration maxAcquireTime;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Maximum time to validate a connection from the pool. By default, wait
+&nbsp;		 * indefinitely.
+&nbsp;		 */
+&nbsp;		private Duration maxValidationTime;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Maximum time to wait to create a new connection. By default, wait indefinitely.
+&nbsp;		 */
+&nbsp;		private Duration maxCreateConnectionTime;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Initial connection pool size.
+&nbsp;		 */
+<b class="nc">&nbsp;		private int initialSize = 10;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Maximal connection pool size.
+&nbsp;		 */
+<b class="nc">&nbsp;		private int maxSize = 10;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Validation query.
+&nbsp;		 */
+&nbsp;		private String validationQuery;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Validation depth.
+&nbsp;		 */
+<b class="nc">&nbsp;		private ValidationDepth validationDepth = ValidationDepth.LOCAL;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether pooling is enabled. Requires r2dbc-pool.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean enabled = true;</b>
+&nbsp;
+&nbsp;		public int getMinIdle() {
+<b class="nc">&nbsp;			return this.minIdle;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setMinIdle(int minIdle) {
+<b class="nc">&nbsp;			this.minIdle = minIdle;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Duration getMaxIdleTime() {
+<b class="nc">&nbsp;			return this.maxIdleTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setMaxIdleTime(Duration maxIdleTime) {
+<b class="nc">&nbsp;			this.maxIdleTime = maxIdleTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Duration getMaxLifeTime() {
+<b class="nc">&nbsp;			return this.maxLifeTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setMaxLifeTime(Duration maxLifeTime) {
+<b class="nc">&nbsp;			this.maxLifeTime = maxLifeTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Duration getMaxValidationTime() {
+<b class="nc">&nbsp;			return this.maxValidationTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setMaxValidationTime(Duration maxValidationTime) {
+<b class="nc">&nbsp;			this.maxValidationTime = maxValidationTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Duration getMaxAcquireTime() {
+<b class="nc">&nbsp;			return this.maxAcquireTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setMaxAcquireTime(Duration maxAcquireTime) {
+<b class="nc">&nbsp;			this.maxAcquireTime = maxAcquireTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Duration getMaxCreateConnectionTime() {
+<b class="nc">&nbsp;			return this.maxCreateConnectionTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setMaxCreateConnectionTime(Duration maxCreateConnectionTime) {
+<b class="nc">&nbsp;			this.maxCreateConnectionTime = maxCreateConnectionTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public int getInitialSize() {
+<b class="nc">&nbsp;			return this.initialSize;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setInitialSize(int initialSize) {
+<b class="nc">&nbsp;			this.initialSize = initialSize;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public int getMaxSize() {
+<b class="nc">&nbsp;			return this.maxSize;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setMaxSize(int maxSize) {
+<b class="nc">&nbsp;			this.maxSize = maxSize;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getValidationQuery() {
+<b class="nc">&nbsp;			return this.validationQuery;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setValidationQuery(String validationQuery) {
+<b class="nc">&nbsp;			this.validationQuery = validationQuery;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public ValidationDepth getValidationDepth() {
+<b class="nc">&nbsp;			return this.validationDepth;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setValidationDepth(ValidationDepth validationDepth) {
+<b class="nc">&nbsp;			this.validationDepth = validationDepth;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isEnabled() {
+<b class="nc">&nbsp;			return this.enabled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setEnabled(boolean enabled) {
+<b class="nc">&nbsp;			this.enabled = enabled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

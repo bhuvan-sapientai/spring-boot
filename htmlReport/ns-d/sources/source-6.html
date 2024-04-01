@@ -1,0 +1,222 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Token</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.cloudfoundry</a>
+</div>
+
+<h1>Coverage Summary for Class: Token (org.springframework.boot.actuate.autoconfigure.cloudfoundry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Token</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.cloudfoundry;
+&nbsp;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException.Reason;
+&nbsp;import org.springframework.boot.json.JsonParserFactory;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * The JSON web token provided with each request that originates from Cloud Foundry.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 1.5.22
+&nbsp; */
+&nbsp;public class Token {
+&nbsp;
+&nbsp;	private final String encoded;
+&nbsp;
+&nbsp;	private final String signature;
+&nbsp;
+&nbsp;	private final Map&lt;String, Object&gt; header;
+&nbsp;
+&nbsp;	private final Map&lt;String, Object&gt; claims;
+&nbsp;
+<b class="nc">&nbsp;	public Token(String encoded) {</b>
+<b class="nc">&nbsp;		this.encoded = encoded;</b>
+<b class="nc">&nbsp;		int firstPeriod = encoded.indexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;		int lastPeriod = encoded.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;		if (firstPeriod &lt;= 0 || lastPeriod &lt;= firstPeriod) {</b>
+<b class="nc">&nbsp;			throw new CloudFoundryAuthorizationException(Reason.INVALID_TOKEN,</b>
+&nbsp;					&quot;JWT must have header, body and signature&quot;);
+&nbsp;		}
+<b class="nc">&nbsp;		this.header = parseJson(encoded.substring(0, firstPeriod));</b>
+<b class="nc">&nbsp;		this.claims = parseJson(encoded.substring(firstPeriod + 1, lastPeriod));</b>
+<b class="nc">&nbsp;		this.signature = encoded.substring(lastPeriod + 1);</b>
+<b class="nc">&nbsp;		if (!StringUtils.hasLength(this.signature)) {</b>
+<b class="nc">&nbsp;			throw new CloudFoundryAuthorizationException(Reason.INVALID_TOKEN,</b>
+&nbsp;					&quot;Token must have non-empty crypto segment&quot;);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Object&gt; parseJson(String base64) {
+&nbsp;		try {
+<b class="nc">&nbsp;			byte[] bytes = Base64.getUrlDecoder().decode(base64);</b>
+<b class="nc">&nbsp;			return JsonParserFactory.getJsonParser().parseMap(new String(bytes, StandardCharsets.UTF_8));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			throw new CloudFoundryAuthorizationException(Reason.INVALID_TOKEN, &quot;Token could not be parsed&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public byte[] getContent() {
+<b class="nc">&nbsp;		return this.encoded.substring(0, this.encoded.lastIndexOf(&#39;.&#39;)).getBytes();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public byte[] getSignature() {
+<b class="nc">&nbsp;		return Base64.getUrlDecoder().decode(this.signature);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getSignatureAlgorithm() {
+<b class="nc">&nbsp;		return getRequired(this.header, &quot;alg&quot;, String.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getIssuer() {
+<b class="nc">&nbsp;		return getRequired(this.claims, &quot;iss&quot;, String.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public long getExpiry() {
+<b class="nc">&nbsp;		return getRequired(this.claims, &quot;exp&quot;, Integer.class).longValue();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public List&lt;String&gt; getScope() {
+<b class="nc">&nbsp;		return getRequired(this.claims, &quot;scope&quot;, List.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getKeyId() {
+<b class="nc">&nbsp;		return getRequired(this.header, &quot;kid&quot;, String.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T&gt; T getRequired(Map&lt;String, Object&gt; map, String key, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;		Object value = map.get(key);</b>
+<b class="nc">&nbsp;		if (value == null) {</b>
+<b class="nc">&nbsp;			throw new CloudFoundryAuthorizationException(Reason.INVALID_TOKEN, &quot;Unable to get value from key &quot; + key);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!type.isInstance(value)) {</b>
+<b class="nc">&nbsp;			throw new CloudFoundryAuthorizationException(Reason.INVALID_TOKEN,</b>
+&nbsp;					&quot;Unexpected value type from key &quot; + key + &quot; value &quot; + value);
+&nbsp;		}
+<b class="nc">&nbsp;		return (T) value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.encoded;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

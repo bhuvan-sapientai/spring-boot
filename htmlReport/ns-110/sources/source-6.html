@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertiesSslBundle</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertiesSslBundle (org.springframework.boot.autoconfigure.ssl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertiesSslBundle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.ssl;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.ssl.SslBundleProperties.Key;
+&nbsp;import org.springframework.boot.ssl.SslBundle;
+&nbsp;import org.springframework.boot.ssl.SslBundleKey;
+&nbsp;import org.springframework.boot.ssl.SslManagerBundle;
+&nbsp;import org.springframework.boot.ssl.SslOptions;
+&nbsp;import org.springframework.boot.ssl.SslStoreBundle;
+&nbsp;import org.springframework.boot.ssl.jks.JksSslStoreBundle;
+&nbsp;import org.springframework.boot.ssl.jks.JksSslStoreDetails;
+&nbsp;import org.springframework.boot.ssl.pem.PemSslStore;
+&nbsp;import org.springframework.boot.ssl.pem.PemSslStoreBundle;
+&nbsp;import org.springframework.boot.ssl.pem.PemSslStoreDetails;
+&nbsp;import org.springframework.core.style.ToStringCreator;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link SslBundle} backed by {@link JksSslBundleProperties} or
+&nbsp; * {@link PemSslBundleProperties}.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.1.0
+&nbsp; */
+&nbsp;public final class PropertiesSslBundle implements SslBundle {
+&nbsp;
+&nbsp;	private final SslStoreBundle stores;
+&nbsp;
+&nbsp;	private final SslBundleKey key;
+&nbsp;
+&nbsp;	private final SslOptions options;
+&nbsp;
+&nbsp;	private final String protocol;
+&nbsp;
+&nbsp;	private final SslManagerBundle managers;
+&nbsp;
+<b class="nc">&nbsp;	private PropertiesSslBundle(SslStoreBundle stores, SslBundleProperties properties) {</b>
+<b class="nc">&nbsp;		this.stores = stores;</b>
+<b class="nc">&nbsp;		this.key = asSslKeyReference(properties.getKey());</b>
+<b class="nc">&nbsp;		this.options = asSslOptions(properties.getOptions());</b>
+<b class="nc">&nbsp;		this.protocol = properties.getProtocol();</b>
+<b class="nc">&nbsp;		this.managers = SslManagerBundle.from(this.stores, this.key);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static SslBundleKey asSslKeyReference(Key key) {
+<b class="nc">&nbsp;		return (key != null) ? SslBundleKey.of(key.getPassword(), key.getAlias()) : SslBundleKey.NONE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static SslOptions asSslOptions(SslBundleProperties.Options options) {
+<b class="nc">&nbsp;		return (options != null) ? SslOptions.of(options.getCiphers(), options.getEnabledProtocols()) : SslOptions.NONE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public SslStoreBundle getStores() {
+<b class="nc">&nbsp;		return this.stores;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public SslBundleKey getKey() {
+<b class="nc">&nbsp;		return this.key;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public SslOptions getOptions() {
+<b class="nc">&nbsp;		return this.options;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getProtocol() {
+<b class="nc">&nbsp;		return this.protocol;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public SslManagerBundle getManagers() {
+<b class="nc">&nbsp;		return this.managers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get an {@link SslBundle} for the given {@link PemSslBundleProperties}.
+&nbsp;	 * @param properties the source properties
+&nbsp;	 * @return an {@link SslBundle} instance
+&nbsp;	 */
+&nbsp;	public static SslBundle get(PemSslBundleProperties properties) {
+<b class="nc">&nbsp;		PemSslStore keyStore = getPemSslStore(&quot;keystore&quot;, properties.getKeystore());</b>
+<b class="nc">&nbsp;		if (keyStore != null) {</b>
+<b class="nc">&nbsp;			keyStore = keyStore.withAlias(properties.getKey().getAlias())</b>
+<b class="nc">&nbsp;				.withPassword(properties.getKey().getPassword());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		PemSslStore trustStore = getPemSslStore(&quot;truststore&quot;, properties.getTruststore());</b>
+<b class="nc">&nbsp;		SslStoreBundle storeBundle = new PemSslStoreBundle(keyStore, trustStore);</b>
+<b class="nc">&nbsp;		return new PropertiesSslBundle(storeBundle, properties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PemSslStore getPemSslStore(String propertyName, PemSslBundleProperties.Store properties) {
+<b class="nc">&nbsp;		PemSslStore pemSslStore = PemSslStore.load(asPemSslStoreDetails(properties));</b>
+<b class="nc">&nbsp;		if (properties.isVerifyKeys()) {</b>
+<b class="nc">&nbsp;			CertificateMatcher certificateMatcher = new CertificateMatcher(pemSslStore.privateKey());</b>
+<b class="nc">&nbsp;			Assert.state(certificateMatcher.matchesAny(pemSslStore.certificates()),</b>
+<b class="nc">&nbsp;					&quot;Private key in %s matches none of the certificates in the chain&quot;.formatted(propertyName));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return pemSslStore;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PemSslStoreDetails asPemSslStoreDetails(PemSslBundleProperties.Store properties) {
+<b class="nc">&nbsp;		return new PemSslStoreDetails(properties.getType(), properties.getCertificate(), properties.getPrivateKey(),</b>
+<b class="nc">&nbsp;				properties.getPrivateKeyPassword());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get an {@link SslBundle} for the given {@link JksSslBundleProperties}.
+&nbsp;	 * @param properties the source properties
+&nbsp;	 * @return an {@link SslBundle} instance
+&nbsp;	 */
+&nbsp;	public static SslBundle get(JksSslBundleProperties properties) {
+<b class="nc">&nbsp;		SslStoreBundle storeBundle = asSslStoreBundle(properties);</b>
+<b class="nc">&nbsp;		return new PropertiesSslBundle(storeBundle, properties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static SslStoreBundle asSslStoreBundle(JksSslBundleProperties properties) {
+<b class="nc">&nbsp;		JksSslStoreDetails keyStoreDetails = asStoreDetails(properties.getKeystore());</b>
+<b class="nc">&nbsp;		JksSslStoreDetails trustStoreDetails = asStoreDetails(properties.getTruststore());</b>
+<b class="nc">&nbsp;		return new JksSslStoreBundle(keyStoreDetails, trustStoreDetails);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static JksSslStoreDetails asStoreDetails(JksSslBundleProperties.Store properties) {
+<b class="nc">&nbsp;		return new JksSslStoreDetails(properties.getType(), properties.getProvider(), properties.getLocation(),</b>
+<b class="nc">&nbsp;				properties.getPassword());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		ToStringCreator creator = new ToStringCreator(this);</b>
+<b class="nc">&nbsp;		creator.append(&quot;key&quot;, this.key);</b>
+<b class="nc">&nbsp;		creator.append(&quot;options&quot;, this.options);</b>
+<b class="nc">&nbsp;		creator.append(&quot;protocol&quot;, this.protocol);</b>
+<b class="nc">&nbsp;		creator.append(&quot;stores&quot;, this.stores);</b>
+<b class="nc">&nbsp;		return creator.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

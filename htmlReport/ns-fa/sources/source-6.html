@@ -1,0 +1,341 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PulsarPropertiesMapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.pulsar</a>
+</div>
+
+<h1>Coverage Summary for Class: PulsarPropertiesMapper (org.springframework.boot.autoconfigure.pulsar)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PulsarPropertiesMapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/101)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PulsarPropertiesMapper$AuthenticationConsumer</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/101)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.pulsar;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.apache.pulsar.client.admin.PulsarAdminBuilder;
+&nbsp;import org.apache.pulsar.client.api.Authentication;
+&nbsp;import org.apache.pulsar.client.api.AuthenticationFactory;
+&nbsp;import org.apache.pulsar.client.api.AutoClusterFailoverBuilder;
+&nbsp;import org.apache.pulsar.client.api.ClientBuilder;
+&nbsp;import org.apache.pulsar.client.api.ConsumerBuilder;
+&nbsp;import org.apache.pulsar.client.api.ProducerBuilder;
+&nbsp;import org.apache.pulsar.client.api.PulsarClientException.UnsupportedAuthenticationException;
+&nbsp;import org.apache.pulsar.client.api.ReaderBuilder;
+&nbsp;import org.apache.pulsar.client.api.ServiceUrlProvider;
+&nbsp;import org.apache.pulsar.client.impl.AutoClusterFailover.AutoClusterFailoverBuilderImpl;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.pulsar.listener.PulsarContainerProperties;
+&nbsp;import org.springframework.pulsar.reader.PulsarReaderContainerProperties;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Helper class used to map {@link PulsarProperties} to various builder customizers.
+&nbsp; *
+&nbsp; * @author Chris Bono
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Swamy Mavuri
+&nbsp; */
+&nbsp;final class PulsarPropertiesMapper {
+&nbsp;
+&nbsp;	private final PulsarProperties properties;
+&nbsp;
+<b class="nc">&nbsp;	PulsarPropertiesMapper(PulsarProperties properties) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void customizeClientBuilder(ClientBuilder clientBuilder, PulsarConnectionDetails connectionDetails) {
+<b class="nc">&nbsp;		PulsarProperties.Client properties = this.properties.getClient();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getConnectionTimeout).to(timeoutProperty(clientBuilder::connectionTimeout));</b>
+<b class="nc">&nbsp;		map.from(properties::getOperationTimeout).to(timeoutProperty(clientBuilder::operationTimeout));</b>
+<b class="nc">&nbsp;		map.from(properties::getLookupTimeout).to(timeoutProperty(clientBuilder::lookupTimeout));</b>
+<b class="nc">&nbsp;		customizeAuthentication(properties.getAuthentication(), clientBuilder::authentication);</b>
+<b class="nc">&nbsp;		customizeServiceUrlProviderBuilder(clientBuilder::serviceUrl, clientBuilder::serviceUrlProvider, properties,</b>
+&nbsp;				connectionDetails);
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeServiceUrlProviderBuilder(Consumer&lt;String&gt; serviceUrlConsumer,
+&nbsp;			Consumer&lt;ServiceUrlProvider&gt; serviceUrlProviderConsumer, PulsarProperties.Client properties,
+&nbsp;			PulsarConnectionDetails connectionDetails) {
+<b class="nc">&nbsp;		PulsarProperties.Failover failoverProperties = properties.getFailover();</b>
+<b class="nc">&nbsp;		if (failoverProperties.getBackupClusters().isEmpty()) {</b>
+<b class="nc">&nbsp;			serviceUrlConsumer.accept(connectionDetails.getBrokerUrl());</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		Map&lt;String, Authentication&gt; secondaryAuths = getSecondaryAuths(failoverProperties);</b>
+<b class="nc">&nbsp;		AutoClusterFailoverBuilder autoClusterFailoverBuilder = new AutoClusterFailoverBuilderImpl();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(connectionDetails::getBrokerUrl).to(autoClusterFailoverBuilder::primary);</b>
+<b class="nc">&nbsp;		map.from(secondaryAuths::keySet).as(ArrayList::new).to(autoClusterFailoverBuilder::secondary);</b>
+<b class="nc">&nbsp;		map.from(failoverProperties::getFailoverPolicy).to(autoClusterFailoverBuilder::failoverPolicy);</b>
+<b class="nc">&nbsp;		map.from(failoverProperties::getFailOverDelay).to(timeoutProperty(autoClusterFailoverBuilder::failoverDelay));</b>
+<b class="nc">&nbsp;		map.from(failoverProperties::getSwitchBackDelay)</b>
+<b class="nc">&nbsp;			.to(timeoutProperty(autoClusterFailoverBuilder::switchBackDelay));</b>
+<b class="nc">&nbsp;		map.from(failoverProperties::getCheckInterval).to(timeoutProperty(autoClusterFailoverBuilder::checkInterval));</b>
+<b class="nc">&nbsp;		map.from(secondaryAuths).to(autoClusterFailoverBuilder::secondaryAuthentication);</b>
+<b class="nc">&nbsp;		serviceUrlProviderConsumer.accept(autoClusterFailoverBuilder.build());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Authentication&gt; getSecondaryAuths(PulsarProperties.Failover properties) {
+<b class="nc">&nbsp;		Map&lt;String, Authentication&gt; secondaryAuths = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		properties.getBackupClusters().forEach((backupCluster) -&gt; {</b>
+<b class="nc">&nbsp;			PulsarProperties.Authentication authenticationProperties = backupCluster.getAuthentication();</b>
+<b class="nc">&nbsp;			if (authenticationProperties.getPluginClassName() == null) {</b>
+<b class="nc">&nbsp;				secondaryAuths.put(backupCluster.getServiceUrl(), null);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				customizeAuthentication(authenticationProperties, (authPluginClassName, authParams) -&gt; {</b>
+<b class="nc">&nbsp;					Authentication authentication = AuthenticationFactory.create(authPluginClassName, authParams);</b>
+<b class="nc">&nbsp;					secondaryAuths.put(backupCluster.getServiceUrl(), authentication);</b>
+&nbsp;				});
+&nbsp;			}
+&nbsp;		});
+<b class="nc">&nbsp;		return secondaryAuths;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void customizeAdminBuilder(PulsarAdminBuilder adminBuilder, PulsarConnectionDetails connectionDetails) {
+<b class="nc">&nbsp;		PulsarProperties.Admin properties = this.properties.getAdmin();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(connectionDetails::getAdminUrl).to(adminBuilder::serviceHttpUrl);</b>
+<b class="nc">&nbsp;		map.from(properties::getConnectionTimeout).to(timeoutProperty(adminBuilder::connectionTimeout));</b>
+<b class="nc">&nbsp;		map.from(properties::getReadTimeout).to(timeoutProperty(adminBuilder::readTimeout));</b>
+<b class="nc">&nbsp;		map.from(properties::getRequestTimeout).to(timeoutProperty(adminBuilder::requestTimeout));</b>
+<b class="nc">&nbsp;		customizeAuthentication(properties.getAuthentication(), adminBuilder::authentication);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeAuthentication(PulsarProperties.Authentication properties, AuthenticationConsumer action) {
+<b class="nc">&nbsp;		String pluginClassName = properties.getPluginClassName();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(pluginClassName)) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				action.accept(pluginClassName, getAuthenticationParamsJson(properties.getParam()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (UnsupportedAuthenticationException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Unable to configure Pulsar authentication&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getAuthenticationParamsJson(Map&lt;String, String&gt; params) {
+<b class="nc">&nbsp;		Map&lt;String, String&gt; sortedParams = new TreeMap&lt;&gt;(params);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return sortedParams.entrySet()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.map((e) -&gt; &quot;\&quot;%s\&quot;:\&quot;%s\&quot;&quot;.formatted(e.getKey(), e.getValue()))</b>
+<b class="nc">&nbsp;				.collect(Collectors.joining(&quot;,&quot;, &quot;{&quot;, &quot;}&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Could not convert auth parameters to encoded string&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	&lt;T&gt; void customizeProducerBuilder(ProducerBuilder&lt;T&gt; producerBuilder) {
+<b class="nc">&nbsp;		PulsarProperties.Producer properties = this.properties.getProducer();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getName).to(producerBuilder::producerName);</b>
+<b class="nc">&nbsp;		map.from(properties::getTopicName).to(producerBuilder::topic);</b>
+<b class="nc">&nbsp;		map.from(properties::getSendTimeout).to(timeoutProperty(producerBuilder::sendTimeout));</b>
+<b class="nc">&nbsp;		map.from(properties::getMessageRoutingMode).to(producerBuilder::messageRoutingMode);</b>
+<b class="nc">&nbsp;		map.from(properties::getHashingScheme).to(producerBuilder::hashingScheme);</b>
+<b class="nc">&nbsp;		map.from(properties::isBatchingEnabled).to(producerBuilder::enableBatching);</b>
+<b class="nc">&nbsp;		map.from(properties::isChunkingEnabled).to(producerBuilder::enableChunking);</b>
+<b class="nc">&nbsp;		map.from(properties::getCompressionType).to(producerBuilder::compressionType);</b>
+<b class="nc">&nbsp;		map.from(properties::getAccessMode).to(producerBuilder::accessMode);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	&lt;T&gt; void customizeConsumerBuilder(ConsumerBuilder&lt;T&gt; consumerBuilder) {
+<b class="nc">&nbsp;		PulsarProperties.Consumer properties = this.properties.getConsumer();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getName).to(consumerBuilder::consumerName);</b>
+<b class="nc">&nbsp;		map.from(properties::getTopics).as(ArrayList::new).to(consumerBuilder::topics);</b>
+<b class="nc">&nbsp;		map.from(properties::getTopicsPattern).to(consumerBuilder::topicsPattern);</b>
+<b class="nc">&nbsp;		map.from(properties::getPriorityLevel).to(consumerBuilder::priorityLevel);</b>
+<b class="nc">&nbsp;		map.from(properties::isReadCompacted).to(consumerBuilder::readCompacted);</b>
+<b class="nc">&nbsp;		map.from(properties::getDeadLetterPolicy).as(DeadLetterPolicyMapper::map).to(consumerBuilder::deadLetterPolicy);</b>
+<b class="nc">&nbsp;		map.from(properties::isRetryEnable).to(consumerBuilder::enableRetry);</b>
+<b class="nc">&nbsp;		customizeConsumerBuilderSubscription(consumerBuilder);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeConsumerBuilderSubscription(ConsumerBuilder&lt;?&gt; consumerBuilder) {
+<b class="nc">&nbsp;		PulsarProperties.Consumer.Subscription properties = this.properties.getConsumer().getSubscription();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getName).to(consumerBuilder::subscriptionName);</b>
+<b class="nc">&nbsp;		map.from(properties::getInitialPosition).to(consumerBuilder::subscriptionInitialPosition);</b>
+<b class="nc">&nbsp;		map.from(properties::getMode).to(consumerBuilder::subscriptionMode);</b>
+<b class="nc">&nbsp;		map.from(properties::getTopicsMode).to(consumerBuilder::subscriptionTopicsMode);</b>
+<b class="nc">&nbsp;		map.from(properties::getType).to(consumerBuilder::subscriptionType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void customizeContainerProperties(PulsarContainerProperties containerProperties) {
+<b class="nc">&nbsp;		customizePulsarContainerConsumerSubscriptionProperties(containerProperties);</b>
+<b class="nc">&nbsp;		customizePulsarContainerListenerProperties(containerProperties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizePulsarContainerConsumerSubscriptionProperties(PulsarContainerProperties containerProperties) {
+<b class="nc">&nbsp;		PulsarProperties.Consumer.Subscription properties = this.properties.getConsumer().getSubscription();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getType).to(containerProperties::setSubscriptionType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizePulsarContainerListenerProperties(PulsarContainerProperties containerProperties) {
+<b class="nc">&nbsp;		PulsarProperties.Listener properties = this.properties.getListener();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getSchemaType).to(containerProperties::setSchemaType);</b>
+<b class="nc">&nbsp;		map.from(properties::isObservationEnabled).to(containerProperties::setObservationEnabled);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	&lt;T&gt; void customizeReaderBuilder(ReaderBuilder&lt;T&gt; readerBuilder) {
+<b class="nc">&nbsp;		PulsarProperties.Reader properties = this.properties.getReader();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getName).to(readerBuilder::readerName);</b>
+<b class="nc">&nbsp;		map.from(properties::getTopics).to(readerBuilder::topics);</b>
+<b class="nc">&nbsp;		map.from(properties::getSubscriptionName).to(readerBuilder::subscriptionName);</b>
+<b class="nc">&nbsp;		map.from(properties::getSubscriptionRolePrefix).to(readerBuilder::subscriptionRolePrefix);</b>
+<b class="nc">&nbsp;		map.from(properties::isReadCompacted).to(readerBuilder::readCompacted);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void customizeReaderContainerProperties(PulsarReaderContainerProperties readerContainerProperties) {
+<b class="nc">&nbsp;		PulsarProperties.Reader properties = this.properties.getReader();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getTopics).to(readerContainerProperties::setTopics);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Consumer&lt;Duration&gt; timeoutProperty(BiConsumer&lt;Integer, TimeUnit&gt; setter) {
+<b class="nc">&nbsp;		return (duration) -&gt; setter.accept((int) duration.toMillis(), TimeUnit.MILLISECONDS);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private interface AuthenticationConsumer {
+&nbsp;
+&nbsp;		void accept(String authPluginClassName, String authParamString) throws UnsupportedAuthenticationException;
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

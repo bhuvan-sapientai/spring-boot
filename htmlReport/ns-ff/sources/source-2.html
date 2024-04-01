@@ -1,0 +1,337 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RSocketProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.rsocket</a>
+</div>
+
+<h1>Coverage Summary for Class: RSocketProperties (org.springframework.boot.autoconfigure.rsocket)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RSocketProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RSocketProperties$Server</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RSocketProperties$Server$Spec</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.rsocket;
+&nbsp;
+&nbsp;import java.net.InetAddress;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.NestedConfigurationProperty;
+&nbsp;import org.springframework.boot.rsocket.server.RSocketServer;
+&nbsp;import org.springframework.boot.web.server.Ssl;
+&nbsp;import org.springframework.util.unit.DataSize;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfigurationProperties Properties} for RSocket support.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Chris Bono
+&nbsp; * @since 2.2.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(&quot;spring.rsocket&quot;)
+<b class="nc">&nbsp;public class RSocketProperties {</b>
+&nbsp;
+<b class="nc">&nbsp;	@NestedConfigurationProperty</b>
+&nbsp;	private final Server server = new Server();
+&nbsp;
+&nbsp;	public Server getServer() {
+<b class="nc">&nbsp;		return this.server;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public static class Server {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Server port.
+&nbsp;		 */
+&nbsp;		private Integer port;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Network address to which the server should bind.
+&nbsp;		 */
+&nbsp;		private InetAddress address;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * RSocket transport protocol.
+&nbsp;		 */
+<b class="nc">&nbsp;		private RSocketServer.Transport transport = RSocketServer.Transport.TCP;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Path under which RSocket handles requests (only works with websocket
+&nbsp;		 * transport).
+&nbsp;		 */
+&nbsp;		private String mappingPath;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Maximum transmission unit. Frames larger than the specified value are
+&nbsp;		 * fragmented.
+&nbsp;		 */
+&nbsp;		private DataSize fragmentSize;
+&nbsp;
+&nbsp;		@NestedConfigurationProperty
+&nbsp;		private Ssl ssl;
+&nbsp;
+<b class="nc">&nbsp;		private final Spec spec = new Spec();</b>
+&nbsp;
+&nbsp;		public Integer getPort() {
+<b class="nc">&nbsp;			return this.port;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setPort(Integer port) {
+<b class="nc">&nbsp;			this.port = port;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public InetAddress getAddress() {
+<b class="nc">&nbsp;			return this.address;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setAddress(InetAddress address) {
+<b class="nc">&nbsp;			this.address = address;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public RSocketServer.Transport getTransport() {
+<b class="nc">&nbsp;			return this.transport;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setTransport(RSocketServer.Transport transport) {
+<b class="nc">&nbsp;			this.transport = transport;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getMappingPath() {
+<b class="nc">&nbsp;			return this.mappingPath;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setMappingPath(String mappingPath) {
+<b class="nc">&nbsp;			this.mappingPath = mappingPath;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public DataSize getFragmentSize() {
+<b class="nc">&nbsp;			return this.fragmentSize;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setFragmentSize(DataSize fragmentSize) {
+<b class="nc">&nbsp;			this.fragmentSize = fragmentSize;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Ssl getSsl() {
+<b class="nc">&nbsp;			return this.ssl;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setSsl(Ssl ssl) {
+<b class="nc">&nbsp;			this.ssl = ssl;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Spec getSpec() {
+<b class="nc">&nbsp;			return this.spec;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		public static class Spec {</b>
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Sub-protocols to use in websocket handshake signature.
+&nbsp;			 */
+&nbsp;			private String protocols;
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Maximum allowable frame payload length.
+&nbsp;			 */
+<b class="nc">&nbsp;			private DataSize maxFramePayloadLength = DataSize.ofBytes(65536);</b>
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Whether to proxy websocket ping frames or respond to them.
+&nbsp;			 */
+&nbsp;			private boolean handlePing;
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Whether the websocket compression extension is enabled.
+&nbsp;			 */
+&nbsp;			private boolean compress;
+&nbsp;
+&nbsp;			public String getProtocols() {
+<b class="nc">&nbsp;				return this.protocols;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			public void setProtocols(String protocols) {
+<b class="nc">&nbsp;				this.protocols = protocols;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			public DataSize getMaxFramePayloadLength() {
+<b class="nc">&nbsp;				return this.maxFramePayloadLength;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			public void setMaxFramePayloadLength(DataSize maxFramePayloadLength) {
+<b class="nc">&nbsp;				this.maxFramePayloadLength = maxFramePayloadLength;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			public boolean isHandlePing() {
+<b class="nc">&nbsp;				return this.handlePing;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			public void setHandlePing(boolean handlePing) {
+<b class="nc">&nbsp;				this.handlePing = handlePing;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			public boolean isCompress() {
+<b class="nc">&nbsp;				return this.compress;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			public void setCompress(boolean compress) {
+<b class="nc">&nbsp;				this.compress = compress;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

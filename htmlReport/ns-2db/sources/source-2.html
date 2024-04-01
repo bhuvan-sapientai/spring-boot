@@ -1,0 +1,275 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BasicJsonTester</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.json</a>
+</div>
+
+<h1>Coverage Summary for Class: BasicJsonTester (org.springframework.boot.test.json)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BasicJsonTester</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.json;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * AssertJ based JSON tester that works with basic JSON strings. Allows testing of JSON
+&nbsp; * payloads created from any source, for example:&lt;pre class=&quot;code&quot;&gt;
+&nbsp; * public class ExampleObjectJsonTests {
+&nbsp; *
+&nbsp; *     private BasicJsonTester json = new BasicJsonTester(getClass());
+&nbsp; *
+&nbsp; *     &amp;#064;Test
+&nbsp; *     public void testWriteJson() throws IOException {
+&nbsp; *         assertThat(json.from(&quot;example.json&quot;)).extractingJsonPathStringValue(&quot;@.name&quot;)
+&nbsp;				.isEqualTo(&quot;Spring&quot;);
+&nbsp; *     }
+&nbsp; *
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * See {@link AbstractJsonMarshalTester} for more details.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;public class BasicJsonTester {
+&nbsp;
+&nbsp;	private JsonLoader loader;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new uninitialized {@link BasicJsonTester} instance.
+&nbsp;	 */
+<b class="nc">&nbsp;	protected BasicJsonTester() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link BasicJsonTester} instance that will load resources as UTF-8.
+&nbsp;	 * @param resourceLoadClass the source class used to load resources
+&nbsp;	 */
+&nbsp;	public BasicJsonTester(Class&lt;?&gt; resourceLoadClass) {
+<b class="nc">&nbsp;		this(resourceLoadClass, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link BasicJsonTester} instance.
+&nbsp;	 * @param resourceLoadClass the source class used to load resources
+&nbsp;	 * @param charset the charset used to load resources
+&nbsp;	 * @since 1.4.1
+&nbsp;	 */
+<b class="nc">&nbsp;	public BasicJsonTester(Class&lt;?&gt; resourceLoadClass, Charset charset) {</b>
+<b class="nc">&nbsp;		Assert.notNull(resourceLoadClass, &quot;ResourceLoadClass must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.loader = new JsonLoader(resourceLoadClass, charset);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize the marshal tester for use, configuring it to load JSON resources as
+&nbsp;	 * UTF-8.
+&nbsp;	 * @param resourceLoadClass the source class used when loading relative classpath
+&nbsp;	 * resources
+&nbsp;	 */
+&nbsp;	protected final void initialize(Class&lt;?&gt; resourceLoadClass) {
+<b class="nc">&nbsp;		initialize(resourceLoadClass, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize the marshal tester for use.
+&nbsp;	 * @param resourceLoadClass the source class used when loading relative classpath
+&nbsp;	 * resources
+&nbsp;	 * @param charset the charset used when loading relative classpath resources
+&nbsp;	 * @since 1.4.1
+&nbsp;	 */
+&nbsp;	protected final void initialize(Class&lt;?&gt; resourceLoadClass, Charset charset) {
+<b class="nc">&nbsp;		if (this.loader == null) {</b>
+<b class="nc">&nbsp;			this.loader = new JsonLoader(resourceLoadClass, charset);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create JSON content from the specified String source. The source can contain the
+&nbsp;	 * JSON itself or, if it ends with {@code .json}, the name of a resource to be loaded
+&nbsp;	 * using {@code resourceLoadClass}.
+&nbsp;	 * @param source the JSON content or a {@code .json} resource name
+&nbsp;	 * @return the JSON content
+&nbsp;	 */
+&nbsp;	public JsonContent&lt;Object&gt; from(CharSequence source) {
+<b class="nc">&nbsp;		verify();</b>
+<b class="nc">&nbsp;		return getJsonContent(this.loader.getJson(source));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create JSON content from the specified resource path.
+&nbsp;	 * @param path the path of the resource to load
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @return the JSON content
+&nbsp;	 */
+&nbsp;	public JsonContent&lt;Object&gt; from(String path, Class&lt;?&gt; resourceLoadClass) {
+<b class="nc">&nbsp;		verify();</b>
+<b class="nc">&nbsp;		return getJsonContent(this.loader.getJson(path, resourceLoadClass));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create JSON content from the specified JSON bytes.
+&nbsp;	 * @param source the bytes of JSON
+&nbsp;	 * @return the JSON content
+&nbsp;	 */
+&nbsp;	public JsonContent&lt;Object&gt; from(byte[] source) {
+<b class="nc">&nbsp;		verify();</b>
+<b class="nc">&nbsp;		return getJsonContent(this.loader.getJson(source));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create JSON content from the specified JSON file.
+&nbsp;	 * @param source the file containing JSON
+&nbsp;	 * @return the JSON content
+&nbsp;	 */
+&nbsp;	public JsonContent&lt;Object&gt; from(File source) {
+<b class="nc">&nbsp;		verify();</b>
+<b class="nc">&nbsp;		return getJsonContent(this.loader.getJson(source));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create JSON content from the specified JSON input stream.
+&nbsp;	 * @param source the input stream containing JSON
+&nbsp;	 * @return the JSON content
+&nbsp;	 */
+&nbsp;	public JsonContent&lt;Object&gt; from(InputStream source) {
+<b class="nc">&nbsp;		verify();</b>
+<b class="nc">&nbsp;		return getJsonContent(this.loader.getJson(source));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create JSON content from the specified JSON resource.
+&nbsp;	 * @param source the resource containing JSON
+&nbsp;	 * @return the JSON content
+&nbsp;	 */
+&nbsp;	public JsonContent&lt;Object&gt; from(Resource source) {
+<b class="nc">&nbsp;		verify();</b>
+<b class="nc">&nbsp;		return getJsonContent(this.loader.getJson(source));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void verify() {
+<b class="nc">&nbsp;		Assert.state(this.loader != null, &quot;Uninitialized BasicJsonTester&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JsonContent&lt;Object&gt; getJsonContent(String json) {
+<b class="nc">&nbsp;		return new JsonContent&lt;&gt;(this.loader.getResourceLoadClass(), null, json);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

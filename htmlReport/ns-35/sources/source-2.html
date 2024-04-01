@@ -1,0 +1,340 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AtlasProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.metrics.export.atlas</a>
+</div>
+
+<h1>Coverage Summary for Class: AtlasProperties (org.springframework.boot.actuate.autoconfigure.metrics.export.atlas)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AtlasProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.metrics.export.atlas;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfigurationProperties @ConfigurationProperties} for configuring Atlas metrics
+&nbsp; * export.
+&nbsp; *
+&nbsp; * @author Jon Schneider
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;management.atlas.metrics.export&quot;)
+<b class="nc">&nbsp;public class AtlasProperties {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Step size (i.e. reporting frequency) to use.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Duration step = Duration.ofMinutes(1);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether exporting of metrics to this backend is enabled.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean enabled = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Connection timeout for requests to this backend.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Duration connectTimeout = Duration.ofSeconds(1);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Read timeout for requests to this backend.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Duration readTimeout = Duration.ofSeconds(10);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Number of threads to use with the metrics publishing scheduler.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Integer numThreads = 4;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Number of measurements per request to use for this backend. If more measurements
+&nbsp;	 * are found, then multiple requests will be made.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Integer batchSize = 10000;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * URI of the Atlas server.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String uri = &quot;http://localhost:7101/api/v1/publish&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Time to live for meters that do not have any activity. After this period the meter
+&nbsp;	 * will be considered expired and will not get reported.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Duration meterTimeToLive = Duration.ofMinutes(15);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to enable streaming to Atlas LWC.
+&nbsp;	 */
+&nbsp;	private boolean lwcEnabled;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Step size (reporting frequency) to use for streaming to Atlas LWC. This is the
+&nbsp;	 * highest supported resolution for getting an on-demand stream of the data. It must
+&nbsp;	 * be less than or equal to management.metrics.export.atlas.step and
+&nbsp;	 * management.metrics.export.atlas.step should be an even multiple of this value.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Duration lwcStep = Duration.ofSeconds(5);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether expressions with the same step size as Atlas publishing should be ignored
+&nbsp;	 * for streaming. Used for cases where data being published to Atlas is also sent into
+&nbsp;	 * streaming from the backend.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean lwcIgnorePublishStep = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Frequency for refreshing config settings from the LWC service.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Duration configRefreshFrequency = Duration.ofSeconds(10);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Time to live for subscriptions from the LWC service.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Duration configTimeToLive = Duration.ofSeconds(150);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * URI for the Atlas LWC endpoint to retrieve current subscriptions.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String configUri = &quot;http://localhost:7101/lwc/api/v1/expressions/local-dev&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * URI for the Atlas LWC endpoint to evaluate the data for a subscription.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String evalUri = &quot;http://localhost:7101/lwc/api/v1/evaluate&quot;;</b>
+&nbsp;
+&nbsp;	public Duration getStep() {
+<b class="nc">&nbsp;		return this.step;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setStep(Duration step) {
+<b class="nc">&nbsp;		this.step = step;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isEnabled() {
+<b class="nc">&nbsp;		return this.enabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setEnabled(boolean enabled) {
+<b class="nc">&nbsp;		this.enabled = enabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Duration getConnectTimeout() {
+<b class="nc">&nbsp;		return this.connectTimeout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setConnectTimeout(Duration connectTimeout) {
+<b class="nc">&nbsp;		this.connectTimeout = connectTimeout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Duration getReadTimeout() {
+<b class="nc">&nbsp;		return this.readTimeout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setReadTimeout(Duration readTimeout) {
+<b class="nc">&nbsp;		this.readTimeout = readTimeout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Integer getNumThreads() {
+<b class="nc">&nbsp;		return this.numThreads;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setNumThreads(Integer numThreads) {
+<b class="nc">&nbsp;		this.numThreads = numThreads;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Integer getBatchSize() {
+<b class="nc">&nbsp;		return this.batchSize;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBatchSize(Integer batchSize) {
+<b class="nc">&nbsp;		this.batchSize = batchSize;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUri() {
+<b class="nc">&nbsp;		return this.uri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUri(String uri) {
+<b class="nc">&nbsp;		this.uri = uri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Duration getMeterTimeToLive() {
+<b class="nc">&nbsp;		return this.meterTimeToLive;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setMeterTimeToLive(Duration meterTimeToLive) {
+<b class="nc">&nbsp;		this.meterTimeToLive = meterTimeToLive;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isLwcEnabled() {
+<b class="nc">&nbsp;		return this.lwcEnabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setLwcEnabled(boolean lwcEnabled) {
+<b class="nc">&nbsp;		this.lwcEnabled = lwcEnabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Duration getLwcStep() {
+<b class="nc">&nbsp;		return this.lwcStep;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setLwcStep(Duration lwcStep) {
+<b class="nc">&nbsp;		this.lwcStep = lwcStep;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isLwcIgnorePublishStep() {
+<b class="nc">&nbsp;		return this.lwcIgnorePublishStep;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setLwcIgnorePublishStep(boolean lwcIgnorePublishStep) {
+<b class="nc">&nbsp;		this.lwcIgnorePublishStep = lwcIgnorePublishStep;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Duration getConfigRefreshFrequency() {
+<b class="nc">&nbsp;		return this.configRefreshFrequency;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setConfigRefreshFrequency(Duration configRefreshFrequency) {
+<b class="nc">&nbsp;		this.configRefreshFrequency = configRefreshFrequency;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Duration getConfigTimeToLive() {
+<b class="nc">&nbsp;		return this.configTimeToLive;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setConfigTimeToLive(Duration configTimeToLive) {
+<b class="nc">&nbsp;		this.configTimeToLive = configTimeToLive;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getConfigUri() {
+<b class="nc">&nbsp;		return this.configUri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setConfigUri(String configUri) {
+<b class="nc">&nbsp;		this.configUri = configUri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getEvalUri() {
+<b class="nc">&nbsp;		return this.evalUri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setEvalUri(String evalUri) {
+<b class="nc">&nbsp;		this.evalUri = evalUri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

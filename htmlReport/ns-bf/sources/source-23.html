@@ -1,0 +1,152 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConditionalOnClass</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionalOnClass (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ConditionalOnClass</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Conditional @Conditional} that only matches when the specified classes are on
+&nbsp; * the classpath.
+&nbsp; * &lt;p&gt;
+&nbsp; * A {@code Class} {@link #value() value} can be safely specified on
+&nbsp; * {@code @Configuration} classes as the annotation metadata is parsed by using ASM before
+&nbsp; * the class is loaded. If a class reference cannot be used then a {@link #name() name}
+&nbsp; * {@code String} attribute can be used.
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;b&gt;Note:&lt;/b&gt; Extra care must be taken when using {@code @ConditionalOnClass} on
+&nbsp; * {@code @Bean} methods where typically the return type is the target of the condition.
+&nbsp; * Before the condition on the method applies, the JVM will have loaded the class and
+&nbsp; * potentially processed method references which will fail if the class is not present. To
+&nbsp; * handle this scenario, a separate {@code @Configuration} class should be used to isolate
+&nbsp; * the condition. For example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;AutoConfiguration
+&nbsp; * public class MyAutoConfiguration {
+&nbsp; *
+&nbsp; * 	&amp;#64;Configuration(proxyBeanMethods = false)
+&nbsp; * 	&amp;#64;ConditionalOnClass(SomeService.class)
+&nbsp; * 	public static class SomeServiceConfiguration {
+&nbsp; *
+&nbsp; * 		&amp;#64;Bean
+&nbsp; * 		&amp;#64;ConditionalOnMissingBean
+&nbsp; * 		public SomeService someService() {
+&nbsp; * 			return new SomeService();
+&nbsp; * 		}
+&nbsp; *
+&nbsp; * 	}
+&nbsp; *
+&nbsp; * }&lt;/pre&gt;
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;@Target({ ElementType.TYPE, ElementType.METHOD })
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Documented
+&nbsp;@Conditional(OnClassCondition.class)
+&nbsp;public @interface ConditionalOnClass {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The classes that must be present. Since this annotation is parsed by loading class
+&nbsp;	 * bytecode, it is safe to specify classes here that may ultimately not be on the
+&nbsp;	 * classpath, only if this annotation is directly on the affected component and
+&nbsp;	 * &lt;b&gt;not&lt;/b&gt; if this annotation is used as a composed, meta-annotation. In order to
+&nbsp;	 * use this annotation as a meta-annotation, only use the {@link #name} attribute.
+&nbsp;	 * @return the classes that must be present
+&nbsp;	 */
+&nbsp;	Class&lt;?&gt;[] value() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The classes names that must be present.
+&nbsp;	 * @return the class names that must be present.
+&nbsp;	 */
+&nbsp;	String[] name() default {};
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

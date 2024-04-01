@@ -1,0 +1,364 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildpackLayersMetadata</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildpackLayersMetadata (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildpackLayersMetadata</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildpackLayersMetadata$BuildpackLayerDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildpackLayersMetadata$Buildpacks</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildpackLayersMetadata$BuildpackVersions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.invoke.MethodHandles;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Image;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageConfig;
+&nbsp;import org.springframework.boot.buildpack.platform.json.MappedObject;
+&nbsp;import org.springframework.boot.buildpack.platform.json.SharedObjectMapper;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Buildpack layers metadata information.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;final class BuildpackLayersMetadata extends MappedObject {
+&nbsp;
+&nbsp;	private static final String LABEL_NAME = &quot;io.buildpacks.buildpack.layers&quot;;
+&nbsp;
+&nbsp;	private final Buildpacks buildpacks;
+&nbsp;
+&nbsp;	private BuildpackLayersMetadata(JsonNode node) {
+<b class="nc">&nbsp;		super(node, MethodHandles.lookup());</b>
+<b class="nc">&nbsp;		this.buildpacks = Buildpacks.fromJson(getNode());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the metadata details of a buildpack with the given ID and version.
+&nbsp;	 * @param id the buildpack ID
+&nbsp;	 * @param version the buildpack version
+&nbsp;	 * @return the buildpack details or {@code null} if a buildpack with the given ID and
+&nbsp;	 * version does not exist in the metadata
+&nbsp;	 */
+&nbsp;	BuildpackLayerDetails getBuildpack(String id, String version) {
+<b class="nc">&nbsp;		return this.buildpacks.getBuildpack(id, version);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link BuildpackLayersMetadata} from an image.
+&nbsp;	 * @param image the source image
+&nbsp;	 * @return the buildpack layers metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuildpackLayersMetadata fromImage(Image image) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(image, &quot;Image must not be null&quot;);</b>
+<b class="nc">&nbsp;		return fromImageConfig(image.getConfig());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link BuildpackLayersMetadata} from image config.
+&nbsp;	 * @param imageConfig the source image config
+&nbsp;	 * @return the buildpack layers metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuildpackLayersMetadata fromImageConfig(ImageConfig imageConfig) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(imageConfig, &quot;ImageConfig must not be null&quot;);</b>
+<b class="nc">&nbsp;		String json = imageConfig.getLabels().get(LABEL_NAME);</b>
+<b class="nc">&nbsp;		Assert.notNull(json, () -&gt; &quot;No &#39;&quot; + LABEL_NAME + &quot;&#39; label found in image config labels &#39;&quot;</b>
+<b class="nc">&nbsp;				+ StringUtils.collectionToCommaDelimitedString(imageConfig.getLabels().keySet()) + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;		return fromJson(json);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link BuildpackLayersMetadata} from JSON.
+&nbsp;	 * @param json the source JSON
+&nbsp;	 * @return the buildpack layers metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuildpackLayersMetadata fromJson(String json) throws IOException {
+<b class="nc">&nbsp;		return fromJson(SharedObjectMapper.get().readTree(json));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link BuildpackLayersMetadata} from JSON.
+&nbsp;	 * @param node the source JSON
+&nbsp;	 * @return the buildpack layers metadata
+&nbsp;	 */
+&nbsp;	static BuildpackLayersMetadata fromJson(JsonNode node) {
+<b class="nc">&nbsp;		return new BuildpackLayersMetadata(node);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class Buildpacks {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, BuildpackVersions&gt; buildpacks = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private BuildpackLayerDetails getBuildpack(String id, String version) {
+<b class="nc">&nbsp;			if (this.buildpacks.containsKey(id)) {</b>
+<b class="nc">&nbsp;				return this.buildpacks.get(id).getBuildpack(version);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addBuildpackVersions(String id, BuildpackVersions versions) {
+<b class="nc">&nbsp;			this.buildpacks.put(id, versions);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Buildpacks fromJson(JsonNode node) {
+<b class="nc">&nbsp;			Buildpacks buildpacks = new Buildpacks();</b>
+<b class="nc">&nbsp;			node.fields()</b>
+<b class="nc">&nbsp;				.forEachRemaining((field) -&gt; buildpacks.addBuildpackVersions(field.getKey(),</b>
+<b class="nc">&nbsp;						BuildpackVersions.fromJson(field.getValue())));</b>
+<b class="nc">&nbsp;			return buildpacks;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class BuildpackVersions {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, BuildpackLayerDetails&gt; versions = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private BuildpackLayerDetails getBuildpack(String version) {
+<b class="nc">&nbsp;			return this.versions.get(version);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addBuildpackVersion(String version, BuildpackLayerDetails details) {
+<b class="nc">&nbsp;			this.versions.put(version, details);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static BuildpackVersions fromJson(JsonNode node) {
+<b class="nc">&nbsp;			BuildpackVersions versions = new BuildpackVersions();</b>
+<b class="nc">&nbsp;			node.fields()</b>
+<b class="nc">&nbsp;				.forEachRemaining((field) -&gt; versions.addBuildpackVersion(field.getKey(),</b>
+<b class="nc">&nbsp;						BuildpackLayerDetails.fromJson(field.getValue())));</b>
+<b class="nc">&nbsp;			return versions;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static final class BuildpackLayerDetails extends MappedObject {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final String homepage;
+&nbsp;
+&nbsp;		private final String layerDiffId;
+&nbsp;
+&nbsp;		private BuildpackLayerDetails(JsonNode node) {
+<b class="nc">&nbsp;			super(node, MethodHandles.lookup());</b>
+<b class="nc">&nbsp;			this.name = valueAt(&quot;/name&quot;, String.class);</b>
+<b class="nc">&nbsp;			this.homepage = valueAt(&quot;/homepage&quot;, String.class);</b>
+<b class="nc">&nbsp;			this.layerDiffId = valueAt(&quot;/layerDiffID&quot;, String.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the buildpack name.
+&nbsp;		 * @return the name
+&nbsp;		 */
+&nbsp;		String getName() {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the buildpack homepage address.
+&nbsp;		 * @return the homepage address
+&nbsp;		 */
+&nbsp;		String getHomepage() {
+<b class="nc">&nbsp;			return this.homepage;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the buildpack layer {@code diffID}.
+&nbsp;		 * @return the layer {@code diffID}
+&nbsp;		 */
+&nbsp;		String getLayerDiffId() {
+<b class="nc">&nbsp;			return this.layerDiffId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static BuildpackLayerDetails fromJson(JsonNode node) {
+<b class="nc">&nbsp;			return new BuildpackLayerDetails(node);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

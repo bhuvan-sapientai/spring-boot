@@ -1,0 +1,315 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LdapProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.ldap</a>
+</div>
+
+<h1>Coverage Summary for Class: LdapProperties (org.springframework.boot.autoconfigure.ldap)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LdapProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LdapProperties$Template</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.ldap;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.ldap.core.LdapTemplate;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration properties for LDAP.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @since 1.5.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.ldap&quot;)
+<b class="nc">&nbsp;public class LdapProperties {</b>
+&nbsp;
+&nbsp;	private static final int DEFAULT_PORT = 389;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * LDAP URLs of the server.
+&nbsp;	 */
+&nbsp;	private String[] urls;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Base suffix from which all operations should originate.
+&nbsp;	 */
+&nbsp;	private String base;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login username of the server.
+&nbsp;	 */
+&nbsp;	private String username;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login password of the server.
+&nbsp;	 */
+&nbsp;	private String password;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether read-only operations should use an anonymous environment. Disabled by
+&nbsp;	 * default unless a username is set.
+&nbsp;	 */
+&nbsp;	private Boolean anonymousReadOnly;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * LDAP specification settings.
+&nbsp;	 */
+<b class="nc">&nbsp;	private final Map&lt;String, String&gt; baseEnvironment = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Template template = new Template();</b>
+&nbsp;
+&nbsp;	public String[] getUrls() {
+<b class="nc">&nbsp;		return this.urls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUrls(String[] urls) {
+<b class="nc">&nbsp;		this.urls = urls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getBase() {
+<b class="nc">&nbsp;		return this.base;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBase(String base) {
+<b class="nc">&nbsp;		this.base = base;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUsername() {
+<b class="nc">&nbsp;		return this.username;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUsername(String username) {
+<b class="nc">&nbsp;		this.username = username;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getPassword() {
+<b class="nc">&nbsp;		return this.password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPassword(String password) {
+<b class="nc">&nbsp;		this.password = password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Boolean getAnonymousReadOnly() {
+<b class="nc">&nbsp;		return this.anonymousReadOnly;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setAnonymousReadOnly(Boolean anonymousReadOnly) {
+<b class="nc">&nbsp;		this.anonymousReadOnly = anonymousReadOnly;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Map&lt;String, String&gt; getBaseEnvironment() {
+<b class="nc">&nbsp;		return this.baseEnvironment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Template getTemplate() {
+<b class="nc">&nbsp;		return this.template;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String[] determineUrls(Environment environment) {
+<b class="nc">&nbsp;		if (ObjectUtils.isEmpty(this.urls)) {</b>
+<b class="nc">&nbsp;			return new String[] { &quot;ldap://localhost:&quot; + determinePort(environment) };</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.urls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int determinePort(Environment environment) {
+<b class="nc">&nbsp;		Assert.notNull(environment, &quot;Environment must not be null&quot;);</b>
+<b class="nc">&nbsp;		String localPort = environment.getProperty(&quot;local.ldap.port&quot;);</b>
+<b class="nc">&nbsp;		if (localPort != null) {</b>
+<b class="nc">&nbsp;			return Integer.parseInt(localPort);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return DEFAULT_PORT;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link LdapTemplate settings}.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Template {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether PartialResultException should be ignored in searches through the
+&nbsp;		 * LdapTemplate.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean ignorePartialResultException = false;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether NameNotFoundException should be ignored in searches through the
+&nbsp;		 * LdapTemplate.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean ignoreNameNotFoundException = false;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether SizeLimitExceededException should be ignored in searches through the
+&nbsp;		 * LdapTemplate.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean ignoreSizeLimitExceededException = true;</b>
+&nbsp;
+&nbsp;		public boolean isIgnorePartialResultException() {
+<b class="nc">&nbsp;			return this.ignorePartialResultException;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setIgnorePartialResultException(boolean ignorePartialResultException) {
+<b class="nc">&nbsp;			this.ignorePartialResultException = ignorePartialResultException;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isIgnoreNameNotFoundException() {
+<b class="nc">&nbsp;			return this.ignoreNameNotFoundException;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setIgnoreNameNotFoundException(boolean ignoreNameNotFoundException) {
+<b class="nc">&nbsp;			this.ignoreNameNotFoundException = ignoreNameNotFoundException;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isIgnoreSizeLimitExceededException() {
+<b class="nc">&nbsp;			return this.ignoreSizeLimitExceededException;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setIgnoreSizeLimitExceededException(Boolean ignoreSizeLimitExceededException) {
+<b class="nc">&nbsp;			this.ignoreSizeLimitExceededException = ignoreSizeLimitExceededException;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

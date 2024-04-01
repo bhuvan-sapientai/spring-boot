@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationPropertySource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.source</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationPropertySource (org.springframework.boot.context.properties.source)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationPropertySource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConfigurationPropertySource$MockitoMock$FlKBUStW</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationPropertySource$MockitoMock$FlKBUStW$auxiliary$gA6Bi1ST</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationPropertySource$MockitoMock$FlKBUStW$auxiliary$VzBJHQBQ</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.source;
+&nbsp;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import org.springframework.boot.origin.OriginTrackedValue;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A source of {@link ConfigurationProperty ConfigurationProperties}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; * @see ConfigurationPropertyName
+&nbsp; * @see OriginTrackedValue
+&nbsp; * @see #getConfigurationProperty(ConfigurationPropertyName)
+&nbsp; */
+&nbsp;@FunctionalInterface
+&nbsp;public interface ConfigurationPropertySource {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a single {@link ConfigurationProperty} from the source or {@code null} if no
+&nbsp;	 * property can be found.
+&nbsp;	 * @param name the name of the property (must not be {@code null})
+&nbsp;	 * @return the associated object or {@code null}.
+&nbsp;	 */
+&nbsp;	ConfigurationProperty getConfigurationProperty(ConfigurationPropertyName name);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if the source contains any descendants of the specified name. May return
+&nbsp;	 * {@link ConfigurationPropertyState#PRESENT} or
+&nbsp;	 * {@link ConfigurationPropertyState#ABSENT} if an answer can be determined or
+&nbsp;	 * {@link ConfigurationPropertyState#UNKNOWN} if it&#39;s not possible to determine a
+&nbsp;	 * definitive answer.
+&nbsp;	 * @param name the name to check
+&nbsp;	 * @return if the source contains any descendants
+&nbsp;	 */
+&nbsp;	default ConfigurationPropertyState containsDescendantOf(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		return ConfigurationPropertyState.UNKNOWN;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a filtered variant of this source, containing only names that match the
+&nbsp;	 * given {@link Predicate}.
+&nbsp;	 * @param filter the filter to match
+&nbsp;	 * @return a filtered {@link ConfigurationPropertySource} instance
+&nbsp;	 */
+&nbsp;	default ConfigurationPropertySource filter(Predicate&lt;ConfigurationPropertyName&gt; filter) {
+<b class="nc">&nbsp;		return new FilteredConfigurationPropertiesSource(this, filter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a variant of this source that supports name aliases.
+&nbsp;	 * @param aliases a function that returns a stream of aliases for any given name
+&nbsp;	 * @return a {@link ConfigurationPropertySource} instance supporting name aliases
+&nbsp;	 */
+&nbsp;	default ConfigurationPropertySource withAliases(ConfigurationPropertyNameAliases aliases) {
+<b class="nc">&nbsp;		return new AliasedConfigurationPropertySource(this, aliases);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a variant of this source that supports a prefix.
+&nbsp;	 * @param prefix the prefix for properties in the source
+&nbsp;	 * @return a {@link ConfigurationPropertySource} instance supporting a prefix
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	default ConfigurationPropertySource withPrefix(String prefix) {
+<b class="nc">&nbsp;		return (StringUtils.hasText(prefix)) ? new PrefixedConfigurationPropertySource(this, prefix) : this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the underlying source that is actually providing the properties.
+&nbsp;	 * @return the underlying property source or {@code null}.
+&nbsp;	 */
+&nbsp;	default Object getUnderlyingSource() {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a single new {@link ConfigurationPropertySource} adapted from the given
+&nbsp;	 * Spring {@link PropertySource} or {@code null} if the source cannot be adapted.
+&nbsp;	 * @param source the Spring property source to adapt
+&nbsp;	 * @return an adapted source or {@code null} {@link SpringConfigurationPropertySource}
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	static ConfigurationPropertySource from(PropertySource&lt;?&gt; source) {
+<b class="nc">&nbsp;		if (source instanceof ConfigurationPropertySourcesPropertySource) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return SpringConfigurationPropertySource.from(source);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

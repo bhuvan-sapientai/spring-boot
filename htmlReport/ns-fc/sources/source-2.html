@@ -1,0 +1,365 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConnectionFactoryConfigurations</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.r2dbc</a>
+</div>
+
+<h1>Coverage Summary for Class: ConnectionFactoryConfigurations (org.springframework.boot.autoconfigure.r2dbc)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConnectionFactoryConfigurations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConnectionFactoryConfigurations$GenericConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConnectionFactoryConfigurations$PoolConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConnectionFactoryConfigurations$PoolConfiguration$PooledConnectionFactoryConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConnectionFactoryConfigurations$PooledConnectionFactoryCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.r2dbc;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import io.r2dbc.pool.ConnectionPool;
+&nbsp;import io.r2dbc.pool.ConnectionPoolConfiguration;
+&nbsp;import io.r2dbc.spi.ConnectionFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+&nbsp;import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties.Pool;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.context.properties.bind.BindResult;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.boot.r2dbc.ConnectionFactoryDecorator;
+&nbsp;import org.springframework.boot.r2dbc.EmbeddedDatabaseConnection;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Condition;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Actual {@link ConnectionFactory} configurations.
+&nbsp; *
+&nbsp; * @author Mark Paluch
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Rodolpho S. Couto
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+<b class="nc">&nbsp;abstract class ConnectionFactoryConfigurations {</b>
+&nbsp;
+&nbsp;	protected static ConnectionFactory createConnectionFactory(R2dbcProperties properties,
+&nbsp;			R2dbcConnectionDetails connectionDetails, ClassLoader classLoader,
+&nbsp;			List&lt;ConnectionFactoryOptionsBuilderCustomizer&gt; optionsCustomizers,
+&nbsp;			List&lt;ConnectionFactoryDecorator&gt; decorators) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return org.springframework.boot.r2dbc.ConnectionFactoryBuilder</b>
+<b class="nc">&nbsp;				.withOptions(new ConnectionFactoryOptionsInitializer().initialize(properties, connectionDetails,</b>
+<b class="nc">&nbsp;						() -&gt; EmbeddedDatabaseConnection.get(classLoader)))</b>
+<b class="nc">&nbsp;				.configure((options) -&gt; {</b>
+<b class="nc">&nbsp;					for (ConnectionFactoryOptionsBuilderCustomizer optionsCustomizer : optionsCustomizers) {</b>
+<b class="nc">&nbsp;						optionsCustomizer.customize(options);</b>
+<b class="nc">&nbsp;					}</b>
+&nbsp;				})
+<b class="nc">&nbsp;				.decorators(decorators)</b>
+<b class="nc">&nbsp;				.build();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IllegalStateException ex) {</b>
+<b class="nc">&nbsp;			String message = ex.getMessage();</b>
+<b class="nc">&nbsp;			if (message != null &amp;&amp; message.contains(&quot;driver=pool&quot;)</b>
+<b class="nc">&nbsp;					&amp;&amp; !ClassUtils.isPresent(&quot;io.r2dbc.pool.ConnectionPool&quot;, classLoader)) {</b>
+<b class="nc">&nbsp;				throw new MissingR2dbcPoolDependencyException();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw ex;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@Conditional(PooledConnectionFactoryCondition.class)
+&nbsp;	@ConditionalOnMissingBean(ConnectionFactory.class)
+<b class="nc">&nbsp;	static class PoolConfiguration {</b>
+&nbsp;
+&nbsp;		@Configuration(proxyBeanMethods = false)
+&nbsp;		@ConditionalOnClass(ConnectionPool.class)
+<b class="nc">&nbsp;		static class PooledConnectionFactoryConfiguration {</b>
+&nbsp;
+&nbsp;			@Bean(destroyMethod = &quot;dispose&quot;)
+&nbsp;			ConnectionPool connectionFactory(R2dbcProperties properties,
+&nbsp;					ObjectProvider&lt;R2dbcConnectionDetails&gt; connectionDetails, ResourceLoader resourceLoader,
+&nbsp;					ObjectProvider&lt;ConnectionFactoryOptionsBuilderCustomizer&gt; customizers,
+&nbsp;					ObjectProvider&lt;ConnectionFactoryDecorator&gt; decorators) {
+<b class="nc">&nbsp;				ConnectionFactory connectionFactory = createConnectionFactory(properties,</b>
+<b class="nc">&nbsp;						connectionDetails.getIfAvailable(), resourceLoader.getClassLoader(),</b>
+<b class="nc">&nbsp;						customizers.orderedStream().toList(), decorators.orderedStream().toList());</b>
+<b class="nc">&nbsp;				R2dbcProperties.Pool pool = properties.getPool();</b>
+<b class="nc">&nbsp;				PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;				ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration.builder(connectionFactory);</b>
+<b class="nc">&nbsp;				map.from(pool.getMaxIdleTime()).to(builder::maxIdleTime);</b>
+<b class="nc">&nbsp;				map.from(pool.getMaxLifeTime()).to(builder::maxLifeTime);</b>
+<b class="nc">&nbsp;				map.from(pool.getMaxAcquireTime()).to(builder::maxAcquireTime);</b>
+<b class="nc">&nbsp;				map.from(pool.getMaxCreateConnectionTime()).to(builder::maxCreateConnectionTime);</b>
+<b class="nc">&nbsp;				map.from(pool.getInitialSize()).to(builder::initialSize);</b>
+<b class="nc">&nbsp;				map.from(pool.getMaxSize()).to(builder::maxSize);</b>
+<b class="nc">&nbsp;				map.from(pool.getValidationQuery()).whenHasText().to(builder::validationQuery);</b>
+<b class="nc">&nbsp;				map.from(pool.getValidationDepth()).to(builder::validationDepth);</b>
+<b class="nc">&nbsp;				map.from(pool.getMinIdle()).to(builder::minIdle);</b>
+<b class="nc">&nbsp;				map.from(pool.getMaxValidationTime()).to(builder::maxValidationTime);</b>
+<b class="nc">&nbsp;				return new ConnectionPool(builder.build());</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;spring.r2dbc.pool&quot;, value = &quot;enabled&quot;, havingValue = &quot;false&quot;,
+&nbsp;			matchIfMissing = true)
+&nbsp;	@ConditionalOnMissingBean(ConnectionFactory.class)
+<b class="nc">&nbsp;	static class GenericConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		ConnectionFactory connectionFactory(R2dbcProperties properties,
+&nbsp;				ObjectProvider&lt;R2dbcConnectionDetails&gt; connectionDetails, ResourceLoader resourceLoader,
+&nbsp;				ObjectProvider&lt;ConnectionFactoryOptionsBuilderCustomizer&gt; customizers,
+&nbsp;				ObjectProvider&lt;ConnectionFactoryDecorator&gt; decorators) {
+<b class="nc">&nbsp;			return createConnectionFactory(properties, connectionDetails.getIfAvailable(),</b>
+<b class="nc">&nbsp;					resourceLoader.getClassLoader(), customizers.orderedStream().toList(),</b>
+<b class="nc">&nbsp;					decorators.orderedStream().toList());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Condition} that checks that a {@link ConnectionPool} is requested. The
+&nbsp;	 * condition matches if pooling was opt-in through configuration. If any of the
+&nbsp;	 * spring.r2dbc.pool.* properties have been configured, an exception is thrown if the
+&nbsp;	 * URL also contains pooling-related options or io.r2dbc.pool.ConnectionPool is not on
+&nbsp;	 * the class path.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class PooledConnectionFactoryCondition extends SpringBootCondition {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;			BindResult&lt;Pool&gt; pool = Binder.get(context.getEnvironment())</b>
+<b class="nc">&nbsp;				.bind(&quot;spring.r2dbc.pool&quot;, Bindable.of(Pool.class));</b>
+<b class="nc">&nbsp;			if (hasPoolUrl(context.getEnvironment())) {</b>
+<b class="nc">&nbsp;				if (pool.isBound()) {</b>
+<b class="nc">&nbsp;					throw new MultipleConnectionPoolConfigurationsException();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return ConditionOutcome.noMatch(&quot;URL-based pooling has been configured&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (pool.isBound() &amp;&amp; !ClassUtils.isPresent(&quot;io.r2dbc.pool.ConnectionPool&quot;, context.getClassLoader())) {</b>
+<b class="nc">&nbsp;				throw new MissingR2dbcPoolDependencyException();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (pool.orElseGet(Pool::new).isEnabled()) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.match(&quot;Property-based pooling is enabled&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return ConditionOutcome.noMatch(&quot;Property-based pooling is disabled&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean hasPoolUrl(Environment environment) {
+<b class="nc">&nbsp;			String url = environment.getProperty(&quot;spring.r2dbc.url&quot;);</b>
+<b class="nc">&nbsp;			return StringUtils.hasText(url) &amp;&amp; url.contains(&quot;:pool:&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BootArchive</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.tasks.bundling</a>
+</div>
+
+<h1>Coverage Summary for Class: BootArchive (org.springframework.boot.gradle.tasks.bundling)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">BootArchive</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.tasks.bundling;
+&nbsp;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.JavaVersion;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.artifacts.result.ResolvedArtifactResult;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.file.FileTreeElement;
+&nbsp;import org.gradle.api.provider.Property;
+&nbsp;import org.gradle.api.provider.Provider;
+&nbsp;import org.gradle.api.specs.Spec;
+&nbsp;import org.gradle.api.tasks.Classpath;
+&nbsp;import org.gradle.api.tasks.Input;
+&nbsp;import org.gradle.api.tasks.Nested;
+&nbsp;import org.gradle.api.tasks.Optional;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.LoaderImplementation;
+&nbsp;
+&nbsp;/**
+&nbsp; * A Spring Boot &quot;fat&quot; archive task.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public interface BootArchive extends Task {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the fully-qualified name of the application&#39;s main class.
+&nbsp;	 * @return the fully-qualified name of the application&#39;s main class
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	Property&lt;String&gt; getMainClass();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Adds Ant-style patterns that identify files that must be unpacked from the archive
+&nbsp;	 * when it is launched.
+&nbsp;	 * @param patterns the patterns
+&nbsp;	 */
+&nbsp;	void requiresUnpack(String... patterns);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Adds a spec that identifies files that must be unpacked from the archive when it is
+&nbsp;	 * launched.
+&nbsp;	 * @param spec the spec
+&nbsp;	 */
+&nbsp;	void requiresUnpack(Spec&lt;FileTreeElement&gt; spec);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link LaunchScriptConfiguration} that will control the script that is
+&nbsp;	 * prepended to the archive.
+&nbsp;	 * @return the launch script configuration, or {@code null} if the launch script has
+&nbsp;	 * not been configured.
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	@Optional
+&nbsp;	LaunchScriptConfiguration getLaunchScript();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configures the archive to have a prepended launch script.
+&nbsp;	 */
+&nbsp;	void launchScript();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configures the archive to have a prepended launch script, customizing its
+&nbsp;	 * configuration using the given {@code action}.
+&nbsp;	 * @param action the action to apply
+&nbsp;	 */
+&nbsp;	void launchScript(Action&lt;LaunchScriptConfiguration&gt; action);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the classpath that will be included in the archive.
+&nbsp;	 * @return the classpath
+&nbsp;	 */
+&nbsp;	@Optional
+&nbsp;	@Classpath
+&nbsp;	FileCollection getClasspath();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Adds files to the classpath to include in the archive. The given {@code classpath}
+&nbsp;	 * is evaluated as per {@link Project#files(Object...)}.
+&nbsp;	 * @param classpath the additions to the classpath
+&nbsp;	 */
+&nbsp;	void classpath(Object... classpath);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the classpath to include in the archive. The given {@code classpath} is
+&nbsp;	 * evaluated as per {@link Project#files(Object...)}.
+&nbsp;	 * @param classpath the classpath
+&nbsp;	 * @since 2.0.7
+&nbsp;	 */
+&nbsp;	void setClasspath(Object classpath);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the classpath to include in the archive.
+&nbsp;	 * @param classpath the classpath
+&nbsp;	 * @since 2.0.7
+&nbsp;	 */
+&nbsp;	void setClasspath(FileCollection classpath);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the target Java version of the project (e.g. as provided by the
+&nbsp;	 * {@code targetCompatibility} build property).
+&nbsp;	 * @return the target Java version
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	Property&lt;JavaVersion&gt; getTargetJavaVersion();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Registers the given lazily provided {@code resolvedArtifacts}. They are used to map
+&nbsp;	 * from the files in the {@link #getClasspath classpath} to their dependency
+&nbsp;	 * coordinates.
+&nbsp;	 * @param resolvedArtifacts the lazily provided resolved artifacts
+&nbsp;	 * @since 3.0.7
+&nbsp;	 */
+&nbsp;	void resolvedArtifacts(Provider&lt;Set&lt;ResolvedArtifactResult&gt;&gt; resolvedArtifacts);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The loader implementation that should be used with the archive.
+&nbsp;	 * @return the loader implementation
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	Property&lt;LoaderImplementation&gt; getLoaderImplementation();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

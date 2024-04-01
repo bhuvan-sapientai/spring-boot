@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildpackMetadata</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildpackMetadata (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildpackMetadata</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.invoke.MethodHandles;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Image;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageConfig;
+&nbsp;import org.springframework.boot.buildpack.platform.json.MappedObject;
+&nbsp;import org.springframework.boot.buildpack.platform.json.SharedObjectMapper;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Buildpack metadata information.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;final class BuildpackMetadata extends MappedObject {
+&nbsp;
+&nbsp;	private static final String LABEL_NAME = &quot;io.buildpacks.buildpackage.metadata&quot;;
+&nbsp;
+&nbsp;	private final String id;
+&nbsp;
+&nbsp;	private final String version;
+&nbsp;
+&nbsp;	private final String homepage;
+&nbsp;
+&nbsp;	private BuildpackMetadata(JsonNode node) {
+<b class="nc">&nbsp;		super(node, MethodHandles.lookup());</b>
+<b class="nc">&nbsp;		this.id = valueAt(&quot;/id&quot;, String.class);</b>
+<b class="nc">&nbsp;		this.version = valueAt(&quot;/version&quot;, String.class);</b>
+<b class="nc">&nbsp;		this.homepage = valueAt(&quot;/homepage&quot;, String.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the buildpack ID.
+&nbsp;	 * @return the ID
+&nbsp;	 */
+&nbsp;	String getId() {
+<b class="nc">&nbsp;		return this.id;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the buildpack version.
+&nbsp;	 * @return the version
+&nbsp;	 */
+&nbsp;	String getVersion() {
+<b class="nc">&nbsp;		return this.version;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the buildpack homepage address.
+&nbsp;	 * @return the homepage
+&nbsp;	 */
+&nbsp;	String getHomepage() {
+<b class="nc">&nbsp;		return this.homepage;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to extract {@link BuildpackMetadata} from an image.
+&nbsp;	 * @param image the source image
+&nbsp;	 * @return the builder metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuildpackMetadata fromImage(Image image) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(image, &quot;Image must not be null&quot;);</b>
+<b class="nc">&nbsp;		return fromImageConfig(image.getConfig());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to extract {@link BuildpackMetadata} from image config.
+&nbsp;	 * @param imageConfig the source image config
+&nbsp;	 * @return the builder metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuildpackMetadata fromImageConfig(ImageConfig imageConfig) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(imageConfig, &quot;ImageConfig must not be null&quot;);</b>
+<b class="nc">&nbsp;		String json = imageConfig.getLabels().get(LABEL_NAME);</b>
+<b class="nc">&nbsp;		Assert.notNull(json, () -&gt; &quot;No &#39;&quot; + LABEL_NAME + &quot;&#39; label found in image config labels &#39;&quot;</b>
+<b class="nc">&nbsp;				+ StringUtils.collectionToCommaDelimitedString(imageConfig.getLabels().keySet()) + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;		return fromJson(json);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method create {@link BuildpackMetadata} from JSON.
+&nbsp;	 * @param json the source JSON
+&nbsp;	 * @return the builder metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuildpackMetadata fromJson(String json) throws IOException {
+<b class="nc">&nbsp;		return fromJson(SharedObjectMapper.get().readTree(json));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method create {@link BuildpackMetadata} from JSON.
+&nbsp;	 * @param node the source JSON
+&nbsp;	 * @return the builder metadata
+&nbsp;	 */
+&nbsp;	static BuildpackMetadata fromJson(JsonNode node) {
+<b class="nc">&nbsp;		return new BuildpackMetadata(node);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

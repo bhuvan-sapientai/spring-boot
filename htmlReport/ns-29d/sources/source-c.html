@@ -1,0 +1,347 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UrlJarFiles</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.net.protocol.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: UrlJarFiles (org.springframework.boot.loader.net.protocol.jar)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UrlJarFiles</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UrlJarFiles$Cache</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.net.protocol.jar;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides access to {@link UrlJarFile} and {@link UrlNestedJarFile} instances taking
+&nbsp; * care of caching concerns when necessary.
+&nbsp; * &lt;p&gt;
+&nbsp; * This class is thread-safe and designed to be shared by all {@link JarUrlConnection}
+&nbsp; * instances.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class UrlJarFiles {
+&nbsp;
+&nbsp;	private final UrlJarFileFactory factory;
+&nbsp;
+<b class="nc">&nbsp;	private final Cache cache = new Cache();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link UrlJarFiles} instance.
+&nbsp;	 */
+&nbsp;	UrlJarFiles() {
+<b class="nc">&nbsp;		this(new UrlJarFileFactory());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link UrlJarFiles} instance.
+&nbsp;	 * @param factory the {@link UrlJarFileFactory} to use.
+&nbsp;	 */
+<b class="nc">&nbsp;	UrlJarFiles(UrlJarFileFactory factory) {</b>
+<b class="nc">&nbsp;		this.factory = factory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get an existing {@link JarFile} instance from the cache, or create a new
+&nbsp;	 * {@link JarFile} instance that can be {@link #cacheIfAbsent(boolean, URL, JarFile)
+&nbsp;	 * cached later}.
+&nbsp;	 * @param useCaches if caches can be used
+&nbsp;	 * @param jarFileUrl the jar file URL
+&nbsp;	 * @return a new or existing {@link JarFile} instance
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	JarFile getOrCreate(boolean useCaches, URL jarFileUrl) throws IOException {
+<b class="nc">&nbsp;		if (useCaches) {</b>
+<b class="nc">&nbsp;			JarFile cached = getCached(jarFileUrl);</b>
+<b class="nc">&nbsp;			if (cached != null) {</b>
+<b class="nc">&nbsp;				return cached;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return this.factory.createJarFile(jarFileUrl, this::onClose);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the cached {@link JarFile} if available.
+&nbsp;	 * @param jarFileUrl the jar file URL
+&nbsp;	 * @return the cached jar or {@code null}
+&nbsp;	 */
+&nbsp;	JarFile getCached(URL jarFileUrl) {
+<b class="nc">&nbsp;		return this.cache.get(jarFileUrl);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Cache the given {@link JarFile} if caching can be used and there is no existing
+&nbsp;	 * entry.
+&nbsp;	 * @param useCaches if caches can be used
+&nbsp;	 * @param jarFileUrl the jar file URL
+&nbsp;	 * @param jarFile the jar file
+&nbsp;	 * @return {@code true} if that file was added to the cache
+&nbsp;	 */
+&nbsp;	boolean cacheIfAbsent(boolean useCaches, URL jarFileUrl, JarFile jarFile) {
+<b class="nc">&nbsp;		if (!useCaches) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.cache.putIfAbsent(jarFileUrl, jarFile);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Close the given {@link JarFile} only if it is not contained in the cache.
+&nbsp;	 * @param jarFileUrl the jar file URL
+&nbsp;	 * @param jarFile the jar file
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	void closeIfNotCached(URL jarFileUrl, JarFile jarFile) throws IOException {
+<b class="nc">&nbsp;		JarFile cached = getCached(jarFileUrl);</b>
+<b class="nc">&nbsp;		if (cached != jarFile) {</b>
+<b class="nc">&nbsp;			jarFile.close();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Reconnect to the {@link JarFile}, returning a replacement {@link URLConnection}.
+&nbsp;	 * @param jarFile the jar file
+&nbsp;	 * @param existingConnection the existing connection
+&nbsp;	 * @return a newly opened connection inhering the same {@code useCaches} value as the
+&nbsp;	 * existing connection
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	URLConnection reconnect(JarFile jarFile, URLConnection existingConnection) throws IOException {
+<b class="nc">&nbsp;		Boolean useCaches = (existingConnection != null) ? existingConnection.getUseCaches() : null;</b>
+<b class="nc">&nbsp;		URLConnection connection = openConnection(jarFile);</b>
+<b class="nc">&nbsp;		if (useCaches != null &amp;&amp; connection != null) {</b>
+<b class="nc">&nbsp;			connection.setUseCaches(useCaches);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return connection;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private URLConnection openConnection(JarFile jarFile) throws IOException {
+<b class="nc">&nbsp;		URL url = this.cache.get(jarFile);</b>
+<b class="nc">&nbsp;		return (url != null) ? url.openConnection() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onClose(JarFile jarFile) {
+<b class="nc">&nbsp;		this.cache.remove(jarFile);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void clearCache() {
+<b class="nc">&nbsp;		this.cache.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Internal cache.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class Cache {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, JarFile&gt; jarFileUrlToJarFile = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;JarFile, URL&gt; jarFileToJarFileUrl = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Get a {@link JarFile} from the cache given a jar file URL.
+&nbsp;		 * @param jarFileUrl the jar file URL
+&nbsp;		 * @return the cached {@link JarFile} or {@code null}
+&nbsp;		 */
+&nbsp;		JarFile get(URL jarFileUrl) {
+<b class="nc">&nbsp;			String urlKey = JarFileUrlKey.get(jarFileUrl);</b>
+<b class="nc">&nbsp;			synchronized (this) {</b>
+<b class="nc">&nbsp;				return this.jarFileUrlToJarFile.get(urlKey);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Get a jar file URL from the cache given a jar file.
+&nbsp;		 * @param jarFile the jar file
+&nbsp;		 * @return the cached {@link URL} or {@code null}
+&nbsp;		 */
+&nbsp;		URL get(JarFile jarFile) {
+<b class="nc">&nbsp;			synchronized (this) {</b>
+<b class="nc">&nbsp;				return this.jarFileToJarFileUrl.get(jarFile);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Put the given jar file URL and jar file into the cache if they aren&#39;t already
+&nbsp;		 * there.
+&nbsp;		 * @param jarFileUrl the jar file URL
+&nbsp;		 * @param jarFile the jar file
+&nbsp;		 * @return {@code true} if the items were added to the cache or {@code false} if
+&nbsp;		 * they were already there
+&nbsp;		 */
+&nbsp;		boolean putIfAbsent(URL jarFileUrl, JarFile jarFile) {
+<b class="nc">&nbsp;			String urlKey = JarFileUrlKey.get(jarFileUrl);</b>
+<b class="nc">&nbsp;			synchronized (this) {</b>
+<b class="nc">&nbsp;				JarFile cached = this.jarFileUrlToJarFile.get(urlKey);</b>
+<b class="nc">&nbsp;				if (cached == null) {</b>
+<b class="nc">&nbsp;					this.jarFileUrlToJarFile.put(urlKey, jarFile);</b>
+<b class="nc">&nbsp;					this.jarFileToJarFileUrl.put(jarFile, jarFileUrl);</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return false;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Remove the given jar and any related URL file from the cache.
+&nbsp;		 * @param jarFile the jar file to remove
+&nbsp;		 */
+&nbsp;		void remove(JarFile jarFile) {
+<b class="nc">&nbsp;			synchronized (this) {</b>
+<b class="nc">&nbsp;				URL removedUrl = this.jarFileToJarFileUrl.remove(jarFile);</b>
+<b class="nc">&nbsp;				if (removedUrl != null) {</b>
+<b class="nc">&nbsp;					this.jarFileUrlToJarFile.remove(JarFileUrlKey.get(removedUrl));</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void clear() {
+<b class="nc">&nbsp;			synchronized (this) {</b>
+<b class="nc">&nbsp;				this.jarFileToJarFileUrl.clear();</b>
+<b class="nc">&nbsp;				this.jarFileUrlToJarFile.clear();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

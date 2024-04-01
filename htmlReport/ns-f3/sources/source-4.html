@@ -1,0 +1,309 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConditionEvaluationReportMessage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionEvaluationReportMessage (org.springframework.boot.autoconfigure.logging)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConditionEvaluationReportMessage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/97)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.logging;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionEvaluationReport;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionEvaluationReport.ConditionAndOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionEvaluationReport.ConditionAndOutcomes;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.LinkedMultiValueMap;
+&nbsp;import org.springframework.util.MultiValueMap;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A condition evaluation report message that can logged or printed.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;public class ConditionEvaluationReportMessage {
+&nbsp;
+&nbsp;	private final StringBuilder message;
+&nbsp;
+&nbsp;	public ConditionEvaluationReportMessage(ConditionEvaluationReport report) {
+<b class="nc">&nbsp;		this(report, &quot;CONDITIONS EVALUATION REPORT&quot;);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public ConditionEvaluationReportMessage(ConditionEvaluationReport report, String title) {</b>
+<b class="nc">&nbsp;		this.message = getLogMessage(report, title);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private StringBuilder getLogMessage(ConditionEvaluationReport report, String title) {
+<b class="nc">&nbsp;		String separator = &quot;=&quot;.repeat(title.length());</b>
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder();</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;%n%n%n&quot;));</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;%s%n&quot;, separator));</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;%s%n&quot;, title));</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;%s%n%n%n&quot;, separator));</b>
+<b class="nc">&nbsp;		Map&lt;String, ConditionAndOutcomes&gt; shortOutcomes = orderByName(report.getConditionAndOutcomesBySource());</b>
+<b class="nc">&nbsp;		logPositiveMatches(message, shortOutcomes);</b>
+<b class="nc">&nbsp;		logNegativeMatches(message, shortOutcomes);</b>
+<b class="nc">&nbsp;		logExclusions(report, message);</b>
+<b class="nc">&nbsp;		logUnconditionalClasses(report, message);</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;%n%n&quot;));</b>
+<b class="nc">&nbsp;		return message;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logPositiveMatches(StringBuilder message, Map&lt;String, ConditionAndOutcomes&gt; shortOutcomes) {
+<b class="nc">&nbsp;		message.append(String.format(&quot;Positive matches:%n&quot;));</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;-----------------%n&quot;));</b>
+<b class="nc">&nbsp;		List&lt;Entry&lt;String, ConditionAndOutcomes&gt;&gt; matched = shortOutcomes.entrySet()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.filter((entry) -&gt; entry.getValue().isFullMatch())</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		if (matched.isEmpty()) {</b>
+<b class="nc">&nbsp;			message.append(String.format(&quot;%n    None%n&quot;));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			matched.forEach((entry) -&gt; addMatchLogMessage(message, entry.getKey(), entry.getValue()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		message.append(String.format(&quot;%n%n&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logNegativeMatches(StringBuilder message, Map&lt;String, ConditionAndOutcomes&gt; shortOutcomes) {
+<b class="nc">&nbsp;		message.append(String.format(&quot;Negative matches:%n&quot;));</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;-----------------%n&quot;));</b>
+<b class="nc">&nbsp;		List&lt;Entry&lt;String, ConditionAndOutcomes&gt;&gt; nonMatched = shortOutcomes.entrySet()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.filter((entry) -&gt; !entry.getValue().isFullMatch())</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		if (nonMatched.isEmpty()) {</b>
+<b class="nc">&nbsp;			message.append(String.format(&quot;%n    None%n&quot;));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			nonMatched.forEach((entry) -&gt; addNonMatchLogMessage(message, entry.getKey(), entry.getValue()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		message.append(String.format(&quot;%n%n&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logExclusions(ConditionEvaluationReport report, StringBuilder message) {
+<b class="nc">&nbsp;		message.append(String.format(&quot;Exclusions:%n&quot;));</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;-----------%n&quot;));</b>
+<b class="nc">&nbsp;		if (report.getExclusions().isEmpty()) {</b>
+<b class="nc">&nbsp;			message.append(String.format(&quot;%n    None%n&quot;));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			for (String exclusion : report.getExclusions()) {</b>
+<b class="nc">&nbsp;				message.append(String.format(&quot;%n    %s%n&quot;, exclusion));</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		message.append(String.format(&quot;%n%n&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logUnconditionalClasses(ConditionEvaluationReport report, StringBuilder message) {
+<b class="nc">&nbsp;		message.append(String.format(&quot;Unconditional classes:%n&quot;));</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;----------------------%n&quot;));</b>
+<b class="nc">&nbsp;		if (report.getUnconditionalClasses().isEmpty()) {</b>
+<b class="nc">&nbsp;			message.append(String.format(&quot;%n    None%n&quot;));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			for (String unconditionalClass : report.getUnconditionalClasses()) {</b>
+<b class="nc">&nbsp;				message.append(String.format(&quot;%n    %s%n&quot;, unconditionalClass));</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, ConditionAndOutcomes&gt; orderByName(Map&lt;String, ConditionAndOutcomes&gt; outcomes) {
+<b class="nc">&nbsp;		MultiValueMap&lt;String, String&gt; map = mapToFullyQualifiedNames(outcomes.keySet());</b>
+<b class="nc">&nbsp;		List&lt;String&gt; shortNames = new ArrayList&lt;&gt;(map.keySet());</b>
+<b class="nc">&nbsp;		Collections.sort(shortNames);</b>
+<b class="nc">&nbsp;		Map&lt;String, ConditionAndOutcomes&gt; result = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String shortName : shortNames) {</b>
+<b class="nc">&nbsp;			List&lt;String&gt; fullyQualifiedNames = map.get(shortName);</b>
+<b class="nc">&nbsp;			if (fullyQualifiedNames.size() &gt; 1) {</b>
+<b class="nc">&nbsp;				fullyQualifiedNames</b>
+<b class="nc">&nbsp;					.forEach((fullyQualifiedName) -&gt; result.put(fullyQualifiedName, outcomes.get(fullyQualifiedName)));</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				result.put(shortName, outcomes.get(fullyQualifiedNames.get(0)));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private MultiValueMap&lt;String, String&gt; mapToFullyQualifiedNames(Set&lt;String&gt; keySet) {
+<b class="nc">&nbsp;		LinkedMultiValueMap&lt;String, String&gt; map = new LinkedMultiValueMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		keySet</b>
+<b class="nc">&nbsp;			.forEach((fullyQualifiedName) -&gt; map.add(ClassUtils.getShortName(fullyQualifiedName), fullyQualifiedName));</b>
+<b class="nc">&nbsp;		return map;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addMatchLogMessage(StringBuilder message, String source, ConditionAndOutcomes matches) {
+<b class="nc">&nbsp;		message.append(String.format(&quot;%n   %s matched:%n&quot;, source));</b>
+<b class="nc">&nbsp;		for (ConditionAndOutcome match : matches) {</b>
+<b class="nc">&nbsp;			logConditionAndOutcome(message, &quot;      &quot;, match);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addNonMatchLogMessage(StringBuilder message, String source,
+&nbsp;			ConditionAndOutcomes conditionAndOutcomes) {
+<b class="nc">&nbsp;		message.append(String.format(&quot;%n   %s:%n&quot;, source));</b>
+<b class="nc">&nbsp;		List&lt;ConditionAndOutcome&gt; matches = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		List&lt;ConditionAndOutcome&gt; nonMatches = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (ConditionAndOutcome conditionAndOutcome : conditionAndOutcomes) {</b>
+<b class="nc">&nbsp;			if (conditionAndOutcome.getOutcome().isMatch()) {</b>
+<b class="nc">&nbsp;				matches.add(conditionAndOutcome);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				nonMatches.add(conditionAndOutcome);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;      Did not match:%n&quot;));</b>
+<b class="nc">&nbsp;		for (ConditionAndOutcome nonMatch : nonMatches) {</b>
+<b class="nc">&nbsp;			logConditionAndOutcome(message, &quot;         &quot;, nonMatch);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (!matches.isEmpty()) {</b>
+<b class="nc">&nbsp;			message.append(String.format(&quot;      Matched:%n&quot;));</b>
+<b class="nc">&nbsp;			for (ConditionAndOutcome match : matches) {</b>
+<b class="nc">&nbsp;				logConditionAndOutcome(message, &quot;         &quot;, match);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logConditionAndOutcome(StringBuilder message, String indent, ConditionAndOutcome conditionAndOutcome) {
+<b class="nc">&nbsp;		message.append(String.format(&quot;%s- &quot;, indent));</b>
+<b class="nc">&nbsp;		String outcomeMessage = conditionAndOutcome.getOutcome().getMessage();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(outcomeMessage)) {</b>
+<b class="nc">&nbsp;			message.append(outcomeMessage);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			message.append(conditionAndOutcome.getOutcome().isMatch() ? &quot;matched&quot; : &quot;did not match&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		message.append(&quot; (&quot;);</b>
+<b class="nc">&nbsp;		message.append(ClassUtils.getShortName(conditionAndOutcome.getCondition().getClass()));</b>
+<b class="nc">&nbsp;		message.append(String.format(&quot;)%n&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.message.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractHealthIndicator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.health</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractHealthIndicator (org.springframework.boot.actuate.health)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractHealthIndicator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.health;
+&nbsp;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.health.Health.Builder;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base {@link HealthIndicator} implementations that encapsulates creation of
+&nbsp; * {@link Health} instance and error handling.
+&nbsp; * &lt;p&gt;
+&nbsp; * This implementation is only suitable if an {@link Exception} raised from
+&nbsp; * {@link #doHealthCheck(org.springframework.boot.actuate.health.Health.Builder)} should
+&nbsp; * create a {@link Status#DOWN} health status.
+&nbsp; *
+&nbsp; * @author Christian Dupuis
+&nbsp; * @since 1.1.0
+&nbsp; */
+&nbsp;public abstract class AbstractHealthIndicator implements HealthIndicator {
+&nbsp;
+<b class="nc">&nbsp;	private static final String NO_MESSAGE = null;</b>
+&nbsp;
+&nbsp;	private static final String DEFAULT_MESSAGE = &quot;Health check failed&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private final Log logger = LogFactory.getLog(getClass());</b>
+&nbsp;
+&nbsp;	private final Function&lt;Exception, String&gt; healthCheckFailedMessage;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AbstractHealthIndicator} instance with a default
+&nbsp;	 * {@code healthCheckFailedMessage}.
+&nbsp;	 */
+&nbsp;	protected AbstractHealthIndicator() {
+<b class="nc">&nbsp;		this(NO_MESSAGE);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AbstractHealthIndicator} instance with a specific message to
+&nbsp;	 * log when the health check fails.
+&nbsp;	 * @param healthCheckFailedMessage the message to log on health check failure
+&nbsp;	 * @since 2.0.0
+&nbsp;	 */
+<b class="nc">&nbsp;	protected AbstractHealthIndicator(String healthCheckFailedMessage) {</b>
+<b class="nc">&nbsp;		this.healthCheckFailedMessage = (ex) -&gt; healthCheckFailedMessage;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AbstractHealthIndicator} instance with a specific message to
+&nbsp;	 * log when the health check fails.
+&nbsp;	 * @param healthCheckFailedMessage the message to log on health check failure
+&nbsp;	 * @since 2.0.0
+&nbsp;	 */
+<b class="nc">&nbsp;	protected AbstractHealthIndicator(Function&lt;Exception, String&gt; healthCheckFailedMessage) {</b>
+<b class="nc">&nbsp;		Assert.notNull(healthCheckFailedMessage, &quot;HealthCheckFailedMessage must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.healthCheckFailedMessage = healthCheckFailedMessage;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final Health health() {
+<b class="nc">&nbsp;		Health.Builder builder = new Health.Builder();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			doHealthCheck(builder);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			builder.down(ex);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		logExceptionIfPresent(builder.getException());</b>
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logExceptionIfPresent(Throwable throwable) {
+<b class="nc">&nbsp;		if (throwable != null &amp;&amp; this.logger.isWarnEnabled()) {</b>
+<b class="nc">&nbsp;			String message = (throwable instanceof Exception ex) ? this.healthCheckFailedMessage.apply(ex) : null;</b>
+<b class="nc">&nbsp;			this.logger.warn(StringUtils.hasText(message) ? message : DEFAULT_MESSAGE, throwable);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Actual health check logic.
+&nbsp;	 * @param builder the {@link Builder} to report health status and details
+&nbsp;	 * @throws Exception any {@link Exception} that should create a {@link Status#DOWN}
+&nbsp;	 * system status.
+&nbsp;	 */
+&nbsp;	protected abstract void doHealthCheck(Health.Builder builder) throws Exception;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

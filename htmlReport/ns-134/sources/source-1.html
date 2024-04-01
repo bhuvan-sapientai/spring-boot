@@ -1,0 +1,321 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApplicationRunner</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.docs</a>
+</div>
+
+<h1>Coverage Summary for Class: ApplicationRunner (org.springframework.boot.build.docs)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApplicationRunner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.docs;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.file.RegularFileProperty;
+&nbsp;import org.gradle.api.provider.ListProperty;
+&nbsp;import org.gradle.api.provider.Property;
+&nbsp;import org.gradle.api.tasks.Classpath;
+&nbsp;import org.gradle.api.tasks.Input;
+&nbsp;import org.gradle.api.tasks.OutputFile;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;import org.gradle.internal.jvm.Jvm;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Task} to run an application for the purpose of capturing its output for
+&nbsp; * inclusion in the reference documentation.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class ApplicationRunner extends DefaultTask {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final RegularFileProperty output = getProject().getObjects().fileProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final ListProperty&lt;String&gt; args = getProject().getObjects().listProperty(String.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Property&lt;String&gt; mainClass = getProject().getObjects().property(String.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Property&lt;String&gt; expectedLogging = getProject().getObjects().property(String.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Property&lt;String&gt; applicationJar = getProject().getObjects()</b>
+<b class="nc">&nbsp;		.property(String.class)</b>
+<b class="nc">&nbsp;		.convention(&quot;/opt/apps/myapp.jar&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, String&gt; normalizations = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private FileCollection classpath;
+&nbsp;
+&nbsp;	@OutputFile
+&nbsp;	public RegularFileProperty getOutput() {
+<b class="nc">&nbsp;		return this.output;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Classpath
+&nbsp;	public FileCollection getClasspath() {
+<b class="nc">&nbsp;		return this.classpath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setClasspath(FileCollection classpath) {
+<b class="nc">&nbsp;		this.classpath = classpath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	public ListProperty&lt;String&gt; getArgs() {
+<b class="nc">&nbsp;		return this.args;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	public Property&lt;String&gt; getMainClass() {
+<b class="nc">&nbsp;		return this.mainClass;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	public Property&lt;String&gt; getExpectedLogging() {
+<b class="nc">&nbsp;		return this.expectedLogging;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	Map&lt;String, String&gt; getNormalizations() {
+<b class="nc">&nbsp;		return this.normalizations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	public Property&lt;String&gt; getApplicationJar() {
+<b class="nc">&nbsp;		return this.applicationJar;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void normalizeTomcatPort() {
+<b class="nc">&nbsp;		this.normalizations.put(&quot;(Tomcat started on port )[\\d]+( \\(http\\))&quot;, &quot;$18080$2&quot;);</b>
+<b class="nc">&nbsp;		this.normalizations.put(&quot;(Tomcat initialized with port )[\\d]+( \\(http\\))&quot;, &quot;$18080$2&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void normalizeLiveReloadPort() {
+<b class="nc">&nbsp;		this.normalizations.put(&quot;(LiveReload server is running on port )[\\d]+&quot;, &quot;$135729&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void runApplication() throws IOException {
+<b class="nc">&nbsp;		List&lt;String&gt; command = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		File executable = Jvm.current().getExecutable(&quot;java&quot;);</b>
+<b class="nc">&nbsp;		command.add(executable.getAbsolutePath());</b>
+<b class="nc">&nbsp;		command.add(&quot;-cp&quot;);</b>
+<b class="nc">&nbsp;		command.add(this.classpath.getFiles()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map(File::getAbsolutePath)</b>
+<b class="nc">&nbsp;			.collect(Collectors.joining(File.pathSeparator)));</b>
+<b class="nc">&nbsp;		command.add(this.mainClass.get());</b>
+<b class="nc">&nbsp;		command.addAll(this.args.get());</b>
+<b class="nc">&nbsp;		File outputFile = this.output.getAsFile().get();</b>
+<b class="nc">&nbsp;		Process process = new ProcessBuilder().redirectOutput(outputFile)</b>
+<b class="nc">&nbsp;			.redirectError(outputFile)</b>
+<b class="nc">&nbsp;			.command(command)</b>
+<b class="nc">&nbsp;			.start();</b>
+<b class="nc">&nbsp;		awaitLogging(process);</b>
+<b class="nc">&nbsp;		process.destroy();</b>
+<b class="nc">&nbsp;		normalizeLogging();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void awaitLogging(Process process) {
+<b class="nc">&nbsp;		long end = System.currentTimeMillis() + 60000;</b>
+<b class="nc">&nbsp;		String expectedLogging = this.expectedLogging.get();</b>
+<b class="nc">&nbsp;		while (System.currentTimeMillis() &lt; end) {</b>
+<b class="nc">&nbsp;			for (String line : outputLines()) {</b>
+<b class="nc">&nbsp;				if (line.contains(expectedLogging)) {</b>
+&nbsp;					return;
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			if (!process.isAlive()) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Process exited before &#39;&quot; + expectedLogging + &quot;&#39; was logged&quot;);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;&#39;&quot; + expectedLogging + &quot;&#39; was not logged within 60 seconds&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; outputLines() {
+<b class="nc">&nbsp;		Path outputPath = this.output.get().getAsFile().toPath();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return Files.readAllLines(outputPath);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(&quot;Failed to read lines of output from &#39;&quot; + outputPath + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void normalizeLogging() {
+<b class="nc">&nbsp;		List&lt;String&gt; outputLines = outputLines();</b>
+<b class="nc">&nbsp;		List&lt;String&gt; normalizedLines = normalize(outputLines);</b>
+<b class="nc">&nbsp;		Path outputPath = this.output.get().getAsFile().toPath();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			Files.write(outputPath, normalizedLines);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(&quot;Failed to write normalized lines of output to &#39;&quot; + outputPath + &quot;&#39;&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; normalize(List&lt;String&gt; lines) {
+<b class="nc">&nbsp;		List&lt;String&gt; normalizedLines = lines;</b>
+<b class="nc">&nbsp;		Map&lt;String, String&gt; normalizations = new HashMap&lt;&gt;(this.normalizations);</b>
+<b class="nc">&nbsp;		normalizations.put(&quot;(Starting .* using Java .* with PID [\\d]+ \\().*( started by ).*( in ).*(\\))&quot;,</b>
+<b class="nc">&nbsp;				&quot;$1&quot; + this.applicationJar.get() + &quot;$2myuser$3/opt/apps/$4&quot;);</b>
+<b class="nc">&nbsp;		for (Entry&lt;String, String&gt; normalization : normalizations.entrySet()) {</b>
+<b class="nc">&nbsp;			Pattern pattern = Pattern.compile(normalization.getKey());</b>
+<b class="nc">&nbsp;			normalizedLines = normalize(normalizedLines, pattern, normalization.getValue());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return normalizedLines;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; normalize(List&lt;String&gt; lines, Pattern pattern, String replacement) {
+<b class="nc">&nbsp;		boolean matched = false;</b>
+<b class="nc">&nbsp;		List&lt;String&gt; normalizedLines = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String line : lines) {</b>
+<b class="nc">&nbsp;			Matcher matcher = pattern.matcher(line);</b>
+<b class="nc">&nbsp;			StringBuilder transformed = new StringBuilder();</b>
+<b class="nc">&nbsp;			while (matcher.find()) {</b>
+<b class="nc">&nbsp;				matched = true;</b>
+<b class="nc">&nbsp;				matcher.appendReplacement(transformed, replacement);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			matcher.appendTail(transformed);</b>
+<b class="nc">&nbsp;			normalizedLines.add(transformed.toString());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (!matched) {</b>
+<b class="nc">&nbsp;			reportUnmatchedNormalization(lines, pattern);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return normalizedLines;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void reportUnmatchedNormalization(List&lt;String&gt; lines, Pattern pattern) {
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder(</b>
+&nbsp;				&quot;&#39;&quot; + pattern + &quot;&#39; did not match any of the following lines of output:&quot;);
+<b class="nc">&nbsp;		message.append(String.format(&quot;%n&quot;));</b>
+<b class="nc">&nbsp;		for (String line : lines) {</b>
+<b class="nc">&nbsp;			message.append(String.format(&quot;%s%n&quot;, line));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		throw new IllegalStateException(message.toString());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

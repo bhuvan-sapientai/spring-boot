@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RegisteredClientsConfiguredCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.security.oauth2.server.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: RegisteredClientsConfiguredCondition (org.springframework.boot.autoconfigure.security.oauth2.server.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RegisteredClientsConfiguredCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.security.oauth2.server.servlet;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;
+&nbsp;/**
+&nbsp; * Condition that matches if any {@code spring.security.oauth2.authorizationserver.client}
+&nbsp; * properties are defined.
+&nbsp; *
+&nbsp; * @author Steve Riesenberg
+&nbsp; */
+<b class="nc">&nbsp;class RegisteredClientsConfiguredCondition extends SpringBootCondition {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Bindable&lt;Map&lt;String, OAuth2AuthorizationServerProperties.Client&gt;&gt; STRING_CLIENT_MAP = Bindable</b>
+<b class="nc">&nbsp;		.mapOf(String.class, OAuth2AuthorizationServerProperties.Client.class);</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		ConditionMessage.Builder message = ConditionMessage</b>
+<b class="nc">&nbsp;			.forCondition(&quot;OAuth2 Registered Clients Configured Condition&quot;);</b>
+<b class="nc">&nbsp;		Map&lt;String, OAuth2AuthorizationServerProperties.Client&gt; registrations = getRegistrations(</b>
+<b class="nc">&nbsp;				context.getEnvironment());</b>
+<b class="nc">&nbsp;		if (!registrations.isEmpty()) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome.match(message.foundExactly(&quot;registered clients &quot; + registrations.values()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.map(OAuth2AuthorizationServerProperties.Client::getRegistration)</b>
+<b class="nc">&nbsp;				.map(OAuth2AuthorizationServerProperties.Registration::getClientId)</b>
+<b class="nc">&nbsp;				.collect(Collectors.joining(&quot;, &quot;))));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConditionOutcome.noMatch(message.notAvailable(&quot;registered clients&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, OAuth2AuthorizationServerProperties.Client&gt; getRegistrations(Environment environment) {
+<b class="nc">&nbsp;		return Binder.get(environment)</b>
+<b class="nc">&nbsp;			.bind(&quot;spring.security.oauth2.authorizationserver.client&quot;, STRING_CLIENT_MAP)</b>
+<b class="nc">&nbsp;			.orElse(Collections.emptyMap());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

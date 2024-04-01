@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildLog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildLog (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildLog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.LogUpdateEvent;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.TotalProgressEvent;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Image;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageReference;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.VolumeName;
+&nbsp;
+&nbsp;/**
+&nbsp; * Callback interface used to provide {@link Builder} output logging.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Andrey Shlykov
+&nbsp; * @author Rafael Ceccone
+&nbsp; * @since 2.3.0
+&nbsp; * @see #toSystemOut()
+&nbsp; */
+&nbsp;public interface BuildLog {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that a build is starting.
+&nbsp;	 * @param request the build request
+&nbsp;	 */
+&nbsp;	void start(BuildRequest request);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that an image is being pulled.
+&nbsp;	 * @param imageReference the image reference
+&nbsp;	 * @param imageType the image type
+&nbsp;	 * @return a consumer for progress update events
+&nbsp;	 */
+&nbsp;	Consumer&lt;TotalProgressEvent&gt; pullingImage(ImageReference imageReference, ImageType imageType);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that an image has been pulled.
+&nbsp;	 * @param image the image that was pulled
+&nbsp;	 * @param imageType the image type that was pulled
+&nbsp;	 */
+&nbsp;	void pulledImage(Image image, ImageType imageType);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that an image is being pushed.
+&nbsp;	 * @param imageReference the image reference
+&nbsp;	 * @return a consumer for progress update events
+&nbsp;	 */
+&nbsp;	Consumer&lt;TotalProgressEvent&gt; pushingImage(ImageReference imageReference);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that an image has been pushed.
+&nbsp;	 * @param imageReference the image reference
+&nbsp;	 */
+&nbsp;	void pushedImage(ImageReference imageReference);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that the lifecycle is executing.
+&nbsp;	 * @param request the build request
+&nbsp;	 * @param version the lifecycle version
+&nbsp;	 * @param buildCacheVolume the name of the build cache volume in use
+&nbsp;	 */
+&nbsp;	void executingLifecycle(BuildRequest request, LifecycleVersion version, VolumeName buildCacheVolume);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that the lifecycle is executing.
+&nbsp;	 * @param request the build request
+&nbsp;	 * @param version the lifecycle version
+&nbsp;	 * @param buildCache the build cache in use
+&nbsp;	 */
+&nbsp;	void executingLifecycle(BuildRequest request, LifecycleVersion version, Cache buildCache);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that a specific phase is running.
+&nbsp;	 * @param request the build request
+&nbsp;	 * @param name the name of the phase
+&nbsp;	 * @return a consumer for log updates
+&nbsp;	 */
+&nbsp;	Consumer&lt;LogUpdateEvent&gt; runningPhase(BuildRequest request, String name);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that a specific phase is being skipped.
+&nbsp;	 * @param name the name of the phase
+&nbsp;	 * @param reason the reason the phase is skipped
+&nbsp;	 */
+&nbsp;	void skippingPhase(String name, String reason);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that the lifecycle has executed.
+&nbsp;	 * @param request the build request
+&nbsp;	 */
+&nbsp;	void executedLifecycle(BuildRequest request);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Log that a tag has been created.
+&nbsp;	 * @param tag the tag reference
+&nbsp;	 */
+&nbsp;	void taggedImage(ImageReference tag);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method that returns a {@link BuildLog} the outputs to {@link System#out}.
+&nbsp;	 * @return a build log instance that logs to system out
+&nbsp;	 */
+&nbsp;	static BuildLog toSystemOut() {
+<b class="nc">&nbsp;		return to(System.out);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method that returns a {@link BuildLog} the outputs to a given
+&nbsp;	 * {@link PrintStream}.
+&nbsp;	 * @param out the print stream used to output the log
+&nbsp;	 * @return a build log instance that logs to the given print stream
+&nbsp;	 */
+&nbsp;	static BuildLog to(PrintStream out) {
+<b class="nc">&nbsp;		return new PrintStreamBuildLog(out);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

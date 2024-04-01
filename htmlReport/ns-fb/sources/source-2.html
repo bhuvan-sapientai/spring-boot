@@ -1,0 +1,303 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > QuartzAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.quartz</a>
+</div>
+
+<h1>Coverage Summary for Class: QuartzAutoConfiguration (org.springframework.boot.autoconfigure.quartz)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QuartzAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">QuartzAutoConfiguration$JdbcStoreTypeConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">QuartzAutoConfiguration$JdbcStoreTypeConfiguration$OnQuartzDatasourceInitializationCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.quartz;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Properties;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.quartz.Calendar;
+&nbsp;import org.quartz.JobDetail;
+&nbsp;import org.quartz.Scheduler;
+&nbsp;import org.quartz.Trigger;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+&nbsp;import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.sql.init.OnDatabaseInitializationCondition;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.sql.init.dependency.DatabaseInitializationDependencyConfigurer;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+&nbsp;import org.springframework.scheduling.quartz.SpringBeanJobFactory;
+&nbsp;import org.springframework.transaction.PlatformTransactionManager;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for Quartz Scheduler.
+&nbsp; *
+&nbsp; * @author Vedran Pavic
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class,
+&nbsp;		LiquibaseAutoConfiguration.class, FlywayAutoConfiguration.class })
+&nbsp;@ConditionalOnClass({ Scheduler.class, SchedulerFactoryBean.class, PlatformTransactionManager.class })
+&nbsp;@EnableConfigurationProperties(QuartzProperties.class)
+<b class="nc">&nbsp;public class QuartzAutoConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public SchedulerFactoryBean quartzScheduler(QuartzProperties properties,
+&nbsp;			ObjectProvider&lt;SchedulerFactoryBeanCustomizer&gt; customizers, ObjectProvider&lt;JobDetail&gt; jobDetails,
+&nbsp;			Map&lt;String, Calendar&gt; calendars, ObjectProvider&lt;Trigger&gt; triggers, ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();</b>
+<b class="nc">&nbsp;		SpringBeanJobFactory jobFactory = new SpringBeanJobFactory();</b>
+<b class="nc">&nbsp;		jobFactory.setApplicationContext(applicationContext);</b>
+<b class="nc">&nbsp;		schedulerFactoryBean.setJobFactory(jobFactory);</b>
+<b class="nc">&nbsp;		if (properties.getSchedulerName() != null) {</b>
+<b class="nc">&nbsp;			schedulerFactoryBean.setSchedulerName(properties.getSchedulerName());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		schedulerFactoryBean.setAutoStartup(properties.isAutoStartup());</b>
+<b class="nc">&nbsp;		schedulerFactoryBean.setStartupDelay((int) properties.getStartupDelay().getSeconds());</b>
+<b class="nc">&nbsp;		schedulerFactoryBean.setWaitForJobsToCompleteOnShutdown(properties.isWaitForJobsToCompleteOnShutdown());</b>
+<b class="nc">&nbsp;		schedulerFactoryBean.setOverwriteExistingJobs(properties.isOverwriteExistingJobs());</b>
+<b class="nc">&nbsp;		if (!properties.getProperties().isEmpty()) {</b>
+<b class="nc">&nbsp;			schedulerFactoryBean.setQuartzProperties(asProperties(properties.getProperties()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		schedulerFactoryBean.setJobDetails(jobDetails.orderedStream().toArray(JobDetail[]::new));</b>
+<b class="nc">&nbsp;		schedulerFactoryBean.setCalendars(calendars);</b>
+<b class="nc">&nbsp;		schedulerFactoryBean.setTriggers(triggers.orderedStream().toArray(Trigger[]::new));</b>
+<b class="nc">&nbsp;		customizers.orderedStream().forEach((customizer) -&gt; customizer.customize(schedulerFactoryBean));</b>
+<b class="nc">&nbsp;		return schedulerFactoryBean;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Properties asProperties(Map&lt;String, String&gt; source) {
+<b class="nc">&nbsp;		Properties properties = new Properties();</b>
+<b class="nc">&nbsp;		properties.putAll(source);</b>
+<b class="nc">&nbsp;		return properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnSingleCandidate(DataSource.class)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;spring.quartz&quot;, name = &quot;job-store-type&quot;, havingValue = &quot;jdbc&quot;)
+&nbsp;	@Import(DatabaseInitializationDependencyConfigurer.class)
+<b class="nc">&nbsp;	protected static class JdbcStoreTypeConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@Order(0)
+&nbsp;		public SchedulerFactoryBeanCustomizer dataSourceCustomizer(QuartzProperties properties, DataSource dataSource,
+&nbsp;				@QuartzDataSource ObjectProvider&lt;DataSource&gt; quartzDataSource,
+&nbsp;				ObjectProvider&lt;PlatformTransactionManager&gt; transactionManager,
+&nbsp;				@QuartzTransactionManager ObjectProvider&lt;PlatformTransactionManager&gt; quartzTransactionManager) {
+<b class="nc">&nbsp;			return (schedulerFactoryBean) -&gt; {</b>
+<b class="nc">&nbsp;				DataSource dataSourceToUse = getDataSource(dataSource, quartzDataSource);</b>
+<b class="nc">&nbsp;				schedulerFactoryBean.setDataSource(dataSourceToUse);</b>
+<b class="nc">&nbsp;				PlatformTransactionManager txManager = getTransactionManager(transactionManager,</b>
+&nbsp;						quartzTransactionManager);
+<b class="nc">&nbsp;				if (txManager != null) {</b>
+<b class="nc">&nbsp;					schedulerFactoryBean.setTransactionManager(txManager);</b>
+&nbsp;				}
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		private DataSource getDataSource(DataSource dataSource, ObjectProvider&lt;DataSource&gt; quartzDataSource) {
+<b class="nc">&nbsp;			DataSource dataSourceIfAvailable = quartzDataSource.getIfAvailable();</b>
+<b class="nc">&nbsp;			return (dataSourceIfAvailable != null) ? dataSourceIfAvailable : dataSource;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private PlatformTransactionManager getTransactionManager(
+&nbsp;				ObjectProvider&lt;PlatformTransactionManager&gt; transactionManager,
+&nbsp;				ObjectProvider&lt;PlatformTransactionManager&gt; quartzTransactionManager) {
+<b class="nc">&nbsp;			PlatformTransactionManager transactionManagerIfAvailable = quartzTransactionManager.getIfAvailable();</b>
+<b class="nc">&nbsp;			return (transactionManagerIfAvailable != null) ? transactionManagerIfAvailable</b>
+<b class="nc">&nbsp;					: transactionManager.getIfUnique();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(QuartzDataSourceScriptDatabaseInitializer.class)
+&nbsp;		@Conditional(OnQuartzDatasourceInitializationCondition.class)
+&nbsp;		public QuartzDataSourceScriptDatabaseInitializer quartzDataSourceScriptDatabaseInitializer(
+&nbsp;				DataSource dataSource, @QuartzDataSource ObjectProvider&lt;DataSource&gt; quartzDataSource,
+&nbsp;				QuartzProperties properties) {
+<b class="nc">&nbsp;			DataSource dataSourceToUse = getDataSource(dataSource, quartzDataSource);</b>
+<b class="nc">&nbsp;			return new QuartzDataSourceScriptDatabaseInitializer(dataSourceToUse, properties);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static class OnQuartzDatasourceInitializationCondition extends OnDatabaseInitializationCondition {
+&nbsp;
+&nbsp;			OnQuartzDatasourceInitializationCondition() {
+<b class="nc">&nbsp;				super(&quot;Quartz&quot;, &quot;spring.quartz.jdbc.initialize-schema&quot;);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

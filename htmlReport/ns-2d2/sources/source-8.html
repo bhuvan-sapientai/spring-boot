@@ -1,0 +1,219 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebFluxTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.autoconfigure.web.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: WebFluxTest (org.springframework.boot.test.autoconfigure.web.reactive)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">WebFluxTest</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.autoconfigure.web.reactive;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Inherited;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.junit.jupiter.api.extension.ExtendWith;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.SpringBootApplication;
+&nbsp;import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
+&nbsp;import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
+&nbsp;import org.springframework.boot.test.autoconfigure.filter.TypeExcludeFilters;
+&nbsp;import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson;
+&nbsp;import org.springframework.boot.test.context.SpringBootTest;
+&nbsp;import org.springframework.context.annotation.ComponentScan;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.core.annotation.AliasFor;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.test.context.BootstrapWith;
+&nbsp;import org.springframework.test.context.junit.jupiter.SpringExtension;
+&nbsp;import org.springframework.test.web.reactive.server.WebTestClient;
+&nbsp;
+&nbsp;/**
+&nbsp; * Annotation that can be used for a Spring WebFlux test that focuses
+&nbsp; * &lt;strong&gt;only&lt;/strong&gt; on Spring WebFlux components.
+&nbsp; * &lt;p&gt;
+&nbsp; * Using this annotation will disable full auto-configuration and instead apply only
+&nbsp; * configuration relevant to WebFlux tests (i.e. {@code @Controller},
+&nbsp; * {@code @ControllerAdvice}, {@code @JsonComponent},
+&nbsp; * {@code Converter}/{@code GenericConverter}, and {@code WebFluxConfigurer} beans but not
+&nbsp; * {@code @Component}, {@code @Service} or {@code @Repository} beans).
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, tests annotated with {@code @WebFluxTest} will also auto-configure a
+&nbsp; * {@link WebTestClient}. For more fine-grained control of WebTestClient the
+&nbsp; * {@link AutoConfigureWebTestClient @AutoConfigureWebTestClient} annotation can be used.
+&nbsp; * &lt;p&gt;
+&nbsp; * Typically {@code @WebFluxTest} is used in combination with
+&nbsp; * {@link org.springframework.boot.test.mock.mockito.MockBean @MockBean} or
+&nbsp; * {@link Import @Import} to create any collaborators required by your {@code @Controller}
+&nbsp; * beans.
+&nbsp; * &lt;p&gt;
+&nbsp; * If you are looking to load your full application configuration and use WebTestClient,
+&nbsp; * you should consider {@link SpringBootTest @SpringBootTest} combined with
+&nbsp; * {@link AutoConfigureWebTestClient @AutoConfigureWebTestClient} rather than this
+&nbsp; * annotation.
+&nbsp; * &lt;p&gt;
+&nbsp; * When using JUnit 4, this annotation should be used in combination with
+&nbsp; * {@code @RunWith(SpringRunner.class)}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Artsiom Yudovin
+&nbsp; * @since 2.0.0
+&nbsp; * @see AutoConfigureWebFlux
+&nbsp; * @see AutoConfigureWebTestClient
+&nbsp; */
+&nbsp;@Target(ElementType.TYPE)
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Documented
+&nbsp;@Inherited
+&nbsp;@BootstrapWith(WebFluxTestContextBootstrapper.class)
+&nbsp;@ExtendWith(SpringExtension.class)
+&nbsp;@OverrideAutoConfiguration(enabled = false)
+&nbsp;@TypeExcludeFilters(WebFluxTypeExcludeFilter.class)
+&nbsp;@AutoConfigureCache
+&nbsp;@AutoConfigureJson
+&nbsp;@AutoConfigureWebFlux
+&nbsp;@AutoConfigureWebTestClient
+&nbsp;@ImportAutoConfiguration
+&nbsp;public @interface WebFluxTest {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties in form {@literal key=value} that should be added to the Spring
+&nbsp;	 * {@link Environment} before the test runs.
+&nbsp;	 * @return the properties to add
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	String[] properties() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Specifies the controllers to test. This is an alias of {@link #controllers()} which
+&nbsp;	 * can be used for brevity if no other attributes are defined. See
+&nbsp;	 * {@link #controllers()} for details.
+&nbsp;	 * @see #controllers()
+&nbsp;	 * @return the controllers to test
+&nbsp;	 */
+&nbsp;	@AliasFor(&quot;controllers&quot;)
+&nbsp;	Class&lt;?&gt;[] value() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Specifies the controllers to test. May be left blank if all {@code @Controller}
+&nbsp;	 * beans should be added to the application context.
+&nbsp;	 * @see #value()
+&nbsp;	 * @return the controllers to test
+&nbsp;	 */
+&nbsp;	@AliasFor(&quot;value&quot;)
+&nbsp;	Class&lt;?&gt;[] controllers() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determines if default filtering should be used with
+&nbsp;	 * {@link SpringBootApplication @SpringBootApplication}. By default only
+&nbsp;	 * {@code @Controller} (when no explicit {@link #controllers() controllers} are
+&nbsp;	 * defined), {@code @ControllerAdvice} and {@code WebFluxConfigurer} beans are
+&nbsp;	 * included.
+&nbsp;	 * @see #includeFilters()
+&nbsp;	 * @see #excludeFilters()
+&nbsp;	 * @return if default filters should be used
+&nbsp;	 */
+&nbsp;	boolean useDefaultFilters() default true;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A set of include filters which can be used to add otherwise filtered beans to the
+&nbsp;	 * application context.
+&nbsp;	 * @return include filters to apply
+&nbsp;	 */
+&nbsp;	ComponentScan.Filter[] includeFilters() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A set of exclude filters which can be used to filter beans that would otherwise be
+&nbsp;	 * added to the application context.
+&nbsp;	 * @return exclude filters to apply
+&nbsp;	 */
+&nbsp;	ComponentScan.Filter[] excludeFilters() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Auto-configuration exclusions that should be applied for this test.
+&nbsp;	 * @return auto-configuration exclusions to apply
+&nbsp;	 */
+&nbsp;	@AliasFor(annotation = ImportAutoConfiguration.class, attribute = &quot;exclude&quot;)
+&nbsp;	Class&lt;?&gt;[] excludeAutoConfiguration() default {};
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

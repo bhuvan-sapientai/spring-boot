@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExplodedArchive</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.launch</a>
+</div>
+
+<h1>Coverage Summary for Class: ExplodedArchive (org.springframework.boot.loader.launch)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExplodedArchive</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExplodedArchive$FileArchiveEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.launch;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Archive} implementation backed by an exploded archive directory.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class ExplodedArchive implements Archive {
+&nbsp;
+<b class="nc">&nbsp;	private static final Object NO_MANIFEST = new Object();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Set&lt;String&gt; SKIPPED_NAMES = Set.of(&quot;.&quot;, &quot;..&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Comparator&lt;File&gt; entryComparator = Comparator.comparing(File::getAbsolutePath);</b>
+&nbsp;
+&nbsp;	private final File rootDirectory;
+&nbsp;
+&nbsp;	private final String rootUriPath;
+&nbsp;
+&nbsp;	private volatile Object manifest;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ExplodedArchive} instance.
+&nbsp;	 * @param rootDirectory the root directory
+&nbsp;	 */
+<b class="nc">&nbsp;	ExplodedArchive(File rootDirectory) {</b>
+<b class="nc">&nbsp;		if (!rootDirectory.exists() || !rootDirectory.isDirectory()) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Invalid source directory &quot; + rootDirectory);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.rootDirectory = rootDirectory;</b>
+<b class="nc">&nbsp;		this.rootUriPath = ExplodedArchive.this.rootDirectory.toURI().getPath();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Manifest getManifest() throws IOException {
+<b class="nc">&nbsp;		Object manifest = this.manifest;</b>
+<b class="nc">&nbsp;		if (manifest == null) {</b>
+<b class="nc">&nbsp;			manifest = loadManifest();</b>
+<b class="nc">&nbsp;			this.manifest = manifest;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (manifest != NO_MANIFEST) ? (Manifest) manifest : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object loadManifest() throws IOException {
+<b class="nc">&nbsp;		File file = new File(this.rootDirectory, &quot;META-INF/MANIFEST.MF&quot;);</b>
+<b class="nc">&nbsp;		if (!file.exists()) {</b>
+<b class="nc">&nbsp;			return NO_MANIFEST;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		try (FileInputStream inputStream = new FileInputStream(file)) {</b>
+<b class="nc">&nbsp;			return new Manifest(inputStream);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Set&lt;URL&gt; getClassPathUrls(Predicate&lt;Entry&gt; includeFilter, Predicate&lt;Entry&gt; directorySearchFilter)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		Set&lt;URL&gt; urls = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		LinkedList&lt;File&gt; files = new LinkedList&lt;&gt;(listFiles(this.rootDirectory));</b>
+<b class="nc">&nbsp;		while (!files.isEmpty()) {</b>
+<b class="nc">&nbsp;			File file = files.poll();</b>
+<b class="nc">&nbsp;			if (SKIPPED_NAMES.contains(file.getName())) {</b>
+<b class="nc">&nbsp;				continue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String entryName = file.toURI().getPath().substring(this.rootUriPath.length());</b>
+<b class="nc">&nbsp;			Entry entry = new FileArchiveEntry(entryName, file);</b>
+<b class="nc">&nbsp;			if (entry.isDirectory() &amp;&amp; directorySearchFilter.test(entry)) {</b>
+<b class="nc">&nbsp;				files.addAll(0, listFiles(file));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (includeFilter.test(entry)) {</b>
+<b class="nc">&nbsp;				urls.add(file.toURI().toURL());</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return urls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;File&gt; listFiles(File file) {
+<b class="nc">&nbsp;		File[] files = file.listFiles();</b>
+<b class="nc">&nbsp;		if (files == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Arrays.sort(files, entryComparator);</b>
+<b class="nc">&nbsp;		return Arrays.asList(files);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public File getRootDirectory() {
+<b class="nc">&nbsp;		return this.rootDirectory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.rootDirectory.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Entry} backed by a File.
+&nbsp;	 */
+<b class="nc">&nbsp;	private record FileArchiveEntry(String name, File file) implements Entry {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isDirectory() {
+<b class="nc">&nbsp;			return this.file.isDirectory();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

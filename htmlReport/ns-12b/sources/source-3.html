@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CheckBom</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.bom</a>
+</div>
+
+<h1>Coverage Summary for Class: CheckBom (org.springframework.boot.build.bom)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CheckBom</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.bom;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.inject.Inject;
+&nbsp;
+&nbsp;import org.apache.maven.artifact.versioning.ArtifactVersion;
+&nbsp;import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+&nbsp;import org.apache.maven.artifact.versioning.Restriction;
+&nbsp;import org.apache.maven.artifact.versioning.VersionRange;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.GradleException;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;
+&nbsp;import org.springframework.boot.build.bom.Library.Group;
+&nbsp;import org.springframework.boot.build.bom.Library.Module;
+&nbsp;import org.springframework.boot.build.bom.Library.ProhibitedVersion;
+&nbsp;import org.springframework.boot.build.bom.Library.VersionAlignment;
+&nbsp;import org.springframework.boot.build.bom.bomr.version.DependencyVersion;
+&nbsp;
+&nbsp;/**
+&nbsp; * Checks the validity of a bom.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;public class CheckBom extends DefaultTask {
+&nbsp;
+&nbsp;	private final BomExtension bom;
+&nbsp;
+&nbsp;	@Inject
+<b class="nc">&nbsp;	public CheckBom(BomExtension bom) {</b>
+<b class="nc">&nbsp;		this.bom = bom;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void checkBom() {
+<b class="nc">&nbsp;		List&lt;String&gt; errors = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Library library : this.bom.getLibraries()) {</b>
+<b class="nc">&nbsp;			checkLibrary(library, errors);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (!errors.isEmpty()) {</b>
+<b class="nc">&nbsp;			System.out.println();</b>
+<b class="nc">&nbsp;			errors.forEach(System.out::println);</b>
+<b class="nc">&nbsp;			System.out.println();</b>
+<b class="nc">&nbsp;			throw new GradleException(&quot;Bom check failed. See previous output for details.&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkLibrary(Library library, List&lt;String&gt; errors) {
+<b class="nc">&nbsp;		List&lt;String&gt; libraryErrors = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		checkExclusions(library, libraryErrors);</b>
+<b class="nc">&nbsp;		checkProhibitedVersions(library, libraryErrors);</b>
+<b class="nc">&nbsp;		checkVersionAlignment(library, libraryErrors);</b>
+<b class="nc">&nbsp;		if (!libraryErrors.isEmpty()) {</b>
+<b class="nc">&nbsp;			errors.add(library.getName());</b>
+<b class="nc">&nbsp;			for (String libraryError : libraryErrors) {</b>
+<b class="nc">&nbsp;				errors.add(&quot;    - &quot; + libraryError);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkExclusions(Library library, List&lt;String&gt; errors) {
+<b class="nc">&nbsp;		for (Group group : library.getGroups()) {</b>
+<b class="nc">&nbsp;			for (Module module : group.getModules()) {</b>
+<b class="nc">&nbsp;				if (!module.getExclusions().isEmpty()) {</b>
+<b class="nc">&nbsp;					checkExclusions(group.getId(), module, library.getVersion().getVersion(), errors);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkExclusions(String groupId, Module module, DependencyVersion version, List&lt;String&gt; errors) {
+<b class="nc">&nbsp;		Set&lt;String&gt; resolved = getProject().getConfigurations()</b>
+<b class="nc">&nbsp;			.detachedConfiguration(</b>
+<b class="nc">&nbsp;					getProject().getDependencies().create(groupId + &quot;:&quot; + module.getName() + &quot;:&quot; + version))</b>
+<b class="nc">&nbsp;			.getResolvedConfiguration()</b>
+<b class="nc">&nbsp;			.getResolvedArtifacts()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map((artifact) -&gt; artifact.getModuleVersion().getId())</b>
+<b class="nc">&nbsp;			.map((id) -&gt; id.getGroup() + &quot;:&quot; + id.getModule().getName())</b>
+<b class="nc">&nbsp;			.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; exclusions = module.getExclusions()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map((exclusion) -&gt; exclusion.getGroupId() + &quot;:&quot; + exclusion.getArtifactId())</b>
+<b class="nc">&nbsp;			.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; unused = new TreeSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String exclusion : exclusions) {</b>
+<b class="nc">&nbsp;			if (!resolved.contains(exclusion)) {</b>
+<b class="nc">&nbsp;				if (exclusion.endsWith(&quot;:*&quot;)) {</b>
+<b class="nc">&nbsp;					String group = exclusion.substring(0, exclusion.indexOf(&#39;:&#39;) + 1);</b>
+<b class="nc">&nbsp;					if (resolved.stream().noneMatch((candidate) -&gt; candidate.startsWith(group))) {</b>
+<b class="nc">&nbsp;						unused.add(exclusion);</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;				else {
+<b class="nc">&nbsp;					unused.add(exclusion);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		exclusions.removeAll(resolved);</b>
+<b class="nc">&nbsp;		if (!unused.isEmpty()) {</b>
+<b class="nc">&nbsp;			errors.add(&quot;Unnecessary exclusions on &quot; + groupId + &quot;:&quot; + module.getName() + &quot;: &quot; + exclusions);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkProhibitedVersions(Library library, List&lt;String&gt; errors) {
+<b class="nc">&nbsp;		ArtifactVersion currentVersion = new DefaultArtifactVersion(library.getVersion().getVersion().toString());</b>
+<b class="nc">&nbsp;		for (ProhibitedVersion prohibited : library.getProhibitedVersions()) {</b>
+<b class="nc">&nbsp;			if (prohibited.isProhibited(library.getVersion().getVersion().toString())) {</b>
+<b class="nc">&nbsp;				errors.add(&quot;Current version &quot; + currentVersion + &quot; is prohibited&quot;);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				VersionRange versionRange = prohibited.getRange();</b>
+<b class="nc">&nbsp;				if (versionRange != null) {</b>
+<b class="nc">&nbsp;					for (Restriction restriction : versionRange.getRestrictions()) {</b>
+<b class="nc">&nbsp;						ArtifactVersion upperBound = restriction.getUpperBound();</b>
+<b class="nc">&nbsp;						if (upperBound == null) {</b>
+&nbsp;							return;
+&nbsp;						}
+<b class="nc">&nbsp;						int comparison = currentVersion.compareTo(upperBound);</b>
+<b class="nc">&nbsp;						if ((restriction.isUpperBoundInclusive() &amp;&amp; comparison &lt;= 0)</b>
+<b class="nc">&nbsp;								|| ((!restriction.isUpperBoundInclusive()) &amp;&amp; comparison &lt; 0)) {</b>
+&nbsp;							return;
+&nbsp;						}
+<b class="nc">&nbsp;					}</b>
+<b class="nc">&nbsp;					errors.add(&quot;Version range &quot; + versionRange + &quot; is ineffective as the current version, &quot;</b>
+&nbsp;							+ currentVersion + &quot;, is greater than its upper bound&quot;);
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkVersionAlignment(Library library, List&lt;String&gt; errors) {
+<b class="nc">&nbsp;		VersionAlignment versionAlignment = library.getVersionAlignment();</b>
+<b class="nc">&nbsp;		if (versionAlignment == null) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		Set&lt;String&gt; alignedVersions = versionAlignment.resolve();</b>
+<b class="nc">&nbsp;		if (alignedVersions.size() == 1) {</b>
+<b class="nc">&nbsp;			String alignedVersion = alignedVersions.iterator().next();</b>
+<b class="nc">&nbsp;			if (!alignedVersion.equals(library.getVersion().getVersion().toString())) {</b>
+<b class="nc">&nbsp;				errors.add(&quot;Version &quot; + library.getVersion().getVersion() + &quot; is misaligned. It should be &quot;</b>
+&nbsp;						+ alignedVersion + &quot;.&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			if (alignedVersions.isEmpty()) {</b>
+<b class="nc">&nbsp;				errors.add(&quot;Version alignment requires a single version but none were found.&quot;);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				errors.add(&quot;Version alignment requires a single version but &quot; + alignedVersions.size() + &quot; were found: &quot;</b>
+&nbsp;						+ alignedVersions + &quot;.&quot;);
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

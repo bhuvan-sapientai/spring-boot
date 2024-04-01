@@ -1,0 +1,463 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileSystemWatcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.filewatch</a>
+</div>
+
+<h1>Coverage Summary for Class: FileSystemWatcher (org.springframework.boot.devtools.filewatch)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileSystemWatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FileSystemWatcher$Watcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/121)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.filewatch;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileFilter;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.atomic.AtomicInteger;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Watches specific directories for file changes.
+&nbsp; *
+&nbsp; * @author Andy Clement
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.3.0
+&nbsp; * @see FileChangeListener
+&nbsp; */
+&nbsp;public class FileSystemWatcher {
+&nbsp;
+<b class="nc">&nbsp;	private static final Duration DEFAULT_POLL_INTERVAL = Duration.ofMillis(1000);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Duration DEFAULT_QUIET_PERIOD = Duration.ofMillis(400);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;FileChangeListener&gt; listeners = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private final boolean daemon;
+&nbsp;
+&nbsp;	private final long pollInterval;
+&nbsp;
+&nbsp;	private final long quietPeriod;
+&nbsp;
+&nbsp;	private final SnapshotStateRepository snapshotStateRepository;
+&nbsp;
+<b class="nc">&nbsp;	private final AtomicInteger remainingScans = new AtomicInteger(-1);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;File, DirectorySnapshot&gt; directories = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private Thread watchThread;
+&nbsp;
+&nbsp;	private FileFilter triggerFilter;
+&nbsp;
+<b class="nc">&nbsp;	private final Object monitor = new Object();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link FileSystemWatcher} instance.
+&nbsp;	 */
+&nbsp;	public FileSystemWatcher() {
+<b class="nc">&nbsp;		this(true, DEFAULT_POLL_INTERVAL, DEFAULT_QUIET_PERIOD);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link FileSystemWatcher} instance.
+&nbsp;	 * @param daemon if a daemon thread used to monitor changes
+&nbsp;	 * @param pollInterval the amount of time to wait between checking for changes
+&nbsp;	 * @param quietPeriod the amount of time required after a change has been detected to
+&nbsp;	 * ensure that updates have completed
+&nbsp;	 */
+&nbsp;	public FileSystemWatcher(boolean daemon, Duration pollInterval, Duration quietPeriod) {
+<b class="nc">&nbsp;		this(daemon, pollInterval, quietPeriod, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link FileSystemWatcher} instance.
+&nbsp;	 * @param daemon if a daemon thread used to monitor changes
+&nbsp;	 * @param pollInterval the amount of time to wait between checking for changes
+&nbsp;	 * @param quietPeriod the amount of time required after a change has been detected to
+&nbsp;	 * ensure that updates have completed
+&nbsp;	 * @param snapshotStateRepository the snapshot state repository
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public FileSystemWatcher(boolean daemon, Duration pollInterval, Duration quietPeriod,
+<b class="nc">&nbsp;			SnapshotStateRepository snapshotStateRepository) {</b>
+<b class="nc">&nbsp;		Assert.notNull(pollInterval, &quot;PollInterval must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(quietPeriod, &quot;QuietPeriod must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(pollInterval.toMillis() &gt; 0, &quot;PollInterval must be positive&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(quietPeriod.toMillis() &gt; 0, &quot;QuietPeriod must be positive&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(pollInterval.toMillis() &gt; quietPeriod.toMillis(),</b>
+&nbsp;				&quot;PollInterval must be greater than QuietPeriod&quot;);
+<b class="nc">&nbsp;		this.daemon = daemon;</b>
+<b class="nc">&nbsp;		this.pollInterval = pollInterval.toMillis();</b>
+<b class="nc">&nbsp;		this.quietPeriod = quietPeriod.toMillis();</b>
+<b class="nc">&nbsp;		this.snapshotStateRepository = (snapshotStateRepository != null) ? snapshotStateRepository</b>
+<b class="nc">&nbsp;				: SnapshotStateRepository.NONE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add listener for file change events. Cannot be called after the watcher has been
+&nbsp;	 * {@link #start() started}.
+&nbsp;	 * @param fileChangeListener the listener to add
+&nbsp;	 */
+&nbsp;	public void addListener(FileChangeListener fileChangeListener) {
+<b class="nc">&nbsp;		Assert.notNull(fileChangeListener, &quot;FileChangeListener must not be null&quot;);</b>
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			checkNotStarted();</b>
+<b class="nc">&nbsp;			this.listeners.add(fileChangeListener);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add source directories to monitor. Cannot be called after the watcher has been
+&nbsp;	 * {@link #start() started}.
+&nbsp;	 * @param directories the directories to monitor
+&nbsp;	 */
+&nbsp;	public void addSourceDirectories(Iterable&lt;File&gt; directories) {
+<b class="nc">&nbsp;		Assert.notNull(directories, &quot;Directories must not be null&quot;);</b>
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			directories.forEach(this::addSourceDirectory);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add a source directory to monitor. Cannot be called after the watcher has been
+&nbsp;	 * {@link #start() started}.
+&nbsp;	 * @param directory the directory to monitor
+&nbsp;	 */
+&nbsp;	public void addSourceDirectory(File directory) {
+<b class="nc">&nbsp;		Assert.notNull(directory, &quot;Directory must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(!directory.isFile(), () -&gt; &quot;Directory &#39;&quot; + directory + &quot;&#39; must not be a file&quot;);</b>
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			checkNotStarted();</b>
+<b class="nc">&nbsp;			this.directories.put(directory, null);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set an optional {@link FileFilter} used to limit the files that trigger a change.
+&nbsp;	 * @param triggerFilter a trigger filter or null
+&nbsp;	 */
+&nbsp;	public void setTriggerFilter(FileFilter triggerFilter) {
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			this.triggerFilter = triggerFilter;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkNotStarted() {
+<b class="nc">&nbsp;		Assert.state(this.watchThread == null, &quot;FileSystemWatcher already started&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Start monitoring the source directory for changes.
+&nbsp;	 */
+&nbsp;	public void start() {
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			createOrRestoreInitialSnapshots();</b>
+<b class="nc">&nbsp;			if (this.watchThread == null) {</b>
+<b class="nc">&nbsp;				Map&lt;File, DirectorySnapshot&gt; localDirectories = new HashMap&lt;&gt;(this.directories);</b>
+<b class="nc">&nbsp;				Watcher watcher = new Watcher(this.remainingScans, new ArrayList&lt;&gt;(this.listeners), this.triggerFilter,</b>
+&nbsp;						this.pollInterval, this.quietPeriod, localDirectories, this.snapshotStateRepository);
+<b class="nc">&nbsp;				this.watchThread = new Thread(watcher);</b>
+<b class="nc">&nbsp;				this.watchThread.setName(&quot;File Watcher&quot;);</b>
+<b class="nc">&nbsp;				this.watchThread.setDaemon(this.daemon);</b>
+<b class="nc">&nbsp;				this.watchThread.start();</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private void createOrRestoreInitialSnapshots() {
+<b class="nc">&nbsp;		Map&lt;File, DirectorySnapshot&gt; restored = (Map&lt;File, DirectorySnapshot&gt;) this.snapshotStateRepository.restore();</b>
+<b class="nc">&nbsp;		this.directories.replaceAll((f, v) -&gt; {</b>
+<b class="nc">&nbsp;			DirectorySnapshot restoredSnapshot = (restored != null) ? restored.get(f) : null;</b>
+<b class="nc">&nbsp;			return (restoredSnapshot != null) ? restoredSnapshot : new DirectorySnapshot(f);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Stop monitoring the source directories.
+&nbsp;	 */
+&nbsp;	public void stop() {
+<b class="nc">&nbsp;		stopAfter(0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Stop monitoring the source directories.
+&nbsp;	 * @param remainingScans the number of remaining scans
+&nbsp;	 */
+&nbsp;	void stopAfter(int remainingScans) {
+&nbsp;		Thread thread;
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			thread = this.watchThread;</b>
+<b class="nc">&nbsp;			if (thread != null) {</b>
+<b class="nc">&nbsp;				this.remainingScans.set(remainingScans);</b>
+<b class="nc">&nbsp;				if (remainingScans &lt;= 0) {</b>
+<b class="nc">&nbsp;					thread.interrupt();</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			this.watchThread = null;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (thread != null &amp;&amp; Thread.currentThread() != thread) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				thread.join();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class Watcher implements Runnable {
+&nbsp;
+&nbsp;		private final AtomicInteger remainingScans;
+&nbsp;
+&nbsp;		private final List&lt;FileChangeListener&gt; listeners;
+&nbsp;
+&nbsp;		private final FileFilter triggerFilter;
+&nbsp;
+&nbsp;		private final long pollInterval;
+&nbsp;
+&nbsp;		private final long quietPeriod;
+&nbsp;
+&nbsp;		private Map&lt;File, DirectorySnapshot&gt; directories;
+&nbsp;
+&nbsp;		private final SnapshotStateRepository snapshotStateRepository;
+&nbsp;
+&nbsp;		private Watcher(AtomicInteger remainingScans, List&lt;FileChangeListener&gt; listeners, FileFilter triggerFilter,
+&nbsp;				long pollInterval, long quietPeriod, Map&lt;File, DirectorySnapshot&gt; directories,
+<b class="nc">&nbsp;				SnapshotStateRepository snapshotStateRepository) {</b>
+<b class="nc">&nbsp;			this.remainingScans = remainingScans;</b>
+<b class="nc">&nbsp;			this.listeners = listeners;</b>
+<b class="nc">&nbsp;			this.triggerFilter = triggerFilter;</b>
+<b class="nc">&nbsp;			this.pollInterval = pollInterval;</b>
+<b class="nc">&nbsp;			this.quietPeriod = quietPeriod;</b>
+<b class="nc">&nbsp;			this.directories = directories;</b>
+<b class="nc">&nbsp;			this.snapshotStateRepository = snapshotStateRepository;</b>
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void run() {
+<b class="nc">&nbsp;			int remainingScans = this.remainingScans.get();</b>
+<b class="nc">&nbsp;			while (remainingScans &gt; 0 || remainingScans == -1) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					if (remainingScans &gt; 0) {</b>
+<b class="nc">&nbsp;						this.remainingScans.decrementAndGet();</b>
+&nbsp;					}
+<b class="nc">&nbsp;					scan();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;					Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				remainingScans = this.remainingScans.get();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void scan() throws InterruptedException {
+<b class="nc">&nbsp;			Thread.sleep(this.pollInterval - this.quietPeriod);</b>
+&nbsp;			Map&lt;File, DirectorySnapshot&gt; previous;
+<b class="nc">&nbsp;			Map&lt;File, DirectorySnapshot&gt; current = this.directories;</b>
+&nbsp;			do {
+<b class="nc">&nbsp;				previous = current;</b>
+<b class="nc">&nbsp;				current = getCurrentSnapshots();</b>
+<b class="nc">&nbsp;				Thread.sleep(this.quietPeriod);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			while (isDifferent(previous, current));</b>
+<b class="nc">&nbsp;			if (isDifferent(this.directories, current)) {</b>
+<b class="nc">&nbsp;				updateSnapshots(current.values());</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isDifferent(Map&lt;File, DirectorySnapshot&gt; previous, Map&lt;File, DirectorySnapshot&gt; current) {
+<b class="nc">&nbsp;			if (!previous.keySet().equals(current.keySet())) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (Map.Entry&lt;File, DirectorySnapshot&gt; entry : previous.entrySet()) {</b>
+<b class="nc">&nbsp;				DirectorySnapshot previousDirectory = entry.getValue();</b>
+<b class="nc">&nbsp;				DirectorySnapshot currentDirectory = current.get(entry.getKey());</b>
+<b class="nc">&nbsp;				if (!previousDirectory.equals(currentDirectory, this.triggerFilter)) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Map&lt;File, DirectorySnapshot&gt; getCurrentSnapshots() {
+<b class="nc">&nbsp;			Map&lt;File, DirectorySnapshot&gt; snapshots = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (File directory : this.directories.keySet()) {</b>
+<b class="nc">&nbsp;				snapshots.put(directory, new DirectorySnapshot(directory));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return snapshots;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void updateSnapshots(Collection&lt;DirectorySnapshot&gt; snapshots) {
+<b class="nc">&nbsp;			Map&lt;File, DirectorySnapshot&gt; updated = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			Set&lt;ChangedFiles&gt; changeSet = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (DirectorySnapshot snapshot : snapshots) {</b>
+<b class="nc">&nbsp;				DirectorySnapshot previous = this.directories.get(snapshot.getDirectory());</b>
+<b class="nc">&nbsp;				updated.put(snapshot.getDirectory(), snapshot);</b>
+<b class="nc">&nbsp;				ChangedFiles changedFiles = previous.getChangedFiles(snapshot, this.triggerFilter);</b>
+<b class="nc">&nbsp;				if (!changedFiles.getFiles().isEmpty()) {</b>
+<b class="nc">&nbsp;					changeSet.add(changedFiles);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			this.directories = updated;</b>
+<b class="nc">&nbsp;			this.snapshotStateRepository.save(updated);</b>
+<b class="nc">&nbsp;			if (!changeSet.isEmpty()) {</b>
+<b class="nc">&nbsp;				fireListeners(Collections.unmodifiableSet(changeSet));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void fireListeners(Set&lt;ChangedFiles&gt; changeSet) {
+<b class="nc">&nbsp;			for (FileChangeListener listener : this.listeners) {</b>
+<b class="nc">&nbsp;				listener.onChange(changeSet);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

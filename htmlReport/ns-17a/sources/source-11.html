@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DockerJson</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DockerJson (org.springframework.boot.docker.compose.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DockerJson</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.core;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.DeserializationFeature;
+&nbsp;import com.fasterxml.jackson.databind.JavaType;
+&nbsp;import com.fasterxml.jackson.databind.MapperFeature;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.json.JsonMapper;
+&nbsp;import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+&nbsp;
+&nbsp;/**
+&nbsp; * Support class used to handle JSON returned from the {@link DockerCli}.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;final class DockerJson {
+&nbsp;
+<b class="nc">&nbsp;	private static final ObjectMapper objectMapper = JsonMapper.builder()</b>
+<b class="nc">&nbsp;		.defaultLocale(Locale.ENGLISH)</b>
+<b class="nc">&nbsp;		.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)</b>
+<b class="nc">&nbsp;		.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)</b>
+<b class="nc">&nbsp;		.addModule(new ParameterNamesModule())</b>
+<b class="nc">&nbsp;		.build();</b>
+&nbsp;
+&nbsp;	private DockerJson() {
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Deserialize JSON to a list. Handles JSON arrays and multiple JSON objects in
+&nbsp;	 * separate lines.
+&nbsp;	 * @param &lt;T&gt; the item type
+&nbsp;	 * @param json the source JSON
+&nbsp;	 * @param itemType the item type
+&nbsp;	 * @return a list of items
+&nbsp;	 */
+&nbsp;	static &lt;T&gt; List&lt;T&gt; deserializeToList(String json, Class&lt;T&gt; itemType) {
+<b class="nc">&nbsp;		if (json.startsWith(&quot;[&quot;)) {</b>
+<b class="nc">&nbsp;			JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, itemType);</b>
+<b class="nc">&nbsp;			return deserialize(json, javaType);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return json.trim().lines().map((line) -&gt; deserialize(line, itemType)).toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Deserialize JSON to an object instance.
+&nbsp;	 * @param &lt;T&gt; the result type
+&nbsp;	 * @param json the source JSON
+&nbsp;	 * @param type the result type
+&nbsp;	 * @return the deserialized result
+&nbsp;	 */
+&nbsp;	static &lt;T&gt; T deserialize(String json, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;		return deserialize(json, objectMapper.getTypeFactory().constructType(type));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static &lt;T&gt; T deserialize(String json, JavaType type) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return objectMapper.readValue(json.trim(), type);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new DockerOutputParseException(json, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,227 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UrlJarFileFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.net.protocol.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: UrlJarFileFactory (org.springframework.boot.loader.net.protocol.jar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UrlJarFileFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.net.protocol.jar;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.lang.Runtime.Version;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.net.protocol.nested.NestedLocation;
+&nbsp;import org.springframework.boot.loader.net.util.UrlDecoder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Factory used by {@link UrlJarFiles} to create {@link JarFile} instances.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @see UrlJarFile
+&nbsp; * @see UrlNestedJarFile
+&nbsp; */
+<b class="nc">&nbsp;class UrlJarFileFactory {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link UrlJarFile} or {@link UrlNestedJarFile} instance.
+&nbsp;	 * @param jarFileUrl the jar file URL
+&nbsp;	 * @param closeAction the action to call when the file is closed
+&nbsp;	 * @return a new {@link JarFile} instance
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	JarFile createJarFile(URL jarFileUrl, Consumer&lt;JarFile&gt; closeAction) throws IOException {
+<b class="nc">&nbsp;		Runtime.Version version = getVersion(jarFileUrl);</b>
+<b class="nc">&nbsp;		if (isLocalFileUrl(jarFileUrl)) {</b>
+<b class="nc">&nbsp;			return createJarFileForLocalFile(jarFileUrl, version, closeAction);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (isNestedUrl(jarFileUrl)) {</b>
+<b class="nc">&nbsp;			return createJarFileForNested(jarFileUrl, version, closeAction);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return createJarFileForStream(jarFileUrl, version, closeAction);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Runtime.Version getVersion(URL url) {
+&nbsp;		// The standard JDK handler uses #runtime to indicate that the runtime version
+&nbsp;		// should be used. This unfortunately doesn&#39;t work for us as
+&nbsp;		// jdk.internal.loader.URLClassPath only adds the runtime fragment when the URL
+&nbsp;		// is using the internal JDK handler. We need to flip the default to use
+&nbsp;		// the runtime version. See gh-38050
+<b class="nc">&nbsp;		return &quot;base&quot;.equals(url.getRef()) ? JarFile.baseVersion() : JarFile.runtimeVersion();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isLocalFileUrl(URL url) {
+<b class="nc">&nbsp;		return url.getProtocol().equalsIgnoreCase(&quot;file&quot;) &amp;&amp; isLocal(url.getHost());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isLocal(String host) {
+<b class="nc">&nbsp;		return host == null || host.isEmpty() || host.equals(&quot;~&quot;) || host.equalsIgnoreCase(&quot;localhost&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarFile createJarFileForLocalFile(URL url, Runtime.Version version, Consumer&lt;JarFile&gt; closeAction)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		String path = UrlDecoder.decode(url.getPath());</b>
+<b class="nc">&nbsp;		return new UrlJarFile(new File(path), version, closeAction);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarFile createJarFileForNested(URL url, Runtime.Version version, Consumer&lt;JarFile&gt; closeAction)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		NestedLocation location = NestedLocation.fromUrl(url);</b>
+<b class="nc">&nbsp;		return new UrlNestedJarFile(location.path().toFile(), location.nestedEntryName(), version, closeAction);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarFile createJarFileForStream(URL url, Version version, Consumer&lt;JarFile&gt; closeAction) throws IOException {
+<b class="nc">&nbsp;		try (InputStream in = url.openStream()) {</b>
+<b class="nc">&nbsp;			return createJarFileForStream(in, version, closeAction);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarFile createJarFileForStream(InputStream in, Version version, Consumer&lt;JarFile&gt; closeAction)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		Path local = Files.createTempFile(&quot;jar_cache&quot;, null);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			Files.copy(in, local, StandardCopyOption.REPLACE_EXISTING);</b>
+<b class="nc">&nbsp;			JarFile jarFile = new UrlJarFile(local.toFile(), version, closeAction);</b>
+<b class="nc">&nbsp;			local.toFile().deleteOnExit();</b>
+<b class="nc">&nbsp;			return jarFile;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			deleteIfPossible(local, ex);</b>
+<b class="nc">&nbsp;			throw ex;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void deleteIfPossible(Path local, Throwable cause) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Files.delete(local);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			cause.addSuppressed(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static boolean isNestedUrl(URL url) {
+<b class="nc">&nbsp;		return url.getProtocol().equalsIgnoreCase(&quot;nested&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

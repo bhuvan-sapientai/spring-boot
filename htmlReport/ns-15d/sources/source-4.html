@@ -1,0 +1,409 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EmbeddedServerContainerInvocationContextProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.embedded</a>
+</div>
+
+<h1>Coverage Summary for Class: EmbeddedServerContainerInvocationContextProvider (org.springframework.boot.context.embedded)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmbeddedServerContainerInvocationContextProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EmbeddedServerContainerInvocationContextProvider$EmbeddedServletContainerInvocationContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedServerContainerInvocationContextProvider$RestTemplateParameterResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedServerContainerInvocationContextProvider$RestTemplateParameterResolver$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedServerContainerInvocationContextProvider$RestTemplateParameterResolver$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.embedded;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+&nbsp;import org.apache.hc.client5.http.impl.classic.HttpClients;
+&nbsp;import org.apache.hc.core5.util.TimeValue;
+&nbsp;import org.junit.jupiter.api.extension.AfterAllCallback;
+&nbsp;import org.junit.jupiter.api.extension.Extension;
+&nbsp;import org.junit.jupiter.api.extension.ExtensionContext;
+&nbsp;import org.junit.jupiter.api.extension.ParameterContext;
+&nbsp;import org.junit.jupiter.api.extension.ParameterResolver;
+&nbsp;import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
+&nbsp;import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
+&nbsp;import org.junit.platform.commons.util.ReflectionUtils;
+&nbsp;
+&nbsp;import org.springframework.boot.testsupport.BuildOutput;
+&nbsp;import org.springframework.http.client.ClientHttpResponse;
+&nbsp;import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+&nbsp;import org.springframework.util.FileSystemUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.client.ResponseErrorHandler;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;import org.springframework.web.util.UriTemplateHandler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link TestTemplateInvocationContextProvider} for templated
+&nbsp; * {@link EmbeddedServletContainerTest embedded servlet container tests}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;class EmbeddedServerContainerInvocationContextProvider
+&nbsp;		implements TestTemplateInvocationContextProvider, AfterAllCallback {
+&nbsp;
+<b class="nc">&nbsp;	private static final Set&lt;String&gt; CONTAINERS = new HashSet&lt;&gt;(Arrays.asList(&quot;jetty&quot;, &quot;tomcat&quot;, &quot;undertow&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final BuildOutput buildOutput = new BuildOutput(</b>
+&nbsp;			EmbeddedServerContainerInvocationContextProvider.class);
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, AbstractApplicationLauncher&gt; launcherCache = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private final Path tempDir;
+&nbsp;
+<b class="nc">&nbsp;	EmbeddedServerContainerInvocationContextProvider() throws IOException {</b>
+<b class="nc">&nbsp;		this.tempDir = Files.createTempDirectory(&quot;embedded-servlet-container-tests&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean supportsTestTemplate(ExtensionContext context) {
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Stream&lt;TestTemplateInvocationContext&gt; provideTestTemplateInvocationContexts(ExtensionContext context) {
+<b class="nc">&nbsp;		EmbeddedServletContainerTest annotation = context.getRequiredTestClass()</b>
+<b class="nc">&nbsp;			.getAnnotation(EmbeddedServletContainerTest.class);</b>
+<b class="nc">&nbsp;		return CONTAINERS.stream()</b>
+<b class="nc">&nbsp;			.map((container) -&gt; getApplication(annotation, container))</b>
+<b class="nc">&nbsp;			.flatMap((builder) -&gt; provideTestTemplateInvocationContexts(annotation, builder));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Stream&lt;EmbeddedServletContainerInvocationContext&gt; provideTestTemplateInvocationContexts(
+&nbsp;			EmbeddedServletContainerTest annotation, Application application) {
+<b class="nc">&nbsp;		return Stream.of(annotation.launchers())</b>
+<b class="nc">&nbsp;			.map((launcherClass) -&gt; getAbstractApplicationLauncher(application, launcherClass))</b>
+<b class="nc">&nbsp;			.map((launcher) -&gt; provideTestTemplateInvocationContext(application, launcher));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private EmbeddedServletContainerInvocationContext provideTestTemplateInvocationContext(Application application,
+&nbsp;			AbstractApplicationLauncher launcher) {
+<b class="nc">&nbsp;		String name = StringUtils.capitalize(application.getContainer()) + &quot;: &quot;</b>
+<b class="nc">&nbsp;				+ launcher.getDescription(application.getPackaging());</b>
+<b class="nc">&nbsp;		return new EmbeddedServletContainerInvocationContext(name, launcher);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterAll(ExtensionContext context) throws Exception {
+<b class="nc">&nbsp;		cleanupCaches();</b>
+<b class="nc">&nbsp;		FileSystemUtils.deleteRecursively(this.tempDir);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void cleanupCaches() {
+<b class="nc">&nbsp;		this.launcherCache.values().forEach(AbstractApplicationLauncher::destroyProcess);</b>
+<b class="nc">&nbsp;		this.launcherCache.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private AbstractApplicationLauncher getAbstractApplicationLauncher(Application application,
+&nbsp;			Class&lt;? extends AbstractApplicationLauncher&gt; launcherClass) {
+<b class="nc">&nbsp;		String cacheKey = application.getContainer() + &quot;:&quot; + application.getPackaging() + &quot;:&quot; + launcherClass.getName();</b>
+<b class="nc">&nbsp;		if (this.launcherCache.containsKey(cacheKey)) {</b>
+<b class="nc">&nbsp;			return this.launcherCache.get(cacheKey);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		AbstractApplicationLauncher launcher = ReflectionUtils.newInstance(launcherClass, application,</b>
+<b class="nc">&nbsp;				new File(buildOutput.getRootLocation(), &quot;app-launcher-&quot; + UUID.randomUUID()));</b>
+<b class="nc">&nbsp;		this.launcherCache.put(cacheKey, launcher);</b>
+<b class="nc">&nbsp;		return launcher;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Application getApplication(EmbeddedServletContainerTest annotation, String container) {
+<b class="nc">&nbsp;		return new Application(annotation.packaging(), container);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static class EmbeddedServletContainerInvocationContext implements TestTemplateInvocationContext, ParameterResolver {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final AbstractApplicationLauncher launcher;
+&nbsp;
+<b class="nc">&nbsp;		EmbeddedServletContainerInvocationContext(String name, AbstractApplicationLauncher launcher) {</b>
+<b class="nc">&nbsp;			this.name = name;</b>
+<b class="nc">&nbsp;			this.launcher = launcher;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public List&lt;Extension&gt; getAdditionalExtensions() {
+<b class="nc">&nbsp;			return Arrays.asList(this.launcher, new RestTemplateParameterResolver(this.launcher));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getDisplayName(int invocationIndex) {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+<b class="nc">&nbsp;			if (parameterContext.getParameter().getType().equals(AbstractApplicationLauncher.class)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return parameterContext.getParameter().getType().equals(RestTemplate.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+<b class="nc">&nbsp;			if (parameterContext.getParameter().getType().equals(AbstractApplicationLauncher.class)) {</b>
+<b class="nc">&nbsp;				return this.launcher;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class RestTemplateParameterResolver implements ParameterResolver {
+&nbsp;
+&nbsp;		private final AbstractApplicationLauncher launcher;
+&nbsp;
+<b class="nc">&nbsp;		private RestTemplateParameterResolver(AbstractApplicationLauncher launcher) {</b>
+<b class="nc">&nbsp;			this.launcher = launcher;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+<b class="nc">&nbsp;			return parameterContext.getParameter().getType().equals(RestTemplate.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+<b class="nc">&nbsp;			RestTemplate rest = new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClients.custom()</b>
+<b class="nc">&nbsp;				.setRetryStrategy(new DefaultHttpRequestRetryStrategy(10, TimeValue.of(1, TimeUnit.SECONDS)))</b>
+<b class="nc">&nbsp;				.build()));</b>
+<b class="nc">&nbsp;			rest.setErrorHandler(new ResponseErrorHandler() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public boolean hasError(ClientHttpResponse response) throws IOException {
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public void handleError(ClientHttpResponse response) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;				}</b>
+&nbsp;
+&nbsp;			});
+<b class="nc">&nbsp;			rest.setUriTemplateHandler(new UriTemplateHandler() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public URI expand(String uriTemplate, Object... uriVariables) {
+<b class="nc">&nbsp;					return URI.create(&quot;http://localhost:&quot; + RestTemplateParameterResolver.this.launcher.getHttpPort()</b>
+&nbsp;							+ uriTemplate);
+&nbsp;				}
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public URI expand(String uriTemplate, Map&lt;String, ?&gt; uriVariables) {
+<b class="nc">&nbsp;					return URI.create(&quot;http://localhost:&quot; + RestTemplateParameterResolver.this.launcher.getHttpPort()</b>
+&nbsp;							+ uriTemplate);
+&nbsp;				}
+&nbsp;
+&nbsp;			});
+<b class="nc">&nbsp;			return rest;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,175 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringPropertyModelHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.logging.logback</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringPropertyModelHandler (org.springframework.boot.logging.logback)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringPropertyModelHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.logging.logback;
+&nbsp;
+&nbsp;import ch.qos.logback.core.Context;
+&nbsp;import ch.qos.logback.core.joran.action.ActionUtil;
+&nbsp;import ch.qos.logback.core.joran.action.ActionUtil.Scope;
+&nbsp;import ch.qos.logback.core.model.Model;
+&nbsp;import ch.qos.logback.core.model.ModelUtil;
+&nbsp;import ch.qos.logback.core.model.processor.ModelHandlerBase;
+&nbsp;import ch.qos.logback.core.model.processor.ModelHandlerException;
+&nbsp;import ch.qos.logback.core.model.processor.ModelInterpretationContext;
+&nbsp;import ch.qos.logback.core.util.OptionHelper;
+&nbsp;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;
+&nbsp;/**
+&nbsp; * Logback {@link ModelHandlerBase model handler} to support {@code &lt;springProperty&gt;}
+&nbsp; * tags. Allows Logback properties to be sourced from the Spring environment.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @see SpringPropertyAction
+&nbsp; * @see SpringPropertyModel
+&nbsp; */
+&nbsp;class SpringPropertyModelHandler extends ModelHandlerBase {
+&nbsp;
+&nbsp;	private final Environment environment;
+&nbsp;
+&nbsp;	SpringPropertyModelHandler(Context context, Environment environment) {
+<b class="nc">&nbsp;		super(context);</b>
+<b class="nc">&nbsp;		this.environment = environment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void handle(ModelInterpretationContext intercon, Model model) throws ModelHandlerException {
+<b class="nc">&nbsp;		SpringPropertyModel propertyModel = (SpringPropertyModel) model;</b>
+<b class="nc">&nbsp;		Scope scope = ActionUtil.stringToScope(propertyModel.getScope());</b>
+<b class="nc">&nbsp;		String defaultValue = propertyModel.getDefaultValue();</b>
+<b class="nc">&nbsp;		String source = propertyModel.getSource();</b>
+<b class="nc">&nbsp;		if (OptionHelper.isNullOrEmpty(propertyModel.getName()) || OptionHelper.isNullOrEmpty(source)) {</b>
+<b class="nc">&nbsp;			addError(&quot;The \&quot;name\&quot; and \&quot;source\&quot; attributes of &lt;springProperty&gt; must be set&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ModelUtil.setProperty(intercon, propertyModel.getName(), getValue(source, defaultValue), scope);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getValue(String source, String defaultValue) {
+<b class="nc">&nbsp;		if (this.environment == null) {</b>
+<b class="nc">&nbsp;			addWarn(&quot;No Spring Environment available to resolve &quot; + source);</b>
+<b class="nc">&nbsp;			return defaultValue;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.environment.getProperty(source, defaultValue);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

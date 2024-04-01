@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: JarWriter (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.attribute.FileTime;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;import java.util.zip.ZipException;
+&nbsp;
+&nbsp;import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
+&nbsp;
+&nbsp;/**
+&nbsp; * Writes JAR content, ensuring valid directory entries are always created and duplicate
+&nbsp; * items are ignored.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class JarWriter extends AbstractJarWriter implements AutoCloseable {
+&nbsp;
+&nbsp;	private final JarArchiveOutputStream jarOutputStream;
+&nbsp;
+&nbsp;	private final FileTime lastModifiedTime;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JarWriter} instance.
+&nbsp;	 * @param file the file to write
+&nbsp;	 * @throws IOException if the file cannot be opened
+&nbsp;	 * @throws FileNotFoundException if the file cannot be found
+&nbsp;	 */
+&nbsp;	public JarWriter(File file) throws FileNotFoundException, IOException {
+<b class="nc">&nbsp;		this(file, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JarWriter} instance.
+&nbsp;	 * @param file the file to write
+&nbsp;	 * @param launchScript an optional launch script to prepend to the front of the jar
+&nbsp;	 * @throws IOException if the file cannot be opened
+&nbsp;	 * @throws FileNotFoundException if the file cannot be found
+&nbsp;	 */
+&nbsp;	public JarWriter(File file, LaunchScript launchScript) throws FileNotFoundException, IOException {
+<b class="nc">&nbsp;		this(file, launchScript, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JarWriter} instance.
+&nbsp;	 * @param file the file to write
+&nbsp;	 * @param launchScript an optional launch script to prepend to the front of the jar
+&nbsp;	 * @param lastModifiedTime an optional last modified time to apply to the written
+&nbsp;	 * entries
+&nbsp;	 * @throws IOException if the file cannot be opened
+&nbsp;	 * @throws FileNotFoundException if the file cannot be found
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	public JarWriter(File file, LaunchScript launchScript, FileTime lastModifiedTime)
+<b class="nc">&nbsp;			throws FileNotFoundException, IOException {</b>
+<b class="nc">&nbsp;		this.jarOutputStream = new JarArchiveOutputStream(new FileOutputStream(file));</b>
+<b class="nc">&nbsp;		if (launchScript != null) {</b>
+<b class="nc">&nbsp;			this.jarOutputStream.writePreamble(launchScript.toByteArray());</b>
+<b class="nc">&nbsp;			file.setExecutable(true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.jarOutputStream.setEncoding(&quot;UTF-8&quot;);</b>
+<b class="nc">&nbsp;		this.lastModifiedTime = lastModifiedTime;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void writeToArchive(ZipEntry entry, EntryWriter entryWriter) throws IOException {
+<b class="nc">&nbsp;		JarArchiveEntry jarEntry = asJarArchiveEntry(entry);</b>
+<b class="nc">&nbsp;		if (this.lastModifiedTime != null) {</b>
+<b class="nc">&nbsp;			jarEntry.setTime(DefaultTimeZoneOffset.INSTANCE.removeFrom(this.lastModifiedTime).toMillis());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.jarOutputStream.putArchiveEntry(jarEntry);</b>
+<b class="nc">&nbsp;		if (entryWriter != null) {</b>
+<b class="nc">&nbsp;			entryWriter.write(this.jarOutputStream);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.jarOutputStream.closeArchiveEntry();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarArchiveEntry asJarArchiveEntry(ZipEntry entry) throws ZipException {
+<b class="nc">&nbsp;		if (entry instanceof JarArchiveEntry jarArchiveEntry) {</b>
+<b class="nc">&nbsp;			return jarArchiveEntry;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new JarArchiveEntry(entry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Close the writer.
+&nbsp;	 * @throws IOException if the file cannot be closed
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void close() throws IOException {
+<b class="nc">&nbsp;		this.jarOutputStream.close();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

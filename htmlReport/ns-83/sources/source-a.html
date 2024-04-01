@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebEndpointResponse</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.web</a>
+</div>
+
+<h1>Coverage Summary for Class: WebEndpointResponse (org.springframework.boot.actuate.endpoint.web)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebEndpointResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.web;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.Producible;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
+&nbsp;import org.springframework.util.MimeType;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@code WebEndpointResponse} can be returned by an operation on a
+&nbsp; * {@link EndpointWebExtension @EndpointWebExtension} to provide additional, web-specific
+&nbsp; * information such as the HTTP status code.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type of the response body
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Vedran Pavic
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public final class WebEndpointResponse&lt;T&gt; {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code 200 OK}.
+&nbsp;	 */
+&nbsp;	public static final int STATUS_OK = 200;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code 204 No Content}.
+&nbsp;	 */
+&nbsp;	public static final int STATUS_NO_CONTENT = 204;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code 400 Bad Request}.
+&nbsp;	 */
+&nbsp;	public static final int STATUS_BAD_REQUEST = 400;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code 404 Not Found}.
+&nbsp;	 */
+&nbsp;	public static final int STATUS_NOT_FOUND = 404;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code 429 Too Many Requests}.
+&nbsp;	 */
+&nbsp;	public static final int STATUS_TOO_MANY_REQUESTS = 429;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code 500 Internal Server Error}.
+&nbsp;	 */
+&nbsp;	public static final int STATUS_INTERNAL_SERVER_ERROR = 500;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code 503 Service Unavailable}.
+&nbsp;	 */
+&nbsp;	public static final int STATUS_SERVICE_UNAVAILABLE = 503;
+&nbsp;
+&nbsp;	private final T body;
+&nbsp;
+&nbsp;	private final int status;
+&nbsp;
+&nbsp;	private final MimeType contentType;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code WebEndpointResponse} with no body and a 200 (OK) status.
+&nbsp;	 */
+&nbsp;	public WebEndpointResponse() {
+<b class="nc">&nbsp;		this(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code WebEndpointResponse} with no body and the given
+&nbsp;	 * {@code status}.
+&nbsp;	 * @param status the HTTP status
+&nbsp;	 */
+&nbsp;	public WebEndpointResponse(int status) {
+<b class="nc">&nbsp;		this(null, status);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code WebEndpointResponse} with the given body and a 200 (OK)
+&nbsp;	 * status.
+&nbsp;	 * @param body the body
+&nbsp;	 */
+&nbsp;	public WebEndpointResponse(T body) {
+<b class="nc">&nbsp;		this(body, STATUS_OK);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code WebEndpointResponse} with the given body and content type and
+&nbsp;	 * a 200 (OK) status.
+&nbsp;	 * @param body the body
+&nbsp;	 * @param producible the producible providing the content type
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public WebEndpointResponse(T body, Producible&lt;?&gt; producible) {
+<b class="nc">&nbsp;		this(body, STATUS_OK, producible.getProducedMimeType());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code WebEndpointResponse} with the given body and content type and
+&nbsp;	 * a 200 (OK) status.
+&nbsp;	 * @param body the body
+&nbsp;	 * @param contentType the content type of the response
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public WebEndpointResponse(T body, MimeType contentType) {
+<b class="nc">&nbsp;		this(body, STATUS_OK, contentType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code WebEndpointResponse} with the given body and status.
+&nbsp;	 * @param body the body
+&nbsp;	 * @param status the HTTP status
+&nbsp;	 */
+&nbsp;	public WebEndpointResponse(T body, int status) {
+<b class="nc">&nbsp;		this(body, status, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code WebEndpointResponse} with the given body and status.
+&nbsp;	 * @param body the body
+&nbsp;	 * @param status the HTTP status
+&nbsp;	 * @param contentType the content type of the response
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+<b class="nc">&nbsp;	public WebEndpointResponse(T body, int status, MimeType contentType) {</b>
+<b class="nc">&nbsp;		this.body = body;</b>
+<b class="nc">&nbsp;		this.status = status;</b>
+<b class="nc">&nbsp;		this.contentType = contentType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the content type of the response.
+&nbsp;	 * @return the content type;
+&nbsp;	 */
+&nbsp;	public MimeType getContentType() {
+<b class="nc">&nbsp;		return this.contentType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the body for the response.
+&nbsp;	 * @return the body
+&nbsp;	 */
+&nbsp;	public T getBody() {
+<b class="nc">&nbsp;		return this.body;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the status for the response.
+&nbsp;	 * @return the status
+&nbsp;	 */
+&nbsp;	public int getStatus() {
+<b class="nc">&nbsp;		return this.status;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,277 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReactiveWebServerApplicationContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.reactive.context</a>
+</div>
+
+<h1>Coverage Summary for Class: ReactiveWebServerApplicationContext (org.springframework.boot.web.reactive.context)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReactiveWebServerApplicationContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.reactive.context;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+&nbsp;import org.springframework.boot.WebApplicationType;
+&nbsp;import org.springframework.boot.availability.AvailabilityChangeEvent;
+&nbsp;import org.springframework.boot.availability.ReadinessState;
+&nbsp;import org.springframework.boot.web.context.ConfigurableWebServerApplicationContext;
+&nbsp;import org.springframework.boot.web.context.MissingWebServerFactoryBeanException;
+&nbsp;import org.springframework.boot.web.context.WebServerGracefulShutdownLifecycle;
+&nbsp;import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.context.ApplicationContextException;
+&nbsp;import org.springframework.core.metrics.StartupStep;
+&nbsp;import org.springframework.http.server.reactive.HttpHandler;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link GenericReactiveWebApplicationContext} that can be used to bootstrap itself
+&nbsp; * from a contained {@link ReactiveWebServerFactory} bean.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class ReactiveWebServerApplicationContext extends GenericReactiveWebApplicationContext
+&nbsp;		implements ConfigurableWebServerApplicationContext {
+&nbsp;
+&nbsp;	private volatile WebServerManager serverManager;
+&nbsp;
+&nbsp;	private String serverNamespace;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ReactiveWebServerApplicationContext}.
+&nbsp;	 */
+<b class="nc">&nbsp;	public ReactiveWebServerApplicationContext() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ReactiveWebServerApplicationContext} with the given
+&nbsp;	 * {@code DefaultListableBeanFactory}.
+&nbsp;	 * @param beanFactory the DefaultListableBeanFactory instance to use for this context
+&nbsp;	 */
+&nbsp;	public ReactiveWebServerApplicationContext(DefaultListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;		super(beanFactory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final void refresh() throws BeansException, IllegalStateException {
+&nbsp;		try {
+<b class="nc">&nbsp;			super.refresh();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			WebServerManager serverManager = this.serverManager;</b>
+<b class="nc">&nbsp;			if (serverManager != null) {</b>
+<b class="nc">&nbsp;				serverManager.getWebServer().stop();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw ex;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void onRefresh() {
+<b class="nc">&nbsp;		super.onRefresh();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			createWebServer();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			throw new ApplicationContextException(&quot;Unable to start reactive web server&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createWebServer() {
+<b class="nc">&nbsp;		WebServerManager serverManager = this.serverManager;</b>
+<b class="nc">&nbsp;		if (serverManager == null) {</b>
+<b class="nc">&nbsp;			StartupStep createWebServer = getApplicationStartup().start(&quot;spring.boot.webserver.create&quot;);</b>
+<b class="nc">&nbsp;			String webServerFactoryBeanName = getWebServerFactoryBeanName();</b>
+<b class="nc">&nbsp;			ReactiveWebServerFactory webServerFactory = getWebServerFactory(webServerFactoryBeanName);</b>
+<b class="nc">&nbsp;			createWebServer.tag(&quot;factory&quot;, webServerFactory.getClass().toString());</b>
+<b class="nc">&nbsp;			boolean lazyInit = getBeanFactory().getBeanDefinition(webServerFactoryBeanName).isLazyInit();</b>
+<b class="nc">&nbsp;			this.serverManager = new WebServerManager(this, webServerFactory, this::getHttpHandler, lazyInit);</b>
+<b class="nc">&nbsp;			getBeanFactory().registerSingleton(&quot;webServerGracefulShutdown&quot;,</b>
+<b class="nc">&nbsp;					new WebServerGracefulShutdownLifecycle(this.serverManager.getWebServer()));</b>
+<b class="nc">&nbsp;			getBeanFactory().registerSingleton(&quot;webServerStartStop&quot;,</b>
+&nbsp;					new WebServerStartStopLifecycle(this.serverManager));
+<b class="nc">&nbsp;			createWebServer.end();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		initPropertySources();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String getWebServerFactoryBeanName() {
+&nbsp;		// Use bean names so that we don&#39;t consider the hierarchy
+<b class="nc">&nbsp;		String[] beanNames = getBeanFactory().getBeanNamesForType(ReactiveWebServerFactory.class);</b>
+<b class="nc">&nbsp;		if (beanNames.length == 0) {</b>
+<b class="nc">&nbsp;			throw new MissingWebServerFactoryBeanException(getClass(), ReactiveWebServerFactory.class,</b>
+&nbsp;					WebApplicationType.REACTIVE);
+&nbsp;		}
+<b class="nc">&nbsp;		if (beanNames.length &gt; 1) {</b>
+<b class="nc">&nbsp;			throw new ApplicationContextException(&quot;Unable to start ReactiveWebApplicationContext due to multiple &quot;</b>
+<b class="nc">&nbsp;					+ &quot;ReactiveWebServerFactory beans : &quot; + StringUtils.arrayToCommaDelimitedString(beanNames));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return beanNames[0];</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected ReactiveWebServerFactory getWebServerFactory(String factoryBeanName) {
+<b class="nc">&nbsp;		return getBeanFactory().getBean(factoryBeanName, ReactiveWebServerFactory.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link HttpHandler} that should be used to process the reactive web
+&nbsp;	 * server. By default this method searches for a suitable bean in the context itself.
+&nbsp;	 * @return a {@link HttpHandler} (never {@code null}
+&nbsp;	 */
+&nbsp;	protected HttpHandler getHttpHandler() {
+&nbsp;		// Use bean names so that we don&#39;t consider the hierarchy
+<b class="nc">&nbsp;		String[] beanNames = getBeanFactory().getBeanNamesForType(HttpHandler.class);</b>
+<b class="nc">&nbsp;		if (beanNames.length == 0) {</b>
+<b class="nc">&nbsp;			throw new ApplicationContextException(</b>
+&nbsp;					&quot;Unable to start ReactiveWebApplicationContext due to missing HttpHandler bean.&quot;);
+&nbsp;		}
+<b class="nc">&nbsp;		if (beanNames.length &gt; 1) {</b>
+<b class="nc">&nbsp;			throw new ApplicationContextException(</b>
+&nbsp;					&quot;Unable to start ReactiveWebApplicationContext due to multiple HttpHandler beans : &quot;
+<b class="nc">&nbsp;							+ StringUtils.arrayToCommaDelimitedString(beanNames));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getBeanFactory().getBean(beanNames[0], HttpHandler.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void doClose() {
+<b class="nc">&nbsp;		if (isActive()) {</b>
+<b class="nc">&nbsp;			AvailabilityChangeEvent.publish(this, ReadinessState.REFUSING_TRAFFIC);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		super.doClose();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link WebServer} that was created by the context or {@code null} if
+&nbsp;	 * the server has not yet been created.
+&nbsp;	 * @return the web server
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public WebServer getWebServer() {
+<b class="nc">&nbsp;		WebServerManager serverManager = this.serverManager;</b>
+<b class="nc">&nbsp;		return (serverManager != null) ? serverManager.getWebServer() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getServerNamespace() {
+<b class="nc">&nbsp;		return this.serverNamespace;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setServerNamespace(String serverNamespace) {
+<b class="nc">&nbsp;		this.serverNamespace = serverNamespace;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

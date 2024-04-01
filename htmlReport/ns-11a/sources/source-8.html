@@ -1,0 +1,401 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UndertowWebServerFactoryCustomizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.embedded</a>
+</div>
+
+<h1>Coverage Summary for Class: UndertowWebServerFactoryCustomizer (org.springframework.boot.autoconfigure.web.embedded)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UndertowWebServerFactoryCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UndertowWebServerFactoryCustomizer$AbstractOptions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowWebServerFactoryCustomizer$ServerOptions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowWebServerFactoryCustomizer$SocketOptions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.embedded;
+&nbsp;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import io.undertow.UndertowOptions;
+&nbsp;import org.xnio.Option;
+&nbsp;import org.xnio.Options;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties.Undertow;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties.Undertow.Accesslog;
+&nbsp;import org.springframework.boot.cloud.CloudPlatform;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.web.embedded.undertow.ConfigurableUndertowWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;import org.springframework.util.unit.DataSize;
+&nbsp;
+&nbsp;/**
+&nbsp; * Customization for Undertow-specific features common for both Servlet and Reactive
+&nbsp; * servers.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Yulin Qin
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Arstiom Yudovin
+&nbsp; * @author Rafiullah Hamedy
+&nbsp; * @author HaiTao Zhang
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class UndertowWebServerFactoryCustomizer
+&nbsp;		implements WebServerFactoryCustomizer&lt;ConfigurableUndertowWebServerFactory&gt;, Ordered {
+&nbsp;
+&nbsp;	private final Environment environment;
+&nbsp;
+&nbsp;	private final ServerProperties serverProperties;
+&nbsp;
+<b class="nc">&nbsp;	public UndertowWebServerFactoryCustomizer(Environment environment, ServerProperties serverProperties) {</b>
+<b class="nc">&nbsp;		this.environment = environment;</b>
+<b class="nc">&nbsp;		this.serverProperties = serverProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void customize(ConfigurableUndertowWebServerFactory factory) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		ServerOptions options = new ServerOptions(factory);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties::getMaxHttpRequestHeaderSize)</b>
+<b class="nc">&nbsp;			.asInt(DataSize::toBytes)</b>
+<b class="nc">&nbsp;			.when(this::isPositive)</b>
+<b class="nc">&nbsp;			.to(options.option(UndertowOptions.MAX_HEADER_SIZE));</b>
+<b class="nc">&nbsp;		mapUndertowProperties(factory, options);</b>
+<b class="nc">&nbsp;		mapAccessLogProperties(factory);</b>
+<b class="nc">&nbsp;		map.from(this::getOrDeduceUseForwardHeaders).to(factory::setUseForwardHeaders);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void mapUndertowProperties(ConfigurableUndertowWebServerFactory factory, ServerOptions serverOptions) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		Undertow properties = this.serverProperties.getUndertow();</b>
+<b class="nc">&nbsp;		map.from(properties::getBufferSize).whenNonNull().asInt(DataSize::toBytes).to(factory::setBufferSize);</b>
+<b class="nc">&nbsp;		ServerProperties.Undertow.Threads threadProperties = properties.getThreads();</b>
+<b class="nc">&nbsp;		map.from(threadProperties::getIo).to(factory::setIoThreads);</b>
+<b class="nc">&nbsp;		map.from(threadProperties::getWorker).to(factory::setWorkerThreads);</b>
+<b class="nc">&nbsp;		map.from(properties::getDirectBuffers).to(factory::setUseDirectBuffers);</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxHttpPostSize)</b>
+<b class="nc">&nbsp;			.as(DataSize::toBytes)</b>
+<b class="nc">&nbsp;			.when(this::isPositive)</b>
+<b class="nc">&nbsp;			.to(serverOptions.option(UndertowOptions.MAX_ENTITY_SIZE));</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxParameters).to(serverOptions.option(UndertowOptions.MAX_PARAMETERS));</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxHeaders).to(serverOptions.option(UndertowOptions.MAX_HEADERS));</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxCookies).to(serverOptions.option(UndertowOptions.MAX_COOKIES));</b>
+<b class="nc">&nbsp;		mapSlashProperties(properties, serverOptions);</b>
+<b class="nc">&nbsp;		map.from(properties::isDecodeUrl).to(serverOptions.option(UndertowOptions.DECODE_URL));</b>
+<b class="nc">&nbsp;		map.from(properties::getUrlCharset).as(Charset::name).to(serverOptions.option(UndertowOptions.URL_CHARSET));</b>
+<b class="nc">&nbsp;		map.from(properties::isAlwaysSetKeepAlive).to(serverOptions.option(UndertowOptions.ALWAYS_SET_KEEP_ALIVE));</b>
+<b class="nc">&nbsp;		map.from(properties::getNoRequestTimeout)</b>
+<b class="nc">&nbsp;			.asInt(Duration::toMillis)</b>
+<b class="nc">&nbsp;			.to(serverOptions.option(UndertowOptions.NO_REQUEST_TIMEOUT));</b>
+<b class="nc">&nbsp;		map.from(properties.getOptions()::getServer).to(serverOptions.forEach(serverOptions::option));</b>
+<b class="nc">&nbsp;		SocketOptions socketOptions = new SocketOptions(factory);</b>
+<b class="nc">&nbsp;		map.from(properties.getOptions()::getSocket).to(socketOptions.forEach(socketOptions::option));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings({ &quot;deprecation&quot;, &quot;removal&quot; })
+&nbsp;	private void mapSlashProperties(Undertow properties, ServerOptions serverOptions) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::isAllowEncodedSlash).to(serverOptions.option(UndertowOptions.ALLOW_ENCODED_SLASH));</b>
+<b class="nc">&nbsp;		map.from(properties::getDecodeSlash).to(serverOptions.option(UndertowOptions.DECODE_SLASH));</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isPositive(Number value) {
+<b class="nc">&nbsp;		return value.longValue() &gt; 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void mapAccessLogProperties(ConfigurableUndertowWebServerFactory factory) {
+<b class="nc">&nbsp;		Accesslog properties = this.serverProperties.getUndertow().getAccesslog();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::isEnabled).to(factory::setAccessLogEnabled);</b>
+<b class="nc">&nbsp;		map.from(properties::getDir).to(factory::setAccessLogDirectory);</b>
+<b class="nc">&nbsp;		map.from(properties::getPattern).to(factory::setAccessLogPattern);</b>
+<b class="nc">&nbsp;		map.from(properties::getPrefix).to(factory::setAccessLogPrefix);</b>
+<b class="nc">&nbsp;		map.from(properties::getSuffix).to(factory::setAccessLogSuffix);</b>
+<b class="nc">&nbsp;		map.from(properties::isRotate).to(factory::setAccessLogRotate);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean getOrDeduceUseForwardHeaders() {
+<b class="nc">&nbsp;		if (this.serverProperties.getForwardHeadersStrategy() == null) {</b>
+<b class="nc">&nbsp;			CloudPlatform platform = CloudPlatform.getActive(this.environment);</b>
+<b class="nc">&nbsp;			return platform != null &amp;&amp; platform.isUsingForwardHeaders();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.serverProperties.getForwardHeadersStrategy().equals(ServerProperties.ForwardHeadersStrategy.NATIVE);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private abstract static class AbstractOptions {
+&nbsp;
+&nbsp;		private final Class&lt;?&gt; source;
+&nbsp;
+&nbsp;		private final Map&lt;String, Option&lt;?&gt;&gt; nameLookup;
+&nbsp;
+&nbsp;		private final ConfigurableUndertowWebServerFactory factory;
+&nbsp;
+<b class="nc">&nbsp;		AbstractOptions(Class&lt;?&gt; source, ConfigurableUndertowWebServerFactory factory) {</b>
+<b class="nc">&nbsp;			Map&lt;String, Option&lt;?&gt;&gt; lookup = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			ReflectionUtils.doWithLocalFields(source, (field) -&gt; {</b>
+<b class="nc">&nbsp;				int modifiers = field.getModifiers();</b>
+<b class="nc">&nbsp;				if (Modifier.isPublic(modifiers) &amp;&amp; Modifier.isStatic(modifiers)</b>
+<b class="nc">&nbsp;						&amp;&amp; Option.class.isAssignableFrom(field.getType())) {</b>
+&nbsp;					try {
+<b class="nc">&nbsp;						Option&lt;?&gt; option = (Option&lt;?&gt;) field.get(null);</b>
+<b class="nc">&nbsp;						lookup.put(getCanonicalName(field.getName()), option);</b>
+&nbsp;					}
+<b class="nc">&nbsp;					catch (IllegalAccessException ex) {</b>
+&nbsp;						// Ignore
+<b class="nc">&nbsp;					}</b>
+&nbsp;				}
+&nbsp;			});
+<b class="nc">&nbsp;			this.source = source;</b>
+<b class="nc">&nbsp;			this.nameLookup = Collections.unmodifiableMap(lookup);</b>
+<b class="nc">&nbsp;			this.factory = factory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected ConfigurableUndertowWebServerFactory getFactory() {
+<b class="nc">&nbsp;			return this.factory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		&lt;T&gt; Consumer&lt;Map&lt;String, String&gt;&gt; forEach(Function&lt;Option&lt;T&gt;, Consumer&lt;T&gt;&gt; function) {
+<b class="nc">&nbsp;			return (map) -&gt; map.forEach((key, value) -&gt; {</b>
+<b class="nc">&nbsp;				Option&lt;T&gt; option = (Option&lt;T&gt;) this.nameLookup.get(getCanonicalName(key));</b>
+<b class="nc">&nbsp;				Assert.state(option != null,</b>
+<b class="nc">&nbsp;						() -&gt; &quot;Unable to find &#39;&quot; + key + &quot;&#39; in &quot; + ClassUtils.getShortName(this.source));</b>
+<b class="nc">&nbsp;				T parsed = option.parseValue(value, getClass().getClassLoader());</b>
+<b class="nc">&nbsp;				function.apply(option).accept(parsed);</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;
+&nbsp;		private static String getCanonicalName(String name) {
+<b class="nc">&nbsp;			StringBuilder canonicalName = new StringBuilder(name.length());</b>
+<b class="nc">&nbsp;			name.chars()</b>
+<b class="nc">&nbsp;				.filter(Character::isLetterOrDigit)</b>
+<b class="nc">&nbsp;				.map(Character::toLowerCase)</b>
+<b class="nc">&nbsp;				.forEach((c) -&gt; canonicalName.append((char) c));</b>
+<b class="nc">&nbsp;			return canonicalName.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ConfigurableUndertowWebServerFactory} wrapper that makes it easier to apply
+&nbsp;	 * {@link UndertowOptions server options}.
+&nbsp;	 */
+&nbsp;	private static class ServerOptions extends AbstractOptions {
+&nbsp;
+&nbsp;		ServerOptions(ConfigurableUndertowWebServerFactory factory) {
+<b class="nc">&nbsp;			super(UndertowOptions.class, factory);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		&lt;T&gt; Consumer&lt;T&gt; option(Option&lt;T&gt; option) {
+<b class="nc">&nbsp;			return (value) -&gt; getFactory().addBuilderCustomizers((builder) -&gt; builder.setServerOption(option, value));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ConfigurableUndertowWebServerFactory} wrapper that makes it easier to apply
+&nbsp;	 * {@link Options socket options}.
+&nbsp;	 */
+&nbsp;	private static class SocketOptions extends AbstractOptions {
+&nbsp;
+&nbsp;		SocketOptions(ConfigurableUndertowWebServerFactory factory) {
+<b class="nc">&nbsp;			super(Options.class, factory);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		&lt;T&gt; Consumer&lt;T&gt; option(Option&lt;T&gt; option) {
+<b class="nc">&nbsp;			return (value) -&gt; getFactory().addBuilderCustomizers((builder) -&gt; builder.setSocketOption(option, value));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

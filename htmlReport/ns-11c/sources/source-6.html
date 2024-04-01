@@ -1,0 +1,310 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReactiveWebServerFactoryConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: ReactiveWebServerFactoryConfiguration (org.springframework.boot.autoconfigure.web.reactive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReactiveWebServerFactoryConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ReactiveWebServerFactoryConfiguration$EmbeddedJetty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ReactiveWebServerFactoryConfiguration$EmbeddedNetty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ReactiveWebServerFactoryConfiguration$EmbeddedTomcat</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ReactiveWebServerFactoryConfiguration$EmbeddedUndertow</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.reactive;
+&nbsp;
+&nbsp;import io.undertow.Undertow;
+&nbsp;import org.eclipse.jetty.ee10.servlet.ServletHolder;
+&nbsp;import reactor.netty.http.server.HttpServer;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.reactor.netty.ReactorNettyConfigurations;
+&nbsp;import org.springframework.boot.web.embedded.jetty.JettyReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.embedded.jetty.JettyServerCustomizer;
+&nbsp;import org.springframework.boot.web.embedded.netty.NettyReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.embedded.netty.NettyRouteProvider;
+&nbsp;import org.springframework.boot.web.embedded.netty.NettyServerCustomizer;
+&nbsp;import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+&nbsp;import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
+&nbsp;import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
+&nbsp;import org.springframework.boot.web.embedded.tomcat.TomcatReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.embedded.undertow.UndertowBuilderCustomizer;
+&nbsp;import org.springframework.boot.web.embedded.undertow.UndertowReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.http.client.ReactorResourceFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration classes for reactive web servers
+&nbsp; * &lt;p&gt;
+&nbsp; * Those should be {@code @Import} in a regular auto-configuration class to guarantee
+&nbsp; * their order of execution.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Raheela Aslam
+&nbsp; * @author Sergey Serdyuk
+&nbsp; */
+<b class="nc">&nbsp;abstract class ReactiveWebServerFactoryConfiguration {</b>
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnMissingBean(ReactiveWebServerFactory.class)
+&nbsp;	@ConditionalOnClass({ HttpServer.class })
+&nbsp;	@Import(ReactorNettyConfigurations.ReactorResourceFactoryConfiguration.class)
+<b class="nc">&nbsp;	static class EmbeddedNetty {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		NettyReactiveWebServerFactory nettyReactiveWebServerFactory(ReactorResourceFactory resourceFactory,
+&nbsp;				ObjectProvider&lt;NettyRouteProvider&gt; routes, ObjectProvider&lt;NettyServerCustomizer&gt; serverCustomizers) {
+<b class="nc">&nbsp;			NettyReactiveWebServerFactory serverFactory = new NettyReactiveWebServerFactory();</b>
+<b class="nc">&nbsp;			serverFactory.setResourceFactory(resourceFactory);</b>
+<b class="nc">&nbsp;			routes.orderedStream().forEach(serverFactory::addRouteProviders);</b>
+<b class="nc">&nbsp;			serverFactory.getServerCustomizers().addAll(serverCustomizers.orderedStream().toList());</b>
+<b class="nc">&nbsp;			return serverFactory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnMissingBean(ReactiveWebServerFactory.class)
+&nbsp;	@ConditionalOnClass({ org.apache.catalina.startup.Tomcat.class })
+<b class="nc">&nbsp;	static class EmbeddedTomcat {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		TomcatReactiveWebServerFactory tomcatReactiveWebServerFactory(
+&nbsp;				ObjectProvider&lt;TomcatConnectorCustomizer&gt; connectorCustomizers,
+&nbsp;				ObjectProvider&lt;TomcatContextCustomizer&gt; contextCustomizers,
+&nbsp;				ObjectProvider&lt;TomcatProtocolHandlerCustomizer&lt;?&gt;&gt; protocolHandlerCustomizers) {
+<b class="nc">&nbsp;			TomcatReactiveWebServerFactory factory = new TomcatReactiveWebServerFactory();</b>
+<b class="nc">&nbsp;			factory.getTomcatConnectorCustomizers().addAll(connectorCustomizers.orderedStream().toList());</b>
+<b class="nc">&nbsp;			factory.getTomcatContextCustomizers().addAll(contextCustomizers.orderedStream().toList());</b>
+<b class="nc">&nbsp;			factory.getTomcatProtocolHandlerCustomizers().addAll(protocolHandlerCustomizers.orderedStream().toList());</b>
+<b class="nc">&nbsp;			return factory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnMissingBean(ReactiveWebServerFactory.class)
+&nbsp;	@ConditionalOnClass({ org.eclipse.jetty.server.Server.class, ServletHolder.class })
+<b class="nc">&nbsp;	static class EmbeddedJetty {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		JettyReactiveWebServerFactory jettyReactiveWebServerFactory(
+&nbsp;				ObjectProvider&lt;JettyServerCustomizer&gt; serverCustomizers) {
+<b class="nc">&nbsp;			JettyReactiveWebServerFactory serverFactory = new JettyReactiveWebServerFactory();</b>
+<b class="nc">&nbsp;			serverFactory.getServerCustomizers().addAll(serverCustomizers.orderedStream().toList());</b>
+<b class="nc">&nbsp;			return serverFactory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnMissingBean(ReactiveWebServerFactory.class)
+&nbsp;	@ConditionalOnClass({ Undertow.class })
+<b class="nc">&nbsp;	static class EmbeddedUndertow {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		UndertowReactiveWebServerFactory undertowReactiveWebServerFactory(
+&nbsp;				ObjectProvider&lt;UndertowBuilderCustomizer&gt; builderCustomizers) {
+<b class="nc">&nbsp;			UndertowReactiveWebServerFactory factory = new UndertowReactiveWebServerFactory();</b>
+<b class="nc">&nbsp;			factory.getBuilderCustomizers().addAll(builderCustomizers.orderedStream().toList());</b>
+<b class="nc">&nbsp;			return factory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

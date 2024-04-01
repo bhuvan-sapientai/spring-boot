@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildImageRegistryIntegrationTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildImageRegistryIntegrationTests (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildImageRegistryIntegrationTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildImageRegistryIntegrationTests$RegistryContainer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;
+&nbsp;import com.github.dockerjava.api.DockerClient;
+&nbsp;import org.junit.jupiter.api.BeforeEach;
+&nbsp;import org.junit.jupiter.api.Disabled;
+&nbsp;import org.junit.jupiter.api.TestTemplate;
+&nbsp;import org.junit.jupiter.api.extension.ExtendWith;
+&nbsp;import org.testcontainers.containers.GenericContainer;
+&nbsp;import org.testcontainers.junit.jupiter.Container;
+&nbsp;import org.testcontainers.junit.jupiter.Testcontainers;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.DockerApi;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.UpdateListener;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Image;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageReference;
+&nbsp;import org.springframework.boot.testsupport.testcontainers.DockerImageNames;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests for the Maven plugin&#39;s image support using a Docker image registry.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;@ExtendWith(MavenBuildExtension.class)
+&nbsp;@Testcontainers(disabledWithoutDocker = true)
+&nbsp;@Disabled(&quot;Disabled until differences between running locally and in CI can be diagnosed&quot;)
+<b class="nc">&nbsp;class BuildImageRegistryIntegrationTests extends AbstractArchiveIntegrationTests {</b>
+&nbsp;
+&nbsp;	@Container
+<b class="nc">&nbsp;	static final RegistryContainer registry = new RegistryContainer().withStartupAttempts(5)</b>
+<b class="nc">&nbsp;		.withStartupTimeout(Duration.ofMinutes(3));</b>
+&nbsp;
+&nbsp;	DockerClient dockerClient;
+&nbsp;
+&nbsp;	String registryAddress;
+&nbsp;
+&nbsp;	@BeforeEach
+&nbsp;	void setUp() {
+<b class="nc">&nbsp;		assertThat(registry.isRunning()).isTrue();</b>
+<b class="nc">&nbsp;		this.dockerClient = registry.getDockerClient();</b>
+<b class="nc">&nbsp;		this.registryAddress = registry.getHost() + &quot;:&quot; + registry.getFirstMappedPort();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenBuildImageIsInvokedWithPublish(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		String repoName = &quot;test-image&quot;;</b>
+<b class="nc">&nbsp;		String imageName = this.registryAddress + &quot;/&quot; + repoName;</b>
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-image-publish&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;package&quot;)</b>
+<b class="nc">&nbsp;			.systemProperty(&quot;spring-boot.build-image.imageName&quot;, imageName)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; {</b>
+<b class="nc">&nbsp;				assertThat(buildLog(project)).contains(&quot;Building image&quot;)</b>
+<b class="nc">&nbsp;					.contains(&quot;Successfully built image&quot;)</b>
+<b class="nc">&nbsp;					.contains(&quot;Pushing image &#39;&quot; + imageName + &quot;:latest&quot; + &quot;&#39;&quot;)</b>
+<b class="nc">&nbsp;					.contains(&quot;Pushed image &#39;&quot; + imageName + &quot;:latest&quot; + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;				ImageReference imageReference = ImageReference.of(imageName);</b>
+<b class="nc">&nbsp;				DockerApi.ImageApi imageApi = new DockerApi().image();</b>
+<b class="nc">&nbsp;				Image pulledImage = imageApi.pull(imageReference, UpdateListener.none());</b>
+<b class="nc">&nbsp;				assertThat(pulledImage).isNotNull();</b>
+<b class="nc">&nbsp;				imageApi.remove(imageReference, false);</b>
+&nbsp;			});
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class RegistryContainer extends GenericContainer&lt;RegistryContainer&gt; {
+&nbsp;
+&nbsp;		RegistryContainer() {
+<b class="nc">&nbsp;			super(DockerImageNames.registry());</b>
+<b class="nc">&nbsp;			addExposedPorts(5000);</b>
+<b class="nc">&nbsp;			addEnv(&quot;SERVER_NAME&quot;, &quot;localhost&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

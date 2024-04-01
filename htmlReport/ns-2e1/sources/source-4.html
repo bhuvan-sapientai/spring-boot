@@ -1,0 +1,331 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RootUriRequestExpectationManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.web.client</a>
+</div>
+
+<h1>Coverage Summary for Class: RootUriRequestExpectationManager (org.springframework.boot.test.web.client)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RootUriRequestExpectationManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RootUriRequestExpectationManager$ReplaceUriClientHttpRequest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.web.client;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.time.Duration;
+&nbsp;
+&nbsp;import org.springframework.boot.web.client.RootUriTemplateHandler;
+&nbsp;import org.springframework.http.client.ClientHttpRequest;
+&nbsp;import org.springframework.http.client.ClientHttpResponse;
+&nbsp;import org.springframework.http.client.support.HttpRequestWrapper;
+&nbsp;import org.springframework.mock.http.client.MockClientHttpRequest;
+&nbsp;import org.springframework.test.web.client.ExpectedCount;
+&nbsp;import org.springframework.test.web.client.MockRestServiceServer;
+&nbsp;import org.springframework.test.web.client.MockRestServiceServer.MockRestServiceServerBuilder;
+&nbsp;import org.springframework.test.web.client.RequestExpectationManager;
+&nbsp;import org.springframework.test.web.client.RequestMatcher;
+&nbsp;import org.springframework.test.web.client.ResponseActions;
+&nbsp;import org.springframework.test.web.client.SimpleRequestExpectationManager;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;import org.springframework.web.util.UriTemplateHandler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link RequestExpectationManager} that strips the specified root URI from the request
+&nbsp; * before verification. Can be used to simply test declarations when all REST calls start
+&nbsp; * the same way. For example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * RestTemplate restTemplate = new RestTemplateBuilder().rootUri(&quot;https://example.com&quot;).build();
+&nbsp; * MockRestServiceServer server = RootUriRequestExpectationManager.bindTo(restTemplate);
+&nbsp; * server.expect(requestTo(&quot;/hello&quot;)).andRespond(withSuccess());
+&nbsp; * restTemplate.getForEntity(&quot;/hello&quot;, String.class);
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; * @see RootUriTemplateHandler
+&nbsp; * @see #bindTo(RestTemplate)
+&nbsp; * @see #forRestTemplate(RestTemplate, RequestExpectationManager)
+&nbsp; */
+&nbsp;public class RootUriRequestExpectationManager implements RequestExpectationManager {
+&nbsp;
+&nbsp;	private final String rootUri;
+&nbsp;
+&nbsp;	private final RequestExpectationManager expectationManager;
+&nbsp;
+<b class="nc">&nbsp;	public RootUriRequestExpectationManager(String rootUri, RequestExpectationManager expectationManager) {</b>
+<b class="nc">&nbsp;		Assert.notNull(rootUri, &quot;RootUri must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(expectationManager, &quot;ExpectationManager must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.rootUri = rootUri;</b>
+<b class="nc">&nbsp;		this.expectationManager = expectationManager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ResponseActions expectRequest(ExpectedCount count, RequestMatcher requestMatcher) {
+<b class="nc">&nbsp;		return this.expectationManager.expectRequest(count, requestMatcher);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ClientHttpResponse validateRequest(ClientHttpRequest request) throws IOException {
+<b class="nc">&nbsp;		String uri = request.getURI().toString();</b>
+<b class="nc">&nbsp;		if (uri.startsWith(this.rootUri)) {</b>
+<b class="nc">&nbsp;			request = replaceURI(request, uri.substring(this.rootUri.length()));</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return this.expectationManager.validateRequest(request);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (AssertionError ex) {</b>
+<b class="nc">&nbsp;			String message = ex.getMessage();</b>
+<b class="nc">&nbsp;			String prefix = &quot;Request URI expected:&lt;/&quot;;</b>
+<b class="nc">&nbsp;			if (message != null &amp;&amp; message.startsWith(prefix)) {</b>
+<b class="nc">&nbsp;				throw new AssertionError(</b>
+<b class="nc">&nbsp;						&quot;Request URI expected:&lt;&quot; + this.rootUri + message.substring(prefix.length() - 1));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw ex;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ClientHttpRequest replaceURI(ClientHttpRequest request, String replacementUri) {
+&nbsp;		URI uri;
+&nbsp;		try {
+<b class="nc">&nbsp;			uri = new URI(replacementUri);</b>
+<b class="nc">&nbsp;			if (request instanceof MockClientHttpRequest mockClientHttpRequest) {</b>
+<b class="nc">&nbsp;				mockClientHttpRequest.setURI(uri);</b>
+<b class="nc">&nbsp;				return mockClientHttpRequest;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new ReplaceUriClientHttpRequest(uri, request);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (URISyntaxException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void verify() {
+<b class="nc">&nbsp;		this.expectationManager.verify();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void verify(Duration timeout) {
+<b class="nc">&nbsp;		this.expectationManager.verify(timeout);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void reset() {
+<b class="nc">&nbsp;		this.expectationManager.reset();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a bound {@link MockRestServiceServer} for the given {@link RestTemplate},
+&nbsp;	 * configured with {@link RootUriRequestExpectationManager} when possible.
+&nbsp;	 * @param restTemplate the source REST template
+&nbsp;	 * @return a configured {@link MockRestServiceServer}
+&nbsp;	 */
+&nbsp;	public static MockRestServiceServer bindTo(RestTemplate restTemplate) {
+<b class="nc">&nbsp;		return bindTo(restTemplate, new SimpleRequestExpectationManager());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a bound {@link MockRestServiceServer} for the given {@link RestTemplate},
+&nbsp;	 * configured with {@link RootUriRequestExpectationManager} when possible.
+&nbsp;	 * @param restTemplate the source REST template
+&nbsp;	 * @param expectationManager the source {@link RequestExpectationManager}
+&nbsp;	 * @return a configured {@link MockRestServiceServer}
+&nbsp;	 */
+&nbsp;	public static MockRestServiceServer bindTo(RestTemplate restTemplate,
+&nbsp;			RequestExpectationManager expectationManager) {
+<b class="nc">&nbsp;		MockRestServiceServerBuilder builder = MockRestServiceServer.bindTo(restTemplate);</b>
+<b class="nc">&nbsp;		return builder.build(forRestTemplate(restTemplate, expectationManager));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return {@link RequestExpectationManager} to be used for binding with the specified
+&nbsp;	 * {@link RestTemplate}. If the {@link RestTemplate} is using a
+&nbsp;	 * {@link RootUriTemplateHandler} then a {@link RootUriRequestExpectationManager} is
+&nbsp;	 * returned, otherwise the source manager is returned unchanged.
+&nbsp;	 * @param restTemplate the source REST template
+&nbsp;	 * @param expectationManager the source {@link RequestExpectationManager}
+&nbsp;	 * @return a {@link RequestExpectationManager} to be bound to the template
+&nbsp;	 */
+&nbsp;	public static RequestExpectationManager forRestTemplate(RestTemplate restTemplate,
+&nbsp;			RequestExpectationManager expectationManager) {
+<b class="nc">&nbsp;		Assert.notNull(restTemplate, &quot;RestTemplate must not be null&quot;);</b>
+<b class="nc">&nbsp;		UriTemplateHandler templateHandler = restTemplate.getUriTemplateHandler();</b>
+<b class="nc">&nbsp;		if (templateHandler instanceof RootUriTemplateHandler rootHandler) {</b>
+<b class="nc">&nbsp;			return new RootUriRequestExpectationManager(rootHandler.getRootUri(), expectationManager);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return expectationManager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ClientHttpRequest} wrapper to replace the request URI.
+&nbsp;	 */
+&nbsp;	private static class ReplaceUriClientHttpRequest extends HttpRequestWrapper implements ClientHttpRequest {
+&nbsp;
+&nbsp;		private final URI uri;
+&nbsp;
+&nbsp;		ReplaceUriClientHttpRequest(URI uri, ClientHttpRequest request) {
+<b class="nc">&nbsp;			super(request);</b>
+<b class="nc">&nbsp;			this.uri = uri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public URI getURI() {
+<b class="nc">&nbsp;			return this.uri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public OutputStream getBody() throws IOException {
+<b class="nc">&nbsp;			return getRequest().getBody();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ClientHttpResponse execute() throws IOException {
+<b class="nc">&nbsp;			return getRequest().execute();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ClientHttpRequest getRequest() {
+<b class="nc">&nbsp;			return (ClientHttpRequest) super.getRequest();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,323 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EmbeddedWebServerFactoryCustomizerAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.embedded</a>
+</div>
+
+<h1>Coverage Summary for Class: EmbeddedWebServerFactoryCustomizerAutoConfiguration (org.springframework.boot.autoconfigure.web.embedded)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmbeddedWebServerFactoryCustomizerAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EmbeddedWebServerFactoryCustomizerAutoConfiguration$JettyWebServerFactoryCustomizerConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedWebServerFactoryCustomizerAutoConfiguration$NettyWebServerFactoryCustomizerConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedWebServerFactoryCustomizerAutoConfiguration$TomcatWebServerFactoryCustomizerConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedWebServerFactoryCustomizerAutoConfiguration$UndertowWebServerFactoryCustomizerConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.embedded;
+&nbsp;
+&nbsp;import io.undertow.Undertow;
+&nbsp;import org.apache.catalina.startup.Tomcat;
+&nbsp;import org.apache.coyote.UpgradeProtocol;
+&nbsp;import org.eclipse.jetty.ee10.webapp.WebAppContext;
+&nbsp;import org.eclipse.jetty.server.Server;
+&nbsp;import org.eclipse.jetty.util.Loader;
+&nbsp;import org.xnio.SslClientAuthMode;
+&nbsp;import reactor.netty.http.server.HttpServer;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWarDeployment;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnThreading;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.autoconfigure.thread.Threading;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.web.embedded.undertow.UndertowDeploymentInfoCustomizer;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.task.VirtualThreadTaskExecutor;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for embedded servlet and reactive
+&nbsp; * web servers customizations.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@ConditionalOnNotWarDeployment
+&nbsp;@ConditionalOnWebApplication
+&nbsp;@EnableConfigurationProperties(ServerProperties.class)
+<b class="nc">&nbsp;public class EmbeddedWebServerFactoryCustomizerAutoConfiguration {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Nested configuration if Tomcat is being used.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass({ Tomcat.class, UpgradeProtocol.class })
+<b class="nc">&nbsp;	public static class TomcatWebServerFactoryCustomizerConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		public TomcatWebServerFactoryCustomizer tomcatWebServerFactoryCustomizer(Environment environment,
+&nbsp;				ServerProperties serverProperties) {
+<b class="nc">&nbsp;			return new TomcatWebServerFactoryCustomizer(environment, serverProperties);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnThreading(Threading.VIRTUAL)
+&nbsp;		TomcatVirtualThreadsWebServerFactoryCustomizer tomcatVirtualThreadsProtocolHandlerCustomizer() {
+<b class="nc">&nbsp;			return new TomcatVirtualThreadsWebServerFactoryCustomizer();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Nested configuration if Jetty is being used.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass({ Server.class, Loader.class, WebAppContext.class })
+<b class="nc">&nbsp;	public static class JettyWebServerFactoryCustomizerConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		public JettyWebServerFactoryCustomizer jettyWebServerFactoryCustomizer(Environment environment,
+&nbsp;				ServerProperties serverProperties) {
+<b class="nc">&nbsp;			return new JettyWebServerFactoryCustomizer(environment, serverProperties);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnThreading(Threading.VIRTUAL)
+&nbsp;		JettyVirtualThreadsWebServerFactoryCustomizer jettyVirtualThreadsWebServerFactoryCustomizer(
+&nbsp;				ServerProperties serverProperties) {
+<b class="nc">&nbsp;			return new JettyVirtualThreadsWebServerFactoryCustomizer(serverProperties);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Nested configuration if Undertow is being used.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass({ Undertow.class, SslClientAuthMode.class })
+<b class="nc">&nbsp;	public static class UndertowWebServerFactoryCustomizerConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		public UndertowWebServerFactoryCustomizer undertowWebServerFactoryCustomizer(Environment environment,
+&nbsp;				ServerProperties serverProperties) {
+<b class="nc">&nbsp;			return new UndertowWebServerFactoryCustomizer(environment, serverProperties);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnThreading(Threading.VIRTUAL)
+&nbsp;		UndertowDeploymentInfoCustomizer virtualThreadsUndertowDeploymentInfoCustomizer() {
+<b class="nc">&nbsp;			return (deploymentInfo) -&gt; deploymentInfo.setExecutor(new VirtualThreadTaskExecutor(&quot;undertow-&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Nested configuration if Netty is being used.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass(HttpServer.class)
+<b class="nc">&nbsp;	public static class NettyWebServerFactoryCustomizerConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		public NettyWebServerFactoryCustomizer nettyWebServerFactoryCustomizer(Environment environment,
+&nbsp;				ServerProperties serverProperties) {
+<b class="nc">&nbsp;			return new NettyWebServerFactoryCustomizer(environment, serverProperties);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

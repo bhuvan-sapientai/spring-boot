@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DockerCompose</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DockerCompose (org.springframework.boot.docker.compose.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DockerCompose</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.core;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.logging.LogLevel;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides a high-level API to work with Docker compose.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.1.0
+&nbsp; */
+&nbsp;public interface DockerCompose {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Timeout duration used to request a forced stop.
+&nbsp;	 */
+<b class="nc">&nbsp;	Duration FORCE_STOP = Duration.ZERO;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Run {@code docker compose up} to create and start services. Waits until all
+&nbsp;	 * contains are started and healthy.
+&nbsp;	 * @param logLevel the log level used to report progress
+&nbsp;	 */
+&nbsp;	void up(LogLevel logLevel);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Run {@code docker compose down} to stop and remove any running services.
+&nbsp;	 * @param timeout the amount of time to wait or {@link #FORCE_STOP} to stop without
+&nbsp;	 * waiting.
+&nbsp;	 */
+&nbsp;	void down(Duration timeout);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Run {@code docker compose start} to start services. Waits until all containers are
+&nbsp;	 * started and healthy.
+&nbsp;	 * @param logLevel the log level used to report progress
+&nbsp;	 */
+&nbsp;	void start(LogLevel logLevel);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Run {@code docker compose stop} to stop any running services.
+&nbsp;	 * @param timeout the amount of time to wait or {@link #FORCE_STOP} to stop without
+&nbsp;	 * waiting.
+&nbsp;	 */
+&nbsp;	void stop(Duration timeout);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if services have been defined in the {@link DockerComposeFile} for the
+&nbsp;	 * active profiles.
+&nbsp;	 * @return {@code true} if services have been defined
+&nbsp;	 * @see #hasDefinedServices()
+&nbsp;	 */
+&nbsp;	boolean hasDefinedServices();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the running services for the active profile, or an empty list if no services
+&nbsp;	 * are running.
+&nbsp;	 * @return the list of running services
+&nbsp;	 */
+&nbsp;	List&lt;RunningService&gt; getRunningServices();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method used to create a {@link DockerCompose} instance.
+&nbsp;	 * @param file the docker compose file
+&nbsp;	 * @param hostname the hostname used for services or {@code null} if the hostname
+&nbsp;	 * should be deduced
+&nbsp;	 * @param activeProfiles a set of the profiles that should be activated
+&nbsp;	 * @return a {@link DockerCompose} instance
+&nbsp;	 */
+&nbsp;	static DockerCompose get(DockerComposeFile file, String hostname, Set&lt;String&gt; activeProfiles) {
+<b class="nc">&nbsp;		DockerCli cli = new DockerCli(null, file, activeProfiles);</b>
+<b class="nc">&nbsp;		return new DefaultDockerCompose(cli, hostname);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,339 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SimpleAsyncTaskExecutorBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.task</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleAsyncTaskExecutorBuilder (org.springframework.boot.task)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleAsyncTaskExecutorBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.task;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.core.task.SimpleAsyncTaskExecutor;
+&nbsp;import org.springframework.core.task.TaskDecorator;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builder that can be used to configure and create a {@link SimpleAsyncTaskExecutor}.
+&nbsp; * Provides convenience methods to set common {@link SimpleAsyncTaskExecutor} settings and
+&nbsp; * register {@link #taskDecorator(TaskDecorator)}). For advanced configuration, consider
+&nbsp; * using {@link SimpleAsyncTaskExecutorCustomizer}.
+&nbsp; * &lt;p&gt;
+&nbsp; * In a typical auto-configured Spring Boot application this builder is available as a
+&nbsp; * bean and can be injected whenever a {@link SimpleAsyncTaskExecutor} is needed.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Filip Hrisafov
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 3.2.0
+&nbsp; */
+&nbsp;public class SimpleAsyncTaskExecutorBuilder {
+&nbsp;
+&nbsp;	private final Boolean virtualThreads;
+&nbsp;
+&nbsp;	private final String threadNamePrefix;
+&nbsp;
+&nbsp;	private final Integer concurrencyLimit;
+&nbsp;
+&nbsp;	private final TaskDecorator taskDecorator;
+&nbsp;
+&nbsp;	private final Set&lt;SimpleAsyncTaskExecutorCustomizer&gt; customizers;
+&nbsp;
+&nbsp;	private final Duration taskTerminationTimeout;
+&nbsp;
+&nbsp;	public SimpleAsyncTaskExecutorBuilder() {
+<b class="nc">&nbsp;		this(null, null, null, null, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private SimpleAsyncTaskExecutorBuilder(Boolean virtualThreads, String threadNamePrefix, Integer concurrencyLimit,
+&nbsp;			TaskDecorator taskDecorator, Set&lt;SimpleAsyncTaskExecutorCustomizer&gt; customizers,
+<b class="nc">&nbsp;			Duration taskTerminationTimeout) {</b>
+<b class="nc">&nbsp;		this.virtualThreads = virtualThreads;</b>
+<b class="nc">&nbsp;		this.threadNamePrefix = threadNamePrefix;</b>
+<b class="nc">&nbsp;		this.concurrencyLimit = concurrencyLimit;</b>
+<b class="nc">&nbsp;		this.taskDecorator = taskDecorator;</b>
+<b class="nc">&nbsp;		this.customizers = customizers;</b>
+<b class="nc">&nbsp;		this.taskTerminationTimeout = taskTerminationTimeout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the prefix to use for the names of newly created threads.
+&nbsp;	 * @param threadNamePrefix the thread name prefix to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder threadNamePrefix(String threadNamePrefix) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskExecutorBuilder(this.virtualThreads, threadNamePrefix, this.concurrencyLimit,</b>
+&nbsp;				this.taskDecorator, this.customizers, this.taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set whether to use virtual threads.
+&nbsp;	 * @param virtualThreads whether to use virtual threads
+&nbsp;	 * @return a new builder instance
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder virtualThreads(Boolean virtualThreads) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskExecutorBuilder(virtualThreads, this.threadNamePrefix, this.concurrencyLimit,</b>
+&nbsp;				this.taskDecorator, this.customizers, this.taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the concurrency limit.
+&nbsp;	 * @param concurrencyLimit the concurrency limit
+&nbsp;	 * @return a new builder instance
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder concurrencyLimit(Integer concurrencyLimit) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskExecutorBuilder(this.virtualThreads, this.threadNamePrefix, concurrencyLimit,</b>
+&nbsp;				this.taskDecorator, this.customizers, this.taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link TaskDecorator} to use or {@code null} to not use any.
+&nbsp;	 * @param taskDecorator the task decorator to use
+&nbsp;	 * @return a new builder instance
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder taskDecorator(TaskDecorator taskDecorator) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskExecutorBuilder(this.virtualThreads, this.threadNamePrefix, this.concurrencyLimit,</b>
+&nbsp;				taskDecorator, this.customizers, this.taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the task termination timeout.
+&nbsp;	 * @param taskTerminationTimeout the task termination timeout
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @since 3.2.1
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder taskTerminationTimeout(Duration taskTerminationTimeout) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskExecutorBuilder(this.virtualThreads, this.threadNamePrefix, this.concurrencyLimit,</b>
+&nbsp;				this.taskDecorator, this.customizers, taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link SimpleAsyncTaskExecutorCustomizer customizers} that should be
+&nbsp;	 * applied to the {@link SimpleAsyncTaskExecutor}. Customizers are applied in the
+&nbsp;	 * order that they were added after builder configuration has been applied. Setting
+&nbsp;	 * this value will replace any previously configured customizers.
+&nbsp;	 * @param customizers the customizers to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #additionalCustomizers(SimpleAsyncTaskExecutorCustomizer...)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder customizers(SimpleAsyncTaskExecutorCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return customizers(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link SimpleAsyncTaskExecutorCustomizer customizers} that should be
+&nbsp;	 * applied to the {@link SimpleAsyncTaskExecutor}. Customizers are applied in the
+&nbsp;	 * order that they were added after builder configuration has been applied. Setting
+&nbsp;	 * this value will replace any previously configured customizers.
+&nbsp;	 * @param customizers the customizers to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #additionalCustomizers(Iterable)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder customizers(
+&nbsp;			Iterable&lt;? extends SimpleAsyncTaskExecutorCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new SimpleAsyncTaskExecutorBuilder(this.virtualThreads, this.threadNamePrefix, this.concurrencyLimit,</b>
+<b class="nc">&nbsp;				this.taskDecorator, append(null, customizers), this.taskTerminationTimeout);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link SimpleAsyncTaskExecutorCustomizer customizers} that should be applied to
+&nbsp;	 * the {@link SimpleAsyncTaskExecutor}. Customizers are applied in the order that they
+&nbsp;	 * were added after builder configuration has been applied.
+&nbsp;	 * @param customizers the customizers to add
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #customizers(SimpleAsyncTaskExecutorCustomizer...)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder additionalCustomizers(SimpleAsyncTaskExecutorCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return additionalCustomizers(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link SimpleAsyncTaskExecutorCustomizer customizers} that should be applied to
+&nbsp;	 * the {@link SimpleAsyncTaskExecutor}. Customizers are applied in the order that they
+&nbsp;	 * were added after builder configuration has been applied.
+&nbsp;	 * @param customizers the customizers to add
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #customizers(Iterable)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorBuilder additionalCustomizers(
+&nbsp;			Iterable&lt;? extends SimpleAsyncTaskExecutorCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new SimpleAsyncTaskExecutorBuilder(this.virtualThreads, this.threadNamePrefix, this.concurrencyLimit,</b>
+<b class="nc">&nbsp;				this.taskDecorator, append(this.customizers, customizers), this.taskTerminationTimeout);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Build a new {@link SimpleAsyncTaskExecutor} instance and configure it using this
+&nbsp;	 * builder.
+&nbsp;	 * @return a configured {@link SimpleAsyncTaskExecutor} instance.
+&nbsp;	 * @see #build(Class)
+&nbsp;	 * @see #configure(SimpleAsyncTaskExecutor)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutor build() {
+<b class="nc">&nbsp;		return configure(new SimpleAsyncTaskExecutor());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Build a new {@link SimpleAsyncTaskExecutor} instance of the specified type and
+&nbsp;	 * configure it using this builder.
+&nbsp;	 * @param &lt;T&gt; the type of task executor
+&nbsp;	 * @param taskExecutorClass the template type to create
+&nbsp;	 * @return a configured {@link SimpleAsyncTaskExecutor} instance.
+&nbsp;	 * @see #build()
+&nbsp;	 * @see #configure(SimpleAsyncTaskExecutor)
+&nbsp;	 */
+&nbsp;	public &lt;T extends SimpleAsyncTaskExecutor&gt; T build(Class&lt;T&gt; taskExecutorClass) {
+<b class="nc">&nbsp;		return configure(BeanUtils.instantiateClass(taskExecutorClass));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the provided {@link SimpleAsyncTaskExecutor} instance using this builder.
+&nbsp;	 * @param &lt;T&gt; the type of task executor
+&nbsp;	 * @param taskExecutor the {@link SimpleAsyncTaskExecutor} to configure
+&nbsp;	 * @return the task executor instance
+&nbsp;	 * @see #build()
+&nbsp;	 * @see #build(Class)
+&nbsp;	 */
+&nbsp;	public &lt;T extends SimpleAsyncTaskExecutor&gt; T configure(T taskExecutor) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(this.virtualThreads).to(taskExecutor::setVirtualThreads);</b>
+<b class="nc">&nbsp;		map.from(this.threadNamePrefix).whenHasText().to(taskExecutor::setThreadNamePrefix);</b>
+<b class="nc">&nbsp;		map.from(this.concurrencyLimit).to(taskExecutor::setConcurrencyLimit);</b>
+<b class="nc">&nbsp;		map.from(this.taskDecorator).to(taskExecutor::setTaskDecorator);</b>
+<b class="nc">&nbsp;		map.from(this.taskTerminationTimeout).as(Duration::toMillis).to(taskExecutor::setTaskTerminationTimeout);</b>
+<b class="nc">&nbsp;		if (!CollectionUtils.isEmpty(this.customizers)) {</b>
+<b class="nc">&nbsp;			this.customizers.forEach((customizer) -&gt; customizer.customize(taskExecutor));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return taskExecutor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; Set&lt;T&gt; append(Set&lt;T&gt; set, Iterable&lt;? extends T&gt; additions) {
+<b class="nc">&nbsp;		Set&lt;T&gt; result = new LinkedHashSet&lt;&gt;((set != null) ? set : Collections.emptySet());</b>
+<b class="nc">&nbsp;		additions.forEach(result::add);</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableSet(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

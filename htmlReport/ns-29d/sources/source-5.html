@@ -1,0 +1,420 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarUrlClassLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.net.protocol.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: JarUrlClassLoader (org.springframework.boot.loader.net.protocol.jar)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarUrlClassLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/93)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JarUrlClassLoader$OptimizedEnumeration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/103)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.net.protocol.jar;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.JarURLConnection;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.jar.NestedJarFile;
+&nbsp;import org.springframework.boot.loader.launch.LaunchedClassLoader;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link URLClassLoader} with optimized support for Jar URLs.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 3.2.0
+&nbsp; */
+&nbsp;public abstract class JarUrlClassLoader extends URLClassLoader {
+&nbsp;
+&nbsp;	private final URL[] urls;
+&nbsp;
+&nbsp;	private final boolean hasJarUrls;
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;URL, JarFile&gt; jarFiles = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;String&gt; undefinablePackages = Collections.newSetFromMap(new ConcurrentHashMap&lt;&gt;());</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LaunchedClassLoader} instance.
+&nbsp;	 * @param urls the URLs from which to load classes and resources
+&nbsp;	 * @param parent the parent class loader for delegation
+&nbsp;	 */
+&nbsp;	public JarUrlClassLoader(URL[] urls, ClassLoader parent) {
+<b class="nc">&nbsp;		super(urls, parent);</b>
+<b class="nc">&nbsp;		this.urls = urls;</b>
+<b class="nc">&nbsp;		this.hasJarUrls = Arrays.stream(urls).anyMatch(this::isJarUrl);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URL findResource(String name) {
+<b class="nc">&nbsp;		if (!this.hasJarUrls) {</b>
+<b class="nc">&nbsp;			return super.findResource(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Optimizations.enable(false);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return super.findResource(name);</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			Optimizations.disable();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Enumeration&lt;URL&gt; findResources(String name) throws IOException {
+<b class="nc">&nbsp;		if (!this.hasJarUrls) {</b>
+<b class="nc">&nbsp;			return super.findResources(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Optimizations.enable(false);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return new OptimizedEnumeration(super.findResources(name));</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			Optimizations.disable();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+<b class="nc">&nbsp;		if (!this.hasJarUrls) {</b>
+<b class="nc">&nbsp;			return super.loadClass(name, resolve);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Optimizations.enable(true);</b>
+&nbsp;		try {
+&nbsp;			try {
+<b class="nc">&nbsp;				definePackageIfNecessary(name);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IllegalArgumentException ex) {</b>
+<b class="nc">&nbsp;				tolerateRaceConditionDueToBeingParallelCapable(ex, name);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return super.loadClass(name, resolve);</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			Optimizations.disable();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Define a package before a {@code findClass} call is made. This is necessary to
+&nbsp;	 * ensure that the appropriate manifest for nested JARs is associated with the
+&nbsp;	 * package.
+&nbsp;	 * @param className the class name being found
+&nbsp;	 */
+&nbsp;	protected final void definePackageIfNecessary(String className) {
+<b class="nc">&nbsp;		if (className.startsWith(&quot;java.&quot;)) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		int lastDot = className.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;		if (lastDot &gt;= 0) {</b>
+<b class="nc">&nbsp;			String packageName = className.substring(0, lastDot);</b>
+<b class="nc">&nbsp;			if (getDefinedPackage(packageName) == null) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					definePackage(className, packageName);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IllegalArgumentException ex) {</b>
+<b class="nc">&nbsp;					tolerateRaceConditionDueToBeingParallelCapable(ex, packageName);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void definePackage(String className, String packageName) {
+<b class="nc">&nbsp;		if (this.undefinablePackages.contains(packageName)) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		String packageEntryName = packageName.replace(&#39;.&#39;, &#39;/&#39;) + &quot;/&quot;;</b>
+<b class="nc">&nbsp;		String classEntryName = className.replace(&#39;.&#39;, &#39;/&#39;) + &quot;.class&quot;;</b>
+<b class="nc">&nbsp;		for (URL url : this.urls) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				JarFile jarFile = getJarFile(url);</b>
+<b class="nc">&nbsp;				if (jarFile != null) {</b>
+<b class="nc">&nbsp;					if (hasEntry(jarFile, classEntryName) &amp;&amp; hasEntry(jarFile, packageEntryName)</b>
+<b class="nc">&nbsp;							&amp;&amp; jarFile.getManifest() != null) {</b>
+<b class="nc">&nbsp;						definePackage(packageName, jarFile.getManifest(), url);</b>
+&nbsp;						return;
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+&nbsp;				// Ignore
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.undefinablePackages.add(packageName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void tolerateRaceConditionDueToBeingParallelCapable(IllegalArgumentException ex, String packageName)
+&nbsp;			throws AssertionError {
+<b class="nc">&nbsp;		if (getDefinedPackage(packageName) == null) {</b>
+&nbsp;			// This should never happen as the IllegalArgumentException indicates that the
+&nbsp;			// package has already been defined and, therefore, getDefinedPackage(name)
+&nbsp;			// should not have returned null.
+<b class="nc">&nbsp;			throw new AssertionError(</b>
+<b class="nc">&nbsp;					&quot;Package %s has already been defined but it could not be found&quot;.formatted(packageName), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasEntry(JarFile jarFile, String name) {
+<b class="nc">&nbsp;		return (jarFile instanceof NestedJarFile nestedJarFile) ? nestedJarFile.hasEntry(name)</b>
+<b class="nc">&nbsp;				: jarFile.getEntry(name) != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarFile getJarFile(URL url) throws IOException {
+<b class="nc">&nbsp;		JarFile jarFile = this.jarFiles.get(url);</b>
+<b class="nc">&nbsp;		if (jarFile != null) {</b>
+<b class="nc">&nbsp;			return jarFile;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		URLConnection connection = url.openConnection();</b>
+<b class="nc">&nbsp;		if (!(connection instanceof JarURLConnection)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		connection.setUseCaches(false);</b>
+<b class="nc">&nbsp;		jarFile = ((JarURLConnection) connection).getJarFile();</b>
+<b class="nc">&nbsp;		synchronized (this.jarFiles) {</b>
+<b class="nc">&nbsp;			JarFile previous = this.jarFiles.putIfAbsent(url, jarFile);</b>
+<b class="nc">&nbsp;			if (previous != null) {</b>
+<b class="nc">&nbsp;				jarFile.close();</b>
+<b class="nc">&nbsp;				jarFile = previous;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return jarFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clear any caches. This method is called reflectively by
+&nbsp;	 * {@code ClearCachesApplicationListener}.
+&nbsp;	 */
+&nbsp;	public void clearCache() {
+<b class="nc">&nbsp;		Handler.clearCache();</b>
+<b class="nc">&nbsp;		org.springframework.boot.loader.net.protocol.nested.Handler.clearCache();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			clearJarFiles();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+&nbsp;			// Ignore
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		for (URL url : this.urls) {</b>
+<b class="nc">&nbsp;			if (isJarUrl(url)) {</b>
+<b class="nc">&nbsp;				clearCache(url);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void clearCache(URL url) {
+&nbsp;		try {
+<b class="nc">&nbsp;			URLConnection connection = url.openConnection();</b>
+<b class="nc">&nbsp;			if (connection instanceof JarURLConnection jarUrlConnection) {</b>
+<b class="nc">&nbsp;				clearCache(jarUrlConnection);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+&nbsp;			// Ignore
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void clearCache(JarURLConnection connection) throws IOException {
+<b class="nc">&nbsp;		JarFile jarFile = connection.getJarFile();</b>
+<b class="nc">&nbsp;		if (jarFile instanceof NestedJarFile nestedJarFile) {</b>
+<b class="nc">&nbsp;			nestedJarFile.clearCache();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isJarUrl(URL url) {
+<b class="nc">&nbsp;		return &quot;jar&quot;.equals(url.getProtocol());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void close() throws IOException {
+<b class="nc">&nbsp;		super.close();</b>
+<b class="nc">&nbsp;		clearJarFiles();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void clearJarFiles() throws IOException {
+<b class="nc">&nbsp;		synchronized (this.jarFiles) {</b>
+<b class="nc">&nbsp;			for (JarFile jarFile : this.jarFiles.values()) {</b>
+<b class="nc">&nbsp;				jarFile.close();</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			this.jarFiles.clear();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Enumeration} that uses fast connections.
+&nbsp;	 */
+&nbsp;	private static class OptimizedEnumeration implements Enumeration&lt;URL&gt; {
+&nbsp;
+&nbsp;		private final Enumeration&lt;URL&gt; delegate;
+&nbsp;
+<b class="nc">&nbsp;		OptimizedEnumeration(Enumeration&lt;URL&gt; delegate) {</b>
+<b class="nc">&nbsp;			this.delegate = delegate;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean hasMoreElements() {
+<b class="nc">&nbsp;			Optimizations.enable(false);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return this.delegate.hasMoreElements();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				Optimizations.disable();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public URL nextElement() {
+<b class="nc">&nbsp;			Optimizations.enable(false);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return this.delegate.nextElement();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				Optimizations.disable();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebSessionIdResolverAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: WebSessionIdResolverAutoConfiguration (org.springframework.boot.autoconfigure.web.reactive)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebSessionIdResolverAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.reactive;
+&nbsp;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.web.server.Cookie;
+&nbsp;import org.springframework.boot.web.server.Cookie.SameSite;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.server.session.CookieWebSessionIdResolver;
+&nbsp;import org.springframework.web.server.session.WebSessionIdResolver;
+&nbsp;import org.springframework.web.server.session.WebSessionManager;
+&nbsp;
+&nbsp;/**
+&nbsp; * Auto-configuration for {@link WebSessionIdResolver}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Weix Sun
+&nbsp; * @since 2.6.0
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@ConditionalOnWebApplication(type = Type.REACTIVE)
+&nbsp;@ConditionalOnClass({ WebSessionManager.class, Mono.class })
+&nbsp;@EnableConfigurationProperties({ WebFluxProperties.class, ServerProperties.class })
+&nbsp;public class WebSessionIdResolverAutoConfiguration {
+&nbsp;
+&nbsp;	private final ServerProperties serverProperties;
+&nbsp;
+&nbsp;	public WebSessionIdResolverAutoConfiguration(ServerProperties serverProperties,
+<b class="nc">&nbsp;			WebFluxProperties webFluxProperties) {</b>
+<b class="nc">&nbsp;		this.serverProperties = serverProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public WebSessionIdResolver webSessionIdResolver() {
+<b class="nc">&nbsp;		CookieWebSessionIdResolver resolver = new CookieWebSessionIdResolver();</b>
+<b class="nc">&nbsp;		String cookieName = this.serverProperties.getReactive().getSession().getCookie().getName();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(cookieName)) {</b>
+<b class="nc">&nbsp;			resolver.setCookieName(cookieName);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		resolver.addCookieInitializer(this::initializeCookie);</b>
+<b class="nc">&nbsp;		return resolver;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void initializeCookie(ResponseCookieBuilder builder) {
+<b class="nc">&nbsp;		Cookie cookie = this.serverProperties.getReactive().getSession().getCookie();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(cookie::getDomain).to(builder::domain);</b>
+<b class="nc">&nbsp;		map.from(cookie::getPath).to(builder::path);</b>
+<b class="nc">&nbsp;		map.from(cookie::getHttpOnly).to(builder::httpOnly);</b>
+<b class="nc">&nbsp;		map.from(cookie::getSecure).to(builder::secure);</b>
+<b class="nc">&nbsp;		map.from(cookie::getMaxAge).to(builder::maxAge);</b>
+<b class="nc">&nbsp;		map.from(getSameSite(cookie)).to(builder::sameSite);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getSameSite(Cookie properties) {
+<b class="nc">&nbsp;		SameSite sameSite = properties.getSameSite();</b>
+<b class="nc">&nbsp;		return (sameSite != null) ? sameSite.attributeValue() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

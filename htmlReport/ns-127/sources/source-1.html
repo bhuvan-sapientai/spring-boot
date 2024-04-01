@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AsciidoctorConventions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build</a>
+</div>
+
+<h1>Coverage Summary for Class: AsciidoctorConventions (org.springframework.boot.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AsciidoctorConventions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.asciidoctor.gradle.jvm.AbstractAsciidoctorTask;
+&nbsp;import org.asciidoctor.gradle.jvm.AsciidoctorJExtension;
+&nbsp;import org.asciidoctor.gradle.jvm.AsciidoctorJPlugin;
+&nbsp;import org.asciidoctor.gradle.jvm.AsciidoctorTask;
+&nbsp;import org.gradle.api.JavaVersion;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.tasks.PathSensitivity;
+&nbsp;import org.gradle.api.tasks.Sync;
+&nbsp;
+&nbsp;import org.springframework.boot.build.artifacts.ArtifactRelease;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Conventions that are applied in the presence of the {@link AsciidoctorJPlugin}. When
+&nbsp; * the plugin is applied:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;All warnings are made fatal.
+&nbsp; * &lt;li&gt;The version of AsciidoctorJ is upgraded to 2.4.3.
+&nbsp; * &lt;li&gt;An {@code asciidoctorExtensions} configuration is created.
+&nbsp; * &lt;li&gt;For each {@link AsciidoctorTask} (HTML only):
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;A task is created to sync the documentation resources to its output directory.
+&nbsp; * &lt;li&gt;{@code doctype} {@link AsciidoctorTask#options(Map) option} is configured.
+&nbsp; * &lt;li&gt;The {@code backend} is configured.
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;li&gt;For each {@link AbstractAsciidoctorTask} (HTML and PDF):
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@link AsciidoctorTask#attributes(Map) Attributes} are configured to enable
+&nbsp; * warnings for references to missing attributes, the GitHub tag, the Artifactory repo for
+&nbsp; * the current version, etc.
+&nbsp; * &lt;li&gt;{@link AbstractAsciidoctorTask#baseDirFollowsSourceDir() baseDirFollowsSourceDir()}
+&nbsp; * is enabled.
+&nbsp; * &lt;li&gt;{@code asciidoctorExtensions} is added to the task&#39;s configurations.
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+<b class="nc">&nbsp;class AsciidoctorConventions {</b>
+&nbsp;
+&nbsp;	private static final String ASCIIDOCTORJ_VERSION = &quot;2.4.3&quot;;
+&nbsp;
+&nbsp;	private static final String EXTENSIONS_CONFIGURATION_NAME = &quot;asciidoctorExtensions&quot;;
+&nbsp;
+&nbsp;	void apply(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().withType(AsciidoctorJPlugin.class, (asciidoctorPlugin) -&gt; {</b>
+<b class="nc">&nbsp;			makeAllWarningsFatal(project);</b>
+<b class="nc">&nbsp;			upgradeAsciidoctorJVersion(project);</b>
+<b class="nc">&nbsp;			createAsciidoctorExtensionsConfiguration(project);</b>
+<b class="nc">&nbsp;			project.getTasks()</b>
+<b class="nc">&nbsp;				.withType(AbstractAsciidoctorTask.class,</b>
+<b class="nc">&nbsp;						(asciidoctorTask) -&gt; configureAsciidoctorTask(project, asciidoctorTask));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void makeAllWarningsFatal(Project project) {
+<b class="nc">&nbsp;		project.getExtensions().getByType(AsciidoctorJExtension.class).fatalWarnings(&quot;.*&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void upgradeAsciidoctorJVersion(Project project) {
+<b class="nc">&nbsp;		project.getExtensions().getByType(AsciidoctorJExtension.class).setVersion(ASCIIDOCTORJ_VERSION);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createAsciidoctorExtensionsConfiguration(Project project) {
+<b class="nc">&nbsp;		project.getConfigurations().create(EXTENSIONS_CONFIGURATION_NAME, (configuration) -&gt; {</b>
+<b class="nc">&nbsp;			project.getConfigurations()</b>
+<b class="nc">&nbsp;				.matching((candidate) -&gt; &quot;dependencyManagement&quot;.equals(candidate.getName()))</b>
+<b class="nc">&nbsp;				.all(configuration::extendsFrom);</b>
+<b class="nc">&nbsp;			configuration.getDependencies()</b>
+<b class="nc">&nbsp;				.add(project.getDependencies()</b>
+<b class="nc">&nbsp;					.create(&quot;io.spring.asciidoctor.backends:spring-asciidoctor-backends:0.0.5&quot;));</b>
+<b class="nc">&nbsp;			configuration.getDependencies()</b>
+<b class="nc">&nbsp;				.add(project.getDependencies().create(&quot;org.asciidoctor:asciidoctorj-pdf:1.5.3&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureAsciidoctorTask(Project project, AbstractAsciidoctorTask asciidoctorTask) {
+<b class="nc">&nbsp;		asciidoctorTask.configurations(EXTENSIONS_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		configureCommonAttributes(project, asciidoctorTask);</b>
+<b class="nc">&nbsp;		configureOptions(asciidoctorTask);</b>
+<b class="nc">&nbsp;		configureForkOptions(asciidoctorTask);</b>
+<b class="nc">&nbsp;		asciidoctorTask.baseDirFollowsSourceDir();</b>
+<b class="nc">&nbsp;		createSyncDocumentationSourceTask(project, asciidoctorTask);</b>
+<b class="nc">&nbsp;		if (asciidoctorTask instanceof AsciidoctorTask task) {</b>
+<b class="nc">&nbsp;			boolean pdf = task.getName().toLowerCase().contains(&quot;pdf&quot;);</b>
+<b class="nc">&nbsp;			String backend = (!pdf) ? &quot;spring-html&quot; : &quot;spring-pdf&quot;;</b>
+<b class="nc">&nbsp;			task.outputOptions((outputOptions) -&gt; outputOptions.backends(backend));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureCommonAttributes(Project project, AbstractAsciidoctorTask asciidoctorTask) {
+<b class="nc">&nbsp;		ArtifactRelease artifacts = ArtifactRelease.forProject(project);</b>
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; attributes = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		attributes.put(&quot;attribute-missing&quot;, &quot;warn&quot;);</b>
+<b class="nc">&nbsp;		attributes.put(&quot;github-tag&quot;, determineGitHubTag(project));</b>
+<b class="nc">&nbsp;		attributes.put(&quot;artifact-release-type&quot;, artifacts.getType());</b>
+<b class="nc">&nbsp;		attributes.put(&quot;artifact-download-repo&quot;, artifacts.getDownloadRepo());</b>
+<b class="nc">&nbsp;		attributes.put(&quot;revnumber&quot;, null);</b>
+<b class="nc">&nbsp;		asciidoctorTask.attributes(attributes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	// See https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/597
+&nbsp;	private void configureForkOptions(AbstractAsciidoctorTask asciidoctorTask) {
+<b class="nc">&nbsp;		if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_16)) {</b>
+<b class="nc">&nbsp;			asciidoctorTask.forkOptions((options) -&gt; options.jvmArgs(&quot;--add-opens&quot;, &quot;java.base/sun.nio.ch=ALL-UNNAMED&quot;,</b>
+&nbsp;					&quot;--add-opens&quot;, &quot;java.base/java.io=ALL-UNNAMED&quot;));
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String determineGitHubTag(Project project) {
+<b class="nc">&nbsp;		String version = &quot;v&quot; + project.getVersion();</b>
+<b class="nc">&nbsp;		return (version.endsWith(&quot;-SNAPSHOT&quot;)) ? &quot;main&quot; : version;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureOptions(AbstractAsciidoctorTask asciidoctorTask) {
+<b class="nc">&nbsp;		asciidoctorTask.options(Collections.singletonMap(&quot;doctype&quot;, &quot;book&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Sync createSyncDocumentationSourceTask(Project project, AbstractAsciidoctorTask asciidoctorTask) {
+<b class="nc">&nbsp;		Sync syncDocumentationSource = project.getTasks()</b>
+<b class="nc">&nbsp;			.create(&quot;syncDocumentationSourceFor&quot; + StringUtils.capitalize(asciidoctorTask.getName()), Sync.class);</b>
+<b class="nc">&nbsp;		File syncedSource = new File(project.getBuildDir(), &quot;docs/src/&quot; + asciidoctorTask.getName());</b>
+<b class="nc">&nbsp;		syncDocumentationSource.setDestinationDir(syncedSource);</b>
+<b class="nc">&nbsp;		syncDocumentationSource.from(&quot;src/docs/&quot;);</b>
+<b class="nc">&nbsp;		asciidoctorTask.dependsOn(syncDocumentationSource);</b>
+<b class="nc">&nbsp;		asciidoctorTask.getInputs()</b>
+<b class="nc">&nbsp;			.dir(syncedSource)</b>
+<b class="nc">&nbsp;			.withPathSensitivity(PathSensitivity.RELATIVE)</b>
+<b class="nc">&nbsp;			.withPropertyName(&quot;synced source&quot;);</b>
+<b class="nc">&nbsp;		asciidoctorTask.setSourceDir(project.relativePath(new File(syncedSource, &quot;asciidoc/&quot;)));</b>
+<b class="nc">&nbsp;		return syncDocumentationSource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

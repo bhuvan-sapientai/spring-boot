@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MariaDbJdbcDockerComposeConnectionDetailsFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.service.connection.mariadb</a>
+</div>
+
+<h1>Coverage Summary for Class: MariaDbJdbcDockerComposeConnectionDetailsFactory (org.springframework.boot.docker.compose.service.connection.mariadb)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MariaDbJdbcDockerComposeConnectionDetailsFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MariaDbJdbcDockerComposeConnectionDetailsFactory$MariaDbJdbcDockerComposeConnectionDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.service.connection.mariadb;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.jdbc.JdbcConnectionDetails;
+&nbsp;import org.springframework.boot.docker.compose.core.RunningService;
+&nbsp;import org.springframework.boot.docker.compose.service.connection.DockerComposeConnectionDetailsFactory;
+&nbsp;import org.springframework.boot.docker.compose.service.connection.DockerComposeConnectionSource;
+&nbsp;import org.springframework.boot.docker.compose.service.connection.jdbc.JdbcUrlBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link DockerComposeConnectionDetailsFactory} to create {@link JdbcConnectionDetails}
+&nbsp; * for a {@code mariadb} service.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class MariaDbJdbcDockerComposeConnectionDetailsFactory
+&nbsp;		extends DockerComposeConnectionDetailsFactory&lt;JdbcConnectionDetails&gt; {
+&nbsp;
+&nbsp;	protected MariaDbJdbcDockerComposeConnectionDetailsFactory() {
+<b class="nc">&nbsp;		super(&quot;mariadb&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected JdbcConnectionDetails getDockerComposeConnectionDetails(DockerComposeConnectionSource source) {
+<b class="nc">&nbsp;		return new MariaDbJdbcDockerComposeConnectionDetails(source.getRunningService());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link JdbcConnectionDetails} backed by a {@code mariadb} {@link RunningService}.
+&nbsp;	 */
+&nbsp;	static class MariaDbJdbcDockerComposeConnectionDetails extends DockerComposeConnectionDetails
+&nbsp;			implements JdbcConnectionDetails {
+&nbsp;
+<b class="nc">&nbsp;		private static final JdbcUrlBuilder jdbcUrlBuilder = new JdbcUrlBuilder(&quot;mariadb&quot;, 3306);</b>
+&nbsp;
+&nbsp;		private final MariaDbEnvironment environment;
+&nbsp;
+&nbsp;		private final String jdbcUrl;
+&nbsp;
+&nbsp;		MariaDbJdbcDockerComposeConnectionDetails(RunningService service) {
+<b class="nc">&nbsp;			super(service);</b>
+<b class="nc">&nbsp;			this.environment = new MariaDbEnvironment(service.env());</b>
+<b class="nc">&nbsp;			this.jdbcUrl = jdbcUrlBuilder.build(service, this.environment.getDatabase());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getUsername() {
+<b class="nc">&nbsp;			return this.environment.getUsername();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getPassword() {
+<b class="nc">&nbsp;			return this.environment.getPassword();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getJdbcUrl() {
+<b class="nc">&nbsp;			return this.jdbcUrl;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,254 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImageAssert</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.image.assertions</a>
+</div>
+
+<h1>Coverage Summary for Class: ImageAssert (org.springframework.boot.image.assertions)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImageAssert</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ImageAssert$LayerContentAssert</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.image.assertions;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+&nbsp;import org.apache.commons.compress.utils.IOUtils;
+&nbsp;import org.assertj.core.api.AbstractAssert;
+&nbsp;import org.assertj.core.api.Assertions;
+&nbsp;import org.assertj.core.api.ListAssert;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.DockerApi;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageReference;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Layer;
+&nbsp;import org.springframework.boot.test.json.JsonContentAssert;
+&nbsp;
+&nbsp;/**
+&nbsp; * AssertJ {@link org.assertj.core.api.Assert} for Docker image contents.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;public class ImageAssert extends AbstractAssert&lt;ImageAssert, ImageReference&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private final HashMap&lt;String, Layer&gt; layers = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	ImageAssert(ImageReference imageReference) throws IOException {
+<b class="nc">&nbsp;		super(imageReference, ImageAssert.class);</b>
+<b class="nc">&nbsp;		getLayers();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void layer(String layerDigest, Consumer&lt;LayerContentAssert&gt; assertConsumer) {
+<b class="nc">&nbsp;		if (!this.layers.containsKey(layerDigest)) {</b>
+<b class="nc">&nbsp;			failWithMessage(&quot;Layer with digest &#39;%s&#39; not found in image&quot;, layerDigest);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		assertConsumer.accept(new LayerContentAssert(this.layers.get(layerDigest)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void getLayers() throws IOException {
+<b class="nc">&nbsp;		new DockerApi().image().exportLayers(this.actual, (id, tarArchive) -&gt; {</b>
+<b class="nc">&nbsp;			Layer layer = Layer.fromTarArchive(tarArchive);</b>
+<b class="nc">&nbsp;			this.layers.put(layer.getId().toString(), layer);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Asserts for image layers.
+&nbsp;	 */
+&nbsp;	public static class LayerContentAssert extends AbstractAssert&lt;LayerContentAssert, Layer&gt; {
+&nbsp;
+&nbsp;		public LayerContentAssert(Layer layer) {
+<b class="nc">&nbsp;			super(layer, LayerContentAssert.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public ListAssert&lt;String&gt; entries() {
+<b class="nc">&nbsp;			List&lt;String&gt; entryNames = new ArrayList&lt;&gt;();</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				ByteArrayOutputStream out = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;				this.actual.writeTo(out);</b>
+<b class="nc">&nbsp;				try (TarArchiveInputStream in = new TarArchiveInputStream(</b>
+<b class="nc">&nbsp;						new ByteArrayInputStream(out.toByteArray()))) {</b>
+<b class="nc">&nbsp;					TarArchiveEntry entry = in.getNextEntry();</b>
+<b class="nc">&nbsp;					while (entry != null) {</b>
+<b class="nc">&nbsp;						if (!entry.isDirectory()) {</b>
+<b class="nc">&nbsp;							entryNames.add(entry.getName().replaceFirst(&quot;^/workspace/&quot;, &quot;&quot;));</b>
+&nbsp;						}
+<b class="nc">&nbsp;						entry = in.getNextEntry();</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				failWithMessage(&quot;IOException while reading image layer archive: &#39;%s&#39;&quot;, ex.getMessage());</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return Assertions.assertThat(entryNames);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void jsonEntry(String name, Consumer&lt;JsonContentAssert&gt; assertConsumer) {
+&nbsp;			try {
+<b class="nc">&nbsp;				ByteArrayOutputStream out = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;				this.actual.writeTo(out);</b>
+<b class="nc">&nbsp;				try (TarArchiveInputStream in = new TarArchiveInputStream(</b>
+<b class="nc">&nbsp;						new ByteArrayInputStream(out.toByteArray()))) {</b>
+<b class="nc">&nbsp;					TarArchiveEntry entry = in.getNextEntry();</b>
+<b class="nc">&nbsp;					while (entry != null) {</b>
+<b class="nc">&nbsp;						if (entry.getName().equals(name)) {</b>
+<b class="nc">&nbsp;							ByteArrayOutputStream entryOut = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;							IOUtils.copy(in, entryOut);</b>
+<b class="nc">&nbsp;							assertConsumer.accept(new JsonContentAssert(LayerContentAssert.class, entryOut.toString()));</b>
+&nbsp;							return;
+&nbsp;						}
+<b class="nc">&nbsp;						entry = in.getNextEntry();</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				failWithMessage(&quot;Expected JSON entry &#39;%s&#39; in layer with digest &#39;%s&#39;&quot;, name, this.actual.getId());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				failWithMessage(&quot;IOException while reading image layer archive: &#39;%s&#39;&quot;, ex.getMessage());</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

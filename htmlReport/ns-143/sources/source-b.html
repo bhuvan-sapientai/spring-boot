@@ -1,0 +1,416 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImageReference</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.type</a>
+</div>
+
+<h1>Coverage Summary for Class: ImageReference (org.springframework.boot.buildpack.platform.docker.type)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImageReference</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/89)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.type;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A reference to a Docker image of the form {@code &quot;imagename[:tag|@digest]&quot;}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 2.3.0
+&nbsp; * @see ImageName
+&nbsp; */
+&nbsp;public final class ImageReference {
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern JAR_VERSION_PATTERN = Pattern.compile(&quot;^(.*)(\\-\\d+)$&quot;);</b>
+&nbsp;
+&nbsp;	private static final String LATEST = &quot;latest&quot;;
+&nbsp;
+&nbsp;	private final ImageName name;
+&nbsp;
+&nbsp;	private final String tag;
+&nbsp;
+&nbsp;	private final String digest;
+&nbsp;
+&nbsp;	private final String string;
+&nbsp;
+<b class="nc">&nbsp;	private ImageReference(ImageName name, String tag, String digest) {</b>
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.name = name;</b>
+<b class="nc">&nbsp;		this.tag = tag;</b>
+<b class="nc">&nbsp;		this.digest = digest;</b>
+<b class="nc">&nbsp;		this.string = buildString(name.toString(), tag, digest);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the domain for this image name.
+&nbsp;	 * @return the domain
+&nbsp;	 * @see ImageName#getDomain()
+&nbsp;	 */
+&nbsp;	public String getDomain() {
+<b class="nc">&nbsp;		return this.name.getDomain();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of this image.
+&nbsp;	 * @return the image name
+&nbsp;	 * @see ImageName#getName()
+&nbsp;	 */
+&nbsp;	public String getName() {
+<b class="nc">&nbsp;		return this.name.getName();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the tag from the reference or {@code null}.
+&nbsp;	 * @return the referenced tag
+&nbsp;	 */
+&nbsp;	public String getTag() {
+<b class="nc">&nbsp;		return this.tag;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the digest from the reference or {@code null}.
+&nbsp;	 * @return the referenced digest
+&nbsp;	 */
+&nbsp;	public String getDigest() {
+<b class="nc">&nbsp;		return this.digest;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ImageReference other = (ImageReference) obj;</b>
+<b class="nc">&nbsp;		boolean result = true;</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; this.name.equals(other.name);</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; ObjectUtils.nullSafeEquals(this.tag, other.tag);</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; ObjectUtils.nullSafeEquals(this.digest, other.digest);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		final int prime = 31;</b>
+<b class="nc">&nbsp;		int result = 1;</b>
+<b class="nc">&nbsp;		result = prime * result + this.name.hashCode();</b>
+<b class="nc">&nbsp;		result = prime * result + ObjectUtils.nullSafeHashCode(this.tag);</b>
+<b class="nc">&nbsp;		result = prime * result + ObjectUtils.nullSafeHashCode(this.digest);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.string;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String toLegacyString() {
+<b class="nc">&nbsp;		return buildString(this.name.toLegacyString(), this.tag, this.digest);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String buildString(String name, String tag, String digest) {
+<b class="nc">&nbsp;		StringBuilder string = new StringBuilder(name);</b>
+<b class="nc">&nbsp;		if (tag != null) {</b>
+<b class="nc">&nbsp;			string.append(&quot;:&quot;).append(tag);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (digest != null) {</b>
+<b class="nc">&nbsp;			string.append(&quot;@&quot;).append(digest);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return string.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ImageReference} with an updated digest.
+&nbsp;	 * @param digest the new digest
+&nbsp;	 * @return an updated image reference
+&nbsp;	 */
+&nbsp;	public ImageReference withDigest(String digest) {
+<b class="nc">&nbsp;		return new ImageReference(this.name, null, digest);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an {@link ImageReference} in the form {@code &quot;imagename:tag&quot;}. If the tag
+&nbsp;	 * has not been defined then {@code latest} is used.
+&nbsp;	 * @return the image reference in tagged form
+&nbsp;	 * @throws IllegalStateException if the image reference contains a digest
+&nbsp;	 */
+&nbsp;	public ImageReference inTaggedForm() {
+<b class="nc">&nbsp;		Assert.state(this.digest == null, () -&gt; &quot;Image reference &#39;&quot; + this + &quot;&#39; cannot contain a digest&quot;);</b>
+<b class="nc">&nbsp;		return new ImageReference(this.name, (this.tag != null) ? this.tag : LATEST, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an {@link ImageReference} without the tag.
+&nbsp;	 * @return the image reference in tagless form
+&nbsp;	 * @since 2.7.12
+&nbsp;	 */
+&nbsp;	public ImageReference inTaglessForm() {
+<b class="nc">&nbsp;		if (this.tag == null) {</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ImageReference(this.name, null, this.digest);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an {@link ImageReference} containing either a tag or a digest. If neither
+&nbsp;	 * the digest nor the tag has been defined then tag {@code latest} is used.
+&nbsp;	 * @return the image reference in tagged or digest form
+&nbsp;	 */
+&nbsp;	public ImageReference inTaggedOrDigestForm() {
+<b class="nc">&nbsp;		if (this.digest != null) {</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return inTaggedForm();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ImageReference} instance deduced from a source JAR file that
+&nbsp;	 * follows common Java naming conventions.
+&nbsp;	 * @param jarFile the source jar file
+&nbsp;	 * @return an {@link ImageName} for the jar file.
+&nbsp;	 */
+&nbsp;	public static ImageReference forJarFile(File jarFile) {
+<b class="nc">&nbsp;		String filename = jarFile.getName();</b>
+<b class="nc">&nbsp;		Assert.isTrue(filename.toLowerCase().endsWith(&quot;.jar&quot;), () -&gt; &quot;File &#39;&quot; + jarFile + &quot;&#39; is not a JAR&quot;);</b>
+<b class="nc">&nbsp;		filename = filename.substring(0, filename.length() - 4);</b>
+<b class="nc">&nbsp;		int firstDot = filename.indexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;		if (firstDot == -1) {</b>
+<b class="nc">&nbsp;			return of(filename);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String name = filename.substring(0, firstDot);</b>
+<b class="nc">&nbsp;		String version = filename.substring(firstDot + 1);</b>
+<b class="nc">&nbsp;		Matcher matcher = JAR_VERSION_PATTERN.matcher(name);</b>
+<b class="nc">&nbsp;		if (matcher.matches()) {</b>
+<b class="nc">&nbsp;			name = matcher.group(1);</b>
+<b class="nc">&nbsp;			version = matcher.group(2).substring(1) + &quot;.&quot; + version;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return of(ImageName.of(name), version);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Generate an image name with a random suffix.
+&nbsp;	 * @param prefix the name prefix
+&nbsp;	 * @return a random image reference
+&nbsp;	 */
+&nbsp;	public static ImageReference random(String prefix) {
+<b class="nc">&nbsp;		return ImageReference.random(prefix, 10);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Generate an image name with a random suffix.
+&nbsp;	 * @param prefix the name prefix
+&nbsp;	 * @param randomLength the number of chars in the random part of the name
+&nbsp;	 * @return a random image reference
+&nbsp;	 */
+&nbsp;	public static ImageReference random(String prefix, int randomLength) {
+<b class="nc">&nbsp;		return of(RandomString.generate(prefix, randomLength));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ImageReference} from the given value. The following value forms
+&nbsp;	 * can be used:
+&nbsp;	 * &lt;ul&gt;
+&nbsp;	 * &lt;li&gt;{@code name} (maps to {@code docker.io/library/name})&lt;/li&gt;
+&nbsp;	 * &lt;li&gt;{@code domain/name}&lt;/li&gt;
+&nbsp;	 * &lt;li&gt;{@code domain:port/name}&lt;/li&gt;
+&nbsp;	 * &lt;li&gt;{@code domain:port/name:tag}&lt;/li&gt;
+&nbsp;	 * &lt;li&gt;{@code domain:port/name@digest}&lt;/li&gt;
+&nbsp;	 * &lt;/ul&gt;
+&nbsp;	 * @param value the value to parse
+&nbsp;	 * @return an {@link ImageName} instance
+&nbsp;	 */
+&nbsp;	public static ImageReference of(String value) {
+<b class="nc">&nbsp;		Assert.hasText(value, &quot;Value must not be null&quot;);</b>
+<b class="nc">&nbsp;		String domain = ImageName.parseDomain(value);</b>
+<b class="nc">&nbsp;		String path = (domain != null) ? value.substring(domain.length() + 1) : value;</b>
+<b class="nc">&nbsp;		String digest = null;</b>
+<b class="nc">&nbsp;		int digestSplit = path.indexOf(&quot;@&quot;);</b>
+<b class="nc">&nbsp;		if (digestSplit != -1) {</b>
+<b class="nc">&nbsp;			String remainder = path.substring(digestSplit + 1);</b>
+<b class="nc">&nbsp;			Matcher matcher = Regex.DIGEST.matcher(remainder);</b>
+<b class="nc">&nbsp;			if (matcher.find()) {</b>
+<b class="nc">&nbsp;				digest = remainder.substring(0, matcher.end());</b>
+<b class="nc">&nbsp;				remainder = remainder.substring(matcher.end());</b>
+<b class="nc">&nbsp;				path = path.substring(0, digestSplit) + remainder;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		String tag = null;</b>
+<b class="nc">&nbsp;		int tagSplit = path.lastIndexOf(&quot;:&quot;);</b>
+<b class="nc">&nbsp;		if (tagSplit != -1) {</b>
+<b class="nc">&nbsp;			String remainder = path.substring(tagSplit + 1);</b>
+<b class="nc">&nbsp;			Matcher matcher = Regex.TAG.matcher(remainder);</b>
+<b class="nc">&nbsp;			if (matcher.find()) {</b>
+<b class="nc">&nbsp;				tag = remainder.substring(0, matcher.end());</b>
+<b class="nc">&nbsp;				remainder = remainder.substring(matcher.end());</b>
+<b class="nc">&nbsp;				path = path.substring(0, tagSplit) + remainder;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		Assert.isTrue(isLowerCase(path) &amp;&amp; matchesPathRegex(path),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Unable to parse image reference \&quot;&quot; + value + &quot;\&quot;. &quot;</b>
+&nbsp;						+ &quot;Image reference must be in the form &#39;[domainHost:port/][path/]name[:tag][@digest]&#39;, &quot;
+&nbsp;						+ &quot;with &#39;path&#39; and &#39;name&#39; containing only [a-z0-9][.][_][-]&quot;);
+<b class="nc">&nbsp;		ImageName name = new ImageName(domain, path);</b>
+<b class="nc">&nbsp;		return new ImageReference(name, tag, digest);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isLowerCase(String path) {
+<b class="nc">&nbsp;		return path.toLowerCase(Locale.ENGLISH).equals(path);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean matchesPathRegex(String path) {
+<b class="nc">&nbsp;		return Regex.PATH.matcher(path).matches();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ImageReference} from the given {@link ImageName}.
+&nbsp;	 * @param name the image name
+&nbsp;	 * @return a new image reference
+&nbsp;	 */
+&nbsp;	public static ImageReference of(ImageName name) {
+<b class="nc">&nbsp;		return new ImageReference(name, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ImageReference} from the given {@link ImageName} and tag.
+&nbsp;	 * @param name the image name
+&nbsp;	 * @param tag the referenced tag
+&nbsp;	 * @return a new image reference
+&nbsp;	 */
+&nbsp;	public static ImageReference of(ImageName name, String tag) {
+<b class="nc">&nbsp;		return new ImageReference(name, tag, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ImageReference} from the given {@link ImageName}, tag and
+&nbsp;	 * digest.
+&nbsp;	 * @param name the image name
+&nbsp;	 * @param tag the referenced tag
+&nbsp;	 * @param digest the referenced digest
+&nbsp;	 * @return a new image reference
+&nbsp;	 */
+&nbsp;	public static ImageReference of(ImageName name, String tag, String digest) {
+<b class="nc">&nbsp;		return new ImageReference(name, tag, digest);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

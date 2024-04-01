@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReleaseSchedule</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.bom.bomr</a>
+</div>
+
+<h1>Coverage Summary for Class: ReleaseSchedule (org.springframework.boot.build.bom.bomr)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReleaseSchedule</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ReleaseSchedule$Release</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2023-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.bom.bomr;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.OffsetDateTime;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.boot.build.bom.bomr.version.DependencyVersion;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.util.LinkedCaseInsensitiveMap;
+&nbsp;import org.springframework.web.client.RestOperations;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;
+&nbsp;/**
+&nbsp; * Release schedule for Spring projects, retrieved from
+&nbsp; * &lt;a href=&quot;https://calendar.spring.io&quot;&gt;https://calendar.spring.io&lt;/a&gt;.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;class ReleaseSchedule {
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern LIBRARY_AND_VERSION = Pattern.compile(&quot;([A-Za-z0-9 ]+) ([0-9A-Za-z.-]+)&quot;);</b>
+&nbsp;
+&nbsp;	private final RestOperations rest;
+&nbsp;
+&nbsp;	ReleaseSchedule() {
+<b class="nc">&nbsp;		this(new RestTemplate());</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	ReleaseSchedule(RestOperations rest) {</b>
+<b class="nc">&nbsp;		this.rest = rest;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings({ &quot;unchecked&quot;, &quot;rawtypes&quot; })
+&nbsp;	Map&lt;String, List&lt;Release&gt;&gt; releasesBetween(OffsetDateTime start, OffsetDateTime end) {
+<b class="nc">&nbsp;		ResponseEntity&lt;List&gt; response = this.rest</b>
+<b class="nc">&nbsp;			.getForEntity(&quot;https://calendar.spring.io/releases?start=&quot; + start + &quot;&amp;end=&quot; + end, List.class);</b>
+<b class="nc">&nbsp;		List&lt;Map&lt;String, String&gt;&gt; body = response.getBody();</b>
+<b class="nc">&nbsp;		Map&lt;String, List&lt;Release&gt;&gt; releasesByLibrary = new LinkedCaseInsensitiveMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		body.stream()</b>
+<b class="nc">&nbsp;			.map(this::asRelease)</b>
+<b class="nc">&nbsp;			.filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;			.forEach((release) -&gt; releasesByLibrary.computeIfAbsent(release.getLibraryName(), (l) -&gt; new ArrayList&lt;&gt;())</b>
+<b class="nc">&nbsp;				.add(release));</b>
+<b class="nc">&nbsp;		return releasesByLibrary;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Release asRelease(Map&lt;String, String&gt; entry) {
+<b class="nc">&nbsp;		LocalDate due = LocalDate.parse(entry.get(&quot;start&quot;));</b>
+<b class="nc">&nbsp;		String title = entry.get(&quot;title&quot;);</b>
+<b class="nc">&nbsp;		Matcher matcher = LIBRARY_AND_VERSION.matcher(title);</b>
+<b class="nc">&nbsp;		if (!matcher.matches()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String library = matcher.group(1);</b>
+<b class="nc">&nbsp;		String version = matcher.group(2);</b>
+<b class="nc">&nbsp;		return new Release(library, DependencyVersion.parse(version), due);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static class Release {
+&nbsp;
+&nbsp;		private final String libraryName;
+&nbsp;
+&nbsp;		private final DependencyVersion version;
+&nbsp;
+&nbsp;		private final LocalDate dueOn;
+&nbsp;
+<b class="nc">&nbsp;		Release(String libraryName, DependencyVersion version, LocalDate dueOn) {</b>
+<b class="nc">&nbsp;			this.libraryName = libraryName;</b>
+<b class="nc">&nbsp;			this.version = version;</b>
+<b class="nc">&nbsp;			this.dueOn = dueOn;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getLibraryName() {
+<b class="nc">&nbsp;			return this.libraryName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		DependencyVersion getVersion() {
+<b class="nc">&nbsp;			return this.version;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		LocalDate getDueOn() {
+<b class="nc">&nbsp;			return this.dueOn;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

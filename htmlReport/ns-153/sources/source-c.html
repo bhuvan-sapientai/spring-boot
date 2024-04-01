@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SimpleConfigurationMetadataRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationmetadata</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleConfigurationMetadataRepository (org.springframework.boot.configurationmetadata)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleConfigurationMetadataRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationmetadata;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * The default {@link ConfigurationMetadataRepository} implementation.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;@SuppressWarnings(&quot;serial&quot;)
+<b class="nc">&nbsp;public class SimpleConfigurationMetadataRepository implements ConfigurationMetadataRepository, Serializable {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, ConfigurationMetadataGroup&gt; allGroups = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Map&lt;String, ConfigurationMetadataGroup&gt; getAllGroups() {
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(this.allGroups);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Map&lt;String, ConfigurationMetadataProperty&gt; getAllProperties() {
+<b class="nc">&nbsp;		Map&lt;String, ConfigurationMetadataProperty&gt; properties = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (ConfigurationMetadataGroup group : this.allGroups.values()) {</b>
+<b class="nc">&nbsp;			properties.putAll(group.getProperties());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified {@link ConfigurationMetadataSource sources}.
+&nbsp;	 * @param sources the sources to add
+&nbsp;	 */
+&nbsp;	public void add(Collection&lt;ConfigurationMetadataSource&gt; sources) {
+<b class="nc">&nbsp;		for (ConfigurationMetadataSource source : sources) {</b>
+<b class="nc">&nbsp;			String groupId = source.getGroupId();</b>
+<b class="nc">&nbsp;			ConfigurationMetadataGroup group = this.allGroups.computeIfAbsent(groupId,</b>
+<b class="nc">&nbsp;					(key) -&gt; new ConfigurationMetadataGroup(groupId));</b>
+<b class="nc">&nbsp;			String sourceType = source.getType();</b>
+<b class="nc">&nbsp;			if (sourceType != null) {</b>
+<b class="nc">&nbsp;				addOrMergeSource(group.getSources(), sourceType, source);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add a {@link ConfigurationMetadataProperty} with the
+&nbsp;	 * {@link ConfigurationMetadataSource source} that defines it, if any.
+&nbsp;	 * @param property the property to add
+&nbsp;	 * @param source the source
+&nbsp;	 */
+&nbsp;	public void add(ConfigurationMetadataProperty property, ConfigurationMetadataSource source) {
+<b class="nc">&nbsp;		if (source != null) {</b>
+<b class="nc">&nbsp;			source.getProperties().putIfAbsent(property.getId(), property);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		getGroup(source).getProperties().putIfAbsent(property.getId(), property);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Merge the content of the specified repository to this repository.
+&nbsp;	 * @param repository the repository to include
+&nbsp;	 */
+&nbsp;	public void include(ConfigurationMetadataRepository repository) {
+<b class="nc">&nbsp;		for (ConfigurationMetadataGroup group : repository.getAllGroups().values()) {</b>
+<b class="nc">&nbsp;			ConfigurationMetadataGroup existingGroup = this.allGroups.get(group.getId());</b>
+<b class="nc">&nbsp;			if (existingGroup == null) {</b>
+<b class="nc">&nbsp;				this.allGroups.put(group.getId(), group);</b>
+&nbsp;			}
+&nbsp;			else {
+&nbsp;				// Merge properties
+<b class="nc">&nbsp;				group.getProperties().forEach((name, value) -&gt; existingGroup.getProperties().putIfAbsent(name, value));</b>
+&nbsp;				// Merge sources
+<b class="nc">&nbsp;				group.getSources().forEach((name, value) -&gt; addOrMergeSource(existingGroup.getSources(), name, value));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurationMetadataGroup getGroup(ConfigurationMetadataSource source) {
+<b class="nc">&nbsp;		if (source == null) {</b>
+<b class="nc">&nbsp;			return this.allGroups.computeIfAbsent(ROOT_GROUP, (key) -&gt; new ConfigurationMetadataGroup(ROOT_GROUP));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.allGroups.get(source.getGroupId());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addOrMergeSource(Map&lt;String, ConfigurationMetadataSource&gt; sources, String name,
+&nbsp;			ConfigurationMetadataSource source) {
+<b class="nc">&nbsp;		ConfigurationMetadataSource existingSource = sources.get(name);</b>
+<b class="nc">&nbsp;		if (existingSource == null) {</b>
+<b class="nc">&nbsp;			sources.put(name, source);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			source.getProperties().forEach((k, v) -&gt; existingSource.getProperties().putIfAbsent(k, v));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

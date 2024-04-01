@@ -1,0 +1,300 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProcessTestAotMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: ProcessTestAotMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProcessTestAotMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.apache.maven.RepositoryUtils;
+&nbsp;import org.apache.maven.artifact.Artifact;
+&nbsp;import org.apache.maven.artifact.DefaultArtifact;
+&nbsp;import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+&nbsp;import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;import org.apache.maven.plugins.annotations.Component;
+&nbsp;import org.apache.maven.plugins.annotations.LifecyclePhase;
+&nbsp;import org.apache.maven.plugins.annotations.Mojo;
+&nbsp;import org.apache.maven.plugins.annotations.Parameter;
+&nbsp;import org.apache.maven.plugins.annotations.ResolutionScope;
+&nbsp;import org.eclipse.aether.RepositorySystem;
+&nbsp;import org.eclipse.aether.collection.CollectRequest;
+&nbsp;import org.eclipse.aether.resolution.ArtifactResult;
+&nbsp;import org.eclipse.aether.resolution.DependencyRequest;
+&nbsp;import org.eclipse.aether.resolution.DependencyResult;
+&nbsp;import org.eclipse.aether.util.artifact.JavaScopes;
+&nbsp;import org.eclipse.aether.util.filter.DependencyFilterUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Invoke the AOT engine on tests.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;@Mojo(name = &quot;process-test-aot&quot;, defaultPhase = LifecyclePhase.PROCESS_TEST_CLASSES, threadSafe = true,
+&nbsp;		requiresDependencyResolution = ResolutionScope.TEST, requiresDependencyCollection = ResolutionScope.TEST)
+<b class="nc">&nbsp;public class ProcessTestAotMojo extends AbstractAotMojo {</b>
+&nbsp;
+&nbsp;	private static final String JUNIT_PLATFORM_GROUP_ID = &quot;org.junit.platform&quot;;
+&nbsp;
+&nbsp;	private static final String JUNIT_PLATFORM_COMMONS_ARTIFACT_ID = &quot;junit-platform-commons&quot;;
+&nbsp;
+&nbsp;	private static final String JUNIT_PLATFORM_LAUNCHER_ARTIFACT_ID = &quot;junit-platform-launcher&quot;;
+&nbsp;
+&nbsp;	private static final String AOT_PROCESSOR_CLASS_NAME = &quot;org.springframework.boot.test.context.SpringBootTestAotProcessor&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the classes and resource files that should be packaged into
+&nbsp;	 * the archive.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.testOutputDirectory}&quot;, required = true)
+&nbsp;	private File testClassesDirectory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the classes and resource files that should be used to run the
+&nbsp;	 * tests.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.outputDirectory}&quot;, required = true)
+&nbsp;	private File classesDirectory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the generated sources.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.directory}/spring-aot/test/sources&quot;, required = true)
+&nbsp;	private File generatedSources;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the generated test resources.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.directory}/spring-aot/test/resources&quot;, required = true)
+&nbsp;	private File generatedResources;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the generated test classes.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.directory}/spring-aot/test/classes&quot;, required = true)
+&nbsp;	private File generatedTestClasses;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the generated test classes.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.directory}/spring-aot/main/classes&quot;, required = true)
+&nbsp;	private File generatedClasses;
+&nbsp;
+&nbsp;	@Component
+&nbsp;	private RepositorySystem repositorySystem;
+&nbsp;
+&nbsp;	@Component
+&nbsp;	private ResolutionErrorHandler resolutionErrorHandler;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void executeAot() throws Exception {
+<b class="nc">&nbsp;		if (this.project.getPackaging().equals(&quot;pom&quot;)) {</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;process-test-aot goal could not be applied to pom project.&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		if (Boolean.getBoolean(&quot;skipTests&quot;) || Boolean.getBoolean(&quot;maven.test.skip&quot;)) {</b>
+<b class="nc">&nbsp;			getLog().info(&quot;Skipping AOT test processing since tests are skipped&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		Path testOutputDirectory = Paths.get(this.project.getBuild().getTestOutputDirectory());</b>
+<b class="nc">&nbsp;		if (Files.notExists(testOutputDirectory)) {</b>
+<b class="nc">&nbsp;			getLog().info(&quot;Skipping AOT test processing since no tests have been detected&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		generateAotAssets(getClassPath(true), AOT_PROCESSOR_CLASS_NAME, getAotArguments());</b>
+<b class="nc">&nbsp;		compileSourceFiles(getClassPath(false), this.generatedSources, this.testClassesDirectory);</b>
+<b class="nc">&nbsp;		copyAll(this.generatedResources.toPath().resolve(&quot;META-INF/native-image&quot;),</b>
+<b class="nc">&nbsp;				this.testClassesDirectory.toPath().resolve(&quot;META-INF/native-image&quot;));</b>
+<b class="nc">&nbsp;		copyAll(this.generatedTestClasses.toPath(), this.testClassesDirectory.toPath());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String[] getAotArguments() {
+<b class="nc">&nbsp;		List&lt;String&gt; aotArguments = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		aotArguments.add(this.testClassesDirectory.toPath().toAbsolutePath().normalize().toString());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.generatedSources.toString());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.generatedResources.toString());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.generatedTestClasses.toString());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.project.getGroupId());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.project.getArtifactId());</b>
+<b class="nc">&nbsp;		return aotArguments.toArray(String[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected URL[] getClassPath(boolean includeJUnitPlatformLauncher) throws Exception {
+<b class="nc">&nbsp;		File[] directories = new File[] { this.testClassesDirectory, this.generatedTestClasses, this.classesDirectory,</b>
+&nbsp;				this.generatedClasses };
+<b class="nc">&nbsp;		URL[] classPath = getClassPath(directories);</b>
+<b class="nc">&nbsp;		if (!includeJUnitPlatformLauncher || this.project.getArtifactMap()</b>
+<b class="nc">&nbsp;			.containsKey(JUNIT_PLATFORM_GROUP_ID + &quot;:&quot; + JUNIT_PLATFORM_LAUNCHER_ARTIFACT_ID)) {</b>
+<b class="nc">&nbsp;			return classPath;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return addJUnitPlatformLauncher(classPath);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private URL[] addJUnitPlatformLauncher(URL[] classPath) throws Exception {
+<b class="nc">&nbsp;		String version = getJUnitPlatformVersion();</b>
+<b class="nc">&nbsp;		DefaultArtifactHandler handler = new DefaultArtifactHandler(&quot;jar&quot;);</b>
+<b class="nc">&nbsp;		handler.setIncludesDependencies(true);</b>
+<b class="nc">&nbsp;		Set&lt;Artifact&gt; artifacts = resolveArtifact(new DefaultArtifact(JUNIT_PLATFORM_GROUP_ID,</b>
+&nbsp;				JUNIT_PLATFORM_LAUNCHER_ARTIFACT_ID, version, null, &quot;jar&quot;, null, handler));
+<b class="nc">&nbsp;		Set&lt;URL&gt; fullClassPath = new LinkedHashSet&lt;&gt;(Arrays.asList(classPath));</b>
+<b class="nc">&nbsp;		for (Artifact artifact : artifacts) {</b>
+<b class="nc">&nbsp;			fullClassPath.add(artifact.getFile().toURI().toURL());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return fullClassPath.toArray(URL[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getJUnitPlatformVersion() throws MojoExecutionException {
+<b class="nc">&nbsp;		String id = JUNIT_PLATFORM_GROUP_ID + &quot;:&quot; + JUNIT_PLATFORM_COMMONS_ARTIFACT_ID;</b>
+<b class="nc">&nbsp;		Artifact platformCommonsArtifact = this.project.getArtifactMap().get(id);</b>
+<b class="nc">&nbsp;		String version = (platformCommonsArtifact != null) ? platformCommonsArtifact.getBaseVersion() : null;</b>
+<b class="nc">&nbsp;		if (version == null) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(</b>
+<b class="nc">&nbsp;					&quot;Unable to find &#39;%s&#39; dependency. Please ensure JUnit is correctly configured.&quot;.formatted(id));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return version;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Set&lt;Artifact&gt; resolveArtifact(Artifact artifact) throws Exception {
+<b class="nc">&nbsp;		CollectRequest collectRequest = new CollectRequest();</b>
+<b class="nc">&nbsp;		collectRequest.setRoot(RepositoryUtils.toDependency(artifact, null));</b>
+<b class="nc">&nbsp;		collectRequest.setRepositories(this.project.getRemotePluginRepositories());</b>
+<b class="nc">&nbsp;		DependencyRequest request = new DependencyRequest();</b>
+<b class="nc">&nbsp;		request.setCollectRequest(collectRequest);</b>
+<b class="nc">&nbsp;		request.setFilter(DependencyFilterUtils.classpathFilter(JavaScopes.RUNTIME));</b>
+<b class="nc">&nbsp;		DependencyResult dependencyResult = this.repositorySystem</b>
+<b class="nc">&nbsp;			.resolveDependencies(getSession().getRepositorySession(), request);</b>
+<b class="nc">&nbsp;		return dependencyResult.getArtifactResults()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map(ArtifactResult::getArtifact)</b>
+<b class="nc">&nbsp;			.map(RepositoryUtils::toArtifact)</b>
+<b class="nc">&nbsp;			.collect(Collectors.toSet());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

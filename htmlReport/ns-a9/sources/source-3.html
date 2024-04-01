@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AuthenticationAuditListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.security</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthenticationAuditListener (org.springframework.boot.actuate.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthenticationAuditListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AuthenticationAuditListener$WebAuditListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.security;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.audit.AuditEvent;
+&nbsp;import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
+&nbsp;import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+&nbsp;import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+&nbsp;import org.springframework.security.web.authentication.switchuser.AuthenticationSwitchUserEvent;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default implementation of {@link AbstractAuthenticationAuditListener}.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Vedran Pavic
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="nc">&nbsp;public class AuthenticationAuditListener extends AbstractAuthenticationAuditListener {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Authentication success event type.
+&nbsp;	 */
+&nbsp;	public static final String AUTHENTICATION_SUCCESS = &quot;AUTHENTICATION_SUCCESS&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Authentication failure event type.
+&nbsp;	 */
+&nbsp;	public static final String AUTHENTICATION_FAILURE = &quot;AUTHENTICATION_FAILURE&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Authentication switch event type.
+&nbsp;	 */
+&nbsp;	public static final String AUTHENTICATION_SWITCH = &quot;AUTHENTICATION_SWITCH&quot;;
+&nbsp;
+&nbsp;	private static final String WEB_LISTENER_CHECK_CLASS = &quot;org.springframework.security.web.authentication.switchuser.AuthenticationSwitchUserEvent&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private final WebAuditListener webListener = maybeCreateWebListener();</b>
+&nbsp;
+&nbsp;	private static WebAuditListener maybeCreateWebListener() {
+<b class="nc">&nbsp;		if (ClassUtils.isPresent(WEB_LISTENER_CHECK_CLASS, null)) {</b>
+<b class="nc">&nbsp;			return new WebAuditListener();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onApplicationEvent(AbstractAuthenticationEvent event) {
+<b class="nc">&nbsp;		if (event instanceof AbstractAuthenticationFailureEvent failureEvent) {</b>
+<b class="nc">&nbsp;			onAuthenticationFailureEvent(failureEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (this.webListener != null &amp;&amp; this.webListener.accepts(event)) {</b>
+<b class="nc">&nbsp;			this.webListener.process(this, event);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (event instanceof AuthenticationSuccessEvent successEvent) {</b>
+<b class="nc">&nbsp;			onAuthenticationSuccessEvent(successEvent);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onAuthenticationFailureEvent(AbstractAuthenticationFailureEvent event) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; data = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		data.put(&quot;type&quot;, event.getException().getClass().getName());</b>
+<b class="nc">&nbsp;		data.put(&quot;message&quot;, event.getException().getMessage());</b>
+<b class="nc">&nbsp;		if (event.getAuthentication().getDetails() != null) {</b>
+<b class="nc">&nbsp;			data.put(&quot;details&quot;, event.getAuthentication().getDetails());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		publish(new AuditEvent(event.getAuthentication().getName(), AUTHENTICATION_FAILURE, data));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onAuthenticationSuccessEvent(AuthenticationSuccessEvent event) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; data = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (event.getAuthentication().getDetails() != null) {</b>
+<b class="nc">&nbsp;			data.put(&quot;details&quot;, event.getAuthentication().getDetails());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		publish(new AuditEvent(event.getAuthentication().getName(), AUTHENTICATION_SUCCESS, data));</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class WebAuditListener {</b>
+&nbsp;
+&nbsp;		void process(AuthenticationAuditListener listener, AbstractAuthenticationEvent input) {
+<b class="nc">&nbsp;			if (listener != null) {</b>
+<b class="nc">&nbsp;				AuthenticationSwitchUserEvent event = (AuthenticationSwitchUserEvent) input;</b>
+<b class="nc">&nbsp;				Map&lt;String, Object&gt; data = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;				if (event.getAuthentication().getDetails() != null) {</b>
+<b class="nc">&nbsp;					data.put(&quot;details&quot;, event.getAuthentication().getDetails());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (event.getTargetUser() != null) {</b>
+<b class="nc">&nbsp;					data.put(&quot;target&quot;, event.getTargetUser().getUsername());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				listener.publish(new AuditEvent(event.getAuthentication().getName(), AUTHENTICATION_SWITCH, data));</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean accepts(AbstractAuthenticationEvent event) {
+<b class="nc">&nbsp;			return event instanceof AuthenticationSwitchUserEvent;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

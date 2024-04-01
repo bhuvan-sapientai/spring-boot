@@ -1,0 +1,227 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MockBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.mock.mockito</a>
+</div>
+
+<h1>Coverage Summary for Class: MockBean (org.springframework.boot.test.mock.mockito)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">MockBean</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.mock.mockito;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Repeatable;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.junit.runner.RunWith;
+&nbsp;import org.mockito.Answers;
+&nbsp;import org.mockito.MockSettings;
+&nbsp;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.core.annotation.AliasFor;
+&nbsp;import org.springframework.test.context.junit4.SpringRunner;
+&nbsp;
+&nbsp;/**
+&nbsp; * Annotation that can be used to add mocks to a Spring {@link ApplicationContext}. Can be
+&nbsp; * used as a class level annotation or on fields in either {@code @Configuration} classes,
+&nbsp; * or test classes that are {@link RunWith @RunWith} the {@link SpringRunner}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Mocks can be registered by type or by {@link #name() bean name}. When registered by
+&nbsp; * type, any existing single bean of a matching type (including subclasses) in the context
+&nbsp; * will be replaced by the mock. When registered by name, an existing bean can be
+&nbsp; * specifically targeted for replacement by a mock. In either case, if no existing bean is
+&nbsp; * defined a new one will be added. Dependencies that are known to the application context
+&nbsp; * but are not beans (such as those
+&nbsp; * {@link org.springframework.beans.factory.config.ConfigurableListableBeanFactory#registerResolvableDependency(Class, Object)
+&nbsp; * registered directly}) will not be found and a mocked bean will be added to the context
+&nbsp; * alongside the existing dependency.
+&nbsp; * &lt;p&gt;
+&nbsp; * When {@code @MockBean} is used on a field, as well as being registered in the
+&nbsp; * application context, the mock will also be injected into the field. Typical usage might
+&nbsp; * be: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;RunWith(SpringRunner.class)
+&nbsp; * public class ExampleTests {
+&nbsp; *
+&nbsp; *     &amp;#064;MockBean
+&nbsp; *     private ExampleService service;
+&nbsp; *
+&nbsp; *     &amp;#064;Autowired
+&nbsp; *     private UserOfService userOfService;
+&nbsp; *
+&nbsp; *     &amp;#064;Test
+&nbsp; *     public void testUserOfService() {
+&nbsp; *         given(this.service.greet()).willReturn(&quot;Hello&quot;);
+&nbsp; *         String actual = this.userOfService.makeUse();
+&nbsp; *         assertEquals(&quot;Was: Hello&quot;, actual);
+&nbsp; *     }
+&nbsp; *
+&nbsp; *     &amp;#064;Configuration
+&nbsp; *     &amp;#064;Import(UserOfService.class) // A &amp;#064;Component injected with ExampleService
+&nbsp; *     static class Config {
+&nbsp; *     }
+&nbsp; *
+&nbsp; *
+&nbsp; * }
+&nbsp; * &lt;/pre&gt; If there is more than one bean of the requested type, qualifier metadata must be
+&nbsp; * specified at field level: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;RunWith(SpringRunner.class)
+&nbsp; * public class ExampleTests {
+&nbsp; *
+&nbsp; *     &amp;#064;MockBean
+&nbsp; *     &amp;#064;Qualifier(&quot;example&quot;)
+&nbsp; *     private ExampleService service;
+&nbsp; *
+&nbsp; *     ...
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * This annotation is {@code @Repeatable} and may be specified multiple times when working
+&nbsp; * with Java 8 or contained within an {@link MockBeans @MockBeans} annotation.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; * @see MockitoPostProcessor
+&nbsp; */
+&nbsp;@Target({ ElementType.TYPE, ElementType.FIELD })
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Documented
+&nbsp;@Repeatable(MockBeans.class)
+&nbsp;public @interface MockBean {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the bean to register or replace. If not specified the name will either
+&nbsp;	 * be generated or, if the mock replaces an existing bean, the existing name will be
+&nbsp;	 * used.
+&nbsp;	 * @return the name of the bean
+&nbsp;	 */
+&nbsp;	String name() default &quot;&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The classes to mock. This is an alias of {@link #classes()} which can be used for
+&nbsp;	 * brevity if no other attributes are defined. See {@link #classes()} for details.
+&nbsp;	 * @return the classes to mock
+&nbsp;	 */
+&nbsp;	@AliasFor(&quot;classes&quot;)
+&nbsp;	Class&lt;?&gt;[] value() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The classes to mock. Each class specified here will result in a mock being created
+&nbsp;	 * and registered with the application context. Classes can be omitted when the
+&nbsp;	 * annotation is used on a field.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * When {@code @MockBean} also defines a {@code name} this attribute can only contain
+&nbsp;	 * a single value.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * If this is the only specified attribute consider using the {@code value} alias
+&nbsp;	 * instead.
+&nbsp;	 * @return the classes to mock
+&nbsp;	 */
+&nbsp;	@AliasFor(&quot;value&quot;)
+&nbsp;	Class&lt;?&gt;[] classes() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Any extra interfaces that should also be declared on the mock. See
+&nbsp;	 * {@link MockSettings#extraInterfaces(Class...)} for details.
+&nbsp;	 * @return any extra interfaces
+&nbsp;	 */
+&nbsp;	Class&lt;?&gt;[] extraInterfaces() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The {@link Answers} type to use on the mock.
+&nbsp;	 * @return the answer type
+&nbsp;	 */
+&nbsp;	Answers answer() default Answers.RETURNS_DEFAULTS;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * If the generated mock is serializable. See {@link MockSettings#serializable()} for
+&nbsp;	 * details.
+&nbsp;	 * @return if the mock is serializable
+&nbsp;	 */
+&nbsp;	boolean serializable() default false;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The reset mode to apply to the mock bean. The default is {@link MockReset#AFTER}
+&nbsp;	 * meaning that mocks are automatically reset after each test method is invoked.
+&nbsp;	 * @return the reset mode
+&nbsp;	 */
+&nbsp;	MockReset reset() default MockReset.AFTER;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

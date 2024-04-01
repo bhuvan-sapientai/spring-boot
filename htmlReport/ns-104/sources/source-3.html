@@ -1,0 +1,385 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OAuth2ResourceServerProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.security.oauth2.resource</a>
+</div>
+
+<h1>Coverage Summary for Class: OAuth2ResourceServerProperties (org.springframework.boot.autoconfigure.security.oauth2.resource)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OAuth2ResourceServerProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OAuth2ResourceServerProperties$Jwt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OAuth2ResourceServerProperties$Opaquetoken</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.security.oauth2.resource;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.source.InvalidConfigurationPropertyValueException;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.security.core.GrantedAuthority;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * OAuth 2.0 resource server properties.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Artsiom Yudovin
+&nbsp; * @author Mushtaq Ahmed
+&nbsp; * @author Yan Kardziyaka
+&nbsp; * @since 2.1.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.security.oauth2.resourceserver&quot;)
+<b class="nc">&nbsp;public class OAuth2ResourceServerProperties {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Jwt jwt = new Jwt();</b>
+&nbsp;
+&nbsp;	public Jwt getJwt() {
+<b class="nc">&nbsp;		return this.jwt;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private final Opaquetoken opaqueToken = new Opaquetoken();</b>
+&nbsp;
+&nbsp;	public Opaquetoken getOpaquetoken() {
+<b class="nc">&nbsp;		return this.opaqueToken;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public static class Jwt {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * JSON Web Key URI to use to verify the JWT token.
+&nbsp;		 */
+&nbsp;		private String jwkSetUri;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * JSON Web Algorithms used for verifying the digital signatures.
+&nbsp;		 */
+<b class="nc">&nbsp;		private List&lt;String&gt; jwsAlgorithms = Arrays.asList(&quot;RS256&quot;);</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * URI that can either be an OpenID Connect discovery endpoint or an OAuth 2.0
+&nbsp;		 * Authorization Server Metadata endpoint defined by RFC 8414.
+&nbsp;		 */
+&nbsp;		private String issuerUri;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Location of the file containing the public key used to verify a JWT.
+&nbsp;		 */
+&nbsp;		private Resource publicKeyLocation;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Identifies the recipients that the JWT is intended for.
+&nbsp;		 */
+<b class="nc">&nbsp;		private List&lt;String&gt; audiences = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Prefix to use for {@link GrantedAuthority authorities} mapped from JWT.
+&nbsp;		 */
+&nbsp;		private String authorityPrefix;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Regex to use for splitting the value of the authorities claim into
+&nbsp;		 * {@link GrantedAuthority authorities}.
+&nbsp;		 */
+&nbsp;		private String authoritiesClaimDelimiter;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Name of token claim to use for mapping {@link GrantedAuthority authorities}
+&nbsp;		 * from JWT.
+&nbsp;		 */
+&nbsp;		private String authoritiesClaimName;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * JWT principal claim name.
+&nbsp;		 */
+&nbsp;		private String principalClaimName;
+&nbsp;
+&nbsp;		public String getJwkSetUri() {
+<b class="nc">&nbsp;			return this.jwkSetUri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setJwkSetUri(String jwkSetUri) {
+<b class="nc">&nbsp;			this.jwkSetUri = jwkSetUri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public List&lt;String&gt; getJwsAlgorithms() {
+<b class="nc">&nbsp;			return this.jwsAlgorithms;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setJwsAlgorithms(List&lt;String&gt; jwsAlgorithms) {
+<b class="nc">&nbsp;			this.jwsAlgorithms = jwsAlgorithms;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getIssuerUri() {
+<b class="nc">&nbsp;			return this.issuerUri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setIssuerUri(String issuerUri) {
+<b class="nc">&nbsp;			this.issuerUri = issuerUri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Resource getPublicKeyLocation() {
+<b class="nc">&nbsp;			return this.publicKeyLocation;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setPublicKeyLocation(Resource publicKeyLocation) {
+<b class="nc">&nbsp;			this.publicKeyLocation = publicKeyLocation;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public List&lt;String&gt; getAudiences() {
+<b class="nc">&nbsp;			return this.audiences;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setAudiences(List&lt;String&gt; audiences) {
+<b class="nc">&nbsp;			this.audiences = audiences;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getAuthorityPrefix() {
+<b class="nc">&nbsp;			return this.authorityPrefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setAuthorityPrefix(String authorityPrefix) {
+<b class="nc">&nbsp;			this.authorityPrefix = authorityPrefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getAuthoritiesClaimDelimiter() {
+<b class="nc">&nbsp;			return this.authoritiesClaimDelimiter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setAuthoritiesClaimDelimiter(String authoritiesClaimDelimiter) {
+<b class="nc">&nbsp;			this.authoritiesClaimDelimiter = authoritiesClaimDelimiter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getAuthoritiesClaimName() {
+<b class="nc">&nbsp;			return this.authoritiesClaimName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setAuthoritiesClaimName(String authoritiesClaimName) {
+<b class="nc">&nbsp;			this.authoritiesClaimName = authoritiesClaimName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getPrincipalClaimName() {
+<b class="nc">&nbsp;			return this.principalClaimName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setPrincipalClaimName(String principalClaimName) {
+<b class="nc">&nbsp;			this.principalClaimName = principalClaimName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String readPublicKey() throws IOException {
+<b class="nc">&nbsp;			String key = &quot;spring.security.oauth2.resourceserver.public-key-location&quot;;</b>
+<b class="nc">&nbsp;			Assert.notNull(this.publicKeyLocation, &quot;PublicKeyLocation must not be null&quot;);</b>
+<b class="nc">&nbsp;			if (!this.publicKeyLocation.exists()) {</b>
+<b class="nc">&nbsp;				throw new InvalidConfigurationPropertyValueException(key, this.publicKeyLocation,</b>
+&nbsp;						&quot;Public key location does not exist&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			try (InputStream inputStream = this.publicKeyLocation.getInputStream()) {</b>
+<b class="nc">&nbsp;				return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public static class Opaquetoken {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Client id used to authenticate with the token introspection endpoint.
+&nbsp;		 */
+&nbsp;		private String clientId;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Client secret used to authenticate with the token introspection endpoint.
+&nbsp;		 */
+&nbsp;		private String clientSecret;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * OAuth 2.0 endpoint through which token introspection is accomplished.
+&nbsp;		 */
+&nbsp;		private String introspectionUri;
+&nbsp;
+&nbsp;		public String getClientId() {
+<b class="nc">&nbsp;			return this.clientId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setClientId(String clientId) {
+<b class="nc">&nbsp;			this.clientId = clientId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getClientSecret() {
+<b class="nc">&nbsp;			return this.clientSecret;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setClientSecret(String clientSecret) {
+<b class="nc">&nbsp;			this.clientSecret = clientSecret;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getIntrospectionUri() {
+<b class="nc">&nbsp;			return this.introspectionUri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setIntrospectionUri(String introspectionUri) {
+<b class="nc">&nbsp;			this.introspectionUri = introspectionUri;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

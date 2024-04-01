@@ -1,0 +1,1034 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ZipContent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.zip</a>
+</div>
+
+<h1>Coverage Summary for Class: ZipContent (org.springframework.boot.loader.zip)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ZipContent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/121)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ZipContent$Entry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ZipContent$Kind</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ZipContent$Loader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/135)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ZipContent$Source</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/304)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.zip;
+&nbsp;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.lang.ref.Cleaner.Cleanable;
+&nbsp;import java.lang.ref.SoftReference;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.channels.ClosedChannelException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.log.DebugLogger;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides raw access to content from a regular or nested zip file. This class performs
+&nbsp; * the low level parsing of a zip file and provide access to raw entry data that it
+&nbsp; * contains. Unlike {@link java.util.zip.ZipFile}, this implementation can load content
+&nbsp; * from a zip file nested inside another file as long as the entry is not compressed.
+&nbsp; * &lt;p&gt;
+&nbsp; * In order to reduce memory consumption, this implementation stores only the hash of the
+&nbsp; * entry names, the central directory offsets and the original positions. Entries are
+&nbsp; * stored internally in {@code hashCode} order so that a binary search can be used to
+&nbsp; * quickly find an entry by name or determine if the zip file doesn&#39;t have a given entry.
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link ZipContent} for a typical Spring Boot application JAR will have somewhere in the
+&nbsp; * region of 10,500 entries which should consume about 122K.
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link ZipContent} results are cached and it is assumed that zip content will not
+&nbsp; * change once loaded. Entries and Strings are not cached and will be recreated on each
+&nbsp; * access which may produce a lot of garbage.
+&nbsp; * &lt;p&gt;
+&nbsp; * This implementation does not use {@link Cleanable} so care must be taken to release
+&nbsp; * {@link ZipContent} resources. The {@link #close()} method should be called explicitly
+&nbsp; * or by try-with-resources. Care must be take to only call close once.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 3.2.0
+&nbsp; */
+&nbsp;public final class ZipContent implements Closeable {
+&nbsp;
+&nbsp;	private static final String META_INF = &quot;META-INF/&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final byte[] SIGNATURE_SUFFIX = &quot;.DSA&quot;.getBytes(StandardCharsets.UTF_8);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final DebugLogger debug = DebugLogger.get(ZipContent.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Map&lt;Source, ZipContent&gt; cache = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private final Source source;
+&nbsp;
+&nbsp;	private final Kind kind;
+&nbsp;
+&nbsp;	private final FileChannelDataBlock data;
+&nbsp;
+&nbsp;	private final long centralDirectoryPos;
+&nbsp;
+&nbsp;	private final long commentPos;
+&nbsp;
+&nbsp;	private final long commentLength;
+&nbsp;
+&nbsp;	private final int[] lookupIndexes;
+&nbsp;
+&nbsp;	private final int[] nameHashLookups;
+&nbsp;
+&nbsp;	private final int[] relativeCentralDirectoryOffsetLookups;
+&nbsp;
+&nbsp;	private final NameOffsetLookups nameOffsetLookups;
+&nbsp;
+&nbsp;	private final boolean hasJarSignatureFile;
+&nbsp;
+&nbsp;	private SoftReference&lt;CloseableDataBlock&gt; virtualData;
+&nbsp;
+&nbsp;	private SoftReference&lt;Map&lt;Class&lt;?&gt;, Object&gt;&gt; info;
+&nbsp;
+&nbsp;	private ZipContent(Source source, Kind kind, FileChannelDataBlock data, long centralDirectoryPos, long commentPos,
+&nbsp;			long commentLength, int[] lookupIndexes, int[] nameHashLookups, int[] relativeCentralDirectoryOffsetLookups,
+<b class="nc">&nbsp;			NameOffsetLookups nameOffsetLookups, boolean hasJarSignatureFile) {</b>
+<b class="nc">&nbsp;		this.source = source;</b>
+<b class="nc">&nbsp;		this.kind = kind;</b>
+<b class="nc">&nbsp;		this.data = data;</b>
+<b class="nc">&nbsp;		this.centralDirectoryPos = centralDirectoryPos;</b>
+<b class="nc">&nbsp;		this.commentPos = commentPos;</b>
+<b class="nc">&nbsp;		this.commentLength = commentLength;</b>
+<b class="nc">&nbsp;		this.lookupIndexes = lookupIndexes;</b>
+<b class="nc">&nbsp;		this.nameHashLookups = nameHashLookups;</b>
+<b class="nc">&nbsp;		this.relativeCentralDirectoryOffsetLookups = relativeCentralDirectoryOffsetLookups;</b>
+<b class="nc">&nbsp;		this.nameOffsetLookups = nameOffsetLookups;</b>
+<b class="nc">&nbsp;		this.hasJarSignatureFile = hasJarSignatureFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the kind of content that was loaded.
+&nbsp;	 * @return the content kind
+&nbsp;	 * @since 3.2.2
+&nbsp;	 */
+&nbsp;	public Kind getKind() {
+<b class="nc">&nbsp;		return this.kind;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Open a {@link DataBlock} containing the raw zip data. For container zip files, this
+&nbsp;	 * may be smaller than the original file since additional bytes are permitted at the
+&nbsp;	 * front of a zip file. For nested zip files, this will be only the contents of the
+&nbsp;	 * nest zip.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * For nested directory zip files, a virtual data block will be created containing
+&nbsp;	 * only the relevant content.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * To release resources, the {@link #close()} method of the data block should be
+&nbsp;	 * called explicitly or by try-with-resources.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * The returned data block should not be accessed once {@link #close()} has been
+&nbsp;	 * called.
+&nbsp;	 * @return the zip data
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	public CloseableDataBlock openRawZipData() throws IOException {
+<b class="nc">&nbsp;		this.data.open();</b>
+<b class="nc">&nbsp;		return (!this.nameOffsetLookups.hasAnyEnabled()) ? this.data : getVirtualData();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CloseableDataBlock getVirtualData() throws IOException {
+<b class="nc">&nbsp;		CloseableDataBlock virtualData = (this.virtualData != null) ? this.virtualData.get() : null;</b>
+<b class="nc">&nbsp;		if (virtualData != null) {</b>
+<b class="nc">&nbsp;			return virtualData;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		virtualData = createVirtualData();</b>
+<b class="nc">&nbsp;		this.virtualData = new SoftReference&lt;&gt;(virtualData);</b>
+<b class="nc">&nbsp;		return virtualData;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CloseableDataBlock createVirtualData() throws IOException {
+<b class="nc">&nbsp;		int size = size();</b>
+<b class="nc">&nbsp;		NameOffsetLookups nameOffsetLookups = this.nameOffsetLookups.emptyCopy();</b>
+<b class="nc">&nbsp;		ZipCentralDirectoryFileHeaderRecord[] centralRecords = new ZipCentralDirectoryFileHeaderRecord[size];</b>
+<b class="nc">&nbsp;		long[] centralRecordPositions = new long[size];</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; size; i++) {</b>
+<b class="nc">&nbsp;			int lookupIndex = ZipContent.this.lookupIndexes[i];</b>
+<b class="nc">&nbsp;			long pos = getCentralDirectoryFileHeaderRecordPos(lookupIndex);</b>
+<b class="nc">&nbsp;			nameOffsetLookups.enable(i, this.nameOffsetLookups.isEnabled(lookupIndex));</b>
+<b class="nc">&nbsp;			centralRecords[i] = ZipCentralDirectoryFileHeaderRecord.load(this.data, pos);</b>
+<b class="nc">&nbsp;			centralRecordPositions[i] = pos;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new VirtualZipDataBlock(this.data, nameOffsetLookups, centralRecords, centralRecordPositions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the number of entries in the ZIP file.
+&nbsp;	 * @return the number of entries
+&nbsp;	 */
+&nbsp;	public int size() {
+<b class="nc">&nbsp;		return this.lookupIndexes.length;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the zip comment, if any.
+&nbsp;	 * @return the comment or {@code null}
+&nbsp;	 */
+&nbsp;	public String getComment() {
+&nbsp;		try {
+<b class="nc">&nbsp;			return ZipString.readString(this.data, this.commentPos, this.commentLength);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (UncheckedIOException ex) {</b>
+<b class="nc">&nbsp;			if (ex.getCause() instanceof ClosedChannelException) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Zip content closed&quot;, ex);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw ex;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the entry with the given name, if any.
+&nbsp;	 * @param name the name of the entry to find
+&nbsp;	 * @return the entry or {@code null}
+&nbsp;	 */
+&nbsp;	public Entry getEntry(CharSequence name) {
+<b class="nc">&nbsp;		return getEntry(null, name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the entry with the given name, if any.
+&nbsp;	 * @param namePrefix an optional prefix for the name
+&nbsp;	 * @param name the name of the entry to find
+&nbsp;	 * @return the entry or {@code null}
+&nbsp;	 */
+&nbsp;	public Entry getEntry(CharSequence namePrefix, CharSequence name) {
+<b class="nc">&nbsp;		int nameHash = nameHash(namePrefix, name);</b>
+<b class="nc">&nbsp;		int lookupIndex = getFirstLookupIndex(nameHash);</b>
+<b class="nc">&nbsp;		int size = size();</b>
+<b class="nc">&nbsp;		while (lookupIndex &gt;= 0 &amp;&amp; lookupIndex &lt; size &amp;&amp; this.nameHashLookups[lookupIndex] == nameHash) {</b>
+<b class="nc">&nbsp;			long pos = getCentralDirectoryFileHeaderRecordPos(lookupIndex);</b>
+<b class="nc">&nbsp;			ZipCentralDirectoryFileHeaderRecord centralRecord = loadZipCentralDirectoryFileHeaderRecord(pos);</b>
+<b class="nc">&nbsp;			if (hasName(lookupIndex, centralRecord, pos, namePrefix, name)) {</b>
+<b class="nc">&nbsp;				return new Entry(lookupIndex, centralRecord);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			lookupIndex++;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if an entry with the given name exists.
+&nbsp;	 * @param namePrefix an optional prefix for the name
+&nbsp;	 * @param name the name of the entry to find
+&nbsp;	 * @return the entry or {@code null}
+&nbsp;	 */
+&nbsp;	public boolean hasEntry(CharSequence namePrefix, CharSequence name) {
+<b class="nc">&nbsp;		int nameHash = nameHash(namePrefix, name);</b>
+<b class="nc">&nbsp;		int lookupIndex = getFirstLookupIndex(nameHash);</b>
+<b class="nc">&nbsp;		int size = size();</b>
+<b class="nc">&nbsp;		while (lookupIndex &gt;= 0 &amp;&amp; lookupIndex &lt; size &amp;&amp; this.nameHashLookups[lookupIndex] == nameHash) {</b>
+<b class="nc">&nbsp;			long pos = getCentralDirectoryFileHeaderRecordPos(lookupIndex);</b>
+<b class="nc">&nbsp;			ZipCentralDirectoryFileHeaderRecord centralRecord = loadZipCentralDirectoryFileHeaderRecord(pos);</b>
+<b class="nc">&nbsp;			if (hasName(lookupIndex, centralRecord, pos, namePrefix, name)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			lookupIndex++;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the entry at the specified index.
+&nbsp;	 * @param index the entry index
+&nbsp;	 * @return the entry
+&nbsp;	 * @throws IndexOutOfBoundsException if the index is out of bounds
+&nbsp;	 */
+&nbsp;	public Entry getEntry(int index) {
+<b class="nc">&nbsp;		int lookupIndex = ZipContent.this.lookupIndexes[index];</b>
+<b class="nc">&nbsp;		long pos = getCentralDirectoryFileHeaderRecordPos(lookupIndex);</b>
+<b class="nc">&nbsp;		ZipCentralDirectoryFileHeaderRecord centralRecord = loadZipCentralDirectoryFileHeaderRecord(pos);</b>
+<b class="nc">&nbsp;		return new Entry(lookupIndex, centralRecord);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ZipCentralDirectoryFileHeaderRecord loadZipCentralDirectoryFileHeaderRecord(long pos) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return ZipCentralDirectoryFileHeaderRecord.load(this.data, pos);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			if (ex instanceof ClosedChannelException) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Zip content closed&quot;, ex);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new UncheckedIOException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private int nameHash(CharSequence namePrefix, CharSequence name) {
+<b class="nc">&nbsp;		int nameHash = 0;</b>
+<b class="nc">&nbsp;		nameHash = (namePrefix != null) ? ZipString.hash(nameHash, namePrefix, false) : nameHash;</b>
+<b class="nc">&nbsp;		nameHash = ZipString.hash(nameHash, name, true);</b>
+<b class="nc">&nbsp;		return nameHash;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int getFirstLookupIndex(int nameHash) {
+<b class="nc">&nbsp;		int lookupIndex = Arrays.binarySearch(this.nameHashLookups, 0, this.nameHashLookups.length, nameHash);</b>
+<b class="nc">&nbsp;		if (lookupIndex &lt; 0) {</b>
+<b class="nc">&nbsp;			return -1;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		while (lookupIndex &gt; 0 &amp;&amp; this.nameHashLookups[lookupIndex - 1] == nameHash) {</b>
+<b class="nc">&nbsp;			lookupIndex--;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return lookupIndex;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private long getCentralDirectoryFileHeaderRecordPos(int lookupIndex) {
+<b class="nc">&nbsp;		return this.centralDirectoryPos + this.relativeCentralDirectoryOffsetLookups[lookupIndex];</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasName(int lookupIndex, ZipCentralDirectoryFileHeaderRecord centralRecord, long pos,
+&nbsp;			CharSequence namePrefix, CharSequence name) {
+<b class="nc">&nbsp;		int offset = this.nameOffsetLookups.get(lookupIndex);</b>
+<b class="nc">&nbsp;		pos += ZipCentralDirectoryFileHeaderRecord.FILE_NAME_OFFSET + offset;</b>
+<b class="nc">&nbsp;		int len = centralRecord.fileNameLength() - offset;</b>
+<b class="nc">&nbsp;		ByteBuffer buffer = ByteBuffer.allocate(ZipString.BUFFER_SIZE);</b>
+<b class="nc">&nbsp;		if (namePrefix != null) {</b>
+<b class="nc">&nbsp;			int startsWithNamePrefix = ZipString.startsWith(buffer, this.data, pos, len, namePrefix);</b>
+<b class="nc">&nbsp;			if (startsWithNamePrefix == -1) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			pos += startsWithNamePrefix;</b>
+<b class="nc">&nbsp;			len -= startsWithNamePrefix;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ZipString.matches(buffer, this.data, pos, len, name, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get or compute information based on the {@link ZipContent}.
+&nbsp;	 * @param &lt;I&gt; the info type to get or compute
+&nbsp;	 * @param type the info type to get or compute
+&nbsp;	 * @param function the function used to compute the information
+&nbsp;	 * @return the computed or existing information
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public &lt;I&gt; I getInfo(Class&lt;I&gt; type, Function&lt;ZipContent, I&gt; function) {
+<b class="nc">&nbsp;		Map&lt;Class&lt;?&gt;, Object&gt; info = (this.info != null) ? this.info.get() : null;</b>
+<b class="nc">&nbsp;		if (info == null) {</b>
+<b class="nc">&nbsp;			info = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			this.info = new SoftReference&lt;&gt;(info);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (I) info.computeIfAbsent(type, (key) -&gt; {</b>
+<b class="nc">&nbsp;			debug.log(&quot;Getting %s info from zip &#39;%s&#39;&quot;, type.getName(), this);</b>
+<b class="nc">&nbsp;			return function.apply(this);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns {@code true} if this zip contains a jar signature file
+&nbsp;	 * ({@code META-INF/*.DSA}).
+&nbsp;	 * @return if the zip contains a jar signature file
+&nbsp;	 */
+&nbsp;	public boolean hasJarSignatureFile() {
+<b class="nc">&nbsp;		return this.hasJarSignatureFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Close this jar file, releasing the underlying file if this was the last reference.
+&nbsp;	 * @see java.io.Closeable#close()
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void close() throws IOException {
+<b class="nc">&nbsp;		this.data.close();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.source.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Open {@link ZipContent} from the specified path. The resulting {@link ZipContent}
+&nbsp;	 * &lt;em&gt;must&lt;/em&gt; be {@link #close() closed} by the caller.
+&nbsp;	 * @param path the zip path
+&nbsp;	 * @return a {@link ZipContent} instance
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	public static ZipContent open(Path path) throws IOException {
+<b class="nc">&nbsp;		return open(new Source(path.toAbsolutePath(), null));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Open nested {@link ZipContent} from the specified path. The resulting
+&nbsp;	 * {@link ZipContent} &lt;em&gt;must&lt;/em&gt; be {@link #close() closed} by the caller.
+&nbsp;	 * @param path the zip path
+&nbsp;	 * @param nestedEntryName the nested entry name to open
+&nbsp;	 * @return a {@link ZipContent} instance
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	public static ZipContent open(Path path, String nestedEntryName) throws IOException {
+<b class="nc">&nbsp;		return open(new Source(path.toAbsolutePath(), nestedEntryName));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ZipContent open(Source source) throws IOException {
+<b class="nc">&nbsp;		ZipContent zipContent = cache.get(source);</b>
+<b class="nc">&nbsp;		if (zipContent != null) {</b>
+<b class="nc">&nbsp;			debug.log(&quot;Opening existing cached zip content for %s&quot;, zipContent);</b>
+<b class="nc">&nbsp;			zipContent.data.open();</b>
+<b class="nc">&nbsp;			return zipContent;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		debug.log(&quot;Loading zip content from %s&quot;, source);</b>
+<b class="nc">&nbsp;		zipContent = Loader.load(source);</b>
+<b class="nc">&nbsp;		ZipContent previouslyCached = cache.putIfAbsent(source, zipContent);</b>
+<b class="nc">&nbsp;		if (previouslyCached != null) {</b>
+<b class="nc">&nbsp;			debug.log(&quot;Closing zip content from %s since cache was populated from another thread&quot;, source);</b>
+<b class="nc">&nbsp;			zipContent.close();</b>
+<b class="nc">&nbsp;			previouslyCached.data.open();</b>
+<b class="nc">&nbsp;			return previouslyCached;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return zipContent;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Zip content kinds.
+&nbsp;	 *
+&nbsp;	 * @since 3.2.2
+&nbsp;	 */
+<b class="nc">&nbsp;	public enum Kind {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Content from a standard zip file.
+&nbsp;		 */
+<b class="nc">&nbsp;		ZIP,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Content from nested zip content.
+&nbsp;		 */
+<b class="nc">&nbsp;		NESTED_ZIP,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Content from a nested zip directory.
+&nbsp;		 */
+<b class="nc">&nbsp;		NESTED_DIRECTORY</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The source of {@link ZipContent}. Used as a cache key.
+&nbsp;	 *
+&nbsp;	 * @param path the path of the zip or container zip
+&nbsp;	 * @param nestedEntryName the name of the nested entry to use or {@code null}
+&nbsp;	 */
+<b class="nc">&nbsp;	private record Source(Path path, String nestedEntryName) {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return if this is the source of a nested zip.
+&nbsp;		 * @return if this is for a nested zip
+&nbsp;		 */
+&nbsp;		boolean isNested() {
+<b class="nc">&nbsp;			return this.nestedEntryName != null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return (!isNested()) ? path().toString() : path() + &quot;[&quot; + nestedEntryName() + &quot;]&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Internal class used to load the zip content create a new {@link ZipContent}
+&nbsp;	 * instance.
+&nbsp;	 */
+&nbsp;	private static final class Loader {
+&nbsp;
+<b class="nc">&nbsp;		private final ByteBuffer buffer = ByteBuffer.allocate(ZipString.BUFFER_SIZE);</b>
+&nbsp;
+&nbsp;		private final Source source;
+&nbsp;
+&nbsp;		private final FileChannelDataBlock data;
+&nbsp;
+&nbsp;		private final long centralDirectoryPos;
+&nbsp;
+&nbsp;		private final int[] index;
+&nbsp;
+&nbsp;		private int[] nameHashLookups;
+&nbsp;
+&nbsp;		private int[] relativeCentralDirectoryOffsetLookups;
+&nbsp;
+&nbsp;		private final NameOffsetLookups nameOffsetLookups;
+&nbsp;
+&nbsp;		private int cursor;
+&nbsp;
+&nbsp;		private Loader(Source source, Entry directoryEntry, FileChannelDataBlock data, long centralDirectoryPos,
+<b class="nc">&nbsp;				int maxSize) {</b>
+<b class="nc">&nbsp;			this.source = source;</b>
+<b class="nc">&nbsp;			this.data = data;</b>
+<b class="nc">&nbsp;			this.centralDirectoryPos = centralDirectoryPos;</b>
+<b class="nc">&nbsp;			this.index = new int[maxSize];</b>
+<b class="nc">&nbsp;			this.nameHashLookups = new int[maxSize];</b>
+<b class="nc">&nbsp;			this.relativeCentralDirectoryOffsetLookups = new int[maxSize];</b>
+<b class="nc">&nbsp;			this.nameOffsetLookups = (directoryEntry != null)</b>
+<b class="nc">&nbsp;					? new NameOffsetLookups(directoryEntry.getName().length(), maxSize) : NameOffsetLookups.NONE;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void add(ZipCentralDirectoryFileHeaderRecord centralRecord, long pos, boolean enableNameOffset)
+&nbsp;				throws IOException {
+<b class="nc">&nbsp;			int nameOffset = this.nameOffsetLookups.enable(this.cursor, enableNameOffset);</b>
+<b class="nc">&nbsp;			int hash = ZipString.hash(this.buffer, this.data,</b>
+&nbsp;					pos + ZipCentralDirectoryFileHeaderRecord.FILE_NAME_OFFSET + nameOffset,
+<b class="nc">&nbsp;					centralRecord.fileNameLength() - nameOffset, true);</b>
+<b class="nc">&nbsp;			this.nameHashLookups[this.cursor] = hash;</b>
+<b class="nc">&nbsp;			this.relativeCentralDirectoryOffsetLookups[this.cursor] = (int) ((pos - this.centralDirectoryPos));</b>
+<b class="nc">&nbsp;			this.index[this.cursor] = this.cursor;</b>
+<b class="nc">&nbsp;			this.cursor++;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ZipContent finish(Kind kind, long commentPos, long commentLength, boolean hasJarSignatureFile) {
+<b class="nc">&nbsp;			if (this.cursor != this.nameHashLookups.length) {</b>
+<b class="nc">&nbsp;				this.nameHashLookups = Arrays.copyOf(this.nameHashLookups, this.cursor);</b>
+<b class="nc">&nbsp;				this.relativeCentralDirectoryOffsetLookups = Arrays.copyOf(this.relativeCentralDirectoryOffsetLookups,</b>
+&nbsp;						this.cursor);
+&nbsp;			}
+<b class="nc">&nbsp;			int size = this.nameHashLookups.length;</b>
+<b class="nc">&nbsp;			sort(0, size - 1);</b>
+<b class="nc">&nbsp;			int[] lookupIndexes = new int[size];</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; size; i++) {</b>
+<b class="nc">&nbsp;				lookupIndexes[this.index[i]] = i;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new ZipContent(this.source, kind, this.data, this.centralDirectoryPos, commentPos, commentLength,</b>
+&nbsp;					lookupIndexes, this.nameHashLookups, this.relativeCentralDirectoryOffsetLookups,
+&nbsp;					this.nameOffsetLookups, hasJarSignatureFile);
+&nbsp;		}
+&nbsp;
+&nbsp;		private void sort(int left, int right) {
+&nbsp;			// Quick sort algorithm, uses nameHashCode as the source but sorts all arrays
+<b class="nc">&nbsp;			if (left &lt; right) {</b>
+<b class="nc">&nbsp;				int pivot = this.nameHashLookups[left + (right - left) / 2];</b>
+<b class="nc">&nbsp;				int i = left;</b>
+<b class="nc">&nbsp;				int j = right;</b>
+<b class="nc">&nbsp;				while (i &lt;= j) {</b>
+<b class="nc">&nbsp;					while (this.nameHashLookups[i] &lt; pivot) {</b>
+<b class="nc">&nbsp;						i++;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					while (this.nameHashLookups[j] &gt; pivot) {</b>
+<b class="nc">&nbsp;						j--;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					if (i &lt;= j) {</b>
+<b class="nc">&nbsp;						swap(i, j);</b>
+<b class="nc">&nbsp;						i++;</b>
+<b class="nc">&nbsp;						j--;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				if (left &lt; j) {</b>
+<b class="nc">&nbsp;					sort(left, j);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (right &gt; i) {</b>
+<b class="nc">&nbsp;					sort(i, right);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void swap(int i, int j) {
+<b class="nc">&nbsp;			swap(this.index, i, j);</b>
+<b class="nc">&nbsp;			swap(this.nameHashLookups, i, j);</b>
+<b class="nc">&nbsp;			swap(this.relativeCentralDirectoryOffsetLookups, i, j);</b>
+<b class="nc">&nbsp;			this.nameOffsetLookups.swap(i, j);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static void swap(int[] array, int i, int j) {
+<b class="nc">&nbsp;			int temp = array[i];</b>
+<b class="nc">&nbsp;			array[i] = array[j];</b>
+<b class="nc">&nbsp;			array[j] = temp;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static ZipContent load(Source source) throws IOException {
+<b class="nc">&nbsp;			if (!source.isNested()) {</b>
+<b class="nc">&nbsp;				return loadNonNested(source);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			try (ZipContent zip = open(source.path())) {</b>
+<b class="nc">&nbsp;				Entry entry = zip.getEntry(source.nestedEntryName());</b>
+<b class="nc">&nbsp;				if (entry == null) {</b>
+<b class="nc">&nbsp;					throw new IOException(&quot;Nested entry &#39;%s&#39; not found in container zip &#39;%s&#39;&quot;</b>
+<b class="nc">&nbsp;						.formatted(source.nestedEntryName(), source.path()));</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return (!entry.isDirectory()) ? loadNestedZip(source, entry) : loadNestedDirectory(source, zip, entry);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static ZipContent loadNonNested(Source source) throws IOException {
+<b class="nc">&nbsp;			debug.log(&quot;Loading non-nested zip &#39;%s&#39;&quot;, source.path());</b>
+<b class="nc">&nbsp;			return openAndLoad(source, Kind.ZIP, new FileChannelDataBlock(source.path()));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static ZipContent loadNestedZip(Source source, Entry entry) throws IOException {
+<b class="nc">&nbsp;			if (entry.centralRecord.compressionMethod() != ZipEntry.STORED) {</b>
+<b class="nc">&nbsp;				throw new IOException(&quot;Nested entry &#39;%s&#39; in container zip &#39;%s&#39; must not be compressed&quot;</b>
+<b class="nc">&nbsp;					.formatted(source.nestedEntryName(), source.path()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			debug.log(&quot;Loading nested zip entry &#39;%s&#39; from &#39;%s&#39;&quot;, source.nestedEntryName(), source.path());</b>
+<b class="nc">&nbsp;			return openAndLoad(source, Kind.NESTED_ZIP, entry.getContent());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static ZipContent openAndLoad(Source source, Kind kind, FileChannelDataBlock data) throws IOException {
+&nbsp;			try {
+<b class="nc">&nbsp;				data.open();</b>
+<b class="nc">&nbsp;				return loadContent(source, kind, data);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException | RuntimeException ex) {</b>
+<b class="nc">&nbsp;				data.close();</b>
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private static ZipContent loadContent(Source source, Kind kind, FileChannelDataBlock data) throws IOException {
+<b class="nc">&nbsp;			ZipEndOfCentralDirectoryRecord.Located locatedEocd = ZipEndOfCentralDirectoryRecord.load(data);</b>
+<b class="nc">&nbsp;			ZipEndOfCentralDirectoryRecord eocd = locatedEocd.endOfCentralDirectoryRecord();</b>
+<b class="nc">&nbsp;			long eocdPos = locatedEocd.pos();</b>
+<b class="nc">&nbsp;			Zip64EndOfCentralDirectoryLocator zip64Locator = Zip64EndOfCentralDirectoryLocator.find(data, eocdPos);</b>
+<b class="nc">&nbsp;			Zip64EndOfCentralDirectoryRecord zip64Eocd = Zip64EndOfCentralDirectoryRecord.load(data, zip64Locator);</b>
+<b class="nc">&nbsp;			data = data.slice(getStartOfZipContent(data, eocd, zip64Eocd));</b>
+<b class="nc">&nbsp;			long centralDirectoryPos = (zip64Eocd != null) ? zip64Eocd.offsetToStartOfCentralDirectory()</b>
+<b class="nc">&nbsp;					: Integer.toUnsignedLong(eocd.offsetToStartOfCentralDirectory());</b>
+<b class="nc">&nbsp;			long numberOfEntries = (zip64Eocd != null) ? zip64Eocd.totalNumberOfCentralDirectoryEntries()</b>
+<b class="nc">&nbsp;					: Short.toUnsignedInt(eocd.totalNumberOfCentralDirectoryEntries());</b>
+<b class="nc">&nbsp;			if (numberOfEntries &lt; 0) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Invalid number of zip entries in &quot; + source);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (numberOfEntries &gt; Integer.MAX_VALUE) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Too many zip entries in &quot; + source);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Loader loader = new Loader(source, null, data, centralDirectoryPos, (int) numberOfEntries);</b>
+<b class="nc">&nbsp;			ByteBuffer signatureNameSuffixBuffer = ByteBuffer.allocate(SIGNATURE_SUFFIX.length);</b>
+<b class="nc">&nbsp;			boolean hasJarSignatureFile = false;</b>
+<b class="nc">&nbsp;			long pos = centralDirectoryPos;</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; numberOfEntries; i++) {</b>
+<b class="nc">&nbsp;				ZipCentralDirectoryFileHeaderRecord centralRecord = ZipCentralDirectoryFileHeaderRecord.load(data, pos);</b>
+<b class="nc">&nbsp;				if (!hasJarSignatureFile) {</b>
+<b class="nc">&nbsp;					long filenamePos = pos + ZipCentralDirectoryFileHeaderRecord.FILE_NAME_OFFSET;</b>
+<b class="nc">&nbsp;					if (centralRecord.fileNameLength() &gt; SIGNATURE_SUFFIX.length &amp;&amp; ZipString.startsWith(loader.buffer,</b>
+<b class="nc">&nbsp;							data, filenamePos, centralRecord.fileNameLength(), META_INF) &gt;= 0) {</b>
+<b class="nc">&nbsp;						signatureNameSuffixBuffer.clear();</b>
+<b class="nc">&nbsp;						data.readFully(signatureNameSuffixBuffer,</b>
+<b class="nc">&nbsp;								filenamePos + centralRecord.fileNameLength() - SIGNATURE_SUFFIX.length);</b>
+<b class="nc">&nbsp;						hasJarSignatureFile = Arrays.equals(SIGNATURE_SUFFIX, signatureNameSuffixBuffer.array());</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				loader.add(centralRecord, pos, false);</b>
+<b class="nc">&nbsp;				pos += centralRecord.size();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			long commentPos = locatedEocd.pos() + ZipEndOfCentralDirectoryRecord.COMMENT_OFFSET;</b>
+<b class="nc">&nbsp;			return loader.finish(kind, commentPos, eocd.commentLength(), hasJarSignatureFile);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns the location in the data that the archive actually starts. For most
+&nbsp;		 * files the archive data will start at 0, however, it is possible to have
+&nbsp;		 * prefixed bytes (often used for startup scripts) at the beginning of the data.
+&nbsp;		 * @param data the source data
+&nbsp;		 * @param eocd the end of central directory record
+&nbsp;		 * @param zip64Eocd the zip64 end of central directory record or {@code null}
+&nbsp;		 * @return the offset within the data where the archive begins
+&nbsp;		 * @throws IOException on I/O error
+&nbsp;		 */
+&nbsp;		private static long getStartOfZipContent(FileChannelDataBlock data, ZipEndOfCentralDirectoryRecord eocd,
+&nbsp;				Zip64EndOfCentralDirectoryRecord zip64Eocd) throws IOException {
+<b class="nc">&nbsp;			long specifiedOffsetToStartOfCentralDirectory = (zip64Eocd != null)</b>
+<b class="nc">&nbsp;					? zip64Eocd.offsetToStartOfCentralDirectory() : eocd.offsetToStartOfCentralDirectory();</b>
+<b class="nc">&nbsp;			long sizeOfCentralDirectoryAndEndRecords = getSizeOfCentralDirectoryAndEndRecords(eocd, zip64Eocd);</b>
+<b class="nc">&nbsp;			long actualOffsetToStartOfCentralDirectory = data.size() - sizeOfCentralDirectoryAndEndRecords;</b>
+<b class="nc">&nbsp;			return actualOffsetToStartOfCentralDirectory - specifiedOffsetToStartOfCentralDirectory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static long getSizeOfCentralDirectoryAndEndRecords(ZipEndOfCentralDirectoryRecord eocd,
+&nbsp;				Zip64EndOfCentralDirectoryRecord zip64Eocd) {
+<b class="nc">&nbsp;			long result = 0;</b>
+<b class="nc">&nbsp;			result += eocd.size();</b>
+<b class="nc">&nbsp;			if (zip64Eocd != null) {</b>
+<b class="nc">&nbsp;				result += Zip64EndOfCentralDirectoryLocator.SIZE;</b>
+<b class="nc">&nbsp;				result += zip64Eocd.size();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			result += (zip64Eocd != null) ? zip64Eocd.sizeOfCentralDirectory() : eocd.sizeOfCentralDirectory();</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static ZipContent loadNestedDirectory(Source source, ZipContent zip, Entry directoryEntry)
+&nbsp;				throws IOException {
+<b class="nc">&nbsp;			debug.log(&quot;Loading nested directory entry &#39;%s&#39; from &#39;%s&#39;&quot;, source.nestedEntryName(), source.path());</b>
+<b class="nc">&nbsp;			if (!source.nestedEntryName().endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(&quot;Nested entry name must end with &#39;/&#39;&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String directoryName = directoryEntry.getName();</b>
+<b class="nc">&nbsp;			zip.data.open();</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Loader loader = new Loader(source, directoryEntry, zip.data, zip.centralDirectoryPos, zip.size());</b>
+<b class="nc">&nbsp;				for (int cursor = 0; cursor &lt; zip.size(); cursor++) {</b>
+<b class="nc">&nbsp;					int index = zip.lookupIndexes[cursor];</b>
+<b class="nc">&nbsp;					if (index != directoryEntry.getLookupIndex()) {</b>
+<b class="nc">&nbsp;						long pos = zip.getCentralDirectoryFileHeaderRecordPos(index);</b>
+<b class="nc">&nbsp;						ZipCentralDirectoryFileHeaderRecord centralRecord = ZipCentralDirectoryFileHeaderRecord</b>
+<b class="nc">&nbsp;							.load(zip.data, pos);</b>
+<b class="nc">&nbsp;						long namePos = pos + ZipCentralDirectoryFileHeaderRecord.FILE_NAME_OFFSET;</b>
+<b class="nc">&nbsp;						short nameLen = centralRecord.fileNameLength();</b>
+<b class="nc">&nbsp;						if (ZipString.startsWith(loader.buffer, zip.data, namePos, nameLen, directoryName) != -1) {</b>
+<b class="nc">&nbsp;							loader.add(centralRecord, pos, true);</b>
+&nbsp;						}
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				return loader.finish(Kind.NESTED_DIRECTORY, zip.commentPos, zip.commentLength, zip.hasJarSignatureFile);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException | RuntimeException ex) {</b>
+<b class="nc">&nbsp;				zip.data.close();</b>
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A single zip content entry.
+&nbsp;	 */
+&nbsp;	public class Entry {
+&nbsp;
+&nbsp;		private final int lookupIndex;
+&nbsp;
+&nbsp;		private final ZipCentralDirectoryFileHeaderRecord centralRecord;
+&nbsp;
+&nbsp;		private volatile String name;
+&nbsp;
+&nbsp;		private volatile FileChannelDataBlock content;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Create a new {@link Entry} instance.
+&nbsp;		 * @param lookupIndex the lookup index of the entry
+&nbsp;		 * @param centralRecord the {@link ZipCentralDirectoryFileHeaderRecord} for the
+&nbsp;		 * entry
+&nbsp;		 */
+<b class="nc">&nbsp;		Entry(int lookupIndex, ZipCentralDirectoryFileHeaderRecord centralRecord) {</b>
+<b class="nc">&nbsp;			this.lookupIndex = lookupIndex;</b>
+<b class="nc">&nbsp;			this.centralRecord = centralRecord;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the lookup index of the entry. Each entry has a unique lookup index but
+&nbsp;		 * they aren&#39;t the same as the order that the entry was loaded.
+&nbsp;		 * @return the entry lookup index
+&nbsp;		 */
+&nbsp;		public int getLookupIndex() {
+<b class="nc">&nbsp;			return this.lookupIndex;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return {@code true} if this is a directory entry.
+&nbsp;		 * @return if the entry is a directory
+&nbsp;		 */
+&nbsp;		public boolean isDirectory() {
+<b class="nc">&nbsp;			return getName().endsWith(&quot;/&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns {@code true} if this entry has a name starting with the given prefix.
+&nbsp;		 * @param prefix the required prefix
+&nbsp;		 * @return if the entry name starts with the prefix
+&nbsp;		 */
+&nbsp;		public boolean hasNameStartingWith(CharSequence prefix) {
+<b class="nc">&nbsp;			String name = this.name;</b>
+<b class="nc">&nbsp;			if (name != null) {</b>
+<b class="nc">&nbsp;				return name.startsWith(prefix.toString());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			long pos = getCentralDirectoryFileHeaderRecordPos(this.lookupIndex)</b>
+&nbsp;					+ ZipCentralDirectoryFileHeaderRecord.FILE_NAME_OFFSET;
+<b class="nc">&nbsp;			return ZipString.startsWith(null, ZipContent.this.data, pos, this.centralRecord.fileNameLength(),</b>
+&nbsp;					prefix) != -1;
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the name of this entry.
+&nbsp;		 * @return the entry name
+&nbsp;		 */
+&nbsp;		public String getName() {
+<b class="nc">&nbsp;			String name = this.name;</b>
+<b class="nc">&nbsp;			if (name == null) {</b>
+<b class="nc">&nbsp;				int offset = ZipContent.this.nameOffsetLookups.get(this.lookupIndex);</b>
+<b class="nc">&nbsp;				long pos = getCentralDirectoryFileHeaderRecordPos(this.lookupIndex)</b>
+&nbsp;						+ ZipCentralDirectoryFileHeaderRecord.FILE_NAME_OFFSET + offset;
+<b class="nc">&nbsp;				name = ZipString.readString(ZipContent.this.data, pos, this.centralRecord.fileNameLength() - offset);</b>
+<b class="nc">&nbsp;				this.name = name;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the compression method for this entry.
+&nbsp;		 * @return the compression method
+&nbsp;		 * @see ZipEntry#STORED
+&nbsp;		 * @see ZipEntry#DEFLATED
+&nbsp;		 */
+&nbsp;		public int getCompressionMethod() {
+<b class="nc">&nbsp;			return this.centralRecord.compressionMethod();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the uncompressed size of this entry.
+&nbsp;		 * @return the uncompressed size
+&nbsp;		 */
+&nbsp;		public int getUncompressedSize() {
+<b class="nc">&nbsp;			return this.centralRecord.uncompressedSize();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Open a {@link DataBlock} providing access to raw contents of the entry (not
+&nbsp;		 * including the local file header).
+&nbsp;		 * &lt;p&gt;
+&nbsp;		 * To release resources, the {@link #close()} method of the data block should be
+&nbsp;		 * called explicitly or by try-with-resources.
+&nbsp;		 * @return the contents of the entry
+&nbsp;		 * @throws IOException on I/O error
+&nbsp;		 */
+&nbsp;		public CloseableDataBlock openContent() throws IOException {
+<b class="nc">&nbsp;			FileChannelDataBlock content = getContent();</b>
+<b class="nc">&nbsp;			content.open();</b>
+<b class="nc">&nbsp;			return content;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private FileChannelDataBlock getContent() throws IOException {
+<b class="nc">&nbsp;			FileChannelDataBlock content = this.content;</b>
+<b class="nc">&nbsp;			if (content == null) {</b>
+<b class="nc">&nbsp;				int pos = this.centralRecord.offsetToLocalHeader();</b>
+<b class="nc">&nbsp;				checkNotZip64Extended(pos);</b>
+<b class="nc">&nbsp;				ZipLocalFileHeaderRecord localHeader = ZipLocalFileHeaderRecord.load(ZipContent.this.data, pos);</b>
+<b class="nc">&nbsp;				int size = this.centralRecord.compressedSize();</b>
+<b class="nc">&nbsp;				checkNotZip64Extended(size);</b>
+<b class="nc">&nbsp;				content = ZipContent.this.data.slice(pos + localHeader.size(), size);</b>
+<b class="nc">&nbsp;				this.content = content;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return content;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void checkNotZip64Extended(int value) throws IOException {
+<b class="nc">&nbsp;			if (value == 0xFFFFFFFF) {</b>
+<b class="nc">&nbsp;				throw new IOException(&quot;Zip64 extended information extra fields are not supported&quot;);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Adapt the raw entry into a {@link ZipEntry} or {@link ZipEntry} subclass.
+&nbsp;		 * @param &lt;E&gt; the entry type
+&nbsp;		 * @param factory the factory used to create the {@link ZipEntry}
+&nbsp;		 * @return a fully populated zip entry
+&nbsp;		 */
+&nbsp;		public &lt;E extends ZipEntry&gt; E as(Function&lt;String, E&gt; factory) {
+<b class="nc">&nbsp;			return as((entry, name) -&gt; factory.apply(name));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Adapt the raw entry into a {@link ZipEntry} or {@link ZipEntry} subclass.
+&nbsp;		 * @param &lt;E&gt; the entry type
+&nbsp;		 * @param factory the factory used to create the {@link ZipEntry}
+&nbsp;		 * @return a fully populated zip entry
+&nbsp;		 */
+&nbsp;		public &lt;E extends ZipEntry&gt; E as(BiFunction&lt;Entry, String, E&gt; factory) {
+&nbsp;			try {
+<b class="nc">&nbsp;				E result = factory.apply(this, getName());</b>
+<b class="nc">&nbsp;				long pos = getCentralDirectoryFileHeaderRecordPos(this.lookupIndex);</b>
+<b class="nc">&nbsp;				this.centralRecord.copyTo(ZipContent.this.data, pos, result);</b>
+<b class="nc">&nbsp;				return result;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new UncheckedIOException(ex);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

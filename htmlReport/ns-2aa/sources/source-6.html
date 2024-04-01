@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AotTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: AotTests (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AotTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.junit.jupiter.api.TestTemplate;
+&nbsp;import org.junit.jupiter.api.extension.ExtendWith;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;import static org.assertj.core.api.Assertions.contentOf;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests for the Maven plugin&#39;s AOT support.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;@ExtendWith(MavenBuildExtension.class)
+<b class="nc">&nbsp;class AotTests {</b>
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsSourcesAreGenerated(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path aotDirectory = project.toPath().resolve(&quot;target/spring-aot/main&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(aotDirectory.resolve(&quot;sources&quot;)))</b>
+<b class="nc">&nbsp;				.contains(Path.of(&quot;org&quot;, &quot;test&quot;, &quot;SampleApplication__ApplicationContextInitializer.java&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsResourcesAreGeneratedAndCopiedToTargetClasses(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-resource-generation&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path targetClasses = project.toPath().resolve(&quot;target/classes&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(targetClasses)).contains(</b>
+<b class="nc">&nbsp;					Path.of(&quot;META-INF&quot;, &quot;native-image&quot;, &quot;org.springframework.boot.maven.it&quot;, &quot;aot-resource-generation&quot;,</b>
+&nbsp;							&quot;reflect-config.json&quot;),
+<b class="nc">&nbsp;					Path.of(&quot;META-INF&quot;, &quot;native-image&quot;, &quot;org.springframework.boot.maven.it&quot;, &quot;aot-resource-generation&quot;,</b>
+&nbsp;							&quot;resource-config.json&quot;),
+<b class="nc">&nbsp;					Path.of(&quot;META-INF&quot;, &quot;native-image&quot;, &quot;org.springframework.boot.maven.it&quot;, &quot;aot-resource-generation&quot;,</b>
+&nbsp;							&quot;native-image.properties&quot;),
+<b class="nc">&nbsp;					Path.of(&quot;generated-resource&quot;), Path.of(&quot;nested/generated-resource&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsWithJdkProxyResourcesIncludeProxyConfig(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-jdk-proxy&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path aotDirectory = project.toPath().resolve(&quot;target/spring-aot/main&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(aotDirectory.resolve(&quot;resources&quot;))).contains(</b>
+<b class="nc">&nbsp;					Path.of(&quot;META-INF&quot;, &quot;native-image&quot;, &quot;org.springframework.boot.maven.it&quot;, &quot;aot-jdk-proxy&quot;,</b>
+&nbsp;							&quot;reflect-config.json&quot;),
+<b class="nc">&nbsp;					Path.of(&quot;META-INF&quot;, &quot;native-image&quot;, &quot;org.springframework.boot.maven.it&quot;, &quot;aot-jdk-proxy&quot;,</b>
+&nbsp;							&quot;resource-config.json&quot;),
+<b class="nc">&nbsp;					Path.of(&quot;META-INF&quot;, &quot;native-image&quot;, &quot;org.springframework.boot.maven.it&quot;, &quot;aot-jdk-proxy&quot;,</b>
+&nbsp;							&quot;proxy-config.json&quot;),
+<b class="nc">&nbsp;					Path.of(&quot;META-INF&quot;, &quot;native-image&quot;, &quot;org.springframework.boot.maven.it&quot;, &quot;aot-jdk-proxy&quot;,</b>
+&nbsp;							&quot;native-image.properties&quot;));
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsWithClassProxyClassesAreGenerated(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-class-proxy&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path aotDirectory = project.toPath().resolve(&quot;target/spring-aot/main&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(aotDirectory.resolve(&quot;classes&quot;)))</b>
+<b class="nc">&nbsp;				.contains(Path.of(&quot;org&quot;, &quot;test&quot;, &quot;SampleRunner$$SpringCGLIB$$0.class&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsWithProfilesSourcesAreGenerated(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-profile&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path aotDirectory = project.toPath().resolve(&quot;target/spring-aot/main&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(aotDirectory.resolve(&quot;sources&quot;)))</b>
+<b class="nc">&nbsp;				.contains(Path.of(&quot;org&quot;, &quot;test&quot;, &quot;TestProfileConfiguration__BeanDefinitions.java&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsWithArgumentsSourcesAreGenerated(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-arguments&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path aotDirectory = project.toPath().resolve(&quot;target/spring-aot/main&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(aotDirectory.resolve(&quot;sources&quot;)))</b>
+<b class="nc">&nbsp;				.contains(Path.of(&quot;org&quot;, &quot;test&quot;, &quot;TestProfileConfiguration__BeanDefinitions.java&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsWithJvmArgumentsSourcesAreGenerated(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-jvm-arguments&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path aotDirectory = project.toPath().resolve(&quot;target/spring-aot/main&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(aotDirectory.resolve(&quot;sources&quot;)))</b>
+<b class="nc">&nbsp;				.contains(Path.of(&quot;org&quot;, &quot;test&quot;, &quot;TestProfileConfiguration__BeanDefinitions.java&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsWithReleaseSourcesAreGenerated(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-release&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path aotDirectory = project.toPath().resolve(&quot;target/spring-aot/main&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(aotDirectory.resolve(&quot;sources&quot;)))</b>
+<b class="nc">&nbsp;				.contains(Path.of(&quot;org&quot;, &quot;test&quot;, &quot;SampleApplication__ApplicationContextInitializer.java&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsWithInvalidCompilerArgumentsCompileFails(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-compiler-arguments&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;package&quot;)</b>
+<b class="nc">&nbsp;			.executeAndFail(</b>
+<b class="nc">&nbsp;					(project) -&gt; assertThat(buildLog(project)).contains(&quot;invalid flag: --invalid-compiler-arg&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsSourcesAreCompiled(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path classesDirectory = project.toPath().resolve(&quot;target/classes&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(classesDirectory))</b>
+<b class="nc">&nbsp;				.contains(Path.of(&quot;org&quot;, &quot;test&quot;, &quot;SampleApplication__ApplicationContextInitializer.class&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsResourcesAreCopiedToTargetClasses(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-jdk-proxy&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path classesDirectory = project.toPath().resolve(&quot;target/classes/META-INF/native-image&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(classesDirectory)).contains(</b>
+<b class="nc">&nbsp;					Path.of(&quot;org.springframework.boot.maven.it&quot;, &quot;aot-jdk-proxy&quot;, &quot;reflect-config.json&quot;),</b>
+<b class="nc">&nbsp;					Path.of(&quot;org.springframework.boot.maven.it&quot;, &quot;aot-jdk-proxy&quot;, &quot;resource-config.json&quot;),</b>
+<b class="nc">&nbsp;					Path.of(&quot;org.springframework.boot.maven.it&quot;, &quot;aot-jdk-proxy&quot;, &quot;proxy-config.json&quot;),</b>
+<b class="nc">&nbsp;					Path.of(&quot;org.springframework.boot.maven.it&quot;, &quot;aot-jdk-proxy&quot;, &quot;native-image.properties&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotRunsWithClassProxyClassesAreCopiedToTargetClasses(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-class-proxy&quot;).goals(&quot;package&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path classesDirectory = project.toPath().resolve(&quot;target/classes/&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(classesDirectory))</b>
+<b class="nc">&nbsp;				.contains(Path.of(&quot;org&quot;, &quot;test&quot;, &quot;SampleRunner$$SpringCGLIB$$0.class&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAotTestRunsSourcesAndResourcesAreGenerated(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;aot-test&quot;).goals(&quot;test&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			Path aotDirectory = project.toPath().resolve(&quot;target/spring-aot/test&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(aotDirectory.resolve(&quot;sources&quot;))).contains(Path.of(&quot;org&quot;, &quot;test&quot;,</b>
+&nbsp;					&quot;SampleApplicationTests__TestContext001_ApplicationContextInitializer.java&quot;));
+<b class="nc">&nbsp;			Path testClassesDirectory = project.toPath().resolve(&quot;target/test-classes&quot;);</b>
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(testClassesDirectory)).contains(Path.of(&quot;META-INF&quot;, &quot;native-image&quot;,</b>
+&nbsp;					&quot;org.springframework.boot.maven.it&quot;, &quot;aot-test&quot;, &quot;reflect-config.json&quot;));
+<b class="nc">&nbsp;			assertThat(collectRelativePaths(testClassesDirectory)).contains(Path.of(&quot;org&quot;, &quot;test&quot;,</b>
+&nbsp;					&quot;SampleApplicationTests__TestContext001_ApplicationContextInitializer.class&quot;));
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	List&lt;Path&gt; collectRelativePaths(Path sourceDirectory) {
+<b class="nc">&nbsp;		try (Stream&lt;Path&gt; pathStream = Files.walk(sourceDirectory)) {</b>
+<b class="nc">&nbsp;			return pathStream.filter(Files::isRegularFile)</b>
+<b class="nc">&nbsp;				.map((path) -&gt; path.subpath(sourceDirectory.getNameCount(), path.getNameCount()))</b>
+<b class="nc">&nbsp;				.toList();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String buildLog(File project) {
+<b class="nc">&nbsp;		return contentOf(new File(project, &quot;target/build.log&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

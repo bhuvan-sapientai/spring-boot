@@ -1,0 +1,216 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApplicationContextServerWebExchangeMatcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.security.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: ApplicationContextServerWebExchangeMatcher (org.springframework.boot.security.reactive)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApplicationContextServerWebExchangeMatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.security.reactive;
+&nbsp;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.server.ServerWebExchange;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ApplicationContext} backed {@link ServerWebExchangeMatcher}. Can work directly
+&nbsp; * with the {@link ApplicationContext}, obtain an existing bean or
+&nbsp; * {@link AutowireCapableBeanFactory#createBean(Class, int, boolean) create a new bean}
+&nbsp; * that is autowired in the usual way.
+&nbsp; *
+&nbsp; * @param &lt;C&gt; the type of the context that the match method actually needs to use. Can be
+&nbsp; * an {@link ApplicationContext} or a class of an {@link ApplicationContext#getBean(Class)
+&nbsp; * existing bean}.
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public abstract class ApplicationContextServerWebExchangeMatcher&lt;C&gt; implements ServerWebExchangeMatcher {
+&nbsp;
+&nbsp;	private final Class&lt;? extends C&gt; contextClass;
+&nbsp;
+&nbsp;	private volatile Supplier&lt;C&gt; context;
+&nbsp;
+<b class="nc">&nbsp;	private final Object contextLock = new Object();</b>
+&nbsp;
+<b class="nc">&nbsp;	public ApplicationContextServerWebExchangeMatcher(Class&lt;? extends C&gt; contextClass) {</b>
+<b class="nc">&nbsp;		Assert.notNull(contextClass, &quot;Context class must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.contextClass = contextClass;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final Mono&lt;MatchResult&gt; matches(ServerWebExchange exchange) {
+<b class="nc">&nbsp;		if (ignoreApplicationContext(exchange.getApplicationContext())) {</b>
+<b class="nc">&nbsp;			return MatchResult.notMatch();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return matches(exchange, getContext(exchange));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Decides whether the rule implemented by the strategy matches the supplied exchange.
+&nbsp;	 * @param exchange the source exchange
+&nbsp;	 * @param context a supplier for the initialized context (may throw an exception)
+&nbsp;	 * @return if the exchange matches
+&nbsp;	 */
+&nbsp;	protected abstract Mono&lt;MatchResult&gt; matches(ServerWebExchange exchange, Supplier&lt;C&gt; context);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if the {@link ApplicationContext} should be ignored and not used for
+&nbsp;	 * matching. If this method returns {@code true} then the context will not be used and
+&nbsp;	 * the {@link #matches(ServerWebExchange) matches} method will return {@code false}.
+&nbsp;	 * @param applicationContext the candidate application context
+&nbsp;	 * @return if the application context should be ignored
+&nbsp;	 * @since 2.2.5
+&nbsp;	 */
+&nbsp;	protected boolean ignoreApplicationContext(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Supplier&lt;C&gt; getContext(ServerWebExchange exchange) {
+<b class="nc">&nbsp;		if (this.context == null) {</b>
+<b class="nc">&nbsp;			synchronized (this.contextLock) {</b>
+<b class="nc">&nbsp;				if (this.context == null) {</b>
+<b class="nc">&nbsp;					Supplier&lt;C&gt; createdContext = createContext(exchange);</b>
+<b class="nc">&nbsp;					initialized(createdContext);</b>
+<b class="nc">&nbsp;					this.context = createdContext;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Called once the context has been initialized.
+&nbsp;	 * @param context a supplier for the initialized context (may throw an exception)
+&nbsp;	 */
+&nbsp;	protected void initialized(Supplier&lt;C&gt; context) {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private Supplier&lt;C&gt; createContext(ServerWebExchange exchange) {
+<b class="nc">&nbsp;		ApplicationContext context = exchange.getApplicationContext();</b>
+<b class="nc">&nbsp;		Assert.state(context != null, &quot;No ApplicationContext found on ServerWebExchange.&quot;);</b>
+<b class="nc">&nbsp;		if (this.contextClass.isInstance(context)) {</b>
+<b class="nc">&nbsp;			return () -&gt; (C) context;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return () -&gt; context.getBean(this.contextClass);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RestartApplicationListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.restart</a>
+</div>
+
+<h1>Coverage Summary for Class: RestartApplicationListener (org.springframework.boot.devtools.restart)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RestartApplicationListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RestartApplicationListener$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.restart;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.context.event.ApplicationFailedEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationPreparedEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationReadyEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationStartingEvent;
+&nbsp;import org.springframework.boot.devtools.system.DevToolsEnablementDeducer;
+&nbsp;import org.springframework.context.ApplicationEvent;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ApplicationListener} to initialize the {@link Restarter}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.3.0
+&nbsp; * @see Restarter
+&nbsp; */
+<b class="nc">&nbsp;public class RestartApplicationListener implements ApplicationListener&lt;ApplicationEvent&gt;, Ordered {</b>
+&nbsp;
+&nbsp;	private static final String ENABLED_PROPERTY = &quot;spring.devtools.restart.enabled&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(RestartApplicationListener.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private int order = HIGHEST_PRECEDENCE;</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onApplicationEvent(ApplicationEvent event) {
+<b class="nc">&nbsp;		if (event instanceof ApplicationStartingEvent startingEvent) {</b>
+<b class="nc">&nbsp;			onApplicationStartingEvent(startingEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (event instanceof ApplicationPreparedEvent preparedEvent) {</b>
+<b class="nc">&nbsp;			onApplicationPreparedEvent(preparedEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (event instanceof ApplicationReadyEvent || event instanceof ApplicationFailedEvent) {</b>
+<b class="nc">&nbsp;			Restarter.getInstance().finish();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (event instanceof ApplicationFailedEvent failedEvent) {</b>
+<b class="nc">&nbsp;			onApplicationFailedEvent(failedEvent);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationStartingEvent(ApplicationStartingEvent event) {
+&nbsp;		// It&#39;s too early to use the Spring environment but we should still allow
+&nbsp;		// users to disable restart using a System property.
+<b class="nc">&nbsp;		String enabled = System.getProperty(ENABLED_PROPERTY);</b>
+<b class="nc">&nbsp;		RestartInitializer restartInitializer = null;</b>
+<b class="nc">&nbsp;		if (enabled == null) {</b>
+<b class="nc">&nbsp;			if (implicitlyEnableRestart()) {</b>
+<b class="nc">&nbsp;				restartInitializer = new DefaultRestartInitializer();</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				logger.info(&quot;Restart disabled due to context in which it is running&quot;);</b>
+<b class="nc">&nbsp;				Restarter.disable();</b>
+&nbsp;				return;
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		else if (Boolean.parseBoolean(enabled)) {</b>
+<b class="nc">&nbsp;			restartInitializer = new DefaultRestartInitializer() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				protected boolean isDevelopmentClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+&nbsp;
+&nbsp;			};
+<b class="nc">&nbsp;			logger.info(LogMessage.format(</b>
+&nbsp;					&quot;Restart enabled irrespective of application packaging due to System property &#39;%s&#39; being set to true&quot;,
+&nbsp;					ENABLED_PROPERTY));
+&nbsp;		}
+<b class="nc">&nbsp;		if (restartInitializer != null) {</b>
+<b class="nc">&nbsp;			String[] args = event.getArgs();</b>
+<b class="nc">&nbsp;			boolean restartOnInitialize = !AgentReloader.isActive();</b>
+<b class="nc">&nbsp;			if (!restartOnInitialize) {</b>
+<b class="nc">&nbsp;				logger.info(&quot;Restart disabled due to an agent-based reloader being active&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Restarter.initialize(args, false, restartInitializer, restartOnInitialize);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			logger.info(LogMessage.format(&quot;Restart disabled due to System property &#39;%s&#39; being set to false&quot;,</b>
+&nbsp;					ENABLED_PROPERTY));
+<b class="nc">&nbsp;			Restarter.disable();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean implicitlyEnableRestart() {
+<b class="nc">&nbsp;		return DevToolsEnablementDeducer.shouldEnable(Thread.currentThread());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationPreparedEvent(ApplicationPreparedEvent event) {
+<b class="nc">&nbsp;		Restarter.getInstance().prepare(event.getApplicationContext());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationFailedEvent(ApplicationFailedEvent event) {
+<b class="nc">&nbsp;		Restarter.getInstance().remove(event.getApplicationContext());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return this.order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the order of the listener.
+&nbsp;	 * @param order the order of the listener
+&nbsp;	 */
+&nbsp;	public void setOrder(int order) {
+<b class="nc">&nbsp;		this.order = order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

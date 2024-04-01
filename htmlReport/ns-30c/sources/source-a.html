@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TomcatEmbeddedContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.tomcat</a>
+</div>
+
+<h1>Coverage Summary for Class: TomcatEmbeddedContext (org.springframework.boot.web.embedded.tomcat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TomcatEmbeddedContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.tomcat;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;import org.apache.catalina.Container;
+&nbsp;import org.apache.catalina.Manager;
+&nbsp;import org.apache.catalina.Wrapper;
+&nbsp;import org.apache.catalina.core.StandardContext;
+&nbsp;import org.apache.catalina.core.StandardWrapper;
+&nbsp;import org.apache.catalina.session.ManagerBase;
+&nbsp;
+&nbsp;import org.springframework.boot.web.server.MimeMappings;
+&nbsp;import org.springframework.boot.web.server.WebServerException;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Tomcat {@link StandardContext} used by {@link TomcatWebServer} to support deferred
+&nbsp; * initialization.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;class TomcatEmbeddedContext extends StandardContext {</b>
+&nbsp;
+&nbsp;	private TomcatStarter starter;
+&nbsp;
+&nbsp;	private MimeMappings mimeMappings;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean loadOnStartup(Container[] children) {
+&nbsp;		// deferred until later (see deferredLoadOnStartup)
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setManager(Manager manager) {
+<b class="nc">&nbsp;		if (manager instanceof ManagerBase) {</b>
+<b class="nc">&nbsp;			manager.setSessionIdGenerator(new LazySessionIdGenerator());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		super.setManager(manager);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void deferredLoadOnStartup() {
+<b class="nc">&nbsp;		doWithThreadContextClassLoader(getLoader().getClassLoader(),</b>
+<b class="nc">&nbsp;				() -&gt; getLoadOnStartupWrappers(findChildren()).forEach(this::load));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Stream&lt;Wrapper&gt; getLoadOnStartupWrappers(Container[] children) {
+<b class="nc">&nbsp;		Map&lt;Integer, List&lt;Wrapper&gt;&gt; grouped = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Container child : children) {</b>
+<b class="nc">&nbsp;			Wrapper wrapper = (Wrapper) child;</b>
+<b class="nc">&nbsp;			int order = wrapper.getLoadOnStartup();</b>
+<b class="nc">&nbsp;			if (order &gt;= 0) {</b>
+<b class="nc">&nbsp;				grouped.computeIfAbsent(order, (o) -&gt; new ArrayList&lt;&gt;()).add(wrapper);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return grouped.values().stream().flatMap(List::stream);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void load(Wrapper wrapper) {
+&nbsp;		try {
+<b class="nc">&nbsp;			wrapper.load();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ServletException ex) {</b>
+<b class="nc">&nbsp;			String message = sm.getString(&quot;standardContext.loadOnStartup.loadException&quot;, getName(), wrapper.getName());</b>
+<b class="nc">&nbsp;			if (getComputedFailCtxIfServletStartFails()) {</b>
+<b class="nc">&nbsp;				throw new WebServerException(message, ex);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			getLogger().error(message, StandardWrapper.getRootCause(ex));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Some older Servlet frameworks (e.g. Struts, BIRT) use the Thread context class
+&nbsp;	 * loader to create servlet instances in this phase. If they do that and then try to
+&nbsp;	 * initialize them later the class loader may have changed, so wrap the call to
+&nbsp;	 * loadOnStartup in what we think is going to be the main webapp classloader at
+&nbsp;	 * runtime.
+&nbsp;	 * @param classLoader the class loader to use
+&nbsp;	 * @param code the code to run
+&nbsp;	 */
+&nbsp;	private void doWithThreadContextClassLoader(ClassLoader classLoader, Runnable code) {
+<b class="nc">&nbsp;		ClassLoader existingLoader = (classLoader != null) ? ClassUtils.overrideThreadContextClassLoader(classLoader)</b>
+<b class="nc">&nbsp;				: null;</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			code.run();</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			if (existingLoader != null) {</b>
+<b class="nc">&nbsp;				ClassUtils.overrideThreadContextClassLoader(existingLoader);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setStarter(TomcatStarter starter) {
+<b class="nc">&nbsp;		this.starter = starter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	TomcatStarter getStarter() {
+<b class="nc">&nbsp;		return this.starter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setMimeMappings(MimeMappings mimeMappings) {
+<b class="nc">&nbsp;		this.mimeMappings = mimeMappings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String[] findMimeMappings() {
+<b class="nc">&nbsp;		List&lt;String&gt; mappings = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		mappings.addAll(Arrays.asList(super.findMimeMappings()));</b>
+<b class="nc">&nbsp;		if (this.mimeMappings != null) {</b>
+<b class="nc">&nbsp;			this.mimeMappings.forEach((mapping) -&gt; mappings.add(mapping.getExtension()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return mappings.toArray(String[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String findMimeMapping(String extension) {
+<b class="nc">&nbsp;		String mimeMapping = super.findMimeMapping(extension);</b>
+<b class="nc">&nbsp;		if (mimeMapping != null) {</b>
+<b class="nc">&nbsp;			return mimeMapping;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (this.mimeMappings != null) ? this.mimeMappings.get(extension) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StaticResourceRequest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.security.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: StaticResourceRequest (org.springframework.boot.autoconfigure.security.reactive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StaticResourceRequest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StaticResourceRequest$StaticResourceServerWebExchange</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.security.reactive;
+&nbsp;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.security.StaticResourceLocation;
+&nbsp;import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
+&nbsp;import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
+&nbsp;import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.server.ServerWebExchange;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used to create a {@link ServerWebExchangeMatcher} for static resources in commonly used
+&nbsp; * locations. Returned by {@link PathRequest#toStaticResources()}.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; * @see PathRequest
+&nbsp; */
+&nbsp;public final class StaticResourceRequest {
+&nbsp;
+<b class="nc">&nbsp;	static final StaticResourceRequest INSTANCE = new StaticResourceRequest();</b>
+&nbsp;
+<b class="nc">&nbsp;	private StaticResourceRequest() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a matcher that includes all commonly used {@link StaticResourceLocation
+&nbsp;	 * Locations}. The
+&nbsp;	 * {@link StaticResourceServerWebExchange#excluding(StaticResourceLocation, StaticResourceLocation...)
+&nbsp;	 * excluding} method can be used to remove specific locations if required. For
+&nbsp;	 * example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * PathRequest.toStaticResources().atCommonLocations().excluding(StaticResourceLocation.CSS)
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @return the configured {@link ServerWebExchangeMatcher}
+&nbsp;	 */
+&nbsp;	public StaticResourceServerWebExchange atCommonLocations() {
+<b class="nc">&nbsp;		return at(EnumSet.allOf(StaticResourceLocation.class));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a matcher that includes the specified {@link StaticResourceLocation
+&nbsp;	 * Locations}. For example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * PathRequest.toStaticResources().at(StaticResourceLocation.CSS, StaticResourceLocation.JAVA_SCRIPT)
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @param first the first location to include
+&nbsp;	 * @param rest additional locations to include
+&nbsp;	 * @return the configured {@link ServerWebExchangeMatcher}
+&nbsp;	 */
+&nbsp;	public StaticResourceServerWebExchange at(StaticResourceLocation first, StaticResourceLocation... rest) {
+<b class="nc">&nbsp;		return at(EnumSet.of(first, rest));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a matcher that includes the specified {@link StaticResourceLocation
+&nbsp;	 * Locations}. For example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * PathRequest.toStaticResources().at(locations)
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @param locations the locations to include
+&nbsp;	 * @return the configured {@link ServerWebExchangeMatcher}
+&nbsp;	 */
+&nbsp;	public StaticResourceServerWebExchange at(Set&lt;StaticResourceLocation&gt; locations) {
+<b class="nc">&nbsp;		Assert.notNull(locations, &quot;Locations must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new StaticResourceServerWebExchange(new LinkedHashSet&lt;&gt;(locations));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The server web exchange matcher used to match against resource
+&nbsp;	 * {@link StaticResourceLocation locations}.
+&nbsp;	 */
+&nbsp;	public static final class StaticResourceServerWebExchange implements ServerWebExchangeMatcher {
+&nbsp;
+&nbsp;		private final Set&lt;StaticResourceLocation&gt; locations;
+&nbsp;
+<b class="nc">&nbsp;		private StaticResourceServerWebExchange(Set&lt;StaticResourceLocation&gt; locations) {</b>
+<b class="nc">&nbsp;			this.locations = locations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a new {@link StaticResourceServerWebExchange} based on this one but
+&nbsp;		 * excluding the specified locations.
+&nbsp;		 * @param first the first location to exclude
+&nbsp;		 * @param rest additional locations to exclude
+&nbsp;		 * @return a new {@link StaticResourceServerWebExchange}
+&nbsp;		 */
+&nbsp;		public StaticResourceServerWebExchange excluding(StaticResourceLocation first, StaticResourceLocation... rest) {
+<b class="nc">&nbsp;			return excluding(EnumSet.of(first, rest));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return a new {@link StaticResourceServerWebExchange} based on this one but
+&nbsp;		 * excluding the specified locations.
+&nbsp;		 * @param locations the locations to exclude
+&nbsp;		 * @return a new {@link StaticResourceServerWebExchange}
+&nbsp;		 */
+&nbsp;		public StaticResourceServerWebExchange excluding(Set&lt;StaticResourceLocation&gt; locations) {
+<b class="nc">&nbsp;			Assert.notNull(locations, &quot;Locations must not be null&quot;);</b>
+<b class="nc">&nbsp;			Set&lt;StaticResourceLocation&gt; subset = new LinkedHashSet&lt;&gt;(this.locations);</b>
+<b class="nc">&nbsp;			subset.removeAll(locations);</b>
+<b class="nc">&nbsp;			return new StaticResourceServerWebExchange(subset);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Stream&lt;String&gt; getPatterns() {
+<b class="nc">&nbsp;			return this.locations.stream().flatMap(StaticResourceLocation::getPatterns);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Mono&lt;MatchResult&gt; matches(ServerWebExchange exchange) {
+<b class="nc">&nbsp;			return new OrServerWebExchangeMatcher(getDelegateMatchers().toList()).matches(exchange);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Stream&lt;ServerWebExchangeMatcher&gt; getDelegateMatchers() {
+<b class="nc">&nbsp;			return getPatterns().map(PathPatternParserServerWebExchangeMatcher::new);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

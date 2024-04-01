@@ -1,0 +1,1288 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JsonContentAssert</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.json</a>
+</div>
+
+<h1>Coverage Summary for Class: JsonContentAssert (org.springframework.boot.test.json)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JsonContentAssert</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/182)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JsonContentAssert$JsonPathValue</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/218)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.json;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import com.jayway.jsonpath.Configuration;
+&nbsp;import com.jayway.jsonpath.JsonPath;
+&nbsp;import com.jayway.jsonpath.PathNotFoundException;
+&nbsp;import org.assertj.core.api.AbstractAssert;
+&nbsp;import org.assertj.core.api.AbstractBooleanAssert;
+&nbsp;import org.assertj.core.api.AbstractCharSequenceAssert;
+&nbsp;import org.assertj.core.api.AbstractObjectAssert;
+&nbsp;import org.assertj.core.api.Assert;
+&nbsp;import org.assertj.core.api.Assertions;
+&nbsp;import org.assertj.core.api.ListAssert;
+&nbsp;import org.assertj.core.api.MapAssert;
+&nbsp;import org.skyscreamer.jsonassert.JSONCompare;
+&nbsp;import org.skyscreamer.jsonassert.JSONCompareMode;
+&nbsp;import org.skyscreamer.jsonassert.JSONCompareResult;
+&nbsp;import org.skyscreamer.jsonassert.comparator.JSONComparator;
+&nbsp;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * AssertJ {@link Assert} for {@link JsonContent}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Diego Berrueta
+&nbsp; * @author Camille Vienot
+&nbsp; * @since 1.4.0
+&nbsp; */
+<b class="nc">&nbsp;public class JsonContentAssert extends AbstractAssert&lt;JsonContentAssert, CharSequence&gt; {</b>
+&nbsp;
+&nbsp;	private final JsonLoader loader;
+&nbsp;
+&nbsp;	private final Configuration configuration;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JsonContentAssert} instance that will load resources as UTF-8.
+&nbsp;	 * @param resourceLoadClass the source class used to load resources
+&nbsp;	 * @param json the actual JSON content
+&nbsp;	 */
+&nbsp;	public JsonContentAssert(Class&lt;?&gt; resourceLoadClass, CharSequence json) {
+<b class="nc">&nbsp;		this(resourceLoadClass, null, json);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JsonContentAssert} instance that will load resources in the
+&nbsp;	 * given {@code charset}.
+&nbsp;	 * @param resourceLoadClass the source class used to load resources
+&nbsp;	 * @param charset the charset of the JSON resources
+&nbsp;	 * @param json the actual JSON content
+&nbsp;	 * @since 1.4.1
+&nbsp;	 */
+&nbsp;	public JsonContentAssert(Class&lt;?&gt; resourceLoadClass, Charset charset, CharSequence json) {
+<b class="nc">&nbsp;		this(resourceLoadClass, charset, json, Configuration.defaultConfiguration());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JsonContentAssert} instance that will load resources in the
+&nbsp;	 * given {@code charset}.
+&nbsp;	 * @param resourceLoadClass the source class used to load resources
+&nbsp;	 * @param charset the charset of the JSON resources
+&nbsp;	 * @param json the actual JSON content
+&nbsp;	 * @param configuration the json-path configuration
+&nbsp;	 */
+&nbsp;	JsonContentAssert(Class&lt;?&gt; resourceLoadClass, Charset charset, CharSequence json, Configuration configuration) {
+<b class="nc">&nbsp;		super(json, JsonContentAssert.class);</b>
+<b class="nc">&nbsp;		this.configuration = configuration;</b>
+<b class="nc">&nbsp;		this.loader = new JsonLoader(resourceLoadClass, charset);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Overridden version of {@code isEqualTo} to perform JSON tests based on the object
+&nbsp;	 * type.
+&nbsp;	 * @see org.assertj.core.api.AbstractAssert#isEqualTo(java.lang.Object)
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public JsonContentAssert isEqualTo(Object expected) {
+<b class="nc">&nbsp;		if (expected == null || expected instanceof CharSequence) {</b>
+<b class="nc">&nbsp;			return isEqualToJson((CharSequence) expected);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (expected instanceof byte[] bytes) {</b>
+<b class="nc">&nbsp;			return isEqualToJson(bytes);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (expected instanceof File file) {</b>
+<b class="nc">&nbsp;			return isEqualToJson(file);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (expected instanceof InputStream inputStream) {</b>
+<b class="nc">&nbsp;			return isEqualToJson(inputStream);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (expected instanceof Resource resource) {</b>
+<b class="nc">&nbsp;			return isEqualToJson(resource);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		failWithMessage(&quot;Unsupported type for JSON assert %s&quot;, expected.getClass());</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#LENIENT leniently} equal
+&nbsp;	 * to the specified JSON. The {@code expected} value can contain the JSON itself or,
+&nbsp;	 * if it ends with {@code .json}, the name of a resource to be loaded using
+&nbsp;	 * {@code resourceLoadClass}.
+&nbsp;	 * @param expected the expected JSON or the name of a resource containing the expected
+&nbsp;	 * JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(CharSequence expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#LENIENT leniently} equal
+&nbsp;	 * to the specified JSON resource.
+&nbsp;	 * @param path the name of a resource containing the expected JSON
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(String path, Class&lt;?&gt; resourceLoadClass) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(path, resourceLoadClass);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#LENIENT leniently} equal
+&nbsp;	 * to the specified JSON bytes.
+&nbsp;	 * @param expected the expected JSON bytes
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(byte[] expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#LENIENT leniently} equal
+&nbsp;	 * to the specified JSON file.
+&nbsp;	 * @param expected a file containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(File expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#LENIENT leniently} equal
+&nbsp;	 * to the specified JSON input stream.
+&nbsp;	 * @param expected an input stream containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(InputStream expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#LENIENT leniently} equal
+&nbsp;	 * to the specified JSON resource.
+&nbsp;	 * @param expected a resource containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(Resource expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#STRICT strictly} equal to
+&nbsp;	 * the specified JSON. The {@code expected} value can contain the JSON itself or, if
+&nbsp;	 * it ends with {@code .json}, the name of a resource to be loaded using
+&nbsp;	 * {@code resourceLoadClass}.
+&nbsp;	 * @param expected the expected JSON or the name of a resource containing the expected
+&nbsp;	 * JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isStrictlyEqualToJson(CharSequence expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#STRICT strictly} equal to
+&nbsp;	 * the specified JSON resource.
+&nbsp;	 * @param path the name of a resource containing the expected JSON
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isStrictlyEqualToJson(String path, Class&lt;?&gt; resourceLoadClass) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(path, resourceLoadClass);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#STRICT strictly} equal to
+&nbsp;	 * the specified JSON bytes.
+&nbsp;	 * @param expected the expected JSON bytes
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isStrictlyEqualToJson(byte[] expected) {
+<b class="nc">&nbsp;		return assertNotFailed(compare(this.loader.getJson(expected), JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#STRICT strictly} equal to
+&nbsp;	 * the specified JSON file.
+&nbsp;	 * @param expected a file containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isStrictlyEqualToJson(File expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#STRICT strictly} equal to
+&nbsp;	 * the specified JSON input stream.
+&nbsp;	 * @param expected an input stream containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isStrictlyEqualToJson(InputStream expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is {@link JSONCompareMode#STRICT strictly} equal to
+&nbsp;	 * the specified JSON resource.
+&nbsp;	 * @param expected a resource containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isStrictlyEqualToJson(Resource expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON. The {@code expected}
+&nbsp;	 * value can contain the JSON itself or, if it ends with {@code .json}, the name of a
+&nbsp;	 * resource to be loaded using {@code resourceLoadClass}.
+&nbsp;	 * @param expected the expected JSON or the name of a resource containing the expected
+&nbsp;	 * JSON
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(CharSequence expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON resource.
+&nbsp;	 * @param path the name of a resource containing the expected JSON
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(String path, Class&lt;?&gt; resourceLoadClass, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(path, resourceLoadClass);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON bytes.
+&nbsp;	 * @param expected the expected JSON bytes
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(byte[] expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON file.
+&nbsp;	 * @param expected a file containing the expected JSON
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(File expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON input stream.
+&nbsp;	 * @param expected an input stream containing the expected JSON
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(InputStream expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		return assertNotFailed(compare(this.loader.getJson(expected), compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON resource.
+&nbsp;	 * @param expected a resource containing the expected JSON
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(Resource expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON. The {@code expected}
+&nbsp;	 * value can contain the JSON itself or, if it ends with {@code .json}, the name of a
+&nbsp;	 * resource to be loaded using {@code resourceLoadClass}.
+&nbsp;	 * @param expected the expected JSON or the name of a resource containing the expected
+&nbsp;	 * JSON
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(CharSequence expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON resource.
+&nbsp;	 * @param path the name of a resource containing the expected JSON
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(String path, Class&lt;?&gt; resourceLoadClass, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(path, resourceLoadClass);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON bytes.
+&nbsp;	 * @param expected the expected JSON bytes
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(byte[] expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON file.
+&nbsp;	 * @param expected a file containing the expected JSON
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(File expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON input stream.
+&nbsp;	 * @param expected an input stream containing the expected JSON
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(InputStream expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is equal to the specified JSON resource.
+&nbsp;	 * @param expected a resource containing the expected JSON
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is not equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isEqualToJson(Resource expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotFailed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Overridden version of {@code isNotEqualTo} to perform JSON tests based on the
+&nbsp;	 * object type.
+&nbsp;	 * @see org.assertj.core.api.AbstractAssert#isEqualTo(java.lang.Object)
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public JsonContentAssert isNotEqualTo(Object expected) {
+<b class="nc">&nbsp;		if (expected == null || expected instanceof CharSequence) {</b>
+<b class="nc">&nbsp;			return isNotEqualToJson((CharSequence) expected);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (expected instanceof byte[] bytes) {</b>
+<b class="nc">&nbsp;			return isNotEqualToJson(bytes);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (expected instanceof File file) {</b>
+<b class="nc">&nbsp;			return isNotEqualToJson(file);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (expected instanceof InputStream inputStream) {</b>
+<b class="nc">&nbsp;			return isNotEqualToJson(inputStream);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (expected instanceof Resource resource) {</b>
+<b class="nc">&nbsp;			return isNotEqualToJson(resource);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		failWithMessage(&quot;Unsupported type for JSON assert %s&quot;, expected.getClass());</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#LENIENT leniently}
+&nbsp;	 * equal to the specified JSON. The {@code expected} value can contain the JSON itself
+&nbsp;	 * or, if it ends with {@code .json}, the name of a resource to be loaded using
+&nbsp;	 * {@code resourceLoadClass}.
+&nbsp;	 * @param expected the expected JSON or the name of a resource containing the expected
+&nbsp;	 * JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(CharSequence expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#LENIENT leniently}
+&nbsp;	 * equal to the specified JSON resource.
+&nbsp;	 * @param path the name of a resource containing the expected JSON
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(String path, Class&lt;?&gt; resourceLoadClass) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(path, resourceLoadClass);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#LENIENT leniently}
+&nbsp;	 * equal to the specified JSON bytes.
+&nbsp;	 * @param expected the expected JSON bytes
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(byte[] expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#LENIENT leniently}
+&nbsp;	 * equal to the specified JSON file.
+&nbsp;	 * @param expected a file containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(File expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#LENIENT leniently}
+&nbsp;	 * equal to the specified JSON input stream.
+&nbsp;	 * @param expected an input stream containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(InputStream expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#LENIENT leniently}
+&nbsp;	 * equal to the specified JSON resource.
+&nbsp;	 * @param expected a resource containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(Resource expected) {
+<b class="nc">&nbsp;		return assertNotPassed(compare(this.loader.getJson(expected), JSONCompareMode.LENIENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#STRICT strictly} equal
+&nbsp;	 * to the specified JSON. The {@code expected} value can contain the JSON itself or,
+&nbsp;	 * if it ends with {@code .json}, the name of a resource to be loaded using
+&nbsp;	 * {@code resourceLoadClass}.
+&nbsp;	 * @param expected the expected JSON or the name of a resource containing the expected
+&nbsp;	 * JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotStrictlyEqualToJson(CharSequence expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#STRICT strictly} equal
+&nbsp;	 * to the specified JSON resource.
+&nbsp;	 * @param path the name of a resource containing the expected JSON
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotStrictlyEqualToJson(String path, Class&lt;?&gt; resourceLoadClass) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(path, resourceLoadClass);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#STRICT strictly} equal
+&nbsp;	 * to the specified JSON bytes.
+&nbsp;	 * @param expected the expected JSON bytes
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotStrictlyEqualToJson(byte[] expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#STRICT strictly} equal
+&nbsp;	 * to the specified JSON file.
+&nbsp;	 * @param expected a file containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotStrictlyEqualToJson(File expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#STRICT strictly} equal
+&nbsp;	 * to the specified JSON input stream.
+&nbsp;	 * @param expected an input stream containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotStrictlyEqualToJson(InputStream expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not {@link JSONCompareMode#STRICT strictly} equal
+&nbsp;	 * to the specified JSON resource.
+&nbsp;	 * @param expected a resource containing the expected JSON
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotStrictlyEqualToJson(Resource expected) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, JSONCompareMode.STRICT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON. The
+&nbsp;	 * {@code expected} value can contain the JSON itself or, if it ends with
+&nbsp;	 * {@code .json}, the name of a resource to be loaded using {@code resourceLoadClass}.
+&nbsp;	 * @param expected the expected JSON or the name of a resource containing the expected
+&nbsp;	 * JSON
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(CharSequence expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON resource.
+&nbsp;	 * @param path the name of a resource containing the expected JSON
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(String path, Class&lt;?&gt; resourceLoadClass, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(path, resourceLoadClass);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON bytes.
+&nbsp;	 * @param expected the expected JSON bytes
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(byte[] expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON file.
+&nbsp;	 * @param expected a file containing the expected JSON
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(File expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON input stream.
+&nbsp;	 * @param expected an input stream containing the expected JSON
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(InputStream expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON resource.
+&nbsp;	 * @param expected a resource containing the expected JSON
+&nbsp;	 * @param compareMode the compare mode used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(Resource expected, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, compareMode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON. The
+&nbsp;	 * {@code expected} value can contain the JSON itself or, if it ends with
+&nbsp;	 * {@code .json}, the name of a resource to be loaded using {@code resourceLoadClass}.
+&nbsp;	 * @param expected the expected JSON or the name of a resource containing the expected
+&nbsp;	 * JSON
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(CharSequence expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON resource.
+&nbsp;	 * @param path the name of a resource containing the expected JSON
+&nbsp;	 * @param resourceLoadClass the source class used to load the resource
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(String path, Class&lt;?&gt; resourceLoadClass, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(path, resourceLoadClass);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON bytes.
+&nbsp;	 * @param expected the expected JSON bytes
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(byte[] expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON file.
+&nbsp;	 * @param expected a file containing the expected JSON
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(File expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON input stream.
+&nbsp;	 * @param expected an input stream containing the expected JSON
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(InputStream expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual value is not equal to the specified JSON resource.
+&nbsp;	 * @param expected a resource containing the expected JSON
+&nbsp;	 * @param comparator the comparator used when checking
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual JSON value is equal to the given one
+&nbsp;	 */
+&nbsp;	public JsonContentAssert isNotEqualToJson(Resource expected, JSONComparator comparator) {
+<b class="nc">&nbsp;		String expectedJson = this.loader.getJson(expected);</b>
+<b class="nc">&nbsp;		return assertNotPassed(compare(expectedJson, comparator));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the JSON path is present without checking if it has a value.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is missing
+&nbsp;	 * @since 2.2.0
+&nbsp;	 * @see #hasJsonPathValue(CharSequence, Object...)
+&nbsp;	 */
+&nbsp;	public JsonContentAssert hasJsonPath(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertHasPath();</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path produces a non-null result. If
+&nbsp;	 * the JSON path expression is not {@linkplain JsonPath#isDefinite() definite}, this
+&nbsp;	 * method verifies that the value at the given path is not &lt;em&gt;empty&lt;/em&gt;.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is missing
+&nbsp;	 */
+&nbsp;	public JsonContentAssert hasJsonPathValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertHasValue(Object.class, &quot;an object&quot;);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path produces a non-null string
+&nbsp;	 * result.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is missing or not a string
+&nbsp;	 */
+&nbsp;	public JsonContentAssert hasJsonPathStringValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertHasValue(String.class, &quot;a string&quot;);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path produces a non-null number
+&nbsp;	 * result.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is missing or not a number
+&nbsp;	 */
+&nbsp;	public JsonContentAssert hasJsonPathNumberValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertHasValue(Number.class, &quot;a number&quot;);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path produces a non-null boolean
+&nbsp;	 * result.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is missing or not a boolean
+&nbsp;	 */
+&nbsp;	public JsonContentAssert hasJsonPathBooleanValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertHasValue(Boolean.class, &quot;a boolean&quot;);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path produces a non-null array
+&nbsp;	 * result.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is missing or not an array
+&nbsp;	 */
+&nbsp;	public JsonContentAssert hasJsonPathArrayValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertHasValue(List.class, &quot;an array&quot;);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path produces a non-null map result.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is missing or not a map
+&nbsp;	 */
+&nbsp;	public JsonContentAssert hasJsonPathMapValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertHasValue(Map.class, &quot;a map&quot;);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path produces an
+&nbsp;	 * {@link ObjectUtils#isEmpty(Object) empty} result.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is not empty
+&nbsp;	 */
+&nbsp;	public JsonContentAssert hasEmptyJsonPathValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertHasEmptyValue();</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the JSON path is not present, even if it has a {@code null} value.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is not missing
+&nbsp;	 * @since 2.2.0
+&nbsp;	 * @see #doesNotHaveJsonPathValue(CharSequence, Object...)
+&nbsp;	 */
+&nbsp;	public JsonContentAssert doesNotHaveJsonPath(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertDoesNotHavePath();</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path produces no result. If the JSON
+&nbsp;	 * path expression is not {@linkplain JsonPath#isDefinite() definite}, this method
+&nbsp;	 * verifies that the value at the given path is &lt;em&gt;empty&lt;/em&gt;.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is not missing
+&nbsp;	 */
+&nbsp;	public JsonContentAssert doesNotHaveJsonPathValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertDoesNotHaveValue();</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the actual value at the given JSON path does not produce an
+&nbsp;	 * {@link ObjectUtils#isEmpty(Object) empty} result.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the value at the given path is empty
+&nbsp;	 */
+&nbsp;	public JsonContentAssert doesNotHaveEmptyJsonPathValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		new JsonPathValue(expression, args).assertDoesNotHaveEmptyValue();</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the value at the given JSON path for further object assertions.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return a new assertion object whose object under test is the extracted item
+&nbsp;	 * @throws AssertionError if the path is not valid
+&nbsp;	 */
+&nbsp;	public AbstractObjectAssert&lt;?, Object&gt; extractingJsonPathValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		return Assertions.assertThat(new JsonPathValue(expression, args).getValue(false));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the string value at the given JSON path for further object assertions.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return a new assertion object whose object under test is the extracted item
+&nbsp;	 * @throws AssertionError if the path is not valid or does not result in a string
+&nbsp;	 */
+&nbsp;	public AbstractCharSequenceAssert&lt;?, String&gt; extractingJsonPathStringValue(CharSequence expression,
+&nbsp;			Object... args) {
+<b class="nc">&nbsp;		return Assertions.assertThat(extractingJsonPathValue(expression, args, String.class, &quot;a string&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the number value at the given JSON path for further object assertions.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return a new assertion object whose object under test is the extracted item
+&nbsp;	 * @throws AssertionError if the path is not valid or does not result in a number
+&nbsp;	 */
+&nbsp;	public AbstractObjectAssert&lt;?, Number&gt; extractingJsonPathNumberValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		return Assertions.assertThat(extractingJsonPathValue(expression, args, Number.class, &quot;a number&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the boolean value at the given JSON path for further object assertions.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @return a new assertion object whose object under test is the extracted item
+&nbsp;	 * @throws AssertionError if the path is not valid or does not result in a boolean
+&nbsp;	 */
+&nbsp;	public AbstractBooleanAssert&lt;?&gt; extractingJsonPathBooleanValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		return Assertions.assertThat(extractingJsonPathValue(expression, args, Boolean.class, &quot;a boolean&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the array value at the given JSON path for further object assertions.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @param &lt;E&gt; element type
+&nbsp;	 * @return a new assertion object whose object under test is the extracted item
+&nbsp;	 * @throws AssertionError if the path is not valid or does not result in an array
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public &lt;E&gt; ListAssert&lt;E&gt; extractingJsonPathArrayValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		return Assertions.assertThat(extractingJsonPathValue(expression, args, List.class, &quot;an array&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the map value at the given JSON path for further object assertions.
+&nbsp;	 * @param expression the {@link JsonPath} expression
+&nbsp;	 * @param args arguments to parameterize the {@code JsonPath} expression with, using
+&nbsp;	 * formatting specifiers defined in {@link String#format(String, Object...)}
+&nbsp;	 * @param &lt;K&gt; key type
+&nbsp;	 * @param &lt;V&gt; value type
+&nbsp;	 * @return a new assertion object whose object under test is the extracted item
+&nbsp;	 * @throws AssertionError if the path is not valid or does not result in a map
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public &lt;K, V&gt; MapAssert&lt;K, V&gt; extractingJsonPathMapValue(CharSequence expression, Object... args) {
+<b class="nc">&nbsp;		return Assertions.assertThat(extractingJsonPathValue(expression, args, Map.class, &quot;a map&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T&gt; T extractingJsonPathValue(CharSequence expression, Object[] args, Class&lt;T&gt; type,
+&nbsp;			String expectedDescription) {
+<b class="nc">&nbsp;		JsonPathValue value = new JsonPathValue(expression, args);</b>
+<b class="nc">&nbsp;		if (value.getValue(false) != null) {</b>
+<b class="nc">&nbsp;			value.assertHasValue(type, expectedDescription);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (T) value.getValue(false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONCompareResult compare(CharSequence expectedJson, JSONCompareMode compareMode) {
+<b class="nc">&nbsp;		if (this.actual == null) {</b>
+<b class="nc">&nbsp;			return compareForNull(expectedJson);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return JSONCompare.compareJSON((expectedJson != null) ? expectedJson.toString() : null,</b>
+<b class="nc">&nbsp;					this.actual.toString(), compareMode);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			if (ex instanceof RuntimeException runtimeException) {</b>
+<b class="nc">&nbsp;				throw runtimeException;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONCompareResult compare(CharSequence expectedJson, JSONComparator comparator) {
+<b class="nc">&nbsp;		if (this.actual == null) {</b>
+<b class="nc">&nbsp;			return compareForNull(expectedJson);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return JSONCompare.compareJSON((expectedJson != null) ? expectedJson.toString() : null,</b>
+<b class="nc">&nbsp;					this.actual.toString(), comparator);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			if (ex instanceof RuntimeException runtimeException) {</b>
+<b class="nc">&nbsp;				throw runtimeException;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONCompareResult compareForNull(CharSequence expectedJson) {
+<b class="nc">&nbsp;		JSONCompareResult result = new JSONCompareResult();</b>
+<b class="nc">&nbsp;		result.passed();</b>
+<b class="nc">&nbsp;		if (expectedJson != null) {</b>
+<b class="nc">&nbsp;			result.fail(&quot;Expected null JSON&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JsonContentAssert assertNotFailed(JSONCompareResult result) {
+<b class="nc">&nbsp;		if (result.failed()) {</b>
+<b class="nc">&nbsp;			failWithMessage(&quot;JSON Comparison failure: %s&quot;, result.getMessage());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JsonContentAssert assertNotPassed(JSONCompareResult result) {
+<b class="nc">&nbsp;		if (result.passed()) {</b>
+<b class="nc">&nbsp;			failWithMessage(&quot;JSON Comparison failure: %s&quot;, result.getMessage());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A {@link JsonPath} value.
+&nbsp;	 */
+&nbsp;	private class JsonPathValue {
+&nbsp;
+&nbsp;		private final String expression;
+&nbsp;
+&nbsp;		private final JsonPath jsonPath;
+&nbsp;
+<b class="nc">&nbsp;		JsonPathValue(CharSequence expression, Object... args) {</b>
+<b class="nc">&nbsp;			org.springframework.util.Assert.hasText((expression != null) ? expression.toString() : null,</b>
+&nbsp;					&quot;expression must not be null or empty&quot;);
+<b class="nc">&nbsp;			this.expression = String.format(expression.toString(), args);</b>
+<b class="nc">&nbsp;			this.jsonPath = JsonPath.compile(this.expression);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void assertHasEmptyValue() {
+<b class="nc">&nbsp;			if (ObjectUtils.isEmpty(getValue(false)) || isIndefiniteAndEmpty()) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			failWithMessage(getExpectedValueMessage(&quot;an empty value&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void assertDoesNotHaveEmptyValue() {
+<b class="nc">&nbsp;			if (!ObjectUtils.isEmpty(getValue(false))) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			failWithMessage(getExpectedValueMessage(&quot;a non-empty value&quot;));</b>
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		void assertHasPath() {
+&nbsp;			try {
+<b class="nc">&nbsp;				read();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (PathNotFoundException ex) {</b>
+<b class="nc">&nbsp;				failWithMessage(&quot;No JSON path \&quot;%s\&quot; found&quot;, this.expression);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void assertDoesNotHavePath() {
+&nbsp;			try {
+<b class="nc">&nbsp;				read();</b>
+<b class="nc">&nbsp;				failWithMessage(&quot;Expecting no JSON path \&quot;%s\&quot;&quot;, this.expression);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (PathNotFoundException ex) {</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void assertHasValue(Class&lt;?&gt; type, String expectedDescription) {
+<b class="nc">&nbsp;			Object value = getValue(true);</b>
+<b class="nc">&nbsp;			if (value == null || isIndefiniteAndEmpty()) {</b>
+<b class="nc">&nbsp;				failWithNoValueMessage();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (type != null &amp;&amp; !type.isInstance(value)) {</b>
+<b class="nc">&nbsp;				failWithMessage(getExpectedValueMessage(expectedDescription));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		void assertDoesNotHaveValue() {
+<b class="nc">&nbsp;			if (getValue(false) == null || isIndefiniteAndEmpty()) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			failWithMessage(getExpectedValueMessage(&quot;no value&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isIndefiniteAndEmpty() {
+<b class="nc">&nbsp;			return !isDefinite() &amp;&amp; isEmpty();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isDefinite() {
+<b class="nc">&nbsp;			return this.jsonPath.isDefinite();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isEmpty() {
+<b class="nc">&nbsp;			return ObjectUtils.isEmpty(getValue(false));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Object getValue(boolean required) {
+&nbsp;			try {
+<b class="nc">&nbsp;				return read();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				if (required) {</b>
+<b class="nc">&nbsp;					failWithNoValueMessage();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void failWithNoValueMessage() {
+<b class="nc">&nbsp;			failWithMessage(&quot;No value at JSON path \&quot;%s\&quot;&quot;, this.expression);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object read() {
+<b class="nc">&nbsp;			CharSequence json = JsonContentAssert.this.actual;</b>
+<b class="nc">&nbsp;			return this.jsonPath.read((json != null) ? json.toString() : null, JsonContentAssert.this.configuration);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getExpectedValueMessage(String expectedDescription) {
+<b class="nc">&nbsp;			return String.format(&quot;Expected %s at JSON path \&quot;%s\&quot; but found: %s&quot;, expectedDescription, this.expression,</b>
+<b class="nc">&nbsp;					ObjectUtils.nullSafeToString(StringUtils.quoteIfString(getValue(false))));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

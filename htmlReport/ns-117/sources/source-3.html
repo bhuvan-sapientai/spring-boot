@@ -1,0 +1,270 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ValidatorAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.validation</a>
+</div>
+
+<h1>Coverage Summary for Class: ValidatorAdapter (org.springframework.boot.autoconfigure.validation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ValidatorAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.validation;
+&nbsp;
+&nbsp;import jakarta.validation.ValidationException;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.DisposableBean;
+&nbsp;import org.springframework.beans.factory.InitializingBean;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.boot.validation.MessageInterpolatorFactory;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContextAware;
+&nbsp;import org.springframework.context.MessageSource;
+&nbsp;import org.springframework.validation.Errors;
+&nbsp;import org.springframework.validation.SmartValidator;
+&nbsp;import org.springframework.validation.Validator;
+&nbsp;import org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean;
+&nbsp;import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Validator} implementation that delegates calls to another {@link Validator}.
+&nbsp; * This {@link Validator} implements Spring&#39;s {@link SmartValidator} interface but does
+&nbsp; * not implement the JSR-303 {@code jakarta.validator.Validator} interface.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Zisis Pavloudis
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class ValidatorAdapter implements SmartValidator, ApplicationContextAware, InitializingBean, DisposableBean {
+&nbsp;
+&nbsp;	private final SmartValidator target;
+&nbsp;
+&nbsp;	private final boolean existingBean;
+&nbsp;
+<b class="nc">&nbsp;	ValidatorAdapter(SmartValidator target, boolean existingBean) {</b>
+<b class="nc">&nbsp;		this.target = target;</b>
+<b class="nc">&nbsp;		this.existingBean = existingBean;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public final Validator getTarget() {
+<b class="nc">&nbsp;		return this.target;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean supports(Class&lt;?&gt; clazz) {
+<b class="nc">&nbsp;		return this.target.supports(clazz);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void validate(Object target, Errors errors) {
+<b class="nc">&nbsp;		this.target.validate(target, errors);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void validate(Object target, Errors errors, Object... validationHints) {
+<b class="nc">&nbsp;		this.target.validate(target, errors, validationHints);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+<b class="nc">&nbsp;		if (!this.existingBean &amp;&amp; this.target instanceof ApplicationContextAware contextAwareTarget) {</b>
+<b class="nc">&nbsp;			contextAwareTarget.setApplicationContext(applicationContext);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterPropertiesSet() throws Exception {
+<b class="nc">&nbsp;		if (!this.existingBean &amp;&amp; this.target instanceof InitializingBean initializingBean) {</b>
+<b class="nc">&nbsp;			initializingBean.afterPropertiesSet();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void destroy() throws Exception {
+<b class="nc">&nbsp;		if (!this.existingBean &amp;&amp; this.target instanceof DisposableBean disposableBean) {</b>
+<b class="nc">&nbsp;			disposableBean.destroy();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link Validator} that only implements the {@link Validator} interface,
+&nbsp;	 * wrapping it if necessary.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * If the specified {@link Validator} is not {@code null}, it is wrapped. If not, a
+&nbsp;	 * {@link jakarta.validation.Validator} is retrieved from the context and wrapped.
+&nbsp;	 * Otherwise, a new default validator is created.
+&nbsp;	 * @param applicationContext the application context
+&nbsp;	 * @param validator an existing validator to use or {@code null}
+&nbsp;	 * @return the validator to use
+&nbsp;	 */
+&nbsp;	public static Validator get(ApplicationContext applicationContext, Validator validator) {
+<b class="nc">&nbsp;		if (validator != null) {</b>
+<b class="nc">&nbsp;			return wrap(validator, false);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getExistingOrCreate(applicationContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Validator getExistingOrCreate(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		Validator existing = getExisting(applicationContext);</b>
+<b class="nc">&nbsp;		if (existing != null) {</b>
+<b class="nc">&nbsp;			return wrap(existing, true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return create(applicationContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Validator getExisting(ApplicationContext applicationContext) {
+&nbsp;		try {
+<b class="nc">&nbsp;			jakarta.validation.Validator validatorBean = applicationContext.getBean(jakarta.validation.Validator.class);</b>
+<b class="nc">&nbsp;			if (validatorBean instanceof Validator validator) {</b>
+<b class="nc">&nbsp;				return validator;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new SpringValidatorAdapter(validatorBean);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Validator create(MessageSource messageSource) {
+<b class="nc">&nbsp;		OptionalValidatorFactoryBean validator = new OptionalValidatorFactoryBean();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			MessageInterpolatorFactory factory = new MessageInterpolatorFactory(messageSource);</b>
+<b class="nc">&nbsp;			validator.setMessageInterpolator(factory.getObject());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ValidationException ex) {</b>
+&nbsp;			// Ignore
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return wrap(validator, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Validator wrap(Validator validator, boolean existingBean) {
+<b class="nc">&nbsp;		if (validator instanceof jakarta.validation.Validator jakartaValidator) {</b>
+<b class="nc">&nbsp;			if (jakartaValidator instanceof SpringValidatorAdapter adapter) {</b>
+<b class="nc">&nbsp;				return new ValidatorAdapter(adapter, existingBean);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new ValidatorAdapter(new SpringValidatorAdapter(jakartaValidator), existingBean);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return validator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public &lt;T&gt; T unwrap(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;		if (type.isInstance(this.target)) {</b>
+<b class="nc">&nbsp;			return (T) this.target;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.target.unwrap(type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

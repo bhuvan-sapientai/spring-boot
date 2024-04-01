@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoConfiguredHealthEndpointGroups</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.health</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoConfiguredHealthEndpointGroups (org.springframework.boot.actuate.autoconfigure.health)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoConfiguredHealthEndpointGroups</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.health;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.BeanFactoryUtils;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointProperties.Group;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.health.HealthProperties.Status;
+&nbsp;import org.springframework.boot.actuate.endpoint.Show;
+&nbsp;import org.springframework.boot.actuate.health.AdditionalHealthEndpointPath;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpointGroup;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpointGroups;
+&nbsp;import org.springframework.boot.actuate.health.HttpCodeStatusMapper;
+&nbsp;import org.springframework.boot.actuate.health.SimpleHttpCodeStatusMapper;
+&nbsp;import org.springframework.boot.actuate.health.SimpleStatusAggregator;
+&nbsp;import org.springframework.boot.actuate.health.StatusAggregator;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Auto-configured {@link HealthEndpointGroups}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class AutoConfiguredHealthEndpointGroups implements HealthEndpointGroups {
+&nbsp;
+<b class="nc">&nbsp;	private static final Predicate&lt;String&gt; ALL = (name) -&gt; true;</b>
+&nbsp;
+&nbsp;	private final HealthEndpointGroup primaryGroup;
+&nbsp;
+&nbsp;	private final Map&lt;String, HealthEndpointGroup&gt; groups;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AutoConfiguredHealthEndpointGroups} instance.
+&nbsp;	 * @param applicationContext the application context used to check for override beans
+&nbsp;	 * @param properties the health endpoint properties
+&nbsp;	 */
+<b class="nc">&nbsp;	AutoConfiguredHealthEndpointGroups(ApplicationContext applicationContext, HealthEndpointProperties properties) {</b>
+<b class="nc">&nbsp;		ListableBeanFactory beanFactory = (applicationContext instanceof ConfigurableApplicationContext configurableContext)</b>
+<b class="nc">&nbsp;				? configurableContext.getBeanFactory() : applicationContext;</b>
+<b class="nc">&nbsp;		Show showComponents = properties.getShowComponents();</b>
+<b class="nc">&nbsp;		Show showDetails = properties.getShowDetails();</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; roles = properties.getRoles();</b>
+<b class="nc">&nbsp;		StatusAggregator statusAggregator = getNonQualifiedBean(beanFactory, StatusAggregator.class);</b>
+<b class="nc">&nbsp;		if (statusAggregator == null) {</b>
+<b class="nc">&nbsp;			statusAggregator = new SimpleStatusAggregator(properties.getStatus().getOrder());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		HttpCodeStatusMapper httpCodeStatusMapper = getNonQualifiedBean(beanFactory, HttpCodeStatusMapper.class);</b>
+<b class="nc">&nbsp;		if (httpCodeStatusMapper == null) {</b>
+<b class="nc">&nbsp;			httpCodeStatusMapper = new SimpleHttpCodeStatusMapper(properties.getStatus().getHttpMapping());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.primaryGroup = new AutoConfiguredHealthEndpointGroup(ALL, statusAggregator, httpCodeStatusMapper,</b>
+&nbsp;				showComponents, showDetails, roles, null);
+<b class="nc">&nbsp;		this.groups = createGroups(properties.getGroup(), beanFactory, statusAggregator, httpCodeStatusMapper,</b>
+&nbsp;				showComponents, showDetails, roles);
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, HealthEndpointGroup&gt; createGroups(Map&lt;String, Group&gt; groupProperties, BeanFactory beanFactory,
+&nbsp;			StatusAggregator defaultStatusAggregator, HttpCodeStatusMapper defaultHttpCodeStatusMapper,
+&nbsp;			Show defaultShowComponents, Show defaultShowDetails, Set&lt;String&gt; defaultRoles) {
+<b class="nc">&nbsp;		Map&lt;String, HealthEndpointGroup&gt; groups = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		groupProperties.forEach((groupName, group) -&gt; {</b>
+<b class="nc">&nbsp;			Status status = group.getStatus();</b>
+<b class="nc">&nbsp;			Show showComponents = (group.getShowComponents() != null) ? group.getShowComponents()</b>
+<b class="nc">&nbsp;					: defaultShowComponents;</b>
+<b class="nc">&nbsp;			Show showDetails = (group.getShowDetails() != null) ? group.getShowDetails() : defaultShowDetails;</b>
+<b class="nc">&nbsp;			Set&lt;String&gt; roles = !CollectionUtils.isEmpty(group.getRoles()) ? group.getRoles() : defaultRoles;</b>
+<b class="nc">&nbsp;			StatusAggregator statusAggregator = getQualifiedBean(beanFactory, StatusAggregator.class, groupName, () -&gt; {</b>
+<b class="nc">&nbsp;				if (!CollectionUtils.isEmpty(status.getOrder())) {</b>
+<b class="nc">&nbsp;					return new SimpleStatusAggregator(status.getOrder());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return defaultStatusAggregator;</b>
+&nbsp;			});
+<b class="nc">&nbsp;			HttpCodeStatusMapper httpCodeStatusMapper = getQualifiedBean(beanFactory, HttpCodeStatusMapper.class,</b>
+&nbsp;					groupName, () -&gt; {
+<b class="nc">&nbsp;						if (!CollectionUtils.isEmpty(status.getHttpMapping())) {</b>
+<b class="nc">&nbsp;							return new SimpleHttpCodeStatusMapper(status.getHttpMapping());</b>
+&nbsp;						}
+<b class="nc">&nbsp;						return defaultHttpCodeStatusMapper;</b>
+&nbsp;					});
+<b class="nc">&nbsp;			Predicate&lt;String&gt; members = new IncludeExcludeGroupMemberPredicate(group.getInclude(), group.getExclude());</b>
+<b class="nc">&nbsp;			AdditionalHealthEndpointPath additionalPath = (group.getAdditionalPath() != null)</b>
+<b class="nc">&nbsp;					? AdditionalHealthEndpointPath.from(group.getAdditionalPath()) : null;</b>
+<b class="nc">&nbsp;			groups.put(groupName, new AutoConfiguredHealthEndpointGroup(members, statusAggregator, httpCodeStatusMapper,</b>
+&nbsp;					showComponents, showDetails, roles, additionalPath));
+&nbsp;		});
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(groups);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T getNonQualifiedBean(ListableBeanFactory beanFactory, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;		List&lt;String&gt; candidates = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String beanName : BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, type)) {</b>
+<b class="nc">&nbsp;			String[] aliases = beanFactory.getAliases(beanName);</b>
+<b class="nc">&nbsp;			if (!BeanFactoryAnnotationUtils.isQualifierMatch(</b>
+<b class="nc">&nbsp;					(qualifier) -&gt; !qualifier.equals(beanName) &amp;&amp; !ObjectUtils.containsElement(aliases, qualifier),</b>
+&nbsp;					beanName, beanFactory)) {
+<b class="nc">&nbsp;				candidates.add(beanName);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (candidates.isEmpty()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (candidates.size() == 1) {</b>
+<b class="nc">&nbsp;			return beanFactory.getBean(candidates.get(0), type);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return beanFactory.getBean(type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T getQualifiedBean(BeanFactory beanFactory, Class&lt;T&gt; type, String qualifier, Supplier&lt;T&gt; fallback) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return BeanFactoryAnnotationUtils.qualifiedBeanOfType(beanFactory, type, qualifier);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			return fallback.get();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public HealthEndpointGroup getPrimary() {
+<b class="nc">&nbsp;		return this.primaryGroup;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Set&lt;String&gt; getNames() {
+<b class="nc">&nbsp;		return this.groups.keySet();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public HealthEndpointGroup get(String name) {
+<b class="nc">&nbsp;		return this.groups.get(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

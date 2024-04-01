@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HealthEndpointWebExtension</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.health</a>
+</div>
+
+<h1>Coverage Summary for Class: HealthEndpointWebExtension (org.springframework.boot.actuate.health)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HealthEndpointWebExtension</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.health;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.ApiVersion;
+&nbsp;import org.springframework.boot.actuate.endpoint.SecurityContext;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Selector;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Selector.Match;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebServerNamespace;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EndpointWebExtension @EndpointWebExtension} for the {@link HealthEndpoint}.
+&nbsp; *
+&nbsp; * @author Christian Dupuis
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@EndpointWebExtension(endpoint = HealthEndpoint.class)
+&nbsp;@ImportRuntimeHints(HealthEndpointWebExtensionRuntimeHints.class)
+&nbsp;public class HealthEndpointWebExtension extends HealthEndpointSupport&lt;HealthContributor, HealthComponent&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] NO_PATH = {};</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link HealthEndpointWebExtension} instance.
+&nbsp;	 * @param registry the health contributor registry
+&nbsp;	 * @param groups the health endpoint groups
+&nbsp;	 * @param slowIndicatorLoggingThreshold duration after which slow health indicator
+&nbsp;	 * logging should occur
+&nbsp;	 * @since 2.6.9
+&nbsp;	 */
+&nbsp;	public HealthEndpointWebExtension(HealthContributorRegistry registry, HealthEndpointGroups groups,
+&nbsp;			Duration slowIndicatorLoggingThreshold) {
+<b class="nc">&nbsp;		super(registry, groups, slowIndicatorLoggingThreshold);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ReadOperation
+&nbsp;	public WebEndpointResponse&lt;HealthComponent&gt; health(ApiVersion apiVersion, WebServerNamespace serverNamespace,
+&nbsp;			SecurityContext securityContext) {
+<b class="nc">&nbsp;		return health(apiVersion, serverNamespace, securityContext, false, NO_PATH);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ReadOperation
+&nbsp;	public WebEndpointResponse&lt;HealthComponent&gt; health(ApiVersion apiVersion, WebServerNamespace serverNamespace,
+&nbsp;			SecurityContext securityContext, @Selector(match = Match.ALL_REMAINING) String... path) {
+<b class="nc">&nbsp;		return health(apiVersion, serverNamespace, securityContext, false, path);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public WebEndpointResponse&lt;HealthComponent&gt; health(ApiVersion apiVersion, WebServerNamespace serverNamespace,
+&nbsp;			SecurityContext securityContext, boolean showAll, String... path) {
+<b class="nc">&nbsp;		HealthResult&lt;HealthComponent&gt; result = getHealth(apiVersion, serverNamespace, securityContext, showAll, path);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			return (Arrays.equals(path, NO_PATH))</b>
+<b class="nc">&nbsp;					? new WebEndpointResponse&lt;&gt;(DEFAULT_HEALTH, WebEndpointResponse.STATUS_OK)</b>
+<b class="nc">&nbsp;					: new WebEndpointResponse&lt;&gt;(WebEndpointResponse.STATUS_NOT_FOUND);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		HealthComponent health = result.getHealth();</b>
+<b class="nc">&nbsp;		HealthEndpointGroup group = result.getGroup();</b>
+<b class="nc">&nbsp;		int statusCode = group.getHttpCodeStatusMapper().getStatusCode(health.getStatus());</b>
+<b class="nc">&nbsp;		return new WebEndpointResponse&lt;&gt;(health, statusCode);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected HealthComponent getHealth(HealthContributor contributor, boolean includeDetails) {
+<b class="nc">&nbsp;		return ((HealthIndicator) contributor).getHealth(includeDetails);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected HealthComponent aggregateContributions(ApiVersion apiVersion, Map&lt;String, HealthComponent&gt; contributions,
+&nbsp;			StatusAggregator statusAggregator, boolean showComponents, Set&lt;String&gt; groupNames) {
+<b class="nc">&nbsp;		return getCompositeHealth(apiVersion, contributions, statusAggregator, showComponents, groupNames);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

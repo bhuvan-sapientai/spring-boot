@@ -1,0 +1,497 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuilderMetadata</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: BuilderMetadata (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuilderMetadata</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuilderMetadata$CreatedBy</td>
+  </tr>
+  <tr>
+    <td class="name">BuilderMetadata$Lifecycle</td>
+  </tr>
+  <tr>
+    <td class="name">BuilderMetadata$Lifecycle$Api</td>
+  </tr>
+  <tr>
+    <td class="name">BuilderMetadata$Lifecycle$Apis</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuilderMetadata$Stack</td>
+  </tr>
+  <tr>
+    <td class="name">BuilderMetadata$Stack$RunImage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuilderMetadata$Update</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.invoke.MethodHandles;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.JsonProcessingException;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.node.ObjectNode;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Image;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageConfig;
+&nbsp;import org.springframework.boot.buildpack.platform.json.MappedObject;
+&nbsp;import org.springframework.boot.buildpack.platform.json.SharedObjectMapper;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builder metadata information.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+<b class="nc">&nbsp;class BuilderMetadata extends MappedObject {</b>
+&nbsp;
+&nbsp;	private static final String LABEL_NAME = &quot;io.buildpacks.builder.metadata&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] EMPTY_MIRRORS = {};</b>
+&nbsp;
+&nbsp;	private final Stack stack;
+&nbsp;
+&nbsp;	private final Lifecycle lifecycle;
+&nbsp;
+&nbsp;	private final CreatedBy createdBy;
+&nbsp;
+&nbsp;	private final List&lt;BuildpackMetadata&gt; buildpacks;
+&nbsp;
+&nbsp;	BuilderMetadata(JsonNode node) {
+<b class="nc">&nbsp;		super(node, MethodHandles.lookup());</b>
+<b class="nc">&nbsp;		this.stack = valueAt(&quot;/stack&quot;, Stack.class);</b>
+<b class="nc">&nbsp;		this.lifecycle = valueAt(&quot;/lifecycle&quot;, Lifecycle.class);</b>
+<b class="nc">&nbsp;		this.createdBy = valueAt(&quot;/createdBy&quot;, CreatedBy.class);</b>
+<b class="nc">&nbsp;		this.buildpacks = extractBuildpacks(getNode().at(&quot;/buildpacks&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;BuildpackMetadata&gt; extractBuildpacks(JsonNode node) {
+<b class="nc">&nbsp;		if (node.isEmpty()) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;BuildpackMetadata&gt; entries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		node.forEach((child) -&gt; entries.add(BuildpackMetadata.fromJson(child)));</b>
+<b class="nc">&nbsp;		return entries;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return stack metadata.
+&nbsp;	 * @return the stack metadata
+&nbsp;	 */
+&nbsp;	Stack getStack() {
+<b class="nc">&nbsp;		return this.stack;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return lifecycle metadata.
+&nbsp;	 * @return the lifecycle metadata
+&nbsp;	 */
+&nbsp;	Lifecycle getLifecycle() {
+<b class="nc">&nbsp;		return this.lifecycle;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return information about who created the builder.
+&nbsp;	 * @return the created by metadata
+&nbsp;	 */
+&nbsp;	CreatedBy getCreatedBy() {
+<b class="nc">&nbsp;		return this.createdBy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the buildpacks that are bundled in the builder.
+&nbsp;	 * @return the buildpacks
+&nbsp;	 */
+&nbsp;	List&lt;BuildpackMetadata&gt; getBuildpacks() {
+<b class="nc">&nbsp;		return this.buildpacks;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an updated copy of this metadata.
+&nbsp;	 * @param update consumer to apply updates
+&nbsp;	 * @return an updated metadata instance
+&nbsp;	 */
+&nbsp;	BuilderMetadata copy(Consumer&lt;Update&gt; update) {
+<b class="nc">&nbsp;		return new Update(this).run(update);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Attach this metadata to the given update callback.
+&nbsp;	 * @param update the update used to attach the metadata
+&nbsp;	 */
+&nbsp;	void attachTo(ImageConfig.Update update) {
+&nbsp;		try {
+<b class="nc">&nbsp;			String json = SharedObjectMapper.get().writeValueAsString(getNode());</b>
+<b class="nc">&nbsp;			update.withLabel(LABEL_NAME, json);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (JsonProcessingException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to extract {@link BuilderMetadata} from an image.
+&nbsp;	 * @param image the source image
+&nbsp;	 * @return the builder metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuilderMetadata fromImage(Image image) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(image, &quot;Image must not be null&quot;);</b>
+<b class="nc">&nbsp;		return fromImageConfig(image.getConfig());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to extract {@link BuilderMetadata} from image config.
+&nbsp;	 * @param imageConfig the image config
+&nbsp;	 * @return the builder metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuilderMetadata fromImageConfig(ImageConfig imageConfig) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(imageConfig, &quot;ImageConfig must not be null&quot;);</b>
+<b class="nc">&nbsp;		String json = imageConfig.getLabels().get(LABEL_NAME);</b>
+<b class="nc">&nbsp;		Assert.notNull(json, () -&gt; &quot;No &#39;&quot; + LABEL_NAME + &quot;&#39; label found in image config labels &#39;&quot;</b>
+<b class="nc">&nbsp;				+ StringUtils.collectionToCommaDelimitedString(imageConfig.getLabels().keySet()) + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;		return fromJson(json);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method create {@link BuilderMetadata} from some JSON.
+&nbsp;	 * @param json the source JSON
+&nbsp;	 * @return the builder metadata
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static BuilderMetadata fromJson(String json) throws IOException {
+<b class="nc">&nbsp;		return new BuilderMetadata(SharedObjectMapper.get().readTree(json));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Stack metadata.
+&nbsp;	 */
+&nbsp;	interface Stack {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return run image metadata.
+&nbsp;		 * @return the run image metadata
+&nbsp;		 */
+&nbsp;		RunImage getRunImage();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Run image metadata.
+&nbsp;		 */
+&nbsp;		interface RunImage {
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Return the builder image reference.
+&nbsp;			 * @return the image reference
+&nbsp;			 */
+&nbsp;			String getImage();
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Return stack mirrors.
+&nbsp;			 * @return the stack mirrors
+&nbsp;			 */
+&nbsp;			default String[] getMirrors() {
+<b class="nc">&nbsp;				return EMPTY_MIRRORS;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Lifecycle metadata.
+&nbsp;	 */
+&nbsp;	interface Lifecycle {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the lifecycle version.
+&nbsp;		 * @return the lifecycle version
+&nbsp;		 */
+&nbsp;		String getVersion();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the default API versions.
+&nbsp;		 * @return the API versions
+&nbsp;		 */
+&nbsp;		Api getApi();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the supported API versions.
+&nbsp;		 * @return the API versions
+&nbsp;		 */
+&nbsp;		Apis getApis();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Default API versions.
+&nbsp;		 */
+&nbsp;		interface Api {
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Return the default buildpack API version.
+&nbsp;			 * @return the buildpack version
+&nbsp;			 */
+&nbsp;			String getBuildpack();
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Return the default platform API version.
+&nbsp;			 * @return the platform version
+&nbsp;			 */
+&nbsp;			String getPlatform();
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Supported API versions.
+&nbsp;		 */
+&nbsp;		interface Apis {
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Return the supported buildpack API versions.
+&nbsp;			 * @return the buildpack versions
+&nbsp;			 */
+&nbsp;			default String[] getBuildpack() {
+<b class="nc">&nbsp;				return valueAt(this, &quot;/buildpack/supported&quot;, String[].class);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			/**
+&nbsp;			 * Return the supported platform API versions.
+&nbsp;			 * @return the platform versions
+&nbsp;			 */
+&nbsp;			default String[] getPlatform() {
+<b class="nc">&nbsp;				return valueAt(this, &quot;/platform/supported&quot;, String[].class);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Created-by metadata.
+&nbsp;	 */
+&nbsp;	interface CreatedBy {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the name of the creator.
+&nbsp;		 * @return the creator name
+&nbsp;		 */
+&nbsp;		String getName();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the version of the creator.
+&nbsp;		 * @return the creator version
+&nbsp;		 */
+&nbsp;		String getVersion();
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update class used to change data when creating a copy.
+&nbsp;	 */
+&nbsp;	static final class Update {
+&nbsp;
+&nbsp;		private final ObjectNode copy;
+&nbsp;
+<b class="nc">&nbsp;		private Update(BuilderMetadata source) {</b>
+<b class="nc">&nbsp;			this.copy = source.getNode().deepCopy();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private BuilderMetadata run(Consumer&lt;Update&gt; update) {
+<b class="nc">&nbsp;			update.accept(this);</b>
+<b class="nc">&nbsp;			return new BuilderMetadata(this.copy);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Update the builder meta-data with a specific created by section.
+&nbsp;		 * @param name the name of the creator
+&nbsp;		 * @param version the version of the creator
+&nbsp;		 */
+&nbsp;		void withCreatedBy(String name, String version) {
+<b class="nc">&nbsp;			ObjectNode createdBy = (ObjectNode) this.copy.at(&quot;/createdBy&quot;);</b>
+<b class="nc">&nbsp;			if (createdBy == null) {</b>
+<b class="nc">&nbsp;				createdBy = this.copy.putObject(&quot;createdBy&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			createdBy.put(&quot;name&quot;, name);</b>
+<b class="nc">&nbsp;			createdBy.put(&quot;version&quot;, version);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

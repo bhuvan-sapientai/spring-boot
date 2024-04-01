@@ -1,0 +1,280 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImportAutoConfigurationImportSelector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: ImportAutoConfigurationImportSelector (org.springframework.boot.autoconfigure)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImportAutoConfigurationImportSelector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.context.annotation.DeterminableImports;
+&nbsp;import org.springframework.boot.context.annotation.ImportCandidates;
+&nbsp;import org.springframework.core.annotation.AnnotatedElementUtils;
+&nbsp;import org.springframework.core.annotation.AnnotationAttributes;
+&nbsp;import org.springframework.core.annotation.AnnotationUtils;
+&nbsp;import org.springframework.core.io.ClassPathResource;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.LinkedMultiValueMap;
+&nbsp;import org.springframework.util.MultiValueMap;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Variant of {@link AutoConfigurationImportSelector} for
+&nbsp; * {@link ImportAutoConfiguration @ImportAutoConfiguration}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Scott Frederick
+&nbsp; */
+<b class="nc">&nbsp;class ImportAutoConfigurationImportSelector extends AutoConfigurationImportSelector implements DeterminableImports {</b>
+&nbsp;
+&nbsp;	private static final String OPTIONAL_PREFIX = &quot;optional:&quot;;
+&nbsp;
+&nbsp;	private static final Set&lt;String&gt; ANNOTATION_NAMES;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Set&lt;String&gt; names = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		names.add(ImportAutoConfiguration.class.getName());</b>
+<b class="nc">&nbsp;		names.add(&quot;org.springframework.boot.autoconfigure.test.ImportAutoConfiguration&quot;);</b>
+<b class="nc">&nbsp;		ANNOTATION_NAMES = Collections.unmodifiableSet(names);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Set&lt;Object&gt; determineImports(AnnotationMetadata metadata) {
+<b class="nc">&nbsp;		List&lt;String&gt; candidateConfigurations = getCandidateConfigurations(metadata, null);</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; result = new LinkedHashSet&lt;&gt;(candidateConfigurations);</b>
+<b class="nc">&nbsp;		result.removeAll(getExclusions(metadata, null));</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableSet(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected AnnotationAttributes getAttributes(AnnotationMetadata metadata) {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected List&lt;String&gt; getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+<b class="nc">&nbsp;		List&lt;String&gt; candidates = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		Map&lt;Class&lt;?&gt;, List&lt;Annotation&gt;&gt; annotations = getAnnotations(metadata);</b>
+<b class="nc">&nbsp;		annotations.forEach(</b>
+<b class="nc">&nbsp;				(source, sourceAnnotations) -&gt; collectCandidateConfigurations(source, sourceAnnotations, candidates));</b>
+<b class="nc">&nbsp;		return candidates;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void collectCandidateConfigurations(Class&lt;?&gt; source, List&lt;Annotation&gt; annotations,
+&nbsp;			List&lt;String&gt; candidates) {
+<b class="nc">&nbsp;		for (Annotation annotation : annotations) {</b>
+<b class="nc">&nbsp;			candidates.addAll(getConfigurationsForAnnotation(source, annotation));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Collection&lt;String&gt; getConfigurationsForAnnotation(Class&lt;?&gt; source, Annotation annotation) {
+<b class="nc">&nbsp;		String[] classes = (String[]) AnnotationUtils.getAnnotationAttributes(annotation, true).get(&quot;classes&quot;);</b>
+<b class="nc">&nbsp;		if (classes.length &gt; 0) {</b>
+<b class="nc">&nbsp;			return Arrays.asList(classes);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return loadFactoryNames(source).stream().map(this::mapFactoryName).filter(Objects::nonNull).toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String mapFactoryName(String name) {
+<b class="nc">&nbsp;		if (!name.startsWith(OPTIONAL_PREFIX)) {</b>
+<b class="nc">&nbsp;			return name;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		name = name.substring(OPTIONAL_PREFIX.length());</b>
+<b class="nc">&nbsp;		return (!present(name)) ? null : name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean present(String className) {
+<b class="nc">&nbsp;		String resourcePath = ClassUtils.convertClassNameToResourcePath(className) + &quot;.class&quot;;</b>
+<b class="nc">&nbsp;		return new ClassPathResource(resourcePath).exists();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Collection&lt;String&gt; loadFactoryNames(Class&lt;?&gt; source) {
+<b class="nc">&nbsp;		return ImportCandidates.load(source, getBeanClassLoader()).getCandidates();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Set&lt;String&gt; getExclusions(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+<b class="nc">&nbsp;		Set&lt;String&gt; exclusions = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		Class&lt;?&gt; source = ClassUtils.resolveClassName(metadata.getClassName(), getBeanClassLoader());</b>
+<b class="nc">&nbsp;		for (String annotationName : ANNOTATION_NAMES) {</b>
+<b class="nc">&nbsp;			AnnotationAttributes merged = AnnotatedElementUtils.getMergedAnnotationAttributes(source, annotationName);</b>
+<b class="nc">&nbsp;			Class&lt;?&gt;[] exclude = (merged != null) ? merged.getClassArray(&quot;exclude&quot;) : null;</b>
+<b class="nc">&nbsp;			if (exclude != null) {</b>
+<b class="nc">&nbsp;				for (Class&lt;?&gt; excludeClass : exclude) {</b>
+<b class="nc">&nbsp;					exclusions.add(excludeClass.getName());</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		for (List&lt;Annotation&gt; annotations : getAnnotations(metadata).values()) {</b>
+<b class="nc">&nbsp;			for (Annotation annotation : annotations) {</b>
+<b class="nc">&nbsp;				String[] exclude = (String[]) AnnotationUtils.getAnnotationAttributes(annotation, true).get(&quot;exclude&quot;);</b>
+<b class="nc">&nbsp;				if (!ObjectUtils.isEmpty(exclude)) {</b>
+<b class="nc">&nbsp;					exclusions.addAll(Arrays.asList(exclude));</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		exclusions.addAll(getExcludeAutoConfigurationsProperty());</b>
+<b class="nc">&nbsp;		return exclusions;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final Map&lt;Class&lt;?&gt;, List&lt;Annotation&gt;&gt; getAnnotations(AnnotationMetadata metadata) {
+<b class="nc">&nbsp;		MultiValueMap&lt;Class&lt;?&gt;, Annotation&gt; annotations = new LinkedMultiValueMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		Class&lt;?&gt; source = ClassUtils.resolveClassName(metadata.getClassName(), getBeanClassLoader());</b>
+<b class="nc">&nbsp;		collectAnnotations(source, annotations, new HashSet&lt;&gt;());</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(annotations);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void collectAnnotations(Class&lt;?&gt; source, MultiValueMap&lt;Class&lt;?&gt;, Annotation&gt; annotations,
+&nbsp;			HashSet&lt;Class&lt;?&gt;&gt; seen) {
+<b class="nc">&nbsp;		if (source != null &amp;&amp; seen.add(source)) {</b>
+<b class="nc">&nbsp;			for (Annotation annotation : source.getDeclaredAnnotations()) {</b>
+<b class="nc">&nbsp;				if (!AnnotationUtils.isInJavaLangAnnotationPackage(annotation)) {</b>
+<b class="nc">&nbsp;					if (ANNOTATION_NAMES.contains(annotation.annotationType().getName())) {</b>
+<b class="nc">&nbsp;						annotations.add(source, annotation);</b>
+&nbsp;					}
+<b class="nc">&nbsp;					collectAnnotations(annotation.annotationType(), annotations, seen);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			collectAnnotations(source.getSuperclass(), annotations, seen);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return super.getOrder() - 1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void handleInvalidExcludes(List&lt;String&gt; invalidExcludes) {
+&nbsp;		// Ignore for test
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

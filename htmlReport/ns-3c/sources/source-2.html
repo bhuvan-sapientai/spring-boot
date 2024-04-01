@@ -1,0 +1,344 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InfluxProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.metrics.export.influx</a>
+</div>
+
+<h1>Coverage Summary for Class: InfluxProperties (org.springframework.boot.actuate.autoconfigure.metrics.export.influx)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InfluxProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.metrics.export.influx;
+&nbsp;
+&nbsp;import io.micrometer.influx.InfluxApiVersion;
+&nbsp;import io.micrometer.influx.InfluxConsistency;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.export.properties.StepRegistryProperties;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfigurationProperties @ConfigurationProperties} for configuring Influx metrics
+&nbsp; * export.
+&nbsp; *
+&nbsp; * @author Jon Schneider
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;management.influx.metrics.export&quot;)
+<b class="nc">&nbsp;public class InfluxProperties extends StepRegistryProperties {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Database to send metrics to. InfluxDB v1 only.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String db = &quot;mydb&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Write consistency for each point.
+&nbsp;	 */
+<b class="nc">&nbsp;	private InfluxConsistency consistency = InfluxConsistency.ONE;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login user of the Influx server. InfluxDB v1 only.
+&nbsp;	 */
+&nbsp;	private String userName;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login password of the Influx server. InfluxDB v1 only.
+&nbsp;	 */
+&nbsp;	private String password;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Retention policy to use (Influx writes to the DEFAULT retention policy if one is
+&nbsp;	 * not specified). InfluxDB v1 only.
+&nbsp;	 */
+&nbsp;	private String retentionPolicy;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Time period for which Influx should retain data in the current database. For
+&nbsp;	 * instance 7d, check the influx documentation for more details on the duration
+&nbsp;	 * format. InfluxDB v1 only.
+&nbsp;	 */
+&nbsp;	private String retentionDuration;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * How many copies of the data are stored in the cluster. Must be 1 for a single node
+&nbsp;	 * instance. InfluxDB v1 only.
+&nbsp;	 */
+&nbsp;	private Integer retentionReplicationFactor;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Time range covered by a shard group. For instance 2w, check the influx
+&nbsp;	 * documentation for more details on the duration format. InfluxDB v1 only.
+&nbsp;	 */
+&nbsp;	private String retentionShardDuration;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * URI of the Influx server.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String uri = &quot;http://localhost:8086&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to enable GZIP compression of metrics batches published to Influx.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean compressed = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to create the Influx database if it does not exist before attempting to
+&nbsp;	 * publish metrics to it. InfluxDB v1 only.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean autoCreateDb = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * API version of InfluxDB to use. Defaults to &#39;v1&#39; unless an org is configured. If an
+&nbsp;	 * org is configured, defaults to &#39;v2&#39;.
+&nbsp;	 */
+&nbsp;	private InfluxApiVersion apiVersion;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Org to write metrics to. InfluxDB v2 only.
+&nbsp;	 */
+&nbsp;	private String org;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bucket for metrics. Use either the bucket name or ID. Defaults to the value of the
+&nbsp;	 * db property if not set. InfluxDB v2 only.
+&nbsp;	 */
+&nbsp;	private String bucket;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Authentication token to use with calls to the InfluxDB backend. For InfluxDB v1,
+&nbsp;	 * the Bearer scheme is used. For v2, the Token scheme is used.
+&nbsp;	 */
+&nbsp;	private String token;
+&nbsp;
+&nbsp;	public String getDb() {
+<b class="nc">&nbsp;		return this.db;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setDb(String db) {
+<b class="nc">&nbsp;		this.db = db;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public InfluxConsistency getConsistency() {
+<b class="nc">&nbsp;		return this.consistency;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setConsistency(InfluxConsistency consistency) {
+<b class="nc">&nbsp;		this.consistency = consistency;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUserName() {
+<b class="nc">&nbsp;		return this.userName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUserName(String userName) {
+<b class="nc">&nbsp;		this.userName = userName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getPassword() {
+<b class="nc">&nbsp;		return this.password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPassword(String password) {
+<b class="nc">&nbsp;		this.password = password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getRetentionPolicy() {
+<b class="nc">&nbsp;		return this.retentionPolicy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setRetentionPolicy(String retentionPolicy) {
+<b class="nc">&nbsp;		this.retentionPolicy = retentionPolicy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getRetentionDuration() {
+<b class="nc">&nbsp;		return this.retentionDuration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setRetentionDuration(String retentionDuration) {
+<b class="nc">&nbsp;		this.retentionDuration = retentionDuration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Integer getRetentionReplicationFactor() {
+<b class="nc">&nbsp;		return this.retentionReplicationFactor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setRetentionReplicationFactor(Integer retentionReplicationFactor) {
+<b class="nc">&nbsp;		this.retentionReplicationFactor = retentionReplicationFactor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getRetentionShardDuration() {
+<b class="nc">&nbsp;		return this.retentionShardDuration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setRetentionShardDuration(String retentionShardDuration) {
+<b class="nc">&nbsp;		this.retentionShardDuration = retentionShardDuration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUri() {
+<b class="nc">&nbsp;		return this.uri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUri(String uri) {
+<b class="nc">&nbsp;		this.uri = uri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isCompressed() {
+<b class="nc">&nbsp;		return this.compressed;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setCompressed(boolean compressed) {
+<b class="nc">&nbsp;		this.compressed = compressed;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isAutoCreateDb() {
+<b class="nc">&nbsp;		return this.autoCreateDb;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setAutoCreateDb(boolean autoCreateDb) {
+<b class="nc">&nbsp;		this.autoCreateDb = autoCreateDb;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public InfluxApiVersion getApiVersion() {
+<b class="nc">&nbsp;		return this.apiVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setApiVersion(InfluxApiVersion apiVersion) {
+<b class="nc">&nbsp;		this.apiVersion = apiVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getOrg() {
+<b class="nc">&nbsp;		return this.org;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOrg(String org) {
+<b class="nc">&nbsp;		this.org = org;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getBucket() {
+<b class="nc">&nbsp;		return this.bucket;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBucket(String bucket) {
+<b class="nc">&nbsp;		this.bucket = bucket;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getToken() {
+<b class="nc">&nbsp;		return this.token;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setToken(String token) {
+<b class="nc">&nbsp;		this.token = token;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,554 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataSourceProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.jdbc</a>
+</div>
+
+<h1>Coverage Summary for Class: DataSourceProperties (org.springframework.boot.autoconfigure.jdbc)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataSourceProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DataSourceProperties$DataSourceBeanCreationException</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DataSourceProperties$Xa</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.jdbc;
+&nbsp;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanClassLoaderAware;
+&nbsp;import org.springframework.beans.factory.BeanCreationException;
+&nbsp;import org.springframework.beans.factory.InitializingBean;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.jdbc.DataSourceBuilder;
+&nbsp;import org.springframework.boot.jdbc.DatabaseDriver;
+&nbsp;import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for configuration of a data source.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Maciej Walkowiak
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Benedikt Ritter
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.1.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.datasource&quot;)
+<b class="nc">&nbsp;public class DataSourceProperties implements BeanClassLoaderAware, InitializingBean {</b>
+&nbsp;
+&nbsp;	private ClassLoader classLoader;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to generate a random datasource name.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean generateUniqueName = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Datasource name to use if &quot;generate-unique-name&quot; is false. Defaults to &quot;testdb&quot;
+&nbsp;	 * when using an embedded database, otherwise null.
+&nbsp;	 */
+&nbsp;	private String name;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Fully qualified name of the connection pool implementation to use. By default, it
+&nbsp;	 * is auto-detected from the classpath.
+&nbsp;	 */
+&nbsp;	private Class&lt;? extends DataSource&gt; type;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Fully qualified name of the JDBC driver. Auto-detected based on the URL by default.
+&nbsp;	 */
+&nbsp;	private String driverClassName;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * JDBC URL of the database.
+&nbsp;	 */
+&nbsp;	private String url;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login username of the database.
+&nbsp;	 */
+&nbsp;	private String username;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login password of the database.
+&nbsp;	 */
+&nbsp;	private String password;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * JNDI location of the datasource. Class, url, username and password are ignored when
+&nbsp;	 * set.
+&nbsp;	 */
+&nbsp;	private String jndiName;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Connection details for an embedded database. Defaults to the most suitable embedded
+&nbsp;	 * database that is available on the classpath.
+&nbsp;	 */
+&nbsp;	private EmbeddedDatabaseConnection embeddedDatabaseConnection;
+&nbsp;
+<b class="nc">&nbsp;	private Xa xa = new Xa();</b>
+&nbsp;
+&nbsp;	private String uniqueName;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		this.classLoader = classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterPropertiesSet() throws Exception {
+<b class="nc">&nbsp;		if (this.embeddedDatabaseConnection == null) {</b>
+<b class="nc">&nbsp;			this.embeddedDatabaseConnection = EmbeddedDatabaseConnection.get(this.classLoader);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize a {@link DataSourceBuilder} with the state of this instance.
+&nbsp;	 * @return a {@link DataSourceBuilder} initialized with the customizations defined on
+&nbsp;	 * this instance
+&nbsp;	 */
+&nbsp;	public DataSourceBuilder&lt;?&gt; initializeDataSourceBuilder() {
+<b class="nc">&nbsp;		return DataSourceBuilder.create(getClassLoader())</b>
+<b class="nc">&nbsp;			.type(getType())</b>
+<b class="nc">&nbsp;			.driverClassName(determineDriverClassName())</b>
+<b class="nc">&nbsp;			.url(determineUrl())</b>
+<b class="nc">&nbsp;			.username(determineUsername())</b>
+<b class="nc">&nbsp;			.password(determinePassword());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isGenerateUniqueName() {
+<b class="nc">&nbsp;		return this.generateUniqueName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setGenerateUniqueName(boolean generateUniqueName) {
+<b class="nc">&nbsp;		this.generateUniqueName = generateUniqueName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setName(String name) {
+<b class="nc">&nbsp;		this.name = name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Class&lt;? extends DataSource&gt; getType() {
+<b class="nc">&nbsp;		return this.type;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setType(Class&lt;? extends DataSource&gt; type) {
+<b class="nc">&nbsp;		this.type = type;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the configured driver or {@code null} if none was configured.
+&nbsp;	 * @return the configured driver
+&nbsp;	 * @see #determineDriverClassName()
+&nbsp;	 */
+&nbsp;	public String getDriverClassName() {
+<b class="nc">&nbsp;		return this.driverClassName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setDriverClassName(String driverClassName) {
+<b class="nc">&nbsp;		this.driverClassName = driverClassName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine the driver to use based on this configuration and the environment.
+&nbsp;	 * @return the driver to use
+&nbsp;	 * @since 1.4.0
+&nbsp;	 */
+&nbsp;	public String determineDriverClassName() {
+<b class="nc">&nbsp;		if (StringUtils.hasText(this.driverClassName)) {</b>
+<b class="nc">&nbsp;			Assert.state(driverClassIsLoadable(), () -&gt; &quot;Cannot load driver class: &quot; + this.driverClassName);</b>
+<b class="nc">&nbsp;			return this.driverClassName;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String driverClassName = null;</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(this.url)) {</b>
+<b class="nc">&nbsp;			driverClassName = DatabaseDriver.fromJdbcUrl(this.url).getDriverClassName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!StringUtils.hasText(driverClassName)) {</b>
+<b class="nc">&nbsp;			driverClassName = this.embeddedDatabaseConnection.getDriverClassName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!StringUtils.hasText(driverClassName)) {</b>
+<b class="nc">&nbsp;			throw new DataSourceBeanCreationException(&quot;Failed to determine a suitable driver class&quot;, this,</b>
+&nbsp;					this.embeddedDatabaseConnection);
+&nbsp;		}
+<b class="nc">&nbsp;		return driverClassName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean driverClassIsLoadable() {
+&nbsp;		try {
+<b class="nc">&nbsp;			ClassUtils.forName(this.driverClassName, null);</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (UnsupportedClassVersionError ex) {</b>
+&nbsp;			// Driver library has been compiled with a later JDK, propagate error
+<b class="nc">&nbsp;			throw ex;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			ex.printStackTrace();</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the configured url or {@code null} if none was configured.
+&nbsp;	 * @return the configured url
+&nbsp;	 * @see #determineUrl()
+&nbsp;	 */
+&nbsp;	public String getUrl() {
+<b class="nc">&nbsp;		return this.url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUrl(String url) {
+<b class="nc">&nbsp;		this.url = url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine the url to use based on this configuration and the environment.
+&nbsp;	 * @return the url to use
+&nbsp;	 * @since 1.4.0
+&nbsp;	 */
+&nbsp;	public String determineUrl() {
+<b class="nc">&nbsp;		if (StringUtils.hasText(this.url)) {</b>
+<b class="nc">&nbsp;			return this.url;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String databaseName = determineDatabaseName();</b>
+<b class="nc">&nbsp;		String url = (databaseName != null) ? this.embeddedDatabaseConnection.getUrl(databaseName) : null;</b>
+<b class="nc">&nbsp;		if (!StringUtils.hasText(url)) {</b>
+<b class="nc">&nbsp;			throw new DataSourceBeanCreationException(&quot;Failed to determine suitable jdbc url&quot;, this,</b>
+&nbsp;					this.embeddedDatabaseConnection);
+&nbsp;		}
+<b class="nc">&nbsp;		return url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine the name to used based on this configuration.
+&nbsp;	 * @return the database name to use or {@code null}
+&nbsp;	 * @since 2.0.0
+&nbsp;	 */
+&nbsp;	public String determineDatabaseName() {
+<b class="nc">&nbsp;		if (this.generateUniqueName) {</b>
+<b class="nc">&nbsp;			if (this.uniqueName == null) {</b>
+<b class="nc">&nbsp;				this.uniqueName = UUID.randomUUID().toString();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.uniqueName;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasLength(this.name)) {</b>
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.embeddedDatabaseConnection != EmbeddedDatabaseConnection.NONE) {</b>
+<b class="nc">&nbsp;			return &quot;testdb&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the configured username or {@code null} if none was configured.
+&nbsp;	 * @return the configured username
+&nbsp;	 * @see #determineUsername()
+&nbsp;	 */
+&nbsp;	public String getUsername() {
+<b class="nc">&nbsp;		return this.username;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUsername(String username) {
+<b class="nc">&nbsp;		this.username = username;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine the username to use based on this configuration and the environment.
+&nbsp;	 * @return the username to use
+&nbsp;	 * @since 1.4.0
+&nbsp;	 */
+&nbsp;	public String determineUsername() {
+<b class="nc">&nbsp;		if (StringUtils.hasText(this.username)) {</b>
+<b class="nc">&nbsp;			return this.username;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (EmbeddedDatabaseConnection.isEmbedded(determineDriverClassName(), determineUrl())) {</b>
+<b class="nc">&nbsp;			return &quot;sa&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the configured password or {@code null} if none was configured.
+&nbsp;	 * @return the configured password
+&nbsp;	 * @see #determinePassword()
+&nbsp;	 */
+&nbsp;	public String getPassword() {
+<b class="nc">&nbsp;		return this.password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPassword(String password) {
+<b class="nc">&nbsp;		this.password = password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine the password to use based on this configuration and the environment.
+&nbsp;	 * @return the password to use
+&nbsp;	 * @since 1.4.0
+&nbsp;	 */
+&nbsp;	public String determinePassword() {
+<b class="nc">&nbsp;		if (StringUtils.hasText(this.password)) {</b>
+<b class="nc">&nbsp;			return this.password;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (EmbeddedDatabaseConnection.isEmbedded(determineDriverClassName(), determineUrl())) {</b>
+<b class="nc">&nbsp;			return &quot;&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getJndiName() {
+<b class="nc">&nbsp;		return this.jndiName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Allows the DataSource to be managed by the container and obtained through JNDI. The
+&nbsp;	 * {@code URL}, {@code driverClassName}, {@code username} and {@code password} fields
+&nbsp;	 * will be ignored when using JNDI lookups.
+&nbsp;	 * @param jndiName the JNDI name
+&nbsp;	 */
+&nbsp;	public void setJndiName(String jndiName) {
+<b class="nc">&nbsp;		this.jndiName = jndiName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public EmbeddedDatabaseConnection getEmbeddedDatabaseConnection() {
+<b class="nc">&nbsp;		return this.embeddedDatabaseConnection;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setEmbeddedDatabaseConnection(EmbeddedDatabaseConnection embeddedDatabaseConnection) {
+<b class="nc">&nbsp;		this.embeddedDatabaseConnection = embeddedDatabaseConnection;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public ClassLoader getClassLoader() {
+<b class="nc">&nbsp;		return this.classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Xa getXa() {
+<b class="nc">&nbsp;		return this.xa;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setXa(Xa xa) {
+<b class="nc">&nbsp;		this.xa = xa;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * XA Specific datasource settings.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Xa {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * XA datasource fully qualified name.
+&nbsp;		 */
+&nbsp;		private String dataSourceClassName;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Properties to pass to the XA data source.
+&nbsp;		 */
+<b class="nc">&nbsp;		private Map&lt;String, String&gt; properties = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		public String getDataSourceClassName() {
+<b class="nc">&nbsp;			return this.dataSourceClassName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setDataSourceClassName(String dataSourceClassName) {
+<b class="nc">&nbsp;			this.dataSourceClassName = dataSourceClassName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, String&gt; getProperties() {
+<b class="nc">&nbsp;			return this.properties;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setProperties(Map&lt;String, String&gt; properties) {
+<b class="nc">&nbsp;			this.properties = properties;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static class DataSourceBeanCreationException extends BeanCreationException {
+&nbsp;
+&nbsp;		private final DataSourceProperties properties;
+&nbsp;
+&nbsp;		private final EmbeddedDatabaseConnection connection;
+&nbsp;
+&nbsp;		DataSourceBeanCreationException(String message, DataSourceProperties properties,
+&nbsp;				EmbeddedDatabaseConnection connection) {
+<b class="nc">&nbsp;			super(message);</b>
+<b class="nc">&nbsp;			this.properties = properties;</b>
+<b class="nc">&nbsp;			this.connection = connection;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		DataSourceProperties getProperties() {
+<b class="nc">&nbsp;			return this.properties;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		EmbeddedDatabaseConnection getConnection() {
+<b class="nc">&nbsp;			return this.connection;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServiceConnectionContextCustomizerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testcontainers.service.connection</a>
+</div>
+
+<h1>Coverage Summary for Class: ServiceConnectionContextCustomizerFactory (org.springframework.boot.testcontainers.service.connection)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServiceConnectionContextCustomizerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testcontainers.service.connection;
+&nbsp;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.testcontainers.containers.Container;
+&nbsp;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.test.context.ContextConfigurationAttributes;
+&nbsp;import org.springframework.test.context.ContextCustomizer;
+&nbsp;import org.springframework.test.context.ContextCustomizerFactory;
+&nbsp;import org.springframework.test.context.TestContextAnnotationUtils;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Spring Test {@link ContextCustomizerFactory} to support
+&nbsp; * {@link ServiceConnection @ServiceConnection} annotated {@link Container} fields in
+&nbsp; * tests.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; */
+<b class="nc">&nbsp;class ServiceConnectionContextCustomizerFactory implements ContextCustomizerFactory {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ContextCustomizer createContextCustomizer(Class&lt;?&gt; testClass,
+&nbsp;			List&lt;ContextConfigurationAttributes&gt; configAttributes) {
+<b class="nc">&nbsp;		List&lt;ContainerConnectionSource&lt;?&gt;&gt; sources = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		collectSources(testClass, sources);</b>
+<b class="nc">&nbsp;		return new ServiceConnectionContextCustomizer(sources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void collectSources(Class&lt;?&gt; candidate, List&lt;ContainerConnectionSource&lt;?&gt;&gt; sources) {
+<b class="nc">&nbsp;		if (candidate == Object.class || candidate == null) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		ReflectionUtils.doWithLocalFields(candidate, (field) -&gt; {</b>
+<b class="nc">&nbsp;			MergedAnnotations annotations = MergedAnnotations.from(field);</b>
+<b class="nc">&nbsp;			annotations.stream(ServiceConnection.class)</b>
+<b class="nc">&nbsp;				.forEach((annotation) -&gt; sources.add(createSource(field, annotation)));</b>
+&nbsp;		});
+<b class="nc">&nbsp;		if (TestContextAnnotationUtils.searchEnclosingClass(candidate)) {</b>
+<b class="nc">&nbsp;			collectSources(candidate.getEnclosingClass(), sources);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (Class&lt;?&gt; implementedInterface : candidate.getInterfaces()) {</b>
+<b class="nc">&nbsp;			collectSources(implementedInterface, sources);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		collectSources(candidate.getSuperclass(), sources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;C extends Container&lt;?&gt;&gt; ContainerConnectionSource&lt;?&gt; createSource(Field field,
+&nbsp;			MergedAnnotation&lt;ServiceConnection&gt; annotation) {
+<b class="nc">&nbsp;		Assert.state(Modifier.isStatic(field.getModifiers()),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;@ServiceConnection field &#39;%s&#39; must be static&quot;.formatted(field.getName()));</b>
+<b class="nc">&nbsp;		Origin origin = new FieldOrigin(field);</b>
+<b class="nc">&nbsp;		Object fieldValue = getFieldValue(field);</b>
+<b class="nc">&nbsp;		Assert.state(fieldValue instanceof Container, () -&gt; &quot;Field &#39;%s&#39; in %s must be a %s&quot;.formatted(field.getName(),</b>
+<b class="nc">&nbsp;				field.getDeclaringClass().getName(), Container.class.getName()));</b>
+<b class="nc">&nbsp;		Class&lt;C&gt; containerType = (Class&lt;C&gt;) fieldValue.getClass();</b>
+<b class="nc">&nbsp;		C container = (C) fieldValue;</b>
+&nbsp;		// container.getDockerImageName() fails if there is no running docker environment
+&nbsp;		// When running tests that doesn&#39;t matter, but running AOT processing should be
+&nbsp;		// possible without a Docker environment
+<b class="nc">&nbsp;		String dockerImageName = isAotProcessingInProgress() ? null : container.getDockerImageName();</b>
+<b class="nc">&nbsp;		return new ContainerConnectionSource&lt;&gt;(&quot;test&quot;, origin, containerType, dockerImageName, annotation,</b>
+<b class="nc">&nbsp;				() -&gt; container);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getFieldValue(Field field) {
+<b class="nc">&nbsp;		ReflectionUtils.makeAccessible(field);</b>
+<b class="nc">&nbsp;		return ReflectionUtils.getField(field, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isAotProcessingInProgress() {
+<b class="nc">&nbsp;		return Boolean.getBoolean(&quot;spring.aot.processing&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

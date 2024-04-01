@@ -1,0 +1,303 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InfoPropertiesInfoContributor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.info</a>
+</div>
+
+<h1>Coverage Summary for Class: InfoPropertiesInfoContributor (org.springframework.boot.actuate.info)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InfoPropertiesInfoContributor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InfoPropertiesInfoContributor$Mode</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.info;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Properties;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
+&nbsp;import org.springframework.boot.info.InfoProperties;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A base {@link InfoContributor} to expose an {@link InfoProperties}.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type of the {@link InfoProperties} to expose
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;public abstract class InfoPropertiesInfoContributor&lt;T extends InfoProperties&gt; implements InfoContributor {
+&nbsp;
+<b class="nc">&nbsp;	private static final Bindable&lt;Map&lt;String, Object&gt;&gt; STRING_OBJECT_MAP = Bindable.mapOf(String.class, Object.class);</b>
+&nbsp;
+&nbsp;	private final T properties;
+&nbsp;
+&nbsp;	private final Mode mode;
+&nbsp;
+<b class="nc">&nbsp;	protected InfoPropertiesInfoContributor(T properties, Mode mode) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+<b class="nc">&nbsp;		this.mode = mode;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the properties that this instance manages.
+&nbsp;	 * @return the info properties
+&nbsp;	 */
+&nbsp;	protected final T getProperties() {
+<b class="nc">&nbsp;		return this.properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the mode that should be used to expose the content.
+&nbsp;	 * @return the mode
+&nbsp;	 */
+&nbsp;	protected final Mode getMode() {
+<b class="nc">&nbsp;		return this.mode;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link PropertySource} for the {@link Mode#SIMPLE SIMPLE} mode.
+&nbsp;	 * @return the property source for the simple model
+&nbsp;	 * @see #toPropertySource()
+&nbsp;	 */
+&nbsp;	protected abstract PropertySource&lt;?&gt; toSimplePropertySource();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the content to contribute to the info endpoint.
+&nbsp;	 * @return the content to expose
+&nbsp;	 * @see #extractContent(PropertySource)
+&nbsp;	 * @see #postProcessContent(Map)
+&nbsp;	 */
+&nbsp;	protected Map&lt;String, Object&gt; generateContent() {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; content = extractContent(toPropertySource());</b>
+<b class="nc">&nbsp;		postProcessContent(content);</b>
+<b class="nc">&nbsp;		return content;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Extract the raw content based on the specified {@link PropertySource}.
+&nbsp;	 * @param propertySource the property source to use
+&nbsp;	 * @return the raw content
+&nbsp;	 */
+&nbsp;	protected Map&lt;String, Object&gt; extractContent(PropertySource&lt;?&gt; propertySource) {
+<b class="nc">&nbsp;		return new Binder(ConfigurationPropertySources.from(propertySource)).bind(&quot;&quot;, STRING_OBJECT_MAP)</b>
+<b class="nc">&nbsp;			.orElseGet(LinkedHashMap::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Post-process the content to expose. Elements can be added, changed or removed.
+&nbsp;	 * @param content the content to expose
+&nbsp;	 */
+&nbsp;	protected void postProcessContent(Map&lt;String, Object&gt; content) {
+&nbsp;
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link PropertySource} to use based on the chosen {@link Mode}.
+&nbsp;	 * @return the property source
+&nbsp;	 */
+&nbsp;	protected PropertySource&lt;?&gt; toPropertySource() {
+<b class="nc">&nbsp;		if (this.mode.equals(Mode.FULL)) {</b>
+<b class="nc">&nbsp;			return this.properties.toPropertySource();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return toSimplePropertySource();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Copy the specified key to the target {@link Properties} if it is set.
+&nbsp;	 * @param target the target properties to update
+&nbsp;	 * @param key the key
+&nbsp;	 */
+&nbsp;	protected void copyIfSet(Properties target, String key) {
+<b class="nc">&nbsp;		String value = this.properties.get(key);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(value)) {</b>
+<b class="nc">&nbsp;			target.put(key, value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Replace the {@code value} for the specified key if the value is not {@code null}.
+&nbsp;	 * @param content the content to expose
+&nbsp;	 * @param key the property to replace
+&nbsp;	 * @param value the new value
+&nbsp;	 */
+&nbsp;	protected void replaceValue(Map&lt;String, Object&gt; content, String key, Object value) {
+<b class="nc">&nbsp;		if (content.containsKey(key) &amp;&amp; value != null) {</b>
+<b class="nc">&nbsp;			content.put(key, value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the nested map with the specified key or empty map if the specified map
+&nbsp;	 * contains no mapping for the key.
+&nbsp;	 * @param map the content
+&nbsp;	 * @param key the key of a nested map
+&nbsp;	 * @return the nested map
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	protected Map&lt;String, Object&gt; getNestedMap(Map&lt;String, Object&gt; map, String key) {
+<b class="nc">&nbsp;		Object value = map.get(key);</b>
+<b class="nc">&nbsp;		if (value == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptyMap();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (Map&lt;String, Object&gt;) value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Defines how properties should be exposed.
+&nbsp;	 */
+<b class="nc">&nbsp;	public enum Mode {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Expose all available data, including custom properties.
+&nbsp;		 */
+<b class="nc">&nbsp;		FULL,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Expose a pre-defined set of core settings only.
+&nbsp;		 */
+<b class="nc">&nbsp;		SIMPLE</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

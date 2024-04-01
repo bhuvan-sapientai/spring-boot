@@ -1,0 +1,404 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CommandRunner</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command</a>
+</div>
+
+<h1>Coverage Summary for Class: CommandRunner (org.springframework.boot.cli.command)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CommandRunner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/106)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.cli.command.status.ExitStatus;
+&nbsp;import org.springframework.boot.cli.util.Log;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Main class used to run {@link Command}s.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.0.0
+&nbsp; * @see #addCommand(Command)
+&nbsp; * @see CommandRunner#runAndHandleErrors(String[])
+&nbsp; */
+&nbsp;public class CommandRunner implements Iterable&lt;Command&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final Set&lt;CommandException.Option&gt; NO_EXCEPTION_OPTIONS = EnumSet</b>
+<b class="nc">&nbsp;		.noneOf(CommandException.Option.class);</b>
+&nbsp;
+&nbsp;	private final String name;
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;Command&gt; commands = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Class&lt;?&gt;[] optionCommandClasses = {};</b>
+&nbsp;
+<b class="nc">&nbsp;	private Class&lt;?&gt;[] hiddenCommandClasses = {};</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link CommandRunner} instance.
+&nbsp;	 * @param name the name of the runner or {@code null}
+&nbsp;	 */
+<b class="nc">&nbsp;	public CommandRunner(String name) {</b>
+<b class="nc">&nbsp;		this.name = StringUtils.hasLength(name) ? name + &quot; &quot; : &quot;&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of the runner or an empty string. Non-empty names will include a
+&nbsp;	 * trailing space character so that they can be used as a prefix.
+&nbsp;	 * @return the name of the runner
+&nbsp;	 */
+&nbsp;	public String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add the specified commands.
+&nbsp;	 * @param commands the commands to add
+&nbsp;	 */
+&nbsp;	public void addCommands(Iterable&lt;Command&gt; commands) {
+<b class="nc">&nbsp;		Assert.notNull(commands, &quot;Commands must not be null&quot;);</b>
+<b class="nc">&nbsp;		for (Command command : commands) {</b>
+<b class="nc">&nbsp;			addCommand(command);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add the specified command.
+&nbsp;	 * @param command the command to add.
+&nbsp;	 */
+&nbsp;	public void addCommand(Command command) {
+<b class="nc">&nbsp;		Assert.notNull(command, &quot;Command must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.commands.add(command);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the command classes which should be considered option commands. An option
+&nbsp;	 * command is a special type of command that usually makes more sense to present as if
+&nbsp;	 * it is an option. For example &#39;--version&#39;.
+&nbsp;	 * @param commandClasses the classes of option commands.
+&nbsp;	 * @see #isOptionCommand(Command)
+&nbsp;	 */
+&nbsp;	public void setOptionCommands(Class&lt;?&gt;... commandClasses) {
+<b class="nc">&nbsp;		Assert.notNull(commandClasses, &quot;CommandClasses must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.optionCommandClasses = commandClasses;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the command classes which should be hidden (i.e. executed but not displayed in
+&nbsp;	 * the available commands list).
+&nbsp;	 * @param commandClasses the classes of hidden commands
+&nbsp;	 */
+&nbsp;	public void setHiddenCommands(Class&lt;?&gt;... commandClasses) {
+<b class="nc">&nbsp;		Assert.notNull(commandClasses, &quot;CommandClasses must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.hiddenCommandClasses = commandClasses;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if the specified command is an option command.
+&nbsp;	 * @param command the command to test
+&nbsp;	 * @return {@code true} if the command is an option command
+&nbsp;	 * @see #setOptionCommands(Class...)
+&nbsp;	 */
+&nbsp;	public boolean isOptionCommand(Command command) {
+<b class="nc">&nbsp;		return isCommandInstanceOf(command, this.optionCommandClasses);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isHiddenCommand(Command command) {
+<b class="nc">&nbsp;		return isCommandInstanceOf(command, this.hiddenCommandClasses);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isCommandInstanceOf(Command command, Class&lt;?&gt;[] commandClasses) {
+<b class="nc">&nbsp;		for (Class&lt;?&gt; commandClass : commandClasses) {</b>
+<b class="nc">&nbsp;			if (commandClass.isInstance(command)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;Command&gt; iterator() {
+<b class="nc">&nbsp;		return getCommands().iterator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final List&lt;Command&gt; getCommands() {
+<b class="nc">&nbsp;		return Collections.unmodifiableList(this.commands);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find a command by name.
+&nbsp;	 * @param name the name of the command
+&nbsp;	 * @return the command or {@code null} if not found
+&nbsp;	 */
+&nbsp;	public Command findCommand(String name) {
+<b class="nc">&nbsp;		for (Command candidate : this.commands) {</b>
+<b class="nc">&nbsp;			String candidateName = candidate.getName();</b>
+<b class="nc">&nbsp;			if (candidateName.equals(name) || (isOptionCommand(candidate) &amp;&amp; (&quot;--&quot; + candidateName).equals(name))) {</b>
+<b class="nc">&nbsp;				return candidate;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Run the appropriate and handle and errors.
+&nbsp;	 * @param args the input arguments
+&nbsp;	 * @return a return status code (non boot is used to indicate an error)
+&nbsp;	 */
+&nbsp;	public int runAndHandleErrors(String... args) {
+<b class="nc">&nbsp;		String[] argsWithoutDebugFlags = removeDebugFlags(args);</b>
+<b class="nc">&nbsp;		boolean debug = argsWithoutDebugFlags.length != args.length;</b>
+<b class="nc">&nbsp;		if (debug) {</b>
+<b class="nc">&nbsp;			System.setProperty(&quot;debug&quot;, &quot;true&quot;);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			ExitStatus result = run(argsWithoutDebugFlags);</b>
+&nbsp;			// The caller will hang up if it gets a non-zero status
+<b class="nc">&nbsp;			if (result != null &amp;&amp; result.isHangup()) {</b>
+<b class="nc">&nbsp;				return (result.getCode() &gt; 0) ? result.getCode() : 0;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return 0;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoArgumentsException ex) {</b>
+<b class="nc">&nbsp;			showUsage();</b>
+<b class="nc">&nbsp;			return 1;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return handleError(debug, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String[] removeDebugFlags(String[] args) {
+<b class="nc">&nbsp;		List&lt;String&gt; rtn = new ArrayList&lt;&gt;(args.length);</b>
+<b class="nc">&nbsp;		boolean appArgsDetected = false;</b>
+<b class="nc">&nbsp;		for (String arg : args) {</b>
+&nbsp;			// Allow apps to have a --debug argument
+<b class="nc">&nbsp;			appArgsDetected |= &quot;--&quot;.equals(arg);</b>
+<b class="nc">&nbsp;			if (&quot;--debug&quot;.equals(arg) &amp;&amp; !appArgsDetected) {</b>
+<b class="nc">&nbsp;				continue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			rtn.add(arg);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return StringUtils.toStringArray(rtn);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Parse the arguments and run a suitable command.
+&nbsp;	 * @param args the arguments
+&nbsp;	 * @return the outcome of the command
+&nbsp;	 * @throws Exception if the command fails
+&nbsp;	 */
+&nbsp;	protected ExitStatus run(String... args) throws Exception {
+<b class="nc">&nbsp;		if (args.length == 0) {</b>
+<b class="nc">&nbsp;			throw new NoArgumentsException();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String commandName = args[0];</b>
+<b class="nc">&nbsp;		String[] commandArguments = Arrays.copyOfRange(args, 1, args.length);</b>
+<b class="nc">&nbsp;		Command command = findCommand(commandName);</b>
+<b class="nc">&nbsp;		if (command == null) {</b>
+<b class="nc">&nbsp;			throw new NoSuchCommandException(commandName);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		beforeRun(command);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return command.run(commandArguments);</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			afterRun(command);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Subclass hook called before a command is run.
+&nbsp;	 * @param command the command about to run
+&nbsp;	 */
+&nbsp;	protected void beforeRun(Command command) {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Subclass hook called after a command has run.
+&nbsp;	 * @param command the command that has run
+&nbsp;	 */
+&nbsp;	protected void afterRun(Command command) {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	private int handleError(boolean debug, Exception ex) {
+<b class="nc">&nbsp;		Set&lt;CommandException.Option&gt; options = NO_EXCEPTION_OPTIONS;</b>
+<b class="nc">&nbsp;		if (ex instanceof CommandException commandException) {</b>
+<b class="nc">&nbsp;			options = commandException.getOptions();</b>
+<b class="nc">&nbsp;			if (options.contains(CommandException.Option.RETHROW)) {</b>
+<b class="nc">&nbsp;				throw (CommandException) ex;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		boolean couldNotShowMessage = false;</b>
+<b class="nc">&nbsp;		if (!options.contains(CommandException.Option.HIDE_MESSAGE)) {</b>
+<b class="nc">&nbsp;			couldNotShowMessage = !errorMessage(ex.getMessage());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (options.contains(CommandException.Option.SHOW_USAGE)) {</b>
+<b class="nc">&nbsp;			showUsage();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (debug || couldNotShowMessage || options.contains(CommandException.Option.STACK_TRACE)) {</b>
+<b class="nc">&nbsp;			printStackTrace(ex);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return 1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected boolean errorMessage(String message) {
+<b class="nc">&nbsp;		Log.error((message != null) ? message : &quot;Unexpected error&quot;);</b>
+<b class="nc">&nbsp;		return message != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void showUsage() {
+<b class="nc">&nbsp;		Log.infoPrint(&quot;usage: &quot; + this.name);</b>
+<b class="nc">&nbsp;		for (Command command : this.commands) {</b>
+<b class="nc">&nbsp;			if (isOptionCommand(command)) {</b>
+<b class="nc">&nbsp;				Log.infoPrint(&quot;[--&quot; + command.getName() + &quot;] &quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		Log.info(&quot;&quot;);</b>
+<b class="nc">&nbsp;		Log.info(&quot;       &lt;command&gt; [&lt;args&gt;]&quot;);</b>
+<b class="nc">&nbsp;		Log.info(&quot;&quot;);</b>
+<b class="nc">&nbsp;		Log.info(&quot;Available commands are:&quot;);</b>
+<b class="nc">&nbsp;		for (Command command : this.commands) {</b>
+<b class="nc">&nbsp;			if (!isOptionCommand(command) &amp;&amp; !isHiddenCommand(command)) {</b>
+<b class="nc">&nbsp;				String usageHelp = command.getUsageHelp();</b>
+<b class="nc">&nbsp;				String description = command.getDescription();</b>
+<b class="nc">&nbsp;				Log.info(String.format(&quot;%n  %1$s %2$-15s%n    %3$s&quot;, command.getName(),</b>
+<b class="nc">&nbsp;						(usageHelp != null) ? usageHelp : &quot;&quot;, (description != null) ? description : &quot;&quot;));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		Log.info(&quot;&quot;);</b>
+<b class="nc">&nbsp;		Log.info(&quot;Common options:&quot;);</b>
+<b class="nc">&nbsp;		Log.info(String.format(&quot;%n  %1$s %2$-15s%n    %3$s&quot;, &quot;--debug&quot;, &quot;Verbose mode&quot;,</b>
+&nbsp;				&quot;Print additional status information for the command you are running&quot;));
+<b class="nc">&nbsp;		Log.info(&quot;&quot;);</b>
+<b class="nc">&nbsp;		Log.info(&quot;&quot;);</b>
+<b class="nc">&nbsp;		Log.info(&quot;See &#39;&quot; + this.name + &quot;help &lt;command&gt;&#39; for more information on a specific command.&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void printStackTrace(Exception ex) {
+<b class="nc">&nbsp;		Log.error(&quot;&quot;);</b>
+<b class="nc">&nbsp;		Log.error(ex);</b>
+<b class="nc">&nbsp;		Log.error(&quot;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

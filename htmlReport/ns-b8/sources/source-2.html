@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractRabbitListenerContainerFactoryConfigurer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.amqp</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractRabbitListenerContainerFactoryConfigurer (org.springframework.boot.autoconfigure.amqp)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractRabbitListenerContainerFactoryConfigurer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.amqp;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.Executor;
+&nbsp;
+&nbsp;import org.springframework.amqp.rabbit.config.AbstractRabbitListenerContainerFactory;
+&nbsp;import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
+&nbsp;import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+&nbsp;import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
+&nbsp;import org.springframework.amqp.rabbit.retry.MessageRecoverer;
+&nbsp;import org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer;
+&nbsp;import org.springframework.amqp.support.converter.MessageConverter;
+&nbsp;import org.springframework.boot.autoconfigure.amqp.RabbitProperties.ListenerRetry;
+&nbsp;import org.springframework.retry.support.RetryTemplate;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configure {@link RabbitListenerContainerFactory} with sensible defaults.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the container factory type.
+&nbsp; * @author Gary Russell
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public abstract class AbstractRabbitListenerContainerFactoryConfigurer&lt;T extends AbstractRabbitListenerContainerFactory&lt;?&gt;&gt; {
+&nbsp;
+&nbsp;	private MessageConverter messageConverter;
+&nbsp;
+&nbsp;	private MessageRecoverer messageRecoverer;
+&nbsp;
+&nbsp;	private List&lt;RabbitRetryTemplateCustomizer&gt; retryTemplateCustomizers;
+&nbsp;
+&nbsp;	private final RabbitProperties rabbitProperties;
+&nbsp;
+&nbsp;	private Executor taskExecutor;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new configurer that will use the given {@code rabbitProperties}.
+&nbsp;	 * @param rabbitProperties properties to use
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+<b class="nc">&nbsp;	protected AbstractRabbitListenerContainerFactoryConfigurer(RabbitProperties rabbitProperties) {</b>
+<b class="nc">&nbsp;		this.rabbitProperties = rabbitProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link MessageConverter} to use or {@code null} if the out-of-the-box
+&nbsp;	 * converter should be used.
+&nbsp;	 * @param messageConverter the {@link MessageConverter}
+&nbsp;	 */
+&nbsp;	protected void setMessageConverter(MessageConverter messageConverter) {
+<b class="nc">&nbsp;		this.messageConverter = messageConverter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link MessageRecoverer} to use or {@code null} to rely on the default.
+&nbsp;	 * @param messageRecoverer the {@link MessageRecoverer}
+&nbsp;	 */
+&nbsp;	protected void setMessageRecoverer(MessageRecoverer messageRecoverer) {
+<b class="nc">&nbsp;		this.messageRecoverer = messageRecoverer;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link RabbitRetryTemplateCustomizer} instances to use.
+&nbsp;	 * @param retryTemplateCustomizers the retry template customizers
+&nbsp;	 */
+&nbsp;	protected void setRetryTemplateCustomizers(List&lt;RabbitRetryTemplateCustomizer&gt; retryTemplateCustomizers) {
+<b class="nc">&nbsp;		this.retryTemplateCustomizers = retryTemplateCustomizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the task executor to use.
+&nbsp;	 * @param taskExecutor the task executor
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public void setTaskExecutor(Executor taskExecutor) {
+<b class="nc">&nbsp;		this.taskExecutor = taskExecutor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final RabbitProperties getRabbitProperties() {
+<b class="nc">&nbsp;		return this.rabbitProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the specified rabbit listener container factory. The factory can be
+&nbsp;	 * further tuned and default settings can be overridden.
+&nbsp;	 * @param factory the {@link AbstractRabbitListenerContainerFactory} instance to
+&nbsp;	 * configure
+&nbsp;	 * @param connectionFactory the {@link ConnectionFactory} to use
+&nbsp;	 */
+&nbsp;	public abstract void configure(T factory, ConnectionFactory connectionFactory);
+&nbsp;
+&nbsp;	protected void configure(T factory, ConnectionFactory connectionFactory,
+&nbsp;			RabbitProperties.AmqpContainer configuration) {
+<b class="nc">&nbsp;		Assert.notNull(factory, &quot;Factory must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(connectionFactory, &quot;ConnectionFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(configuration, &quot;Configuration must not be null&quot;);</b>
+<b class="nc">&nbsp;		factory.setConnectionFactory(connectionFactory);</b>
+<b class="nc">&nbsp;		if (this.messageConverter != null) {</b>
+<b class="nc">&nbsp;			factory.setMessageConverter(this.messageConverter);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		factory.setAutoStartup(configuration.isAutoStartup());</b>
+<b class="nc">&nbsp;		if (configuration.getAcknowledgeMode() != null) {</b>
+<b class="nc">&nbsp;			factory.setAcknowledgeMode(configuration.getAcknowledgeMode());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (configuration.getPrefetch() != null) {</b>
+<b class="nc">&nbsp;			factory.setPrefetchCount(configuration.getPrefetch());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (configuration.getDefaultRequeueRejected() != null) {</b>
+<b class="nc">&nbsp;			factory.setDefaultRequeueRejected(configuration.getDefaultRequeueRejected());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (configuration.getIdleEventInterval() != null) {</b>
+<b class="nc">&nbsp;			factory.setIdleEventInterval(configuration.getIdleEventInterval().toMillis());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		factory.setMissingQueuesFatal(configuration.isMissingQueuesFatal());</b>
+<b class="nc">&nbsp;		factory.setDeBatchingEnabled(configuration.isDeBatchingEnabled());</b>
+<b class="nc">&nbsp;		factory.setForceStop(configuration.isForceStop());</b>
+<b class="nc">&nbsp;		if (this.taskExecutor != null) {</b>
+<b class="nc">&nbsp;			factory.setTaskExecutor(this.taskExecutor);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		factory.setObservationEnabled(configuration.isObservationEnabled());</b>
+<b class="nc">&nbsp;		ListenerRetry retryConfig = configuration.getRetry();</b>
+<b class="nc">&nbsp;		if (retryConfig.isEnabled()) {</b>
+<b class="nc">&nbsp;			RetryInterceptorBuilder&lt;?, ?&gt; builder = (retryConfig.isStateless()) ? RetryInterceptorBuilder.stateless()</b>
+<b class="nc">&nbsp;					: RetryInterceptorBuilder.stateful();</b>
+<b class="nc">&nbsp;			RetryTemplate retryTemplate = new RetryTemplateFactory(this.retryTemplateCustomizers)</b>
+<b class="nc">&nbsp;				.createRetryTemplate(retryConfig, RabbitRetryTemplateCustomizer.Target.LISTENER);</b>
+<b class="nc">&nbsp;			builder.retryOperations(retryTemplate);</b>
+<b class="nc">&nbsp;			MessageRecoverer recoverer = (this.messageRecoverer != null) ? this.messageRecoverer</b>
+<b class="nc">&nbsp;					: new RejectAndDontRequeueRecoverer();</b>
+<b class="nc">&nbsp;			builder.recoverer(recoverer);</b>
+<b class="nc">&nbsp;			factory.setAdviceChain(builder.build());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

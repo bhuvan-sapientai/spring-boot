@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HintCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command.core</a>
+</div>
+
+<h1>Coverage Summary for Class: HintCommand (org.springframework.boot.cli.command.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HintCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command.core;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.boot.cli.command.AbstractCommand;
+&nbsp;import org.springframework.boot.cli.command.Command;
+&nbsp;import org.springframework.boot.cli.command.CommandRunner;
+&nbsp;import org.springframework.boot.cli.command.options.OptionHelp;
+&nbsp;import org.springframework.boot.cli.command.status.ExitStatus;
+&nbsp;import org.springframework.boot.cli.util.Log;
+&nbsp;
+&nbsp;/**
+&nbsp; * Internal {@link Command} to provide hints for shell auto-completion. Expects to be
+&nbsp; * called with the current index followed by a list of arguments already typed.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class HintCommand extends AbstractCommand {
+&nbsp;
+&nbsp;	private final CommandRunner commandRunner;
+&nbsp;
+&nbsp;	public HintCommand(CommandRunner commandRunner) {
+<b class="nc">&nbsp;		super(&quot;hint&quot;, &quot;Provides hints for shell auto-completion&quot;);</b>
+<b class="nc">&nbsp;		this.commandRunner = commandRunner;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ExitStatus run(String... args) throws Exception {
+&nbsp;		try {
+<b class="nc">&nbsp;			int index = (args.length != 0) ? Integer.parseInt(args[0]) - 1 : 0;</b>
+<b class="nc">&nbsp;			List&lt;String&gt; arguments = new ArrayList&lt;&gt;(args.length);</b>
+<b class="nc">&nbsp;			for (int i = 2; i &lt; args.length; i++) {</b>
+<b class="nc">&nbsp;				arguments.add(args[i]);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String starting = &quot;&quot;;</b>
+<b class="nc">&nbsp;			if (index &lt; arguments.size()) {</b>
+<b class="nc">&nbsp;				starting = arguments.remove(index);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (index == 0) {</b>
+<b class="nc">&nbsp;				showCommandHints(starting);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (!arguments.isEmpty() &amp;&amp; !starting.isEmpty()) {</b>
+<b class="nc">&nbsp;				String command = arguments.remove(0);</b>
+<b class="nc">&nbsp;				showCommandOptionHints(command, Collections.unmodifiableList(arguments), starting);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+&nbsp;			// Swallow and provide no hints
+<b class="nc">&nbsp;			return ExitStatus.ERROR;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return ExitStatus.OK;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void showCommandHints(String starting) {
+<b class="nc">&nbsp;		for (Command command : this.commandRunner) {</b>
+<b class="nc">&nbsp;			if (isHintMatch(command, starting)) {</b>
+<b class="nc">&nbsp;				Log.info(command.getName() + &quot; &quot; + command.getDescription());</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isHintMatch(Command command, String starting) {
+<b class="nc">&nbsp;		if (command instanceof HintCommand) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return command.getName().startsWith(starting)</b>
+<b class="nc">&nbsp;				|| (this.commandRunner.isOptionCommand(command) &amp;&amp; (&quot;--&quot; + command.getName()).startsWith(starting));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void showCommandOptionHints(String commandName, List&lt;String&gt; specifiedArguments, String starting) {
+<b class="nc">&nbsp;		Command command = this.commandRunner.findCommand(commandName);</b>
+<b class="nc">&nbsp;		if (command != null) {</b>
+<b class="nc">&nbsp;			for (OptionHelp help : command.getOptionsHelp()) {</b>
+<b class="nc">&nbsp;				if (!alreadyUsed(help, specifiedArguments)) {</b>
+<b class="nc">&nbsp;					for (String option : help.getOptions()) {</b>
+<b class="nc">&nbsp;						if (option.startsWith(starting)) {</b>
+<b class="nc">&nbsp;							Log.info(option + &quot; &quot; + help.getUsageHelp());</b>
+&nbsp;						}
+<b class="nc">&nbsp;					}</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean alreadyUsed(OptionHelp help, List&lt;String&gt; specifiedArguments) {
+<b class="nc">&nbsp;		for (String argument : specifiedArguments) {</b>
+<b class="nc">&nbsp;			if (help.getOptions().contains(argument)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

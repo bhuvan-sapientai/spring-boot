@@ -1,0 +1,265 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConditionOutcome</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionOutcome (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConditionOutcome</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Outcome for a condition match, including log message.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.0.0
+&nbsp; * @see ConditionMessage
+&nbsp; */
+&nbsp;public class ConditionOutcome {
+&nbsp;
+&nbsp;	private final boolean match;
+&nbsp;
+&nbsp;	private final ConditionMessage message;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConditionOutcome} instance. For more consistent messages
+&nbsp;	 * consider using {@link #ConditionOutcome(boolean, ConditionMessage)}.
+&nbsp;	 * @param match if the condition is a match
+&nbsp;	 * @param message the condition message
+&nbsp;	 */
+&nbsp;	public ConditionOutcome(boolean match, String message) {
+<b class="nc">&nbsp;		this(match, ConditionMessage.of(message));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConditionOutcome} instance.
+&nbsp;	 * @param match if the condition is a match
+&nbsp;	 * @param message the condition message
+&nbsp;	 */
+<b class="nc">&nbsp;	public ConditionOutcome(boolean match, ConditionMessage message) {</b>
+<b class="nc">&nbsp;		Assert.notNull(message, &quot;ConditionMessage must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.match = match;</b>
+<b class="nc">&nbsp;		this.message = message;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConditionOutcome} instance for a &#39;match&#39;.
+&nbsp;	 * @return the {@link ConditionOutcome}
+&nbsp;	 */
+&nbsp;	public static ConditionOutcome match() {
+<b class="nc">&nbsp;		return match(ConditionMessage.empty());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConditionOutcome} instance for &#39;match&#39;. For more consistent
+&nbsp;	 * messages consider using {@link #match(ConditionMessage)}.
+&nbsp;	 * @param message the message
+&nbsp;	 * @return the {@link ConditionOutcome}
+&nbsp;	 */
+&nbsp;	public static ConditionOutcome match(String message) {
+<b class="nc">&nbsp;		return new ConditionOutcome(true, message);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConditionOutcome} instance for &#39;match&#39;.
+&nbsp;	 * @param message the message
+&nbsp;	 * @return the {@link ConditionOutcome}
+&nbsp;	 */
+&nbsp;	public static ConditionOutcome match(ConditionMessage message) {
+<b class="nc">&nbsp;		return new ConditionOutcome(true, message);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConditionOutcome} instance for &#39;no match&#39;. For more consistent
+&nbsp;	 * messages consider using {@link #noMatch(ConditionMessage)}.
+&nbsp;	 * @param message the message
+&nbsp;	 * @return the {@link ConditionOutcome}
+&nbsp;	 */
+&nbsp;	public static ConditionOutcome noMatch(String message) {
+<b class="nc">&nbsp;		return new ConditionOutcome(false, message);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConditionOutcome} instance for &#39;no match&#39;.
+&nbsp;	 * @param message the message
+&nbsp;	 * @return the {@link ConditionOutcome}
+&nbsp;	 */
+&nbsp;	public static ConditionOutcome noMatch(ConditionMessage message) {
+<b class="nc">&nbsp;		return new ConditionOutcome(false, message);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return {@code true} if the outcome was a match.
+&nbsp;	 * @return {@code true} if the outcome matches
+&nbsp;	 */
+&nbsp;	public boolean isMatch() {
+<b class="nc">&nbsp;		return this.match;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an outcome message or {@code null}.
+&nbsp;	 * @return the message or {@code null}
+&nbsp;	 */
+&nbsp;	public String getMessage() {
+<b class="nc">&nbsp;		return this.message.isEmpty() ? null : this.message.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an outcome message or {@code null}.
+&nbsp;	 * @return the message or {@code null}
+&nbsp;	 */
+&nbsp;	public ConditionMessage getConditionMessage() {
+<b class="nc">&nbsp;		return this.message;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (getClass() == obj.getClass()) {</b>
+<b class="nc">&nbsp;			ConditionOutcome other = (ConditionOutcome) obj;</b>
+<b class="nc">&nbsp;			return (this.match == other.match &amp;&amp; ObjectUtils.nullSafeEquals(this.message, other.message));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return super.equals(obj);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return Boolean.hashCode(this.match) * 31 + ObjectUtils.nullSafeHashCode(this.message);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return (this.message != null) ? this.message.toString() : &quot;&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the inverse of the specified condition outcome.
+&nbsp;	 * @param outcome the outcome to inverse
+&nbsp;	 * @return the inverse of the condition outcome
+&nbsp;	 * @since 1.3.0
+&nbsp;	 */
+&nbsp;	public static ConditionOutcome inverse(ConditionOutcome outcome) {
+<b class="nc">&nbsp;		return new ConditionOutcome(!outcome.isMatch(), outcome.getConditionMessage());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

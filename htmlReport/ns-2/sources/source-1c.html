@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StartupInfoLogger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot</a>
+</div>
+
+<h1>Coverage Summary for Class: StartupInfoLogger (org.springframework.boot)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StartupInfoLogger</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot;
+&nbsp;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;
+&nbsp;import org.springframework.aot.AotDetector;
+&nbsp;import org.springframework.boot.SpringApplication.Startup;
+&nbsp;import org.springframework.boot.system.ApplicationHome;
+&nbsp;import org.springframework.boot.system.ApplicationPid;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Logs application information on startup.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;class StartupInfoLogger {
+&nbsp;
+&nbsp;	private final Class&lt;?&gt; sourceClass;
+&nbsp;
+<b class="nc">&nbsp;	StartupInfoLogger(Class&lt;?&gt; sourceClass) {</b>
+<b class="nc">&nbsp;		this.sourceClass = sourceClass;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void logStarting(Log applicationLog) {
+<b class="nc">&nbsp;		Assert.notNull(applicationLog, &quot;Log must not be null&quot;);</b>
+<b class="nc">&nbsp;		applicationLog.info(LogMessage.of(this::getStartingMessage));</b>
+<b class="nc">&nbsp;		applicationLog.debug(LogMessage.of(this::getRunningMessage));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void logStarted(Log applicationLog, Startup startup) {
+<b class="nc">&nbsp;		if (applicationLog.isInfoEnabled()) {</b>
+<b class="nc">&nbsp;			applicationLog.info(getStartedMessage(startup));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private CharSequence getStartingMessage() {
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder();</b>
+<b class="nc">&nbsp;		message.append(&quot;Starting&quot;);</b>
+<b class="nc">&nbsp;		appendAotMode(message);</b>
+<b class="nc">&nbsp;		appendApplicationName(message);</b>
+<b class="nc">&nbsp;		appendVersion(message, this.sourceClass);</b>
+<b class="nc">&nbsp;		appendJavaVersion(message);</b>
+<b class="nc">&nbsp;		appendPid(message);</b>
+<b class="nc">&nbsp;		appendContext(message);</b>
+<b class="nc">&nbsp;		return message;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CharSequence getRunningMessage() {
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder();</b>
+<b class="nc">&nbsp;		message.append(&quot;Running with Spring Boot&quot;);</b>
+<b class="nc">&nbsp;		appendVersion(message, getClass());</b>
+<b class="nc">&nbsp;		message.append(&quot;, Spring&quot;);</b>
+<b class="nc">&nbsp;		appendVersion(message, ApplicationContext.class);</b>
+<b class="nc">&nbsp;		return message;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CharSequence getStartedMessage(Startup startup) {
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder();</b>
+<b class="nc">&nbsp;		message.append(startup.action());</b>
+<b class="nc">&nbsp;		appendApplicationName(message);</b>
+<b class="nc">&nbsp;		message.append(&quot; in &quot;);</b>
+<b class="nc">&nbsp;		message.append(startup.timeTakenToStarted().toMillis() / 1000.0);</b>
+<b class="nc">&nbsp;		message.append(&quot; seconds&quot;);</b>
+<b class="nc">&nbsp;		Long uptimeMs = startup.processUptime();</b>
+<b class="nc">&nbsp;		if (uptimeMs != null) {</b>
+<b class="nc">&nbsp;			double uptime = uptimeMs / 1000.0;</b>
+<b class="nc">&nbsp;			message.append(&quot; (process running for &quot;).append(uptime).append(&quot;)&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return message;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void appendAotMode(StringBuilder message) {
+<b class="nc">&nbsp;		append(message, &quot;&quot;, () -&gt; AotDetector.useGeneratedArtifacts() ? &quot;AOT-processed&quot; : null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void appendApplicationName(StringBuilder message) {
+<b class="nc">&nbsp;		append(message, &quot;&quot;,</b>
+<b class="nc">&nbsp;				() -&gt; (this.sourceClass != null) ? ClassUtils.getShortName(this.sourceClass) : &quot;application&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void appendVersion(StringBuilder message, Class&lt;?&gt; source) {
+<b class="nc">&nbsp;		append(message, &quot;v&quot;, () -&gt; source.getPackage().getImplementationVersion());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void appendPid(StringBuilder message) {
+<b class="nc">&nbsp;		append(message, &quot;with PID &quot;, ApplicationPid::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void appendContext(StringBuilder message) {
+<b class="nc">&nbsp;		StringBuilder context = new StringBuilder();</b>
+<b class="nc">&nbsp;		ApplicationHome home = new ApplicationHome(this.sourceClass);</b>
+<b class="nc">&nbsp;		if (home.getSource() != null) {</b>
+<b class="nc">&nbsp;			context.append(home.getSource().getAbsolutePath());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		append(context, &quot;started by &quot;, () -&gt; System.getProperty(&quot;user.name&quot;));</b>
+<b class="nc">&nbsp;		append(context, &quot;in &quot;, () -&gt; System.getProperty(&quot;user.dir&quot;));</b>
+<b class="nc">&nbsp;		if (!context.isEmpty()) {</b>
+<b class="nc">&nbsp;			message.append(&quot; (&quot;);</b>
+<b class="nc">&nbsp;			message.append(context);</b>
+<b class="nc">&nbsp;			message.append(&quot;)&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void appendJavaVersion(StringBuilder message) {
+<b class="nc">&nbsp;		append(message, &quot;using Java &quot;, () -&gt; System.getProperty(&quot;java.version&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void append(StringBuilder message, String prefix, Callable&lt;Object&gt; call) {
+<b class="nc">&nbsp;		append(message, prefix, call, &quot;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void append(StringBuilder message, String prefix, Callable&lt;Object&gt; call, String defaultValue) {
+<b class="nc">&nbsp;		Object result = callIfPossible(call);</b>
+<b class="nc">&nbsp;		String value = (result != null) ? result.toString() : null;</b>
+<b class="nc">&nbsp;		if (!StringUtils.hasLength(value)) {</b>
+<b class="nc">&nbsp;			value = defaultValue;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasLength(value)) {</b>
+<b class="nc">&nbsp;			message.append((!message.isEmpty()) ? &quot; &quot; : &quot;&quot;);</b>
+<b class="nc">&nbsp;			message.append(prefix);</b>
+<b class="nc">&nbsp;			message.append(value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object callIfPossible(Callable&lt;Object&gt; call) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return call.call();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

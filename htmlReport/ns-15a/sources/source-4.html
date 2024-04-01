@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileEncodingApplicationListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context</a>
+</div>
+
+<h1>Coverage Summary for Class: FileEncodingApplicationListener (org.springframework.boot.context)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileEncodingApplicationListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (12/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link ApplicationListener} that halts application startup if the system file
+&nbsp; * encoding does not match an expected value set in the environment. By default has no
+&nbsp; * effect, but if you set {@code spring.mandatory_file_encoding} (or some camelCase or
+&nbsp; * UPPERCASE variant of that) to the name of a character encoding (e.g. &quot;UTF-8&quot;) then this
+&nbsp; * initializer throws an exception when the {@code file.encoding} System property does not
+&nbsp; * equal it.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The System property {@code file.encoding} is normally set by the JVM in response to the
+&nbsp; * {@code LANG} or {@code LC_ALL} environment variables. It is used (along with other
+&nbsp; * platform-dependent variables keyed off those environment variables) to encode JVM
+&nbsp; * arguments as well as file names and paths. In most cases you can override the file
+&nbsp; * encoding System property on the command line (with standard JVM features), but also
+&nbsp; * consider setting the {@code LANG} environment variable to an explicit
+&nbsp; * character-encoding value (e.g. &quot;en_GB.UTF-8&quot;).
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="fc">&nbsp;public class FileEncodingApplicationListener</b>
+&nbsp;		implements ApplicationListener&lt;ApplicationEnvironmentPreparedEvent&gt;, Ordered {
+&nbsp;
+<b class="fc">&nbsp;	private static final Log logger = LogFactory.getLog(FileEncodingApplicationListener.class);</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return Ordered.LOWEST_PRECEDENCE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
+<b class="fc">&nbsp;		ConfigurableEnvironment environment = event.getEnvironment();</b>
+<b class="fc">&nbsp;		String desired = environment.getProperty(&quot;spring.mandatory-file-encoding&quot;);</b>
+<b class="fc">&nbsp;		if (desired == null) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="fc">&nbsp;		String encoding = System.getProperty(&quot;file.encoding&quot;);</b>
+<b class="fc">&nbsp;		if (encoding != null &amp;&amp; !desired.equalsIgnoreCase(encoding)) {</b>
+<b class="fc">&nbsp;			if (logger.isErrorEnabled()) {</b>
+<b class="fc">&nbsp;				logger.error(&quot;System property &#39;file.encoding&#39; is currently &#39;&quot; + encoding + &quot;&#39;. It should be &#39;&quot; + desired</b>
+&nbsp;						+ &quot;&#39; (as defined in &#39;spring.mandatoryFileEncoding&#39;).&quot;);
+<b class="fc">&nbsp;				logger.error(&quot;Environment variable LANG is &#39;&quot; + System.getenv(&quot;LANG&quot;)</b>
+&nbsp;						+ &quot;&#39;. You could use a locale setting that matches encoding=&#39;&quot; + desired + &quot;&#39;.&quot;);
+<b class="fc">&nbsp;				logger.error(&quot;Environment variable LC_ALL is &#39;&quot; + System.getenv(&quot;LC_ALL&quot;)</b>
+&nbsp;						+ &quot;&#39;. You could use a locale setting that matches encoding=&#39;&quot; + desired + &quot;&#39;.&quot;);
+&nbsp;			}
+<b class="fc">&nbsp;			throw new IllegalStateException(&quot;The Java Virtual Machine has not been configured to use the &quot;</b>
+&nbsp;					+ &quot;desired default character encoding (&quot; + desired + &quot;).&quot;);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

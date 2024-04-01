@@ -1,0 +1,359 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AsciiBytes</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: AsciiBytes (org.springframework.boot.loader.jar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AsciiBytes</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/99)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.jar;
+&nbsp;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;
+&nbsp;/**
+&nbsp; * Simple wrapper around a byte array that represents an ASCII. Used for performance
+&nbsp; * reasons to save constructing Strings for ZIP data.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;final class AsciiBytes {
+&nbsp;
+&nbsp;	private static final String EMPTY_STRING = &quot;&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final int[] INITIAL_BYTE_BITMASK = { 0x7F, 0x1F, 0x0F, 0x07 };</b>
+&nbsp;
+&nbsp;	private static final int SUBSEQUENT_BYTE_BITMASK = 0x3F;
+&nbsp;
+&nbsp;	private final byte[] bytes;
+&nbsp;
+&nbsp;	private final int offset;
+&nbsp;
+&nbsp;	private final int length;
+&nbsp;
+&nbsp;	private String string;
+&nbsp;
+&nbsp;	private int hash;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AsciiBytes} from the specified String.
+&nbsp;	 * @param string the source string
+&nbsp;	 */
+&nbsp;	AsciiBytes(String string) {
+<b class="nc">&nbsp;		this(string.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;		this.string = string;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AsciiBytes} from the specified bytes. NOTE: underlying bytes
+&nbsp;	 * are not expected to change.
+&nbsp;	 * @param bytes the source bytes
+&nbsp;	 */
+&nbsp;	AsciiBytes(byte[] bytes) {
+<b class="nc">&nbsp;		this(bytes, 0, bytes.length);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AsciiBytes} from the specified bytes. NOTE: underlying bytes
+&nbsp;	 * are not expected to change.
+&nbsp;	 * @param bytes the source bytes
+&nbsp;	 * @param offset the offset
+&nbsp;	 * @param length the length
+&nbsp;	 */
+<b class="nc">&nbsp;	AsciiBytes(byte[] bytes, int offset, int length) {</b>
+<b class="nc">&nbsp;		if (offset &lt; 0 || length &lt; 0 || (offset + length) &gt; bytes.length) {</b>
+<b class="nc">&nbsp;			throw new IndexOutOfBoundsException();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.bytes = bytes;</b>
+<b class="nc">&nbsp;		this.offset = offset;</b>
+<b class="nc">&nbsp;		this.length = length;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	int length() {
+<b class="nc">&nbsp;		return this.length;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean startsWith(AsciiBytes prefix) {
+<b class="nc">&nbsp;		if (this == prefix) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (prefix.length &gt; this.length) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (int i = 0; i &lt; prefix.length; i++) {</b>
+<b class="nc">&nbsp;			if (this.bytes[i + this.offset] != prefix.bytes[i + prefix.offset]) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean endsWith(AsciiBytes postfix) {
+<b class="nc">&nbsp;		if (this == postfix) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (postfix.length &gt; this.length) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (int i = 0; i &lt; postfix.length; i++) {</b>
+<b class="nc">&nbsp;			if (this.bytes[this.offset + (this.length - 1) - i] != postfix.bytes[postfix.offset + (postfix.length - 1)</b>
+&nbsp;					- i]) {
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	AsciiBytes substring(int beginIndex) {
+<b class="nc">&nbsp;		return substring(beginIndex, this.length);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	AsciiBytes substring(int beginIndex, int endIndex) {
+<b class="nc">&nbsp;		int length = endIndex - beginIndex;</b>
+<b class="nc">&nbsp;		if (this.offset + length &gt; this.bytes.length) {</b>
+<b class="nc">&nbsp;			throw new IndexOutOfBoundsException();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new AsciiBytes(this.bytes, this.offset + beginIndex, length);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean matches(CharSequence name, char suffix) {
+<b class="nc">&nbsp;		int charIndex = 0;</b>
+<b class="nc">&nbsp;		int nameLen = name.length();</b>
+<b class="nc">&nbsp;		int totalLen = nameLen + ((suffix != 0) ? 1 : 0);</b>
+<b class="nc">&nbsp;		for (int i = this.offset; i &lt; this.offset + this.length; i++) {</b>
+<b class="nc">&nbsp;			int b = this.bytes[i];</b>
+<b class="nc">&nbsp;			int remainingUtfBytes = getNumberOfUtfBytes(b) - 1;</b>
+<b class="nc">&nbsp;			b &amp;= INITIAL_BYTE_BITMASK[remainingUtfBytes];</b>
+<b class="nc">&nbsp;			for (int j = 0; j &lt; remainingUtfBytes; j++) {</b>
+<b class="nc">&nbsp;				b = (b &lt;&lt; 6) + (this.bytes[++i] &amp; SUBSEQUENT_BYTE_BITMASK);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			char c = getChar(name, suffix, charIndex++);</b>
+<b class="nc">&nbsp;			if (b &lt;= 0xFFFF) {</b>
+<b class="nc">&nbsp;				if (c != b) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				if (c != ((b &gt;&gt; 0xA) + 0xD7C0)) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				c = getChar(name, suffix, charIndex++);</b>
+<b class="nc">&nbsp;				if (c != ((b &amp; 0x3FF) + 0xDC00)) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return charIndex == totalLen;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private char getChar(CharSequence name, char suffix, int index) {
+<b class="nc">&nbsp;		if (index &lt; name.length()) {</b>
+<b class="nc">&nbsp;			return name.charAt(index);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (index == name.length()) {</b>
+<b class="nc">&nbsp;			return suffix;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int getNumberOfUtfBytes(int b) {
+<b class="nc">&nbsp;		if ((b &amp; 0x80) == 0) {</b>
+<b class="nc">&nbsp;			return 1;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int numberOfUtfBytes = 0;</b>
+<b class="nc">&nbsp;		while ((b &amp; 0x80) != 0) {</b>
+<b class="nc">&nbsp;			b &lt;&lt;= 1;</b>
+<b class="nc">&nbsp;			numberOfUtfBytes++;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return numberOfUtfBytes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (obj == null) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj.getClass() == AsciiBytes.class) {</b>
+<b class="nc">&nbsp;			AsciiBytes other = (AsciiBytes) obj;</b>
+<b class="nc">&nbsp;			if (this.length == other.length) {</b>
+<b class="nc">&nbsp;				for (int i = 0; i &lt; this.length; i++) {</b>
+<b class="nc">&nbsp;					if (this.bytes[this.offset + i] != other.bytes[other.offset + i]) {</b>
+<b class="nc">&nbsp;						return false;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		int hash = this.hash;</b>
+<b class="nc">&nbsp;		if (hash == 0 &amp;&amp; this.bytes.length &gt; 0) {</b>
+<b class="nc">&nbsp;			for (int i = this.offset; i &lt; this.offset + this.length; i++) {</b>
+<b class="nc">&nbsp;				int b = this.bytes[i];</b>
+<b class="nc">&nbsp;				int remainingUtfBytes = getNumberOfUtfBytes(b) - 1;</b>
+<b class="nc">&nbsp;				b &amp;= INITIAL_BYTE_BITMASK[remainingUtfBytes];</b>
+<b class="nc">&nbsp;				for (int j = 0; j &lt; remainingUtfBytes; j++) {</b>
+<b class="nc">&nbsp;					b = (b &lt;&lt; 6) + (this.bytes[++i] &amp; SUBSEQUENT_BYTE_BITMASK);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (b &lt;= 0xFFFF) {</b>
+<b class="nc">&nbsp;					hash = 31 * hash + b;</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					hash = 31 * hash + ((b &gt;&gt; 0xA) + 0xD7C0);</b>
+<b class="nc">&nbsp;					hash = 31 * hash + ((b &amp; 0x3FF) + 0xDC00);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			this.hash = hash;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return hash;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		if (this.string == null) {</b>
+<b class="nc">&nbsp;			if (this.length == 0) {</b>
+<b class="nc">&nbsp;				this.string = EMPTY_STRING;</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				this.string = new String(this.bytes, this.offset, this.length, StandardCharsets.UTF_8);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return this.string;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static String toString(byte[] bytes) {
+<b class="nc">&nbsp;		return new String(bytes, StandardCharsets.UTF_8);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static int hashCode(CharSequence charSequence) {
+&nbsp;		// We&#39;re compatible with String&#39;s hashCode()
+<b class="nc">&nbsp;		if (charSequence instanceof StringSequence) {</b>
+&nbsp;			// ... but save making an unnecessary String for StringSequence
+<b class="nc">&nbsp;			return charSequence.hashCode();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return charSequence.toString().hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static int hashCode(int hash, char suffix) {
+<b class="nc">&nbsp;		return (suffix != 0) ? (31 * hash + suffix) : hash;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

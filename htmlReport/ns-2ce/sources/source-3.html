@@ -1,0 +1,345 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TestEntityManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.autoconfigure.orm.jpa</a>
+</div>
+
+<h1>Coverage Summary for Class: TestEntityManager (org.springframework.boot.test.autoconfigure.orm.jpa)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestEntityManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.autoconfigure.orm.jpa;
+&nbsp;
+&nbsp;import jakarta.persistence.EntityManager;
+&nbsp;import jakarta.persistence.EntityManagerFactory;
+&nbsp;import jakarta.persistence.PersistenceUnitUtil;
+&nbsp;
+&nbsp;import org.springframework.orm.jpa.EntityManagerFactoryUtils;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Alternative to {@link EntityManager} for use in JPA tests. Provides a subset of
+&nbsp; * {@link EntityManager} methods that are useful for tests as well as helper methods for
+&nbsp; * common testing tasks such as {@link #persistFlushFind(Object) persist/flush/find}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;public class TestEntityManager {
+&nbsp;
+&nbsp;	private final EntityManagerFactory entityManagerFactory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link TestEntityManager} instance for the given
+&nbsp;	 * {@link EntityManagerFactory}.
+&nbsp;	 * @param entityManagerFactory the source entity manager factory
+&nbsp;	 */
+<b class="nc">&nbsp;	public TestEntityManager(EntityManagerFactory entityManagerFactory) {</b>
+<b class="nc">&nbsp;		Assert.notNull(entityManagerFactory, &quot;EntityManagerFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.entityManagerFactory = entityManagerFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Make an instance managed and persistent then return its ID. Delegates to
+&nbsp;	 * {@link EntityManager#persist(Object)} then {@link #getId(Object)}.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Helpful when setting up test data in a test: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * Object entityId = this.testEntityManager.persist(new MyEntity(&quot;Spring&quot;));
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @param entity the source entity
+&nbsp;	 * @return the ID of the newly persisted entity
+&nbsp;	 */
+&nbsp;	public Object persistAndGetId(Object entity) {
+<b class="nc">&nbsp;		persist(entity);</b>
+<b class="nc">&nbsp;		return getId(entity);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Make an instance managed and persistent then return its ID. Delegates to
+&nbsp;	 * {@link EntityManager#persist(Object)} then {@link #getId(Object, Class)}.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Helpful when setting up test data in a test: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * Long entityId = this.testEntityManager.persist(new MyEntity(&quot;Spring&quot;), Long.class);
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @param &lt;T&gt; the ID type
+&nbsp;	 * @param entity the source entity
+&nbsp;	 * @param idType the ID type
+&nbsp;	 * @return the ID of the newly persisted entity
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; T persistAndGetId(Object entity, Class&lt;T&gt; idType) {
+<b class="nc">&nbsp;		persist(entity);</b>
+<b class="nc">&nbsp;		return getId(entity, idType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Make an instance managed and persistent. Delegates to
+&nbsp;	 * {@link EntityManager#persist(Object)} then returns the original source entity.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Helpful when setting up test data in a test: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * MyEntity entity = this.testEntityManager.persist(new MyEntity(&quot;Spring&quot;));
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @param &lt;E&gt; the entity type
+&nbsp;	 * @param entity the entity to persist
+&nbsp;	 * @return the persisted entity
+&nbsp;	 */
+&nbsp;	public &lt;E&gt; E persist(E entity) {
+<b class="nc">&nbsp;		getEntityManager().persist(entity);</b>
+<b class="nc">&nbsp;		return entity;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Make an instance managed and persistent, synchronize the persistence context to the
+&nbsp;	 * underlying database and finally find the persisted entity by its ID. Delegates to
+&nbsp;	 * {@link #persistAndFlush(Object)} then {@link #find(Class, Object)} with the
+&nbsp;	 * {@link #getId(Object) entity ID}.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Helpful when ensuring that entity data is actually written and read from the
+&nbsp;	 * underlying database correctly.
+&nbsp;	 * @param &lt;E&gt; the entity type
+&nbsp;	 * @param entity the entity to persist
+&nbsp;	 * @return the entity found using the ID of the persisted entity
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public &lt;E&gt; E persistFlushFind(E entity) {
+<b class="nc">&nbsp;		EntityManager entityManager = getEntityManager();</b>
+<b class="nc">&nbsp;		persistAndFlush(entity);</b>
+<b class="nc">&nbsp;		Object id = getId(entity);</b>
+<b class="nc">&nbsp;		entityManager.detach(entity);</b>
+<b class="nc">&nbsp;		return (E) entityManager.find(entity.getClass(), id);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Make an instance managed and persistent then synchronize the persistence context to
+&nbsp;	 * the underlying database. Delegates to {@link EntityManager#persist(Object)} then
+&nbsp;	 * {@link #flush()} and finally returns the original source entity.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Helpful when setting up test data in a test: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * MyEntity entity = this.testEntityManager.persistAndFlush(new MyEntity(&quot;Spring&quot;));
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @param &lt;E&gt; the entity type
+&nbsp;	 * @param entity the entity to persist
+&nbsp;	 * @return the persisted entity
+&nbsp;	 */
+&nbsp;	public &lt;E&gt; E persistAndFlush(E entity) {
+<b class="nc">&nbsp;		persist(entity);</b>
+<b class="nc">&nbsp;		flush();</b>
+<b class="nc">&nbsp;		return entity;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Merge the state of the given entity into the current persistence context. Delegates
+&nbsp;	 * to {@link EntityManager#merge(Object)}
+&nbsp;	 * @param &lt;E&gt; the entity type
+&nbsp;	 * @param entity the entity to merge
+&nbsp;	 * @return the merged entity
+&nbsp;	 */
+&nbsp;	public &lt;E&gt; E merge(E entity) {
+<b class="nc">&nbsp;		return getEntityManager().merge(entity);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Remove the entity instance. Delegates to {@link EntityManager#remove(Object)}
+&nbsp;	 * @param entity the entity to remove
+&nbsp;	 */
+&nbsp;	public void remove(Object entity) {
+<b class="nc">&nbsp;		getEntityManager().remove(entity);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find by primary key. Delegates to {@link EntityManager#find(Class, Object)}.
+&nbsp;	 * @param &lt;E&gt; the entity type
+&nbsp;	 * @param entityClass the entity class
+&nbsp;	 * @param primaryKey the entity primary key
+&nbsp;	 * @return the found entity or {@code null} if the entity does not exist
+&nbsp;	 * @see #getId(Object)
+&nbsp;	 */
+&nbsp;	public &lt;E&gt; E find(Class&lt;E&gt; entityClass, Object primaryKey) {
+<b class="nc">&nbsp;		return getEntityManager().find(entityClass, primaryKey);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Synchronize the persistence context to the underlying database. Delegates to
+&nbsp;	 * {@link EntityManager#flush()}.
+&nbsp;	 */
+&nbsp;	public void flush() {
+<b class="nc">&nbsp;		getEntityManager().flush();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Refresh the state of the instance from the database, overwriting changes made to
+&nbsp;	 * the entity, if any. Delegates to {@link EntityManager#refresh(Object)}.
+&nbsp;	 * @param &lt;E&gt; the entity type
+&nbsp;	 * @param entity the entity to refresh
+&nbsp;	 * @return the refreshed entity
+&nbsp;	 */
+&nbsp;	public &lt;E&gt; E refresh(E entity) {
+<b class="nc">&nbsp;		getEntityManager().refresh(entity);</b>
+<b class="nc">&nbsp;		return entity;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clear the persistence context, causing all managed entities to become detached.
+&nbsp;	 * Delegates to {@link EntityManager#clear()}
+&nbsp;	 */
+&nbsp;	public void clear() {
+<b class="nc">&nbsp;		getEntityManager().clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Remove the given entity from the persistence context, causing a managed entity to
+&nbsp;	 * become detached. Delegates to {@link EntityManager#detach(Object)}.
+&nbsp;	 * @param entity the entity to detach.
+&nbsp;	 */
+&nbsp;	public void detach(Object entity) {
+<b class="nc">&nbsp;		getEntityManager().detach(entity);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the ID of the given entity. Delegates to
+&nbsp;	 * {@link PersistenceUnitUtil#getIdentifier(Object)}.
+&nbsp;	 * @param entity the source entity
+&nbsp;	 * @return the ID of the entity or {@code null}
+&nbsp;	 * @see #getId(Object, Class)
+&nbsp;	 */
+&nbsp;	public Object getId(Object entity) {
+<b class="nc">&nbsp;		return this.entityManagerFactory.getPersistenceUnitUtil().getIdentifier(entity);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the ID of the given entity cast to a specific type. Delegates to
+&nbsp;	 * {@link PersistenceUnitUtil#getIdentifier(Object)}.
+&nbsp;	 * @param &lt;T&gt; the ID type
+&nbsp;	 * @param entity the source entity
+&nbsp;	 * @param idType the expected ID type
+&nbsp;	 * @return the ID of the entity or {@code null}
+&nbsp;	 * @see #getId(Object)
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public &lt;T&gt; T getId(Object entity, Class&lt;T&gt; idType) {
+<b class="nc">&nbsp;		Object id = getId(entity);</b>
+<b class="nc">&nbsp;		Assert.isInstanceOf(idType, id, &quot;ID mismatch:&quot;);</b>
+<b class="nc">&nbsp;		return (T) id;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the underlying {@link EntityManager} that&#39;s actually used to perform all
+&nbsp;	 * operations.
+&nbsp;	 * @return the entity manager
+&nbsp;	 */
+&nbsp;	public final EntityManager getEntityManager() {
+<b class="nc">&nbsp;		EntityManager manager = EntityManagerFactoryUtils.getTransactionalEntityManager(this.entityManagerFactory);</b>
+<b class="nc">&nbsp;		Assert.state(manager != null, &quot;No transactional EntityManager found, is your test running in a transaction?&quot;);</b>
+<b class="nc">&nbsp;		return manager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConditionalOnProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionalOnProperty (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ConditionalOnProperty</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Conditional @Conditional} that checks if the specified properties have a
+&nbsp; * specific value. By default the properties must be present in the {@link Environment}
+&nbsp; * and &lt;strong&gt;not&lt;/strong&gt; equal to {@code false}. The {@link #havingValue()} and
+&nbsp; * {@link #matchIfMissing()} attributes allow further customizations.
+&nbsp; * &lt;p&gt;
+&nbsp; * The {@link #havingValue} attribute can be used to specify the value that the property
+&nbsp; * should have. The table below shows when a condition matches according to the property
+&nbsp; * value and the {@link #havingValue()} attribute:
+&nbsp; *
+&nbsp; * &lt;table border=&quot;1&quot;&gt;
+&nbsp; * &lt;caption&gt;Having values&lt;/caption&gt;
+&nbsp; * &lt;tr&gt;
+&nbsp; * &lt;th&gt;Property Value&lt;/th&gt;
+&nbsp; * &lt;th&gt;{@code havingValue=&quot;&quot;}&lt;/th&gt;
+&nbsp; * &lt;th&gt;{@code havingValue=&quot;true&quot;}&lt;/th&gt;
+&nbsp; * &lt;th&gt;{@code havingValue=&quot;false&quot;}&lt;/th&gt;
+&nbsp; * &lt;th&gt;{@code havingValue=&quot;foo&quot;}&lt;/th&gt;
+&nbsp; * &lt;/tr&gt;
+&nbsp; * &lt;tr&gt;
+&nbsp; * &lt;td&gt;{@code &quot;true&quot;}&lt;/td&gt;
+&nbsp; * &lt;td&gt;yes&lt;/td&gt;
+&nbsp; * &lt;td&gt;yes&lt;/td&gt;
+&nbsp; * &lt;td&gt;no&lt;/td&gt;
+&nbsp; * &lt;td&gt;no&lt;/td&gt;
+&nbsp; * &lt;/tr&gt;
+&nbsp; * &lt;tr&gt;
+&nbsp; * &lt;td&gt;{@code &quot;false&quot;}&lt;/td&gt;
+&nbsp; * &lt;td&gt;no&lt;/td&gt;
+&nbsp; * &lt;td&gt;no&lt;/td&gt;
+&nbsp; * &lt;td&gt;yes&lt;/td&gt;
+&nbsp; * &lt;td&gt;no&lt;/td&gt;
+&nbsp; * &lt;/tr&gt;
+&nbsp; * &lt;tr&gt;
+&nbsp; * &lt;td&gt;{@code &quot;foo&quot;}&lt;/td&gt;
+&nbsp; * &lt;td&gt;yes&lt;/td&gt;
+&nbsp; * &lt;td&gt;no&lt;/td&gt;
+&nbsp; * &lt;td&gt;no&lt;/td&gt;
+&nbsp; * &lt;td&gt;yes&lt;/td&gt;
+&nbsp; * &lt;/tr&gt;
+&nbsp; * &lt;/table&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * If the property is not contained in the {@link Environment} at all, the
+&nbsp; * {@link #matchIfMissing()} attribute is consulted. By default missing attributes do not
+&nbsp; * match.
+&nbsp; * &lt;p&gt;
+&nbsp; * This condition cannot be reliably used for matching collection properties. For example,
+&nbsp; * in the following configuration, the condition matches if {@code spring.example.values}
+&nbsp; * is present in the {@link Environment} but does not match if
+&nbsp; * {@code spring.example.values[0]} is present.
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;ConditionalOnProperty(prefix = &quot;spring&quot;, name = &quot;example.values&quot;)
+&nbsp; * class ExampleAutoConfiguration {
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * It is better to use a custom condition for such cases.
+&nbsp; *
+&nbsp; * @author Maciej Walkowiak
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.1.0
+&nbsp; */
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Target({ ElementType.TYPE, ElementType.METHOD })
+&nbsp;@Documented
+&nbsp;@Conditional(OnPropertyCondition.class)
+&nbsp;public @interface ConditionalOnProperty {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link #name()}.
+&nbsp;	 * @return the names
+&nbsp;	 */
+&nbsp;	String[] value() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A prefix that should be applied to each property. The prefix automatically ends
+&nbsp;	 * with a dot if not specified. A valid prefix is defined by one or more words
+&nbsp;	 * separated with dots (e.g. {@code &quot;acme.system.feature&quot;}).
+&nbsp;	 * @return the prefix
+&nbsp;	 */
+&nbsp;	String prefix() default &quot;&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the properties to test. If a prefix has been defined, it is applied to
+&nbsp;	 * compute the full key of each property. For instance if the prefix is
+&nbsp;	 * {@code app.config} and one value is {@code my-value}, the full key would be
+&nbsp;	 * {@code app.config.my-value}
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Use the dashed notation to specify each property, that is all lower case with a &quot;-&quot;
+&nbsp;	 * to separate words (e.g. {@code my-long-property}).
+&nbsp;	 * @return the names
+&nbsp;	 */
+&nbsp;	String[] name() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The string representation of the expected value for the properties. If not
+&nbsp;	 * specified, the property must &lt;strong&gt;not&lt;/strong&gt; be equal to {@code false}.
+&nbsp;	 * @return the expected value
+&nbsp;	 */
+&nbsp;	String havingValue() default &quot;&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Specify if the condition should match if the property is not set. Defaults to
+&nbsp;	 * {@code false}.
+&nbsp;	 * @return if the condition should match if the property is missing
+&nbsp;	 */
+&nbsp;	boolean matchIfMissing() default false;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

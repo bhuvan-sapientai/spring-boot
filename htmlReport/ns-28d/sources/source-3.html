@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExtractCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.jarmode.layertools</a>
+</div>
+
+<h1>Coverage Summary for Class: ExtractCommand (org.springframework.boot.jarmode.layertools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExtractCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.jarmode.layertools;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.attribute.BasicFileAttributeView;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;import java.util.zip.ZipInputStream;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * The {@code &#39;extract&#39;} tools command.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ExtractCommand extends Command {
+&nbsp;
+<b class="nc">&nbsp;	static final Option DESTINATION_OPTION = Option.of(&quot;destination&quot;, &quot;string&quot;, &quot;The destination to extract files to&quot;);</b>
+&nbsp;
+&nbsp;	private final Context context;
+&nbsp;
+&nbsp;	private final Layers layers;
+&nbsp;
+&nbsp;	ExtractCommand(Context context) {
+<b class="nc">&nbsp;		this(context, Layers.get(context));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ExtractCommand(Context context, Layers layers) {
+<b class="nc">&nbsp;		super(&quot;extract&quot;, &quot;Extracts layers from the jar for image creation&quot;, Options.of(DESTINATION_OPTION),</b>
+<b class="nc">&nbsp;				Parameters.of(&quot;[&lt;layer&gt;...]&quot;));</b>
+<b class="nc">&nbsp;		this.context = context;</b>
+<b class="nc">&nbsp;		this.layers = layers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void run(Map&lt;Option, String&gt; options, List&lt;String&gt; parameters) {
+&nbsp;		try {
+<b class="nc">&nbsp;			File destination = options.containsKey(DESTINATION_OPTION) ? new File(options.get(DESTINATION_OPTION))</b>
+<b class="nc">&nbsp;					: this.context.getWorkingDir();</b>
+<b class="nc">&nbsp;			for (String layer : this.layers) {</b>
+<b class="nc">&nbsp;				if (parameters.isEmpty() || parameters.contains(layer)) {</b>
+<b class="nc">&nbsp;					mkDirs(new File(destination, layer));</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			try (ZipInputStream zip = new ZipInputStream(new FileInputStream(this.context.getArchiveFile()))) {</b>
+<b class="nc">&nbsp;				ZipEntry entry = zip.getNextEntry();</b>
+<b class="nc">&nbsp;				Assert.state(entry != null, &quot;File &#39;&quot; + this.context.getArchiveFile().toString()</b>
+&nbsp;						+ &quot;&#39; is not compatible with layertools; ensure jar file is valid and launch script is not enabled&quot;);
+<b class="nc">&nbsp;				while (entry != null) {</b>
+<b class="nc">&nbsp;					if (!entry.isDirectory()) {</b>
+<b class="nc">&nbsp;						String layer = this.layers.getLayer(entry);</b>
+<b class="nc">&nbsp;						if (parameters.isEmpty() || parameters.contains(layer)) {</b>
+<b class="nc">&nbsp;							write(zip, entry, new File(destination, layer));</b>
+&nbsp;						}
+&nbsp;					}
+<b class="nc">&nbsp;					entry = zip.getNextEntry();</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void write(ZipInputStream zip, ZipEntry entry, File destination) throws IOException {
+<b class="nc">&nbsp;		String canonicalOutputPath = destination.getCanonicalPath() + File.separator;</b>
+<b class="nc">&nbsp;		File file = new File(destination, entry.getName());</b>
+<b class="nc">&nbsp;		String canonicalEntryPath = file.getCanonicalPath();</b>
+<b class="nc">&nbsp;		Assert.state(canonicalEntryPath.startsWith(canonicalOutputPath),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Entry &#39;&quot; + entry.getName() + &quot;&#39; would be written to &#39;&quot; + canonicalEntryPath</b>
+&nbsp;						+ &quot;&#39;. This is outside the output location of &#39;&quot; + canonicalOutputPath
+&nbsp;						+ &quot;&#39;. Verify the contents of your archive.&quot;);
+<b class="nc">&nbsp;		mkParentDirs(file);</b>
+<b class="nc">&nbsp;		try (OutputStream out = new FileOutputStream(file)) {</b>
+<b class="nc">&nbsp;			StreamUtils.copy(zip, out);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			Files.getFileAttributeView(file.toPath(), BasicFileAttributeView.class)</b>
+<b class="nc">&nbsp;				.setTimes(entry.getLastModifiedTime(), entry.getLastAccessTime(), entry.getCreationTime());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+&nbsp;			// File system does not support setting time attributes. Continue.
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void mkParentDirs(File file) throws IOException {
+<b class="nc">&nbsp;		mkDirs(file.getParentFile());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void mkDirs(File file) throws IOException {
+<b class="nc">&nbsp;		if (!file.exists() &amp;&amp; !file.mkdirs()) {</b>
+<b class="nc">&nbsp;			throw new IOException(&quot;Unable to create directory &quot; + file);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

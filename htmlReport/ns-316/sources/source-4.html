@@ -1,0 +1,515 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServletWebServerApplicationContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet.context</a>
+</div>
+
+<h1>Coverage Summary for Class: ServletWebServerApplicationContext (org.springframework.boot.web.servlet.context)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServletWebServerApplicationContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/88)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ServletWebServerApplicationContext$ExistingWebApplicationScopes</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/104)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet.context;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EventListener;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import jakarta.servlet.Filter;
+&nbsp;import jakarta.servlet.Servlet;
+&nbsp;import jakarta.servlet.ServletConfig;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.config.Scope;
+&nbsp;import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+&nbsp;import org.springframework.boot.WebApplicationType;
+&nbsp;import org.springframework.boot.availability.AvailabilityChangeEvent;
+&nbsp;import org.springframework.boot.availability.ReadinessState;
+&nbsp;import org.springframework.boot.web.context.ConfigurableWebServerApplicationContext;
+&nbsp;import org.springframework.boot.web.context.MissingWebServerFactoryBeanException;
+&nbsp;import org.springframework.boot.web.context.WebServerGracefulShutdownLifecycle;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.boot.web.servlet.FilterRegistrationBean;
+&nbsp;import org.springframework.boot.web.servlet.ServletContextInitializer;
+&nbsp;import org.springframework.boot.web.servlet.ServletContextInitializerBeans;
+&nbsp;import org.springframework.boot.web.servlet.ServletRegistrationBean;
+&nbsp;import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContextException;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.metrics.StartupStep;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.context.ContextLoaderListener;
+&nbsp;import org.springframework.web.context.ServletContextAware;
+&nbsp;import org.springframework.web.context.WebApplicationContext;
+&nbsp;import org.springframework.web.context.support.GenericWebApplicationContext;
+&nbsp;import org.springframework.web.context.support.ServletContextAwareProcessor;
+&nbsp;import org.springframework.web.context.support.ServletContextResource;
+&nbsp;import org.springframework.web.context.support.ServletContextScope;
+&nbsp;import org.springframework.web.context.support.WebApplicationContextUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link WebApplicationContext} that can be used to bootstrap itself from a contained
+&nbsp; * {@link ServletWebServerFactory} bean.
+&nbsp; * &lt;p&gt;
+&nbsp; * This context will create, initialize and run an {@link WebServer} by searching for a
+&nbsp; * single {@link ServletWebServerFactory} bean within the {@link ApplicationContext}
+&nbsp; * itself. The {@link ServletWebServerFactory} is free to use standard Spring concepts
+&nbsp; * (such as dependency injection, lifecycle callbacks and property placeholder variables).
+&nbsp; * &lt;p&gt;
+&nbsp; * In addition, any {@link Servlet} or {@link Filter} beans defined in the context will be
+&nbsp; * automatically registered with the web server. In the case of a single Servlet bean, the
+&nbsp; * &#39;/&#39; mapping will be used. If multiple Servlet beans are found then the lowercase bean
+&nbsp; * name will be used as a mapping prefix. Any Servlet named &#39;dispatcherServlet&#39; will
+&nbsp; * always be mapped to &#39;/&#39;. Filter beans will be mapped to all URLs (&#39;/*&#39;).
+&nbsp; * &lt;p&gt;
+&nbsp; * For more advanced configuration, the context can instead define beans that implement
+&nbsp; * the {@link ServletContextInitializer} interface (most often
+&nbsp; * {@link ServletRegistrationBean}s and/or {@link FilterRegistrationBean}s). To prevent
+&nbsp; * double registration, the use of {@link ServletContextInitializer} beans will disable
+&nbsp; * automatic Servlet and Filter bean registration.
+&nbsp; * &lt;p&gt;
+&nbsp; * Although this context can be used directly, most developers should consider using the
+&nbsp; * {@link AnnotationConfigServletWebServerApplicationContext} or
+&nbsp; * {@link XmlServletWebServerApplicationContext} variants.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.0.0
+&nbsp; * @see AnnotationConfigServletWebServerApplicationContext
+&nbsp; * @see XmlServletWebServerApplicationContext
+&nbsp; * @see ServletWebServerFactory
+&nbsp; */
+&nbsp;public class ServletWebServerApplicationContext extends GenericWebApplicationContext
+&nbsp;		implements ConfigurableWebServerApplicationContext {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ServletWebServerApplicationContext.class);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Constant value for the DispatcherServlet bean name. A Servlet bean with this name
+&nbsp;	 * is deemed to be the &quot;main&quot; servlet and is automatically given a mapping of &quot;/&quot; by
+&nbsp;	 * default. To change the default behavior you can use a
+&nbsp;	 * {@link ServletRegistrationBean} or a different bean name.
+&nbsp;	 */
+&nbsp;	public static final String DISPATCHER_SERVLET_NAME = &quot;dispatcherServlet&quot;;
+&nbsp;
+&nbsp;	private volatile WebServer webServer;
+&nbsp;
+&nbsp;	private ServletConfig servletConfig;
+&nbsp;
+&nbsp;	private String serverNamespace;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ServletWebServerApplicationContext}.
+&nbsp;	 */
+<b class="nc">&nbsp;	public ServletWebServerApplicationContext() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ServletWebServerApplicationContext} with the given
+&nbsp;	 * {@code DefaultListableBeanFactory}.
+&nbsp;	 * @param beanFactory the DefaultListableBeanFactory instance to use for this context
+&nbsp;	 */
+&nbsp;	public ServletWebServerApplicationContext(DefaultListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;		super(beanFactory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register ServletContextAwareProcessor.
+&nbsp;	 * @see ServletContextAwareProcessor
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;		beanFactory.addBeanPostProcessor(new WebApplicationContextServletContextAwareProcessor(this));</b>
+<b class="nc">&nbsp;		beanFactory.ignoreDependencyInterface(ServletContextAware.class);</b>
+<b class="nc">&nbsp;		registerWebApplicationScopes();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final void refresh() throws BeansException, IllegalStateException {
+&nbsp;		try {
+<b class="nc">&nbsp;			super.refresh();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			WebServer webServer = this.webServer;</b>
+<b class="nc">&nbsp;			if (webServer != null) {</b>
+<b class="nc">&nbsp;				webServer.stop();</b>
+<b class="nc">&nbsp;				webServer.destroy();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw ex;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void onRefresh() {
+<b class="nc">&nbsp;		super.onRefresh();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			createWebServer();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			throw new ApplicationContextException(&quot;Unable to start web server&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void doClose() {
+<b class="nc">&nbsp;		if (isActive()) {</b>
+<b class="nc">&nbsp;			AvailabilityChangeEvent.publish(this, ReadinessState.REFUSING_TRAFFIC);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		super.doClose();</b>
+<b class="nc">&nbsp;		WebServer webServer = this.webServer;</b>
+<b class="nc">&nbsp;		if (webServer != null) {</b>
+<b class="nc">&nbsp;			webServer.destroy();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createWebServer() {
+<b class="nc">&nbsp;		WebServer webServer = this.webServer;</b>
+<b class="nc">&nbsp;		ServletContext servletContext = getServletContext();</b>
+<b class="nc">&nbsp;		if (webServer == null &amp;&amp; servletContext == null) {</b>
+<b class="nc">&nbsp;			StartupStep createWebServer = getApplicationStartup().start(&quot;spring.boot.webserver.create&quot;);</b>
+<b class="nc">&nbsp;			ServletWebServerFactory factory = getWebServerFactory();</b>
+<b class="nc">&nbsp;			createWebServer.tag(&quot;factory&quot;, factory.getClass().toString());</b>
+<b class="nc">&nbsp;			this.webServer = factory.getWebServer(getSelfInitializer());</b>
+<b class="nc">&nbsp;			createWebServer.end();</b>
+<b class="nc">&nbsp;			getBeanFactory().registerSingleton(&quot;webServerGracefulShutdown&quot;,</b>
+&nbsp;					new WebServerGracefulShutdownLifecycle(this.webServer));
+<b class="nc">&nbsp;			getBeanFactory().registerSingleton(&quot;webServerStartStop&quot;,</b>
+&nbsp;					new WebServerStartStopLifecycle(this, this.webServer));
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		else if (servletContext != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				getSelfInitializer().onStartup(servletContext);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ServletException ex) {</b>
+<b class="nc">&nbsp;				throw new ApplicationContextException(&quot;Cannot initialize servlet context&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		initPropertySources();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link ServletWebServerFactory} that should be used to create the
+&nbsp;	 * embedded {@link WebServer}. By default this method searches for a suitable bean in
+&nbsp;	 * the context itself.
+&nbsp;	 * @return a {@link ServletWebServerFactory} (never {@code null})
+&nbsp;	 */
+&nbsp;	protected ServletWebServerFactory getWebServerFactory() {
+&nbsp;		// Use bean names so that we don&#39;t consider the hierarchy
+<b class="nc">&nbsp;		String[] beanNames = getBeanFactory().getBeanNamesForType(ServletWebServerFactory.class);</b>
+<b class="nc">&nbsp;		if (beanNames.length == 0) {</b>
+<b class="nc">&nbsp;			throw new MissingWebServerFactoryBeanException(getClass(), ServletWebServerFactory.class,</b>
+&nbsp;					WebApplicationType.SERVLET);
+&nbsp;		}
+<b class="nc">&nbsp;		if (beanNames.length &gt; 1) {</b>
+<b class="nc">&nbsp;			throw new ApplicationContextException(&quot;Unable to start ServletWebServerApplicationContext due to multiple &quot;</b>
+<b class="nc">&nbsp;					+ &quot;ServletWebServerFactory beans : &quot; + StringUtils.arrayToCommaDelimitedString(beanNames));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getBeanFactory().getBean(beanNames[0], ServletWebServerFactory.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link ServletContextInitializer} that will be used to complete the
+&nbsp;	 * setup of this {@link WebApplicationContext}.
+&nbsp;	 * @return the self initializer
+&nbsp;	 * @see #prepareWebApplicationContext(ServletContext)
+&nbsp;	 */
+&nbsp;	private org.springframework.boot.web.servlet.ServletContextInitializer getSelfInitializer() {
+<b class="nc">&nbsp;		return this::selfInitialize;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void selfInitialize(ServletContext servletContext) throws ServletException {
+<b class="nc">&nbsp;		prepareWebApplicationContext(servletContext);</b>
+<b class="nc">&nbsp;		registerApplicationScope(servletContext);</b>
+<b class="nc">&nbsp;		WebApplicationContextUtils.registerEnvironmentBeans(getBeanFactory(), servletContext);</b>
+<b class="nc">&nbsp;		for (ServletContextInitializer beans : getServletContextInitializerBeans()) {</b>
+<b class="nc">&nbsp;			beans.onStartup(servletContext);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerApplicationScope(ServletContext servletContext) {
+<b class="nc">&nbsp;		ServletContextScope appScope = new ServletContextScope(servletContext);</b>
+<b class="nc">&nbsp;		getBeanFactory().registerScope(WebApplicationContext.SCOPE_APPLICATION, appScope);</b>
+&nbsp;		// Register as ServletContext attribute, for ContextCleanupListener to detect it.
+<b class="nc">&nbsp;		servletContext.setAttribute(ServletContextScope.class.getName(), appScope);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerWebApplicationScopes() {
+<b class="nc">&nbsp;		ExistingWebApplicationScopes existingScopes = new ExistingWebApplicationScopes(getBeanFactory());</b>
+<b class="nc">&nbsp;		WebApplicationContextUtils.registerWebApplicationScopes(getBeanFactory());</b>
+<b class="nc">&nbsp;		existingScopes.restore();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns {@link ServletContextInitializer}s that should be used with the embedded
+&nbsp;	 * web server. By default this method will first attempt to find
+&nbsp;	 * {@link ServletContextInitializer}, {@link Servlet}, {@link Filter} and certain
+&nbsp;	 * {@link EventListener} beans.
+&nbsp;	 * @return the servlet initializer beans
+&nbsp;	 */
+&nbsp;	protected Collection&lt;ServletContextInitializer&gt; getServletContextInitializerBeans() {
+<b class="nc">&nbsp;		return new ServletContextInitializerBeans(getBeanFactory());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Prepare the {@link WebApplicationContext} with the given fully loaded
+&nbsp;	 * {@link ServletContext}. This method is usually called from
+&nbsp;	 * {@link ServletContextInitializer#onStartup(ServletContext)} and is similar to the
+&nbsp;	 * functionality usually provided by a {@link ContextLoaderListener}.
+&nbsp;	 * @param servletContext the operational servlet context
+&nbsp;	 */
+&nbsp;	protected void prepareWebApplicationContext(ServletContext servletContext) {
+<b class="nc">&nbsp;		Object rootContext = servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);</b>
+<b class="nc">&nbsp;		if (rootContext != null) {</b>
+<b class="nc">&nbsp;			if (rootContext == this) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(</b>
+&nbsp;						&quot;Cannot initialize context because there is already a root application context present - &quot;
+&nbsp;								+ &quot;check whether you have multiple ServletContextInitializers!&quot;);
+&nbsp;			}
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		servletContext.log(&quot;Initializing Spring embedded WebApplicationContext&quot;);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this);</b>
+<b class="nc">&nbsp;			if (logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;				logger.debug(&quot;Published root WebApplicationContext as ServletContext attribute with name [&quot;</b>
+&nbsp;						+ WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE + &quot;]&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			setServletContext(servletContext);</b>
+<b class="nc">&nbsp;			if (logger.isInfoEnabled()) {</b>
+<b class="nc">&nbsp;				long elapsedTime = System.currentTimeMillis() - getStartupDate();</b>
+<b class="nc">&nbsp;				logger.info(&quot;Root WebApplicationContext: initialization completed in &quot; + elapsedTime + &quot; ms&quot;);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException | Error ex) {</b>
+<b class="nc">&nbsp;			logger.error(&quot;Context initialization failed&quot;, ex);</b>
+<b class="nc">&nbsp;			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, ex);</b>
+<b class="nc">&nbsp;			throw ex;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Resource getResourceByPath(String path) {
+<b class="nc">&nbsp;		if (getServletContext() == null) {</b>
+<b class="nc">&nbsp;			return new ClassPathContextResource(path, getClassLoader());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ServletContextResource(getServletContext(), path);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getServerNamespace() {
+<b class="nc">&nbsp;		return this.serverNamespace;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setServerNamespace(String serverNamespace) {
+<b class="nc">&nbsp;		this.serverNamespace = serverNamespace;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setServletConfig(ServletConfig servletConfig) {
+<b class="nc">&nbsp;		this.servletConfig = servletConfig;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ServletConfig getServletConfig() {
+<b class="nc">&nbsp;		return this.servletConfig;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link WebServer} that was created by the context or {@code null} if
+&nbsp;	 * the server has not yet been created.
+&nbsp;	 * @return the embedded web server
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public WebServer getWebServer() {
+<b class="nc">&nbsp;		return this.webServer;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility class to store and restore any user defined scopes. This allows scopes to
+&nbsp;	 * be registered in an ApplicationContextInitializer in the same way as they would in
+&nbsp;	 * a classic non-embedded web application context.
+&nbsp;	 */
+&nbsp;	public static class ExistingWebApplicationScopes {
+&nbsp;
+&nbsp;		private static final Set&lt;String&gt; SCOPES;
+&nbsp;
+&nbsp;		static {
+<b class="nc">&nbsp;			Set&lt;String&gt; scopes = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			scopes.add(WebApplicationContext.SCOPE_REQUEST);</b>
+<b class="nc">&nbsp;			scopes.add(WebApplicationContext.SCOPE_SESSION);</b>
+<b class="nc">&nbsp;			SCOPES = Collections.unmodifiableSet(scopes);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private final ConfigurableListableBeanFactory beanFactory;
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, Scope&gt; scopes = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		public ExistingWebApplicationScopes(ConfigurableListableBeanFactory beanFactory) {</b>
+<b class="nc">&nbsp;			this.beanFactory = beanFactory;</b>
+<b class="nc">&nbsp;			for (String scopeName : SCOPES) {</b>
+<b class="nc">&nbsp;				Scope scope = beanFactory.getRegisteredScope(scopeName);</b>
+<b class="nc">&nbsp;				if (scope != null) {</b>
+<b class="nc">&nbsp;					this.scopes.put(scopeName, scope);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void restore() {
+<b class="nc">&nbsp;			this.scopes.forEach((key, value) -&gt; {</b>
+<b class="nc">&nbsp;				if (logger.isInfoEnabled()) {</b>
+<b class="nc">&nbsp;					logger.info(&quot;Restoring user defined scope &quot; + key);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				this.beanFactory.registerScope(key, value);</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MavenBuildOutputTimestamp</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: MavenBuildOutputTimestamp (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MavenBuildOutputTimestamp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.nio.file.attribute.FileTime;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.OffsetDateTime;
+&nbsp;import java.time.ZoneOffset;
+&nbsp;import java.time.format.DateTimeParseException;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Parse output timestamp configured for Reproducible Builds&#39; archive entries.
+&nbsp; * &lt;p&gt;
+&nbsp; * Either as {@link java.time.format.DateTimeFormatter#ISO_OFFSET_DATE_TIME} or as a
+&nbsp; * number representing seconds since the epoch (like &lt;a href=
+&nbsp; * &quot;https://reproducible-builds.org/docs/source-date-epoch/&quot;&gt;SOURCE_DATE_EPOCH&lt;/a&gt;).
+&nbsp; * Implementation inspired by &lt;a href=
+&nbsp; * &quot;https://github.com/apache/maven-archiver/blob/cc2f6a219f6563f450b0c00e8ccd651520b67406/src/main/java/org/apache/maven/archiver/MavenArchiver.java#L768&quot;&gt;MavenArchiver&lt;/a&gt;.
+&nbsp; *
+&nbsp; * @author Niels Basjes
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;class MavenBuildOutputTimestamp {
+&nbsp;
+<b class="nc">&nbsp;	private static final Instant DATE_MIN = Instant.parse(&quot;1980-01-01T00:00:02Z&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Instant DATE_MAX = Instant.parse(&quot;2099-12-31T23:59:59Z&quot;);</b>
+&nbsp;
+&nbsp;	private final String timestamp;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@link MavenBuildOutputTimestamp}.
+&nbsp;	 * @param timestamp timestamp or {@code null}
+&nbsp;	 */
+<b class="nc">&nbsp;	MavenBuildOutputTimestamp(String timestamp) {</b>
+<b class="nc">&nbsp;		this.timestamp = timestamp;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the parsed timestamp as an {@code FileTime}.
+&nbsp;	 * @return the parsed timestamp as an {@code FileTime}, or {@code null}
+&nbsp;	 * @throws IllegalArgumentException if the outputTimestamp is neither ISO 8601 nor an
+&nbsp;	 * integer, or it&#39;s not within the valid range 1980-01-01T00:00:02Z to
+&nbsp;	 * 2099-12-31T23:59:59Z
+&nbsp;	 */
+&nbsp;	FileTime toFileTime() {
+<b class="nc">&nbsp;		Instant instant = toInstant();</b>
+<b class="nc">&nbsp;		if (instant == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return FileTime.from(instant);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the parsed timestamp as an {@code Instant}.
+&nbsp;	 * @return the parsed timestamp as an {@code Instant}, or {@code null}
+&nbsp;	 * @throws IllegalArgumentException if the outputTimestamp is neither ISO 8601 nor an
+&nbsp;	 * integer, or it&#39;s not within the valid range 1980-01-01T00:00:02Z to
+&nbsp;	 * 2099-12-31T23:59:59Z
+&nbsp;	 */
+&nbsp;	Instant toInstant() {
+<b class="nc">&nbsp;		if (!StringUtils.hasLength(this.timestamp)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (isNumeric(this.timestamp)) {</b>
+<b class="nc">&nbsp;			return Instant.ofEpochSecond(Long.parseLong(this.timestamp));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.timestamp.length() &lt; 2) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			Instant instant = OffsetDateTime.parse(this.timestamp)</b>
+<b class="nc">&nbsp;				.withOffsetSameInstant(ZoneOffset.UTC)</b>
+<b class="nc">&nbsp;				.truncatedTo(ChronoUnit.SECONDS)</b>
+<b class="nc">&nbsp;				.toInstant();</b>
+<b class="nc">&nbsp;			if (instant.isBefore(DATE_MIN) || instant.isAfter(DATE_MAX)) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(String</b>
+<b class="nc">&nbsp;					.format(String.format(&quot;&#39;%s&#39; is not within the valid range %s to %s&quot;, instant, DATE_MIN, DATE_MAX)));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return instant;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (DateTimeParseException pe) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(String.format(&quot;Can&#39;t parse &#39;%s&#39; to instant&quot;, this.timestamp));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isNumeric(String str) {
+<b class="nc">&nbsp;		for (char c : str.toCharArray()) {</b>
+<b class="nc">&nbsp;			if (!Character.isDigit(c)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,392 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoConfigurationPackages</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoConfigurationPackages (org.springframework.boot.autoconfigure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoConfigurationPackages</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoConfigurationPackages$BasePackages</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoConfigurationPackages$PackageImports</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoConfigurationPackages$Registrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.ConstructorArgumentValues;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.RootBeanDefinition;
+&nbsp;import org.springframework.boot.context.annotation.DeterminableImports;
+&nbsp;import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+&nbsp;import org.springframework.core.annotation.AnnotationAttributes;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class for storing auto-configuration packages for reference later (e.g. by JPA entity
+&nbsp; * scanner).
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Oliver Gierke
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AutoConfigurationPackages {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(AutoConfigurationPackages.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final String BEAN = AutoConfigurationPackages.class.getName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine if the auto-configuration base packages for the given bean factory are
+&nbsp;	 * available.
+&nbsp;	 * @param beanFactory the source bean factory
+&nbsp;	 * @return true if there are auto-config packages available
+&nbsp;	 */
+&nbsp;	public static boolean has(BeanFactory beanFactory) {
+<b class="nc">&nbsp;		return beanFactory.containsBean(BEAN) &amp;&amp; !get(beanFactory).isEmpty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the auto-configuration base packages for the given bean factory.
+&nbsp;	 * @param beanFactory the source bean factory
+&nbsp;	 * @return a list of auto-configuration packages
+&nbsp;	 * @throws IllegalStateException if auto-configuration is not enabled
+&nbsp;	 */
+&nbsp;	public static List&lt;String&gt; get(BeanFactory beanFactory) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return beanFactory.getBean(BEAN, BasePackages.class).get();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to retrieve @EnableAutoConfiguration base packages&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Programmatically registers the auto-configuration package names. Subsequent
+&nbsp;	 * invocations will add the given package names to those that have already been
+&nbsp;	 * registered. You can use this method to manually define the base packages that will
+&nbsp;	 * be used for a given {@link BeanDefinitionRegistry}. Generally it&#39;s recommended that
+&nbsp;	 * you don&#39;t call this method directly, but instead rely on the default convention
+&nbsp;	 * where the package name is set from your {@code @EnableAutoConfiguration}
+&nbsp;	 * configuration class or classes.
+&nbsp;	 * @param registry the bean definition registry
+&nbsp;	 * @param packageNames the package names to set
+&nbsp;	 */
+&nbsp;	public static void register(BeanDefinitionRegistry registry, String... packageNames) {
+<b class="nc">&nbsp;		if (registry.containsBeanDefinition(BEAN)) {</b>
+<b class="nc">&nbsp;			addBasePackages(registry.getBeanDefinition(BEAN), packageNames);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			RootBeanDefinition beanDefinition = new RootBeanDefinition(BasePackages.class);</b>
+<b class="nc">&nbsp;			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);</b>
+<b class="nc">&nbsp;			addBasePackages(beanDefinition, packageNames);</b>
+<b class="nc">&nbsp;			registry.registerBeanDefinition(BEAN, beanDefinition);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void addBasePackages(BeanDefinition beanDefinition, String[] additionalBasePackages) {
+<b class="nc">&nbsp;		ConstructorArgumentValues constructorArgumentValues = beanDefinition.getConstructorArgumentValues();</b>
+<b class="nc">&nbsp;		if (constructorArgumentValues.hasIndexedArgumentValue(0)) {</b>
+<b class="nc">&nbsp;			String[] existingPackages = (String[]) constructorArgumentValues.getIndexedArgumentValue(0, String[].class)</b>
+<b class="nc">&nbsp;				.getValue();</b>
+<b class="nc">&nbsp;			constructorArgumentValues.addIndexedArgumentValue(0,</b>
+<b class="nc">&nbsp;					Stream.concat(Stream.of(existingPackages), Stream.of(additionalBasePackages))</b>
+<b class="nc">&nbsp;						.distinct()</b>
+<b class="nc">&nbsp;						.toArray(String[]::new));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			constructorArgumentValues.addIndexedArgumentValue(0, additionalBasePackages);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ImportBeanDefinitionRegistrar} to store the base package from the importing
+&nbsp;	 * configuration.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImports {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;			register(registry, new PackageImports(metadata).getPackageNames().toArray(new String[0]));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Set&lt;Object&gt; determineImports(AnnotationMetadata metadata) {
+<b class="nc">&nbsp;			return Collections.singleton(new PackageImports(metadata));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Wrapper for a package import.
+&nbsp;	 */
+&nbsp;	private static final class PackageImports {
+&nbsp;
+&nbsp;		private final List&lt;String&gt; packageNames;
+&nbsp;
+<b class="nc">&nbsp;		PackageImports(AnnotationMetadata metadata) {</b>
+<b class="nc">&nbsp;			AnnotationAttributes attributes = AnnotationAttributes</b>
+<b class="nc">&nbsp;				.fromMap(metadata.getAnnotationAttributes(AutoConfigurationPackage.class.getName(), false));</b>
+<b class="nc">&nbsp;			List&lt;String&gt; packageNames = new ArrayList&lt;&gt;(Arrays.asList(attributes.getStringArray(&quot;basePackages&quot;)));</b>
+<b class="nc">&nbsp;			for (Class&lt;?&gt; basePackageClass : attributes.getClassArray(&quot;basePackageClasses&quot;)) {</b>
+<b class="nc">&nbsp;				packageNames.add(basePackageClass.getPackage().getName());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (packageNames.isEmpty()) {</b>
+<b class="nc">&nbsp;				packageNames.add(ClassUtils.getPackageName(metadata.getClassName()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.packageNames = Collections.unmodifiableList(packageNames);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		List&lt;String&gt; getPackageNames() {
+<b class="nc">&nbsp;			return this.packageNames;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean equals(Object obj) {
+<b class="nc">&nbsp;			if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.packageNames.equals(((PackageImports) obj).packageNames);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int hashCode() {
+<b class="nc">&nbsp;			return this.packageNames.hashCode();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return &quot;Package Imports &quot; + this.packageNames;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Holder for the base package (name may be null to indicate no scanning).
+&nbsp;	 */
+&nbsp;	static final class BasePackages {
+&nbsp;
+&nbsp;		private final List&lt;String&gt; packages;
+&nbsp;
+&nbsp;		private boolean loggedBasePackageInfo;
+&nbsp;
+<b class="nc">&nbsp;		BasePackages(String... names) {</b>
+<b class="nc">&nbsp;			List&lt;String&gt; packages = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (String name : names) {</b>
+<b class="nc">&nbsp;				if (StringUtils.hasText(name)) {</b>
+<b class="nc">&nbsp;					packages.add(name);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			this.packages = packages;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		List&lt;String&gt; get() {
+<b class="nc">&nbsp;			if (!this.loggedBasePackageInfo) {</b>
+<b class="nc">&nbsp;				if (this.packages.isEmpty()) {</b>
+<b class="nc">&nbsp;					if (logger.isWarnEnabled()) {</b>
+<b class="nc">&nbsp;						logger.warn(&quot;@EnableAutoConfiguration was declared on a class &quot;</b>
+&nbsp;								+ &quot;in the default package. Automatic @Repository and &quot;
+&nbsp;								+ &quot;@Entity scanning is not enabled.&quot;);
+&nbsp;					}
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					if (logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;						String packageNames = StringUtils.collectionToCommaDelimitedString(this.packages);</b>
+<b class="nc">&nbsp;						logger.debug(&quot;@EnableAutoConfiguration was declared on a class in the package &#39;&quot; + packageNames</b>
+&nbsp;								+ &quot;&#39;. Automatic @Repository and @Entity scanning is enabled.&quot;);
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				this.loggedBasePackageInfo = true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.packages;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

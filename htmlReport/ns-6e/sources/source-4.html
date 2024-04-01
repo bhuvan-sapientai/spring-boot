@@ -1,0 +1,278 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ManagementContextConfigurationImportSelector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.web.server</a>
+</div>
+
+<h1>Coverage Summary for Class: ManagementContextConfigurationImportSelector (org.springframework.boot.actuate.autoconfigure.web.server)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ManagementContextConfigurationImportSelector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ManagementContextConfigurationImportSelector$ManagementConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.web.server;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanClassLoaderAware;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.ManagementContextType;
+&nbsp;import org.springframework.boot.context.annotation.ImportCandidates;
+&nbsp;import org.springframework.context.annotation.DeferredImportSelector;
+&nbsp;import org.springframework.core.OrderComparator;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.core.type.classreading.MetadataReader;
+&nbsp;import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Selects configuration classes for the management context configuration. Entries are
+&nbsp; * loaded from
+&nbsp; * {@code /META-INF/spring/org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration.imports}.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Scott Frederick
+&nbsp; * @see ManagementContextConfiguration
+&nbsp; * @see ImportCandidates
+&nbsp; */
+&nbsp;@Order(Ordered.LOWEST_PRECEDENCE)
+<b class="nc">&nbsp;class ManagementContextConfigurationImportSelector implements DeferredImportSelector, BeanClassLoaderAware {</b>
+&nbsp;
+&nbsp;	private ClassLoader classLoader;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String[] selectImports(AnnotationMetadata metadata) {
+<b class="nc">&nbsp;		ManagementContextType contextType = (ManagementContextType) metadata</b>
+<b class="nc">&nbsp;			.getAnnotationAttributes(EnableManagementContext.class.getName())</b>
+<b class="nc">&nbsp;			.get(&quot;value&quot;);</b>
+&nbsp;		// Find all management context configuration classes, filtering duplicates
+<b class="nc">&nbsp;		List&lt;ManagementConfiguration&gt; configurations = getConfigurations();</b>
+<b class="nc">&nbsp;		OrderComparator.sort(configurations);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; names = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (ManagementConfiguration configuration : configurations) {</b>
+<b class="nc">&nbsp;			if (configuration.getContextType() == ManagementContextType.ANY</b>
+<b class="nc">&nbsp;					|| configuration.getContextType() == contextType) {</b>
+<b class="nc">&nbsp;				names.add(configuration.getClassName());</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return StringUtils.toStringArray(names);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;ManagementConfiguration&gt; getConfigurations() {
+<b class="nc">&nbsp;		SimpleMetadataReaderFactory readerFactory = new SimpleMetadataReaderFactory(this.classLoader);</b>
+<b class="nc">&nbsp;		List&lt;ManagementConfiguration&gt; configurations = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String className : loadFactoryNames()) {</b>
+<b class="nc">&nbsp;			addConfiguration(readerFactory, configurations, className);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return configurations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addConfiguration(SimpleMetadataReaderFactory readerFactory,
+&nbsp;			List&lt;ManagementConfiguration&gt; configurations, String className) {
+&nbsp;		try {
+<b class="nc">&nbsp;			MetadataReader metadataReader = readerFactory.getMetadataReader(className);</b>
+<b class="nc">&nbsp;			configurations.add(new ManagementConfiguration(metadataReader));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(&quot;Failed to read annotation metadata for &#39;&quot; + className + &quot;&#39;&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected List&lt;String&gt; loadFactoryNames() {
+<b class="nc">&nbsp;		return ImportCandidates.load(ManagementContextConfiguration.class, this.classLoader).getCandidates();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		this.classLoader = classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A management configuration class which can be sorted according to {@code @Order}.
+&nbsp;	 */
+&nbsp;	private static final class ManagementConfiguration implements Ordered {
+&nbsp;
+&nbsp;		private final String className;
+&nbsp;
+&nbsp;		private final int order;
+&nbsp;
+&nbsp;		private final ManagementContextType contextType;
+&nbsp;
+<b class="nc">&nbsp;		ManagementConfiguration(MetadataReader metadataReader) {</b>
+<b class="nc">&nbsp;			AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();</b>
+<b class="nc">&nbsp;			this.order = readOrder(annotationMetadata);</b>
+<b class="nc">&nbsp;			this.className = metadataReader.getClassMetadata().getClassName();</b>
+<b class="nc">&nbsp;			this.contextType = readContextType(annotationMetadata);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ManagementContextType readContextType(AnnotationMetadata annotationMetadata) {
+<b class="nc">&nbsp;			Map&lt;String, Object&gt; annotationAttributes = annotationMetadata</b>
+<b class="nc">&nbsp;				.getAnnotationAttributes(ManagementContextConfiguration.class.getName());</b>
+<b class="nc">&nbsp;			return (annotationAttributes != null) ? (ManagementContextType) annotationAttributes.get(&quot;value&quot;)</b>
+<b class="nc">&nbsp;					: ManagementContextType.ANY;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int readOrder(AnnotationMetadata annotationMetadata) {
+<b class="nc">&nbsp;			Map&lt;String, Object&gt; attributes = annotationMetadata.getAnnotationAttributes(Order.class.getName());</b>
+<b class="nc">&nbsp;			Integer order = (attributes != null) ? (Integer) attributes.get(&quot;value&quot;) : null;</b>
+<b class="nc">&nbsp;			return (order != null) ? order : Ordered.LOWEST_PRECEDENCE;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getClassName() {
+<b class="nc">&nbsp;			return this.className;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getOrder() {
+<b class="nc">&nbsp;			return this.order;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ManagementContextType getContextType() {
+<b class="nc">&nbsp;			return this.contextType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

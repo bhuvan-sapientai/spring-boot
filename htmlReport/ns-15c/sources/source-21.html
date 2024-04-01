@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InactiveConfigDataAccessException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.config</a>
+</div>
+
+<h1>Coverage Summary for Class: InactiveConfigDataAccessException (org.springframework.boot.context.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InactiveConfigDataAccessException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (3/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.2%
+  </span>
+  <span class="absValue">
+    (25/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.config;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;
+&nbsp;/**
+&nbsp; * Exception thrown when an attempt is made to resolve a property against an inactive
+&nbsp; * {@link ConfigData} property source. Used to ensure that a user doesn&#39;t accidentally
+&nbsp; * attempt to specify a properties that can never be resolved.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.4.0
+&nbsp; */
+&nbsp;public class InactiveConfigDataAccessException extends ConfigDataException {
+&nbsp;
+&nbsp;	private final PropertySource&lt;?&gt; propertySource;
+&nbsp;
+&nbsp;	private final ConfigDataResource location;
+&nbsp;
+&nbsp;	private final String propertyName;
+&nbsp;
+&nbsp;	private final Origin origin;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link InactiveConfigDataAccessException} instance.
+&nbsp;	 * @param propertySource the inactive property source
+&nbsp;	 * @param location the {@link ConfigDataResource} of the property source or
+&nbsp;	 * {@code null} if the source was not loaded from {@link ConfigData}.
+&nbsp;	 * @param propertyName the name of the property
+&nbsp;	 * @param origin the origin or the property or {@code null}
+&nbsp;	 */
+&nbsp;	InactiveConfigDataAccessException(PropertySource&lt;?&gt; propertySource, ConfigDataResource location,
+&nbsp;			String propertyName, Origin origin) {
+<b class="fc">&nbsp;		super(getMessage(propertySource, location, propertyName, origin), null);</b>
+<b class="fc">&nbsp;		this.propertySource = propertySource;</b>
+<b class="fc">&nbsp;		this.location = location;</b>
+<b class="fc">&nbsp;		this.propertyName = propertyName;</b>
+<b class="fc">&nbsp;		this.origin = origin;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getMessage(PropertySource&lt;?&gt; propertySource, ConfigDataResource location, String propertyName,
+&nbsp;			Origin origin) {
+<b class="fc">&nbsp;		StringBuilder message = new StringBuilder(&quot;Inactive property source &#39;&quot;);</b>
+<b class="fc">&nbsp;		message.append(propertySource.getName());</b>
+<b class="fc">&nbsp;		if (location != null) {</b>
+<b class="fc">&nbsp;			message.append(&quot;&#39; imported from location &#39;&quot;);</b>
+<b class="fc">&nbsp;			message.append(location);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		message.append(&quot;&#39; cannot contain property &#39;&quot;);</b>
+<b class="fc">&nbsp;		message.append(propertyName);</b>
+<b class="fc">&nbsp;		message.append(&quot;&#39;&quot;);</b>
+<b class="fc">&nbsp;		if (origin != null) {</b>
+<b class="fc">&nbsp;			message.append(&quot; [origin: &quot;);</b>
+<b class="fc">&nbsp;			message.append(origin);</b>
+<b class="fc">&nbsp;			message.append(&quot;]&quot;);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return message.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the inactive property source that contained the property.
+&nbsp;	 * @return the property source
+&nbsp;	 */
+&nbsp;	public PropertySource&lt;?&gt; getPropertySource() {
+<b class="nc">&nbsp;		return this.propertySource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link ConfigDataResource} of the property source or {@code null} if the
+&nbsp;	 * source was not loaded from {@link ConfigData}.
+&nbsp;	 * @return the config data location or {@code null}
+&nbsp;	 */
+&nbsp;	public ConfigDataResource getLocation() {
+<b class="nc">&nbsp;		return this.location;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of the property.
+&nbsp;	 * @return the property name
+&nbsp;	 */
+&nbsp;	public String getPropertyName() {
+<b class="nc">&nbsp;		return this.propertyName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the origin or the property or {@code null}.
+&nbsp;	 * @return the property origin
+&nbsp;	 */
+&nbsp;	public Origin getOrigin() {
+<b class="nc">&nbsp;		return this.origin;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Throw an {@link InactiveConfigDataAccessException} if the given
+&nbsp;	 * {@link ConfigDataEnvironmentContributor} contains the property.
+&nbsp;	 * @param contributor the contributor to check
+&nbsp;	 * @param name the name to check
+&nbsp;	 */
+&nbsp;	static void throwIfPropertyFound(ConfigDataEnvironmentContributor contributor, ConfigurationPropertyName name) {
+<b class="fc">&nbsp;		ConfigurationPropertySource source = contributor.getConfigurationPropertySource();</b>
+<b class="fc">&nbsp;		ConfigurationProperty property = (source != null) ? source.getConfigurationProperty(name) : null;</b>
+<b class="fc">&nbsp;		if (property != null) {</b>
+<b class="fc">&nbsp;			PropertySource&lt;?&gt; propertySource = contributor.getPropertySource();</b>
+<b class="fc">&nbsp;			ConfigDataResource location = contributor.getResource();</b>
+<b class="fc">&nbsp;			throw new InactiveConfigDataAccessException(propertySource, location, name.toString(),</b>
+<b class="fc">&nbsp;					property.getOrigin());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

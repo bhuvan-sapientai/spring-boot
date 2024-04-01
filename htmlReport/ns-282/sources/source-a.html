@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringBootPlugin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.plugin</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringBootPlugin (org.springframework.boot.gradle.plugin)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringBootPlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.plugin;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.gradle.api.GradleException;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.util.GradleVersion;
+&nbsp;
+&nbsp;import org.springframework.boot.gradle.dsl.SpringBootExtension;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootBuildImage;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootJar;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootWar;
+&nbsp;import org.springframework.boot.gradle.util.VersionExtractor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Gradle plugin for Spring Boot.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Danny Hyun
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.2.7
+&nbsp; */
+<b class="nc">&nbsp;public class SpringBootPlugin implements Plugin&lt;Project&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final String SPRING_BOOT_VERSION = VersionExtractor.forClass(DependencyManagementPluginAction.class);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@link Configuration} that contains Spring Boot archives.
+&nbsp;	 * @since 2.0.0
+&nbsp;	 */
+&nbsp;	public static final String BOOT_ARCHIVES_CONFIGURATION_NAME = &quot;bootArchives&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the default {@link BootJar} task.
+&nbsp;	 * @since 2.0.0
+&nbsp;	 */
+&nbsp;	public static final String BOOT_JAR_TASK_NAME = &quot;bootJar&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the default {@link BootWar} task.
+&nbsp;	 * @since 2.0.0
+&nbsp;	 */
+&nbsp;	public static final String BOOT_WAR_TASK_NAME = &quot;bootWar&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the default {@link BootBuildImage} task.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	public static final String BOOT_BUILD_IMAGE_TASK_NAME = &quot;bootBuildImage&quot;;
+&nbsp;
+&nbsp;	static final String BOOT_RUN_TASK_NAME = &quot;bootRun&quot;;
+&nbsp;
+&nbsp;	static final String BOOT_TEST_RUN_TASK_NAME = &quot;bootTestRun&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@code developmentOnly} configuration.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	public static final String DEVELOPMENT_ONLY_CONFIGURATION_NAME = &quot;developmentOnly&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@code testAndDevelopmentOnly} configuration.
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public static final String TEST_AND_DEVELOPMENT_ONLY_CONFIGURATION_NAME = &quot;testAndDevelopmentOnly&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@code productionRuntimeClasspath} configuration.
+&nbsp;	 */
+&nbsp;	public static final String PRODUCTION_RUNTIME_CLASSPATH_CONFIGURATION_NAME = &quot;productionRuntimeClasspath&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@link ResolveMainClassName} task used to resolve a main class from
+&nbsp;	 * the output of the {@code main} source set.
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	public static final String RESOLVE_MAIN_CLASS_NAME_TASK_NAME = &quot;resolveMainClassName&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@link ResolveMainClassName} task used to resolve a main class from
+&nbsp;	 * the output of the {@code test} source set then, if needed, the output of the
+&nbsp;	 * {@code main} source set.
+&nbsp;	 * @since 3.1.0
+&nbsp;	 */
+&nbsp;	public static final String RESOLVE_TEST_MAIN_CLASS_NAME_TASK_NAME = &quot;resolveTestMainClassName&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The coordinates {@code (group:name:version)} of the
+&nbsp;	 * {@code spring-boot-dependencies} bom.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static final String BOM_COORDINATES = &quot;org.springframework.boot:spring-boot-dependencies:&quot;</b>
+&nbsp;			+ SPRING_BOOT_VERSION;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void apply(Project project) {
+<b class="nc">&nbsp;		verifyGradleVersion();</b>
+<b class="nc">&nbsp;		createExtension(project);</b>
+<b class="nc">&nbsp;		Configuration bootArchives = createBootArchivesConfiguration(project);</b>
+<b class="nc">&nbsp;		registerPluginActions(project, bootArchives);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void verifyGradleVersion() {
+<b class="nc">&nbsp;		GradleVersion currentVersion = GradleVersion.current();</b>
+<b class="nc">&nbsp;		if (currentVersion.compareTo(GradleVersion.version(&quot;7.4&quot;)) &lt; 0) {</b>
+<b class="nc">&nbsp;			throw new GradleException(&quot;Spring Boot plugin requires Gradle 7.x (7.4 or later). &quot;</b>
+&nbsp;					+ &quot;The current version is &quot; + currentVersion);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createExtension(Project project) {
+<b class="nc">&nbsp;		project.getExtensions().create(&quot;springBoot&quot;, SpringBootExtension.class, project);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Configuration createBootArchivesConfiguration(Project project) {
+<b class="nc">&nbsp;		Configuration bootArchives = project.getConfigurations().create(BOOT_ARCHIVES_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		bootArchives.setDescription(&quot;Configuration for Spring Boot archive artifacts.&quot;);</b>
+<b class="nc">&nbsp;		bootArchives.setCanBeResolved(false);</b>
+<b class="nc">&nbsp;		return bootArchives;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerPluginActions(Project project, Configuration bootArchives) {
+<b class="nc">&nbsp;		SinglePublishedArtifact singlePublishedArtifact = new SinglePublishedArtifact(bootArchives,</b>
+<b class="nc">&nbsp;				project.getArtifacts());</b>
+<b class="nc">&nbsp;		List&lt;PluginApplicationAction&gt; actions = Arrays.asList(new JavaPluginAction(singlePublishedArtifact),</b>
+&nbsp;				new WarPluginAction(singlePublishedArtifact), new DependencyManagementPluginAction(),
+&nbsp;				new ApplicationPluginAction(), new KotlinPluginAction(), new NativeImagePluginAction());
+<b class="nc">&nbsp;		for (PluginApplicationAction action : actions) {</b>
+<b class="nc">&nbsp;			withPluginClassOfAction(action,</b>
+<b class="nc">&nbsp;					(pluginClass) -&gt; project.getPlugins().withType(pluginClass, (plugin) -&gt; action.execute(project)));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void withPluginClassOfAction(PluginApplicationAction action,
+&nbsp;			Consumer&lt;Class&lt;? extends Plugin&lt;? extends Project&gt;&gt;&gt; consumer) {
+&nbsp;		Class&lt;? extends Plugin&lt;? extends Project&gt;&gt; pluginClass;
+&nbsp;		try {
+<b class="nc">&nbsp;			pluginClass = action.getPluginClass();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+&nbsp;			// Plugin class unavailable.
+&nbsp;			return;
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		consumer.accept(pluginClass);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

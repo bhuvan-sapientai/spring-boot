@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CommandCompleter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command.shell</a>
+</div>
+
+<h1>Coverage Summary for Class: CommandCompleter (org.springframework.boot.cli.command.shell)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CommandCompleter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CommandCompleter$OptionHelpLine</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command.shell;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import jline.console.ConsoleReader;
+&nbsp;import jline.console.completer.AggregateCompleter;
+&nbsp;import jline.console.completer.ArgumentCompleter;
+&nbsp;import jline.console.completer.ArgumentCompleter.ArgumentDelimiter;
+&nbsp;import jline.console.completer.Completer;
+&nbsp;import jline.console.completer.FileNameCompleter;
+&nbsp;import jline.console.completer.StringsCompleter;
+&nbsp;
+&nbsp;import org.springframework.boot.cli.command.Command;
+&nbsp;import org.springframework.boot.cli.command.options.OptionHelp;
+&nbsp;import org.springframework.boot.cli.util.Log;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * JLine {@link Completer} for Spring Boot {@link Command}s.
+&nbsp; *
+&nbsp; * @author Jon Brisbin
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class CommandCompleter extends StringsCompleter {
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, Completer&gt; commandCompleters = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;Command&gt; commands = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private final ConsoleReader console;
+&nbsp;
+&nbsp;	public CommandCompleter(ConsoleReader consoleReader, ArgumentDelimiter argumentDelimiter,
+<b class="nc">&nbsp;			Iterable&lt;Command&gt; commands) {</b>
+<b class="nc">&nbsp;		this.console = consoleReader;</b>
+<b class="nc">&nbsp;		List&lt;String&gt; names = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Command command : commands) {</b>
+<b class="nc">&nbsp;			this.commands.add(command);</b>
+<b class="nc">&nbsp;			names.add(command.getName());</b>
+<b class="nc">&nbsp;			List&lt;String&gt; options = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (OptionHelp optionHelp : command.getOptionsHelp()) {</b>
+<b class="nc">&nbsp;				options.addAll(optionHelp.getOptions());</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			AggregateCompleter argumentCompleters = new AggregateCompleter(new StringsCompleter(options),</b>
+&nbsp;					new FileNameCompleter());
+<b class="nc">&nbsp;			ArgumentCompleter argumentCompleter = new ArgumentCompleter(argumentDelimiter, argumentCompleters);</b>
+<b class="nc">&nbsp;			argumentCompleter.setStrict(false);</b>
+<b class="nc">&nbsp;			this.commandCompleters.put(command.getName(), argumentCompleter);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		getStrings().addAll(names);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int complete(String buffer, int cursor, List&lt;CharSequence&gt; candidates) {
+<b class="nc">&nbsp;		int completionIndex = super.complete(buffer, cursor, candidates);</b>
+<b class="nc">&nbsp;		int spaceIndex = buffer.indexOf(&#39; &#39;);</b>
+<b class="nc">&nbsp;		String commandName = ((spaceIndex != -1) ? buffer.substring(0, spaceIndex) : &quot;&quot;);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(commandName)) {</b>
+<b class="nc">&nbsp;			for (Command command : this.commands) {</b>
+<b class="nc">&nbsp;				if (command.getName().equals(commandName)) {</b>
+<b class="nc">&nbsp;					if (cursor == buffer.length() &amp;&amp; buffer.endsWith(&quot; &quot;)) {</b>
+<b class="nc">&nbsp;						printUsage(command);</b>
+<b class="nc">&nbsp;						break;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					Completer completer = this.commandCompleters.get(command.getName());</b>
+<b class="nc">&nbsp;					if (completer != null) {</b>
+<b class="nc">&nbsp;						completionIndex = completer.complete(buffer, cursor, candidates);</b>
+<b class="nc">&nbsp;						break;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return completionIndex;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void printUsage(Command command) {
+&nbsp;		try {
+<b class="nc">&nbsp;			int maxOptionsLength = 0;</b>
+<b class="nc">&nbsp;			List&lt;OptionHelpLine&gt; optionHelpLines = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (OptionHelp optionHelp : command.getOptionsHelp()) {</b>
+<b class="nc">&nbsp;				OptionHelpLine optionHelpLine = new OptionHelpLine(optionHelp);</b>
+<b class="nc">&nbsp;				optionHelpLines.add(optionHelpLine);</b>
+<b class="nc">&nbsp;				maxOptionsLength = Math.max(maxOptionsLength, optionHelpLine.getOptions().length());</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;
+<b class="nc">&nbsp;			this.console.println();</b>
+<b class="nc">&nbsp;			this.console.println(&quot;Usage:&quot;);</b>
+<b class="nc">&nbsp;			this.console.println(command.getName() + &quot; &quot; + command.getUsageHelp());</b>
+<b class="nc">&nbsp;			for (OptionHelpLine optionHelpLine : optionHelpLines) {</b>
+<b class="nc">&nbsp;				this.console.println(String.format(&quot;\t%&quot; + maxOptionsLength + &quot;s: %s&quot;, optionHelpLine.getOptions(),</b>
+<b class="nc">&nbsp;						optionHelpLine.getUsage()));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			this.console.drawLine();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			Log.error(ex.getMessage() + &quot; (&quot; + ex.getClass().getName() + &quot;)&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encapsulated options and usage help.
+&nbsp;	 */
+&nbsp;	private static class OptionHelpLine {
+&nbsp;
+&nbsp;		private final String options;
+&nbsp;
+&nbsp;		private final String usage;
+&nbsp;
+<b class="nc">&nbsp;		OptionHelpLine(OptionHelp optionHelp) {</b>
+<b class="nc">&nbsp;			this.options = String.join(&quot;, &quot;, optionHelp.getOptions());</b>
+<b class="nc">&nbsp;			this.usage = optionHelp.getUsageHelp();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getOptions() {
+<b class="nc">&nbsp;			return this.options;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getUsage() {
+<b class="nc">&nbsp;			return this.usage;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

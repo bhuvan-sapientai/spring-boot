@@ -1,0 +1,401 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CachingOperationInvoker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.invoker.cache</a>
+</div>
+
+<h1>Coverage Summary for Class: CachingOperationInvoker (org.springframework.boot.actuate.endpoint.invoker.cache)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CachingOperationInvoker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CachingOperationInvoker$CachedResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CachingOperationInvoker$CacheKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CachingOperationInvoker$ReactiveCachedResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/69)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.invoker.cache;
+&nbsp;
+&nbsp;import java.security.Principal;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import reactor.core.publisher.Flux;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.ApiVersion;
+&nbsp;import org.springframework.boot.actuate.endpoint.InvocationContext;
+&nbsp;import org.springframework.boot.actuate.endpoint.SecurityContext;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationInvoker;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationParameter;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationParameters;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebServerNamespace;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ConcurrentReferenceHashMap;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link OperationInvoker} that caches the response of an operation with a
+&nbsp; * configurable time to live.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Christoph Dreis
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class CachingOperationInvoker implements OperationInvoker {
+&nbsp;
+<b class="nc">&nbsp;	private static final boolean IS_REACTOR_PRESENT = ClassUtils.isPresent(&quot;reactor.core.publisher.Mono&quot;, null);</b>
+&nbsp;
+&nbsp;	private static final int CACHE_CLEANUP_THRESHOLD = 40;
+&nbsp;
+&nbsp;	private final OperationInvoker invoker;
+&nbsp;
+&nbsp;	private final long timeToLive;
+&nbsp;
+&nbsp;	private final Map&lt;CacheKey, CachedResponse&gt; cachedResponses;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new instance with the target {@link OperationInvoker} to use to compute
+&nbsp;	 * the response and the time to live for the cache.
+&nbsp;	 * @param invoker the {@link OperationInvoker} this instance wraps
+&nbsp;	 * @param timeToLive the maximum time in milliseconds that a response can be cached
+&nbsp;	 */
+<b class="nc">&nbsp;	CachingOperationInvoker(OperationInvoker invoker, long timeToLive) {</b>
+<b class="nc">&nbsp;		Assert.isTrue(timeToLive &gt; 0, &quot;TimeToLive must be strictly positive&quot;);</b>
+<b class="nc">&nbsp;		this.invoker = invoker;</b>
+<b class="nc">&nbsp;		this.timeToLive = timeToLive;</b>
+<b class="nc">&nbsp;		this.cachedResponses = new ConcurrentReferenceHashMap&lt;&gt;();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the maximum time in milliseconds that a response can be cached.
+&nbsp;	 * @return the time to live of a response
+&nbsp;	 */
+&nbsp;	public long getTimeToLive() {
+<b class="nc">&nbsp;		return this.timeToLive;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object invoke(InvocationContext context) {
+<b class="nc">&nbsp;		if (hasInput(context)) {</b>
+<b class="nc">&nbsp;			return this.invoker.invoke(context);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		long accessTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;		if (this.cachedResponses.size() &gt; CACHE_CLEANUP_THRESHOLD) {</b>
+<b class="nc">&nbsp;			cleanExpiredCachedResponses(accessTime);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		CacheKey cacheKey = getCacheKey(context);</b>
+<b class="nc">&nbsp;		CachedResponse cached = this.cachedResponses.get(cacheKey);</b>
+<b class="nc">&nbsp;		if (cached == null || cached.isStale(accessTime, this.timeToLive)) {</b>
+<b class="nc">&nbsp;			Object response = this.invoker.invoke(context);</b>
+<b class="nc">&nbsp;			cached = createCachedResponse(response, accessTime);</b>
+<b class="nc">&nbsp;			this.cachedResponses.put(cacheKey, cached);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return cached.getResponse();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CacheKey getCacheKey(InvocationContext context) {
+<b class="nc">&nbsp;		ApiVersion contextApiVersion = context.resolveArgument(ApiVersion.class);</b>
+<b class="nc">&nbsp;		Principal principal = context.resolveArgument(Principal.class);</b>
+<b class="nc">&nbsp;		WebServerNamespace serverNamespace = context.resolveArgument(WebServerNamespace.class);</b>
+<b class="nc">&nbsp;		return new CacheKey(contextApiVersion, principal, serverNamespace);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void cleanExpiredCachedResponses(long accessTime) {
+&nbsp;		try {
+<b class="nc">&nbsp;			this.cachedResponses.entrySet().removeIf((entry) -&gt; entry.getValue().isStale(accessTime, this.timeToLive));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasInput(InvocationContext context) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; arguments = context.getArguments();</b>
+<b class="nc">&nbsp;		if (!ObjectUtils.isEmpty(arguments)) {</b>
+<b class="nc">&nbsp;			return arguments.values().stream().anyMatch(Objects::nonNull);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CachedResponse createCachedResponse(Object response, long accessTime) {
+<b class="nc">&nbsp;		if (IS_REACTOR_PRESENT) {</b>
+<b class="nc">&nbsp;			return new ReactiveCachedResponse(response, accessTime, this.timeToLive);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new CachedResponse(response, accessTime);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static boolean isApplicable(OperationParameters parameters) {
+<b class="nc">&nbsp;		for (OperationParameter parameter : parameters) {</b>
+<b class="nc">&nbsp;			if (parameter.isMandatory() &amp;&amp; !CacheKey.containsType(parameter.getType())) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A cached response that encapsulates the response itself and the time at which it
+&nbsp;	 * was created.
+&nbsp;	 */
+&nbsp;	static class CachedResponse {
+&nbsp;
+&nbsp;		private final Object response;
+&nbsp;
+&nbsp;		private final long creationTime;
+&nbsp;
+<b class="nc">&nbsp;		CachedResponse(Object response, long creationTime) {</b>
+<b class="nc">&nbsp;			this.response = response;</b>
+<b class="nc">&nbsp;			this.creationTime = creationTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isStale(long accessTime, long timeToLive) {
+<b class="nc">&nbsp;			return (accessTime - this.creationTime) &gt;= timeToLive;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Object getResponse() {
+<b class="nc">&nbsp;			return this.response;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link CachedResponse} variant used when Reactor is present.
+&nbsp;	 */
+&nbsp;	static class ReactiveCachedResponse extends CachedResponse {
+&nbsp;
+&nbsp;		ReactiveCachedResponse(Object response, long creationTime, long timeToLive) {
+<b class="nc">&nbsp;			super(applyCaching(response, timeToLive), creationTime);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Object applyCaching(Object response, long timeToLive) {
+<b class="nc">&nbsp;			if (response instanceof Mono) {</b>
+<b class="nc">&nbsp;				return ((Mono&lt;?&gt;) response).cache(Duration.ofMillis(timeToLive));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (response instanceof Flux) {</b>
+<b class="nc">&nbsp;				return ((Flux&lt;?&gt;) response).cache(Duration.ofMillis(timeToLive));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return response;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class CacheKey {
+&nbsp;
+<b class="nc">&nbsp;		private static final Class&lt;?&gt;[] CACHEABLE_TYPES = new Class&lt;?&gt;[] { ApiVersion.class, SecurityContext.class,</b>
+&nbsp;				WebServerNamespace.class };
+&nbsp;
+&nbsp;		private final ApiVersion apiVersion;
+&nbsp;
+&nbsp;		private final Principal principal;
+&nbsp;
+&nbsp;		private final WebServerNamespace serverNamespace;
+&nbsp;
+<b class="nc">&nbsp;		private CacheKey(ApiVersion apiVersion, Principal principal, WebServerNamespace serverNamespace) {</b>
+<b class="nc">&nbsp;			this.principal = principal;</b>
+<b class="nc">&nbsp;			this.apiVersion = apiVersion;</b>
+<b class="nc">&nbsp;			this.serverNamespace = serverNamespace;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static boolean containsType(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			return Arrays.stream(CacheKey.CACHEABLE_TYPES).anyMatch((c) -&gt; c.isAssignableFrom(type));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean equals(Object obj) {
+<b class="nc">&nbsp;			if (this == obj) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			CacheKey other = (CacheKey) obj;</b>
+<b class="nc">&nbsp;			return this.apiVersion.equals(other.apiVersion)</b>
+<b class="nc">&nbsp;					&amp;&amp; ObjectUtils.nullSafeEquals(this.principal, other.principal)</b>
+<b class="nc">&nbsp;					&amp;&amp; ObjectUtils.nullSafeEquals(this.serverNamespace, other.serverNamespace);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int hashCode() {
+<b class="nc">&nbsp;			final int prime = 31;</b>
+<b class="nc">&nbsp;			int result = 1;</b>
+<b class="nc">&nbsp;			result = prime * result + this.apiVersion.hashCode();</b>
+<b class="nc">&nbsp;			result = prime * result + ObjectUtils.nullSafeHashCode(this.principal);</b>
+<b class="nc">&nbsp;			result = prime * result + ObjectUtils.nullSafeHashCode(this.serverNamespace);</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

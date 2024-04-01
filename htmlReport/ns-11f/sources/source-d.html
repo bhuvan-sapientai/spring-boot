@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServletWebServerFactoryCustomizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: ServletWebServerFactoryCustomizer (org.springframework.boot.autoconfigure.web.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServletWebServerFactoryCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.servlet;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.ssl.SslBundles;
+&nbsp;import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+&nbsp;import org.springframework.boot.web.servlet.WebListenerRegistrar;
+&nbsp;import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+&nbsp;import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link WebServerFactoryCustomizer} to apply {@link ServerProperties} and
+&nbsp; * {@link WebListenerRegistrar WebListenerRegistrars} to servlet web servers.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Olivier Lamy
+&nbsp; * @author Yunkun Huang
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Lasse Wulff
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class ServletWebServerFactoryCustomizer
+&nbsp;		implements WebServerFactoryCustomizer&lt;ConfigurableServletWebServerFactory&gt;, Ordered {
+&nbsp;
+&nbsp;	private final ServerProperties serverProperties;
+&nbsp;
+&nbsp;	private final List&lt;WebListenerRegistrar&gt; webListenerRegistrars;
+&nbsp;
+&nbsp;	private final List&lt;CookieSameSiteSupplier&gt; cookieSameSiteSuppliers;
+&nbsp;
+&nbsp;	private final SslBundles sslBundles;
+&nbsp;
+&nbsp;	public ServletWebServerFactoryCustomizer(ServerProperties serverProperties) {
+<b class="nc">&nbsp;		this(serverProperties, Collections.emptyList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public ServletWebServerFactoryCustomizer(ServerProperties serverProperties,
+&nbsp;			List&lt;WebListenerRegistrar&gt; webListenerRegistrars) {
+<b class="nc">&nbsp;		this(serverProperties, webListenerRegistrars, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ServletWebServerFactoryCustomizer(ServerProperties serverProperties,
+&nbsp;			List&lt;WebListenerRegistrar&gt; webListenerRegistrars, List&lt;CookieSameSiteSupplier&gt; cookieSameSiteSuppliers,
+<b class="nc">&nbsp;			SslBundles sslBundles) {</b>
+<b class="nc">&nbsp;		this.serverProperties = serverProperties;</b>
+<b class="nc">&nbsp;		this.webListenerRegistrars = webListenerRegistrars;</b>
+<b class="nc">&nbsp;		this.cookieSameSiteSuppliers = cookieSameSiteSuppliers;</b>
+<b class="nc">&nbsp;		this.sslBundles = sslBundles;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void customize(ConfigurableServletWebServerFactory factory) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties::getPort).to(factory::setPort);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties::getAddress).to(factory::setAddress);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties.getServlet()::getContextPath).to(factory::setContextPath);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties.getServlet()::getApplicationDisplayName).to(factory::setDisplayName);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties.getServlet()::isRegisterDefaultServlet).to(factory::setRegisterDefaultServlet);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties.getServlet()::getSession).to(factory::setSession);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties::getSsl).to(factory::setSsl);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties.getServlet()::getJsp).to(factory::setJsp);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties::getCompression).to(factory::setCompression);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties::getHttp2).to(factory::setHttp2);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties::getServerHeader).to(factory::setServerHeader);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties.getServlet()::getContextParameters).to(factory::setInitParameters);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties.getShutdown()).to(factory::setShutdown);</b>
+<b class="nc">&nbsp;		map.from(() -&gt; this.sslBundles).to(factory::setSslBundles);</b>
+<b class="nc">&nbsp;		map.from(() -&gt; this.cookieSameSiteSuppliers)</b>
+<b class="nc">&nbsp;			.whenNot(CollectionUtils::isEmpty)</b>
+<b class="nc">&nbsp;			.to(factory::setCookieSameSiteSuppliers);</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties::getMimeMappings).to(factory::setMimeMappings);</b>
+<b class="nc">&nbsp;		this.webListenerRegistrars.forEach((registrar) -&gt; registrar.register(factory));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

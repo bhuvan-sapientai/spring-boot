@@ -1,0 +1,748 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildRequest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildRequest (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildRequest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.format.DateTimeParseException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Binding;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageReference;
+&nbsp;import org.springframework.boot.buildpack.platform.io.Owner;
+&nbsp;import org.springframework.boot.buildpack.platform.io.TarArchive;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * A build request to be handled by the {@link Builder}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Andrey Shlykov
+&nbsp; * @author Jeroen Meijer
+&nbsp; * @author Rafael Ceccone
+&nbsp; * @author Julian Liebig
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class BuildRequest {
+&nbsp;
+&nbsp;	static final String DEFAULT_BUILDER_IMAGE_NAME = &quot;paketobuildpacks/builder-jammy-base:latest&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final ImageReference DEFAULT_BUILDER = ImageReference.of(DEFAULT_BUILDER_IMAGE_NAME);</b>
+&nbsp;
+&nbsp;	private final ImageReference name;
+&nbsp;
+&nbsp;	private final Function&lt;Owner, TarArchive&gt; applicationContent;
+&nbsp;
+&nbsp;	private final ImageReference builder;
+&nbsp;
+&nbsp;	private final ImageReference runImage;
+&nbsp;
+&nbsp;	private final Creator creator;
+&nbsp;
+&nbsp;	private final Map&lt;String, String&gt; env;
+&nbsp;
+&nbsp;	private final boolean cleanCache;
+&nbsp;
+&nbsp;	private final boolean verboseLogging;
+&nbsp;
+&nbsp;	private final PullPolicy pullPolicy;
+&nbsp;
+&nbsp;	private final boolean publish;
+&nbsp;
+&nbsp;	private final List&lt;BuildpackReference&gt; buildpacks;
+&nbsp;
+&nbsp;	private final List&lt;Binding&gt; bindings;
+&nbsp;
+&nbsp;	private final String network;
+&nbsp;
+&nbsp;	private final List&lt;ImageReference&gt; tags;
+&nbsp;
+&nbsp;	private final Cache buildWorkspace;
+&nbsp;
+&nbsp;	private final Cache buildCache;
+&nbsp;
+&nbsp;	private final Cache launchCache;
+&nbsp;
+&nbsp;	private final Instant createdDate;
+&nbsp;
+&nbsp;	private final String applicationDirectory;
+&nbsp;
+&nbsp;	private final List&lt;String&gt; securityOptions;
+&nbsp;
+<b class="nc">&nbsp;	BuildRequest(ImageReference name, Function&lt;Owner, TarArchive&gt; applicationContent) {</b>
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(applicationContent, &quot;ApplicationContent must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.name = name.inTaggedForm();</b>
+<b class="nc">&nbsp;		this.applicationContent = applicationContent;</b>
+<b class="nc">&nbsp;		this.builder = DEFAULT_BUILDER;</b>
+<b class="nc">&nbsp;		this.runImage = null;</b>
+<b class="nc">&nbsp;		this.env = Collections.emptyMap();</b>
+<b class="nc">&nbsp;		this.cleanCache = false;</b>
+<b class="nc">&nbsp;		this.verboseLogging = false;</b>
+<b class="nc">&nbsp;		this.pullPolicy = PullPolicy.ALWAYS;</b>
+<b class="nc">&nbsp;		this.publish = false;</b>
+<b class="nc">&nbsp;		this.creator = Creator.withVersion(&quot;&quot;);</b>
+<b class="nc">&nbsp;		this.buildpacks = Collections.emptyList();</b>
+<b class="nc">&nbsp;		this.bindings = Collections.emptyList();</b>
+<b class="nc">&nbsp;		this.network = null;</b>
+<b class="nc">&nbsp;		this.tags = Collections.emptyList();</b>
+<b class="nc">&nbsp;		this.buildWorkspace = null;</b>
+<b class="nc">&nbsp;		this.buildCache = null;</b>
+<b class="nc">&nbsp;		this.launchCache = null;</b>
+<b class="nc">&nbsp;		this.createdDate = null;</b>
+<b class="nc">&nbsp;		this.applicationDirectory = null;</b>
+<b class="nc">&nbsp;		this.securityOptions = null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	BuildRequest(ImageReference name, Function&lt;Owner, TarArchive&gt; applicationContent, ImageReference builder,
+&nbsp;			ImageReference runImage, Creator creator, Map&lt;String, String&gt; env, boolean cleanCache,
+&nbsp;			boolean verboseLogging, PullPolicy pullPolicy, boolean publish, List&lt;BuildpackReference&gt; buildpacks,
+&nbsp;			List&lt;Binding&gt; bindings, String network, List&lt;ImageReference&gt; tags, Cache buildWorkspace, Cache buildCache,
+<b class="nc">&nbsp;			Cache launchCache, Instant createdDate, String applicationDirectory, List&lt;String&gt; securityOptions) {</b>
+<b class="nc">&nbsp;		this.name = name;</b>
+<b class="nc">&nbsp;		this.applicationContent = applicationContent;</b>
+<b class="nc">&nbsp;		this.builder = builder;</b>
+<b class="nc">&nbsp;		this.runImage = runImage;</b>
+<b class="nc">&nbsp;		this.creator = creator;</b>
+<b class="nc">&nbsp;		this.env = env;</b>
+<b class="nc">&nbsp;		this.cleanCache = cleanCache;</b>
+<b class="nc">&nbsp;		this.verboseLogging = verboseLogging;</b>
+<b class="nc">&nbsp;		this.pullPolicy = pullPolicy;</b>
+<b class="nc">&nbsp;		this.publish = publish;</b>
+<b class="nc">&nbsp;		this.buildpacks = buildpacks;</b>
+<b class="nc">&nbsp;		this.bindings = bindings;</b>
+<b class="nc">&nbsp;		this.network = network;</b>
+<b class="nc">&nbsp;		this.tags = tags;</b>
+<b class="nc">&nbsp;		this.buildWorkspace = buildWorkspace;</b>
+<b class="nc">&nbsp;		this.buildCache = buildCache;</b>
+<b class="nc">&nbsp;		this.launchCache = launchCache;</b>
+<b class="nc">&nbsp;		this.createdDate = createdDate;</b>
+<b class="nc">&nbsp;		this.applicationDirectory = applicationDirectory;</b>
+<b class="nc">&nbsp;		this.securityOptions = securityOptions;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated builder.
+&nbsp;	 * @param builder the new builder to use
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withBuilder(ImageReference builder) {
+<b class="nc">&nbsp;		Assert.notNull(builder, &quot;Builder must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, builder.inTaggedOrDigestForm(), this.runImage,</b>
+&nbsp;				this.creator, this.env, this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish,
+&nbsp;				this.buildpacks, this.bindings, this.network, this.tags, this.buildWorkspace, this.buildCache,
+&nbsp;				this.launchCache, this.createdDate, this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated run image.
+&nbsp;	 * @param runImageName the run image to use
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withRunImage(ImageReference runImageName) {
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, runImageName.inTaggedOrDigestForm(),</b>
+&nbsp;				this.creator, this.env, this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish,
+&nbsp;				this.buildpacks, this.bindings, this.network, this.tags, this.buildWorkspace, this.buildCache,
+&nbsp;				this.launchCache, this.createdDate, this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated creator.
+&nbsp;	 * @param creator the new {@code Creator} to use
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withCreator(Creator creator) {
+<b class="nc">&nbsp;		Assert.notNull(creator, &quot;Creator must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an additional env variable.
+&nbsp;	 * @param name the variable name
+&nbsp;	 * @param value the variable value
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withEnv(String name, String value) {
+<b class="nc">&nbsp;		Assert.hasText(name, &quot;Name must not be empty&quot;);</b>
+<b class="nc">&nbsp;		Assert.hasText(value, &quot;Value must not be empty&quot;);</b>
+<b class="nc">&nbsp;		Map&lt;String, String&gt; env = new LinkedHashMap&lt;&gt;(this.env);</b>
+<b class="nc">&nbsp;		env.put(name, value);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator,</b>
+<b class="nc">&nbsp;				Collections.unmodifiableMap(env), this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish,</b>
+&nbsp;				this.buildpacks, this.bindings, this.network, this.tags, this.buildWorkspace, this.buildCache,
+&nbsp;				this.launchCache, this.createdDate, this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with additional env variables.
+&nbsp;	 * @param env the additional variables
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withEnv(Map&lt;String, String&gt; env) {
+<b class="nc">&nbsp;		Assert.notNull(env, &quot;Env must not be null&quot;);</b>
+<b class="nc">&nbsp;		Map&lt;String, String&gt; updatedEnv = new LinkedHashMap&lt;&gt;(this.env);</b>
+<b class="nc">&nbsp;		updatedEnv.putAll(env);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator,</b>
+<b class="nc">&nbsp;				Collections.unmodifiableMap(updatedEnv), this.cleanCache, this.verboseLogging, this.pullPolicy,</b>
+&nbsp;				this.publish, this.buildpacks, this.bindings, this.network, this.tags, this.buildWorkspace,
+&nbsp;				this.buildCache, this.launchCache, this.createdDate, this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated clean cache setting.
+&nbsp;	 * @param cleanCache if the cache should be cleaned
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withCleanCache(boolean cleanCache) {
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated verbose logging setting.
+&nbsp;	 * @param verboseLogging if verbose logging should be used
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withVerboseLogging(boolean verboseLogging) {
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with the updated image pull policy.
+&nbsp;	 * @param pullPolicy image pull policy {@link PullPolicy}
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withPullPolicy(PullPolicy pullPolicy) {
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated publish setting.
+&nbsp;	 * @param publish if the built image should be pushed to a registry
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withPublish(boolean publish) {
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated buildpacks setting.
+&nbsp;	 * @param buildpacks a collection of buildpacks to use when building the image
+&nbsp;	 * @return an updated build request
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public BuildRequest withBuildpacks(BuildpackReference... buildpacks) {
+<b class="nc">&nbsp;		Assert.notEmpty(buildpacks, &quot;Buildpacks must not be empty&quot;);</b>
+<b class="nc">&nbsp;		return withBuildpacks(Arrays.asList(buildpacks));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated buildpacks setting.
+&nbsp;	 * @param buildpacks a collection of buildpacks to use when building the image
+&nbsp;	 * @return an updated build request
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public BuildRequest withBuildpacks(List&lt;BuildpackReference&gt; buildpacks) {
+<b class="nc">&nbsp;		Assert.notNull(buildpacks, &quot;Buildpacks must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with updated bindings.
+&nbsp;	 * @param bindings a collection of bindings to mount to the build container
+&nbsp;	 * @return an updated build request
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public BuildRequest withBindings(Binding... bindings) {
+<b class="nc">&nbsp;		Assert.notEmpty(bindings, &quot;Bindings must not be empty&quot;);</b>
+<b class="nc">&nbsp;		return withBindings(Arrays.asList(bindings));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with updated bindings.
+&nbsp;	 * @param bindings a collection of bindings to mount to the build container
+&nbsp;	 * @return an updated build request
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public BuildRequest withBindings(List&lt;Binding&gt; bindings) {
+<b class="nc">&nbsp;		Assert.notNull(bindings, &quot;Bindings must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated network setting.
+&nbsp;	 * @param network the network the build container will connect to
+&nbsp;	 * @return an updated build request
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	public BuildRequest withNetwork(String network) {
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with updated tags.
+&nbsp;	 * @param tags a collection of tags to be created for the built image
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withTags(ImageReference... tags) {
+<b class="nc">&nbsp;		Assert.notEmpty(tags, &quot;Tags must not be empty&quot;);</b>
+<b class="nc">&nbsp;		return withTags(Arrays.asList(tags));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with updated tags.
+&nbsp;	 * @param tags a collection of tags to be created for the built image
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withTags(List&lt;ImageReference&gt; tags) {
+<b class="nc">&nbsp;		Assert.notNull(tags, &quot;Tags must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated build workspace.
+&nbsp;	 * @param buildWorkspace the build workspace
+&nbsp;	 * @return an updated build request
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public BuildRequest withBuildWorkspace(Cache buildWorkspace) {
+<b class="nc">&nbsp;		Assert.notNull(buildWorkspace, &quot;BuildWorkspace must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated build cache.
+&nbsp;	 * @param buildCache the build cache
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withBuildCache(Cache buildCache) {
+<b class="nc">&nbsp;		Assert.notNull(buildCache, &quot;BuildCache must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated launch cache.
+&nbsp;	 * @param launchCache the cache
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withLaunchCache(Cache launchCache) {
+<b class="nc">&nbsp;		Assert.notNull(launchCache, &quot;LaunchCache must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated created date.
+&nbsp;	 * @param createdDate the created date
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withCreatedDate(String createdDate) {
+<b class="nc">&nbsp;		Assert.notNull(createdDate, &quot;CreatedDate must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache,
+<b class="nc">&nbsp;				parseCreatedDate(createdDate), this.applicationDirectory, this.securityOptions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Instant parseCreatedDate(String createdDate) {
+<b class="nc">&nbsp;		if (&quot;now&quot;.equalsIgnoreCase(createdDate)) {</b>
+<b class="nc">&nbsp;			return Instant.now();</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return Instant.parse(createdDate);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (DateTimeParseException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Error parsing &#39;&quot; + createdDate + &quot;&#39; as an image created date&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated application directory.
+&nbsp;	 * @param applicationDirectory the application directory
+&nbsp;	 * @return an updated build request
+&nbsp;	 */
+&nbsp;	public BuildRequest withApplicationDirectory(String applicationDirectory) {
+<b class="nc">&nbsp;		Assert.notNull(applicationDirectory, &quot;ApplicationDirectory must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				applicationDirectory, this.securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link BuildRequest} with an updated security options.
+&nbsp;	 * @param securityOptions the security options
+&nbsp;	 * @return an updated build request
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public BuildRequest withSecurityOptions(List&lt;String&gt; securityOptions) {
+<b class="nc">&nbsp;		Assert.notNull(securityOptions, &quot;SecurityOption must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildRequest(this.name, this.applicationContent, this.builder, this.runImage, this.creator, this.env,</b>
+&nbsp;				this.cleanCache, this.verboseLogging, this.pullPolicy, this.publish, this.buildpacks, this.bindings,
+&nbsp;				this.network, this.tags, this.buildWorkspace, this.buildCache, this.launchCache, this.createdDate,
+&nbsp;				this.applicationDirectory, securityOptions);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of the image that should be created.
+&nbsp;	 * @return the name of the image
+&nbsp;	 */
+&nbsp;	public ImageReference getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link TarArchive} containing the application content that the buildpack
+&nbsp;	 * should package. This is typically the contents of the Jar.
+&nbsp;	 * @param owner the owner of the tar entries
+&nbsp;	 * @return the application content
+&nbsp;	 * @see TarArchive#fromZip(File, Owner)
+&nbsp;	 */
+&nbsp;	public TarArchive getApplicationContent(Owner owner) {
+<b class="nc">&nbsp;		return this.applicationContent.apply(owner);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the builder that should be used.
+&nbsp;	 * @return the builder to use
+&nbsp;	 */
+&nbsp;	public ImageReference getBuilder() {
+<b class="nc">&nbsp;		return this.builder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the run image that should be used, if provided.
+&nbsp;	 * @return the run image
+&nbsp;	 */
+&nbsp;	public ImageReference getRunImage() {
+<b class="nc">&nbsp;		return this.runImage;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link Creator} the builder should use.
+&nbsp;	 * @return the {@code Creator}
+&nbsp;	 */
+&nbsp;	public Creator getCreator() {
+<b class="nc">&nbsp;		return this.creator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return any env variable that should be passed to the builder.
+&nbsp;	 * @return the builder env
+&nbsp;	 */
+&nbsp;	public Map&lt;String, String&gt; getEnv() {
+<b class="nc">&nbsp;		return this.env;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if caches should be cleaned before packaging.
+&nbsp;	 * @return if caches should be cleaned
+&nbsp;	 */
+&nbsp;	public boolean isCleanCache() {
+<b class="nc">&nbsp;		return this.cleanCache;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if verbose logging output should be used.
+&nbsp;	 * @return if verbose logging should be used
+&nbsp;	 */
+&nbsp;	public boolean isVerboseLogging() {
+<b class="nc">&nbsp;		return this.verboseLogging;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the built image should be pushed to a registry.
+&nbsp;	 * @return if the built image should be pushed to a registry
+&nbsp;	 */
+&nbsp;	public boolean isPublish() {
+<b class="nc">&nbsp;		return this.publish;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the image {@link PullPolicy} that the builder should use.
+&nbsp;	 * @return image pull policy
+&nbsp;	 */
+&nbsp;	public PullPolicy getPullPolicy() {
+<b class="nc">&nbsp;		return this.pullPolicy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the collection of buildpacks to use when building the image, if provided.
+&nbsp;	 * @return the buildpacks
+&nbsp;	 */
+&nbsp;	public List&lt;BuildpackReference&gt; getBuildpacks() {
+<b class="nc">&nbsp;		return this.buildpacks;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the collection of bindings to mount to the build container.
+&nbsp;	 * @return the bindings
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public List&lt;Binding&gt; getBindings() {
+<b class="nc">&nbsp;		return this.bindings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the network the build container will connect to.
+&nbsp;	 * @return the network
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	public String getNetwork() {
+<b class="nc">&nbsp;		return this.network;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the collection of tags that should be created.
+&nbsp;	 * @return the tags
+&nbsp;	 */
+&nbsp;	public List&lt;ImageReference&gt; getTags() {
+<b class="nc">&nbsp;		return this.tags;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the build workspace that should be used by the lifecycle.
+&nbsp;	 * @return the build workspace or {@code null}
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public Cache getBuildWorkspace() {
+<b class="nc">&nbsp;		return this.buildWorkspace;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the custom build cache that should be used by the lifecycle.
+&nbsp;	 * @return the build cache
+&nbsp;	 */
+&nbsp;	public Cache getBuildCache() {
+<b class="nc">&nbsp;		return this.buildCache;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the custom launch cache that should be used by the lifecycle.
+&nbsp;	 * @return the launch cache
+&nbsp;	 */
+&nbsp;	public Cache getLaunchCache() {
+<b class="nc">&nbsp;		return this.launchCache;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the custom created date that should be used by the lifecycle.
+&nbsp;	 * @return the created date
+&nbsp;	 */
+&nbsp;	public Instant getCreatedDate() {
+<b class="nc">&nbsp;		return this.createdDate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the application directory that should be used by the lifecycle.
+&nbsp;	 * @return the application directory
+&nbsp;	 */
+&nbsp;	public String getApplicationDirectory() {
+<b class="nc">&nbsp;		return this.applicationDirectory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the security options that should be used by the lifecycle.
+&nbsp;	 * @return the security options or {@code null}
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public List&lt;String&gt; getSecurityOptions() {
+<b class="nc">&nbsp;		return this.securityOptions;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link BuildRequest} from a JAR file.
+&nbsp;	 * @param jarFile the source jar file
+&nbsp;	 * @return a new build request instance
+&nbsp;	 */
+&nbsp;	public static BuildRequest forJarFile(File jarFile) {
+<b class="nc">&nbsp;		assertJarFile(jarFile);</b>
+<b class="nc">&nbsp;		return forJarFile(ImageReference.forJarFile(jarFile).inTaggedForm(), jarFile);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link BuildRequest} from a JAR file.
+&nbsp;	 * @param name the name of the image that should be created
+&nbsp;	 * @param jarFile the source jar file
+&nbsp;	 * @return a new build request instance
+&nbsp;	 */
+&nbsp;	public static BuildRequest forJarFile(ImageReference name, File jarFile) {
+<b class="nc">&nbsp;		assertJarFile(jarFile);</b>
+<b class="nc">&nbsp;		return new BuildRequest(name, (owner) -&gt; TarArchive.fromZip(jarFile, owner));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link BuildRequest} with specific content.
+&nbsp;	 * @param name the name of the image that should be created
+&nbsp;	 * @param applicationContent function to provide the application content
+&nbsp;	 * @return a new build request instance
+&nbsp;	 */
+&nbsp;	public static BuildRequest of(ImageReference name, Function&lt;Owner, TarArchive&gt; applicationContent) {
+<b class="nc">&nbsp;		return new BuildRequest(name, applicationContent);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void assertJarFile(File jarFile) {
+<b class="nc">&nbsp;		Assert.notNull(jarFile, &quot;JarFile must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(jarFile.exists(), &quot;JarFile must exist&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(jarFile.isFile(), &quot;JarFile must be a file&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

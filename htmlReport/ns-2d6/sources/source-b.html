@@ -1,0 +1,487 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringBootTestContextBootstrapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.context</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringBootTestContextBootstrapper (org.springframework.boot.test.context)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringBootTestContextBootstrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/127)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.context;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.SpringBootConfiguration;
+&nbsp;import org.springframework.boot.WebApplicationType;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
+&nbsp;import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+&nbsp;import org.springframework.core.annotation.AnnotationUtils;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.test.context.ContextConfiguration;
+&nbsp;import org.springframework.test.context.ContextConfigurationAttributes;
+&nbsp;import org.springframework.test.context.ContextCustomizer;
+&nbsp;import org.springframework.test.context.ContextHierarchy;
+&nbsp;import org.springframework.test.context.ContextLoader;
+&nbsp;import org.springframework.test.context.MergedContextConfiguration;
+&nbsp;import org.springframework.test.context.TestContext;
+&nbsp;import org.springframework.test.context.TestContextAnnotationUtils;
+&nbsp;import org.springframework.test.context.TestContextBootstrapper;
+&nbsp;import org.springframework.test.context.aot.AotTestAttributes;
+&nbsp;import org.springframework.test.context.support.DefaultTestContextBootstrapper;
+&nbsp;import org.springframework.test.context.support.TestPropertySourceUtils;
+&nbsp;import org.springframework.test.context.web.WebAppConfiguration;
+&nbsp;import org.springframework.test.context.web.WebMergedContextConfiguration;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link TestContextBootstrapper} for Spring Boot. Provides support for
+&nbsp; * {@link SpringBootTest @SpringBootTest} and may also be used directly or subclassed.
+&nbsp; * Provides the following features over and above {@link DefaultTestContextBootstrapper}:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;Uses {@link SpringBootContextLoader} as the
+&nbsp; * {@link #getDefaultContextLoaderClass(Class) default context loader}.&lt;/li&gt;
+&nbsp; * &lt;li&gt;Automatically searches for a
+&nbsp; * {@link SpringBootConfiguration @SpringBootConfiguration} when required.&lt;/li&gt;
+&nbsp; * &lt;li&gt;Allows custom {@link Environment} {@link #getProperties(Class)} to be defined.&lt;/li&gt;
+&nbsp; * &lt;li&gt;Provides support for different {@link WebEnvironment webEnvironment} modes.&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Lorenzo Dee
+&nbsp; * @since 1.4.0
+&nbsp; * @see SpringBootTest
+&nbsp; * @see TestConfiguration
+&nbsp; */
+&nbsp;public class SpringBootTestContextBootstrapper extends DefaultTestContextBootstrapper {
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] WEB_ENVIRONMENT_CLASSES = { &quot;jakarta.servlet.Servlet&quot;,</b>
+&nbsp;			&quot;org.springframework.web.context.ConfigurableWebApplicationContext&quot; };
+&nbsp;
+&nbsp;	private static final String REACTIVE_WEB_ENVIRONMENT_CLASS = &quot;org.springframework.&quot;
+&nbsp;			+ &quot;web.reactive.DispatcherHandler&quot;;
+&nbsp;
+&nbsp;	private static final String MVC_WEB_ENVIRONMENT_CLASS = &quot;org.springframework.web.servlet.DispatcherServlet&quot;;
+&nbsp;
+&nbsp;	private static final String JERSEY_WEB_ENVIRONMENT_CLASS = &quot;org.glassfish.jersey.server.ResourceConfig&quot;;
+&nbsp;
+&nbsp;	private static final String ACTIVATE_SERVLET_LISTENER = &quot;org.springframework.test.&quot;
+&nbsp;			+ &quot;context.web.ServletTestExecutionListener.activateListener&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(SpringBootTestContextBootstrapper.class);</b>
+&nbsp;
+&nbsp;	private final AotTestAttributes aotTestAttributes;
+&nbsp;
+&nbsp;	public SpringBootTestContextBootstrapper() {
+<b class="nc">&nbsp;		this(AotTestAttributes.getInstance());</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	SpringBootTestContextBootstrapper(AotTestAttributes aotTestAttributes) {</b>
+<b class="nc">&nbsp;		this.aotTestAttributes = aotTestAttributes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public TestContext buildTestContext() {
+<b class="nc">&nbsp;		TestContext context = super.buildTestContext();</b>
+<b class="nc">&nbsp;		verifyConfiguration(context.getTestClass());</b>
+<b class="nc">&nbsp;		WebEnvironment webEnvironment = getWebEnvironment(context.getTestClass());</b>
+<b class="nc">&nbsp;		if (webEnvironment == WebEnvironment.MOCK &amp;&amp; deduceWebApplicationType() == WebApplicationType.SERVLET) {</b>
+<b class="nc">&nbsp;			context.setAttribute(ACTIVATE_SERVLET_LISTENER, true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (webEnvironment != null &amp;&amp; webEnvironment.isEmbedded()) {</b>
+<b class="nc">&nbsp;			context.setAttribute(ACTIVATE_SERVLET_LISTENER, false);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected ContextLoader resolveContextLoader(Class&lt;?&gt; testClass,
+&nbsp;			List&lt;ContextConfigurationAttributes&gt; configAttributesList) {
+<b class="nc">&nbsp;		Class&lt;?&gt;[] classes = getClasses(testClass);</b>
+<b class="nc">&nbsp;		if (!ObjectUtils.isEmpty(classes)) {</b>
+<b class="nc">&nbsp;			for (ContextConfigurationAttributes configAttributes : configAttributesList) {</b>
+<b class="nc">&nbsp;				addConfigAttributesClasses(configAttributes, classes);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return super.resolveContextLoader(testClass, configAttributesList);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addConfigAttributesClasses(ContextConfigurationAttributes configAttributes, Class&lt;?&gt;[] classes) {
+<b class="nc">&nbsp;		Set&lt;Class&lt;?&gt;&gt; combined = new LinkedHashSet&lt;&gt;(Arrays.asList(classes));</b>
+<b class="nc">&nbsp;		if (configAttributes.getClasses() != null) {</b>
+<b class="nc">&nbsp;			combined.addAll(Arrays.asList(configAttributes.getClasses()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		configAttributes.setClasses(ClassUtils.toClassArray(combined));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Class&lt;? extends ContextLoader&gt; getDefaultContextLoaderClass(Class&lt;?&gt; testClass) {
+<b class="nc">&nbsp;		return SpringBootContextLoader.class;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected MergedContextConfiguration processMergedContextConfiguration(MergedContextConfiguration mergedConfig) {
+<b class="nc">&nbsp;		Class&lt;?&gt;[] classes = getOrFindConfigurationClasses(mergedConfig);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; propertySourceProperties = getAndProcessPropertySourceProperties(mergedConfig);</b>
+<b class="nc">&nbsp;		mergedConfig = createModifiedConfig(mergedConfig, classes, StringUtils.toStringArray(propertySourceProperties));</b>
+<b class="nc">&nbsp;		WebEnvironment webEnvironment = getWebEnvironment(mergedConfig.getTestClass());</b>
+<b class="nc">&nbsp;		if (webEnvironment != null &amp;&amp; isWebEnvironmentSupported(mergedConfig)) {</b>
+<b class="nc">&nbsp;			WebApplicationType webApplicationType = getWebApplicationType(mergedConfig);</b>
+<b class="nc">&nbsp;			if (webApplicationType == WebApplicationType.SERVLET</b>
+<b class="nc">&nbsp;					&amp;&amp; (webEnvironment.isEmbedded() || webEnvironment == WebEnvironment.MOCK)) {</b>
+<b class="nc">&nbsp;				mergedConfig = new WebMergedContextConfiguration(mergedConfig, determineResourceBasePath(mergedConfig));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (webApplicationType == WebApplicationType.REACTIVE</b>
+<b class="nc">&nbsp;					&amp;&amp; (webEnvironment.isEmbedded() || webEnvironment == WebEnvironment.MOCK)) {</b>
+<b class="nc">&nbsp;				return new ReactiveWebMergedContextConfiguration(mergedConfig);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return mergedConfig;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private WebApplicationType getWebApplicationType(MergedContextConfiguration configuration) {
+<b class="nc">&nbsp;		ConfigurationPropertySource source = new MapConfigurationPropertySource(</b>
+<b class="nc">&nbsp;				TestPropertySourceUtils.convertInlinedPropertiesToMap(configuration.getPropertySourceProperties()));</b>
+<b class="nc">&nbsp;		Binder binder = new Binder(source);</b>
+<b class="nc">&nbsp;		return binder.bind(&quot;spring.main.web-application-type&quot;, Bindable.of(WebApplicationType.class))</b>
+<b class="nc">&nbsp;			.orElseGet(this::deduceWebApplicationType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private WebApplicationType deduceWebApplicationType() {
+<b class="nc">&nbsp;		if (ClassUtils.isPresent(REACTIVE_WEB_ENVIRONMENT_CLASS, null)</b>
+<b class="nc">&nbsp;				&amp;&amp; !ClassUtils.isPresent(MVC_WEB_ENVIRONMENT_CLASS, null)</b>
+<b class="nc">&nbsp;				&amp;&amp; !ClassUtils.isPresent(JERSEY_WEB_ENVIRONMENT_CLASS, null)) {</b>
+<b class="nc">&nbsp;			return WebApplicationType.REACTIVE;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (String className : WEB_ENVIRONMENT_CLASSES) {</b>
+<b class="nc">&nbsp;			if (!ClassUtils.isPresent(className, null)) {</b>
+<b class="nc">&nbsp;				return WebApplicationType.NONE;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return WebApplicationType.SERVLET;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determines the resource base path for web applications using the value of
+&nbsp;	 * {@link WebAppConfiguration @WebAppConfiguration}, if any, on the test class of the
+&nbsp;	 * given {@code configuration}. Defaults to {@code src/main/webapp} in its absence.
+&nbsp;	 * @param configuration the configuration to examine
+&nbsp;	 * @return the resource base path
+&nbsp;	 * @since 2.1.6
+&nbsp;	 */
+&nbsp;	protected String determineResourceBasePath(MergedContextConfiguration configuration) {
+<b class="nc">&nbsp;		return MergedAnnotations.from(configuration.getTestClass(), SearchStrategy.TYPE_HIERARCHY)</b>
+<b class="nc">&nbsp;			.get(WebAppConfiguration.class)</b>
+<b class="nc">&nbsp;			.getValue(MergedAnnotation.VALUE, String.class)</b>
+<b class="nc">&nbsp;			.orElse(&quot;src/main/webapp&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isWebEnvironmentSupported(MergedContextConfiguration mergedConfig) {
+<b class="nc">&nbsp;		Class&lt;?&gt; testClass = mergedConfig.getTestClass();</b>
+<b class="nc">&nbsp;		ContextHierarchy hierarchy = AnnotationUtils.getAnnotation(testClass, ContextHierarchy.class);</b>
+<b class="nc">&nbsp;		if (hierarchy == null || hierarchy.value().length == 0) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ContextConfiguration[] configurations = hierarchy.value();</b>
+<b class="nc">&nbsp;		return isFromConfiguration(mergedConfig, configurations[configurations.length - 1]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isFromConfiguration(MergedContextConfiguration candidateConfig,
+&nbsp;			ContextConfiguration configuration) {
+<b class="nc">&nbsp;		ContextConfigurationAttributes attributes = new ContextConfigurationAttributes(candidateConfig.getTestClass(),</b>
+&nbsp;				configuration);
+<b class="nc">&nbsp;		Set&lt;Class&lt;?&gt;&gt; configurationClasses = new HashSet&lt;&gt;(Arrays.asList(attributes.getClasses()));</b>
+<b class="nc">&nbsp;		for (Class&lt;?&gt; candidate : candidateConfig.getClasses()) {</b>
+<b class="nc">&nbsp;			if (configurationClasses.contains(candidate)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Class&lt;?&gt;[] getOrFindConfigurationClasses(MergedContextConfiguration mergedConfig) {
+<b class="nc">&nbsp;		Class&lt;?&gt;[] classes = mergedConfig.getClasses();</b>
+<b class="nc">&nbsp;		if (containsNonTestComponent(classes) || mergedConfig.hasLocations()) {</b>
+<b class="nc">&nbsp;			return classes;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Class&lt;?&gt; found = findConfigurationClass(mergedConfig.getTestClass());</b>
+<b class="nc">&nbsp;		logger.info(&quot;Found @SpringBootConfiguration &quot; + found.getName() + &quot; for test &quot; + mergedConfig.getTestClass());</b>
+<b class="nc">&nbsp;		return merge(found, classes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Class&lt;?&gt; findConfigurationClass(Class&lt;?&gt; testClass) {
+<b class="nc">&nbsp;		String propertyName = &quot;%s.SpringBootConfiguration.%s&quot;</b>
+<b class="nc">&nbsp;			.formatted(SpringBootTestContextBootstrapper.class.getName(), testClass.getName());</b>
+<b class="nc">&nbsp;		String foundClassName = this.aotTestAttributes.getString(propertyName);</b>
+<b class="nc">&nbsp;		if (foundClassName != null) {</b>
+<b class="nc">&nbsp;			return ClassUtils.resolveClassName(foundClassName, testClass.getClassLoader());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Class&lt;?&gt; found = new AnnotatedClassFinder(SpringBootConfiguration.class).findFromClass(testClass);</b>
+<b class="nc">&nbsp;		Assert.state(found != null, &quot;Unable to find a @SpringBootConfiguration, you need to use &quot;</b>
+&nbsp;				+ &quot;@ContextConfiguration or @SpringBootTest(classes=...) with your test&quot;);
+<b class="nc">&nbsp;		this.aotTestAttributes.setAttribute(propertyName, found.getName());</b>
+<b class="nc">&nbsp;		return found;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean containsNonTestComponent(Class&lt;?&gt;[] classes) {
+<b class="nc">&nbsp;		for (Class&lt;?&gt; candidate : classes) {</b>
+<b class="nc">&nbsp;			if (!MergedAnnotations.from(candidate, SearchStrategy.INHERITED_ANNOTATIONS)</b>
+<b class="nc">&nbsp;				.isPresent(TestConfiguration.class)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Class&lt;?&gt;[] merge(Class&lt;?&gt; head, Class&lt;?&gt;[] existing) {
+<b class="nc">&nbsp;		Class&lt;?&gt;[] result = new Class&lt;?&gt;[existing.length + 1];</b>
+<b class="nc">&nbsp;		result[0] = head;</b>
+<b class="nc">&nbsp;		System.arraycopy(existing, 0, result, 1, existing.length);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; getAndProcessPropertySourceProperties(MergedContextConfiguration mergedConfig) {
+<b class="nc">&nbsp;		List&lt;String&gt; propertySourceProperties = new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;				Arrays.asList(mergedConfig.getPropertySourceProperties()));</b>
+<b class="nc">&nbsp;		String differentiator = getDifferentiatorPropertySourceProperty();</b>
+<b class="nc">&nbsp;		if (differentiator != null) {</b>
+<b class="nc">&nbsp;			propertySourceProperties.add(differentiator);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		processPropertySourceProperties(mergedConfig, propertySourceProperties);</b>
+<b class="nc">&nbsp;		return propertySourceProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a &quot;differentiator&quot; property to ensure that there is something to
+&nbsp;	 * differentiate regular tests and bootstrapped tests. Without this property a cached
+&nbsp;	 * context could be returned that wasn&#39;t created by this bootstrapper. By default uses
+&nbsp;	 * the bootstrapper class as a property.
+&nbsp;	 * @return the differentiator or {@code null}
+&nbsp;	 */
+&nbsp;	protected String getDifferentiatorPropertySourceProperty() {
+<b class="nc">&nbsp;		return getClass().getName() + &quot;=true&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Post process the property source properties, adding or removing elements as
+&nbsp;	 * required.
+&nbsp;	 * @param mergedConfig the merged context configuration
+&nbsp;	 * @param propertySourceProperties the property source properties to process
+&nbsp;	 */
+&nbsp;	protected void processPropertySourceProperties(MergedContextConfiguration mergedConfig,
+&nbsp;			List&lt;String&gt; propertySourceProperties) {
+<b class="nc">&nbsp;		Class&lt;?&gt; testClass = mergedConfig.getTestClass();</b>
+<b class="nc">&nbsp;		String[] properties = getProperties(testClass);</b>
+<b class="nc">&nbsp;		if (!ObjectUtils.isEmpty(properties)) {</b>
+&nbsp;			// Added first so that inlined properties from @TestPropertySource take
+&nbsp;			// precedence
+<b class="nc">&nbsp;			propertySourceProperties.addAll(0, Arrays.asList(properties));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		WebEnvironment webEnvironment = getWebEnvironment(testClass);</b>
+<b class="nc">&nbsp;		if (webEnvironment == WebEnvironment.RANDOM_PORT) {</b>
+<b class="nc">&nbsp;			propertySourceProperties.add(&quot;server.port=0&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (webEnvironment == WebEnvironment.NONE) {</b>
+<b class="nc">&nbsp;			propertySourceProperties.add(&quot;spring.main.web-application-type=none&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link WebEnvironment} type for this test or null if undefined.
+&nbsp;	 * @param testClass the source test class
+&nbsp;	 * @return the {@link WebEnvironment} or {@code null}
+&nbsp;	 */
+&nbsp;	protected WebEnvironment getWebEnvironment(Class&lt;?&gt; testClass) {
+<b class="nc">&nbsp;		SpringBootTest annotation = getAnnotation(testClass);</b>
+<b class="nc">&nbsp;		return (annotation != null) ? annotation.webEnvironment() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Class&lt;?&gt;[] getClasses(Class&lt;?&gt; testClass) {
+<b class="nc">&nbsp;		SpringBootTest annotation = getAnnotation(testClass);</b>
+<b class="nc">&nbsp;		return (annotation != null) ? annotation.classes() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String[] getProperties(Class&lt;?&gt; testClass) {
+<b class="nc">&nbsp;		SpringBootTest annotation = getAnnotation(testClass);</b>
+<b class="nc">&nbsp;		return (annotation != null) ? annotation.properties() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected SpringBootTest getAnnotation(Class&lt;?&gt; testClass) {
+<b class="nc">&nbsp;		return TestContextAnnotationUtils.findMergedAnnotation(testClass, SpringBootTest.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void verifyConfiguration(Class&lt;?&gt; testClass) {
+<b class="nc">&nbsp;		SpringBootTest springBootTest = getAnnotation(testClass);</b>
+<b class="nc">&nbsp;		if (springBootTest != null &amp;&amp; isListeningOnPort(springBootTest.webEnvironment())</b>
+<b class="nc">&nbsp;				&amp;&amp; MergedAnnotations.from(testClass, SearchStrategy.INHERITED_ANNOTATIONS)</b>
+<b class="nc">&nbsp;					.isPresent(WebAppConfiguration.class)) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;@WebAppConfiguration should only be used &quot;</b>
+&nbsp;					+ &quot;with @SpringBootTest when @SpringBootTest is configured with a &quot;
+&nbsp;					+ &quot;mock web environment. Please remove @WebAppConfiguration or reconfigure @SpringBootTest.&quot;);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isListeningOnPort(WebEnvironment webEnvironment) {
+<b class="nc">&nbsp;		return webEnvironment == WebEnvironment.DEFINED_PORT || webEnvironment == WebEnvironment.RANDOM_PORT;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link MergedContextConfiguration} with different classes.
+&nbsp;	 * @param mergedConfig the source config
+&nbsp;	 * @param classes the replacement classes
+&nbsp;	 * @return a new {@link MergedContextConfiguration}
+&nbsp;	 */
+&nbsp;	protected final MergedContextConfiguration createModifiedConfig(MergedContextConfiguration mergedConfig,
+&nbsp;			Class&lt;?&gt;[] classes) {
+<b class="nc">&nbsp;		return createModifiedConfig(mergedConfig, classes, mergedConfig.getPropertySourceProperties());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link MergedContextConfiguration} with different classes and
+&nbsp;	 * properties.
+&nbsp;	 * @param mergedConfig the source config
+&nbsp;	 * @param classes the replacement classes
+&nbsp;	 * @param propertySourceProperties the replacement properties
+&nbsp;	 * @return a new {@link MergedContextConfiguration}
+&nbsp;	 */
+&nbsp;	protected final MergedContextConfiguration createModifiedConfig(MergedContextConfiguration mergedConfig,
+&nbsp;			Class&lt;?&gt;[] classes, String[] propertySourceProperties) {
+<b class="nc">&nbsp;		Set&lt;ContextCustomizer&gt; contextCustomizers = new LinkedHashSet&lt;&gt;(mergedConfig.getContextCustomizers());</b>
+<b class="nc">&nbsp;		contextCustomizers.add(new SpringBootTestAnnotation(mergedConfig.getTestClass()));</b>
+<b class="nc">&nbsp;		return new MergedContextConfiguration(mergedConfig.getTestClass(), mergedConfig.getLocations(), classes,</b>
+<b class="nc">&nbsp;				mergedConfig.getContextInitializerClasses(), mergedConfig.getActiveProfiles(),</b>
+<b class="nc">&nbsp;				mergedConfig.getPropertySourceDescriptors(), propertySourceProperties, contextCustomizers,</b>
+<b class="nc">&nbsp;				mergedConfig.getContextLoader(), getCacheAwareContextLoaderDelegate(), mergedConfig.getParent());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

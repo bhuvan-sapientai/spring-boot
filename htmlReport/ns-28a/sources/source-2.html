@@ -1,0 +1,690 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PaketoBuilderTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.image.paketo</a>
+</div>
+
+<h1>Coverage Summary for Class: PaketoBuilderTests (org.springframework.boot.image.paketo)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PaketoBuilderTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/316)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PaketoBuilderTests$DigestCapturingCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PaketoBuilderTests$DigestsCapturingCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/327)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.image.paketo;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;import com.github.dockerjava.api.model.ContainerConfig;
+&nbsp;import org.assertj.core.api.Condition;
+&nbsp;import org.gradle.testkit.runner.BuildResult;
+&nbsp;import org.gradle.testkit.runner.TaskOutcome;
+&nbsp;import org.junit.jupiter.api.BeforeEach;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;import org.junit.jupiter.api.condition.EnabledForJreRange;
+&nbsp;import org.junit.jupiter.api.condition.JRE;
+&nbsp;import org.junit.jupiter.api.extension.ExtendWith;
+&nbsp;import org.testcontainers.containers.GenericContainer;
+&nbsp;import org.testcontainers.containers.wait.strategy.Wait;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.DockerApi;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageName;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageReference;
+&nbsp;import org.springframework.boot.image.assertions.ImageAssertions;
+&nbsp;import org.springframework.boot.image.junit.GradleBuildInjectionExtension;
+&nbsp;import org.springframework.boot.testsupport.gradle.testkit.GradleBuild;
+&nbsp;import org.springframework.boot.testsupport.gradle.testkit.GradleBuildExtension;
+&nbsp;import org.springframework.boot.testsupport.gradle.testkit.GradleVersions;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;import static org.assertj.core.api.Assertions.entry;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests for the Paketo builder and buildpacks.
+&nbsp; *
+&nbsp; * See
+&nbsp; * https://paketo.io/docs/buildpacks/language-family-buildpacks/java/#additional-metadata
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;@ExtendWith({ GradleBuildInjectionExtension.class, GradleBuildExtension.class })
+&nbsp;@EnabledForJreRange(max = JRE.JAVA_21)
+<b class="nc">&nbsp;class PaketoBuilderTests {</b>
+&nbsp;
+&nbsp;	GradleBuild gradleBuild;
+&nbsp;
+&nbsp;	@BeforeEach
+&nbsp;	void configureGradleBuild() {
+<b class="nc">&nbsp;		this.gradleBuild.scriptProperty(&quot;systemTestMavenRepository&quot;,</b>
+<b class="nc">&nbsp;				new File(&quot;build/system-test-maven-repository&quot;).getAbsoluteFile().toURI().toASCIIString());</b>
+<b class="nc">&nbsp;		this.gradleBuild.scriptPropertyFrom(new File(&quot;../../gradle.properties&quot;), &quot;nativeBuildToolsVersion&quot;);</b>
+<b class="nc">&nbsp;		this.gradleBuild.expectDeprecationMessages(&quot;BPL_SPRING_CLOUD_BINDINGS_ENABLED.*true.*Deprecated&quot;);</b>
+<b class="nc">&nbsp;		this.gradleBuild.expectDeprecationMessages(&quot;BOM table is deprecated&quot;);</b>
+<b class="nc">&nbsp;		this.gradleBuild.gradleVersion(GradleVersions.maximumCompatible());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void executableJarApp() throws Exception {
+<b class="nc">&nbsp;		writeMainClass();</b>
+<b class="nc">&nbsp;		String imageName = &quot;paketo-integration/&quot; + this.gradleBuild.getProjectDir().getName();</b>
+<b class="nc">&nbsp;		ImageReference imageReference = ImageReference.of(ImageName.of(imageName));</b>
+<b class="nc">&nbsp;		BuildResult result = buildImage(imageName);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withExposedPorts(8080);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;			ContainerConfig config = container.getContainerInfo().getConfig();</b>
+<b class="nc">&nbsp;			assertLabelsMatchManifestAttributes(config);</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config).buildMetadata((metadata) -&gt; {</b>
+<b class="nc">&nbsp;				metadata.buildpacks()</b>
+<b class="nc">&nbsp;					.contains(&quot;paketo-buildpacks/ca-certificates&quot;, &quot;paketo-buildpacks/bellsoft-liberica&quot;,</b>
+&nbsp;							&quot;paketo-buildpacks/executable-jar&quot;, &quot;paketo-buildpacks/dist-zip&quot;,
+&nbsp;							&quot;paketo-buildpacks/spring-boot&quot;);
+<b class="nc">&nbsp;				metadata.processOfType(&quot;web&quot;)</b>
+<b class="nc">&nbsp;					.containsExactly(&quot;java&quot;, &quot;org.springframework.boot.loader.launch.JarLauncher&quot;);</b>
+<b class="nc">&nbsp;				metadata.processOfType(&quot;executable-jar&quot;)</b>
+<b class="nc">&nbsp;					.containsExactly(&quot;java&quot;, &quot;org.springframework.boot.loader.launch.JarLauncher&quot;);</b>
+&nbsp;			});
+<b class="nc">&nbsp;			assertImageHasJvmSbomLayer(imageReference, config);</b>
+<b class="nc">&nbsp;			assertImageHasDependenciesSbomLayer(imageReference, config, &quot;executable-jar&quot;);</b>
+<b class="nc">&nbsp;			assertImageLayersMatchLayersIndex(imageReference, config);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		finally {
+<b class="nc">&nbsp;			removeImage(imageReference);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void executableJarAppWithAdditionalArgs() throws Exception {
+<b class="nc">&nbsp;		writeMainClass();</b>
+<b class="nc">&nbsp;		String imageName = &quot;paketo-integration/&quot; + this.gradleBuild.getProjectDir().getName();</b>
+<b class="nc">&nbsp;		ImageReference imageReference = ImageReference.of(ImageName.of(imageName));</b>
+<b class="nc">&nbsp;		BuildResult result = buildImage(imageName);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withCommand(&quot;--server.port=9090&quot;);</b>
+<b class="nc">&nbsp;			container.withExposedPorts(9090);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		finally {
+<b class="nc">&nbsp;			removeImage(imageReference);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void executableJarAppBuiltTwiceWithCaching() throws Exception {
+<b class="nc">&nbsp;		writeMainClass();</b>
+<b class="nc">&nbsp;		String imageName = &quot;paketo-integration/&quot; + this.gradleBuild.getProjectDir().getName();</b>
+<b class="nc">&nbsp;		ImageReference imageReference = ImageReference.of(ImageName.of(imageName));</b>
+<b class="nc">&nbsp;		BuildResult result = buildImage(imageName);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withExposedPorts(8080);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;			container.stop();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		this.gradleBuild.expectDeprecationMessages(&quot;BOM table is deprecated&quot;);</b>
+<b class="nc">&nbsp;		result = buildImage(imageName);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withExposedPorts(8080);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		finally {
+<b class="nc">&nbsp;			removeImage(imageReference);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void bootDistZipJarApp() throws Exception {
+<b class="nc">&nbsp;		writeMainClass();</b>
+<b class="nc">&nbsp;		String projectName = this.gradleBuild.getProjectDir().getName();</b>
+<b class="nc">&nbsp;		String imageName = &quot;paketo-integration/&quot; + projectName;</b>
+<b class="nc">&nbsp;		ImageReference imageReference = ImageReference.of(ImageName.of(imageName));</b>
+<b class="nc">&nbsp;		BuildResult result = buildImage(imageName, &quot;assemble&quot;, &quot;bootDistZip&quot;);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withExposedPorts(8080);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;			ContainerConfig config = container.getContainerInfo().getConfig();</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config).buildMetadata((metadata) -&gt; {</b>
+<b class="nc">&nbsp;				metadata.buildpacks()</b>
+<b class="nc">&nbsp;					.contains(&quot;paketo-buildpacks/ca-certificates&quot;, &quot;paketo-buildpacks/bellsoft-liberica&quot;,</b>
+&nbsp;							&quot;paketo-buildpacks/dist-zip&quot;, &quot;paketo-buildpacks/spring-boot&quot;);
+<b class="nc">&nbsp;				String launcher = &quot;/workspace/&quot; + projectName + &quot;-boot/bin/&quot; + projectName;</b>
+<b class="nc">&nbsp;				metadata.processOfType(&quot;web&quot;).containsExactly(launcher);</b>
+<b class="nc">&nbsp;				metadata.processOfType(&quot;dist-zip&quot;).containsExactly(launcher);</b>
+&nbsp;			});
+<b class="nc">&nbsp;			assertImageHasJvmSbomLayer(imageReference, config);</b>
+<b class="nc">&nbsp;			assertImageHasDependenciesSbomLayer(imageReference, config, &quot;dist-zip&quot;);</b>
+<b class="nc">&nbsp;			DigestCapturingCondition digest = new DigestCapturingCondition();</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config)</b>
+<b class="nc">&nbsp;				.lifecycleMetadata((metadata) -&gt; metadata.appLayerShas().haveExactly(1, digest));</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(imageReference)</b>
+<b class="nc">&nbsp;				.layer(digest.getDigest(),</b>
+<b class="nc">&nbsp;						(layer) -&gt; layer.entries()</b>
+<b class="nc">&nbsp;							.contains(projectName + &quot;-boot/bin/&quot; + projectName,</b>
+&nbsp;									projectName + &quot;-boot/lib/&quot; + projectName + &quot;.jar&quot;));
+<b class="nc">&nbsp;		}</b>
+&nbsp;		finally {
+<b class="nc">&nbsp;			removeImage(imageReference);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void plainDistZipJarApp() throws Exception {
+<b class="nc">&nbsp;		writeMainClass();</b>
+<b class="nc">&nbsp;		String projectName = this.gradleBuild.getProjectDir().getName();</b>
+<b class="nc">&nbsp;		String imageName = &quot;paketo-integration/&quot; + projectName;</b>
+<b class="nc">&nbsp;		ImageReference imageReference = ImageReference.of(ImageName.of(imageName));</b>
+<b class="nc">&nbsp;		BuildResult result = buildImage(imageName, &quot;assemble&quot;, &quot;bootDistZip&quot;);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withExposedPorts(8080);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;			ContainerConfig config = container.getContainerInfo().getConfig();</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config).buildMetadata((metadata) -&gt; {</b>
+<b class="nc">&nbsp;				metadata.buildpacks()</b>
+<b class="nc">&nbsp;					.contains(&quot;paketo-buildpacks/ca-certificates&quot;, &quot;paketo-buildpacks/bellsoft-liberica&quot;,</b>
+&nbsp;							&quot;paketo-buildpacks/dist-zip&quot;, &quot;paketo-buildpacks/spring-boot&quot;);
+<b class="nc">&nbsp;				String launcher = &quot;/workspace/&quot; + projectName + &quot;/bin/&quot; + projectName;</b>
+<b class="nc">&nbsp;				metadata.processOfType(&quot;web&quot;).containsExactly(launcher);</b>
+<b class="nc">&nbsp;				metadata.processOfType(&quot;dist-zip&quot;).containsExactly(launcher);</b>
+&nbsp;			});
+<b class="nc">&nbsp;			assertImageHasJvmSbomLayer(imageReference, config);</b>
+<b class="nc">&nbsp;			assertImageHasDependenciesSbomLayer(imageReference, config, &quot;dist-zip&quot;);</b>
+<b class="nc">&nbsp;			DigestCapturingCondition digest = new DigestCapturingCondition();</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config)</b>
+<b class="nc">&nbsp;				.lifecycleMetadata((metadata) -&gt; metadata.appLayerShas().haveExactly(1, digest));</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(imageReference)</b>
+<b class="nc">&nbsp;				.layer(digest.getDigest(), (layer) -&gt; layer.entries()</b>
+<b class="nc">&nbsp;					.contains(projectName + &quot;/bin/&quot; + projectName, projectName + &quot;/lib/&quot; + projectName + &quot;-plain.jar&quot;)</b>
+<b class="nc">&nbsp;					.anyMatch((s) -&gt; s.startsWith(projectName + &quot;/lib/spring-boot-&quot;))</b>
+<b class="nc">&nbsp;					.anyMatch((s) -&gt; s.startsWith(projectName + &quot;/lib/spring-core-&quot;))</b>
+<b class="nc">&nbsp;					.anyMatch((s) -&gt; s.startsWith(projectName + &quot;/lib/spring-web-&quot;)));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		finally {
+<b class="nc">&nbsp;			removeImage(imageReference);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void executableWarApp() throws Exception {
+<b class="nc">&nbsp;		writeMainClass();</b>
+<b class="nc">&nbsp;		writeServletInitializerClass();</b>
+<b class="nc">&nbsp;		String imageName = &quot;paketo-integration/&quot; + this.gradleBuild.getProjectDir().getName();</b>
+<b class="nc">&nbsp;		ImageReference imageReference = ImageReference.of(ImageName.of(imageName));</b>
+<b class="nc">&nbsp;		BuildResult result = buildImage(imageName);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withExposedPorts(8080);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;			ContainerConfig config = container.getContainerInfo().getConfig();</b>
+<b class="nc">&nbsp;			assertLabelsMatchManifestAttributes(config);</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config).buildMetadata((metadata) -&gt; {</b>
+<b class="nc">&nbsp;				metadata.buildpacks()</b>
+<b class="nc">&nbsp;					.contains(&quot;paketo-buildpacks/ca-certificates&quot;, &quot;paketo-buildpacks/bellsoft-liberica&quot;,</b>
+&nbsp;							&quot;paketo-buildpacks/executable-jar&quot;, &quot;paketo-buildpacks/dist-zip&quot;,
+&nbsp;							&quot;paketo-buildpacks/spring-boot&quot;);
+<b class="nc">&nbsp;				metadata.processOfType(&quot;web&quot;)</b>
+<b class="nc">&nbsp;					.containsExactly(&quot;java&quot;, &quot;org.springframework.boot.loader.launch.WarLauncher&quot;);</b>
+<b class="nc">&nbsp;				metadata.processOfType(&quot;executable-jar&quot;)</b>
+<b class="nc">&nbsp;					.containsExactly(&quot;java&quot;, &quot;org.springframework.boot.loader.launch.WarLauncher&quot;);</b>
+&nbsp;			});
+<b class="nc">&nbsp;			assertImageHasJvmSbomLayer(imageReference, config);</b>
+<b class="nc">&nbsp;			assertImageHasDependenciesSbomLayer(imageReference, config, &quot;executable-jar&quot;);</b>
+<b class="nc">&nbsp;			assertImageLayersMatchLayersIndex(imageReference, config);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		finally {
+<b class="nc">&nbsp;			removeImage(imageReference);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void plainWarApp() throws Exception {
+<b class="nc">&nbsp;		writeMainClass();</b>
+<b class="nc">&nbsp;		writeServletInitializerClass();</b>
+<b class="nc">&nbsp;		String imageName = &quot;paketo-integration/&quot; + this.gradleBuild.getProjectDir().getName();</b>
+<b class="nc">&nbsp;		ImageReference imageReference = ImageReference.of(ImageName.of(imageName));</b>
+<b class="nc">&nbsp;		BuildResult result = buildImage(imageName);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withExposedPorts(8080);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;			ContainerConfig config = container.getContainerInfo().getConfig();</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config).buildMetadata((metadata) -&gt; {</b>
+<b class="nc">&nbsp;				metadata.buildpacks()</b>
+<b class="nc">&nbsp;					.contains(&quot;paketo-buildpacks/ca-certificates&quot;, &quot;paketo-buildpacks/bellsoft-liberica&quot;,</b>
+&nbsp;							&quot;paketo-buildpacks/apache-tomcat&quot;, &quot;paketo-buildpacks/dist-zip&quot;,
+&nbsp;							&quot;paketo-buildpacks/spring-boot&quot;);
+<b class="nc">&nbsp;				metadata.processOfType(&quot;web&quot;)</b>
+<b class="nc">&nbsp;					.satisfiesExactly((command) -&gt; assertThat(command).endsWith(&quot;sh&quot;),</b>
+<b class="nc">&nbsp;							(arg) -&gt; assertThat(arg).endsWith(&quot;catalina.sh&quot;),</b>
+<b class="nc">&nbsp;							(arg) -&gt; assertThat(arg).isEqualTo(&quot;run&quot;));</b>
+<b class="nc">&nbsp;				metadata.processOfType(&quot;tomcat&quot;)</b>
+<b class="nc">&nbsp;					.satisfiesExactly((command) -&gt; assertThat(command).endsWith(&quot;sh&quot;),</b>
+<b class="nc">&nbsp;							(arg) -&gt; assertThat(arg).endsWith(&quot;catalina.sh&quot;),</b>
+<b class="nc">&nbsp;							(arg) -&gt; assertThat(arg).isEqualTo(&quot;run&quot;));</b>
+&nbsp;			});
+<b class="nc">&nbsp;			assertImageHasJvmSbomLayer(imageReference, config);</b>
+<b class="nc">&nbsp;			assertImageHasDependenciesSbomLayer(imageReference, config, &quot;apache-tomcat&quot;);</b>
+<b class="nc">&nbsp;			DigestCapturingCondition digest = new DigestCapturingCondition();</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config)</b>
+<b class="nc">&nbsp;				.lifecycleMetadata((metadata) -&gt; metadata.appLayerShas().haveExactly(1, digest));</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(imageReference)</b>
+<b class="nc">&nbsp;				.layer(digest.getDigest(),</b>
+<b class="nc">&nbsp;						(layer) -&gt; layer.entries()</b>
+<b class="nc">&nbsp;							.contains(&quot;WEB-INF/classes/example/ExampleApplication.class&quot;,</b>
+&nbsp;									&quot;WEB-INF/classes/example/HelloController.class&quot;, &quot;META-INF/MANIFEST.MF&quot;)
+<b class="nc">&nbsp;							.anyMatch((s) -&gt; s.startsWith(&quot;WEB-INF/lib/spring-boot-&quot;))</b>
+<b class="nc">&nbsp;							.anyMatch((s) -&gt; s.startsWith(&quot;WEB-INF/lib/spring-core-&quot;))</b>
+<b class="nc">&nbsp;							.anyMatch((s) -&gt; s.startsWith(&quot;WEB-INF/lib/spring-web-&quot;)));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		finally {
+<b class="nc">&nbsp;			removeImage(imageReference);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	@EnabledForJreRange(max = JRE.JAVA_17)
+&nbsp;	void nativeApp() throws Exception {
+<b class="nc">&nbsp;		this.gradleBuild.expectDeprecationMessages(&quot;uses or overrides a deprecated API&quot;);</b>
+<b class="nc">&nbsp;		this.gradleBuild.expectDeprecationMessages(&quot;has been deprecated and marked for removal&quot;);</b>
+&nbsp;		// these deprecations are transitive from the Native Build Tools Gradle plugin
+<b class="nc">&nbsp;		this.gradleBuild</b>
+<b class="nc">&nbsp;			.expectDeprecationMessages(&quot;has been deprecated. This is scheduled to be removed in Gradle 9.0&quot;);</b>
+<b class="nc">&nbsp;		this.gradleBuild.expectDeprecationMessages(&quot;upgrading_version_8.html#deprecated_access_to_convention&quot;);</b>
+<b class="nc">&nbsp;		writeMainClass();</b>
+<b class="nc">&nbsp;		String imageName = &quot;paketo-integration/&quot; + this.gradleBuild.getProjectDir().getName();</b>
+<b class="nc">&nbsp;		ImageReference imageReference = ImageReference.of(ImageName.of(imageName));</b>
+<b class="nc">&nbsp;		BuildResult result = buildImage(imageName);</b>
+<b class="nc">&nbsp;		assertThat(result.task(&quot;:bootBuildImage&quot;).getOutcome()).isEqualTo(TaskOutcome.SUCCESS);</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = new GenericContainer&lt;&gt;(imageName)) {</b>
+<b class="nc">&nbsp;			container.withExposedPorts(8080);</b>
+<b class="nc">&nbsp;			container.waitingFor(Wait.forHttp(&quot;/test&quot;)).start();</b>
+<b class="nc">&nbsp;			ContainerConfig config = container.getContainerInfo().getConfig();</b>
+<b class="nc">&nbsp;			assertLabelsMatchManifestAttributes(config);</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config).buildMetadata((metadata) -&gt; {</b>
+<b class="nc">&nbsp;				metadata.buildpacks()</b>
+<b class="nc">&nbsp;					.contains(&quot;paketo-buildpacks/ca-certificates&quot;, &quot;paketo-buildpacks/bellsoft-liberica&quot;,</b>
+&nbsp;							&quot;paketo-buildpacks/executable-jar&quot;, &quot;paketo-buildpacks/spring-boot&quot;,
+&nbsp;							&quot;paketo-buildpacks/native-image&quot;);
+<b class="nc">&nbsp;				metadata.processOfType(&quot;web&quot;)</b>
+<b class="nc">&nbsp;					.satisfiesExactly((command) -&gt; assertThat(command).endsWith(&quot;/example.ExampleApplication&quot;));</b>
+<b class="nc">&nbsp;				metadata.processOfType(&quot;native-image&quot;)</b>
+<b class="nc">&nbsp;					.satisfiesExactly((command) -&gt; assertThat(command).endsWith(&quot;/example.ExampleApplication&quot;));</b>
+&nbsp;			});
+<b class="nc">&nbsp;			assertImageHasDependenciesSbomLayer(imageReference, config, &quot;native-image&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		finally {
+<b class="nc">&nbsp;			removeImage(imageReference);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildResult buildImage(String imageName, String... arguments) {
+<b class="nc">&nbsp;		String[] buildImageArgs = { &quot;bootBuildImage&quot;, &quot;--imageName=&quot; + imageName, &quot;--pullPolicy=IF_NOT_PRESENT&quot; };</b>
+<b class="nc">&nbsp;		String[] args = StringUtils.concatenateStringArrays(arguments, buildImageArgs);</b>
+<b class="nc">&nbsp;		return this.gradleBuild.build(args);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeMainClass() throws IOException {
+<b class="nc">&nbsp;		writeProjectFile(&quot;ExampleApplication.java&quot;, (writer) -&gt; {</b>
+<b class="nc">&nbsp;			writer.println(&quot;package example;&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;import org.springframework.boot.SpringApplication;&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;import org.springframework.boot.autoconfigure.SpringBootApplication;&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;import org.springframework.stereotype.Controller;&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;import org.springframework.web.bind.annotation.RequestMapping;&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;import org.springframework.web.bind.annotation.ResponseBody;&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;@SpringBootApplication&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;public class ExampleApplication {&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;    public static void main(String[] args) {&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;        SpringApplication.run(ExampleApplication.class, args);&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;    }&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;}&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;@Controller&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;class HelloController {&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;    @RequestMapping(\&quot;/test\&quot;)&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;    @ResponseBody&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;    String home() {&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;        return \&quot;Hello, world!\&quot;;&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;    }&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;}&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeServletInitializerClass() throws IOException {
+<b class="nc">&nbsp;		writeProjectFile(&quot;ServletInitializer.java&quot;, (writer) -&gt; {</b>
+<b class="nc">&nbsp;			writer.println(&quot;package example;&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;import org.springframework.boot.builder.SpringApplicationBuilder;&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;public class ServletInitializer extends SpringBootServletInitializer {&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;    @Override&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;        return application.sources(ExampleApplication.class);&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;    }&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;}&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeProjectFile(String fileName, Consumer&lt;PrintWriter&gt; consumer) throws IOException {
+<b class="nc">&nbsp;		File examplePackage = new File(this.gradleBuild.getProjectDir(), &quot;src/main/java/example&quot;);</b>
+<b class="nc">&nbsp;		examplePackage.mkdirs();</b>
+<b class="nc">&nbsp;		File main = new File(examplePackage, fileName);</b>
+<b class="nc">&nbsp;		try (PrintWriter writer = new PrintWriter(new FileWriter(main))) {</b>
+<b class="nc">&nbsp;			consumer.accept(writer);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertLabelsMatchManifestAttributes(ContainerConfig config) throws IOException {
+<b class="nc">&nbsp;		try (JarFile jarFile = new JarFile(projectArchiveFile())) {</b>
+<b class="nc">&nbsp;			Attributes attributes = jarFile.getManifest().getMainAttributes();</b>
+<b class="nc">&nbsp;			ImageAssertions.assertThat(config).labels((labels) -&gt; {</b>
+<b class="nc">&nbsp;				labels.contains(entry(&quot;org.springframework.boot.version&quot;, attributes.getValue(&quot;Spring-Boot-Version&quot;)));</b>
+<b class="nc">&nbsp;				labels.contains(entry(&quot;org.opencontainers.image.title&quot;,</b>
+<b class="nc">&nbsp;						attributes.getValue(Attributes.Name.IMPLEMENTATION_TITLE)));</b>
+<b class="nc">&nbsp;				labels.contains(entry(&quot;org.opencontainers.image.version&quot;,</b>
+<b class="nc">&nbsp;						attributes.getValue(Attributes.Name.IMPLEMENTATION_VERSION)));</b>
+&nbsp;			});
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertImageHasJvmSbomLayer(ImageReference imageReference, ContainerConfig config) throws IOException {
+<b class="nc">&nbsp;		DigestCapturingCondition digest = new DigestCapturingCondition();</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(config).lifecycleMetadata((metadata) -&gt; metadata.sbomLayerSha().has(digest));</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(imageReference).layer(digest.getDigest(), (layer) -&gt; {</b>
+<b class="nc">&nbsp;			layer.entries().contains(&quot;/layers/sbom/launch/paketo-buildpacks_bellsoft-liberica/jre/sbom.syft.json&quot;);</b>
+<b class="nc">&nbsp;			layer.jsonEntry(&quot;/layers/sbom/launch/paketo-buildpacks_bellsoft-liberica/jre/sbom.syft.json&quot;, (json) -&gt; {</b>
+<b class="nc">&nbsp;				json.extractingJsonPathStringValue(&quot;$.Artifacts[0].Name&quot;).isEqualTo(&quot;BellSoft Liberica JRE&quot;);</b>
+<b class="nc">&nbsp;				json.extractingJsonPathStringValue(&quot;$.Artifacts[0].Version&quot;).startsWith(javaMajorVersion());</b>
+&nbsp;			});
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertImageHasDependenciesSbomLayer(ImageReference imageReference, ContainerConfig config,
+&nbsp;			String buildpack) throws IOException {
+<b class="nc">&nbsp;		DigestCapturingCondition digest = new DigestCapturingCondition();</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(config).lifecycleMetadata((metadata) -&gt; metadata.sbomLayerSha().has(digest));</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(imageReference).layer(digest.getDigest(), (layer) -&gt; {</b>
+<b class="nc">&nbsp;			layer.entries()</b>
+<b class="nc">&nbsp;				.contains(&quot;/layers/sbom/launch/paketo-buildpacks_&quot; + buildpack + &quot;/sbom.syft.json&quot;,</b>
+&nbsp;						&quot;/layers/sbom/launch/paketo-buildpacks_&quot; + buildpack + &quot;/sbom.cdx.json&quot;);
+<b class="nc">&nbsp;			layer.jsonEntry(&quot;/layers/sbom/launch/paketo-buildpacks_&quot; + buildpack + &quot;/sbom.syft.json&quot;,</b>
+<b class="nc">&nbsp;					(json) -&gt; json.extractingJsonPathArrayValue(&quot;$.artifacts.[*].name&quot;)</b>
+<b class="nc">&nbsp;						.contains(&quot;spring-beans&quot;, &quot;spring-boot&quot;, &quot;spring-boot-autoconfigure&quot;, &quot;spring-context&quot;,</b>
+&nbsp;								&quot;spring-core&quot;, &quot;spring-expression&quot;, &quot;spring-jcl&quot;, &quot;spring-web&quot;, &quot;spring-webmvc&quot;));
+<b class="nc">&nbsp;			layer.jsonEntry(&quot;/layers/sbom/launch/paketo-buildpacks_&quot; + buildpack + &quot;/sbom.cdx.json&quot;,</b>
+<b class="nc">&nbsp;					(json) -&gt; json.extractingJsonPathArrayValue(&quot;$.components.[*].name&quot;)</b>
+<b class="nc">&nbsp;						.contains(&quot;spring-beans&quot;, &quot;spring-boot&quot;, &quot;spring-boot-autoconfigure&quot;, &quot;spring-context&quot;,</b>
+&nbsp;								&quot;spring-core&quot;, &quot;spring-expression&quot;, &quot;spring-jcl&quot;, &quot;spring-web&quot;, &quot;spring-webmvc&quot;));
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertImageLayersMatchLayersIndex(ImageReference imageReference, ContainerConfig config)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		DigestsCapturingCondition digests = new DigestsCapturingCondition();</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(config)</b>
+<b class="nc">&nbsp;			.lifecycleMetadata((metadata) -&gt; metadata.appLayerShas().haveExactly(5, digests));</b>
+<b class="nc">&nbsp;		LayersIndex layersIndex = LayersIndex.fromArchiveFile(projectArchiveFile());</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(imageReference)</b>
+<b class="nc">&nbsp;			.layer(digests.getDigest(0), (layer) -&gt; layer.entries()</b>
+<b class="nc">&nbsp;				.allMatch((entry) -&gt; startsWithOneOf(entry, layersIndex.getLayer(&quot;dependencies&quot;))));</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(imageReference)</b>
+<b class="nc">&nbsp;			.layer(digests.getDigest(1), (layer) -&gt; layer.entries()</b>
+<b class="nc">&nbsp;				.allMatch((entry) -&gt; startsWithOneOf(entry, layersIndex.getLayer(&quot;spring-boot-loader&quot;))));</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(imageReference)</b>
+<b class="nc">&nbsp;			.layer(digests.getDigest(2), (layer) -&gt; layer.entries()</b>
+<b class="nc">&nbsp;				.allMatch((entry) -&gt; startsWithOneOf(entry, layersIndex.getLayer(&quot;snapshot-dependencies&quot;))));</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(imageReference)</b>
+<b class="nc">&nbsp;			.layer(digests.getDigest(3), (layer) -&gt; layer.entries()</b>
+<b class="nc">&nbsp;				.allMatch((entry) -&gt; startsWithOneOf(entry, layersIndex.getLayer(&quot;application&quot;))));</b>
+<b class="nc">&nbsp;		ImageAssertions.assertThat(imageReference)</b>
+<b class="nc">&nbsp;			.layer(digests.getDigest(4),</b>
+<b class="nc">&nbsp;					(layer) -&gt; layer.entries().allMatch((entry) -&gt; entry.contains(&quot;lib/spring-cloud-bindings-&quot;)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File projectArchiveFile() {
+<b class="nc">&nbsp;		return new File(this.gradleBuild.getProjectDir(), &quot;build/libs&quot;).listFiles()[0];</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String javaMajorVersion() {
+<b class="nc">&nbsp;		String javaVersion = System.getProperty(&quot;java.version&quot;);</b>
+<b class="nc">&nbsp;		if (javaVersion.startsWith(&quot;1.&quot;)) {</b>
+<b class="nc">&nbsp;			return javaVersion.substring(2, 3);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int firstDotIndex = javaVersion.indexOf(&quot;.&quot;);</b>
+<b class="nc">&nbsp;		if (firstDotIndex != -1) {</b>
+<b class="nc">&nbsp;			return javaVersion.substring(0, firstDotIndex);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return javaVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean startsWithOneOf(String actual, List&lt;String&gt; expectedPrefixes) {
+<b class="nc">&nbsp;		for (String prefix : expectedPrefixes) {</b>
+<b class="nc">&nbsp;			if (actual.startsWith(prefix)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void removeImage(ImageReference image) throws IOException {
+<b class="nc">&nbsp;		new DockerApi().image().remove(image, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class DigestCapturingCondition extends Condition&lt;Object&gt; {
+&nbsp;
+<b class="nc">&nbsp;		private static String digest = null;</b>
+&nbsp;
+&nbsp;		DigestCapturingCondition() {
+<b class="nc">&nbsp;			super(predicate(), &quot;a value starting with &#39;sha256:&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Predicate&lt;Object&gt; predicate() {
+<b class="nc">&nbsp;			return (sha) -&gt; {</b>
+<b class="nc">&nbsp;				digest = sha.toString();</b>
+<b class="nc">&nbsp;				return sha.toString().startsWith(&quot;sha256:&quot;);</b>
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		String getDigest() {
+<b class="nc">&nbsp;			return digest;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class DigestsCapturingCondition extends Condition&lt;Object&gt; {
+&nbsp;
+&nbsp;		private static List&lt;String&gt; digests;
+&nbsp;
+&nbsp;		DigestsCapturingCondition() {
+<b class="nc">&nbsp;			super(predicate(), &quot;a value starting with &#39;sha256:&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Predicate&lt;Object&gt; predicate() {
+<b class="nc">&nbsp;			digests = new ArrayList&lt;&gt;();</b>
+&nbsp;			return (sha) -&gt; {
+<b class="nc">&nbsp;				digests.add(sha.toString());</b>
+<b class="nc">&nbsp;				return sha.toString().startsWith(&quot;sha256:&quot;);</b>
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		String getDigest(int index) {
+<b class="nc">&nbsp;			return digests.get(index);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

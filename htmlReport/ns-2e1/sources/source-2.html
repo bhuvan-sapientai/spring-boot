@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MockServerRestClientCustomizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.web.client</a>
+</div>
+
+<h1>Coverage Summary for Class: MockServerRestClientCustomizer (org.springframework.boot.test.web.client)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MockServerRestClientCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.web.client;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.boot.web.client.RestClientCustomizer;
+&nbsp;import org.springframework.http.client.BufferingClientHttpRequestFactory;
+&nbsp;import org.springframework.test.web.client.MockRestServiceServer;
+&nbsp;import org.springframework.test.web.client.MockRestServiceServer.MockRestServiceServerBuilder;
+&nbsp;import org.springframework.test.web.client.RequestExpectationManager;
+&nbsp;import org.springframework.test.web.client.SimpleRequestExpectationManager;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.client.RestClient;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link RestClientCustomizer} that can be applied to {@link RestClient.Builder}
+&nbsp; * instances to add {@link MockRestServiceServer} support.
+&nbsp; * &lt;p&gt;
+&nbsp; * Typically applied to an existing builder before it is used, for example:
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
+&nbsp; * RestClient.Builder builder = RestClient.builder();
+&nbsp; * customizer.customize(builder);
+&nbsp; * MyBean bean = new MyBean(client.build());
+&nbsp; * customizer.getServer().expect(requestTo(&quot;/hello&quot;)).andRespond(withSuccess());
+&nbsp; * bean.makeRestCall();
+&nbsp; * &lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * If the customizer is only used once, the {@link #getServer()} method can be used to
+&nbsp; * obtain the mock server. If the customizer has been used more than once the
+&nbsp; * {@link #getServer(RestClient.Builder)} or {@link #getServers()} method must be used to
+&nbsp; * access the related server.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 3.2.0
+&nbsp; * @see #getServer()
+&nbsp; * @see #getServer(RestClient.Builder)
+&nbsp; */
+&nbsp;public class MockServerRestClientCustomizer implements RestClientCustomizer {
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;RestClient.Builder, RequestExpectationManager&gt; expectationManagers = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;RestClient.Builder, MockRestServiceServer&gt; servers = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private final Supplier&lt;? extends RequestExpectationManager&gt; expectationManagerSupplier;
+&nbsp;
+<b class="nc">&nbsp;	private boolean bufferContent = false;</b>
+&nbsp;
+&nbsp;	public MockServerRestClientCustomizer() {
+<b class="nc">&nbsp;		this(SimpleRequestExpectationManager::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Crate a new {@link MockServerRestClientCustomizer} instance.
+&nbsp;	 * @param expectationManager the expectation manager class to use
+&nbsp;	 */
+&nbsp;	public MockServerRestClientCustomizer(Class&lt;? extends RequestExpectationManager&gt; expectationManager) {
+<b class="nc">&nbsp;		this(() -&gt; BeanUtils.instantiateClass(expectationManager));</b>
+<b class="nc">&nbsp;		Assert.notNull(expectationManager, &quot;ExpectationManager must not be null&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Crate a new {@link MockServerRestClientCustomizer} instance.
+&nbsp;	 * @param expectationManagerSupplier a supplier that provides the
+&nbsp;	 * {@link RequestExpectationManager} to use
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+<b class="nc">&nbsp;	public MockServerRestClientCustomizer(Supplier&lt;? extends RequestExpectationManager&gt; expectationManagerSupplier) {</b>
+<b class="nc">&nbsp;		Assert.notNull(expectationManagerSupplier, &quot;ExpectationManagerSupplier must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.expectationManagerSupplier = expectationManagerSupplier;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set if the {@link BufferingClientHttpRequestFactory} wrapper should be used to
+&nbsp;	 * buffer the input and output streams, and for example, allow multiple reads of the
+&nbsp;	 * response body.
+&nbsp;	 * @param bufferContent if request and response content should be buffered
+&nbsp;	 * @since 3.1.0
+&nbsp;	 */
+&nbsp;	public void setBufferContent(boolean bufferContent) {
+<b class="nc">&nbsp;		this.bufferContent = bufferContent;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void customize(RestClient.Builder restClientBuilder) {
+<b class="nc">&nbsp;		RequestExpectationManager expectationManager = createExpectationManager();</b>
+<b class="nc">&nbsp;		MockRestServiceServerBuilder serverBuilder = MockRestServiceServer.bindTo(restClientBuilder);</b>
+<b class="nc">&nbsp;		if (this.bufferContent) {</b>
+<b class="nc">&nbsp;			serverBuilder.bufferContent();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		MockRestServiceServer server = serverBuilder.build(expectationManager);</b>
+<b class="nc">&nbsp;		this.expectationManagers.put(restClientBuilder, expectationManager);</b>
+<b class="nc">&nbsp;		this.servers.put(restClientBuilder, server);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected RequestExpectationManager createExpectationManager() {
+<b class="nc">&nbsp;		return this.expectationManagerSupplier.get();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public MockRestServiceServer getServer() {
+<b class="nc">&nbsp;		Assert.state(!this.servers.isEmpty(), &quot;Unable to return a single MockRestServiceServer since &quot;</b>
+&nbsp;				+ &quot;MockServerRestClientCustomizer has not been bound to a RestClient&quot;);
+<b class="nc">&nbsp;		Assert.state(this.servers.size() == 1, &quot;Unable to return a single MockRestServiceServer since &quot;</b>
+&nbsp;				+ &quot;MockServerRestClientCustomizer has been bound to more than one RestClient&quot;);
+<b class="nc">&nbsp;		return this.servers.values().iterator().next();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Map&lt;RestClient.Builder, RequestExpectationManager&gt; getExpectationManagers() {
+<b class="nc">&nbsp;		return this.expectationManagers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public MockRestServiceServer getServer(RestClient.Builder restClientBuilder) {
+<b class="nc">&nbsp;		return this.servers.get(restClientBuilder);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Map&lt;RestClient.Builder, MockRestServiceServer&gt; getServers() {
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(this.servers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoConfiguration (org.springframework.boot.autoconfigure)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">AutoConfiguration</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.context.annotation.ImportCandidates;
+&nbsp;import org.springframework.context.annotation.AnnotationBeanNameGenerator;
+&nbsp;import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.annotation.AliasFor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Indicates that a class provides configuration that can be automatically applied by
+&nbsp; * Spring Boot. Auto-configuration classes are regular
+&nbsp; * {@link Configuration @Configuration} with the exception that
+&nbsp; * {@literal Configuration#proxyBeanMethods() proxyBeanMethods} is always {@code false}.
+&nbsp; * They are located using {@link ImportCandidates}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Generally auto-configuration classes are marked as {@link Conditional @Conditional}
+&nbsp; * (most often using {@link ConditionalOnClass @ConditionalOnClass} and
+&nbsp; * {@link ConditionalOnMissingBean @ConditionalOnMissingBean} annotations).
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @see EnableAutoConfiguration
+&nbsp; * @see AutoConfigureBefore
+&nbsp; * @see AutoConfigureAfter
+&nbsp; * @see Conditional
+&nbsp; * @see ConditionalOnClass
+&nbsp; * @see ConditionalOnMissingBean
+&nbsp; * @since 2.7.0
+&nbsp; */
+&nbsp;@Target(ElementType.TYPE)
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Documented
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@AutoConfigureBefore
+&nbsp;@AutoConfigureAfter
+&nbsp;public @interface AutoConfiguration {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Explicitly specify the name of the Spring bean definition associated with the
+&nbsp;	 * {@code @AutoConfiguration} class. If left unspecified (the common case), a bean
+&nbsp;	 * name will be automatically generated.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * The custom name applies only if the {@code @AutoConfiguration} class is picked up
+&nbsp;	 * through component scanning or supplied directly to an
+&nbsp;	 * {@link AnnotationConfigApplicationContext}. If the {@code @AutoConfiguration} class
+&nbsp;	 * is registered as a traditional XML bean definition, the name/id of the bean element
+&nbsp;	 * will take precedence.
+&nbsp;	 * @return the explicit component name, if any (or empty String otherwise)
+&nbsp;	 * @see AnnotationBeanNameGenerator
+&nbsp;	 */
+&nbsp;	@AliasFor(annotation = Configuration.class)
+&nbsp;	String value() default &quot;&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The auto-configure classes that should have not yet been applied.
+&nbsp;	 * @return the classes
+&nbsp;	 */
+&nbsp;	@AliasFor(annotation = AutoConfigureBefore.class, attribute = &quot;value&quot;)
+&nbsp;	Class&lt;?&gt;[] before() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The names of the auto-configure classes that should have not yet been applied.
+&nbsp;	 * @return the class names
+&nbsp;	 */
+&nbsp;	@AliasFor(annotation = AutoConfigureBefore.class, attribute = &quot;name&quot;)
+&nbsp;	String[] beforeName() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The auto-configure classes that should have already been applied.
+&nbsp;	 * @return the classes
+&nbsp;	 */
+&nbsp;	@AliasFor(annotation = AutoConfigureAfter.class, attribute = &quot;value&quot;)
+&nbsp;	Class&lt;?&gt;[] after() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The names of the auto-configure classes that should have already been applied.
+&nbsp;	 * @return the class names
+&nbsp;	 */
+&nbsp;	@AliasFor(annotation = AutoConfigureAfter.class, attribute = &quot;name&quot;)
+&nbsp;	String[] afterName() default {};
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

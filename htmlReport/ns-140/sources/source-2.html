@@ -1,0 +1,360 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DockerConfigurationMetadata</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.configuration</a>
+</div>
+
+<h1>Coverage Summary for Class: DockerConfigurationMetadata (org.springframework.boot.buildpack.platform.docker.configuration)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DockerConfigurationMetadata</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DockerConfigurationMetadata$DockerConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DockerConfigurationMetadata$DockerContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.configuration;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.invoke.MethodHandles;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.util.HexFormat;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.JsonProcessingException;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.node.NullNode;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.json.MappedObject;
+&nbsp;import org.springframework.boot.buildpack.platform.json.SharedObjectMapper;
+&nbsp;import org.springframework.boot.buildpack.platform.system.Environment;
+&nbsp;
+&nbsp;/**
+&nbsp; * Docker configuration stored in metadata files managed by the Docker CLI.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;final class DockerConfigurationMetadata {
+&nbsp;
+&nbsp;	private static final String DOCKER_CONFIG = &quot;DOCKER_CONFIG&quot;;
+&nbsp;
+&nbsp;	private static final String DEFAULT_CONTEXT = &quot;default&quot;;
+&nbsp;
+&nbsp;	private static final String CONFIG_DIR = &quot;.docker&quot;;
+&nbsp;
+&nbsp;	private static final String CONTEXTS_DIR = &quot;contexts&quot;;
+&nbsp;
+&nbsp;	private static final String META_DIR = &quot;meta&quot;;
+&nbsp;
+&nbsp;	private static final String TLS_DIR = &quot;tls&quot;;
+&nbsp;
+&nbsp;	private static final String DOCKER_ENDPOINT = &quot;docker&quot;;
+&nbsp;
+&nbsp;	private static final String CONFIG_FILE_NAME = &quot;config.json&quot;;
+&nbsp;
+&nbsp;	private static final String CONTEXT_FILE_NAME = &quot;meta.json&quot;;
+&nbsp;
+&nbsp;	private final String configLocation;
+&nbsp;
+&nbsp;	private final DockerConfig config;
+&nbsp;
+&nbsp;	private final DockerContext context;
+&nbsp;
+<b class="nc">&nbsp;	private DockerConfigurationMetadata(String configLocation, DockerConfig config, DockerContext context) {</b>
+<b class="nc">&nbsp;		this.configLocation = configLocation;</b>
+<b class="nc">&nbsp;		this.config = config;</b>
+<b class="nc">&nbsp;		this.context = context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	DockerConfig getConfiguration() {
+<b class="nc">&nbsp;		return this.config;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	DockerContext getContext() {
+<b class="nc">&nbsp;		return this.context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	DockerContext forContext(String context) {
+<b class="nc">&nbsp;		return createDockerContext(this.configLocation, context);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static DockerConfigurationMetadata from(Environment environment) {
+<b class="nc">&nbsp;		String configLocation = (environment.get(DOCKER_CONFIG) != null) ? environment.get(DOCKER_CONFIG)</b>
+<b class="nc">&nbsp;				: Path.of(System.getProperty(&quot;user.home&quot;), CONFIG_DIR).toString();</b>
+<b class="nc">&nbsp;		DockerConfig dockerConfig = createDockerConfig(configLocation);</b>
+<b class="nc">&nbsp;		DockerContext dockerContext = createDockerContext(configLocation, dockerConfig.getCurrentContext());</b>
+<b class="nc">&nbsp;		return new DockerConfigurationMetadata(configLocation, dockerConfig, dockerContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static DockerConfig createDockerConfig(String configLocation) {
+<b class="nc">&nbsp;		Path path = Path.of(configLocation, CONFIG_FILE_NAME);</b>
+<b class="nc">&nbsp;		if (!path.toFile().exists()) {</b>
+<b class="nc">&nbsp;			return DockerConfig.empty();</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return DockerConfig.fromJson(readPathContent(path));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (JsonProcessingException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Error parsing Docker configuration file &#39;&quot; + path + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static DockerContext createDockerContext(String configLocation, String currentContext) {
+<b class="nc">&nbsp;		if (currentContext == null || DEFAULT_CONTEXT.equals(currentContext)) {</b>
+<b class="nc">&nbsp;			return DockerContext.empty();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Path metaPath = Path.of(configLocation, CONTEXTS_DIR, META_DIR, asHash(currentContext), CONTEXT_FILE_NAME);</b>
+<b class="nc">&nbsp;		Path tlsPath = Path.of(configLocation, CONTEXTS_DIR, TLS_DIR, asHash(currentContext), DOCKER_ENDPOINT);</b>
+<b class="nc">&nbsp;		if (!metaPath.toFile().exists()) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Docker context &#39;&quot; + currentContext + &quot;&#39; does not exist&quot;);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			DockerContext context = DockerContext.fromJson(readPathContent(metaPath));</b>
+<b class="nc">&nbsp;			if (tlsPath.toFile().isDirectory()) {</b>
+<b class="nc">&nbsp;				return context.withTlsPath(tlsPath.toString());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return context;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (JsonProcessingException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Error parsing Docker context metadata file &#39;&quot; + metaPath + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String asHash(String currentContext) {
+&nbsp;		try {
+<b class="nc">&nbsp;			MessageDigest digest = MessageDigest.getInstance(&quot;SHA-256&quot;);</b>
+<b class="nc">&nbsp;			byte[] hash = digest.digest(currentContext.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;			return HexFormat.of().formatHex(hash);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchAlgorithmException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String readPathContent(Path path) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return Files.readString(path);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Error reading Docker configuration file &#39;&quot; + path + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	static final class DockerConfig extends MappedObject {
+&nbsp;
+&nbsp;		private final String currentContext;
+&nbsp;
+&nbsp;		private DockerConfig(JsonNode node) {
+<b class="nc">&nbsp;			super(node, MethodHandles.lookup());</b>
+<b class="nc">&nbsp;			this.currentContext = valueAt(&quot;/currentContext&quot;, String.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getCurrentContext() {
+<b class="nc">&nbsp;			return this.currentContext;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static DockerConfig fromJson(String json) throws JsonProcessingException {
+<b class="nc">&nbsp;			return new DockerConfig(SharedObjectMapper.get().readTree(json));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static DockerConfig empty() {
+<b class="nc">&nbsp;			return new DockerConfig(NullNode.instance);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static final class DockerContext extends MappedObject {
+&nbsp;
+&nbsp;		private final String dockerHost;
+&nbsp;
+&nbsp;		private final Boolean skipTlsVerify;
+&nbsp;
+&nbsp;		private final String tlsPath;
+&nbsp;
+&nbsp;		private DockerContext(JsonNode node, String tlsPath) {
+<b class="nc">&nbsp;			super(node, MethodHandles.lookup());</b>
+<b class="nc">&nbsp;			this.dockerHost = valueAt(&quot;/Endpoints/&quot; + DOCKER_ENDPOINT + &quot;/Host&quot;, String.class);</b>
+<b class="nc">&nbsp;			this.skipTlsVerify = valueAt(&quot;/Endpoints/&quot; + DOCKER_ENDPOINT + &quot;/SkipTLSVerify&quot;, Boolean.class);</b>
+<b class="nc">&nbsp;			this.tlsPath = tlsPath;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getDockerHost() {
+<b class="nc">&nbsp;			return this.dockerHost;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Boolean isTlsVerify() {
+<b class="nc">&nbsp;			return this.skipTlsVerify != null &amp;&amp; !this.skipTlsVerify;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getTlsPath() {
+<b class="nc">&nbsp;			return this.tlsPath;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		DockerContext withTlsPath(String tlsPath) {
+<b class="nc">&nbsp;			return new DockerContext(this.getNode(), tlsPath);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static DockerContext fromJson(String json) throws JsonProcessingException {
+<b class="nc">&nbsp;			return new DockerContext(SharedObjectMapper.get().readTree(json), null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static DockerContext empty() {
+<b class="nc">&nbsp;			return new DockerContext(NullNode.instance, null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

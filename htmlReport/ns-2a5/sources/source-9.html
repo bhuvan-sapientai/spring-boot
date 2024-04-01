@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Zip64EndOfCentralDirectoryRecord</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.zip</a>
+</div>
+
+<h1>Coverage Summary for Class: Zip64EndOfCentralDirectoryRecord (org.springframework.boot.loader.zip)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Zip64EndOfCentralDirectoryRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.zip;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.ByteOrder;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.log.DebugLogger;
+&nbsp;
+&nbsp;/**
+&nbsp; * A Zip64 end of central directory record.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @param size the size of this record
+&nbsp; * @param sizeOfZip64EndOfCentralDirectoryRecord the size of zip64 end of central
+&nbsp; * directory record
+&nbsp; * @param versionMadeBy the version that made the zip
+&nbsp; * @param versionNeededToExtract the version needed to extract the zip
+&nbsp; * @param numberOfThisDisk the number of this disk
+&nbsp; * @param diskWhereCentralDirectoryStarts the disk where central directory starts
+&nbsp; * @param numberOfCentralDirectoryEntriesOnThisDisk the number of central directory
+&nbsp; * entries on this disk
+&nbsp; * @param totalNumberOfCentralDirectoryEntries the total number of central directory
+&nbsp; * entries
+&nbsp; * @param sizeOfCentralDirectory the size of central directory (bytes)
+&nbsp; * @param offsetToStartOfCentralDirectory the offset of start of central directory,
+&nbsp; * relative to start of archive
+&nbsp; * @see &lt;a href=&quot;https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT&quot;&gt;Chapter
+&nbsp; * 4.3.14 of the Zip File Format Specification&lt;/a&gt;
+&nbsp; */
+<b class="nc">&nbsp;record Zip64EndOfCentralDirectoryRecord(long size, long sizeOfZip64EndOfCentralDirectoryRecord, short versionMadeBy,</b>
+&nbsp;		short versionNeededToExtract, int numberOfThisDisk, int diskWhereCentralDirectoryStarts,
+&nbsp;		long numberOfCentralDirectoryEntriesOnThisDisk, long totalNumberOfCentralDirectoryEntries,
+&nbsp;		long sizeOfCentralDirectory, long offsetToStartOfCentralDirectory) {
+&nbsp;
+<b class="nc">&nbsp;	private static final DebugLogger debug = DebugLogger.get(Zip64EndOfCentralDirectoryRecord.class);</b>
+&nbsp;
+&nbsp;	private static final int SIGNATURE = 0x06064b50;
+&nbsp;
+&nbsp;	private static final int MINIMUM_SIZE = 56;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load the {@link Zip64EndOfCentralDirectoryRecord} from the given data block based
+&nbsp;	 * on the offset given in the locator.
+&nbsp;	 * @param dataBlock the source data block
+&nbsp;	 * @param locator the {@link Zip64EndOfCentralDirectoryLocator} or {@code null}
+&nbsp;	 * @return a new {@link ZipCentralDirectoryFileHeaderRecord} instance or {@code null}
+&nbsp;	 * if the locator is {@code null}
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	static Zip64EndOfCentralDirectoryRecord load(DataBlock dataBlock, Zip64EndOfCentralDirectoryLocator locator)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		if (locator == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ByteBuffer buffer = ByteBuffer.allocate(MINIMUM_SIZE);</b>
+<b class="nc">&nbsp;		buffer.order(ByteOrder.LITTLE_ENDIAN);</b>
+<b class="nc">&nbsp;		long size = locator.pos() - locator.offsetToZip64EndOfCentralDirectoryRecord();</b>
+<b class="nc">&nbsp;		long pos = locator.pos() - size;</b>
+<b class="nc">&nbsp;		debug.log(&quot;Loading Zip64EndOfCentralDirectoryRecord from position %s size %s&quot;, pos, size);</b>
+<b class="nc">&nbsp;		dataBlock.readFully(buffer, pos);</b>
+<b class="nc">&nbsp;		buffer.rewind();</b>
+<b class="nc">&nbsp;		int signature = buffer.getInt();</b>
+<b class="nc">&nbsp;		if (signature != SIGNATURE) {</b>
+<b class="nc">&nbsp;			debug.log(&quot;Found incorrect Zip64EndOfCentralDirectoryRecord signature %s at position %s&quot;, signature, pos);</b>
+<b class="nc">&nbsp;			throw new IOException(&quot;Zip64 &#39;End Of Central Directory Record&#39; not found at position &quot; + pos</b>
+&nbsp;					+ &quot;. Zip file is corrupt or includes prefixed bytes which are not supported with Zip64 files&quot;);
+&nbsp;		}
+<b class="nc">&nbsp;		return new Zip64EndOfCentralDirectoryRecord(size, buffer.getLong(), buffer.getShort(), buffer.getShort(),</b>
+<b class="nc">&nbsp;				buffer.getInt(), buffer.getInt(), buffer.getLong(), buffer.getLong(), buffer.getLong(),</b>
+<b class="nc">&nbsp;				buffer.getLong());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

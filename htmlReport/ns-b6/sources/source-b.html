@@ -1,0 +1,389 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SharedMetadataReaderFactoryContextInitializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: SharedMetadataReaderFactoryContextInitializer (org.springframework.boot.autoconfigure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SharedMetadataReaderFactoryContextInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SharedMetadataReaderFactoryContextInitializer$CachingMetadataReaderFactoryPostProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SharedMetadataReaderFactoryContextInitializer$ConfigurationClassPostProcessorCustomizingSupplier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SharedMetadataReaderFactoryContextInitializer$SharedMetadataReaderFactoryBean</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure;
+&nbsp;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.aot.AotDetector;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.MutablePropertyValues;
+&nbsp;import org.springframework.beans.factory.BeanClassLoaderAware;
+&nbsp;import org.springframework.beans.factory.FactoryBean;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.aot.BeanRegistrationExcludeFilter;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.config.RuntimeBeanReference;
+&nbsp;import org.springframework.beans.factory.support.AbstractBeanDefinition;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+&nbsp;import org.springframework.beans.factory.support.RegisteredBean;
+&nbsp;import org.springframework.boot.type.classreading.ConcurrentReferenceCachingMetadataReaderFactory;
+&nbsp;import org.springframework.context.ApplicationContextInitializer;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.annotation.AnnotationConfigUtils;
+&nbsp;import org.springframework.context.annotation.ConfigurationClassPostProcessor;
+&nbsp;import org.springframework.context.event.ContextRefreshedEvent;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.PriorityOrdered;
+&nbsp;import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+&nbsp;import org.springframework.core.type.classreading.MetadataReaderFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ApplicationContextInitializer} to create a shared
+&nbsp; * {@link CachingMetadataReaderFactory} between the
+&nbsp; * {@link ConfigurationClassPostProcessor} and Spring Boot.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; */
+<b class="nc">&nbsp;class SharedMetadataReaderFactoryContextInitializer implements</b>
+&nbsp;		ApplicationContextInitializer&lt;ConfigurableApplicationContext&gt;, Ordered, BeanRegistrationExcludeFilter {
+&nbsp;
+&nbsp;	public static final String BEAN_NAME = &quot;org.springframework.boot.autoconfigure.&quot;
+&nbsp;			+ &quot;internalCachingMetadataReaderFactory&quot;;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void initialize(ConfigurableApplicationContext applicationContext) {
+<b class="nc">&nbsp;		if (AotDetector.useGeneratedArtifacts()) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		BeanFactoryPostProcessor postProcessor = new CachingMetadataReaderFactoryPostProcessor(applicationContext);</b>
+<b class="nc">&nbsp;		applicationContext.addBeanFactoryPostProcessor(postProcessor);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean isExcludedFromAotProcessing(RegisteredBean registeredBean) {
+<b class="nc">&nbsp;		return BEAN_NAME.equals(registeredBean.getBeanName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BeanDefinitionRegistryPostProcessor} to register the
+&nbsp;	 * {@link CachingMetadataReaderFactory} and configure the
+&nbsp;	 * {@link ConfigurationClassPostProcessor}.
+&nbsp;	 */
+&nbsp;	static class CachingMetadataReaderFactoryPostProcessor
+&nbsp;			implements BeanDefinitionRegistryPostProcessor, PriorityOrdered {
+&nbsp;
+&nbsp;		private final ConfigurableApplicationContext context;
+&nbsp;
+<b class="nc">&nbsp;		CachingMetadataReaderFactoryPostProcessor(ConfigurableApplicationContext context) {</b>
+<b class="nc">&nbsp;			this.context = context;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getOrder() {
+&nbsp;			// Must happen before the ConfigurationClassPostProcessor is created
+<b class="nc">&nbsp;			return Ordered.HIGHEST_PRECEDENCE;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+<b class="nc">&nbsp;			register(registry);</b>
+<b class="nc">&nbsp;			configureConfigurationClassPostProcessor(registry);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void register(BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;			if (!registry.containsBeanDefinition(BEAN_NAME)) {</b>
+<b class="nc">&nbsp;				BeanDefinition definition = BeanDefinitionBuilder</b>
+<b class="nc">&nbsp;					.rootBeanDefinition(SharedMetadataReaderFactoryBean.class, SharedMetadataReaderFactoryBean::new)</b>
+<b class="nc">&nbsp;					.getBeanDefinition();</b>
+<b class="nc">&nbsp;				registry.registerBeanDefinition(BEAN_NAME, definition);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configureConfigurationClassPostProcessor(BeanDefinitionRegistry registry) {
+&nbsp;			try {
+<b class="nc">&nbsp;				configureConfigurationClassPostProcessor(</b>
+<b class="nc">&nbsp;						registry.getBeanDefinition(AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configureConfigurationClassPostProcessor(BeanDefinition definition) {
+<b class="nc">&nbsp;			if (definition instanceof AbstractBeanDefinition abstractBeanDefinition) {</b>
+<b class="nc">&nbsp;				configureConfigurationClassPostProcessor(abstractBeanDefinition);</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			configureConfigurationClassPostProcessor(definition.getPropertyValues());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configureConfigurationClassPostProcessor(AbstractBeanDefinition definition) {
+<b class="nc">&nbsp;			Supplier&lt;?&gt; instanceSupplier = definition.getInstanceSupplier();</b>
+<b class="nc">&nbsp;			if (instanceSupplier != null) {</b>
+<b class="nc">&nbsp;				definition.setInstanceSupplier(</b>
+&nbsp;						new ConfigurationClassPostProcessorCustomizingSupplier(this.context, instanceSupplier));
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			configureConfigurationClassPostProcessor(definition.getPropertyValues());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configureConfigurationClassPostProcessor(MutablePropertyValues propertyValues) {
+<b class="nc">&nbsp;			propertyValues.add(&quot;metadataReaderFactory&quot;, new RuntimeBeanReference(BEAN_NAME));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Supplier} used to customize the {@link ConfigurationClassPostProcessor} when
+&nbsp;	 * it&#39;s first created.
+&nbsp;	 */
+&nbsp;	static class ConfigurationClassPostProcessorCustomizingSupplier implements Supplier&lt;Object&gt; {
+&nbsp;
+&nbsp;		private final ConfigurableApplicationContext context;
+&nbsp;
+&nbsp;		private final Supplier&lt;?&gt; instanceSupplier;
+&nbsp;
+&nbsp;		ConfigurationClassPostProcessorCustomizingSupplier(ConfigurableApplicationContext context,
+<b class="nc">&nbsp;				Supplier&lt;?&gt; instanceSupplier) {</b>
+<b class="nc">&nbsp;			this.context = context;</b>
+<b class="nc">&nbsp;			this.instanceSupplier = instanceSupplier;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object get() {
+<b class="nc">&nbsp;			Object instance = this.instanceSupplier.get();</b>
+<b class="nc">&nbsp;			if (instance instanceof ConfigurationClassPostProcessor postProcessor) {</b>
+<b class="nc">&nbsp;				configureConfigurationClassPostProcessor(postProcessor);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return instance;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configureConfigurationClassPostProcessor(ConfigurationClassPostProcessor instance) {
+<b class="nc">&nbsp;			instance.setMetadataReaderFactory(this.context.getBean(BEAN_NAME, MetadataReaderFactory.class));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link FactoryBean} to create the shared {@link MetadataReaderFactory}.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class SharedMetadataReaderFactoryBean</b>
+&nbsp;			implements FactoryBean&lt;ConcurrentReferenceCachingMetadataReaderFactory&gt;, BeanClassLoaderAware,
+&nbsp;			ApplicationListener&lt;ContextRefreshedEvent&gt; {
+&nbsp;
+&nbsp;		private ConcurrentReferenceCachingMetadataReaderFactory metadataReaderFactory;
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setBeanClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;			this.metadataReaderFactory = new ConcurrentReferenceCachingMetadataReaderFactory(classLoader);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConcurrentReferenceCachingMetadataReaderFactory getObject() throws Exception {
+<b class="nc">&nbsp;			return this.metadataReaderFactory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Class&lt;?&gt; getObjectType() {
+<b class="nc">&nbsp;			return CachingMetadataReaderFactory.class;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isSingleton() {
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void onApplicationEvent(ContextRefreshedEvent event) {
+<b class="nc">&nbsp;			this.metadataReaderFactory.clearCache();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

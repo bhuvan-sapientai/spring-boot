@@ -1,0 +1,275 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PemContent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.ssl.pem</a>
+</div>
+
+<h1>Coverage Summary for Class: PemContent (org.springframework.boot.ssl.pem)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PemContent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.ssl.pem;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardOpenOption;
+&nbsp;import java.security.PrivateKey;
+&nbsp;import java.security.cert.X509Certificate;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ResourceUtils;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * PEM encoded content that can provide {@link X509Certificate certificates} and
+&nbsp; * {@link PrivateKey private keys}.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.2.0
+&nbsp; */
+&nbsp;public final class PemContent {
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern PEM_HEADER = Pattern.compile(&quot;-+BEGIN\\s+[^-]*-+&quot;, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern PEM_FOOTER = Pattern.compile(&quot;-+END\\s+[^-]*-+&quot;, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+&nbsp;	private final String text;
+&nbsp;
+<b class="nc">&nbsp;	private PemContent(String text) {</b>
+<b class="nc">&nbsp;		this.text = text;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Parse and return all {@link X509Certificate certificates} from the PEM content.
+&nbsp;	 * Most PEM files either contain a single certificate or a certificate chain.
+&nbsp;	 * @return the certificates
+&nbsp;	 * @throws IllegalStateException if no certificates could be loaded
+&nbsp;	 */
+&nbsp;	public List&lt;X509Certificate&gt; getCertificates() {
+<b class="nc">&nbsp;		return PemCertificateParser.parse(this.text);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Parse and return the {@link PrivateKey private keys} from the PEM content.
+&nbsp;	 * @return the private keys
+&nbsp;	 * @throws IllegalStateException if no private key could be loaded
+&nbsp;	 */
+&nbsp;	public PrivateKey getPrivateKey() {
+<b class="nc">&nbsp;		return getPrivateKey(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Parse and return the {@link PrivateKey private keys} from the PEM content or
+&nbsp;	 * {@code null} if there is no private key.
+&nbsp;	 * @param password the password to decrypt the private keys or {@code null}
+&nbsp;	 * @return the private keys
+&nbsp;	 */
+&nbsp;	public PrivateKey getPrivateKey(String password) {
+<b class="nc">&nbsp;		return PemPrivateKeyParser.parse(this.text, password);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Objects.equals(this.text, ((PemContent) obj).text);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return Objects.hash(this.text);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.text;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load {@link PemContent} from the given content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load).
+&nbsp;	 * @param content the content to load
+&nbsp;	 * @return a new {@link PemContent} instance
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	static PemContent load(String content) throws IOException {
+<b class="nc">&nbsp;		if (content == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (isPresentInText(content)) {</b>
+<b class="nc">&nbsp;			return new PemContent(content);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return load(ResourceUtils.getURL(content));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException | UncheckedIOException ex) {</b>
+<b class="nc">&nbsp;			throw new IOException(&quot;Error reading certificate or key from file &#39;%s&#39;&quot;.formatted(content), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load {@link PemContent} from the given {@link Path}.
+&nbsp;	 * @param path a path to load the content from
+&nbsp;	 * @return the loaded PEM content
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public static PemContent load(Path path) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(path, &quot;Path must not be null&quot;);</b>
+<b class="nc">&nbsp;		try (InputStream in = Files.newInputStream(path, StandardOpenOption.READ)) {</b>
+<b class="nc">&nbsp;			return load(in);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PemContent load(URL url) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(url, &quot;Url must not be null&quot;);</b>
+<b class="nc">&nbsp;		try (InputStream in = url.openStream()) {</b>
+<b class="nc">&nbsp;			return load(in);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PemContent load(InputStream in) throws IOException {
+<b class="nc">&nbsp;		return of(StreamUtils.copyToString(in, StandardCharsets.UTF_8));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PemContent} instance containing the given text.
+&nbsp;	 * @param text the text containing PEM encoded content
+&nbsp;	 * @return a new {@link PemContent} instance
+&nbsp;	 */
+&nbsp;	public static PemContent of(String text) {
+<b class="nc">&nbsp;		return (text != null) ? new PemContent(text) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if PEM content is present in the given text.
+&nbsp;	 * @param text the text to check
+&nbsp;	 * @return if the text includes PEM encoded content.
+&nbsp;	 */
+&nbsp;	public static boolean isPresentInText(String text) {
+<b class="nc">&nbsp;		return text != null &amp;&amp; PEM_HEADER.matcher(text).find() &amp;&amp; PEM_FOOTER.matcher(text).find();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

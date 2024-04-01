@@ -1,0 +1,469 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BootJar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.tasks.bundling</a>
+</div>
+
+<h1>Coverage Summary for Class: BootJar (org.springframework.boot.gradle.tasks.bundling)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BootJar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BootJar$LibrarySpec</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BootJar$ZipCompressionResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.tasks.bundling;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.artifacts.result.ResolvedArtifactResult;
+&nbsp;import org.gradle.api.file.CopySpec;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.file.FileCopyDetails;
+&nbsp;import org.gradle.api.file.FileTreeElement;
+&nbsp;import org.gradle.api.internal.file.copy.CopyAction;
+&nbsp;import org.gradle.api.provider.Provider;
+&nbsp;import org.gradle.api.specs.Spec;
+&nbsp;import org.gradle.api.tasks.Internal;
+&nbsp;import org.gradle.api.tasks.Nested;
+&nbsp;import org.gradle.api.tasks.bundling.Jar;
+&nbsp;import org.gradle.work.DisableCachingByDefault;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.LoaderImplementation;
+&nbsp;
+&nbsp;/**
+&nbsp; * A custom {@link Jar} task that produces a Spring Boot executable jar.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@DisableCachingByDefault(because = &quot;Not worth caching&quot;)
+&nbsp;public abstract class BootJar extends Jar implements BootArchive {
+&nbsp;
+&nbsp;	private static final String LAUNCHER = &quot;org.springframework.boot.loader.launch.JarLauncher&quot;;
+&nbsp;
+&nbsp;	private static final String CLASSES_DIRECTORY = &quot;BOOT-INF/classes/&quot;;
+&nbsp;
+&nbsp;	private static final String LIB_DIRECTORY = &quot;BOOT-INF/lib/&quot;;
+&nbsp;
+&nbsp;	private static final String LAYERS_INDEX = &quot;BOOT-INF/layers.idx&quot;;
+&nbsp;
+&nbsp;	private static final String CLASSPATH_INDEX = &quot;BOOT-INF/classpath.idx&quot;;
+&nbsp;
+&nbsp;	private final BootArchiveSupport support;
+&nbsp;
+&nbsp;	private final CopySpec bootInfSpec;
+&nbsp;
+&nbsp;	private final LayeredSpec layered;
+&nbsp;
+&nbsp;	private final Provider&lt;String&gt; projectName;
+&nbsp;
+&nbsp;	private final Provider&lt;Object&gt; projectVersion;
+&nbsp;
+&nbsp;	private final ResolvedDependencies resolvedDependencies;
+&nbsp;
+&nbsp;	private FileCollection classpath;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code BootJar} task.
+&nbsp;	 */
+<b class="nc">&nbsp;	public BootJar() {</b>
+<b class="nc">&nbsp;		this.support = new BootArchiveSupport(LAUNCHER, new LibrarySpec(), new ZipCompressionResolver());</b>
+<b class="nc">&nbsp;		Project project = getProject();</b>
+<b class="nc">&nbsp;		this.bootInfSpec = project.copySpec().into(&quot;BOOT-INF&quot;);</b>
+<b class="nc">&nbsp;		this.layered = project.getObjects().newInstance(LayeredSpec.class);</b>
+<b class="nc">&nbsp;		configureBootInfSpec(this.bootInfSpec);</b>
+<b class="nc">&nbsp;		getMainSpec().with(this.bootInfSpec);</b>
+<b class="nc">&nbsp;		this.projectName = project.provider(project::getName);</b>
+<b class="nc">&nbsp;		this.projectVersion = project.provider(project::getVersion);</b>
+<b class="nc">&nbsp;		this.resolvedDependencies = new ResolvedDependencies(project);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureBootInfSpec(CopySpec bootInfSpec) {
+<b class="nc">&nbsp;		bootInfSpec.into(&quot;classes&quot;, fromCallTo(this::classpathDirectories));</b>
+<b class="nc">&nbsp;		bootInfSpec.into(&quot;lib&quot;, fromCallTo(this::classpathFiles)).eachFile(this.support::excludeNonZipFiles);</b>
+<b class="nc">&nbsp;		this.support.moveModuleInfoToRoot(bootInfSpec);</b>
+<b class="nc">&nbsp;		moveMetaInfToRoot(bootInfSpec);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Iterable&lt;File&gt; classpathDirectories() {
+<b class="nc">&nbsp;		return classpathEntries(File::isDirectory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Iterable&lt;File&gt; classpathFiles() {
+<b class="nc">&nbsp;		return classpathEntries(File::isFile);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Iterable&lt;File&gt; classpathEntries(Spec&lt;File&gt; filter) {
+<b class="nc">&nbsp;		return (this.classpath != null) ? this.classpath.filter(filter) : Collections.emptyList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void moveMetaInfToRoot(CopySpec spec) {
+<b class="nc">&nbsp;		spec.eachFile((file) -&gt; {</b>
+<b class="nc">&nbsp;			String path = file.getRelativeSourcePath().getPathString();</b>
+<b class="nc">&nbsp;			if (path.startsWith(&quot;META-INF/&quot;) &amp;&amp; !path.equals(&quot;META-INF/aop.xml&quot;) &amp;&amp; !path.endsWith(&quot;.kotlin_module&quot;)</b>
+<b class="nc">&nbsp;					&amp;&amp; !path.startsWith(&quot;META-INF/services/&quot;)) {</b>
+<b class="nc">&nbsp;				this.support.moveToRoot(file);</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void resolvedArtifacts(Provider&lt;Set&lt;ResolvedArtifactResult&gt;&gt; resolvedArtifacts) {
+<b class="nc">&nbsp;		this.resolvedDependencies.resolvedArtifacts(resolvedArtifacts);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Nested
+&nbsp;	ResolvedDependencies getResolvedDependencies() {
+<b class="nc">&nbsp;		return this.resolvedDependencies;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void copy() {
+<b class="nc">&nbsp;		this.support.configureManifest(getManifest(), getMainClass().get(), CLASSES_DIRECTORY, LIB_DIRECTORY,</b>
+<b class="nc">&nbsp;				CLASSPATH_INDEX, (isLayeredDisabled()) ? null : LAYERS_INDEX,</b>
+<b class="nc">&nbsp;				this.getTargetJavaVersion().get().getMajorVersion(), this.projectName.get(), this.projectVersion.get());</b>
+<b class="nc">&nbsp;		super.copy();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isLayeredDisabled() {
+<b class="nc">&nbsp;		return !getLayered().getEnabled().get();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected CopyAction createCopyAction() {
+<b class="nc">&nbsp;		LoaderImplementation loaderImplementation = getLoaderImplementation().getOrElse(LoaderImplementation.DEFAULT);</b>
+<b class="nc">&nbsp;		if (!isLayeredDisabled()) {</b>
+<b class="nc">&nbsp;			LayerResolver layerResolver = new LayerResolver(this.resolvedDependencies, this.layered, this::isLibrary);</b>
+<b class="nc">&nbsp;			String layerToolsLocation = this.layered.getIncludeLayerTools().get() ? LIB_DIRECTORY : null;</b>
+<b class="nc">&nbsp;			return this.support.createCopyAction(this, this.resolvedDependencies, loaderImplementation, true,</b>
+&nbsp;					layerResolver, layerToolsLocation);
+&nbsp;		}
+<b class="nc">&nbsp;		return this.support.createCopyAction(this, this.resolvedDependencies, loaderImplementation, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void requiresUnpack(String... patterns) {
+<b class="nc">&nbsp;		this.support.requiresUnpack(patterns);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void requiresUnpack(Spec&lt;FileTreeElement&gt; spec) {
+<b class="nc">&nbsp;		this.support.requiresUnpack(spec);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public LaunchScriptConfiguration getLaunchScript() {
+<b class="nc">&nbsp;		return this.support.getLaunchScript();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void launchScript() {
+<b class="nc">&nbsp;		enableLaunchScriptIfNecessary();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void launchScript(Action&lt;LaunchScriptConfiguration&gt; action) {
+<b class="nc">&nbsp;		action.execute(enableLaunchScriptIfNecessary());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the spec that describes the layers in a layered jar.
+&nbsp;	 * @return the spec for the layers
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	public LayeredSpec getLayered() {
+<b class="nc">&nbsp;		return this.layered;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configures the jar&#39;s layering using the given {@code action}.
+&nbsp;	 * @param action the action to apply
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	public void layered(Action&lt;LayeredSpec&gt; action) {
+<b class="nc">&nbsp;		action.execute(this.layered);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public FileCollection getClasspath() {
+<b class="nc">&nbsp;		return this.classpath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void classpath(Object... classpath) {
+<b class="nc">&nbsp;		FileCollection existingClasspath = this.classpath;</b>
+<b class="nc">&nbsp;		this.classpath = getProject().files((existingClasspath != null) ? existingClasspath : Collections.emptyList(),</b>
+&nbsp;				classpath);
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setClasspath(Object classpath) {
+<b class="nc">&nbsp;		this.classpath = getProject().files(classpath);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setClasspath(FileCollection classpath) {
+<b class="nc">&nbsp;		this.classpath = getProject().files(classpath);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a {@code CopySpec} that can be used to add content to the {@code BOOT-INF}
+&nbsp;	 * directory of the jar.
+&nbsp;	 * @return a {@code CopySpec} for {@code BOOT-INF}
+&nbsp;	 * @since 2.0.3
+&nbsp;	 */
+&nbsp;	@Internal
+&nbsp;	public CopySpec getBootInf() {
+<b class="nc">&nbsp;		CopySpec child = getProject().copySpec();</b>
+<b class="nc">&nbsp;		this.bootInfSpec.with(child);</b>
+<b class="nc">&nbsp;		return child;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Calls the given {@code action} to add content to the {@code BOOT-INF} directory of
+&nbsp;	 * the jar.
+&nbsp;	 * @param action the {@code Action} to call
+&nbsp;	 * @return the {@code CopySpec} for {@code BOOT-INF} that was passed to the
+&nbsp;	 * {@code Action}
+&nbsp;	 * @since 2.0.3
+&nbsp;	 */
+&nbsp;	public CopySpec bootInf(Action&lt;CopySpec&gt; action) {
+<b class="nc">&nbsp;		CopySpec bootInf = getBootInf();</b>
+<b class="nc">&nbsp;		action.execute(bootInf);</b>
+<b class="nc">&nbsp;		return bootInf;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link ZipCompression} that should be used when adding the file
+&nbsp;	 * represented by the given {@code details} to the jar. By default, any
+&nbsp;	 * {@link #isLibrary(FileCopyDetails) library} is {@link ZipCompression#STORED stored}
+&nbsp;	 * and all other files are {@link ZipCompression#DEFLATED deflated}.
+&nbsp;	 * @param details the file copy details
+&nbsp;	 * @return the compression to use
+&nbsp;	 */
+&nbsp;	protected ZipCompression resolveZipCompression(FileCopyDetails details) {
+<b class="nc">&nbsp;		return isLibrary(details) ? ZipCompression.STORED : ZipCompression.DEFLATED;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the {@link FileCopyDetails} are for a library. By default any file in
+&nbsp;	 * {@code BOOT-INF/lib} is considered to be a library.
+&nbsp;	 * @param details the file copy details
+&nbsp;	 * @return {@code true} if the details are for a library
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	protected boolean isLibrary(FileCopyDetails details) {
+<b class="nc">&nbsp;		String path = details.getRelativePath().getPathString();</b>
+<b class="nc">&nbsp;		return path.startsWith(LIB_DIRECTORY);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private LaunchScriptConfiguration enableLaunchScriptIfNecessary() {
+<b class="nc">&nbsp;		LaunchScriptConfiguration launchScript = this.support.getLaunchScript();</b>
+<b class="nc">&nbsp;		if (launchScript == null) {</b>
+<b class="nc">&nbsp;			launchScript = new LaunchScriptConfiguration(this);</b>
+<b class="nc">&nbsp;			this.support.setLaunchScript(launchScript);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return launchScript;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Syntactic sugar that makes {@link CopySpec#into} calls a little easier to read.
+&nbsp;	 * @param &lt;T&gt; the result type
+&nbsp;	 * @param callable the callable
+&nbsp;	 * @return an action to add the callable to the spec
+&nbsp;	 */
+&nbsp;	private static &lt;T&gt; Action&lt;CopySpec&gt; fromCallTo(Callable&lt;T&gt; callable) {
+<b class="nc">&nbsp;		return (spec) -&gt; spec.from(callTo(callable));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Syntactic sugar that makes {@link CopySpec#from} calls a little easier to read.
+&nbsp;	 * @param &lt;T&gt; the result type
+&nbsp;	 * @param callable the callable
+&nbsp;	 * @return the callable
+&nbsp;	 */
+&nbsp;	private static &lt;T&gt; Callable&lt;T&gt; callTo(Callable&lt;T&gt; callable) {
+<b class="nc">&nbsp;		return callable;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private final class LibrarySpec implements Spec&lt;FileCopyDetails&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isSatisfiedBy(FileCopyDetails details) {
+<b class="nc">&nbsp;			return isLibrary(details);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private final class ZipCompressionResolver implements Function&lt;FileCopyDetails, ZipCompression&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ZipCompression apply(FileCopyDetails details) {
+<b class="nc">&nbsp;			return resolveZipCompression(details);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

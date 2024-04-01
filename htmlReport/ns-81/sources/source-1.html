@@ -1,0 +1,319 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EndpointMBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.jmx</a>
+</div>
+
+<h1>Coverage Summary for Class: EndpointMBean (org.springframework.boot.actuate.endpoint.jmx)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EndpointMBean</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EndpointMBean$ReactiveHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.jmx;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.management.Attribute;
+&nbsp;import javax.management.AttributeList;
+&nbsp;import javax.management.AttributeNotFoundException;
+&nbsp;import javax.management.DynamicMBean;
+&nbsp;import javax.management.InvalidAttributeValueException;
+&nbsp;import javax.management.MBeanException;
+&nbsp;import javax.management.MBeanInfo;
+&nbsp;import javax.management.ReflectionException;
+&nbsp;
+&nbsp;import reactor.core.publisher.Flux;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
+&nbsp;import org.springframework.boot.actuate.endpoint.InvocationContext;
+&nbsp;import org.springframework.boot.actuate.endpoint.SecurityContext;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Adapter to expose a {@link ExposableJmxEndpoint JMX endpoint} as a
+&nbsp; * {@link DynamicMBean}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class EndpointMBean implements DynamicMBean {
+&nbsp;
+<b class="nc">&nbsp;	private static final boolean REACTOR_PRESENT = ClassUtils.isPresent(&quot;reactor.core.publisher.Mono&quot;,</b>
+<b class="nc">&nbsp;			EndpointMBean.class.getClassLoader());</b>
+&nbsp;
+&nbsp;	private final JmxOperationResponseMapper responseMapper;
+&nbsp;
+&nbsp;	private final ClassLoader classLoader;
+&nbsp;
+&nbsp;	private final ExposableJmxEndpoint endpoint;
+&nbsp;
+&nbsp;	private final MBeanInfo info;
+&nbsp;
+&nbsp;	private final Map&lt;String, JmxOperation&gt; operations;
+&nbsp;
+<b class="nc">&nbsp;	EndpointMBean(JmxOperationResponseMapper responseMapper, ClassLoader classLoader, ExposableJmxEndpoint endpoint) {</b>
+<b class="nc">&nbsp;		Assert.notNull(responseMapper, &quot;ResponseMapper must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(endpoint, &quot;Endpoint must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.responseMapper = responseMapper;</b>
+<b class="nc">&nbsp;		this.classLoader = classLoader;</b>
+<b class="nc">&nbsp;		this.endpoint = endpoint;</b>
+<b class="nc">&nbsp;		this.info = new MBeanInfoFactory(responseMapper).getMBeanInfo(endpoint);</b>
+<b class="nc">&nbsp;		this.operations = getOperations(endpoint);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, JmxOperation&gt; getOperations(ExposableJmxEndpoint endpoint) {
+<b class="nc">&nbsp;		Map&lt;String, JmxOperation&gt; operations = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		endpoint.getOperations().forEach((operation) -&gt; operations.put(operation.getName(), operation));</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(operations);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public MBeanInfo getMBeanInfo() {
+<b class="nc">&nbsp;		return this.info;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object invoke(String actionName, Object[] params, String[] signature)
+&nbsp;			throws MBeanException, ReflectionException {
+<b class="nc">&nbsp;		JmxOperation operation = this.operations.get(actionName);</b>
+<b class="nc">&nbsp;		if (operation == null) {</b>
+<b class="nc">&nbsp;			String message = &quot;Endpoint with id &#39;&quot; + this.endpoint.getEndpointId() + &quot;&#39; has no operation named &quot;</b>
+&nbsp;					+ actionName;
+<b class="nc">&nbsp;			throw new ReflectionException(new IllegalArgumentException(message), message);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ClassLoader previousClassLoader = overrideThreadContextClassLoader(this.classLoader);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return invoke(operation, params);</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			overrideThreadContextClassLoader(previousClassLoader);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ClassLoader overrideThreadContextClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		if (classLoader != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return ClassUtils.overrideThreadContextClassLoader(classLoader);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (SecurityException ex) {</b>
+&nbsp;				// can&#39;t set class loader, ignore it and proceed
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object invoke(JmxOperation operation, Object[] params) throws MBeanException, ReflectionException {
+&nbsp;		try {
+<b class="nc">&nbsp;			String[] parameterNames = operation.getParameters()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.map(JmxOperationParameter::getName)</b>
+<b class="nc">&nbsp;				.toArray(String[]::new);</b>
+<b class="nc">&nbsp;			Map&lt;String, Object&gt; arguments = getArguments(parameterNames, params);</b>
+<b class="nc">&nbsp;			InvocationContext context = new InvocationContext(SecurityContext.NONE, arguments);</b>
+<b class="nc">&nbsp;			Object result = operation.invoke(context);</b>
+<b class="nc">&nbsp;			if (REACTOR_PRESENT) {</b>
+<b class="nc">&nbsp;				result = ReactiveHandler.handle(result);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.responseMapper.mapResponse(result);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (InvalidEndpointRequestException ex) {</b>
+<b class="nc">&nbsp;			throw new ReflectionException(new IllegalArgumentException(ex.getMessage()), ex.getMessage());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new MBeanException(translateIfNecessary(ex), ex.getMessage());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Exception translateIfNecessary(Exception exception) {
+<b class="nc">&nbsp;		if (exception.getClass().getName().startsWith(&quot;java.&quot;)) {</b>
+<b class="nc">&nbsp;			return exception;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new IllegalStateException(exception.getMessage());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Object&gt; getArguments(String[] parameterNames, Object[] params) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; arguments = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; params.length; i++) {</b>
+<b class="nc">&nbsp;			arguments.put(parameterNames[i], params[i]);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return arguments;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object getAttribute(String attribute)
+&nbsp;			throws AttributeNotFoundException, MBeanException, ReflectionException {
+<b class="nc">&nbsp;		throw new AttributeNotFoundException(&quot;EndpointMBeans do not support attributes&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAttribute(Attribute attribute)
+&nbsp;			throws AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
+<b class="nc">&nbsp;		throw new AttributeNotFoundException(&quot;EndpointMBeans do not support attributes&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public AttributeList getAttributes(String[] attributes) {
+<b class="nc">&nbsp;		return new AttributeList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public AttributeList setAttributes(AttributeList attributes) {
+<b class="nc">&nbsp;		return new AttributeList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class ReactiveHandler {
+&nbsp;
+&nbsp;		static Object handle(Object result) {
+<b class="nc">&nbsp;			if (result instanceof Flux) {</b>
+<b class="nc">&nbsp;				result = ((Flux&lt;?&gt;) result).collectList();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (result instanceof Mono) {</b>
+<b class="nc">&nbsp;				return ((Mono&lt;?&gt;) result).block();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

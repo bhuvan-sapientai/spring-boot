@@ -1,0 +1,615 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildImageMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildImageMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildImageMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildImageMojo$MojoBuildLog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildImageMojo$MojoBuildLog$ProgressLog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildImageMojo$PackagedTarArchive</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/99)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarConstants;
+&nbsp;import org.apache.maven.artifact.Artifact;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;import org.apache.maven.plugin.logging.Log;
+&nbsp;import org.apache.maven.plugins.annotations.Parameter;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.build.AbstractBuildLog;
+&nbsp;import org.springframework.boot.buildpack.platform.build.BuildLog;
+&nbsp;import org.springframework.boot.buildpack.platform.build.BuildRequest;
+&nbsp;import org.springframework.boot.buildpack.platform.build.Builder;
+&nbsp;import org.springframework.boot.buildpack.platform.build.Creator;
+&nbsp;import org.springframework.boot.buildpack.platform.build.PullPolicy;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.TotalProgressEvent;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.configuration.DockerConfiguration;
+&nbsp;import org.springframework.boot.buildpack.platform.io.Owner;
+&nbsp;import org.springframework.boot.buildpack.platform.io.TarArchive;
+&nbsp;import org.springframework.boot.loader.tools.EntryWriter;
+&nbsp;import org.springframework.boot.loader.tools.ImagePackager;
+&nbsp;import org.springframework.boot.loader.tools.LayoutFactory;
+&nbsp;import org.springframework.boot.loader.tools.Libraries;
+&nbsp;import org.springframework.boot.loader.tools.LoaderImplementation;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Package an application into an OCI image using a buildpack.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Jeroen Meijer
+&nbsp; * @since 2.3.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class BuildImageMojo extends AbstractPackagerMojo {</b>
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		System.setProperty(&quot;org.slf4j.simpleLogger.log.org.apache.http.wire&quot;, &quot;ERROR&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the source archive.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.directory}&quot;, required = true)
+&nbsp;	private File sourceDirectory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the source archive.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.finalName}&quot;, readonly = true)
+&nbsp;	private String finalName;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Skip the execution.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.skip&quot;, defaultValue = &quot;false&quot;)
+&nbsp;	private boolean skip;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Classifier used when finding the source archive.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private String classifier;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Image configuration, with {@code builder}, {@code runImage}, {@code name},
+&nbsp;	 * {@code env}, {@code cleanCache}, {@code verboseLogging}, {@code pullPolicy}, and
+&nbsp;	 * {@code publish} options.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private Image image;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#name} to support configuration through command-line
+&nbsp;	 * property.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.imageName&quot;, readonly = true)
+&nbsp;	String imageName;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#builder} to support configuration through command-line
+&nbsp;	 * property.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.builder&quot;, readonly = true)
+&nbsp;	String imageBuilder;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#runImage} to support configuration through command-line
+&nbsp;	 * property.
+&nbsp;	 * @since 2.3.1
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.runImage&quot;, readonly = true)
+&nbsp;	String runImage;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#cleanCache} to support configuration through command-line
+&nbsp;	 * property.
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.cleanCache&quot;, readonly = true)
+&nbsp;	Boolean cleanCache;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#pullPolicy} to support configuration through command-line
+&nbsp;	 * property.
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.pullPolicy&quot;, readonly = true)
+&nbsp;	PullPolicy pullPolicy;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#publish} to support configuration through command-line
+&nbsp;	 * property.
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.publish&quot;, readonly = true)
+&nbsp;	Boolean publish;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#network} to support configuration through command-line
+&nbsp;	 * property.
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.network&quot;, readonly = true)
+&nbsp;	String network;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#createdDate} to support configuration through command-line
+&nbsp;	 * property.
+&nbsp;	 * @since 3.1.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.createdDate&quot;, readonly = true)
+&nbsp;	String createdDate;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Alias for {@link Image#applicationDirectory} to support configuration through
+&nbsp;	 * command-line property.
+&nbsp;	 * @since 3.1.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-image.applicationDirectory&quot;, readonly = true)
+&nbsp;	String applicationDirectory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Docker configuration options.
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private Docker docker;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The type of archive (which corresponds to how the dependencies are laid out inside
+&nbsp;	 * it). Possible values are {@code JAR}, {@code WAR}, {@code ZIP}, {@code DIR},
+&nbsp;	 * {@code NONE}. Defaults to a guess based on the archive type.
+&nbsp;	 * @since 2.3.11
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private LayoutType layout;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The loader implementation that should be used.
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private LoaderImplementation loaderImplementation;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The layout factory that will be used to create the executable archive if no
+&nbsp;	 * explicit layout is set. Alternative layouts implementations can be provided by 3rd
+&nbsp;	 * parties.
+&nbsp;	 * @since 2.3.11
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private LayoutFactory layoutFactory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the type of archive that should be used when building the image.
+&nbsp;	 * @return the value of the {@code layout} parameter, or {@code null} if the parameter
+&nbsp;	 * is not provided
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	protected LayoutType getLayout() {
+<b class="nc">&nbsp;		return this.layout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected LoaderImplementation getLoaderImplementation() {
+<b class="nc">&nbsp;		return this.loaderImplementation;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the layout factory that will be used to determine the
+&nbsp;	 * {@link AbstractPackagerMojo.LayoutType} if no explicit layout is set.
+&nbsp;	 * @return the value of the {@code layoutFactory} parameter, or {@code null} if the
+&nbsp;	 * parameter is not provided
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	protected LayoutFactory getLayoutFactory() {
+<b class="nc">&nbsp;		return this.layoutFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void execute() throws MojoExecutionException {
+<b class="nc">&nbsp;		if (this.project.getPackaging().equals(&quot;pom&quot;)) {</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;build-image goal could not be applied to pom project.&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.skip) {</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;skipping build-image as per configuration.&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		buildImage();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void buildImage() throws MojoExecutionException {
+<b class="nc">&nbsp;		Libraries libraries = getLibraries(Collections.emptySet());</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			DockerConfiguration dockerConfiguration = (this.docker != null) ? this.docker.asDockerConfiguration()</b>
+<b class="nc">&nbsp;					: new Docker().asDockerConfiguration();</b>
+<b class="nc">&nbsp;			BuildRequest request = getBuildRequest(libraries);</b>
+<b class="nc">&nbsp;			Builder builder = new Builder(new MojoBuildLog(this::getLog), dockerConfiguration);</b>
+<b class="nc">&nbsp;			builder.build(request);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(ex.getMessage(), ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest getBuildRequest(Libraries libraries) {
+<b class="nc">&nbsp;		ImagePackager imagePackager = new ImagePackager(getArchiveFile(), getBackupFile());</b>
+<b class="nc">&nbsp;		Function&lt;Owner, TarArchive&gt; content = (owner) -&gt; getApplicationContent(owner, libraries, imagePackager);</b>
+<b class="nc">&nbsp;		Image image = (this.image != null) ? this.image : new Image();</b>
+<b class="nc">&nbsp;		if (image.name == null &amp;&amp; this.imageName != null) {</b>
+<b class="nc">&nbsp;			image.setName(this.imageName);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (image.builder == null &amp;&amp; this.imageBuilder != null) {</b>
+<b class="nc">&nbsp;			image.setBuilder(this.imageBuilder);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (image.runImage == null &amp;&amp; this.runImage != null) {</b>
+<b class="nc">&nbsp;			image.setRunImage(this.runImage);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (image.cleanCache == null &amp;&amp; this.cleanCache != null) {</b>
+<b class="nc">&nbsp;			image.setCleanCache(this.cleanCache);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (image.pullPolicy == null &amp;&amp; this.pullPolicy != null) {</b>
+<b class="nc">&nbsp;			image.setPullPolicy(this.pullPolicy);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (image.publish == null &amp;&amp; this.publish != null) {</b>
+<b class="nc">&nbsp;			image.setPublish(this.publish);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (image.network == null &amp;&amp; this.network != null) {</b>
+<b class="nc">&nbsp;			image.setNetwork(this.network);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (image.createdDate == null &amp;&amp; this.createdDate != null) {</b>
+<b class="nc">&nbsp;			image.setCreatedDate(this.createdDate);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (image.applicationDirectory == null &amp;&amp; this.applicationDirectory != null) {</b>
+<b class="nc">&nbsp;			image.setApplicationDirectory(this.applicationDirectory);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return customize(image.getBuildRequest(this.project.getArtifact(), content));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TarArchive getApplicationContent(Owner owner, Libraries libraries, ImagePackager imagePackager) {
+<b class="nc">&nbsp;		ImagePackager packager = getConfiguredPackager(() -&gt; imagePackager);</b>
+<b class="nc">&nbsp;		return new PackagedTarArchive(owner, libraries, packager);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getArchiveFile() {
+&nbsp;		// We can use &#39;project.getArtifact().getFile()&#39; because that was done in a
+&nbsp;		// forked lifecycle and is now null
+<b class="nc">&nbsp;		File archiveFile = getTargetFile(this.finalName, this.classifier, this.sourceDirectory);</b>
+<b class="nc">&nbsp;		if (!archiveFile.exists()) {</b>
+<b class="nc">&nbsp;			archiveFile = getSourceArtifact(this.classifier).getFile();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!archiveFile.exists()) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;A jar or war file is required for building image&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return archiveFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link File} to use to back up the original source.
+&nbsp;	 * @return the file to use to back up the original source
+&nbsp;	 */
+&nbsp;	private File getBackupFile() {
+<b class="nc">&nbsp;		Artifact source = getSourceArtifact(null);</b>
+<b class="nc">&nbsp;		if (this.classifier != null &amp;&amp; !this.classifier.equals(source.getClassifier())) {</b>
+<b class="nc">&nbsp;			return source.getFile();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customize(BuildRequest request) {
+<b class="nc">&nbsp;		request = customizeCreator(request);</b>
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeCreator(BuildRequest request) {
+<b class="nc">&nbsp;		String springBootVersion = VersionExtractor.forClass(BuildImageMojo.class);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(springBootVersion)) {</b>
+<b class="nc">&nbsp;			request = request.withCreator(Creator.withVersion(springBootVersion));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BuildLog} backed by Mojo logging.
+&nbsp;	 */
+&nbsp;	private static class MojoBuildLog extends AbstractBuildLog {
+&nbsp;
+<b class="nc">&nbsp;		private static final long THRESHOLD = Duration.ofSeconds(2).toMillis();</b>
+&nbsp;
+&nbsp;		private final Supplier&lt;Log&gt; log;
+&nbsp;
+<b class="nc">&nbsp;		MojoBuildLog(Supplier&lt;Log&gt; log) {</b>
+<b class="nc">&nbsp;			this.log = log;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected void log(String message) {
+<b class="nc">&nbsp;			this.log.get().info(message);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected Consumer&lt;TotalProgressEvent&gt; getProgressConsumer(String message) {
+<b class="nc">&nbsp;			return new ProgressLog(message);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private class ProgressLog implements Consumer&lt;TotalProgressEvent&gt; {
+&nbsp;
+&nbsp;			private final String message;
+&nbsp;
+&nbsp;			private long last;
+&nbsp;
+<b class="nc">&nbsp;			ProgressLog(String message) {</b>
+<b class="nc">&nbsp;				this.message = message;</b>
+<b class="nc">&nbsp;				this.last = System.currentTimeMillis();</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void accept(TotalProgressEvent progress) {
+<b class="nc">&nbsp;				log(progress.getPercent());</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			private void log(int percent) {
+<b class="nc">&nbsp;				if (percent == 100 || (System.currentTimeMillis() - this.last) &gt; THRESHOLD) {</b>
+<b class="nc">&nbsp;					MojoBuildLog.this.log.get().info(this.message + &quot; &quot; + percent + &quot;%&quot;);</b>
+<b class="nc">&nbsp;					this.last = System.currentTimeMillis();</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Adapter class to expose the packaged jar as a {@link TarArchive}.
+&nbsp;	 */
+&nbsp;	static class PackagedTarArchive implements TarArchive {
+&nbsp;
+<b class="nc">&nbsp;		static final long NORMALIZED_MOD_TIME = TarArchive.NORMALIZED_TIME.toEpochMilli();</b>
+&nbsp;
+&nbsp;		private final Owner owner;
+&nbsp;
+&nbsp;		private final Libraries libraries;
+&nbsp;
+&nbsp;		private final ImagePackager packager;
+&nbsp;
+<b class="nc">&nbsp;		PackagedTarArchive(Owner owner, Libraries libraries, ImagePackager packager) {</b>
+<b class="nc">&nbsp;			this.owner = owner;</b>
+<b class="nc">&nbsp;			this.libraries = libraries;</b>
+<b class="nc">&nbsp;			this.packager = packager;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void writeTo(OutputStream outputStream) throws IOException {
+<b class="nc">&nbsp;			TarArchiveOutputStream tar = new TarArchiveOutputStream(outputStream);</b>
+<b class="nc">&nbsp;			tar.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				this.packager.packageImage(this.libraries, (entry, entryWriter) -&gt; write(entry, entryWriter, tar));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;				outputStream.close();</b>
+<b class="nc">&nbsp;				throw new RuntimeException(&quot;Error packaging archive for image&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void write(ZipEntry jarEntry, EntryWriter entryWriter, TarArchiveOutputStream tar) {
+&nbsp;			try {
+<b class="nc">&nbsp;				TarArchiveEntry tarEntry = convert(jarEntry);</b>
+<b class="nc">&nbsp;				tar.putArchiveEntry(tarEntry);</b>
+<b class="nc">&nbsp;				if (tarEntry.isFile()) {</b>
+<b class="nc">&nbsp;					entryWriter.write(tar);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				tar.closeArchiveEntry();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private TarArchiveEntry convert(ZipEntry entry) {
+<b class="nc">&nbsp;			byte linkFlag = (entry.isDirectory()) ? TarConstants.LF_DIR : TarConstants.LF_NORMAL;</b>
+<b class="nc">&nbsp;			TarArchiveEntry tarEntry = new TarArchiveEntry(entry.getName(), linkFlag, true);</b>
+<b class="nc">&nbsp;			tarEntry.setUserId(this.owner.getUid());</b>
+<b class="nc">&nbsp;			tarEntry.setGroupId(this.owner.getGid());</b>
+<b class="nc">&nbsp;			tarEntry.setModTime(NORMALIZED_MOD_TIME);</b>
+<b class="nc">&nbsp;			if (!entry.isDirectory()) {</b>
+<b class="nc">&nbsp;				tarEntry.setSize(entry.getSize());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return tarEntry;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

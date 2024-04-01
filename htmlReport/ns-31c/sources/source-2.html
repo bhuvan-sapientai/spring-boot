@@ -1,0 +1,788 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebServiceTemplateBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.webservices.client</a>
+</div>
+
+<h1>Coverage Summary for Class: WebServiceTemplateBuilder (org.springframework.boot.webservices.client)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebServiceTemplateBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/102)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebServiceTemplateBuilder$CheckConnectionFaultCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WebServiceTemplateBuilder$CheckConnectionForErrorCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WebServiceTemplateBuilder$FaultMessageResolverCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WebServiceTemplateBuilder$WebServiceMessageSenders</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/119)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.webservices.client;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.xml.transform.TransformerFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.oxm.Marshaller;
+&nbsp;import org.springframework.oxm.Unmarshaller;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;import org.springframework.ws.WebServiceMessageFactory;
+&nbsp;import org.springframework.ws.client.core.FaultMessageResolver;
+&nbsp;import org.springframework.ws.client.core.WebServiceTemplate;
+&nbsp;import org.springframework.ws.client.support.destination.DestinationProvider;
+&nbsp;import org.springframework.ws.client.support.interceptor.ClientInterceptor;
+&nbsp;import org.springframework.ws.transport.WebServiceMessageSender;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builder that can be used to configure and create a {@link WebServiceTemplate}. Provides
+&nbsp; * convenience methods to register {@link #messageSenders(WebServiceMessageSender...)
+&nbsp; * message senders}, {@link #interceptors(ClientInterceptor...) client interceptors} and
+&nbsp; * {@link #customizers(WebServiceTemplateCustomizer...) customizers}.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default the built {@link WebServiceTemplate} uses the most suitable HTTP-based
+&nbsp; * {@link WebServiceMessageSender}, call {@link #detectHttpMessageSender(boolean)
+&nbsp; * detectHttpMessageSender(false)} if you prefer to keep the default. In a typical
+&nbsp; * auto-configured Spring Boot application this builder is available as a bean and can be
+&nbsp; * injected whenever a {@link WebServiceTemplate} is needed.
+&nbsp; *
+&nbsp; * @author Dmytro Nosan
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.1.0
+&nbsp; */
+&nbsp;public class WebServiceTemplateBuilder {
+&nbsp;
+&nbsp;	private final boolean detectHttpMessageSender;
+&nbsp;
+&nbsp;	private final Set&lt;ClientInterceptor&gt; interceptors;
+&nbsp;
+&nbsp;	private final Set&lt;WebServiceTemplateCustomizer&gt; internalCustomizers;
+&nbsp;
+&nbsp;	private final Set&lt;WebServiceTemplateCustomizer&gt; customizers;
+&nbsp;
+&nbsp;	private final WebServiceMessageSenders messageSenders;
+&nbsp;
+&nbsp;	private final Marshaller marshaller;
+&nbsp;
+&nbsp;	private final Unmarshaller unmarshaller;
+&nbsp;
+&nbsp;	private final DestinationProvider destinationProvider;
+&nbsp;
+&nbsp;	private final Class&lt;? extends TransformerFactory&gt; transformerFactoryClass;
+&nbsp;
+&nbsp;	private final WebServiceMessageFactory messageFactory;
+&nbsp;
+<b class="nc">&nbsp;	public WebServiceTemplateBuilder(WebServiceTemplateCustomizer... customizers) {</b>
+<b class="nc">&nbsp;		this.detectHttpMessageSender = true;</b>
+<b class="nc">&nbsp;		this.interceptors = null;</b>
+<b class="nc">&nbsp;		this.internalCustomizers = null;</b>
+<b class="nc">&nbsp;		this.customizers = Collections.unmodifiableSet(new LinkedHashSet&lt;&gt;(Arrays.asList(customizers)));</b>
+<b class="nc">&nbsp;		this.messageSenders = new WebServiceMessageSenders();</b>
+<b class="nc">&nbsp;		this.marshaller = null;</b>
+<b class="nc">&nbsp;		this.unmarshaller = null;</b>
+<b class="nc">&nbsp;		this.destinationProvider = null;</b>
+<b class="nc">&nbsp;		this.transformerFactoryClass = null;</b>
+<b class="nc">&nbsp;		this.messageFactory = null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private WebServiceTemplateBuilder(boolean detectHttpMessageSender, Set&lt;ClientInterceptor&gt; interceptors,
+&nbsp;			Set&lt;WebServiceTemplateCustomizer&gt; internalCustomizers, Set&lt;WebServiceTemplateCustomizer&gt; customizers,
+&nbsp;			WebServiceMessageSenders messageSenders, Marshaller marshaller, Unmarshaller unmarshaller,
+&nbsp;			DestinationProvider destinationProvider, Class&lt;? extends TransformerFactory&gt; transformerFactoryClass,
+<b class="nc">&nbsp;			WebServiceMessageFactory messageFactory) {</b>
+<b class="nc">&nbsp;		this.detectHttpMessageSender = detectHttpMessageSender;</b>
+<b class="nc">&nbsp;		this.interceptors = interceptors;</b>
+<b class="nc">&nbsp;		this.internalCustomizers = internalCustomizers;</b>
+<b class="nc">&nbsp;		this.customizers = customizers;</b>
+<b class="nc">&nbsp;		this.messageSenders = messageSenders;</b>
+<b class="nc">&nbsp;		this.marshaller = marshaller;</b>
+<b class="nc">&nbsp;		this.unmarshaller = unmarshaller;</b>
+<b class="nc">&nbsp;		this.destinationProvider = destinationProvider;</b>
+<b class="nc">&nbsp;		this.transformerFactoryClass = transformerFactoryClass;</b>
+<b class="nc">&nbsp;		this.messageFactory = messageFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set if a suitable HTTP-based {@link WebServiceMessageSender} should be detected
+&nbsp;	 * based on the classpath. Default is {@code true}.
+&nbsp;	 * @param detectHttpMessageSender if an HTTP-based {@link WebServiceMessageSender}
+&nbsp;	 * should be detected
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see HttpWebServiceMessageSenderBuilder
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder detectHttpMessageSender(boolean detectHttpMessageSender) {
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, this.unmarshaller, this.destinationProvider,
+&nbsp;				this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the {@link WebServiceMessageSender WebServiceMessageSenders} that should be
+&nbsp;	 * used with the {@link WebServiceTemplate}. Setting this value will replace any
+&nbsp;	 * previously defined message senders, including the HTTP-based message sender, if
+&nbsp;	 * any. Consider using {@link #additionalMessageSenders(WebServiceMessageSender...)}
+&nbsp;	 * to keep it with user-defined message senders.
+&nbsp;	 * @param messageSenders the message senders to set
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see #additionalMessageSenders(WebServiceMessageSender...)
+&nbsp;	 * @see #detectHttpMessageSender(boolean)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder messageSenders(WebServiceMessageSender... messageSenders) {
+<b class="nc">&nbsp;		Assert.notNull(messageSenders, &quot;MessageSenders must not be null&quot;);</b>
+<b class="nc">&nbsp;		return messageSenders(Arrays.asList(messageSenders));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the {@link WebServiceMessageSender WebServiceMessageSenders} that should be
+&nbsp;	 * used with the {@link WebServiceTemplate}. Setting this value will replace any
+&nbsp;	 * previously defined message senders, including the HTTP-based message sender, if
+&nbsp;	 * any. Consider using {@link #additionalMessageSenders(Collection)} to keep it with
+&nbsp;	 * user-defined message senders.
+&nbsp;	 * @param messageSenders the message senders to set
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see #additionalMessageSenders(Collection)
+&nbsp;	 * @see #detectHttpMessageSender(boolean)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder messageSenders(Collection&lt;? extends WebServiceMessageSender&gt; messageSenders) {
+<b class="nc">&nbsp;		Assert.notNull(messageSenders, &quot;MessageSenders must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+<b class="nc">&nbsp;				this.customizers, this.messageSenders.set(messageSenders), this.marshaller, this.unmarshaller,</b>
+&nbsp;				this.destinationProvider, this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add additional {@link WebServiceMessageSender WebServiceMessageSenders} that should
+&nbsp;	 * be used with the {@link WebServiceTemplate}.
+&nbsp;	 * @param messageSenders the message senders to add
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see #messageSenders(WebServiceMessageSender...)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder additionalMessageSenders(WebServiceMessageSender... messageSenders) {
+<b class="nc">&nbsp;		Assert.notNull(messageSenders, &quot;MessageSenders must not be null&quot;);</b>
+<b class="nc">&nbsp;		return additionalMessageSenders(Arrays.asList(messageSenders));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add additional {@link WebServiceMessageSender WebServiceMessageSenders} that should
+&nbsp;	 * be used with the {@link WebServiceTemplate}.
+&nbsp;	 * @param messageSenders the message senders to add
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see #messageSenders(Collection)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder additionalMessageSenders(
+&nbsp;			Collection&lt;? extends WebServiceMessageSender&gt; messageSenders) {
+<b class="nc">&nbsp;		Assert.notNull(messageSenders, &quot;MessageSenders must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+<b class="nc">&nbsp;				this.customizers, this.messageSenders.add(messageSenders), this.marshaller, this.unmarshaller,</b>
+&nbsp;				this.destinationProvider, this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link ClientInterceptor ClientInterceptors} that should be used with the
+&nbsp;	 * {@link WebServiceTemplate}. Setting this value will replace any previously defined
+&nbsp;	 * interceptors.
+&nbsp;	 * @param interceptors the interceptors to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #additionalInterceptors(ClientInterceptor...)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder interceptors(ClientInterceptor... interceptors) {
+<b class="nc">&nbsp;		Assert.notNull(interceptors, &quot;Interceptors must not be null&quot;);</b>
+<b class="nc">&nbsp;		return interceptors(Arrays.asList(interceptors));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link ClientInterceptor ClientInterceptors} that should be used with the
+&nbsp;	 * {@link WebServiceTemplate}. Setting this value will replace any previously defined
+&nbsp;	 * interceptors.
+&nbsp;	 * @param interceptors the interceptors to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #additionalInterceptors(Collection)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder interceptors(Collection&lt;? extends ClientInterceptor&gt; interceptors) {
+<b class="nc">&nbsp;		Assert.notNull(interceptors, &quot;Interceptors must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender,</b>
+<b class="nc">&nbsp;				append(Collections.&lt;ClientInterceptor&gt;emptySet(), interceptors), this.internalCustomizers,</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, this.unmarshaller, this.destinationProvider,
+&nbsp;				this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add additional {@link ClientInterceptor ClientInterceptors} that should be used
+&nbsp;	 * with the {@link WebServiceTemplate}.
+&nbsp;	 * @param interceptors the interceptors to add
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #interceptors(ClientInterceptor...)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder additionalInterceptors(ClientInterceptor... interceptors) {
+<b class="nc">&nbsp;		Assert.notNull(interceptors, &quot;Interceptors must not be null&quot;);</b>
+<b class="nc">&nbsp;		return additionalInterceptors(Arrays.asList(interceptors));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add additional {@link ClientInterceptor ClientInterceptors} that should be used
+&nbsp;	 * with the {@link WebServiceTemplate}.
+&nbsp;	 * @param interceptors the interceptors to add
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #interceptors(Collection)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder additionalInterceptors(Collection&lt;? extends ClientInterceptor&gt; interceptors) {
+<b class="nc">&nbsp;		Assert.notNull(interceptors, &quot;Interceptors must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, append(this.interceptors, interceptors),</b>
+&nbsp;				this.internalCustomizers, this.customizers, this.messageSenders, this.marshaller, this.unmarshaller,
+&nbsp;				this.destinationProvider, this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link WebServiceTemplateCustomizer WebServiceTemplateCustomizers} that should
+&nbsp;	 * be applied to the {@link WebServiceTemplate}. Customizers are applied in the order
+&nbsp;	 * that they were added after builder configuration has been applied. Setting this
+&nbsp;	 * value will replace any previously configured customizers.
+&nbsp;	 * @param customizers the customizers to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #additionalCustomizers(WebServiceTemplateCustomizer...)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder customizers(WebServiceTemplateCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return customizers(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link WebServiceTemplateCustomizer WebServiceTemplateCustomizers} that should
+&nbsp;	 * be applied to the {@link WebServiceTemplate}. Customizers are applied in the order
+&nbsp;	 * that they were added after builder configuration has been applied. Setting this
+&nbsp;	 * value will replace any previously configured customizers.
+&nbsp;	 * @param customizers the customizers to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #additionalCustomizers(Collection)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder customizers(Collection&lt;? extends WebServiceTemplateCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+<b class="nc">&nbsp;				append(Collections.&lt;WebServiceTemplateCustomizer&gt;emptySet(), customizers), this.messageSenders,</b>
+&nbsp;				this.marshaller, this.unmarshaller, this.destinationProvider, this.transformerFactoryClass,
+&nbsp;				this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add additional {@link WebServiceTemplateCustomizer WebServiceTemplateCustomizers}
+&nbsp;	 * that should be applied to the {@link WebServiceTemplate}. Customizers are applied
+&nbsp;	 * in the order that they were added after builder configuration has been applied.
+&nbsp;	 * @param customizers the customizers to add
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #customizers(WebServiceTemplateCustomizer...)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder additionalCustomizers(WebServiceTemplateCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return additionalCustomizers(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add additional {@link WebServiceTemplateCustomizer WebServiceTemplateCustomizers}
+&nbsp;	 * that should be applied to the {@link WebServiceTemplate}. Customizers are applied
+&nbsp;	 * in the order that they were added after builder configuration has been applied.
+&nbsp;	 * @param customizers the customizers to add
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #customizers(Collection)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder additionalCustomizers(
+&nbsp;			Collection&lt;? extends WebServiceTemplateCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+<b class="nc">&nbsp;				append(this.customizers, customizers), this.messageSenders, this.marshaller, this.unmarshaller,</b>
+&nbsp;				this.destinationProvider, this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Indicates whether the connection should be checked for fault indicators
+&nbsp;	 * ({@code true}), or whether we should rely on the message only ({@code false}).
+&nbsp;	 * @param checkConnectionForFault whether to check for fault indicators
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see WebServiceTemplate#setCheckConnectionForFault(boolean)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setCheckConnectionForFault(boolean checkConnectionForFault) {
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors,</b>
+<b class="nc">&nbsp;				append(this.internalCustomizers, new CheckConnectionFaultCustomizer(checkConnectionForFault)),</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, this.unmarshaller, this.destinationProvider,
+&nbsp;				this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Indicates whether the connection should be checked for error indicators
+&nbsp;	 * ({@code true}), or whether these should be ignored ({@code false}).
+&nbsp;	 * @param checkConnectionForError whether to check for error indicators
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see WebServiceTemplate#setCheckConnectionForError(boolean)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setCheckConnectionForError(boolean checkConnectionForError) {
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors,</b>
+<b class="nc">&nbsp;				append(this.internalCustomizers, new CheckConnectionForErrorCustomizer(checkConnectionForError)),</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, this.unmarshaller, this.destinationProvider,
+&nbsp;				this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the {@link WebServiceMessageFactory} to use for creating messages.
+&nbsp;	 * @param messageFactory the message factory to use for creating messages
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see WebServiceTemplate#setMessageFactory(WebServiceMessageFactory)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setWebServiceMessageFactory(WebServiceMessageFactory messageFactory) {
+<b class="nc">&nbsp;		Assert.notNull(messageFactory, &quot;MessageFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, this.unmarshaller, this.destinationProvider,
+&nbsp;				this.transformerFactoryClass, messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link Unmarshaller} to use to deserialize messages.
+&nbsp;	 * @param unmarshaller the message unmarshaller
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see WebServiceTemplate#setUnmarshaller(Unmarshaller)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setUnmarshaller(Unmarshaller unmarshaller) {
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, unmarshaller, this.destinationProvider,
+&nbsp;				this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link Marshaller} to use to serialize messages.
+&nbsp;	 * @param marshaller the message marshaller
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see WebServiceTemplate#setMarshaller(Marshaller)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setMarshaller(Marshaller marshaller) {
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+&nbsp;				this.customizers, this.messageSenders, marshaller, this.unmarshaller, this.destinationProvider,
+&nbsp;				this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link FaultMessageResolver} to use.
+&nbsp;	 * @param faultMessageResolver the fault message resolver to use
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see WebServiceTemplate#setFaultMessageResolver(FaultMessageResolver)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setFaultMessageResolver(FaultMessageResolver faultMessageResolver) {
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors,</b>
+<b class="nc">&nbsp;				append(this.internalCustomizers, new FaultMessageResolverCustomizer(faultMessageResolver)),</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, this.unmarshaller, this.destinationProvider,
+&nbsp;				this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link TransformerFactory} implementation to use.
+&nbsp;	 * @param transformerFactoryClass the transformer factory implementation to use
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see WebServiceTemplate#setTransformerFactoryClass(Class)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setTransformerFactoryClass(
+&nbsp;			Class&lt;? extends TransformerFactory&gt; transformerFactoryClass) {
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, this.unmarshaller, this.destinationProvider,
+&nbsp;				transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the default URI to be used on operations that do not have a URI parameter.
+&nbsp;	 * Typically, either this property is set, or
+&nbsp;	 * {@link #setDestinationProvider(DestinationProvider)}, but not both.
+&nbsp;	 * @param defaultUri the destination provider URI to be used on operations that do not
+&nbsp;	 * have a URI parameter.
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see #setDestinationProvider(DestinationProvider)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setDefaultUri(String defaultUri) {
+<b class="nc">&nbsp;		Assert.hasText(defaultUri, &quot;DefaultUri must not be empty&quot;);</b>
+<b class="nc">&nbsp;		return setDestinationProvider(() -&gt; URI.create(defaultUri));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link DestinationProvider} to use. Typically, either this property is set,
+&nbsp;	 * or {@link #setDefaultUri(String)}, but not both.
+&nbsp;	 * @param destinationProvider the destination provider to be used on operations that
+&nbsp;	 * do not have a URI parameter.
+&nbsp;	 * @return a new builder instance.
+&nbsp;	 * @see WebServiceTemplate#setDestinationProvider(DestinationProvider)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplateBuilder setDestinationProvider(DestinationProvider destinationProvider) {
+<b class="nc">&nbsp;		Assert.notNull(destinationProvider, &quot;DestinationProvider must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new WebServiceTemplateBuilder(this.detectHttpMessageSender, this.interceptors, this.internalCustomizers,</b>
+&nbsp;				this.customizers, this.messageSenders, this.marshaller, this.unmarshaller, destinationProvider,
+&nbsp;				this.transformerFactoryClass, this.messageFactory);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Build a new {@link WebServiceTemplate} instance and configure it using this
+&nbsp;	 * builder.
+&nbsp;	 * @return a configured {@link WebServiceTemplate} instance.
+&nbsp;	 * @see #build(Class)
+&nbsp;	 * @see #configure(WebServiceTemplate)
+&nbsp;	 */
+&nbsp;	public WebServiceTemplate build() {
+<b class="nc">&nbsp;		return configure(new WebServiceTemplate());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Build a new {@link WebServiceTemplate} instance of the specified type and configure
+&nbsp;	 * it using this builder.
+&nbsp;	 * @param &lt;T&gt; the type of web service template
+&nbsp;	 * @param webServiceTemplateClass the template type to create
+&nbsp;	 * @return a configured {@link WebServiceTemplate} instance.
+&nbsp;	 * @see WebServiceTemplateBuilder#build()
+&nbsp;	 * @see #configure(WebServiceTemplate)
+&nbsp;	 */
+&nbsp;	public &lt;T extends WebServiceTemplate&gt; T build(Class&lt;T&gt; webServiceTemplateClass) {
+<b class="nc">&nbsp;		Assert.notNull(webServiceTemplateClass, &quot;WebServiceTemplateClass must not be null&quot;);</b>
+<b class="nc">&nbsp;		return configure(BeanUtils.instantiateClass(webServiceTemplateClass));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the provided {@link WebServiceTemplate} instance using this builder.
+&nbsp;	 * @param &lt;T&gt; the type of web service template
+&nbsp;	 * @param webServiceTemplate the {@link WebServiceTemplate} to configure
+&nbsp;	 * @return the web service template instance
+&nbsp;	 * @see #build()
+&nbsp;	 * @see #build(Class)
+&nbsp;	 */
+&nbsp;	public &lt;T extends WebServiceTemplate&gt; T configure(T webServiceTemplate) {
+<b class="nc">&nbsp;		Assert.notNull(webServiceTemplate, &quot;WebServiceTemplate must not be null&quot;);</b>
+<b class="nc">&nbsp;		configureMessageSenders(webServiceTemplate);</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		applyCustomizers(webServiceTemplate, this.internalCustomizers);</b>
+<b class="nc">&nbsp;		map.from(this.marshaller).to(webServiceTemplate::setMarshaller);</b>
+<b class="nc">&nbsp;		map.from(this.unmarshaller).to(webServiceTemplate::setUnmarshaller);</b>
+<b class="nc">&nbsp;		map.from(this.destinationProvider).to(webServiceTemplate::setDestinationProvider);</b>
+<b class="nc">&nbsp;		map.from(this.transformerFactoryClass).to(webServiceTemplate::setTransformerFactoryClass);</b>
+<b class="nc">&nbsp;		map.from(this.messageFactory).to(webServiceTemplate::setMessageFactory);</b>
+<b class="nc">&nbsp;		if (!CollectionUtils.isEmpty(this.interceptors)) {</b>
+<b class="nc">&nbsp;			Set&lt;ClientInterceptor&gt; merged = new LinkedHashSet&lt;&gt;(this.interceptors);</b>
+<b class="nc">&nbsp;			if (webServiceTemplate.getInterceptors() != null) {</b>
+<b class="nc">&nbsp;				merged.addAll(Arrays.asList(webServiceTemplate.getInterceptors()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			webServiceTemplate.setInterceptors(merged.toArray(new ClientInterceptor[0]));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		applyCustomizers(webServiceTemplate, this.customizers);</b>
+<b class="nc">&nbsp;		return webServiceTemplate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyCustomizers(WebServiceTemplate webServiceTemplate,
+&nbsp;			Set&lt;WebServiceTemplateCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		if (!CollectionUtils.isEmpty(customizers)) {</b>
+<b class="nc">&nbsp;			for (WebServiceTemplateCustomizer customizer : customizers) {</b>
+<b class="nc">&nbsp;				customizer.customize(webServiceTemplate);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends WebServiceTemplate&gt; void configureMessageSenders(T webServiceTemplate) {
+<b class="nc">&nbsp;		if (this.messageSenders.isOnlyAdditional() &amp;&amp; this.detectHttpMessageSender) {</b>
+<b class="nc">&nbsp;			Set&lt;WebServiceMessageSender&gt; merged = append(this.messageSenders.getMessageSenders(),</b>
+<b class="nc">&nbsp;					new HttpWebServiceMessageSenderBuilder().build());</b>
+<b class="nc">&nbsp;			webServiceTemplate.setMessageSenders(merged.toArray(new WebServiceMessageSender[0]));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		else if (!CollectionUtils.isEmpty(this.messageSenders.getMessageSenders())) {</b>
+<b class="nc">&nbsp;			webServiceTemplate</b>
+<b class="nc">&nbsp;				.setMessageSenders(this.messageSenders.getMessageSenders().toArray(new WebServiceMessageSender[0]));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; Set&lt;T&gt; append(Set&lt;T&gt; set, T addition) {
+<b class="nc">&nbsp;		return append(set, Collections.singleton(addition));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static &lt;T&gt; Set&lt;T&gt; append(Set&lt;T&gt; set, Collection&lt;? extends T&gt; additions) {
+<b class="nc">&nbsp;		Set&lt;T&gt; result = new LinkedHashSet&lt;&gt;((set != null) ? set : Collections.emptySet());</b>
+<b class="nc">&nbsp;		result.addAll((additions != null) ? additions : Collections.emptyList());</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableSet(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Collect user-defined {@link WebServiceMessageSender} and whether only additional
+&nbsp;	 * message senders were added or not.
+&nbsp;	 */
+&nbsp;	private static final class WebServiceMessageSenders {
+&nbsp;
+&nbsp;		private final boolean onlyAdditional;
+&nbsp;
+&nbsp;		private final Set&lt;WebServiceMessageSender&gt; messageSenders;
+&nbsp;
+&nbsp;		private WebServiceMessageSenders() {
+<b class="nc">&nbsp;			this(true, Collections.emptySet());</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		private WebServiceMessageSenders(boolean onlyAdditional, Set&lt;WebServiceMessageSender&gt; messageSenders) {</b>
+<b class="nc">&nbsp;			this.onlyAdditional = onlyAdditional;</b>
+<b class="nc">&nbsp;			this.messageSenders = messageSenders;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isOnlyAdditional() {
+<b class="nc">&nbsp;			return this.onlyAdditional;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;WebServiceMessageSender&gt; getMessageSenders() {
+<b class="nc">&nbsp;			return this.messageSenders;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		WebServiceMessageSenders set(Collection&lt;? extends WebServiceMessageSender&gt; messageSenders) {
+<b class="nc">&nbsp;			return new WebServiceMessageSenders(false, new LinkedHashSet&lt;&gt;(messageSenders));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		WebServiceMessageSenders add(Collection&lt;? extends WebServiceMessageSender&gt; messageSenders) {
+<b class="nc">&nbsp;			return new WebServiceMessageSenders(this.onlyAdditional, append(this.messageSenders, messageSenders));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link WebServiceTemplateCustomizer} to set
+&nbsp;	 * {@link WebServiceTemplate#setCheckConnectionForFault(boolean)
+&nbsp;	 * checkConnectionForFault}.
+&nbsp;	 */
+&nbsp;	private static final class CheckConnectionFaultCustomizer implements WebServiceTemplateCustomizer {
+&nbsp;
+&nbsp;		private final boolean checkConnectionFault;
+&nbsp;
+<b class="nc">&nbsp;		private CheckConnectionFaultCustomizer(boolean checkConnectionFault) {</b>
+<b class="nc">&nbsp;			this.checkConnectionFault = checkConnectionFault;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void customize(WebServiceTemplate webServiceTemplate) {
+<b class="nc">&nbsp;			webServiceTemplate.setCheckConnectionForFault(this.checkConnectionFault);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link WebServiceTemplateCustomizer} to set
+&nbsp;	 * {@link WebServiceTemplate#setCheckConnectionForError(boolean)
+&nbsp;	 * checkConnectionForError}.
+&nbsp;	 */
+&nbsp;	private static final class CheckConnectionForErrorCustomizer implements WebServiceTemplateCustomizer {
+&nbsp;
+&nbsp;		private final boolean checkConnectionForError;
+&nbsp;
+<b class="nc">&nbsp;		private CheckConnectionForErrorCustomizer(boolean checkConnectionForError) {</b>
+<b class="nc">&nbsp;			this.checkConnectionForError = checkConnectionForError;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void customize(WebServiceTemplate webServiceTemplate) {
+<b class="nc">&nbsp;			webServiceTemplate.setCheckConnectionForError(this.checkConnectionForError);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link WebServiceTemplateCustomizer} to set
+&nbsp;	 * {@link WebServiceTemplate#setFaultMessageResolver(FaultMessageResolver)
+&nbsp;	 * faultMessageResolver}.
+&nbsp;	 */
+&nbsp;	private static final class FaultMessageResolverCustomizer implements WebServiceTemplateCustomizer {
+&nbsp;
+&nbsp;		private final FaultMessageResolver faultMessageResolver;
+&nbsp;
+<b class="nc">&nbsp;		private FaultMessageResolverCustomizer(FaultMessageResolver faultMessageResolver) {</b>
+<b class="nc">&nbsp;			this.faultMessageResolver = faultMessageResolver;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void customize(WebServiceTemplate webServiceTemplate) {
+<b class="nc">&nbsp;			webServiceTemplate.setFaultMessageResolver(this.faultMessageResolver);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

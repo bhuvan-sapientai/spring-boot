@@ -1,0 +1,406 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FlywayEndpoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.flyway</a>
+</div>
+
+<h1>Coverage Summary for Class: FlywayEndpoint (org.springframework.boot.actuate.flyway)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FlywayEndpoint</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FlywayEndpoint$ContextFlywayBeansDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FlywayEndpoint$FlywayBeansDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FlywayEndpoint$FlywayDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FlywayEndpoint$FlywayMigrationDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.flyway;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.flywaydb.core.Flyway;
+&nbsp;import org.flywaydb.core.api.MigrationInfo;
+&nbsp;import org.flywaydb.core.api.MigrationState;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationResponseBody;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Endpoint @Endpoint} to expose flyway info.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Artsiom Yudovin
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@Endpoint(id = &quot;flyway&quot;)
+&nbsp;public class FlywayEndpoint {
+&nbsp;
+&nbsp;	private final ApplicationContext context;
+&nbsp;
+<b class="nc">&nbsp;	public FlywayEndpoint(ApplicationContext context) {</b>
+<b class="nc">&nbsp;		this.context = context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ReadOperation
+&nbsp;	public FlywayBeansDescriptor flywayBeans() {
+<b class="nc">&nbsp;		ApplicationContext target = this.context;</b>
+<b class="nc">&nbsp;		Map&lt;String, ContextFlywayBeansDescriptor&gt; contextFlywayBeans = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		while (target != null) {</b>
+<b class="nc">&nbsp;			Map&lt;String, FlywayDescriptor&gt; flywayBeans = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			target.getBeansOfType(Flyway.class)</b>
+<b class="nc">&nbsp;				.forEach((name, flyway) -&gt; flywayBeans.put(name, new FlywayDescriptor(flyway.info().all())));</b>
+<b class="nc">&nbsp;			ApplicationContext parent = target.getParent();</b>
+<b class="nc">&nbsp;			contextFlywayBeans.put(target.getId(),</b>
+<b class="nc">&nbsp;					new ContextFlywayBeansDescriptor(flywayBeans, (parent != null) ? parent.getId() : null));</b>
+<b class="nc">&nbsp;			target = parent;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return new FlywayBeansDescriptor(contextFlywayBeans);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of an application&#39;s {@link Flyway} beans.
+&nbsp;	 */
+&nbsp;	public static final class FlywayBeansDescriptor implements OperationResponseBody {
+&nbsp;
+&nbsp;		private final Map&lt;String, ContextFlywayBeansDescriptor&gt; contexts;
+&nbsp;
+<b class="nc">&nbsp;		private FlywayBeansDescriptor(Map&lt;String, ContextFlywayBeansDescriptor&gt; contexts) {</b>
+<b class="nc">&nbsp;			this.contexts = contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, ContextFlywayBeansDescriptor&gt; getContexts() {
+<b class="nc">&nbsp;			return this.contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of an application context&#39;s {@link Flyway} beans.
+&nbsp;	 */
+&nbsp;	public static final class ContextFlywayBeansDescriptor {
+&nbsp;
+&nbsp;		private final Map&lt;String, FlywayDescriptor&gt; flywayBeans;
+&nbsp;
+&nbsp;		private final String parentId;
+&nbsp;
+<b class="nc">&nbsp;		private ContextFlywayBeansDescriptor(Map&lt;String, FlywayDescriptor&gt; flywayBeans, String parentId) {</b>
+<b class="nc">&nbsp;			this.flywayBeans = flywayBeans;</b>
+<b class="nc">&nbsp;			this.parentId = parentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, FlywayDescriptor&gt; getFlywayBeans() {
+<b class="nc">&nbsp;			return this.flywayBeans;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getParentId() {
+<b class="nc">&nbsp;			return this.parentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a {@link Flyway} bean.
+&nbsp;	 */
+&nbsp;	public static class FlywayDescriptor {
+&nbsp;
+&nbsp;		private final List&lt;FlywayMigrationDescriptor&gt; migrations;
+&nbsp;
+<b class="nc">&nbsp;		private FlywayDescriptor(MigrationInfo[] migrations) {</b>
+<b class="nc">&nbsp;			this.migrations = Stream.of(migrations).map(FlywayMigrationDescriptor::new).toList();</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		public FlywayDescriptor(List&lt;FlywayMigrationDescriptor&gt; migrations) {</b>
+<b class="nc">&nbsp;			this.migrations = migrations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public List&lt;FlywayMigrationDescriptor&gt; getMigrations() {
+<b class="nc">&nbsp;			return this.migrations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a migration performed by Flyway.
+&nbsp;	 */
+&nbsp;	public static final class FlywayMigrationDescriptor {
+&nbsp;
+&nbsp;		private final String type;
+&nbsp;
+&nbsp;		private final Integer checksum;
+&nbsp;
+&nbsp;		private final String version;
+&nbsp;
+&nbsp;		private final String description;
+&nbsp;
+&nbsp;		private final String script;
+&nbsp;
+&nbsp;		private final MigrationState state;
+&nbsp;
+&nbsp;		private final String installedBy;
+&nbsp;
+&nbsp;		private final Instant installedOn;
+&nbsp;
+&nbsp;		private final Integer installedRank;
+&nbsp;
+&nbsp;		private final Integer executionTime;
+&nbsp;
+<b class="nc">&nbsp;		private FlywayMigrationDescriptor(MigrationInfo info) {</b>
+<b class="nc">&nbsp;			this.type = info.getType().name();</b>
+<b class="nc">&nbsp;			this.checksum = info.getChecksum();</b>
+<b class="nc">&nbsp;			this.version = nullSafeToString(info.getVersion());</b>
+<b class="nc">&nbsp;			this.description = info.getDescription();</b>
+<b class="nc">&nbsp;			this.script = info.getScript();</b>
+<b class="nc">&nbsp;			this.state = info.getState();</b>
+<b class="nc">&nbsp;			this.installedBy = info.getInstalledBy();</b>
+<b class="nc">&nbsp;			this.installedRank = info.getInstalledRank();</b>
+<b class="nc">&nbsp;			this.executionTime = info.getExecutionTime();</b>
+<b class="nc">&nbsp;			this.installedOn = nullSafeToInstant(info.getInstalledOn());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String nullSafeToString(Object obj) {
+<b class="nc">&nbsp;			return (obj != null) ? obj.toString() : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Instant nullSafeToInstant(Date date) {
+<b class="nc">&nbsp;			return (date != null) ? Instant.ofEpochMilli(date.getTime()) : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getType() {
+<b class="nc">&nbsp;			return this.type;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Integer getChecksum() {
+<b class="nc">&nbsp;			return this.checksum;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getVersion() {
+<b class="nc">&nbsp;			return this.version;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getDescription() {
+<b class="nc">&nbsp;			return this.description;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getScript() {
+<b class="nc">&nbsp;			return this.script;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public MigrationState getState() {
+<b class="nc">&nbsp;			return this.state;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getInstalledBy() {
+<b class="nc">&nbsp;			return this.installedBy;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Instant getInstalledOn() {
+<b class="nc">&nbsp;			return this.installedOn;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Integer getInstalledRank() {
+<b class="nc">&nbsp;			return this.installedRank;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Integer getExecutionTime() {
+<b class="nc">&nbsp;			return this.executionTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

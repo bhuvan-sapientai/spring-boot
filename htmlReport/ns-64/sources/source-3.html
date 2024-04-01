@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OtlpTracingConfigurations</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.tracing.otlp</a>
+</div>
+
+<h1>Coverage Summary for Class: OtlpTracingConfigurations (org.springframework.boot.actuate.autoconfigure.tracing.otlp)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OtlpTracingConfigurations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OtlpTracingConfigurations$ConnectionDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OtlpTracingConfigurations$ConnectionDetails$PropertiesOtlpTracingConnectionDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OtlpTracingConfigurations$Exporters</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.tracing.otlp;
+&nbsp;
+&nbsp;import java.util.Map.Entry;
+&nbsp;
+&nbsp;import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
+&nbsp;import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporterBuilder;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.tracing.ConditionalOnEnabledTracing;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configurations imported by {@link OtlpAutoConfiguration}.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+<b class="nc">&nbsp;class OtlpTracingConfigurations {</b>
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+<b class="nc">&nbsp;	static class ConnectionDetails {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		@ConditionalOnProperty(prefix = &quot;management.otlp.tracing&quot;, name = &quot;endpoint&quot;)
+&nbsp;		OtlpTracingConnectionDetails otlpTracingConnectionDetails(OtlpProperties properties) {
+<b class="nc">&nbsp;			return new PropertiesOtlpTracingConnectionDetails(properties);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Adapts {@link OtlpProperties} to {@link OtlpTracingConnectionDetails}.
+&nbsp;		 */
+&nbsp;		static class PropertiesOtlpTracingConnectionDetails implements OtlpTracingConnectionDetails {
+&nbsp;
+&nbsp;			private final OtlpProperties properties;
+&nbsp;
+<b class="nc">&nbsp;			PropertiesOtlpTracingConnectionDetails(OtlpProperties properties) {</b>
+<b class="nc">&nbsp;				this.properties = properties;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public String getUrl() {
+<b class="nc">&nbsp;				return this.properties.getEndpoint();</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+<b class="nc">&nbsp;	static class Exporters {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(value = OtlpHttpSpanExporter.class,
+&nbsp;				type = &quot;io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter&quot;)
+&nbsp;		@ConditionalOnBean(OtlpTracingConnectionDetails.class)
+&nbsp;		@ConditionalOnEnabledTracing
+&nbsp;		OtlpHttpSpanExporter otlpHttpSpanExporter(OtlpProperties properties,
+&nbsp;				OtlpTracingConnectionDetails connectionDetails) {
+<b class="nc">&nbsp;			OtlpHttpSpanExporterBuilder builder = OtlpHttpSpanExporter.builder()</b>
+<b class="nc">&nbsp;				.setEndpoint(connectionDetails.getUrl())</b>
+<b class="nc">&nbsp;				.setTimeout(properties.getTimeout())</b>
+<b class="nc">&nbsp;				.setCompression(properties.getCompression().name().toLowerCase());</b>
+<b class="nc">&nbsp;			for (Entry&lt;String, String&gt; header : properties.getHeaders().entrySet()) {</b>
+<b class="nc">&nbsp;				builder.addHeader(header.getKey(), header.getValue());</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return builder.build();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

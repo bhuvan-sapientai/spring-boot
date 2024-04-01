@@ -1,0 +1,378 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringApplicationJsonEnvironmentPostProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.env</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringApplicationJsonEnvironmentPostProcessor (org.springframework.boot.env)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringApplicationJsonEnvironmentPostProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpringApplicationJsonEnvironmentPostProcessor$JsonPropertySource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SpringApplicationJsonEnvironmentPostProcessor$JsonPropertyValue</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.env;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.json.JsonParser;
+&nbsp;import org.springframework.boot.json.JsonParserFactory;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginLookup;
+&nbsp;import org.springframework.boot.origin.PropertySourceOrigin;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.MapPropertySource;
+&nbsp;import org.springframework.core.env.MutablePropertySources;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.core.env.StandardEnvironment;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.context.support.StandardServletEnvironment;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link EnvironmentPostProcessor} that parses JSON from
+&nbsp; * {@code spring.application.json} or equivalently {@code SPRING_APPLICATION_JSON} and
+&nbsp; * adds it as a map property source to the {@link Environment}. The new properties are
+&nbsp; * added with higher priority than the system properties.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Artsiom Yudovin
+&nbsp; * @since 1.3.0
+&nbsp; */
+<b class="nc">&nbsp;public class SpringApplicationJsonEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the {@code spring.application.json} property.
+&nbsp;	 */
+&nbsp;	public static final String SPRING_APPLICATION_JSON_PROPERTY = &quot;spring.application.json&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the {@code SPRING_APPLICATION_JSON} environment variable.
+&nbsp;	 */
+&nbsp;	public static final String SPRING_APPLICATION_JSON_ENVIRONMENT_VARIABLE = &quot;SPRING_APPLICATION_JSON&quot;;
+&nbsp;
+&nbsp;	private static final String SERVLET_ENVIRONMENT_CLASS = &quot;org.springframework.web.&quot;
+&nbsp;			+ &quot;context.support.StandardServletEnvironment&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Set&lt;String&gt; SERVLET_ENVIRONMENT_PROPERTY_SOURCES = new LinkedHashSet&lt;&gt;(</b>
+<b class="nc">&nbsp;			Arrays.asList(StandardServletEnvironment.JNDI_PROPERTY_SOURCE_NAME,</b>
+&nbsp;					StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
+&nbsp;					StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME));
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The default order for the processor.
+&nbsp;	 */
+&nbsp;	public static final int DEFAULT_ORDER = Ordered.HIGHEST_PRECEDENCE + 5;
+&nbsp;
+<b class="nc">&nbsp;	private int order = DEFAULT_ORDER;</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return this.order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOrder(int order) {
+<b class="nc">&nbsp;		this.order = order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+<b class="nc">&nbsp;		MutablePropertySources propertySources = environment.getPropertySources();</b>
+<b class="nc">&nbsp;		propertySources.stream()</b>
+<b class="nc">&nbsp;			.map(JsonPropertyValue::get)</b>
+<b class="nc">&nbsp;			.filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;			.findFirst()</b>
+<b class="nc">&nbsp;			.ifPresent((v) -&gt; processJson(environment, v));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processJson(ConfigurableEnvironment environment, JsonPropertyValue propertyValue) {
+<b class="nc">&nbsp;		JsonParser parser = JsonParserFactory.getJsonParser();</b>
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; map = parser.parseMap(propertyValue.getJson());</b>
+<b class="nc">&nbsp;		if (!map.isEmpty()) {</b>
+<b class="nc">&nbsp;			addJsonPropertySource(environment, new JsonPropertySource(propertyValue, flatten(map)));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flatten the map keys using period separator.
+&nbsp;	 * @param map the map that should be flattened
+&nbsp;	 * @return the flattened map
+&nbsp;	 */
+&nbsp;	private Map&lt;String, Object&gt; flatten(Map&lt;String, Object&gt; map) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; result = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		flatten(null, result, map);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void flatten(String prefix, Map&lt;String, Object&gt; result, Map&lt;String, Object&gt; map) {
+<b class="nc">&nbsp;		String namePrefix = (prefix != null) ? prefix + &quot;.&quot; : &quot;&quot;;</b>
+<b class="nc">&nbsp;		map.forEach((key, value) -&gt; extract(namePrefix + key, result, value));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private void extract(String name, Map&lt;String, Object&gt; result, Object value) {
+<b class="nc">&nbsp;		if (value instanceof Map) {</b>
+<b class="nc">&nbsp;			if (CollectionUtils.isEmpty((Map&lt;?, ?&gt;) value)) {</b>
+<b class="nc">&nbsp;				result.put(name, value);</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			flatten(name, result, (Map&lt;String, Object&gt;) value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (value instanceof Collection) {</b>
+<b class="nc">&nbsp;			if (CollectionUtils.isEmpty((Collection&lt;?&gt;) value)) {</b>
+<b class="nc">&nbsp;				result.put(name, value);</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			int index = 0;</b>
+<b class="nc">&nbsp;			for (Object object : (Collection&lt;Object&gt;) value) {</b>
+<b class="nc">&nbsp;				extract(name + &quot;[&quot; + index + &quot;]&quot;, result, object);</b>
+<b class="nc">&nbsp;				index++;</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			result.put(name, value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addJsonPropertySource(ConfigurableEnvironment environment, PropertySource&lt;?&gt; source) {
+<b class="nc">&nbsp;		MutablePropertySources sources = environment.getPropertySources();</b>
+<b class="nc">&nbsp;		String name = findPropertySource(sources);</b>
+<b class="nc">&nbsp;		if (sources.contains(name)) {</b>
+<b class="nc">&nbsp;			sources.addBefore(name, source);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			sources.addFirst(source);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String findPropertySource(MutablePropertySources sources) {
+<b class="nc">&nbsp;		if (ClassUtils.isPresent(SERVLET_ENVIRONMENT_CLASS, null)) {</b>
+<b class="nc">&nbsp;			PropertySource&lt;?&gt; servletPropertySource = sources.stream()</b>
+<b class="nc">&nbsp;				.filter((source) -&gt; SERVLET_ENVIRONMENT_PROPERTY_SOURCES.contains(source.getName()))</b>
+<b class="nc">&nbsp;				.findFirst()</b>
+<b class="nc">&nbsp;				.orElse(null);</b>
+<b class="nc">&nbsp;			if (servletPropertySource != null) {</b>
+<b class="nc">&nbsp;				return servletPropertySource.getName();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class JsonPropertySource extends MapPropertySource implements OriginLookup&lt;String&gt; {
+&nbsp;
+&nbsp;		private final JsonPropertyValue propertyValue;
+&nbsp;
+&nbsp;		JsonPropertySource(JsonPropertyValue propertyValue, Map&lt;String, Object&gt; source) {
+<b class="nc">&nbsp;			super(SPRING_APPLICATION_JSON_PROPERTY, source);</b>
+<b class="nc">&nbsp;			this.propertyValue = propertyValue;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Origin getOrigin(String key) {
+<b class="nc">&nbsp;			return this.propertyValue.getOrigin();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class JsonPropertyValue {
+&nbsp;
+<b class="nc">&nbsp;		private static final String[] CANDIDATES = { SPRING_APPLICATION_JSON_PROPERTY,</b>
+&nbsp;				SPRING_APPLICATION_JSON_ENVIRONMENT_VARIABLE };
+&nbsp;
+&nbsp;		private final PropertySource&lt;?&gt; propertySource;
+&nbsp;
+&nbsp;		private final String propertyName;
+&nbsp;
+&nbsp;		private final String json;
+&nbsp;
+<b class="nc">&nbsp;		JsonPropertyValue(PropertySource&lt;?&gt; propertySource, String propertyName, String json) {</b>
+<b class="nc">&nbsp;			this.propertySource = propertySource;</b>
+<b class="nc">&nbsp;			this.propertyName = propertyName;</b>
+<b class="nc">&nbsp;			this.json = json;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getJson() {
+<b class="nc">&nbsp;			return this.json;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Origin getOrigin() {
+<b class="nc">&nbsp;			return PropertySourceOrigin.get(this.propertySource, this.propertyName);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static JsonPropertyValue get(PropertySource&lt;?&gt; propertySource) {
+<b class="nc">&nbsp;			for (String candidate : CANDIDATES) {</b>
+<b class="nc">&nbsp;				Object value = propertySource.getProperty(candidate);</b>
+<b class="nc">&nbsp;				if (value instanceof String string &amp;&amp; StringUtils.hasLength(string)) {</b>
+<b class="nc">&nbsp;					return new JsonPropertyValue(propertySource, candidate, string);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

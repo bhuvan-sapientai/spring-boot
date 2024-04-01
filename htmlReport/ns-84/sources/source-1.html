@@ -1,0 +1,229 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ControllerEndpointDiscoverer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.web.annotation</a>
+</div>
+
+<h1>Coverage Summary for Class: ControllerEndpointDiscoverer (org.springframework.boot.actuate.endpoint.web.annotation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ControllerEndpointDiscoverer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ControllerEndpointDiscoverer$ControllerEndpointDiscovererRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.web.annotation;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.MemberCategory;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.boot.actuate.endpoint.EndpointFilter;
+&nbsp;import org.springframework.boot.actuate.endpoint.EndpointId;
+&nbsp;import org.springframework.boot.actuate.endpoint.Operation;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.DiscoveredOperationMethod;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.EndpointDiscoverer;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationInvoker;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.ParameterValueMapper;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.PathMapper;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointDiscoverer.ControllerEndpointDiscovererRuntimeHints;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EndpointDiscoverer} for {@link ExposableControllerEndpoint controller
+&nbsp; * endpoints}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@ImportRuntimeHints(ControllerEndpointDiscovererRuntimeHints.class)
+&nbsp;public class ControllerEndpointDiscoverer extends EndpointDiscoverer&lt;ExposableControllerEndpoint, Operation&gt;
+&nbsp;		implements ControllerEndpointsSupplier {
+&nbsp;
+&nbsp;	private final List&lt;PathMapper&gt; endpointPathMappers;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ControllerEndpointDiscoverer} instance.
+&nbsp;	 * @param applicationContext the source application context
+&nbsp;	 * @param endpointPathMappers the endpoint path mappers
+&nbsp;	 * @param filters filters to apply
+&nbsp;	 */
+&nbsp;	public ControllerEndpointDiscoverer(ApplicationContext applicationContext, List&lt;PathMapper&gt; endpointPathMappers,
+&nbsp;			Collection&lt;EndpointFilter&lt;ExposableControllerEndpoint&gt;&gt; filters) {
+<b class="nc">&nbsp;		super(applicationContext, ParameterValueMapper.NONE, Collections.emptyList(), filters);</b>
+<b class="nc">&nbsp;		this.endpointPathMappers = endpointPathMappers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isEndpointTypeExposed(Class&lt;?&gt; beanType) {
+<b class="nc">&nbsp;		MergedAnnotations annotations = MergedAnnotations.from(beanType, SearchStrategy.SUPERCLASS);</b>
+<b class="nc">&nbsp;		return annotations.isPresent(ControllerEndpoint.class) || annotations.isPresent(RestControllerEndpoint.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected ExposableControllerEndpoint createEndpoint(Object endpointBean, EndpointId id, boolean enabledByDefault,
+&nbsp;			Collection&lt;Operation&gt; operations) {
+<b class="nc">&nbsp;		String rootPath = PathMapper.getRootPath(this.endpointPathMappers, id);</b>
+<b class="nc">&nbsp;		return new DiscoveredControllerEndpoint(this, endpointBean, id, rootPath, enabledByDefault);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Operation createOperation(EndpointId endpointId, DiscoveredOperationMethod operationMethod,
+&nbsp;			OperationInvoker invoker) {
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;ControllerEndpoints must not declare operations&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected OperationKey createOperationKey(Operation operation) {
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;ControllerEndpoints must not declare operations&quot;);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class ControllerEndpointDiscovererRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			hints.reflection()</b>
+<b class="nc">&nbsp;				.registerType(ControllerEndpointFilter.class, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

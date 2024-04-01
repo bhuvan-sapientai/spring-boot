@@ -1,0 +1,490 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LiquibaseEndpoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.liquibase</a>
+</div>
+
+<h1>Coverage Summary for Class: LiquibaseEndpoint (org.springframework.boot.actuate.liquibase)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LiquibaseEndpoint</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LiquibaseEndpoint$ChangeSetDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LiquibaseEndpoint$ContextExpressionDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LiquibaseEndpoint$ContextLiquibaseBeansDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LiquibaseEndpoint$LiquibaseBeanDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LiquibaseEndpoint$LiquibaseBeansDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.liquibase;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import liquibase.changelog.ChangeSet.ExecType;
+&nbsp;import liquibase.changelog.RanChangeSet;
+&nbsp;import liquibase.changelog.StandardChangeLogHistoryService;
+&nbsp;import liquibase.database.Database;
+&nbsp;import liquibase.database.DatabaseFactory;
+&nbsp;import liquibase.database.jvm.JdbcConnection;
+&nbsp;import liquibase.integration.spring.SpringLiquibase;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationResponseBody;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Endpoint @Endpoint} to expose liquibase info.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@Endpoint(id = &quot;liquibase&quot;)
+&nbsp;public class LiquibaseEndpoint {
+&nbsp;
+&nbsp;	private final ApplicationContext context;
+&nbsp;
+<b class="nc">&nbsp;	public LiquibaseEndpoint(ApplicationContext context) {</b>
+<b class="nc">&nbsp;		Assert.notNull(context, &quot;Context must be specified&quot;);</b>
+<b class="nc">&nbsp;		this.context = context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ReadOperation
+&nbsp;	public LiquibaseBeansDescriptor liquibaseBeans() {
+<b class="nc">&nbsp;		ApplicationContext target = this.context;</b>
+<b class="nc">&nbsp;		Map&lt;String, ContextLiquibaseBeansDescriptor&gt; contextBeans = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		while (target != null) {</b>
+<b class="nc">&nbsp;			Map&lt;String, LiquibaseBeanDescriptor&gt; liquibaseBeans = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			DatabaseFactory factory = DatabaseFactory.getInstance();</b>
+<b class="nc">&nbsp;			target.getBeansOfType(SpringLiquibase.class)</b>
+<b class="nc">&nbsp;				.forEach((name, liquibase) -&gt; liquibaseBeans.put(name, createReport(liquibase, factory)));</b>
+<b class="nc">&nbsp;			ApplicationContext parent = target.getParent();</b>
+<b class="nc">&nbsp;			contextBeans.put(target.getId(),</b>
+<b class="nc">&nbsp;					new ContextLiquibaseBeansDescriptor(liquibaseBeans, (parent != null) ? parent.getId() : null));</b>
+<b class="nc">&nbsp;			target = parent;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return new LiquibaseBeansDescriptor(contextBeans);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private LiquibaseBeanDescriptor createReport(SpringLiquibase liquibase, DatabaseFactory factory) {
+&nbsp;		try {
+<b class="nc">&nbsp;			DataSource dataSource = liquibase.getDataSource();</b>
+<b class="nc">&nbsp;			JdbcConnection connection = new JdbcConnection(dataSource.getConnection());</b>
+<b class="nc">&nbsp;			Database database = null;</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				database = factory.findCorrectDatabaseImplementation(connection);</b>
+<b class="nc">&nbsp;				String defaultSchema = liquibase.getDefaultSchema();</b>
+<b class="nc">&nbsp;				if (StringUtils.hasText(defaultSchema)) {</b>
+<b class="nc">&nbsp;					database.setDefaultSchemaName(defaultSchema);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				database.setDatabaseChangeLogTableName(liquibase.getDatabaseChangeLogTable());</b>
+<b class="nc">&nbsp;				database.setDatabaseChangeLogLockTableName(liquibase.getDatabaseChangeLogLockTable());</b>
+<b class="nc">&nbsp;				StandardChangeLogHistoryService service = new StandardChangeLogHistoryService();</b>
+<b class="nc">&nbsp;				service.setDatabase(database);</b>
+<b class="nc">&nbsp;				return new LiquibaseBeanDescriptor(</b>
+<b class="nc">&nbsp;						service.getRanChangeSets().stream().map(ChangeSetDescriptor::new).toList());</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				if (database != null) {</b>
+<b class="nc">&nbsp;					database.close();</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					connection.close();</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to get Liquibase change sets&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of an application&#39;s {@link SpringLiquibase} beans.
+&nbsp;	 */
+&nbsp;	public static final class LiquibaseBeansDescriptor implements OperationResponseBody {
+&nbsp;
+&nbsp;		private final Map&lt;String, ContextLiquibaseBeansDescriptor&gt; contexts;
+&nbsp;
+<b class="nc">&nbsp;		private LiquibaseBeansDescriptor(Map&lt;String, ContextLiquibaseBeansDescriptor&gt; contexts) {</b>
+<b class="nc">&nbsp;			this.contexts = contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, ContextLiquibaseBeansDescriptor&gt; getContexts() {
+<b class="nc">&nbsp;			return this.contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of an application context&#39;s {@link SpringLiquibase} beans.
+&nbsp;	 */
+&nbsp;	public static final class ContextLiquibaseBeansDescriptor {
+&nbsp;
+&nbsp;		private final Map&lt;String, LiquibaseBeanDescriptor&gt; liquibaseBeans;
+&nbsp;
+&nbsp;		private final String parentId;
+&nbsp;
+<b class="nc">&nbsp;		private ContextLiquibaseBeansDescriptor(Map&lt;String, LiquibaseBeanDescriptor&gt; liquibaseBeans, String parentId) {</b>
+<b class="nc">&nbsp;			this.liquibaseBeans = liquibaseBeans;</b>
+<b class="nc">&nbsp;			this.parentId = parentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, LiquibaseBeanDescriptor&gt; getLiquibaseBeans() {
+<b class="nc">&nbsp;			return this.liquibaseBeans;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getParentId() {
+<b class="nc">&nbsp;			return this.parentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a {@link SpringLiquibase} bean.
+&nbsp;	 */
+&nbsp;	public static final class LiquibaseBeanDescriptor {
+&nbsp;
+&nbsp;		private final List&lt;ChangeSetDescriptor&gt; changeSets;
+&nbsp;
+<b class="nc">&nbsp;		public LiquibaseBeanDescriptor(List&lt;ChangeSetDescriptor&gt; changeSets) {</b>
+<b class="nc">&nbsp;			this.changeSets = changeSets;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public List&lt;ChangeSetDescriptor&gt; getChangeSets() {
+<b class="nc">&nbsp;			return this.changeSets;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a Liquibase change set.
+&nbsp;	 */
+&nbsp;	public static class ChangeSetDescriptor {
+&nbsp;
+&nbsp;		private final String author;
+&nbsp;
+&nbsp;		private final String changeLog;
+&nbsp;
+&nbsp;		private final String comments;
+&nbsp;
+&nbsp;		private final Set&lt;String&gt; contexts;
+&nbsp;
+&nbsp;		private final Instant dateExecuted;
+&nbsp;
+&nbsp;		private final String deploymentId;
+&nbsp;
+&nbsp;		private final String description;
+&nbsp;
+&nbsp;		private final ExecType execType;
+&nbsp;
+&nbsp;		private final String id;
+&nbsp;
+&nbsp;		private final Set&lt;String&gt; labels;
+&nbsp;
+&nbsp;		private final String checksum;
+&nbsp;
+&nbsp;		private final Integer orderExecuted;
+&nbsp;
+&nbsp;		private final String tag;
+&nbsp;
+<b class="nc">&nbsp;		public ChangeSetDescriptor(RanChangeSet ranChangeSet) {</b>
+<b class="nc">&nbsp;			this.author = ranChangeSet.getAuthor();</b>
+<b class="nc">&nbsp;			this.changeLog = ranChangeSet.getChangeLog();</b>
+<b class="nc">&nbsp;			this.comments = ranChangeSet.getComments();</b>
+<b class="nc">&nbsp;			this.contexts = ranChangeSet.getContextExpression().getContexts();</b>
+<b class="nc">&nbsp;			this.dateExecuted = Instant.ofEpochMilli(ranChangeSet.getDateExecuted().getTime());</b>
+<b class="nc">&nbsp;			this.deploymentId = ranChangeSet.getDeploymentId();</b>
+<b class="nc">&nbsp;			this.description = ranChangeSet.getDescription();</b>
+<b class="nc">&nbsp;			this.execType = ranChangeSet.getExecType();</b>
+<b class="nc">&nbsp;			this.id = ranChangeSet.getId();</b>
+<b class="nc">&nbsp;			this.labels = ranChangeSet.getLabels().getLabels();</b>
+<b class="nc">&nbsp;			this.checksum = ((ranChangeSet.getLastCheckSum() != null) ? ranChangeSet.getLastCheckSum().toString()</b>
+<b class="nc">&nbsp;					: null);</b>
+<b class="nc">&nbsp;			this.orderExecuted = ranChangeSet.getOrderExecuted();</b>
+<b class="nc">&nbsp;			this.tag = ranChangeSet.getTag();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getAuthor() {
+<b class="nc">&nbsp;			return this.author;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getChangeLog() {
+<b class="nc">&nbsp;			return this.changeLog;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getComments() {
+<b class="nc">&nbsp;			return this.comments;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Set&lt;String&gt; getContexts() {
+<b class="nc">&nbsp;			return this.contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Instant getDateExecuted() {
+<b class="nc">&nbsp;			return this.dateExecuted;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getDeploymentId() {
+<b class="nc">&nbsp;			return this.deploymentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getDescription() {
+<b class="nc">&nbsp;			return this.description;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public ExecType getExecType() {
+<b class="nc">&nbsp;			return this.execType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getId() {
+<b class="nc">&nbsp;			return this.id;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Set&lt;String&gt; getLabels() {
+<b class="nc">&nbsp;			return this.labels;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getChecksum() {
+<b class="nc">&nbsp;			return this.checksum;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Integer getOrderExecuted() {
+<b class="nc">&nbsp;			return this.orderExecuted;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getTag() {
+<b class="nc">&nbsp;			return this.tag;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a context expression in a {@link ChangeSetDescriptor}.
+&nbsp;	 */
+&nbsp;	public static class ContextExpressionDescriptor {
+&nbsp;
+&nbsp;		private final Set&lt;String&gt; contexts;
+&nbsp;
+<b class="nc">&nbsp;		public ContextExpressionDescriptor(Set&lt;String&gt; contexts) {</b>
+<b class="nc">&nbsp;			this.contexts = contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Set&lt;String&gt; getContexts() {
+<b class="nc">&nbsp;			return this.contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

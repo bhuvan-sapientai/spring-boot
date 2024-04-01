@@ -1,0 +1,315 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NettyReactiveWebServerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.netty</a>
+</div>
+
+<h1>Coverage Summary for Class: NettyReactiveWebServerFactory (org.springframework.boot.web.embedded.netty)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NettyReactiveWebServerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.netty;
+&nbsp;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import reactor.netty.http.HttpProtocol;
+&nbsp;import reactor.netty.http.server.HttpServer;
+&nbsp;
+&nbsp;import org.springframework.boot.web.reactive.server.AbstractReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.Shutdown;
+&nbsp;import org.springframework.boot.web.server.Ssl;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.http.client.ReactorResourceFactory;
+&nbsp;import org.springframework.http.server.reactive.HttpHandler;
+&nbsp;import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ReactiveWebServerFactory} that can be used to create {@link NettyWebServer}s.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class NettyReactiveWebServerFactory extends AbstractReactiveWebServerFactory {
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;NettyServerCustomizer&gt; serverCustomizers = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;NettyRouteProvider&gt; routeProviders = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private Duration lifecycleTimeout;
+&nbsp;
+&nbsp;	private boolean useForwardHeaders;
+&nbsp;
+&nbsp;	private ReactorResourceFactory resourceFactory;
+&nbsp;
+&nbsp;	private Shutdown shutdown;
+&nbsp;
+<b class="nc">&nbsp;	public NettyReactiveWebServerFactory() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public NettyReactiveWebServerFactory(int port) {
+<b class="nc">&nbsp;		super(port);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public WebServer getWebServer(HttpHandler httpHandler) {
+<b class="nc">&nbsp;		HttpServer httpServer = createHttpServer();</b>
+<b class="nc">&nbsp;		ReactorHttpHandlerAdapter handlerAdapter = new ReactorHttpHandlerAdapter(httpHandler);</b>
+<b class="nc">&nbsp;		NettyWebServer webServer = createNettyWebServer(httpServer, handlerAdapter, this.lifecycleTimeout,</b>
+<b class="nc">&nbsp;				getShutdown());</b>
+<b class="nc">&nbsp;		webServer.setRouteProviders(this.routeProviders);</b>
+<b class="nc">&nbsp;		return webServer;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	NettyWebServer createNettyWebServer(HttpServer httpServer, ReactorHttpHandlerAdapter handlerAdapter,
+&nbsp;			Duration lifecycleTimeout, Shutdown shutdown) {
+<b class="nc">&nbsp;		return new NettyWebServer(httpServer, handlerAdapter, lifecycleTimeout, shutdown, this.resourceFactory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link NettyServerCustomizer}s that will be
+&nbsp;	 * applied to the Netty server builder.
+&nbsp;	 * @return the customizers that will be applied
+&nbsp;	 */
+&nbsp;	public Collection&lt;NettyServerCustomizer&gt; getServerCustomizers() {
+<b class="nc">&nbsp;		return this.serverCustomizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link NettyServerCustomizer}s that should be applied to the Netty server
+&nbsp;	 * builder. Calling this method will replace any existing customizers.
+&nbsp;	 * @param serverCustomizers the customizers to set
+&nbsp;	 */
+&nbsp;	public void setServerCustomizers(Collection&lt;? extends NettyServerCustomizer&gt; serverCustomizers) {
+<b class="nc">&nbsp;		Assert.notNull(serverCustomizers, &quot;ServerCustomizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.serverCustomizers = new LinkedHashSet&lt;&gt;(serverCustomizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link NettyServerCustomizer}s that should be applied while building the
+&nbsp;	 * server.
+&nbsp;	 * @param serverCustomizers the customizers to add
+&nbsp;	 */
+&nbsp;	public void addServerCustomizers(NettyServerCustomizer... serverCustomizers) {
+<b class="nc">&nbsp;		Assert.notNull(serverCustomizers, &quot;ServerCustomizer must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.serverCustomizers.addAll(Arrays.asList(serverCustomizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link NettyRouteProvider}s that should be applied, in order, before the
+&nbsp;	 * handler for the Spring application.
+&nbsp;	 * @param routeProviders the route providers to add
+&nbsp;	 */
+&nbsp;	public void addRouteProviders(NettyRouteProvider... routeProviders) {
+<b class="nc">&nbsp;		Assert.notNull(routeProviders, &quot;NettyRouteProvider must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.routeProviders.addAll(Arrays.asList(routeProviders));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the maximum amount of time that should be waited when starting or stopping the
+&nbsp;	 * server.
+&nbsp;	 * @param lifecycleTimeout the lifecycle timeout
+&nbsp;	 */
+&nbsp;	public void setLifecycleTimeout(Duration lifecycleTimeout) {
+<b class="nc">&nbsp;		this.lifecycleTimeout = lifecycleTimeout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set if x-forward-* headers should be processed.
+&nbsp;	 * @param useForwardHeaders if x-forward headers should be used
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	public void setUseForwardHeaders(boolean useForwardHeaders) {
+<b class="nc">&nbsp;		this.useForwardHeaders = useForwardHeaders;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link ReactorResourceFactory} to get the shared resources from.
+&nbsp;	 * @param resourceFactory the server resources
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	public void setResourceFactory(ReactorResourceFactory resourceFactory) {
+<b class="nc">&nbsp;		this.resourceFactory = resourceFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setShutdown(Shutdown shutdown) {
+<b class="nc">&nbsp;		this.shutdown = shutdown;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Shutdown getShutdown() {
+<b class="nc">&nbsp;		return this.shutdown;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private HttpServer createHttpServer() {
+<b class="nc">&nbsp;		HttpServer server = HttpServer.create().bindAddress(this::getListenAddress);</b>
+<b class="nc">&nbsp;		if (Ssl.isEnabled(getSsl())) {</b>
+<b class="nc">&nbsp;			server = customizeSslConfiguration(server);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (getCompression() != null &amp;&amp; getCompression().getEnabled()) {</b>
+<b class="nc">&nbsp;			CompressionCustomizer compressionCustomizer = new CompressionCustomizer(getCompression());</b>
+<b class="nc">&nbsp;			server = compressionCustomizer.apply(server);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		server = server.protocol(listProtocols()).forwarded(this.useForwardHeaders);</b>
+<b class="nc">&nbsp;		return applyCustomizers(server);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private HttpServer customizeSslConfiguration(HttpServer httpServer) {
+<b class="nc">&nbsp;		SslServerCustomizer customizer = new SslServerCustomizer(getHttp2(), getSsl().getClientAuth(), getSslBundle());</b>
+<b class="nc">&nbsp;		String bundleName = getSsl().getBundle();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(bundleName)) {</b>
+<b class="nc">&nbsp;			getSslBundles().addBundleUpdateHandler(bundleName, customizer::updateSslBundle);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return customizer.apply(httpServer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private HttpProtocol[] listProtocols() {
+<b class="nc">&nbsp;		List&lt;HttpProtocol&gt; protocols = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		protocols.add(HttpProtocol.HTTP11);</b>
+<b class="nc">&nbsp;		if (getHttp2() != null &amp;&amp; getHttp2().isEnabled()) {</b>
+<b class="nc">&nbsp;			if (getSsl() != null &amp;&amp; getSsl().isEnabled()) {</b>
+<b class="nc">&nbsp;				protocols.add(HttpProtocol.H2);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				protocols.add(HttpProtocol.H2C);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return protocols.toArray(new HttpProtocol[0]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private InetSocketAddress getListenAddress() {
+<b class="nc">&nbsp;		if (getAddress() != null) {</b>
+<b class="nc">&nbsp;			return new InetSocketAddress(getAddress().getHostAddress(), getPort());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new InetSocketAddress(getPort());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private HttpServer applyCustomizers(HttpServer server) {
+<b class="nc">&nbsp;		for (NettyServerCustomizer customizer : this.serverCustomizers) {</b>
+<b class="nc">&nbsp;			server = customizer.apply(server);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return server;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

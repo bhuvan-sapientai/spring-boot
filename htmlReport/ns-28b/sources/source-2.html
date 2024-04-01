@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.info</a>
+</div>
+
+<h1>Coverage Summary for Class: GitProperties (org.springframework.boot.info)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GitProperties$GitPropertiesRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.info;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.time.format.DateTimeParseException;
+&nbsp;import java.util.Properties;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.boot.info.GitProperties.GitPropertiesRuntimeHints;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provide git-related information such as commit id and time.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;@ImportRuntimeHints(GitPropertiesRuntimeHints.class)
+&nbsp;public class GitProperties extends InfoProperties {
+&nbsp;
+&nbsp;	public GitProperties(Properties entries) {
+<b class="nc">&nbsp;		super(processEntries(entries));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of the branch or {@code null}.
+&nbsp;	 * @return the branch
+&nbsp;	 */
+&nbsp;	public String getBranch() {
+<b class="nc">&nbsp;		return get(&quot;branch&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the full id of the commit or {@code null}.
+&nbsp;	 * @return the full commit id
+&nbsp;	 */
+&nbsp;	public String getCommitId() {
+<b class="nc">&nbsp;		return get(&quot;commit.id&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the abbreviated id of the commit or {@code null}.
+&nbsp;	 * @return the short commit id
+&nbsp;	 */
+&nbsp;	public String getShortCommitId() {
+<b class="nc">&nbsp;		String shortId = get(&quot;commit.id.abbrev&quot;);</b>
+<b class="nc">&nbsp;		if (shortId != null) {</b>
+<b class="nc">&nbsp;			return shortId;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String id = getCommitId();</b>
+<b class="nc">&nbsp;		if (id == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (id.length() &gt; 7) ? id.substring(0, 7) : id;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the timestamp of the commit or {@code null}.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * If the original value could not be parsed properly, it is still available with the
+&nbsp;	 * {@code commit.time} key.
+&nbsp;	 * @return the commit time
+&nbsp;	 * @see #get(String)
+&nbsp;	 */
+&nbsp;	public Instant getCommitTime() {
+<b class="nc">&nbsp;		return getInstant(&quot;commit.time&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Properties processEntries(Properties properties) {
+<b class="nc">&nbsp;		coercePropertyToEpoch(properties, &quot;commit.time&quot;);</b>
+<b class="nc">&nbsp;		coercePropertyToEpoch(properties, &quot;build.time&quot;);</b>
+<b class="nc">&nbsp;		Object commitId = properties.get(&quot;commit.id&quot;);</b>
+<b class="nc">&nbsp;		if (commitId != null) {</b>
+&nbsp;			// Can get converted into a map, so we copy the entry as a nested key
+<b class="nc">&nbsp;			properties.put(&quot;commit.id.full&quot;, commitId);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void coercePropertyToEpoch(Properties properties, String key) {
+<b class="nc">&nbsp;		String value = properties.getProperty(key);</b>
+<b class="nc">&nbsp;		if (value != null) {</b>
+<b class="nc">&nbsp;			properties.setProperty(key, coerceToEpoch(value));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Attempt to convert the specified value to epoch time. Git properties information
+&nbsp;	 * are known to be specified either as epoch time in seconds or using a specific date
+&nbsp;	 * format.
+&nbsp;	 * @param s the value to coerce to
+&nbsp;	 * @return the epoch time in milliseconds or the original value if it couldn&#39;t be
+&nbsp;	 * converted
+&nbsp;	 */
+&nbsp;	private static String coerceToEpoch(String s) {
+<b class="nc">&nbsp;		Long epoch = parseEpochSecond(s);</b>
+<b class="nc">&nbsp;		if (epoch != null) {</b>
+<b class="nc">&nbsp;			return String.valueOf(epoch);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		DateTimeFormatter format = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&#39;T&#39;HH:mm:ssZ&quot;);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return String.valueOf(format.parse(s, Instant::from).toEpochMilli());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (DateTimeParseException ex) {</b>
+<b class="nc">&nbsp;			return s;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Long parseEpochSecond(String s) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return Long.parseLong(s) * 1000;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NumberFormatException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class GitPropertiesRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			hints.resources().registerPattern(&quot;git.properties&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

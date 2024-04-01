@@ -1,0 +1,277 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ElasticsearchDataConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.data.elasticsearch</a>
+</div>
+
+<h1>Coverage Summary for Class: ElasticsearchDataConfiguration (org.springframework.boot.autoconfigure.data.elasticsearch)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ElasticsearchDataConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ElasticsearchDataConfiguration$BaseConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ElasticsearchDataConfiguration$JavaClientConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ElasticsearchDataConfiguration$ReactiveRestClientConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.data.elasticsearch;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;
+&nbsp;import co.elastic.clients.elasticsearch.ElasticsearchClient;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.domain.EntityScanner;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.data.elasticsearch.annotations.Document;
+&nbsp;import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+&nbsp;import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchClient;
+&nbsp;import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
+&nbsp;import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+&nbsp;import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
+&nbsp;import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
+&nbsp;import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomConversions;
+&nbsp;import org.springframework.data.elasticsearch.core.convert.MappingElasticsearchConverter;
+&nbsp;import org.springframework.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration classes for Spring Data for Elasticsearch
+&nbsp; * &lt;p&gt;
+&nbsp; * Those should be {@code @Import} in a regular auto-configuration class to guarantee
+&nbsp; * their order of execution.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+<b class="nc">&nbsp;abstract class ElasticsearchDataConfiguration {</b>
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+<b class="nc">&nbsp;	static class BaseConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		ElasticsearchCustomConversions elasticsearchCustomConversions() {
+<b class="nc">&nbsp;			return new ElasticsearchCustomConversions(Collections.emptyList());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		SimpleElasticsearchMappingContext elasticsearchMappingContext(ApplicationContext applicationContext,
+&nbsp;				ElasticsearchCustomConversions elasticsearchCustomConversions) throws ClassNotFoundException {
+<b class="nc">&nbsp;			SimpleElasticsearchMappingContext mappingContext = new SimpleElasticsearchMappingContext();</b>
+<b class="nc">&nbsp;			mappingContext.setInitialEntitySet(new EntityScanner(applicationContext).scan(Document.class));</b>
+<b class="nc">&nbsp;			mappingContext.setSimpleTypeHolder(elasticsearchCustomConversions.getSimpleTypeHolder());</b>
+<b class="nc">&nbsp;			return mappingContext;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		ElasticsearchConverter elasticsearchConverter(SimpleElasticsearchMappingContext mappingContext,
+&nbsp;				ElasticsearchCustomConversions elasticsearchCustomConversions) {
+<b class="nc">&nbsp;			MappingElasticsearchConverter converter = new MappingElasticsearchConverter(mappingContext);</b>
+<b class="nc">&nbsp;			converter.setConversions(elasticsearchCustomConversions);</b>
+<b class="nc">&nbsp;			return converter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass(ElasticsearchClient.class)
+<b class="nc">&nbsp;	static class JavaClientConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(value = ElasticsearchOperations.class, name = &quot;elasticsearchTemplate&quot;)
+&nbsp;		@ConditionalOnBean(ElasticsearchClient.class)
+&nbsp;		ElasticsearchTemplate elasticsearchTemplate(ElasticsearchClient client, ElasticsearchConverter converter) {
+<b class="nc">&nbsp;			return new ElasticsearchTemplate(client, converter);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+<b class="nc">&nbsp;	static class ReactiveRestClientConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(value = ReactiveElasticsearchOperations.class, name = &quot;reactiveElasticsearchTemplate&quot;)
+&nbsp;		@ConditionalOnBean(ReactiveElasticsearchClient.class)
+&nbsp;		ReactiveElasticsearchTemplate reactiveElasticsearchTemplate(ReactiveElasticsearchClient client,
+&nbsp;				ElasticsearchConverter converter) {
+<b class="nc">&nbsp;			return new ReactiveElasticsearchTemplate(client, converter);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

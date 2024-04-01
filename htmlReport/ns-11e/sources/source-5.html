@@ -1,0 +1,168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HttpComponentsClientHttpConnectorFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.reactive.function.client</a>
+</div>
+
+<h1>Coverage Summary for Class: HttpComponentsClientHttpConnectorFactory (org.springframework.boot.autoconfigure.web.reactive.function.client)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HttpComponentsClientHttpConnectorFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.reactive.function.client;
+&nbsp;
+&nbsp;import javax.net.ssl.SSLContext;
+&nbsp;
+&nbsp;import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+&nbsp;import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+&nbsp;import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+&nbsp;import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
+&nbsp;import org.apache.hc.core5.http.nio.ssl.BasicClientTlsStrategy;
+&nbsp;import org.apache.hc.core5.reactor.ssl.SSLSessionVerifier;
+&nbsp;
+&nbsp;import org.springframework.boot.ssl.SslBundle;
+&nbsp;import org.springframework.boot.ssl.SslOptions;
+&nbsp;import org.springframework.http.client.reactive.HttpComponentsClientHttpConnector;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ClientHttpConnectorFactory} for {@link HttpComponentsClientHttpConnector}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+<b class="nc">&nbsp;class HttpComponentsClientHttpConnectorFactory</b>
+&nbsp;		implements ClientHttpConnectorFactory&lt;HttpComponentsClientHttpConnector&gt; {
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public HttpComponentsClientHttpConnector createClientHttpConnector(SslBundle sslBundle) {
+<b class="nc">&nbsp;		HttpAsyncClientBuilder builder = HttpAsyncClients.custom().useSystemProperties();</b>
+<b class="nc">&nbsp;		if (sslBundle != null) {</b>
+<b class="nc">&nbsp;			SslOptions options = sslBundle.getOptions();</b>
+<b class="nc">&nbsp;			SSLContext sslContext = sslBundle.createSslContext();</b>
+<b class="nc">&nbsp;			SSLSessionVerifier sessionVerifier = (endpoint, sslEngine) -&gt; {</b>
+<b class="nc">&nbsp;				if (options.getCiphers() != null) {</b>
+<b class="nc">&nbsp;					sslEngine.setEnabledCipherSuites(options.getCiphers());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (options.getEnabledProtocols() != null) {</b>
+<b class="nc">&nbsp;					sslEngine.setEnabledProtocols(options.getEnabledProtocols());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			};
+<b class="nc">&nbsp;			BasicClientTlsStrategy tlsStrategy = new BasicClientTlsStrategy(sslContext, sessionVerifier);</b>
+<b class="nc">&nbsp;			AsyncClientConnectionManager connectionManager = PoolingAsyncClientConnectionManagerBuilder.create()</b>
+<b class="nc">&nbsp;				.setTlsStrategy(tlsStrategy)</b>
+<b class="nc">&nbsp;				.build();</b>
+<b class="nc">&nbsp;			builder.setConnectionManager(connectionManager);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new HttpComponentsClientHttpConnector(builder.build());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

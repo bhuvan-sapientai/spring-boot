@@ -1,0 +1,759 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Packager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: Packager (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Packager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/143)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Packager$MainClassTimeoutWarningListener</td>
+  </tr>
+  <tr>
+    <td class="name">Packager$PackagedLibraries</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Packager$PackagedLibraries$PackagedLibrariesUnpackHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Packager$RepackagingEntryTransformer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/210)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.JarEntry;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;
+&nbsp;import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.AbstractJarWriter.EntryTransformer;
+&nbsp;import org.springframework.boot.loader.tools.AbstractJarWriter.UnpackHandler;
+&nbsp;import org.springframework.core.io.support.SpringFactoriesLoader;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base class for packagers.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public abstract class Packager {
+&nbsp;
+&nbsp;	private static final String MAIN_CLASS_ATTRIBUTE = &quot;Main-Class&quot;;
+&nbsp;
+&nbsp;	private static final String START_CLASS_ATTRIBUTE = &quot;Start-Class&quot;;
+&nbsp;
+&nbsp;	private static final String BOOT_VERSION_ATTRIBUTE = &quot;Spring-Boot-Version&quot;;
+&nbsp;
+&nbsp;	private static final String BOOT_CLASSES_ATTRIBUTE = &quot;Spring-Boot-Classes&quot;;
+&nbsp;
+&nbsp;	private static final String BOOT_LIB_ATTRIBUTE = &quot;Spring-Boot-Lib&quot;;
+&nbsp;
+&nbsp;	private static final String BOOT_CLASSPATH_INDEX_ATTRIBUTE = &quot;Spring-Boot-Classpath-Index&quot;;
+&nbsp;
+&nbsp;	private static final String BOOT_LAYERS_INDEX_ATTRIBUTE = &quot;Spring-Boot-Layers-Index&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final byte[] ZIP_FILE_HEADER = new byte[] { &#39;P&#39;, &#39;K&#39;, 3, 4 };</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final long FIND_WARNING_TIMEOUT = TimeUnit.SECONDS.toMillis(10);</b>
+&nbsp;
+&nbsp;	private static final String SPRING_BOOT_APPLICATION_CLASS_NAME = &quot;org.springframework.boot.autoconfigure.SpringBootApplication&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;MainClassTimeoutWarningListener&gt; mainClassTimeoutListeners = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private String mainClass;
+&nbsp;
+&nbsp;	private final File source;
+&nbsp;
+&nbsp;	private File backupFile;
+&nbsp;
+&nbsp;	private Layout layout;
+&nbsp;
+&nbsp;	private LoaderImplementation loaderImplementation;
+&nbsp;
+&nbsp;	private LayoutFactory layoutFactory;
+&nbsp;
+&nbsp;	private Layers layers;
+&nbsp;
+&nbsp;	private LayersIndex layersIndex;
+&nbsp;
+<b class="nc">&nbsp;	private boolean includeRelevantJarModeJars = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Packager} instance.
+&nbsp;	 * @param source the source archive file to package
+&nbsp;	 */
+<b class="nc">&nbsp;	protected Packager(File source) {</b>
+<b class="nc">&nbsp;		Assert.notNull(source, &quot;Source file must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(source.exists() &amp;&amp; source.isFile(),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Source must refer to an existing file, got &quot; + source.getAbsolutePath());</b>
+<b class="nc">&nbsp;		this.source = source.getAbsoluteFile();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add a listener that will be triggered to display a warning if searching for the
+&nbsp;	 * main class takes too long.
+&nbsp;	 * @param listener the listener to add
+&nbsp;	 */
+&nbsp;	public void addMainClassTimeoutWarningListener(MainClassTimeoutWarningListener listener) {
+<b class="nc">&nbsp;		this.mainClassTimeoutListeners.add(listener);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the main class that should be run. If not specified the value from the
+&nbsp;	 * MANIFEST will be used, or if no manifest entry is found the archive will be
+&nbsp;	 * searched for a suitable class.
+&nbsp;	 * @param mainClass the main class name
+&nbsp;	 */
+&nbsp;	public void setMainClass(String mainClass) {
+<b class="nc">&nbsp;		this.mainClass = mainClass;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the layout to use for the jar. Defaults to {@link Layouts#forFile(File)}.
+&nbsp;	 * @param layout the layout
+&nbsp;	 */
+&nbsp;	public void setLayout(Layout layout) {
+<b class="nc">&nbsp;		Assert.notNull(layout, &quot;Layout must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.layout = layout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the loader implementation to use.
+&nbsp;	 * @param loaderImplementation the loaderImplementation to set
+&nbsp;	 */
+&nbsp;	public void setLoaderImplementation(LoaderImplementation loaderImplementation) {
+<b class="nc">&nbsp;		this.loaderImplementation = loaderImplementation;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the layout factory for the jar. The factory can be used when no specific
+&nbsp;	 * layout is specified.
+&nbsp;	 * @param layoutFactory the layout factory to set
+&nbsp;	 */
+&nbsp;	public void setLayoutFactory(LayoutFactory layoutFactory) {
+<b class="nc">&nbsp;		this.layoutFactory = layoutFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the layers that should be used in the jar.
+&nbsp;	 * @param layers the jar layers
+&nbsp;	 */
+&nbsp;	public void setLayers(Layers layers) {
+<b class="nc">&nbsp;		Assert.notNull(layers, &quot;Layers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.layers = layers;</b>
+<b class="nc">&nbsp;		this.layersIndex = new LayersIndex(layers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the {@link File} to use to back up the original source.
+&nbsp;	 * @param backupFile the file to use to back up the original source
+&nbsp;	 */
+&nbsp;	protected void setBackupFile(File backupFile) {
+<b class="nc">&nbsp;		this.backupFile = backupFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets if jarmode jars relevant for the packaging should be automatically included.
+&nbsp;	 * @param includeRelevantJarModeJars if relevant jars are included
+&nbsp;	 */
+&nbsp;	public void setIncludeRelevantJarModeJars(boolean includeRelevantJarModeJars) {
+<b class="nc">&nbsp;		this.includeRelevantJarModeJars = includeRelevantJarModeJars;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final boolean isAlreadyPackaged() {
+<b class="nc">&nbsp;		return isAlreadyPackaged(this.source);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final boolean isAlreadyPackaged(File file) {
+<b class="nc">&nbsp;		try (JarFile jarFile = new JarFile(file)) {</b>
+<b class="nc">&nbsp;			Manifest manifest = jarFile.getManifest();</b>
+<b class="nc">&nbsp;			return (manifest != null &amp;&amp; manifest.getMainAttributes().getValue(BOOT_VERSION_ATTRIBUTE) != null);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Error reading archive file&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final void write(JarFile sourceJar, Libraries libraries, AbstractJarWriter writer) throws IOException {
+<b class="nc">&nbsp;		write(sourceJar, libraries, writer, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final void write(JarFile sourceJar, Libraries libraries, AbstractJarWriter writer,
+&nbsp;			boolean ensureReproducibleBuild) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(libraries, &quot;Libraries must not be null&quot;);</b>
+<b class="nc">&nbsp;		write(sourceJar, writer, new PackagedLibraries(libraries, ensureReproducibleBuild));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void write(JarFile sourceJar, AbstractJarWriter writer, PackagedLibraries libraries) throws IOException {
+<b class="nc">&nbsp;		if (isLayered()) {</b>
+<b class="nc">&nbsp;			writer.useLayers(this.layers, this.layersIndex);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		writer.writeManifest(buildManifest(sourceJar));</b>
+<b class="nc">&nbsp;		writeLoaderClasses(writer);</b>
+<b class="nc">&nbsp;		writer.writeEntries(sourceJar, getEntityTransformer(), libraries.getUnpackHandler(),</b>
+<b class="nc">&nbsp;				libraries.getLibraryLookup());</b>
+<b class="nc">&nbsp;		Map&lt;String, Library&gt; writtenLibraries = libraries.write(writer);</b>
+<b class="nc">&nbsp;		writeNativeImageArgFile(writer, sourceJar, writtenLibraries);</b>
+<b class="nc">&nbsp;		if (isLayered()) {</b>
+<b class="nc">&nbsp;			writeLayerIndex(writer);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		writeSignatureFileIfNecessary(writtenLibraries, writer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeLoaderClasses(AbstractJarWriter writer) throws IOException {
+<b class="nc">&nbsp;		Layout layout = getLayout();</b>
+<b class="nc">&nbsp;		if (layout instanceof CustomLoaderLayout customLoaderLayout) {</b>
+<b class="nc">&nbsp;			customLoaderLayout.writeLoadedClasses(writer);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (layout.isExecutable()) {</b>
+<b class="nc">&nbsp;			writer.writeLoaderClasses(this.loaderImplementation);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeNativeImageArgFile(AbstractJarWriter writer, JarFile sourceJar,
+&nbsp;			Map&lt;String, Library&gt; writtenLibraries) throws IOException {
+<b class="nc">&nbsp;		Set&lt;String&gt; excludes = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Map.Entry&lt;String, Library&gt; entry : writtenLibraries.entrySet()) {</b>
+<b class="nc">&nbsp;			LibraryCoordinates coordinates = entry.getValue().getCoordinates();</b>
+<b class="nc">&nbsp;			ZipEntry zipEntry = (coordinates != null)</b>
+<b class="nc">&nbsp;					? sourceJar.getEntry(ReachabilityMetadataProperties.getLocation(coordinates)) : null;</b>
+<b class="nc">&nbsp;			if (zipEntry != null) {</b>
+<b class="nc">&nbsp;				try (InputStream inputStream = sourceJar.getInputStream(zipEntry)) {</b>
+<b class="nc">&nbsp;					ReachabilityMetadataProperties properties = ReachabilityMetadataProperties</b>
+<b class="nc">&nbsp;						.fromInputStream(inputStream);</b>
+<b class="nc">&nbsp;					if (properties.isOverridden()) {</b>
+<b class="nc">&nbsp;						excludes.add(entry.getKey());</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		NativeImageArgFile argFile = new NativeImageArgFile(excludes);</b>
+<b class="nc">&nbsp;		argFile.writeIfNecessary((lines) -&gt; {</b>
+<b class="nc">&nbsp;			String contents = String.join(&quot;\n&quot;, lines) + &quot;\n&quot;;</b>
+<b class="nc">&nbsp;			writer.writeEntry(NativeImageArgFile.LOCATION,</b>
+<b class="nc">&nbsp;					new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8)));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeLayerIndex(AbstractJarWriter writer) throws IOException {
+<b class="nc">&nbsp;		String name = this.layout.getLayersIndexFileLocation();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(name)) {</b>
+<b class="nc">&nbsp;			Layer layer = this.layers.getLayer(name);</b>
+<b class="nc">&nbsp;			this.layersIndex.add(layer, name);</b>
+<b class="nc">&nbsp;			writer.writeEntry(name, this.layersIndex::writeTo);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void writeSignatureFileIfNecessary(Map&lt;String, Library&gt; writtenLibraries, AbstractJarWriter writer)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	private EntryTransformer getEntityTransformer() {
+<b class="nc">&nbsp;		if (getLayout() instanceof RepackagingLayout repackagingLayout) {</b>
+<b class="nc">&nbsp;			return new RepackagingEntryTransformer(repackagingLayout);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return EntryTransformer.NONE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isZip(InputStreamSupplier supplier) {
+&nbsp;		try {
+<b class="nc">&nbsp;			try (InputStream inputStream = supplier.openStream()) {</b>
+<b class="nc">&nbsp;				return isZip(inputStream);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isZip(InputStream inputStream) throws IOException {
+<b class="nc">&nbsp;		for (byte magicByte : ZIP_FILE_HEADER) {</b>
+<b class="nc">&nbsp;			if (inputStream.read() != magicByte) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Manifest buildManifest(JarFile source) throws IOException {
+<b class="nc">&nbsp;		Manifest manifest = createInitialManifest(source);</b>
+<b class="nc">&nbsp;		addMainAndStartAttributes(source, manifest);</b>
+<b class="nc">&nbsp;		addBootAttributes(manifest.getMainAttributes());</b>
+<b class="nc">&nbsp;		return manifest;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Manifest createInitialManifest(JarFile source) throws IOException {
+<b class="nc">&nbsp;		if (source.getManifest() != null) {</b>
+<b class="nc">&nbsp;			return new Manifest(source.getManifest());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Manifest manifest = new Manifest();</b>
+<b class="nc">&nbsp;		manifest.getMainAttributes().putValue(&quot;Manifest-Version&quot;, &quot;1.0&quot;);</b>
+<b class="nc">&nbsp;		return manifest;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addMainAndStartAttributes(JarFile source, Manifest manifest) throws IOException {
+<b class="nc">&nbsp;		String mainClass = getMainClass(source, manifest);</b>
+<b class="nc">&nbsp;		String launcherClass = getLayout().getLauncherClassName();</b>
+<b class="nc">&nbsp;		if (launcherClass != null) {</b>
+<b class="nc">&nbsp;			Assert.state(mainClass != null, &quot;Unable to find main class&quot;);</b>
+<b class="nc">&nbsp;			manifest.getMainAttributes().putValue(MAIN_CLASS_ATTRIBUTE, launcherClass);</b>
+<b class="nc">&nbsp;			manifest.getMainAttributes().putValue(START_CLASS_ATTRIBUTE, mainClass);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (mainClass != null) {</b>
+<b class="nc">&nbsp;			manifest.getMainAttributes().putValue(MAIN_CLASS_ATTRIBUTE, mainClass);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getMainClass(JarFile source, Manifest manifest) throws IOException {
+<b class="nc">&nbsp;		if (this.mainClass != null) {</b>
+<b class="nc">&nbsp;			return this.mainClass;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String attributeValue = manifest.getMainAttributes().getValue(MAIN_CLASS_ATTRIBUTE);</b>
+<b class="nc">&nbsp;		if (attributeValue != null) {</b>
+<b class="nc">&nbsp;			return attributeValue;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return findMainMethodWithTimeoutWarning(source);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String findMainMethodWithTimeoutWarning(JarFile source) throws IOException {
+<b class="nc">&nbsp;		long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;		String mainMethod = findMainMethod(source);</b>
+<b class="nc">&nbsp;		long duration = System.currentTimeMillis() - startTime;</b>
+<b class="nc">&nbsp;		if (duration &gt; FIND_WARNING_TIMEOUT) {</b>
+<b class="nc">&nbsp;			for (MainClassTimeoutWarningListener listener : this.mainClassTimeoutListeners) {</b>
+<b class="nc">&nbsp;				listener.handleTimeoutWarning(duration, mainMethod);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return mainMethod;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String findMainMethod(JarFile source) throws IOException {
+<b class="nc">&nbsp;		return MainClassFinder.findSingleMainClass(source, getLayout().getClassesLocation(),</b>
+&nbsp;				SPRING_BOOT_APPLICATION_CLASS_NAME);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link File} to use to back up the original source.
+&nbsp;	 * @return the file to use to back up the original source
+&nbsp;	 */
+&nbsp;	public final File getBackupFile() {
+<b class="nc">&nbsp;		if (this.backupFile != null) {</b>
+<b class="nc">&nbsp;			return this.backupFile;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new File(this.source.getParentFile(), this.source.getName() + &quot;.original&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final File getSource() {
+<b class="nc">&nbsp;		return this.source;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final Layout getLayout() {
+<b class="nc">&nbsp;		if (this.layout == null) {</b>
+<b class="nc">&nbsp;			Layout createdLayout = getLayoutFactory().getLayout(this.source);</b>
+<b class="nc">&nbsp;			Assert.state(createdLayout != null, &quot;Unable to detect layout&quot;);</b>
+<b class="nc">&nbsp;			this.layout = createdLayout;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.layout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private LayoutFactory getLayoutFactory() {
+<b class="nc">&nbsp;		if (this.layoutFactory != null) {</b>
+<b class="nc">&nbsp;			return this.layoutFactory;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;LayoutFactory&gt; factories = SpringFactoriesLoader.loadFactories(LayoutFactory.class, null);</b>
+<b class="nc">&nbsp;		if (factories.isEmpty()) {</b>
+<b class="nc">&nbsp;			return new DefaultLayoutFactory();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Assert.state(factories.size() == 1, &quot;No unique LayoutFactory found&quot;);</b>
+<b class="nc">&nbsp;		return factories.get(0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addBootAttributes(Attributes attributes) {
+<b class="nc">&nbsp;		attributes.putValue(BOOT_VERSION_ATTRIBUTE, getClass().getPackage().getImplementationVersion());</b>
+<b class="nc">&nbsp;		addBootAttributesForLayout(attributes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addBootAttributesForLayout(Attributes attributes) {
+<b class="nc">&nbsp;		Layout layout = getLayout();</b>
+<b class="nc">&nbsp;		if (layout instanceof RepackagingLayout repackagingLayout) {</b>
+<b class="nc">&nbsp;			attributes.putValue(BOOT_CLASSES_ATTRIBUTE, repackagingLayout.getRepackagedClassesLocation());</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			attributes.putValue(BOOT_CLASSES_ATTRIBUTE, layout.getClassesLocation());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		putIfHasLength(attributes, BOOT_LIB_ATTRIBUTE, getLayout().getLibraryLocation(&quot;&quot;, LibraryScope.COMPILE));</b>
+<b class="nc">&nbsp;		putIfHasLength(attributes, BOOT_CLASSPATH_INDEX_ATTRIBUTE, layout.getClasspathIndexFileLocation());</b>
+<b class="nc">&nbsp;		if (isLayered()) {</b>
+<b class="nc">&nbsp;			putIfHasLength(attributes, BOOT_LAYERS_INDEX_ATTRIBUTE, layout.getLayersIndexFileLocation());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void putIfHasLength(Attributes attributes, String name, String value) {
+<b class="nc">&nbsp;		if (StringUtils.hasLength(value)) {</b>
+<b class="nc">&nbsp;			attributes.putValue(name, value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isLayered() {
+<b class="nc">&nbsp;		return this.layers != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Callback interface used to present a warning when finding the main class takes too
+&nbsp;	 * long.
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	public interface MainClassTimeoutWarningListener {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Handle a timeout warning.
+&nbsp;		 * @param duration the amount of time it took to find the main method
+&nbsp;		 * @param mainMethod the main method that was actually found
+&nbsp;		 */
+&nbsp;		void handleTimeoutWarning(long duration, String mainMethod);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An {@code EntryTransformer} that renames entries by applying a prefix.
+&nbsp;	 */
+&nbsp;	private static final class RepackagingEntryTransformer implements EntryTransformer {
+&nbsp;
+&nbsp;		private final RepackagingLayout layout;
+&nbsp;
+<b class="nc">&nbsp;		private RepackagingEntryTransformer(RepackagingLayout layout) {</b>
+<b class="nc">&nbsp;			this.layout = layout;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public JarArchiveEntry transform(JarArchiveEntry entry) {
+<b class="nc">&nbsp;			if (entry.getName().equals(&quot;META-INF/INDEX.LIST&quot;)) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (!isTransformable(entry)) {</b>
+<b class="nc">&nbsp;				return entry;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String transformedName = transformName(entry.getName());</b>
+<b class="nc">&nbsp;			JarArchiveEntry transformedEntry = new JarArchiveEntry(transformedName);</b>
+<b class="nc">&nbsp;			transformedEntry.setTime(entry.getTime());</b>
+<b class="nc">&nbsp;			transformedEntry.setSize(entry.getSize());</b>
+<b class="nc">&nbsp;			transformedEntry.setMethod(entry.getMethod());</b>
+<b class="nc">&nbsp;			if (entry.getComment() != null) {</b>
+<b class="nc">&nbsp;				transformedEntry.setComment(entry.getComment());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			transformedEntry.setCompressedSize(entry.getCompressedSize());</b>
+<b class="nc">&nbsp;			transformedEntry.setCrc(entry.getCrc());</b>
+<b class="nc">&nbsp;			if (entry.getCreationTime() != null) {</b>
+<b class="nc">&nbsp;				transformedEntry.setCreationTime(entry.getCreationTime());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (entry.getExtra() != null) {</b>
+<b class="nc">&nbsp;				transformedEntry.setExtra(entry.getExtra());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (entry.getLastAccessTime() != null) {</b>
+<b class="nc">&nbsp;				transformedEntry.setLastAccessTime(entry.getLastAccessTime());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (entry.getLastModifiedTime() != null) {</b>
+<b class="nc">&nbsp;				transformedEntry.setLastModifiedTime(entry.getLastModifiedTime());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return transformedEntry;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String transformName(String name) {
+<b class="nc">&nbsp;			return this.layout.getRepackagedClassesLocation() + name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isTransformable(JarArchiveEntry entry) {
+<b class="nc">&nbsp;			String name = entry.getName();</b>
+<b class="nc">&nbsp;			if (name.startsWith(&quot;META-INF/&quot;)) {</b>
+<b class="nc">&nbsp;				return name.equals(&quot;META-INF/aop.xml&quot;) || name.endsWith(&quot;.kotlin_module&quot;)</b>
+<b class="nc">&nbsp;						|| name.startsWith(&quot;META-INF/services/&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return !name.startsWith(&quot;BOOT-INF/&quot;) &amp;&amp; !name.equals(&quot;module-info.class&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Libraries that should be packaged into the archive.
+&nbsp;	 */
+&nbsp;	private final class PackagedLibraries {
+&nbsp;
+&nbsp;		private final Map&lt;String, Library&gt; libraries;
+&nbsp;
+&nbsp;		private final UnpackHandler unpackHandler;
+&nbsp;
+&nbsp;		private final Function&lt;JarEntry, Library&gt; libraryLookup;
+&nbsp;
+<b class="nc">&nbsp;		PackagedLibraries(Libraries libraries, boolean ensureReproducibleBuild) throws IOException {</b>
+<b class="nc">&nbsp;			this.libraries = (ensureReproducibleBuild) ? new TreeMap&lt;&gt;() : new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			libraries.doWithLibraries((library) -&gt; {</b>
+<b class="nc">&nbsp;				if (isZip(library::openStream)) {</b>
+<b class="nc">&nbsp;					addLibrary(library);</b>
+&nbsp;				}
+&nbsp;			});
+<b class="nc">&nbsp;			if (isLayered() &amp;&amp; Packager.this.includeRelevantJarModeJars) {</b>
+<b class="nc">&nbsp;				addLibrary(JarModeLibrary.LAYER_TOOLS);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.unpackHandler = new PackagedLibrariesUnpackHandler();</b>
+<b class="nc">&nbsp;			this.libraryLookup = this::lookup;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addLibrary(Library library) {
+<b class="nc">&nbsp;			String location = getLayout().getLibraryLocation(library.getName(), library.getScope());</b>
+<b class="nc">&nbsp;			if (location != null) {</b>
+<b class="nc">&nbsp;				String path = location + library.getName();</b>
+<b class="nc">&nbsp;				Library existing = this.libraries.putIfAbsent(path, library);</b>
+<b class="nc">&nbsp;				Assert.state(existing == null, () -&gt; &quot;Duplicate library &quot; + library.getName());</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private Library lookup(JarEntry entry) {
+<b class="nc">&nbsp;			return this.libraries.get(entry.getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		UnpackHandler getUnpackHandler() {
+<b class="nc">&nbsp;			return this.unpackHandler;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Function&lt;JarEntry, Library&gt; getLibraryLookup() {
+<b class="nc">&nbsp;			return this.libraryLookup;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Map&lt;String, Library&gt; write(AbstractJarWriter writer) throws IOException {
+<b class="nc">&nbsp;			Map&lt;String, Library&gt; writtenLibraries = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (Entry&lt;String, Library&gt; entry : this.libraries.entrySet()) {</b>
+<b class="nc">&nbsp;				String path = entry.getKey();</b>
+<b class="nc">&nbsp;				Library library = entry.getValue();</b>
+<b class="nc">&nbsp;				if (library.isIncluded()) {</b>
+<b class="nc">&nbsp;					String location = path.substring(0, path.lastIndexOf(&#39;/&#39;) + 1);</b>
+<b class="nc">&nbsp;					writer.writeNestedLibrary(location, library);</b>
+<b class="nc">&nbsp;					writtenLibraries.put(path, library);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			writeClasspathIndexIfNecessary(writtenLibraries.keySet(), getLayout(), writer);</b>
+<b class="nc">&nbsp;			return writtenLibraries;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeClasspathIndexIfNecessary(Collection&lt;String&gt; paths, Layout layout, AbstractJarWriter writer)
+&nbsp;				throws IOException {
+<b class="nc">&nbsp;			if (layout.getClasspathIndexFileLocation() != null) {</b>
+<b class="nc">&nbsp;				List&lt;String&gt; names = paths.stream().map((path) -&gt; &quot;- \&quot;&quot; + path + &quot;\&quot;&quot;).toList();</b>
+<b class="nc">&nbsp;				writer.writeIndexFile(layout.getClasspathIndexFileLocation(), names);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * An {@link UnpackHandler} that determines that an entry needs to be unpacked if
+&nbsp;		 * a library that requires unpacking has a matching entry name.
+&nbsp;		 */
+<b class="nc">&nbsp;		private final class PackagedLibrariesUnpackHandler implements UnpackHandler {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public boolean requiresUnpack(String name) {
+<b class="nc">&nbsp;				Library library = PackagedLibraries.this.libraries.get(name);</b>
+<b class="nc">&nbsp;				return library != null &amp;&amp; library.isUnpackRequired();</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public String sha1Hash(String name) throws IOException {
+<b class="nc">&nbsp;				Library library = PackagedLibraries.this.libraries.get(name);</b>
+<b class="nc">&nbsp;				Assert.notNull(library, () -&gt; &quot;No library found for entry name &#39;&quot; + name + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;				return Digest.sha1(library::openStream);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

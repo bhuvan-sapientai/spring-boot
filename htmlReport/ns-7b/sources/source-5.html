@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InvocationContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint</a>
+</div>
+
+<h1>Coverage Summary for Class: InvocationContext (org.springframework.boot.actuate.endpoint)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InvocationContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint;
+&nbsp;
+&nbsp;import java.security.Principal;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationInvoker;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * The context for the {@link OperationInvoker invocation of an operation}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class InvocationContext {
+&nbsp;
+&nbsp;	private final Map&lt;String, Object&gt; arguments;
+&nbsp;
+&nbsp;	private final List&lt;OperationArgumentResolver&gt; argumentResolvers;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new context for an operation being invoked by the given
+&nbsp;	 * {@code securityContext} with the given available {@code arguments}.
+&nbsp;	 * @param securityContext the current security context. Never {@code null}
+&nbsp;	 * @param arguments the arguments available to the operation. Never {@code null}
+&nbsp;	 * @param argumentResolvers resolvers for additional arguments should be available to
+&nbsp;	 * the operation.
+&nbsp;	 */
+&nbsp;	public InvocationContext(SecurityContext securityContext, Map&lt;String, Object&gt; arguments,
+<b class="nc">&nbsp;			OperationArgumentResolver... argumentResolvers) {</b>
+<b class="nc">&nbsp;		Assert.notNull(securityContext, &quot;SecurityContext must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(arguments, &quot;Arguments must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.arguments = arguments;</b>
+<b class="nc">&nbsp;		this.argumentResolvers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (argumentResolvers != null) {</b>
+<b class="nc">&nbsp;			this.argumentResolvers.addAll(Arrays.asList(argumentResolvers));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.argumentResolvers.add(OperationArgumentResolver.of(SecurityContext.class, () -&gt; securityContext));</b>
+<b class="nc">&nbsp;		this.argumentResolvers.add(OperationArgumentResolver.of(Principal.class, securityContext::getPrincipal));</b>
+<b class="nc">&nbsp;		this.argumentResolvers.add(OperationArgumentResolver.of(ApiVersion.class, () -&gt; ApiVersion.LATEST));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the invocation arguments.
+&nbsp;	 * @return the arguments
+&nbsp;	 */
+&nbsp;	public Map&lt;String, Object&gt; getArguments() {
+<b class="nc">&nbsp;		return this.arguments;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolves an argument with the given {@code argumentType}.
+&nbsp;	 * @param &lt;T&gt; type of the argument
+&nbsp;	 * @param argumentType type of the argument
+&nbsp;	 * @return resolved argument of the required type or {@code null}
+&nbsp;	 * @since 2.5.0
+&nbsp;	 * @see #canResolve(Class)
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; T resolveArgument(Class&lt;T&gt; argumentType) {
+<b class="nc">&nbsp;		for (OperationArgumentResolver argumentResolver : this.argumentResolvers) {</b>
+<b class="nc">&nbsp;			if (argumentResolver.canResolve(argumentType)) {</b>
+<b class="nc">&nbsp;				T result = argumentResolver.resolve(argumentType);</b>
+<b class="nc">&nbsp;				if (result != null) {</b>
+<b class="nc">&nbsp;					return result;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the context is capable of resolving an argument of the given
+&nbsp;	 * {@code type}. Note that, even when {@code true} is returned,
+&nbsp;	 * {@link #resolveArgument argument resolution} will return {@code null} if no
+&nbsp;	 * argument of the required type is available.
+&nbsp;	 * @param type argument type
+&nbsp;	 * @return {@code true} if resolution of arguments of the given type is possible,
+&nbsp;	 * otherwise {@code false}.
+&nbsp;	 * @since 2.5.0
+&nbsp;	 * @see #resolveArgument(Class)
+&nbsp;	 */
+&nbsp;	public boolean canResolve(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		for (OperationArgumentResolver argumentResolver : this.argumentResolvers) {</b>
+<b class="nc">&nbsp;			if (argumentResolver.canResolve(type)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

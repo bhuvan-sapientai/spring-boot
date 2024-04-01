@@ -1,0 +1,760 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertiesLauncher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.launch</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertiesLauncher (org.springframework.boot.loader.launch)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertiesLauncher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/240)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PropertiesLauncher$Instantiator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PropertiesLauncher$Instantiator$Using</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/250)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.launch;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.net.HttpURLConnection;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.net.URLDecoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.launch.Archive.Entry;
+&nbsp;import org.springframework.boot.loader.log.DebugLogger;
+&nbsp;import org.springframework.boot.loader.net.protocol.jar.JarUrl;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Launcher} for archives with user-configured classpath and main class through a
+&nbsp; * properties file.
+&nbsp; * &lt;p&gt;
+&nbsp; * Looks in various places for a properties file to extract loader settings, defaulting to
+&nbsp; * {@code loader.properties} either on the current classpath or in the current working
+&nbsp; * directory. The name of the properties file can be changed by setting a System property
+&nbsp; * {@code loader.config.name} (e.g. {@code -Dloader.config.name=my} will look for
+&nbsp; * {@code my.properties}. If that file doesn&#39;t exist then tries
+&nbsp; * {@code loader.config.location} (with allowed prefixes {@code classpath:} and
+&nbsp; * {@code file:} or any valid URL). Once that file is located turns it into Properties and
+&nbsp; * extracts optional values (which can also be provided overridden as System properties in
+&nbsp; * case the file doesn&#39;t exist):
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@code loader.path}: a comma-separated list of directories (containing file
+&nbsp; * resources and/or nested archives in *.jar or *.zip or archives) or archives to append
+&nbsp; * to the classpath. {@code BOOT-INF/classes,BOOT-INF/lib} in the application archive are
+&nbsp; * always used&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@code loader.main}: the main method to delegate execution to once the class loader
+&nbsp; * is set up. No default, but will fall back to looking for a {@code Start-Class} in a
+&nbsp; * {@code MANIFEST.MF}, if there is one in &lt;code&gt;${loader.home}/META-INF&lt;/code&gt;.&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Janne Valkealahti
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.2.0
+&nbsp; */
+&nbsp;public class PropertiesLauncher extends Launcher {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties key for main class. As a manifest entry can also be specified as
+&nbsp;	 * {@code Start-Class}.
+&nbsp;	 */
+&nbsp;	public static final String MAIN = &quot;loader.main&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties key for classpath entries (directories possibly containing jars or
+&nbsp;	 * jars). Multiple entries can be specified using a comma-separated list. {@code
+&nbsp;	 * BOOT-INF/classes,BOOT-INF/lib} in the application archive are always used.
+&nbsp;	 */
+&nbsp;	public static final String PATH = &quot;loader.path&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties key for home directory. This is the location of external configuration
+&nbsp;	 * if not on classpath, and also the base path for any relative paths in the
+&nbsp;	 * {@link #PATH loader path}. Defaults to current working directory (
+&nbsp;	 * &lt;code&gt;${user.dir}&lt;/code&gt;).
+&nbsp;	 */
+&nbsp;	public static final String HOME = &quot;loader.home&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties key for default command line arguments. These arguments (if present) are
+&nbsp;	 * prepended to the main method arguments before launching.
+&nbsp;	 */
+&nbsp;	public static final String ARGS = &quot;loader.args&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties key for name of external configuration file (excluding suffix). Defaults
+&nbsp;	 * to &quot;application&quot;. Ignored if {@link #CONFIG_LOCATION loader config location} is
+&nbsp;	 * provided instead.
+&nbsp;	 */
+&nbsp;	public static final String CONFIG_NAME = &quot;loader.config.name&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties key for config file location (including optional classpath:, file: or
+&nbsp;	 * URL prefix).
+&nbsp;	 */
+&nbsp;	public static final String CONFIG_LOCATION = &quot;loader.config.location&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties key for boolean flag (default false) which, if set, will cause the
+&nbsp;	 * external configuration properties to be copied to System properties (assuming that
+&nbsp;	 * is allowed by Java security).
+&nbsp;	 */
+&nbsp;	public static final String SET_SYSTEM_PROPERTIES = &quot;loader.system&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final URL[] NO_URLS = new URL[0];</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern WORD_SEPARATOR = Pattern.compile(&quot;\\W+&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final String NESTED_ARCHIVE_SEPARATOR = &quot;!&quot; + File.separator;</b>
+&nbsp;
+&nbsp;	private static final String JAR_FILE_PREFIX = &quot;jar:file:&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final DebugLogger debug = DebugLogger.get(PropertiesLauncher.class);</b>
+&nbsp;
+&nbsp;	private final Archive archive;
+&nbsp;
+&nbsp;	private final File homeDirectory;
+&nbsp;
+&nbsp;	private final List&lt;String&gt; paths;
+&nbsp;
+<b class="nc">&nbsp;	private final Properties properties = new Properties();</b>
+&nbsp;
+&nbsp;	public PropertiesLauncher() throws Exception {
+<b class="nc">&nbsp;		this(Archive.create(Launcher.class));</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	PropertiesLauncher(Archive archive) throws Exception {</b>
+<b class="nc">&nbsp;		this.archive = archive;</b>
+<b class="nc">&nbsp;		this.homeDirectory = getHomeDirectory();</b>
+<b class="nc">&nbsp;		initializeProperties();</b>
+<b class="nc">&nbsp;		this.paths = getPaths();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected File getHomeDirectory() throws Exception {
+<b class="nc">&nbsp;		return new File(getPropertyWithDefault(HOME, &quot;${user.dir}&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void initializeProperties() throws Exception {
+<b class="nc">&nbsp;		List&lt;String&gt; configs = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (getProperty(CONFIG_LOCATION) != null) {</b>
+<b class="nc">&nbsp;			configs.add(getProperty(CONFIG_LOCATION));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			String[] names = getPropertyWithDefault(CONFIG_NAME, &quot;loader&quot;).split(&quot;,&quot;);</b>
+<b class="nc">&nbsp;			for (String name : names) {</b>
+<b class="nc">&nbsp;				String propertiesFile = name + &quot;.properties&quot;;</b>
+<b class="nc">&nbsp;				configs.add(&quot;file:&quot; + this.homeDirectory + &quot;/&quot; + propertiesFile);</b>
+<b class="nc">&nbsp;				configs.add(&quot;classpath:&quot; + propertiesFile);</b>
+<b class="nc">&nbsp;				configs.add(&quot;classpath:BOOT-INF/classes/&quot; + propertiesFile);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		for (String config : configs) {</b>
+<b class="nc">&nbsp;			try (InputStream resource = getResource(config)) {</b>
+<b class="nc">&nbsp;				if (resource == null) {</b>
+<b class="nc">&nbsp;					debug.log(&quot;Not found: %s&quot;, config);</b>
+&nbsp;					continue;
+&nbsp;				}
+<b class="nc">&nbsp;				debug.log(&quot;Found: %s&quot;, config);</b>
+<b class="nc">&nbsp;				loadResource(resource);</b>
+&nbsp;				return; // Load the first one we find
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private InputStream getResource(String config) throws Exception {
+<b class="nc">&nbsp;		if (config.startsWith(&quot;classpath:&quot;)) {</b>
+<b class="nc">&nbsp;			return getClasspathResource(config.substring(&quot;classpath:&quot;.length()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		config = handleUrl(config);</b>
+<b class="nc">&nbsp;		if (isUrl(config)) {</b>
+<b class="nc">&nbsp;			return getURLResource(config);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getFileResource(config);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private InputStream getClasspathResource(String config) {
+<b class="nc">&nbsp;		config = stripLeadingSlashes(config);</b>
+<b class="nc">&nbsp;		config = &quot;/&quot; + config;</b>
+<b class="nc">&nbsp;		debug.log(&quot;Trying classpath: %s&quot;, config);</b>
+<b class="nc">&nbsp;		return getClass().getResourceAsStream(config);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String handleUrl(String path) {
+<b class="nc">&nbsp;		if (path.startsWith(&quot;jar:file:&quot;) || path.startsWith(&quot;file:&quot;)) {</b>
+<b class="nc">&nbsp;			path = URLDecoder.decode(path, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;			if (path.startsWith(&quot;file:&quot;)) {</b>
+<b class="nc">&nbsp;				path = path.substring(&quot;file:&quot;.length());</b>
+<b class="nc">&nbsp;				if (path.startsWith(&quot;//&quot;)) {</b>
+<b class="nc">&nbsp;					path = path.substring(2);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return path;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isUrl(String config) {
+<b class="nc">&nbsp;		return config.contains(&quot;://&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private InputStream getURLResource(String config) throws Exception {
+<b class="nc">&nbsp;		URL url = new URL(config);</b>
+<b class="nc">&nbsp;		if (exists(url)) {</b>
+<b class="nc">&nbsp;			URLConnection connection = url.openConnection();</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return connection.getInputStream();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				disconnect(connection);</b>
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean exists(URL url) throws IOException {
+<b class="nc">&nbsp;		URLConnection connection = url.openConnection();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			connection.setUseCaches(connection.getClass().getSimpleName().startsWith(&quot;JNLP&quot;));</b>
+<b class="nc">&nbsp;			if (connection instanceof HttpURLConnection httpConnection) {</b>
+<b class="nc">&nbsp;				httpConnection.setRequestMethod(&quot;HEAD&quot;);</b>
+<b class="nc">&nbsp;				int responseCode = httpConnection.getResponseCode();</b>
+<b class="nc">&nbsp;				if (responseCode == HttpURLConnection.HTTP_OK) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return (connection.getContentLength() &gt;= 0);</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			disconnect(connection);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void disconnect(URLConnection connection) {
+<b class="nc">&nbsp;		if (connection instanceof HttpURLConnection httpConnection) {</b>
+<b class="nc">&nbsp;			httpConnection.disconnect();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private InputStream getFileResource(String config) throws Exception {
+<b class="nc">&nbsp;		File file = new File(config);</b>
+<b class="nc">&nbsp;		debug.log(&quot;Trying file: %s&quot;, config);</b>
+<b class="nc">&nbsp;		return (!file.canRead()) ? null : new FileInputStream(file);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void loadResource(InputStream resource) throws Exception {
+<b class="nc">&nbsp;		this.properties.load(resource);</b>
+<b class="nc">&nbsp;		resolvePropertyPlaceholders();</b>
+<b class="nc">&nbsp;		if (&quot;true&quot;.equalsIgnoreCase(getProperty(SET_SYSTEM_PROPERTIES))) {</b>
+<b class="nc">&nbsp;			addToSystemProperties();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void resolvePropertyPlaceholders() {
+<b class="nc">&nbsp;		for (String name : this.properties.stringPropertyNames()) {</b>
+<b class="nc">&nbsp;			String value = this.properties.getProperty(name);</b>
+<b class="nc">&nbsp;			String resolved = SystemPropertyUtils.resolvePlaceholders(this.properties, value);</b>
+<b class="nc">&nbsp;			if (resolved != null) {</b>
+<b class="nc">&nbsp;				this.properties.put(name, resolved);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addToSystemProperties() {
+<b class="nc">&nbsp;		debug.log(&quot;Adding resolved properties to System properties&quot;);</b>
+<b class="nc">&nbsp;		for (String name : this.properties.stringPropertyNames()) {</b>
+<b class="nc">&nbsp;			String value = this.properties.getProperty(name);</b>
+<b class="nc">&nbsp;			System.setProperty(name, value);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; getPaths() throws Exception {
+<b class="nc">&nbsp;		String path = getProperty(PATH);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; paths = (path != null) ? parsePathsProperty(path) : Collections.emptyList();</b>
+<b class="nc">&nbsp;		debug.log(&quot;Nested archive paths: %s&quot;, this.paths);</b>
+<b class="nc">&nbsp;		return paths;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; parsePathsProperty(String commaSeparatedPaths) {
+<b class="nc">&nbsp;		List&lt;String&gt; paths = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String path : commaSeparatedPaths.split(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;			path = cleanupPath(path);</b>
+&nbsp;			// &quot;&quot; means the user wants root of archive but not current directory
+<b class="nc">&nbsp;			path = (path.isEmpty()) ? &quot;/&quot; : path;</b>
+<b class="nc">&nbsp;			paths.add(path);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (paths.isEmpty()) {</b>
+<b class="nc">&nbsp;			paths.add(&quot;lib&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return paths;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String cleanupPath(String path) {
+<b class="nc">&nbsp;		path = path.trim();</b>
+&nbsp;		// No need for current dir path
+<b class="nc">&nbsp;		if (path.startsWith(&quot;./&quot;)) {</b>
+<b class="nc">&nbsp;			path = path.substring(2);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (isArchive(path)) {</b>
+<b class="nc">&nbsp;			return path;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (path.endsWith(&quot;/*&quot;)) {</b>
+<b class="nc">&nbsp;			return path.substring(0, path.length() - 1);</b>
+&nbsp;		}
+&nbsp;		// It&#39;s a directory
+<b class="nc">&nbsp;		return (!path.endsWith(&quot;/&quot;) &amp;&amp; !path.equals(&quot;.&quot;)) ? path + &quot;/&quot; : path;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected ClassLoader createClassLoader(Collection&lt;URL&gt; urls) throws Exception {
+<b class="nc">&nbsp;		String loaderClassName = getProperty(&quot;loader.classLoader&quot;);</b>
+<b class="nc">&nbsp;		if (loaderClassName == null) {</b>
+<b class="nc">&nbsp;			return super.createClassLoader(urls);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ClassLoader parent = getClass().getClassLoader();</b>
+<b class="nc">&nbsp;		ClassLoader classLoader = new LaunchedClassLoader(false, urls.toArray(new URL[0]), parent);</b>
+<b class="nc">&nbsp;		debug.log(&quot;Classpath for custom loader: %s&quot;, urls);</b>
+<b class="nc">&nbsp;		classLoader = wrapWithCustomClassLoader(classLoader, loaderClassName);</b>
+<b class="nc">&nbsp;		debug.log(&quot;Using custom class loader: %s&quot;, loaderClassName);</b>
+<b class="nc">&nbsp;		return classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ClassLoader wrapWithCustomClassLoader(ClassLoader parent, String loaderClassName) throws Exception {
+<b class="nc">&nbsp;		Instantiator&lt;ClassLoader&gt; instantiator = new Instantiator&lt;&gt;(parent, loaderClassName);</b>
+<b class="nc">&nbsp;		ClassLoader loader = instantiator.declaredConstructor(ClassLoader.class).newInstance(parent);</b>
+<b class="nc">&nbsp;		loader = (loader != null) ? loader</b>
+<b class="nc">&nbsp;				: instantiator.declaredConstructor(URL[].class, ClassLoader.class).newInstance(NO_URLS, parent);</b>
+<b class="nc">&nbsp;		loader = (loader != null) ? loader : instantiator.constructWithoutParameters();</b>
+<b class="nc">&nbsp;		if (loader != null) {</b>
+<b class="nc">&nbsp;			return loader;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;Unable to create class loader for &quot; + loaderClassName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Archive getArchive() {
+<b class="nc">&nbsp;		return null; // We don&#39;t have a single archive and are not exploded.</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String getMainClass() throws Exception {
+<b class="nc">&nbsp;		String mainClass = getProperty(MAIN, &quot;Start-Class&quot;);</b>
+<b class="nc">&nbsp;		if (mainClass == null) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;No &#39;%s&#39; or &#39;Start-Class&#39; specified&quot;.formatted(MAIN));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return mainClass;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String[] getArgs(String... args) throws Exception {
+<b class="nc">&nbsp;		String loaderArgs = getProperty(ARGS);</b>
+<b class="nc">&nbsp;		return (loaderArgs != null) ? merge(loaderArgs.split(&quot;\\s+&quot;), args) : args;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String[] merge(String[] a1, String[] a2) {
+<b class="nc">&nbsp;		String[] result = new String[a1.length + a2.length];</b>
+<b class="nc">&nbsp;		System.arraycopy(a1, 0, result, 0, a1.length);</b>
+<b class="nc">&nbsp;		System.arraycopy(a2, 0, result, a1.length, a2.length);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getProperty(String name) throws Exception {
+<b class="nc">&nbsp;		return getProperty(name, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getProperty(String name, String manifestKey) throws Exception {
+<b class="nc">&nbsp;		return getProperty(name, manifestKey, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getPropertyWithDefault(String name, String defaultValue) throws Exception {
+<b class="nc">&nbsp;		return getProperty(name, null, defaultValue);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getProperty(String name, String manifestKey, String defaultValue) throws Exception {
+<b class="nc">&nbsp;		manifestKey = (manifestKey != null) ? manifestKey : toCamelCase(name.replace(&#39;.&#39;, &#39;-&#39;));</b>
+<b class="nc">&nbsp;		String value = SystemPropertyUtils.getProperty(name);</b>
+<b class="nc">&nbsp;		if (value != null) {</b>
+<b class="nc">&nbsp;			return getResolvedProperty(name, manifestKey, value, &quot;environment&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.properties.containsKey(name)) {</b>
+<b class="nc">&nbsp;			value = this.properties.getProperty(name);</b>
+<b class="nc">&nbsp;			return getResolvedProperty(name, manifestKey, value, &quot;properties&quot;);</b>
+&nbsp;		}
+&nbsp;		// Prefer home dir for MANIFEST if there is one
+<b class="nc">&nbsp;		if (this.homeDirectory != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				try (ExplodedArchive explodedArchive = new ExplodedArchive(this.homeDirectory)) {</b>
+<b class="nc">&nbsp;					value = getManifestValue(explodedArchive, manifestKey);</b>
+<b class="nc">&nbsp;					if (value != null) {</b>
+<b class="nc">&nbsp;						return getResolvedProperty(name, manifestKey, value, &quot;home directory manifest&quot;);</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IllegalStateException ex) {</b>
+&nbsp;				// Ignore
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;		// Otherwise try the root archive
+<b class="nc">&nbsp;		value = getManifestValue(this.archive, manifestKey);</b>
+<b class="nc">&nbsp;		if (value != null) {</b>
+<b class="nc">&nbsp;			return getResolvedProperty(name, manifestKey, value, &quot;manifest&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return SystemPropertyUtils.resolvePlaceholders(this.properties, defaultValue);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getManifestValue(Archive archive, String manifestKey) throws Exception {
+<b class="nc">&nbsp;		Manifest manifest = archive.getManifest();</b>
+<b class="nc">&nbsp;		return (manifest != null) ? manifest.getMainAttributes().getValue(manifestKey) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getResolvedProperty(String name, String manifestKey, String value, String from) {
+<b class="nc">&nbsp;		value = SystemPropertyUtils.resolvePlaceholders(this.properties, value);</b>
+<b class="nc">&nbsp;		String altName = (manifestKey != null &amp;&amp; !manifestKey.equals(name)) ? &quot;[%s] &quot;.formatted(manifestKey) : &quot;&quot;;</b>
+<b class="nc">&nbsp;		debug.log(&quot;Property &#39;%s&#39;%s from %s: %s&quot;, name, altName, from, value);</b>
+<b class="nc">&nbsp;		return value;</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	void close() throws Exception {
+<b class="nc">&nbsp;		if (this.archive != null) {</b>
+<b class="nc">&nbsp;			this.archive.close();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public static String toCamelCase(CharSequence string) {
+<b class="nc">&nbsp;		if (string == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		StringBuilder result = new StringBuilder();</b>
+<b class="nc">&nbsp;		Matcher matcher = WORD_SEPARATOR.matcher(string);</b>
+<b class="nc">&nbsp;		int pos = 0;</b>
+<b class="nc">&nbsp;		while (matcher.find()) {</b>
+<b class="nc">&nbsp;			result.append(capitalize(string.subSequence(pos, matcher.end()).toString()));</b>
+<b class="nc">&nbsp;			pos = matcher.end();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		result.append(capitalize(string.subSequence(pos, string.length()).toString()));</b>
+<b class="nc">&nbsp;		return result.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String capitalize(String str) {
+<b class="nc">&nbsp;		return Character.toUpperCase(str.charAt(0)) + str.substring(1);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Set&lt;URL&gt; getClassPathUrls() throws Exception {
+<b class="nc">&nbsp;		Set&lt;URL&gt; urls = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String path : getPaths()) {</b>
+<b class="nc">&nbsp;			path = cleanupPath(handleUrl(path));</b>
+<b class="nc">&nbsp;			urls.addAll(getClassPathUrlsForPath(path));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		urls.addAll(getClassPathUrlsForRoot());</b>
+<b class="nc">&nbsp;		debug.log(&quot;Using class path URLs %s&quot;, urls);</b>
+<b class="nc">&nbsp;		return urls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Set&lt;URL&gt; getClassPathUrlsForPath(String path) throws Exception {
+<b class="nc">&nbsp;		File file = (!isAbsolutePath(path)) ? new File(this.homeDirectory, path) : new File(path);</b>
+<b class="nc">&nbsp;		Set&lt;URL&gt; urls = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (!&quot;/&quot;.equals(path)) {</b>
+<b class="nc">&nbsp;			if (file.isDirectory()) {</b>
+<b class="nc">&nbsp;				try (ExplodedArchive explodedArchive = new ExplodedArchive(file)) {</b>
+<b class="nc">&nbsp;					debug.log(&quot;Adding classpath entries from directory %s&quot;, file);</b>
+<b class="nc">&nbsp;					urls.add(file.toURI().toURL());</b>
+<b class="nc">&nbsp;					urls.addAll(explodedArchive.getClassPathUrls(this::isArchive));</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (!file.getPath().contains(NESTED_ARCHIVE_SEPARATOR) &amp;&amp; isArchive(file.getName())) {</b>
+<b class="nc">&nbsp;			debug.log(&quot;Adding classpath entries from jar/zip archive %s&quot;, path);</b>
+<b class="nc">&nbsp;			urls.add(file.toURI().toURL());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Set&lt;URL&gt; nested = getClassPathUrlsForNested(path);</b>
+<b class="nc">&nbsp;		if (!nested.isEmpty()) {</b>
+<b class="nc">&nbsp;			debug.log(&quot;Adding classpath entries from nested %s&quot;, path);</b>
+<b class="nc">&nbsp;			urls.addAll(nested);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return urls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Set&lt;URL&gt; getClassPathUrlsForNested(String path) throws Exception {
+<b class="nc">&nbsp;		boolean isJustArchive = isArchive(path);</b>
+<b class="nc">&nbsp;		if (!path.equals(&quot;/&quot;) &amp;&amp; path.startsWith(&quot;/&quot;)</b>
+<b class="nc">&nbsp;				|| (this.archive.isExploded() &amp;&amp; this.archive.getRootDirectory().equals(this.homeDirectory))) {</b>
+<b class="nc">&nbsp;			return Collections.emptySet();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		File file = null;</b>
+<b class="nc">&nbsp;		if (isJustArchive) {</b>
+<b class="nc">&nbsp;			File candidate = new File(this.homeDirectory, path);</b>
+<b class="nc">&nbsp;			if (candidate.exists()) {</b>
+<b class="nc">&nbsp;				file = candidate;</b>
+<b class="nc">&nbsp;				path = &quot;&quot;;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		int separatorIndex = path.indexOf(&#39;!&#39;);</b>
+<b class="nc">&nbsp;		if (separatorIndex != -1) {</b>
+<b class="nc">&nbsp;			file = (!path.startsWith(JAR_FILE_PREFIX)) ? new File(this.homeDirectory, path.substring(0, separatorIndex))</b>
+<b class="nc">&nbsp;					: new File(path.substring(JAR_FILE_PREFIX.length(), separatorIndex));</b>
+<b class="nc">&nbsp;			path = path.substring(separatorIndex + 1);</b>
+<b class="nc">&nbsp;			path = stripLeadingSlashes(path);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (path.equals(&quot;/&quot;) || path.equals(&quot;./&quot;) || path.equals(&quot;.&quot;)) {</b>
+&nbsp;			// The prefix for nested jars is actually empty if it&#39;s at the root
+<b class="nc">&nbsp;			path = &quot;&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Archive archive = (file != null) ? new JarFileArchive(file) : this.archive;</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			Set&lt;URL&gt; urls = new LinkedHashSet&lt;&gt;(archive.getClassPathUrls(includeByPrefix(path)));</b>
+<b class="nc">&nbsp;			if (!isJustArchive &amp;&amp; file != null &amp;&amp; path.isEmpty()) {</b>
+<b class="nc">&nbsp;				urls.add(JarUrl.create(file));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return urls;</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			if (archive != this.archive) {</b>
+<b class="nc">&nbsp;				archive.close();</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Set&lt;URL&gt; getClassPathUrlsForRoot() throws IOException {
+<b class="nc">&nbsp;		debug.log(&quot;Adding classpath entries from root archive %s&quot;, this.archive);</b>
+<b class="nc">&nbsp;		return this.archive.getClassPathUrls(JarLauncher::isLibraryFileOrClassesDirectory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Predicate&lt;Entry&gt; includeByPrefix(String prefix) {
+<b class="nc">&nbsp;		return (entry) -&gt; (entry.isDirectory() &amp;&amp; entry.name().equals(prefix))</b>
+<b class="nc">&nbsp;				|| (isArchive(entry) &amp;&amp; entry.name().startsWith(prefix));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isArchive(Entry entry) {
+<b class="nc">&nbsp;		return isArchive(entry.name());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isArchive(String name) {
+<b class="nc">&nbsp;		name = name.toLowerCase(Locale.ENGLISH);</b>
+<b class="nc">&nbsp;		return name.endsWith(&quot;.jar&quot;) || name.endsWith(&quot;.zip&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isAbsolutePath(String root) {
+&nbsp;		// Windows contains &quot;:&quot; others start with &quot;/&quot;
+<b class="nc">&nbsp;		return root.contains(&quot;:&quot;) || root.startsWith(&quot;/&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String stripLeadingSlashes(String string) {
+<b class="nc">&nbsp;		while (string.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			string = string.substring(1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return string;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public static void main(String[] args) throws Exception {
+<b class="nc">&nbsp;		PropertiesLauncher launcher = new PropertiesLauncher();</b>
+<b class="nc">&nbsp;		args = launcher.getArgs(args);</b>
+<b class="nc">&nbsp;		launcher.launch(args);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility to help instantiate objects.
+&nbsp;	 */
+<b class="nc">&nbsp;	private record Instantiator&lt;T&gt;(ClassLoader parent, Class&lt;?&gt; type) {</b>
+&nbsp;
+&nbsp;		Instantiator(ClassLoader parent, String className) throws ClassNotFoundException {
+<b class="nc">&nbsp;			this(parent, Class.forName(className, true, parent));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		T constructWithoutParameters() throws Exception {
+<b class="nc">&nbsp;			return declaredConstructor().newInstance();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Using&lt;T&gt; declaredConstructor(Class&lt;?&gt;... parameterTypes) {
+<b class="nc">&nbsp;			return new Using&lt;&gt;(this, parameterTypes);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		private record Using&lt;T&gt;(Instantiator&lt;T&gt; instantiator, Class&lt;?&gt;... parameterTypes) {</b>
+&nbsp;
+&nbsp;			@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;			T newInstance(Object... initargs) throws Exception {
+&nbsp;				try {
+<b class="nc">&nbsp;					Constructor&lt;?&gt; constructor = this.instantiator.type().getDeclaredConstructor(this.parameterTypes);</b>
+<b class="nc">&nbsp;					constructor.setAccessible(true);</b>
+<b class="nc">&nbsp;					return (T) constructor.newInstance(initargs);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (NoSuchMethodException ex) {</b>
+<b class="nc">&nbsp;					return null;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

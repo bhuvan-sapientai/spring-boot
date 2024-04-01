@@ -1,0 +1,360 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JCacheCacheConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.cache</a>
+</div>
+
+<h1>Coverage Summary for Class: JCacheCacheConfiguration (org.springframework.boot.autoconfigure.cache)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JCacheCacheConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JCacheCacheConfiguration$JCacheAvailableCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JCacheCacheConfiguration$JCacheAvailableCondition$CustomJCacheCacheManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JCacheCacheConfiguration$JCacheAvailableCondition$JCacheProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JCacheCacheConfiguration$JCacheProviderAvailableCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.cache;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Properties;
+&nbsp;
+&nbsp;import javax.cache.CacheManager;
+&nbsp;import javax.cache.Caching;
+&nbsp;import javax.cache.configuration.MutableConfiguration;
+&nbsp;import javax.cache.spi.CachingProvider;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanClassLoaderAware;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+&nbsp;import org.springframework.cache.jcache.JCacheCacheManager;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Cache configuration for JSR-107 compliant providers.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@ConditionalOnClass({ Caching.class, JCacheCacheManager.class })
+&nbsp;@ConditionalOnMissingBean(org.springframework.cache.CacheManager.class)
+&nbsp;@Conditional({ CacheCondition.class, JCacheCacheConfiguration.JCacheAvailableCondition.class })
+&nbsp;@Import(HazelcastJCacheCustomizationConfiguration.class)
+<b class="nc">&nbsp;class JCacheCacheConfiguration implements BeanClassLoaderAware {</b>
+&nbsp;
+&nbsp;	private ClassLoader beanClassLoader;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		this.beanClassLoader = classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	JCacheCacheManager cacheManager(CacheManagerCustomizers customizers, CacheManager jCacheCacheManager) {
+<b class="nc">&nbsp;		JCacheCacheManager cacheManager = new JCacheCacheManager(jCacheCacheManager);</b>
+<b class="nc">&nbsp;		return customizers.customize(cacheManager);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	CacheManager jCacheCacheManager(CacheProperties cacheProperties,
+&nbsp;			ObjectProvider&lt;javax.cache.configuration.Configuration&lt;?, ?&gt;&gt; defaultCacheConfiguration,
+&nbsp;			ObjectProvider&lt;JCacheManagerCustomizer&gt; cacheManagerCustomizers,
+&nbsp;			ObjectProvider&lt;JCachePropertiesCustomizer&gt; cachePropertiesCustomizers) throws IOException {
+<b class="nc">&nbsp;		CacheManager jCacheCacheManager = createCacheManager(cacheProperties, cachePropertiesCustomizers);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; cacheNames = cacheProperties.getCacheNames();</b>
+<b class="nc">&nbsp;		if (!CollectionUtils.isEmpty(cacheNames)) {</b>
+<b class="nc">&nbsp;			for (String cacheName : cacheNames) {</b>
+<b class="nc">&nbsp;				jCacheCacheManager.createCache(cacheName,</b>
+<b class="nc">&nbsp;						defaultCacheConfiguration.getIfAvailable(MutableConfiguration::new));</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		cacheManagerCustomizers.orderedStream().forEach((customizer) -&gt; customizer.customize(jCacheCacheManager));</b>
+<b class="nc">&nbsp;		return jCacheCacheManager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CacheManager createCacheManager(CacheProperties cacheProperties,
+&nbsp;			ObjectProvider&lt;JCachePropertiesCustomizer&gt; cachePropertiesCustomizers) throws IOException {
+<b class="nc">&nbsp;		CachingProvider cachingProvider = getCachingProvider(cacheProperties.getJcache().getProvider());</b>
+<b class="nc">&nbsp;		Properties properties = createCacheManagerProperties(cachePropertiesCustomizers, cacheProperties);</b>
+<b class="nc">&nbsp;		Resource configLocation = cacheProperties.resolveConfigLocation(cacheProperties.getJcache().getConfig());</b>
+<b class="nc">&nbsp;		if (configLocation != null) {</b>
+<b class="nc">&nbsp;			return cachingProvider.getCacheManager(configLocation.getURI(), this.beanClassLoader, properties);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return cachingProvider.getCacheManager(null, this.beanClassLoader, properties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CachingProvider getCachingProvider(String cachingProviderFqn) {
+<b class="nc">&nbsp;		if (StringUtils.hasText(cachingProviderFqn)) {</b>
+<b class="nc">&nbsp;			return Caching.getCachingProvider(cachingProviderFqn);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Caching.getCachingProvider();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Properties createCacheManagerProperties(
+&nbsp;			ObjectProvider&lt;JCachePropertiesCustomizer&gt; cachePropertiesCustomizers, CacheProperties cacheProperties) {
+<b class="nc">&nbsp;		Properties properties = new Properties();</b>
+<b class="nc">&nbsp;		cachePropertiesCustomizers.orderedStream()</b>
+<b class="nc">&nbsp;			.forEach((customizer) -&gt; customizer.customize(cacheProperties, properties));</b>
+<b class="nc">&nbsp;		return properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine if JCache is available. This either kicks in if a provider is available
+&nbsp;	 * as defined per {@link JCacheProviderAvailableCondition} or if a
+&nbsp;	 * {@link CacheManager} has already been defined.
+&nbsp;	 */
+&nbsp;	@Order(Ordered.LOWEST_PRECEDENCE)
+&nbsp;	static class JCacheAvailableCondition extends AnyNestedCondition {
+&nbsp;
+&nbsp;		JCacheAvailableCondition() {
+<b class="nc">&nbsp;			super(ConfigurationPhase.REGISTER_BEAN);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Conditional(JCacheProviderAvailableCondition.class)
+<b class="nc">&nbsp;		static class JCacheProvider {</b>
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		@ConditionalOnSingleCandidate(CacheManager.class)
+<b class="nc">&nbsp;		static class CustomJCacheCacheManager {</b>
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine if a JCache provider is available. This either kicks in if a default
+&nbsp;	 * {@link CachingProvider} has been found or if the property referring to the provider
+&nbsp;	 * to use has been set.
+&nbsp;	 */
+&nbsp;	@Order(Ordered.LOWEST_PRECEDENCE)
+<b class="nc">&nbsp;	static class JCacheProviderAvailableCondition extends SpringBootCondition {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;			ConditionMessage.Builder message = ConditionMessage.forCondition(&quot;JCache&quot;);</b>
+<b class="nc">&nbsp;			String providerProperty = &quot;spring.cache.jcache.provider&quot;;</b>
+<b class="nc">&nbsp;			if (context.getEnvironment().containsProperty(providerProperty)) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.match(message.because(&quot;JCache provider specified&quot;));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Iterator&lt;CachingProvider&gt; providers = Caching.getCachingProviders().iterator();</b>
+<b class="nc">&nbsp;			if (!providers.hasNext()) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.noMatch(message.didNotFind(&quot;JSR-107 provider&quot;).atAll());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			providers.next();</b>
+<b class="nc">&nbsp;			if (providers.hasNext()) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.noMatch(message.foundExactly(&quot;multiple JSR-107 providers&quot;));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return ConditionOutcome.match(message.foundExactly(&quot;single JSR-107 provider&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

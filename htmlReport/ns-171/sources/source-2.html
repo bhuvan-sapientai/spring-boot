@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Dispatcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.remote.server</a>
+</div>
+
+<h1>Coverage Summary for Class: Dispatcher (org.springframework.boot.devtools.remote.server)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Dispatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.remote.server;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.server.ServerHttpRequest;
+&nbsp;import org.springframework.http.server.ServerHttpResponse;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Dispatcher used to route incoming remote server requests to a {@link Handler}. Similar
+&nbsp; * to {@code DispatchServlet} in Spring MVC but separate to ensure that remote support can
+&nbsp; * be used regardless of any web framework.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.3.0
+&nbsp; * @see HandlerMapper
+&nbsp; */
+&nbsp;public class Dispatcher {
+&nbsp;
+&nbsp;	private final AccessManager accessManager;
+&nbsp;
+&nbsp;	private final List&lt;HandlerMapper&gt; mappers;
+&nbsp;
+<b class="nc">&nbsp;	public Dispatcher(AccessManager accessManager, Collection&lt;HandlerMapper&gt; mappers) {</b>
+<b class="nc">&nbsp;		Assert.notNull(accessManager, &quot;AccessManager must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(mappers, &quot;Mappers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.accessManager = accessManager;</b>
+<b class="nc">&nbsp;		this.mappers = new ArrayList&lt;&gt;(mappers);</b>
+<b class="nc">&nbsp;		AnnotationAwareOrderComparator.sort(this.mappers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Dispatch the specified request to an appropriate {@link Handler}.
+&nbsp;	 * @param request the request
+&nbsp;	 * @param response the response
+&nbsp;	 * @return {@code true} if the request was dispatched
+&nbsp;	 * @throws IOException in case of I/O errors
+&nbsp;	 */
+&nbsp;	public boolean handle(ServerHttpRequest request, ServerHttpResponse response) throws IOException {
+<b class="nc">&nbsp;		for (HandlerMapper mapper : this.mappers) {</b>
+<b class="nc">&nbsp;			Handler handler = mapper.getHandler(request);</b>
+<b class="nc">&nbsp;			if (handler != null) {</b>
+<b class="nc">&nbsp;				handle(handler, request, response);</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void handle(Handler handler, ServerHttpRequest request, ServerHttpResponse response) throws IOException {
+<b class="nc">&nbsp;		if (!this.accessManager.isAllowed(request)) {</b>
+<b class="nc">&nbsp;			response.setStatusCode(HttpStatus.FORBIDDEN);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		handler.handle(request, response);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

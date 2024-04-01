@@ -1,0 +1,288 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LayersIndex</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: LayersIndex (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LayersIndex</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LayersIndex$Node</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.util.LinkedMultiValueMap;
+&nbsp;import org.springframework.util.MultiValueMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * Index describing the layer to which each entry in a jar belongs. Index files are simple
+&nbsp; * text files that should be read from top to bottom. Each file defines the layers and
+&nbsp; * their content. Layer names are written as quoted strings prefixed by a dash space
+&nbsp; * ({@code &quot;- &quot;}) and with a colon ({@code &quot;:&quot;}) suffix. Layer content is either a file or
+&nbsp; * directory name written as a quoted string prefixed by space space dash space
+&nbsp; * ({@code &quot;  - &quot;}). A directory name ends with {@code /}, a file name does not. When a
+&nbsp; * directory name is used it means that all files inside that directory are in the same
+&nbsp; * layer.
+&nbsp; * &lt;p&gt;
+&nbsp; * Index files are designed to be compatible with YAML and may be read into a list of
+&nbsp; * {@code Map&lt;String, List&lt;String&gt;&gt;} instances.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class LayersIndex {
+&nbsp;
+&nbsp;	private final Iterable&lt;Layer&gt; layers;
+&nbsp;
+<b class="nc">&nbsp;	private final Node root = new Node();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LayersIndex} backed by the given layers.
+&nbsp;	 * @param layers the layers in the index
+&nbsp;	 */
+&nbsp;	public LayersIndex(Layer... layers) {
+<b class="nc">&nbsp;		this(Arrays.asList(layers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LayersIndex} backed by the given layers.
+&nbsp;	 * @param layers the layers in the index
+&nbsp;	 */
+<b class="nc">&nbsp;	public LayersIndex(Iterable&lt;Layer&gt; layers) {</b>
+<b class="nc">&nbsp;		this.layers = layers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add an item to the index.
+&nbsp;	 * @param layer the layer of the item
+&nbsp;	 * @param name the name of the item
+&nbsp;	 */
+&nbsp;	public void add(Layer layer, String name) {
+<b class="nc">&nbsp;		String[] segments = name.split(&quot;/&quot;);</b>
+<b class="nc">&nbsp;		Node node = this.root;</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; segments.length; i++) {</b>
+<b class="nc">&nbsp;			boolean isDirectory = i &lt; (segments.length - 1);</b>
+<b class="nc">&nbsp;			node = node.updateOrAddNode(segments[i], isDirectory, layer);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Write the layer index to an output stream.
+&nbsp;	 * @param out the destination stream
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public void writeTo(OutputStream out) throws IOException {
+<b class="nc">&nbsp;		MultiValueMap&lt;Layer, String&gt; index = new LinkedMultiValueMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		this.root.buildIndex(&quot;&quot;, index);</b>
+<b class="nc">&nbsp;		index.values().forEach(Collections::sort);</b>
+<b class="nc">&nbsp;		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;		for (Layer layer : this.layers) {</b>
+<b class="nc">&nbsp;			List&lt;String&gt; names = index.get(layer);</b>
+<b class="nc">&nbsp;			writer.write(&quot;- \&quot;&quot; + layer + &quot;\&quot;:\n&quot;);</b>
+<b class="nc">&nbsp;			if (names != null) {</b>
+<b class="nc">&nbsp;				for (String name : names) {</b>
+<b class="nc">&nbsp;					writer.write(&quot;  - \&quot;&quot; + name + &quot;\&quot;\n&quot;);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		writer.flush();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A node within the index representing a single path segment.
+&nbsp;	 */
+&nbsp;	private static class Node {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final Set&lt;Layer&gt; layers;
+&nbsp;
+<b class="nc">&nbsp;		private final List&lt;Node&gt; children = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		Node() {</b>
+<b class="nc">&nbsp;			this.name = &quot;&quot;;</b>
+<b class="nc">&nbsp;			this.layers = new HashSet&lt;&gt;();</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		Node(String name, Layer layer) {</b>
+<b class="nc">&nbsp;			this.name = name;</b>
+<b class="nc">&nbsp;			this.layers = new HashSet&lt;&gt;(Collections.singleton(layer));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Node updateOrAddNode(String segment, boolean isDirectory, Layer layer) {
+<b class="nc">&nbsp;			String name = segment + (isDirectory ? &quot;/&quot; : &quot;&quot;);</b>
+<b class="nc">&nbsp;			for (Node child : this.children) {</b>
+<b class="nc">&nbsp;				if (name.equals(child.name)) {</b>
+<b class="nc">&nbsp;					child.layers.add(layer);</b>
+<b class="nc">&nbsp;					return child;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			Node child = new Node(name, layer);</b>
+<b class="nc">&nbsp;			this.children.add(child);</b>
+<b class="nc">&nbsp;			return child;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void buildIndex(String path, MultiValueMap&lt;Layer, String&gt; index) {
+<b class="nc">&nbsp;			String name = path + this.name;</b>
+<b class="nc">&nbsp;			if (this.layers.size() == 1) {</b>
+<b class="nc">&nbsp;				index.add(this.layers.iterator().next(), name);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				for (Node child : this.children) {</b>
+<b class="nc">&nbsp;					child.buildIndex(name, index);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

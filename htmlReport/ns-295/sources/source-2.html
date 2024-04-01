@@ -1,0 +1,311 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExecutableArchiveLauncher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: ExecutableArchiveLauncher (org.springframework.boot.loader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExecutableArchiveLauncher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.archive.Archive;
+&nbsp;import org.springframework.boot.loader.archive.ExplodedArchive;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for executable archive {@link Launcher}s.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public abstract class ExecutableArchiveLauncher extends Launcher {
+&nbsp;
+&nbsp;	private static final String START_CLASS_ATTRIBUTE = &quot;Start-Class&quot;;
+&nbsp;
+&nbsp;	protected static final String BOOT_CLASSPATH_INDEX_ATTRIBUTE = &quot;Spring-Boot-Classpath-Index&quot;;
+&nbsp;
+&nbsp;	protected static final String DEFAULT_CLASSPATH_INDEX_FILE_NAME = &quot;classpath.idx&quot;;
+&nbsp;
+&nbsp;	private final Archive archive;
+&nbsp;
+&nbsp;	private final ClassPathIndexFile classPathIndex;
+&nbsp;
+<b class="nc">&nbsp;	public ExecutableArchiveLauncher() {</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			this.archive = createArchive();</b>
+<b class="nc">&nbsp;			this.classPathIndex = getClassPathIndex(this.archive);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	protected ExecutableArchiveLauncher(Archive archive) {</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			this.archive = archive;</b>
+<b class="nc">&nbsp;			this.classPathIndex = getClassPathIndex(this.archive);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected ClassPathIndexFile getClassPathIndex(Archive archive) throws IOException {
+&nbsp;		// Only needed for exploded archives, regular ones already have a defined order
+<b class="nc">&nbsp;		if (archive instanceof ExplodedArchive) {</b>
+<b class="nc">&nbsp;			String location = getClassPathIndexFileLocation(archive);</b>
+<b class="nc">&nbsp;			return ClassPathIndexFile.loadIfPossible(archive.getUrl(), location);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getClassPathIndexFileLocation(Archive archive) throws IOException {
+<b class="nc">&nbsp;		Manifest manifest = archive.getManifest();</b>
+<b class="nc">&nbsp;		Attributes attributes = (manifest != null) ? manifest.getMainAttributes() : null;</b>
+<b class="nc">&nbsp;		String location = (attributes != null) ? attributes.getValue(BOOT_CLASSPATH_INDEX_ATTRIBUTE) : null;</b>
+<b class="nc">&nbsp;		return (location != null) ? location : getArchiveEntryPathPrefix() + DEFAULT_CLASSPATH_INDEX_FILE_NAME;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String getMainClass() throws Exception {
+<b class="nc">&nbsp;		Manifest manifest = this.archive.getManifest();</b>
+<b class="nc">&nbsp;		String mainClass = null;</b>
+<b class="nc">&nbsp;		if (manifest != null) {</b>
+<b class="nc">&nbsp;			mainClass = manifest.getMainAttributes().getValue(START_CLASS_ATTRIBUTE);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (mainClass == null) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;No &#39;Start-Class&#39; manifest entry specified in &quot; + this);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return mainClass;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected ClassLoader createClassLoader(Iterator&lt;Archive&gt; archives) throws Exception {
+<b class="nc">&nbsp;		List&lt;URL&gt; urls = new ArrayList&lt;&gt;(guessClassPathSize());</b>
+<b class="nc">&nbsp;		while (archives.hasNext()) {</b>
+<b class="nc">&nbsp;			urls.add(archives.next().getUrl());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.classPathIndex != null) {</b>
+<b class="nc">&nbsp;			urls.addAll(this.classPathIndex.getUrls());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return createClassLoader(urls.toArray(new URL[0]));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int guessClassPathSize() {
+<b class="nc">&nbsp;		if (this.classPathIndex != null) {</b>
+<b class="nc">&nbsp;			return this.classPathIndex.size() + 10;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return 50;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Iterator&lt;Archive&gt; getClassPathArchivesIterator() throws Exception {
+<b class="nc">&nbsp;		Archive.EntryFilter searchFilter = this::isSearchCandidate;</b>
+<b class="nc">&nbsp;		Iterator&lt;Archive&gt; archives = this.archive.getNestedArchives(searchFilter,</b>
+<b class="nc">&nbsp;				(entry) -&gt; isNestedArchive(entry) &amp;&amp; !isEntryIndexed(entry));</b>
+<b class="nc">&nbsp;		if (isPostProcessingClassPathArchives()) {</b>
+<b class="nc">&nbsp;			archives = applyClassPathArchivePostProcessing(archives);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return archives;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isEntryIndexed(Archive.Entry entry) {
+<b class="nc">&nbsp;		if (this.classPathIndex != null) {</b>
+<b class="nc">&nbsp;			return this.classPathIndex.containsEntry(entry.getName());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Iterator&lt;Archive&gt; applyClassPathArchivePostProcessing(Iterator&lt;Archive&gt; archives) throws Exception {
+<b class="nc">&nbsp;		List&lt;Archive&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		while (archives.hasNext()) {</b>
+<b class="nc">&nbsp;			list.add(archives.next());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		postProcessClassPathArchives(list);</b>
+<b class="nc">&nbsp;		return list.iterator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine if the specified entry is a candidate for further searching.
+&nbsp;	 * @param entry the entry to check
+&nbsp;	 * @return {@code true} if the entry is a candidate for further searching
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	protected boolean isSearchCandidate(Archive.Entry entry) {
+<b class="nc">&nbsp;		if (getArchiveEntryPathPrefix() == null) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return entry.getName().startsWith(getArchiveEntryPathPrefix());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine if the specified entry is a nested item that should be added to the
+&nbsp;	 * classpath.
+&nbsp;	 * @param entry the entry to check
+&nbsp;	 * @return {@code true} if the entry is a nested item (jar or directory)
+&nbsp;	 */
+&nbsp;	protected abstract boolean isNestedArchive(Archive.Entry entry);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if post-processing needs to be applied to the archives. For back
+&nbsp;	 * compatibility this method returns {@code true}, but subclasses that don&#39;t override
+&nbsp;	 * {@link #postProcessClassPathArchives(List)} should provide an implementation that
+&nbsp;	 * returns {@code false}.
+&nbsp;	 * @return if the {@link #postProcessClassPathArchives(List)} method is implemented
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	protected boolean isPostProcessingClassPathArchives() {
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Called to post-process archive entries before they are used. Implementations can
+&nbsp;	 * add and remove entries.
+&nbsp;	 * @param archives the archives
+&nbsp;	 * @throws Exception if the post-processing fails
+&nbsp;	 * @see #isPostProcessingClassPathArchives()
+&nbsp;	 */
+&nbsp;	protected void postProcessClassPathArchives(List&lt;Archive&gt; archives) throws Exception {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the path prefix for entries in the archive.
+&nbsp;	 * @return the path prefix
+&nbsp;	 */
+&nbsp;	protected String getArchiveEntryPathPrefix() {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isExploded() {
+<b class="nc">&nbsp;		return this.archive.isExploded();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected final Archive getArchive() {
+<b class="nc">&nbsp;		return this.archive;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

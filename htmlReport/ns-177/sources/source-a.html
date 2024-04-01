@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JvmLauncher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.tests</a>
+</div>
+
+<h1>Coverage Summary for Class: JvmLauncher (org.springframework.boot.devtools.tests)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JvmLauncher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JvmLauncher$LaunchedJvm</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.tests;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+&nbsp;import org.junit.jupiter.api.extension.Extension;
+&nbsp;import org.junit.jupiter.api.extension.ExtensionContext;
+&nbsp;
+&nbsp;import org.springframework.boot.testsupport.BuildOutput;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Extension} that launches a JVM and redirects its output to a test
+&nbsp; * method-specific location.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;class JvmLauncher implements BeforeTestExecutionCallback {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern NON_ALPHABET_PATTERN = Pattern.compile(&quot;[^A-Za-z]+&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final BuildOutput buildOutput = new BuildOutput(getClass());</b>
+&nbsp;
+&nbsp;	private File outputDirectory;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void beforeTestExecution(ExtensionContext context) throws Exception {
+<b class="nc">&nbsp;		this.outputDirectory = new File(this.buildOutput.getRootLocation(),</b>
+<b class="nc">&nbsp;				&quot;output/&quot; + NON_ALPHABET_PATTERN.matcher(context.getRequiredTestMethod().getName()).replaceAll(&quot;&quot;));</b>
+<b class="nc">&nbsp;		this.outputDirectory.mkdirs();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	LaunchedJvm launch(String name, String classpath, String... args) throws IOException {
+<b class="nc">&nbsp;		List&lt;String&gt; command = new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;				Arrays.asList(System.getProperty(&quot;java.home&quot;) + &quot;/bin/java&quot;, &quot;-cp&quot;, classpath));</b>
+<b class="nc">&nbsp;		command.addAll(Arrays.asList(args));</b>
+<b class="nc">&nbsp;		File standardOut = new File(this.outputDirectory, name + &quot;.out&quot;);</b>
+<b class="nc">&nbsp;		File standardError = new File(this.outputDirectory, name + &quot;.err&quot;);</b>
+<b class="nc">&nbsp;		Process process = new ProcessBuilder(StringUtils.toStringArray(command)).redirectError(standardError)</b>
+<b class="nc">&nbsp;			.redirectOutput(standardOut)</b>
+<b class="nc">&nbsp;			.start();</b>
+<b class="nc">&nbsp;		return new LaunchedJvm(process, standardOut, standardError);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static class LaunchedJvm {
+&nbsp;
+&nbsp;		private final Process process;
+&nbsp;
+<b class="nc">&nbsp;		private final Instant launchTime = Instant.now();</b>
+&nbsp;
+&nbsp;		private final File standardOut;
+&nbsp;
+&nbsp;		private final File standardError;
+&nbsp;
+<b class="nc">&nbsp;		LaunchedJvm(Process process, File standardOut, File standardError) {</b>
+<b class="nc">&nbsp;			this.process = process;</b>
+<b class="nc">&nbsp;			this.standardOut = standardOut;</b>
+<b class="nc">&nbsp;			this.standardError = standardError;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Process getProcess() {
+<b class="nc">&nbsp;			return this.process;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Instant getLaunchTime() {
+<b class="nc">&nbsp;			return this.launchTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		File getStandardOut() {
+<b class="nc">&nbsp;			return this.standardOut;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		File getStandardError() {
+<b class="nc">&nbsp;			return this.standardError;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

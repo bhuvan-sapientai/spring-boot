@@ -1,0 +1,196 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JsonStream</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.json</a>
+</div>
+
+<h1>Coverage Summary for Class: JsonStream (org.springframework.boot.buildpack.platform.json)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JsonStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.json;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.JsonFactory;
+&nbsp;import com.fasterxml.jackson.core.JsonParser;
+&nbsp;import com.fasterxml.jackson.core.JsonToken;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.node.ObjectNode;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility class that allows JSON to be parsed and processed as it&#39;s received.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class JsonStream {
+&nbsp;
+&nbsp;	private final ObjectMapper objectMapper;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JsonStream} backed by the given object mapper.
+&nbsp;	 * @param objectMapper the object mapper to use
+&nbsp;	 */
+<b class="nc">&nbsp;	public JsonStream(ObjectMapper objectMapper) {</b>
+<b class="nc">&nbsp;		this.objectMapper = objectMapper;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Stream {@link ObjectNode object nodes} from the content as they become available.
+&nbsp;	 * @param content the source content
+&nbsp;	 * @param consumer the {@link ObjectNode} consumer
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public void get(InputStream content, Consumer&lt;ObjectNode&gt; consumer) throws IOException {
+<b class="nc">&nbsp;		get(content, ObjectNode.class, consumer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Stream objects from the content as they become available.
+&nbsp;	 * @param &lt;T&gt; the object type
+&nbsp;	 * @param content the source content
+&nbsp;	 * @param type the object type
+&nbsp;	 * @param consumer the {@link ObjectNode} consumer
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; void get(InputStream content, Class&lt;T&gt; type, Consumer&lt;T&gt; consumer) throws IOException {
+<b class="nc">&nbsp;		JsonFactory jsonFactory = this.objectMapper.getFactory();</b>
+<b class="nc">&nbsp;		try (JsonParser parser = jsonFactory.createParser(content)) {</b>
+<b class="nc">&nbsp;			while (!parser.isClosed()) {</b>
+<b class="nc">&nbsp;				JsonToken token = parser.nextToken();</b>
+<b class="nc">&nbsp;				if (token != null &amp;&amp; token != JsonToken.END_OBJECT) {</b>
+<b class="nc">&nbsp;					T node = read(parser, type);</b>
+<b class="nc">&nbsp;					if (node != null) {</b>
+<b class="nc">&nbsp;						consumer.accept(node);</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T&gt; T read(JsonParser parser, Class&lt;T&gt; type) throws IOException {
+<b class="nc">&nbsp;		if (ObjectNode.class.isAssignableFrom(type)) {</b>
+<b class="nc">&nbsp;			ObjectNode node = this.objectMapper.readTree(parser);</b>
+<b class="nc">&nbsp;			if (node == null || node.isMissingNode() || node.isEmpty()) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return (T) node;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.objectMapper.readValue(parser, type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

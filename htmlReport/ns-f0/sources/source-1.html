@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LdapAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.ldap</a>
+</div>
+
+<h1>Coverage Summary for Class: LdapAutoConfiguration (org.springframework.boot.autoconfigure.ldap)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LdapAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.ldap;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.ldap.LdapProperties.Template;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.ldap.core.ContextSource;
+&nbsp;import org.springframework.ldap.core.LdapOperations;
+&nbsp;import org.springframework.ldap.core.LdapTemplate;
+&nbsp;import org.springframework.ldap.core.support.DirContextAuthenticationStrategy;
+&nbsp;import org.springframework.ldap.core.support.LdapContextSource;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for LDAP.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Vedran Pavic
+&nbsp; * @since 1.5.0
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@ConditionalOnClass(ContextSource.class)
+&nbsp;@EnableConfigurationProperties(LdapProperties.class)
+<b class="nc">&nbsp;public class LdapAutoConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(LdapConnectionDetails.class)
+&nbsp;	PropertiesLdapConnectionDetails propertiesLdapConnectionDetails(LdapProperties properties,
+&nbsp;			Environment environment) {
+<b class="nc">&nbsp;		return new PropertiesLdapConnectionDetails(properties, environment);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public LdapContextSource ldapContextSource(LdapConnectionDetails connectionDetails, LdapProperties properties,
+&nbsp;			ObjectProvider&lt;DirContextAuthenticationStrategy&gt; dirContextAuthenticationStrategy) {
+<b class="nc">&nbsp;		LdapContextSource source = new LdapContextSource();</b>
+<b class="nc">&nbsp;		dirContextAuthenticationStrategy.ifUnique(source::setAuthenticationStrategy);</b>
+<b class="nc">&nbsp;		PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		propertyMapper.from(connectionDetails.getUsername()).to(source::setUserDn);</b>
+<b class="nc">&nbsp;		propertyMapper.from(connectionDetails.getPassword()).to(source::setPassword);</b>
+<b class="nc">&nbsp;		propertyMapper.from(properties.getAnonymousReadOnly()).to(source::setAnonymousReadOnly);</b>
+<b class="nc">&nbsp;		propertyMapper.from(connectionDetails.getBase()).to(source::setBase);</b>
+<b class="nc">&nbsp;		propertyMapper.from(connectionDetails.getUrls()).to(source::setUrls);</b>
+<b class="nc">&nbsp;		propertyMapper.from(properties.getBaseEnvironment())</b>
+<b class="nc">&nbsp;			.to((baseEnvironment) -&gt; source.setBaseEnvironmentProperties(Collections.unmodifiableMap(baseEnvironment)));</b>
+<b class="nc">&nbsp;		return source;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(LdapOperations.class)
+&nbsp;	public LdapTemplate ldapTemplate(LdapProperties properties, ContextSource contextSource) {
+<b class="nc">&nbsp;		Template template = properties.getTemplate();</b>
+<b class="nc">&nbsp;		PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		LdapTemplate ldapTemplate = new LdapTemplate(contextSource);</b>
+<b class="nc">&nbsp;		propertyMapper.from(template.isIgnorePartialResultException())</b>
+<b class="nc">&nbsp;			.to(ldapTemplate::setIgnorePartialResultException);</b>
+<b class="nc">&nbsp;		propertyMapper.from(template.isIgnoreNameNotFoundException()).to(ldapTemplate::setIgnoreNameNotFoundException);</b>
+<b class="nc">&nbsp;		propertyMapper.from(template.isIgnoreSizeLimitExceededException())</b>
+<b class="nc">&nbsp;			.to(ldapTemplate::setIgnoreSizeLimitExceededException);</b>
+<b class="nc">&nbsp;		return ldapTemplate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

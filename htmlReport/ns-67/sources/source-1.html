@@ -1,0 +1,282 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HttpSender</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.tracing.zipkin</a>
+</div>
+
+<h1>Coverage Summary for Class: HttpSender (org.springframework.boot.actuate.autoconfigure.tracing.zipkin)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HttpSender</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HttpSender$HttpPostCall</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.tracing.zipkin;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.zip.GZIPOutputStream;
+&nbsp;
+&nbsp;import zipkin2.Call;
+&nbsp;import zipkin2.CheckResult;
+&nbsp;import zipkin2.codec.Encoding;
+&nbsp;import zipkin2.reporter.BytesMessageEncoder;
+&nbsp;import zipkin2.reporter.ClosedSenderException;
+&nbsp;import zipkin2.reporter.Sender;
+&nbsp;
+&nbsp;import org.springframework.http.HttpHeaders;
+&nbsp;import org.springframework.util.unit.DataSize;
+&nbsp;
+&nbsp;/**
+&nbsp; * A Zipkin {@link Sender} that uses an HTTP client to send JSON spans. Supports automatic
+&nbsp; * compression with gzip.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Stefan Bratanov
+&nbsp; */
+<b class="nc">&nbsp;abstract class HttpSender extends Sender {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final DataSize MESSAGE_MAX_SIZE = DataSize.ofKilobytes(512);</b>
+&nbsp;
+&nbsp;	private volatile boolean closed;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Encoding encoding() {
+<b class="nc">&nbsp;		return Encoding.JSON;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int messageMaxBytes() {
+<b class="nc">&nbsp;		return (int) MESSAGE_MAX_SIZE.toBytes();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int messageSizeInBytes(List&lt;byte[]&gt; encodedSpans) {
+<b class="nc">&nbsp;		return encoding().listSizeInBytes(encodedSpans);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int messageSizeInBytes(int encodedSizeInBytes) {
+<b class="nc">&nbsp;		return encoding().listSizeInBytes(encodedSizeInBytes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public CheckResult check() {
+&nbsp;		try {
+<b class="nc">&nbsp;			sendSpans(Collections.emptyList()).execute();</b>
+<b class="nc">&nbsp;			return CheckResult.OK;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException | RuntimeException ex) {</b>
+<b class="nc">&nbsp;			return CheckResult.failed(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void close() throws IOException {
+<b class="nc">&nbsp;		this.closed = true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The returned {@link HttpPostCall} will send span(s) as a POST to a zipkin endpoint
+&nbsp;	 * when executed.
+&nbsp;	 * @param batchedEncodedSpans list of encoded spans as a byte array
+&nbsp;	 * @return an instance of a Zipkin {@link Call} which can be executed
+&nbsp;	 */
+&nbsp;	protected abstract HttpPostCall sendSpans(byte[] batchedEncodedSpans);
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Call&lt;Void&gt; sendSpans(List&lt;byte[]&gt; encodedSpans) {
+<b class="nc">&nbsp;		if (this.closed) {</b>
+<b class="nc">&nbsp;			throw new ClosedSenderException();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return sendSpans(BytesMessageEncoder.JSON.encode(encodedSpans));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	abstract static class HttpPostCall extends Call.Base&lt;Void&gt; {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Only use gzip compression on data which is bigger than this in bytes.
+&nbsp;		 */
+<b class="nc">&nbsp;		private static final DataSize COMPRESSION_THRESHOLD = DataSize.ofKilobytes(1);</b>
+&nbsp;
+&nbsp;		private final byte[] body;
+&nbsp;
+<b class="nc">&nbsp;		HttpPostCall(byte[] body) {</b>
+<b class="nc">&nbsp;			this.body = body;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected byte[] getBody() {
+<b class="nc">&nbsp;			if (needsCompression()) {</b>
+<b class="nc">&nbsp;				return compress(this.body);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.body;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected byte[] getUncompressedBody() {
+<b class="nc">&nbsp;			return this.body;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected HttpHeaders getDefaultHeaders() {
+<b class="nc">&nbsp;			HttpHeaders headers = new HttpHeaders();</b>
+<b class="nc">&nbsp;			headers.set(&quot;b3&quot;, &quot;0&quot;);</b>
+<b class="nc">&nbsp;			headers.set(&quot;Content-Type&quot;, &quot;application/json&quot;);</b>
+<b class="nc">&nbsp;			if (needsCompression()) {</b>
+<b class="nc">&nbsp;				headers.set(&quot;Content-Encoding&quot;, &quot;gzip&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return headers;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean needsCompression() {
+<b class="nc">&nbsp;			return this.body.length &gt; COMPRESSION_THRESHOLD.toBytes();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private byte[] compress(byte[] input) {
+<b class="nc">&nbsp;			ByteArrayOutputStream result = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;			try (GZIPOutputStream gzip = new GZIPOutputStream(result)) {</b>
+<b class="nc">&nbsp;				gzip.write(input);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new UncheckedIOException(ex);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return result.toByteArray();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,314 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildInfoProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.tasks.buildinfo</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildInfoProperties (org.springframework.boot.gradle.tasks.buildinfo)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildInfoProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildInfoProperties$CurrentIsoInstantSupplier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.tasks.buildinfo;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javax.inject.Inject;
+&nbsp;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.provider.MapProperty;
+&nbsp;import org.gradle.api.provider.Property;
+&nbsp;import org.gradle.api.provider.Provider;
+&nbsp;import org.gradle.api.provider.SetProperty;
+&nbsp;import org.gradle.api.tasks.Input;
+&nbsp;import org.gradle.api.tasks.Internal;
+&nbsp;import org.gradle.api.tasks.Optional;
+&nbsp;
+&nbsp;import org.springframework.util.function.SingletonSupplier;
+&nbsp;
+&nbsp;/**
+&nbsp; * The properties that are written into the {@code build-info.properties} file.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@SuppressWarnings(&quot;serial&quot;)
+&nbsp;public abstract class BuildInfoProperties implements Serializable {
+&nbsp;
+&nbsp;	private final SetProperty&lt;String&gt; excludes;
+&nbsp;
+<b class="nc">&nbsp;	private final Supplier&lt;String&gt; creationTime = SingletonSupplier.of(new CurrentIsoInstantSupplier());</b>
+&nbsp;
+&nbsp;	@Inject
+<b class="nc">&nbsp;	public BuildInfoProperties(Project project, SetProperty&lt;String&gt; excludes) {</b>
+<b class="nc">&nbsp;		this.excludes = excludes;</b>
+<b class="nc">&nbsp;		getGroup().convention(project.provider(() -&gt; project.getGroup().toString()));</b>
+<b class="nc">&nbsp;		getVersion().convention(project.provider(() -&gt; project.getVersion().toString()));</b>
+<b class="nc">&nbsp;		getArtifact()</b>
+<b class="nc">&nbsp;			.convention(project.provider(() -&gt; project.findProperty(&quot;archivesBaseName&quot;)).map(Object::toString));</b>
+<b class="nc">&nbsp;		getName().convention(project.provider(project::getName));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@code build.group} property. Defaults to the {@link Project#getGroup()
+&nbsp;	 * Project&#39;s group}.
+&nbsp;	 * @return the group property
+&nbsp;	 */
+&nbsp;	@Internal
+&nbsp;	public abstract Property&lt;String&gt; getGroup();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@code build.artifact} property.
+&nbsp;	 * @return the artifact property
+&nbsp;	 */
+&nbsp;	@Internal
+&nbsp;	public abstract Property&lt;String&gt; getArtifact();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@code build.version} property. Defaults to the
+&nbsp;	 * {@link Project#getVersion() Project&#39;s version}.
+&nbsp;	 * @return the version
+&nbsp;	 */
+&nbsp;	@Internal
+&nbsp;	public abstract Property&lt;String&gt; getVersion();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@code build.name} property. Defaults to the {@link Project#getName()
+&nbsp;	 * Project&#39;s name}.
+&nbsp;	 * @return the name
+&nbsp;	 */
+&nbsp;	@Internal
+&nbsp;	public abstract Property&lt;String&gt; getName();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@code build.time} property.
+&nbsp;	 * @return the time
+&nbsp;	 */
+&nbsp;	@Internal
+&nbsp;	public abstract Property&lt;String&gt; getTime();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the additional properties that will be included. When written, the name of
+&nbsp;	 * each additional property is prefixed with {@code build.}.
+&nbsp;	 * @return the additional properties
+&nbsp;	 */
+&nbsp;	@Internal
+&nbsp;	public abstract MapProperty&lt;String, Object&gt; getAdditional();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	String getArtifactIfNotExcluded() {
+<b class="nc">&nbsp;		return getIfNotExcluded(getArtifact(), &quot;artifact&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	String getGroupIfNotExcluded() {
+<b class="nc">&nbsp;		return getIfNotExcluded(getGroup(), &quot;group&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	String getNameIfNotExcluded() {
+<b class="nc">&nbsp;		return getIfNotExcluded(getName(), &quot;name&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	Instant getTimeIfNotExcluded() {
+<b class="nc">&nbsp;		String time = getIfNotExcluded(getTime(), &quot;time&quot;, this.creationTime);</b>
+<b class="nc">&nbsp;		return (time != null) ? Instant.parse(time) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	String getVersionIfNotExcluded() {
+<b class="nc">&nbsp;		return getIfNotExcluded(getVersion(), &quot;version&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	Map&lt;String, String&gt; getAdditionalIfNotExcluded() {
+<b class="nc">&nbsp;		return coerceToStringValues(applyExclusions(getAdditional().getOrElse(Collections.emptyMap())));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T getIfNotExcluded(Property&lt;T&gt; property, String name) {
+<b class="nc">&nbsp;		return getIfNotExcluded(property, name, () -&gt; null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T getIfNotExcluded(Property&lt;T&gt; property, String name, Supplier&lt;T&gt; defaultValue) {
+<b class="nc">&nbsp;		if (this.excludes.getOrElse(Collections.emptySet()).contains(name)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return property.getOrElse(defaultValue.get());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, String&gt; coerceToStringValues(Map&lt;String, Object&gt; input) {
+<b class="nc">&nbsp;		Map&lt;String, String&gt; output = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		input.forEach((key, value) -&gt; {</b>
+<b class="nc">&nbsp;			if (value instanceof Provider&lt;?&gt; provider) {</b>
+<b class="nc">&nbsp;				value = provider.getOrNull();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			output.put(key, (value != null) ? value.toString() : null);</b>
+&nbsp;		});
+<b class="nc">&nbsp;		return output;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Object&gt; applyExclusions(Map&lt;String, Object&gt; input) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; output = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; exclusions = this.excludes.getOrElse(Collections.emptySet());</b>
+<b class="nc">&nbsp;		input.forEach((key, value) -&gt; output.put(key, (!exclusions.contains(key)) ? value : null));</b>
+<b class="nc">&nbsp;		return output;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class CurrentIsoInstantSupplier implements Supplier&lt;String&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String get() {
+<b class="nc">&nbsp;			return DateTimeFormatter.ISO_INSTANT.format(Instant.now());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

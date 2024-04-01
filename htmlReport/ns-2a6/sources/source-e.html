@@ -1,0 +1,350 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoggingSystem</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: LoggingSystem (org.springframework.boot.logging)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoggingSystem</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.3%
+  </span>
+  <span class="absValue">
+    (1/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8%
+  </span>
+  <span class="absValue">
+    (2/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoggingSystem$MockitoMock$Iue94fzN</td>
+  </tr>
+  <tr>
+    <td class="name">LoggingSystem$MockitoMock$Iue94fzN$auxiliary$LLqqGvf3</td>
+  </tr>
+  <tr>
+    <td class="name">LoggingSystem$MockitoMock$Iue94fzN$auxiliary$oE0w4G07</td>
+  </tr>
+  <tr>
+    <td class="name">LoggingSystem$NoOpLoggingSystem</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    5.9%
+  </span>
+  <span class="absValue">
+    (1/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (2/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.logging;
+&nbsp;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Common abstraction over logging systems.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Ben Hale
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class LoggingSystem {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A System property that can be used to indicate the {@link LoggingSystem} to use.
+&nbsp;	 */
+<b class="fc">&nbsp;	public static final String SYSTEM_PROPERTY = LoggingSystem.class.getName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The value of the {@link #SYSTEM_PROPERTY} that can be used to indicate that no
+&nbsp;	 * {@link LoggingSystem} should be used.
+&nbsp;	 */
+&nbsp;	public static final String NONE = &quot;none&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name used for the root logger. LoggingSystem implementations should ensure that
+&nbsp;	 * this is the name used to represent the root logger, regardless of the underlying
+&nbsp;	 * implementation.
+&nbsp;	 */
+&nbsp;	public static final String ROOT_LOGGER_NAME = &quot;ROOT&quot;;
+&nbsp;
+<b class="fc">&nbsp;	private static final LoggingSystemFactory SYSTEM_FACTORY = LoggingSystemFactory.fromSpringFactories();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of an {@link Environment} property used to indicate that a correlation ID
+&nbsp;	 * is expected to be logged at some point.
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public static final String EXPECT_CORRELATION_ID_PROPERTY = &quot;logging.expect-correlation-id&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link LoggingSystemProperties} that should be applied.
+&nbsp;	 * @param environment the {@link ConfigurableEnvironment} used to obtain value
+&nbsp;	 * @return the {@link LoggingSystemProperties} to apply
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public LoggingSystemProperties getSystemProperties(ConfigurableEnvironment environment) {
+<b class="nc">&nbsp;		return new LoggingSystemProperties(environment);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Reset the logging system to be limit output. This method may be called before
+&nbsp;	 * {@link #initialize(LoggingInitializationContext, String, LogFile)} to reduce
+&nbsp;	 * logging noise until the system has been fully initialized.
+&nbsp;	 */
+&nbsp;	public abstract void beforeInitialize();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Fully initialize the logging system.
+&nbsp;	 * @param initializationContext the logging initialization context
+&nbsp;	 * @param configLocation a log configuration location or {@code null} if default
+&nbsp;	 * initialization is required
+&nbsp;	 * @param logFile the log output file that should be written or {@code null} for
+&nbsp;	 * console only output
+&nbsp;	 */
+&nbsp;	public void initialize(LoggingInitializationContext initializationContext, String configLocation, LogFile logFile) {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clean up the logging system. The default implementation does nothing. Subclasses
+&nbsp;	 * should override this method to perform any logging system-specific cleanup.
+&nbsp;	 */
+&nbsp;	public void cleanUp() {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a {@link Runnable} that can handle shutdown of this logging system when the
+&nbsp;	 * JVM exits. The default implementation returns {@code null}, indicating that no
+&nbsp;	 * shutdown is required.
+&nbsp;	 * @return the shutdown handler, or {@code null}
+&nbsp;	 */
+&nbsp;	public Runnable getShutdownHandler() {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a set of the {@link LogLevel LogLevels} that are actually supported by the
+&nbsp;	 * logging system.
+&nbsp;	 * @return the supported levels
+&nbsp;	 */
+&nbsp;	public Set&lt;LogLevel&gt; getSupportedLogLevels() {
+<b class="nc">&nbsp;		return EnumSet.allOf(LogLevel.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the logging level for a given logger.
+&nbsp;	 * @param loggerName the name of the logger to set ({@code null} can be used for the
+&nbsp;	 * root logger).
+&nbsp;	 * @param level the log level ({@code null} can be used to remove any custom level for
+&nbsp;	 * the logger and use the default configuration instead)
+&nbsp;	 */
+&nbsp;	public void setLogLevel(String loggerName, LogLevel level) {
+<b class="nc">&nbsp;		throw new UnsupportedOperationException(&quot;Unable to set log level&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a collection of the current configuration for all a {@link LoggingSystem}&#39;s
+&nbsp;	 * loggers.
+&nbsp;	 * @return the current configurations
+&nbsp;	 * @since 1.5.0
+&nbsp;	 */
+&nbsp;	public List&lt;LoggerConfiguration&gt; getLoggerConfigurations() {
+<b class="nc">&nbsp;		throw new UnsupportedOperationException(&quot;Unable to get logger configurations&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the current configuration for a {@link LoggingSystem}&#39;s logger.
+&nbsp;	 * @param loggerName the name of the logger
+&nbsp;	 * @return the current configuration
+&nbsp;	 * @since 1.5.0
+&nbsp;	 */
+&nbsp;	public LoggerConfiguration getLoggerConfiguration(String loggerName) {
+<b class="nc">&nbsp;		throw new UnsupportedOperationException(&quot;Unable to get logger configuration&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Detect and return the logging system in use. Supports Logback and Java Logging.
+&nbsp;	 * @param classLoader the classloader
+&nbsp;	 * @return the logging system
+&nbsp;	 */
+&nbsp;	public static LoggingSystem get(ClassLoader classLoader) {
+<b class="nc">&nbsp;		String loggingSystemClassName = System.getProperty(SYSTEM_PROPERTY);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(loggingSystemClassName)) {</b>
+<b class="nc">&nbsp;			if (NONE.equals(loggingSystemClassName)) {</b>
+<b class="nc">&nbsp;				return new NoOpLoggingSystem();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return get(classLoader, loggingSystemClassName);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		LoggingSystem loggingSystem = SYSTEM_FACTORY.getLoggingSystem(classLoader);</b>
+<b class="nc">&nbsp;		Assert.state(loggingSystem != null, &quot;No suitable logging system located&quot;);</b>
+<b class="nc">&nbsp;		return loggingSystem;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static LoggingSystem get(ClassLoader classLoader, String loggingSystemClassName) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Class&lt;?&gt; systemClass = ClassUtils.forName(loggingSystemClassName, classLoader);</b>
+<b class="nc">&nbsp;			Constructor&lt;?&gt; constructor = systemClass.getDeclaredConstructor(ClassLoader.class);</b>
+<b class="nc">&nbsp;			constructor.setAccessible(true);</b>
+<b class="nc">&nbsp;			return (LoggingSystem) constructor.newInstance(classLoader);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link LoggingSystem} that does nothing.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class NoOpLoggingSystem extends LoggingSystem {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void beforeInitialize() {
+&nbsp;
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setLogLevel(String loggerName, LogLevel level) {
+&nbsp;
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public List&lt;LoggerConfiguration&gt; getLoggerConfigurations() {
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public LoggerConfiguration getLoggerConfiguration(String loggerName) {
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

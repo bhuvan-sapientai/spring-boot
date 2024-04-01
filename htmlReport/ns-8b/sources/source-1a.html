@@ -1,0 +1,218 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NamedContributorsMapAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.health</a>
+</div>
+
+<h1>Coverage Summary for Class: NamedContributorsMapAdapter (org.springframework.boot.actuate.health)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NamedContributorsMapAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NamedContributorsMapAdapter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.health;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link NamedContributors} backed by a map with values adapted as necessary.
+&nbsp; *
+&nbsp; * @param &lt;V&gt; the value type
+&nbsp; * @param &lt;C&gt; the contributor type
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Guirong Hu
+&nbsp; * @see CompositeHealthContributorMapAdapter
+&nbsp; * @see CompositeReactiveHealthContributorMapAdapter
+&nbsp; */
+&nbsp;abstract class NamedContributorsMapAdapter&lt;V, C&gt; implements NamedContributors&lt;C&gt; {
+&nbsp;
+&nbsp;	private final Map&lt;String, C&gt; map;
+&nbsp;
+<b class="nc">&nbsp;	NamedContributorsMapAdapter(Map&lt;String, V&gt; map, Function&lt;V, ? extends C&gt; valueAdapter) {</b>
+<b class="nc">&nbsp;		Assert.notNull(map, &quot;Map must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(valueAdapter, &quot;ValueAdapter must not be null&quot;);</b>
+<b class="nc">&nbsp;		map.keySet().forEach(this::validateKey);</b>
+<b class="nc">&nbsp;		this.map = Collections.unmodifiableMap(map.entrySet()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.collect(LinkedHashMap::new,</b>
+<b class="nc">&nbsp;					(result, entry) -&gt; result.put(entry.getKey(), adapt(entry.getValue(), valueAdapter)), Map::putAll));</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private void validateKey(String value) {
+<b class="nc">&nbsp;		Assert.notNull(value, &quot;Map must not contain null keys&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(!value.contains(&quot;/&quot;), &quot;Map keys must not contain a &#39;/&#39;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private C adapt(V value, Function&lt;V, ? extends C&gt; valueAdapter) {
+<b class="nc">&nbsp;		C contributor = (value != null) ? valueAdapter.apply(value) : null;</b>
+<b class="nc">&nbsp;		Assert.notNull(contributor, &quot;Map must not contain null values&quot;);</b>
+<b class="nc">&nbsp;		return contributor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;NamedContributor&lt;C&gt;&gt; iterator() {
+<b class="nc">&nbsp;		Iterator&lt;Entry&lt;String, C&gt;&gt; iterator = this.map.entrySet().iterator();</b>
+<b class="nc">&nbsp;		return new Iterator&lt;&gt;() {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public boolean hasNext() {
+<b class="nc">&nbsp;				return iterator.hasNext();</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public NamedContributor&lt;C&gt; next() {
+<b class="nc">&nbsp;				Entry&lt;String, C&gt; entry = iterator.next();</b>
+<b class="nc">&nbsp;				return NamedContributor.of(entry.getKey(), entry.getValue());</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public C getContributor(String name) {
+<b class="nc">&nbsp;		return this.map.get(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

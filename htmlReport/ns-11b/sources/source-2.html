@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebConversionService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.format</a>
+</div>
+
+<h1>Coverage Summary for Class: WebConversionService (org.springframework.boot.autoconfigure.web.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebConversionService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.format;
+&nbsp;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.format.datetime.DateFormatter;
+&nbsp;import org.springframework.format.datetime.DateFormatterRegistrar;
+&nbsp;import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
+&nbsp;import org.springframework.format.number.NumberFormatAnnotationFormatterFactory;
+&nbsp;import org.springframework.format.number.money.CurrencyUnitFormatter;
+&nbsp;import org.springframework.format.number.money.Jsr354NumberFormatAnnotationFormatterFactory;
+&nbsp;import org.springframework.format.number.money.MonetaryAmountFormatter;
+&nbsp;import org.springframework.format.support.DefaultFormattingConversionService;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link org.springframework.format.support.FormattingConversionService} dedicated to web
+&nbsp; * applications for formatting and converting values to/from the web.
+&nbsp; * &lt;p&gt;
+&nbsp; * This service replaces the default implementations provided by
+&nbsp; * {@link org.springframework.web.servlet.config.annotation.EnableWebMvc @EnableWebMvc}
+&nbsp; * and {@link org.springframework.web.reactive.config.EnableWebFlux @EnableWebFlux}.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class WebConversionService extends DefaultFormattingConversionService {
+&nbsp;
+<b class="nc">&nbsp;	private static final boolean JSR_354_PRESENT = ClassUtils.isPresent(&quot;javax.money.MonetaryAmount&quot;,</b>
+<b class="nc">&nbsp;			WebConversionService.class.getClassLoader());</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new WebConversionService that configures formatters with the provided
+&nbsp;	 * date, time, and date-time formats, or registers the default if no custom format is
+&nbsp;	 * provided.
+&nbsp;	 * @param dateTimeFormatters the formatters to use for date, time, and date-time
+&nbsp;	 * formatting
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	public WebConversionService(DateTimeFormatters dateTimeFormatters) {
+<b class="nc">&nbsp;		super(false);</b>
+<b class="nc">&nbsp;		if (dateTimeFormatters.isCustomized()) {</b>
+<b class="nc">&nbsp;			addFormatters(dateTimeFormatters);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			addDefaultFormatters(this);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addFormatters(DateTimeFormatters dateTimeFormatters) {
+<b class="nc">&nbsp;		addFormatterForFieldAnnotation(new NumberFormatAnnotationFormatterFactory());</b>
+<b class="nc">&nbsp;		if (JSR_354_PRESENT) {</b>
+<b class="nc">&nbsp;			addFormatter(new CurrencyUnitFormatter());</b>
+<b class="nc">&nbsp;			addFormatter(new MonetaryAmountFormatter());</b>
+<b class="nc">&nbsp;			addFormatterForFieldAnnotation(new Jsr354NumberFormatAnnotationFormatterFactory());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		registerJsr310(dateTimeFormatters);</b>
+<b class="nc">&nbsp;		registerJavaDate(dateTimeFormatters);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerJsr310(DateTimeFormatters dateTimeFormatters) {
+<b class="nc">&nbsp;		DateTimeFormatterRegistrar dateTime = new DateTimeFormatterRegistrar();</b>
+<b class="nc">&nbsp;		configure(dateTimeFormatters::getDateFormatter, dateTime::setDateFormatter);</b>
+<b class="nc">&nbsp;		configure(dateTimeFormatters::getTimeFormatter, dateTime::setTimeFormatter);</b>
+<b class="nc">&nbsp;		configure(dateTimeFormatters::getDateTimeFormatter, dateTime::setDateTimeFormatter);</b>
+<b class="nc">&nbsp;		dateTime.registerFormatters(this);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configure(Supplier&lt;DateTimeFormatter&gt; supplier, Consumer&lt;DateTimeFormatter&gt; consumer) {
+<b class="nc">&nbsp;		DateTimeFormatter formatter = supplier.get();</b>
+<b class="nc">&nbsp;		if (formatter != null) {</b>
+<b class="nc">&nbsp;			consumer.accept(formatter);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerJavaDate(DateTimeFormatters dateTimeFormatters) {
+<b class="nc">&nbsp;		DateFormatterRegistrar dateFormatterRegistrar = new DateFormatterRegistrar();</b>
+<b class="nc">&nbsp;		String datePattern = dateTimeFormatters.getDatePattern();</b>
+<b class="nc">&nbsp;		if (datePattern != null) {</b>
+<b class="nc">&nbsp;			DateFormatter dateFormatter = new DateFormatter(datePattern);</b>
+<b class="nc">&nbsp;			dateFormatterRegistrar.setFormatter(dateFormatter);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		dateFormatterRegistrar.registerFormatters(this);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

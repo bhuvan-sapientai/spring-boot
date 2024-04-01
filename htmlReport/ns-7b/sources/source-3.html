@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EndpointId</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint</a>
+</div>
+
+<h1>Coverage Summary for Class: EndpointId (org.springframework.boot.actuate.endpoint)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EndpointId</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint;
+&nbsp;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * An identifier for an actuator endpoint. Endpoint IDs may contain only letters and
+&nbsp; * numbers. They must begin with a lower-case letter. Case and syntax characters are
+&nbsp; * ignored when comparing endpoint IDs.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.6
+&nbsp; */
+&nbsp;public final class EndpointId {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(EndpointId.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Set&lt;String&gt; loggedWarnings = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern VALID_PATTERN = Pattern.compile(&quot;[a-zA-Z0-9.-]+&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern WARNING_PATTERN = Pattern.compile(&quot;[.-]+&quot;);</b>
+&nbsp;
+&nbsp;	private static final String MIGRATE_LEGACY_NAMES_PROPERTY = &quot;management.endpoints.migrate-legacy-ids&quot;;
+&nbsp;
+&nbsp;	private final String value;
+&nbsp;
+&nbsp;	private final String lowerCaseValue;
+&nbsp;
+&nbsp;	private final String lowerCaseAlphaNumeric;
+&nbsp;
+<b class="nc">&nbsp;	private EndpointId(String value) {</b>
+<b class="nc">&nbsp;		Assert.hasText(value, &quot;Value must not be empty&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(VALID_PATTERN.matcher(value).matches(), &quot;Value must only contain valid chars&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(!Character.isDigit(value.charAt(0)), &quot;Value must not start with a number&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(!Character.isUpperCase(value.charAt(0)), &quot;Value must not start with an uppercase letter&quot;);</b>
+<b class="nc">&nbsp;		if (WARNING_PATTERN.matcher(value).find()) {</b>
+<b class="nc">&nbsp;			logWarning(value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.value = value;</b>
+<b class="nc">&nbsp;		this.lowerCaseValue = value.toLowerCase(Locale.ENGLISH);</b>
+<b class="nc">&nbsp;		this.lowerCaseAlphaNumeric = getAlphaNumerics(this.lowerCaseValue);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getAlphaNumerics(String value) {
+<b class="nc">&nbsp;		StringBuilder result = new StringBuilder(value.length());</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; value.length(); i++) {</b>
+<b class="nc">&nbsp;			char ch = value.charAt(i);</b>
+<b class="nc">&nbsp;			if (ch &gt;= &#39;a&#39; &amp;&amp; ch &lt;= &#39;z&#39; || ch &gt;= &#39;0&#39; &amp;&amp; ch &lt;= &#39;9&#39;) {</b>
+<b class="nc">&nbsp;				result.append(ch);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return result.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.lowerCaseAlphaNumeric.equals(((EndpointId) obj).lowerCaseAlphaNumeric);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return this.lowerCaseAlphaNumeric.hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a lower-case version of the endpoint ID.
+&nbsp;	 * @return the lower-case endpoint ID
+&nbsp;	 */
+&nbsp;	public String toLowerCaseString() {
+<b class="nc">&nbsp;		return this.lowerCaseValue;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link EndpointId} of the specified value.
+&nbsp;	 * @param value the endpoint ID value
+&nbsp;	 * @return an {@link EndpointId} instance
+&nbsp;	 */
+&nbsp;	public static EndpointId of(String value) {
+<b class="nc">&nbsp;		return new EndpointId(value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link EndpointId} of the specified value. This
+&nbsp;	 * variant will respect the {@code management.endpoints.migrate-legacy-names} property
+&nbsp;	 * if it has been set in the {@link Environment}.
+&nbsp;	 * @param environment the Spring environment
+&nbsp;	 * @param value the endpoint ID value
+&nbsp;	 * @return an {@link EndpointId} instance
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public static EndpointId of(Environment environment, String value) {
+<b class="nc">&nbsp;		Assert.notNull(environment, &quot;Environment must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new EndpointId(migrateLegacyId(environment, value));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String migrateLegacyId(Environment environment, String value) {
+<b class="nc">&nbsp;		if (environment.getProperty(MIGRATE_LEGACY_NAMES_PROPERTY, Boolean.class, false)) {</b>
+<b class="nc">&nbsp;			return value.replaceAll(&quot;[-.]+&quot;, &quot;&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link EndpointId} from a property value. More
+&nbsp;	 * lenient than {@link #of(String)} to allow for common &quot;relaxed&quot; property variants.
+&nbsp;	 * @param value the property value to convert
+&nbsp;	 * @return an {@link EndpointId} instance
+&nbsp;	 */
+&nbsp;	public static EndpointId fromPropertyValue(String value) {
+<b class="nc">&nbsp;		return new EndpointId(value.replace(&quot;-&quot;, &quot;&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static void resetLoggedWarnings() {
+<b class="nc">&nbsp;		loggedWarnings.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void logWarning(String value) {
+<b class="nc">&nbsp;		if (logger.isWarnEnabled() &amp;&amp; loggedWarnings.add(value)) {</b>
+<b class="nc">&nbsp;			logger.warn(&quot;Endpoint ID &#39;&quot; + value + &quot;&#39; contains invalid characters, please migrate to a valid format.&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

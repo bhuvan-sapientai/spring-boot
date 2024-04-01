@@ -1,0 +1,188 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SimpleAsyncTaskExecutorAssert</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testsupport.assertj</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleAsyncTaskExecutorAssert (org.springframework.boot.testsupport.assertj)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleAsyncTaskExecutorAssert</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testsupport.assertj;
+&nbsp;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;
+&nbsp;import org.assertj.core.api.AbstractAssert;
+&nbsp;import org.assertj.core.api.Assert;
+&nbsp;
+&nbsp;import org.springframework.core.task.SimpleAsyncTaskExecutor;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * AssertJ {@link Assert} for {@link SimpleAsyncTaskExecutor}.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;public final class SimpleAsyncTaskExecutorAssert
+&nbsp;		extends AbstractAssert&lt;SimpleAsyncTaskExecutorAssert, SimpleAsyncTaskExecutor&gt; {
+&nbsp;
+&nbsp;	private SimpleAsyncTaskExecutorAssert(SimpleAsyncTaskExecutor actual) {
+<b class="nc">&nbsp;		super(actual, SimpleAsyncTaskExecutorAssert.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual executor uses platform threads.
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual executor doesn&#39;t use platform threads
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorAssert usesPlatformThreads() {
+<b class="nc">&nbsp;		isNotNull();</b>
+<b class="nc">&nbsp;		if (producesVirtualThreads()) {</b>
+<b class="nc">&nbsp;			failWithMessage(&quot;Expected executor to use platform threads, but it uses virtual threads&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verifies that the actual executor uses virtual threads.
+&nbsp;	 * @return {@code this} assertion object
+&nbsp;	 * @throws AssertionError if the actual executor doesn&#39;t use virtual threads
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskExecutorAssert usesVirtualThreads() {
+<b class="nc">&nbsp;		isNotNull();</b>
+<b class="nc">&nbsp;		if (!producesVirtualThreads()) {</b>
+<b class="nc">&nbsp;			failWithMessage(&quot;Expected executor to use virtual threads, but it uses platform threads&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean producesVirtualThreads() {
+<b class="nc">&nbsp;		Field field = ReflectionUtils.findField(SimpleAsyncTaskExecutor.class, &quot;virtualThreadDelegate&quot;);</b>
+<b class="nc">&nbsp;		if (field == null) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Field SimpleAsyncTaskExecutor.virtualThreadDelegate not found&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ReflectionUtils.makeAccessible(field);</b>
+<b class="nc">&nbsp;		Object virtualThreadDelegate = ReflectionUtils.getField(field, this.actual);</b>
+<b class="nc">&nbsp;		return virtualThreadDelegate != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new assertion class with the given {@link SimpleAsyncTaskExecutor}.
+&nbsp;	 * @param actual the {@link SimpleAsyncTaskExecutor}
+&nbsp;	 * @return the assertion class
+&nbsp;	 */
+&nbsp;	public static SimpleAsyncTaskExecutorAssert assertThat(SimpleAsyncTaskExecutor actual) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskExecutorAssert(actual);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JerseyHealthEndpointAdditionalPathResourceFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.web.jersey</a>
+</div>
+
+<h1>Coverage Summary for Class: JerseyHealthEndpointAdditionalPathResourceFactory (org.springframework.boot.actuate.endpoint.web.jersey)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JerseyHealthEndpointAdditionalPathResourceFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.web.jersey;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.glassfish.jersey.server.model.Resource;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointMapping;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.ExposableWebEndpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebOperation;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebOperationRequestPredicate;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebServerNamespace;
+&nbsp;import org.springframework.boot.actuate.health.AdditionalHealthEndpointPath;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpointGroup;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpointGroups;
+&nbsp;
+&nbsp;/**
+&nbsp; * A factory for creating Jersey {@link Resource Resources} for health groups with
+&nbsp; * additional path.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.6.0
+&nbsp; */
+&nbsp;public final class JerseyHealthEndpointAdditionalPathResourceFactory {
+&nbsp;
+<b class="nc">&nbsp;	private final JerseyEndpointResourceFactory delegate = new JerseyEndpointResourceFactory();</b>
+&nbsp;
+&nbsp;	private final Set&lt;HealthEndpointGroup&gt; groups;
+&nbsp;
+&nbsp;	private final WebServerNamespace serverNamespace;
+&nbsp;
+&nbsp;	public JerseyHealthEndpointAdditionalPathResourceFactory(WebServerNamespace serverNamespace,
+<b class="nc">&nbsp;			HealthEndpointGroups groups) {</b>
+<b class="nc">&nbsp;		this.serverNamespace = serverNamespace;</b>
+<b class="nc">&nbsp;		this.groups = groups.getAllWithAdditionalPath(serverNamespace);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Collection&lt;Resource&gt; createEndpointResources(EndpointMapping endpointMapping,
+&nbsp;			Collection&lt;ExposableWebEndpoint&gt; endpoints) {
+<b class="nc">&nbsp;		return endpoints.stream()</b>
+<b class="nc">&nbsp;			.flatMap((endpoint) -&gt; endpoint.getOperations().stream())</b>
+<b class="nc">&nbsp;			.flatMap((operation) -&gt; createResources(endpointMapping, operation))</b>
+<b class="nc">&nbsp;			.toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Stream&lt;Resource&gt; createResources(EndpointMapping endpointMapping, WebOperation operation) {
+<b class="nc">&nbsp;		WebOperationRequestPredicate requestPredicate = operation.getRequestPredicate();</b>
+<b class="nc">&nbsp;		String matchAllRemainingPathSegmentsVariable = requestPredicate.getMatchAllRemainingPathSegmentsVariable();</b>
+<b class="nc">&nbsp;		if (matchAllRemainingPathSegmentsVariable != null) {</b>
+<b class="nc">&nbsp;			List&lt;Resource&gt; resources = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (HealthEndpointGroup group : this.groups) {</b>
+<b class="nc">&nbsp;				AdditionalHealthEndpointPath additionalPath = group.getAdditionalPath();</b>
+<b class="nc">&nbsp;				if (additionalPath != null) {</b>
+<b class="nc">&nbsp;					resources.add(this.delegate.getResource(endpointMapping, operation, requestPredicate,</b>
+<b class="nc">&nbsp;							additionalPath.getValue(), this.serverNamespace,</b>
+<b class="nc">&nbsp;							(data, pathSegmentsVariable) -&gt; data.getUriInfo().getPath()));</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return resources.stream();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Stream.empty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

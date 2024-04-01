@@ -1,0 +1,1300 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationPropertyName</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.source</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationPropertyName (org.springframework.boot.context.properties.source)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationPropertyName</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (23/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    32%
+  </span>
+  <span class="absValue">
+    (86/269)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConfigurationPropertyName$ElementCharPredicate</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationPropertyName$Elements</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (9/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    51.7%
+  </span>
+  <span class="absValue">
+    (31/60)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationPropertyName$ElementsParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.9%
+  </span>
+  <span class="absValue">
+    (10/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    74.1%
+  </span>
+  <span class="absValue">
+    (60/81)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationPropertyName$ElementType</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationPropertyName$Form</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    59.3%
+  </span>
+  <span class="absValue">
+    (48/81)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.8%
+  </span>
+  <span class="absValue">
+    (191/426)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.source;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A configuration property name composed of elements separated by dots. User created
+&nbsp; * names may contain the characters &quot;{@code a-z}&quot; &quot;{@code 0-9}&quot;) and &quot;{@code -}&quot;, they
+&nbsp; * must be lower-case and must start with an alphanumeric character. The &quot;{@code -}&quot; is
+&nbsp; * used purely for formatting, i.e. &quot;{@code foo-bar}&quot; and &quot;{@code foobar}&quot; are considered
+&nbsp; * equivalent.
+&nbsp; * &lt;p&gt;
+&nbsp; * The &quot;{@code [}&quot; and &quot;{@code ]}&quot; characters may be used to indicate an associative
+&nbsp; * index(i.e. a {@link Map} key or a {@link Collection} index). Indexes names are not
+&nbsp; * restricted and are considered case-sensitive.
+&nbsp; * &lt;p&gt;
+&nbsp; * Here are some typical examples:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@code spring.main.banner-mode}&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@code server.hosts[0].name}&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@code log[org.springboot].level}&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; * @see #of(CharSequence)
+&nbsp; * @see ConfigurationPropertySource
+&nbsp; */
+&nbsp;public final class ConfigurationPropertyName implements Comparable&lt;ConfigurationPropertyName&gt; {
+&nbsp;
+&nbsp;	private static final String EMPTY_STRING = &quot;&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An empty {@link ConfigurationPropertyName}.
+&nbsp;	 */
+<b class="fc">&nbsp;	public static final ConfigurationPropertyName EMPTY = new ConfigurationPropertyName(Elements.EMPTY);</b>
+&nbsp;
+&nbsp;	private final Elements elements;
+&nbsp;
+&nbsp;	private final CharSequence[] uniformElements;
+&nbsp;
+&nbsp;	private String string;
+&nbsp;
+&nbsp;	private int hashCode;
+&nbsp;
+<b class="fc">&nbsp;	private ConfigurationPropertyName(Elements elements) {</b>
+<b class="fc">&nbsp;		this.elements = elements;</b>
+<b class="fc">&nbsp;		this.uniformElements = new CharSequence[elements.getSize()];</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns {@code true} if this {@link ConfigurationPropertyName} is empty.
+&nbsp;	 * @return {@code true} if the name is empty
+&nbsp;	 */
+&nbsp;	public boolean isEmpty() {
+<b class="fc">&nbsp;		return this.elements.getSize() == 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the last element in the name is indexed.
+&nbsp;	 * @return {@code true} if the last element is indexed
+&nbsp;	 */
+&nbsp;	public boolean isLastElementIndexed() {
+<b class="nc">&nbsp;		int size = getNumberOfElements();</b>
+<b class="nc">&nbsp;		return (size &gt; 0 &amp;&amp; isIndexed(size - 1));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return {@code true} if any element in the name is indexed.
+&nbsp;	 * @return if the element has one or more indexed elements
+&nbsp;	 * @since 2.2.10
+&nbsp;	 */
+&nbsp;	public boolean hasIndexedElement() {
+<b class="nc">&nbsp;		for (int i = 0; i &lt; getNumberOfElements(); i++) {</b>
+<b class="nc">&nbsp;			if (isIndexed(i)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the element in the name is indexed.
+&nbsp;	 * @param elementIndex the index of the element
+&nbsp;	 * @return {@code true} if the element is indexed
+&nbsp;	 */
+&nbsp;	boolean isIndexed(int elementIndex) {
+<b class="fc">&nbsp;		return this.elements.getType(elementIndex).isIndexed();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the element in the name is indexed and numeric.
+&nbsp;	 * @param elementIndex the index of the element
+&nbsp;	 * @return {@code true} if the element is indexed and numeric
+&nbsp;	 */
+&nbsp;	public boolean isNumericIndex(int elementIndex) {
+<b class="nc">&nbsp;		return this.elements.getType(elementIndex) == ElementType.NUMERICALLY_INDEXED;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the last element in the name in the given form.
+&nbsp;	 * @param form the form to return
+&nbsp;	 * @return the last element
+&nbsp;	 */
+&nbsp;	public String getLastElement(Form form) {
+<b class="nc">&nbsp;		int size = getNumberOfElements();</b>
+<b class="nc">&nbsp;		return (size != 0) ? getElement(size - 1, form) : EMPTY_STRING;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an element in the name in the given form.
+&nbsp;	 * @param elementIndex the element index
+&nbsp;	 * @param form the form to return
+&nbsp;	 * @return the last element
+&nbsp;	 */
+&nbsp;	public String getElement(int elementIndex, Form form) {
+<b class="fc">&nbsp;		CharSequence element = this.elements.get(elementIndex);</b>
+<b class="fc">&nbsp;		ElementType type = this.elements.getType(elementIndex);</b>
+<b class="fc">&nbsp;		if (type.isIndexed()) {</b>
+<b class="nc">&nbsp;			return element.toString();</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (form == Form.ORIGINAL) {</b>
+<b class="nc">&nbsp;			if (type != ElementType.NON_UNIFORM) {</b>
+<b class="nc">&nbsp;				return element.toString();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return convertToOriginalForm(element).toString();</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (form == Form.DASHED) {</b>
+<b class="fc">&nbsp;			if (type == ElementType.UNIFORM || type == ElementType.DASHED) {</b>
+<b class="nc">&nbsp;				return element.toString();</b>
+&nbsp;			}
+<b class="fc">&nbsp;			return convertToDashedElement(element).toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		CharSequence uniformElement = this.uniformElements[elementIndex];</b>
+<b class="nc">&nbsp;		if (uniformElement == null) {</b>
+<b class="nc">&nbsp;			uniformElement = (type != ElementType.UNIFORM) ? convertToUniformElement(element) : element;</b>
+<b class="nc">&nbsp;			this.uniformElements[elementIndex] = uniformElement.toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return uniformElement.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CharSequence convertToOriginalForm(CharSequence element) {
+<b class="nc">&nbsp;		return convertElement(element, false,</b>
+<b class="nc">&nbsp;				(ch, i) -&gt; ch == &#39;_&#39; || ElementsParser.isValidChar(Character.toLowerCase(ch), i));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CharSequence convertToDashedElement(CharSequence element) {
+<b class="fc">&nbsp;		return convertElement(element, true, ElementsParser::isValidChar);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CharSequence convertToUniformElement(CharSequence element) {
+<b class="nc">&nbsp;		return convertElement(element, true, (ch, i) -&gt; ElementsParser.isAlphaNumeric(ch));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CharSequence convertElement(CharSequence element, boolean lowercase, ElementCharPredicate filter) {
+<b class="fc">&nbsp;		StringBuilder result = new StringBuilder(element.length());</b>
+<b class="fc">&nbsp;		for (int i = 0; i &lt; element.length(); i++) {</b>
+<b class="fc">&nbsp;			char ch = lowercase ? Character.toLowerCase(element.charAt(i)) : element.charAt(i);</b>
+<b class="fc">&nbsp;			if (filter.test(ch, i)) {</b>
+<b class="fc">&nbsp;				result.append(ch);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="fc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the total number of elements in the name.
+&nbsp;	 * @return the number of elements
+&nbsp;	 */
+&nbsp;	public int getNumberOfElements() {
+<b class="fc">&nbsp;		return this.elements.getSize();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConfigurationPropertyName} by appending the given suffix.
+&nbsp;	 * @param suffix the elements to append
+&nbsp;	 * @return a new {@link ConfigurationPropertyName}
+&nbsp;	 * @throws InvalidConfigurationPropertyNameException if the result is not valid
+&nbsp;	 */
+&nbsp;	public ConfigurationPropertyName append(String suffix) {
+<b class="fc">&nbsp;		if (!StringUtils.hasLength(suffix)) {</b>
+<b class="fc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Elements additionalElements = probablySingleElementOf(suffix);</b>
+<b class="nc">&nbsp;		return new ConfigurationPropertyName(this.elements.append(additionalElements));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConfigurationPropertyName} by appending the given suffix.
+&nbsp;	 * @param suffix the elements to append
+&nbsp;	 * @return a new {@link ConfigurationPropertyName}
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public ConfigurationPropertyName append(ConfigurationPropertyName suffix) {
+<b class="nc">&nbsp;		if (suffix == null) {</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ConfigurationPropertyName(this.elements.append(suffix.elements));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the parent of this {@link ConfigurationPropertyName} or
+&nbsp;	 * {@link ConfigurationPropertyName#EMPTY} if there is no parent.
+&nbsp;	 * @return the parent name
+&nbsp;	 */
+&nbsp;	public ConfigurationPropertyName getParent() {
+<b class="fc">&nbsp;		int numberOfElements = getNumberOfElements();</b>
+<b class="fc">&nbsp;		return (numberOfElements &lt;= 1) ? EMPTY : chop(numberOfElements - 1);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link ConfigurationPropertyName} by chopping this name to the given
+&nbsp;	 * {@code size}. For example, {@code chop(1)} on the name {@code foo.bar} will return
+&nbsp;	 * {@code foo}.
+&nbsp;	 * @param size the size to chop
+&nbsp;	 * @return the chopped name
+&nbsp;	 */
+&nbsp;	public ConfigurationPropertyName chop(int size) {
+<b class="nc">&nbsp;		if (size &gt;= getNumberOfElements()) {</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ConfigurationPropertyName(this.elements.chop(size));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link ConfigurationPropertyName} by based on this name offset by
+&nbsp;	 * specific element index. For example, {@code chop(1)} on the name {@code foo.bar}
+&nbsp;	 * will return {@code bar}.
+&nbsp;	 * @param offset the element offset
+&nbsp;	 * @return the sub name
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public ConfigurationPropertyName subName(int offset) {
+<b class="nc">&nbsp;		if (offset == 0) {</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (offset == getNumberOfElements()) {</b>
+<b class="nc">&nbsp;			return EMPTY;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (offset &lt; 0 || offset &gt; getNumberOfElements()) {</b>
+<b class="nc">&nbsp;			throw new IndexOutOfBoundsException(&quot;Offset: &quot; + offset + &quot;, NumberOfElements: &quot; + getNumberOfElements());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ConfigurationPropertyName(this.elements.subElements(offset));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns {@code true} if this element is an immediate parent of the specified name.
+&nbsp;	 * @param name the name to check
+&nbsp;	 * @return {@code true} if this name is an ancestor
+&nbsp;	 */
+&nbsp;	public boolean isParentOf(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		if (getNumberOfElements() != name.getNumberOfElements() - 1) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return isAncestorOf(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns {@code true} if this element is an ancestor (immediate or nested parent) of
+&nbsp;	 * the specified name.
+&nbsp;	 * @param name the name to check
+&nbsp;	 * @return {@code true} if this name is an ancestor
+&nbsp;	 */
+&nbsp;	public boolean isAncestorOf(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		if (getNumberOfElements() &gt;= name.getNumberOfElements()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return elementsEqual(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int compareTo(ConfigurationPropertyName other) {
+<b class="nc">&nbsp;		return compare(this, other);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int compare(ConfigurationPropertyName n1, ConfigurationPropertyName n2) {
+<b class="nc">&nbsp;		int l1 = n1.getNumberOfElements();</b>
+<b class="nc">&nbsp;		int l2 = n2.getNumberOfElements();</b>
+<b class="nc">&nbsp;		int i1 = 0;</b>
+<b class="nc">&nbsp;		int i2 = 0;</b>
+<b class="nc">&nbsp;		while (i1 &lt; l1 || i2 &lt; l2) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				ElementType type1 = (i1 &lt; l1) ? n1.elements.getType(i1) : null;</b>
+<b class="nc">&nbsp;				ElementType type2 = (i2 &lt; l2) ? n2.elements.getType(i2) : null;</b>
+<b class="nc">&nbsp;				String e1 = (i1 &lt; l1) ? n1.getElement(i1++, Form.UNIFORM) : null;</b>
+<b class="nc">&nbsp;				String e2 = (i2 &lt; l2) ? n2.getElement(i2++, Form.UNIFORM) : null;</b>
+<b class="nc">&nbsp;				int result = compare(e1, type1, e2, type2);</b>
+<b class="nc">&nbsp;				if (result != 0) {</b>
+<b class="nc">&nbsp;					return result;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ArrayIndexOutOfBoundsException ex) {</b>
+<b class="nc">&nbsp;				throw new RuntimeException(ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int compare(String e1, ElementType type1, String e2, ElementType type2) {
+<b class="nc">&nbsp;		if (e1 == null) {</b>
+<b class="nc">&nbsp;			return -1;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (e2 == null) {</b>
+<b class="nc">&nbsp;			return 1;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int result = Boolean.compare(type2.isIndexed(), type1.isIndexed());</b>
+<b class="nc">&nbsp;		if (result != 0) {</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type1 == ElementType.NUMERICALLY_INDEXED &amp;&amp; type2 == ElementType.NUMERICALLY_INDEXED) {</b>
+<b class="nc">&nbsp;			long v1 = Long.parseLong(e1);</b>
+<b class="nc">&nbsp;			long v2 = Long.parseLong(e2);</b>
+<b class="nc">&nbsp;			return Long.compare(v1, v2);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return e1.compareTo(e2);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="fc">&nbsp;		if (obj == this) {</b>
+<b class="fc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || obj.getClass() != getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ConfigurationPropertyName other = (ConfigurationPropertyName) obj;</b>
+<b class="nc">&nbsp;		if (getNumberOfElements() != other.getNumberOfElements()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.elements.canShortcutWithSource(ElementType.UNIFORM)</b>
+<b class="nc">&nbsp;				&amp;&amp; other.elements.canShortcutWithSource(ElementType.UNIFORM)) {</b>
+<b class="nc">&nbsp;			return toString().equals(other.toString());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return elementsEqual(other);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean elementsEqual(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		for (int i = this.elements.getSize() - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;			if (elementDiffers(this.elements, name.elements, i)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean elementDiffers(Elements e1, Elements e2, int i) {
+<b class="nc">&nbsp;		ElementType type1 = e1.getType(i);</b>
+<b class="nc">&nbsp;		ElementType type2 = e2.getType(i);</b>
+<b class="nc">&nbsp;		if (type1.allowsFastEqualityCheck() &amp;&amp; type2.allowsFastEqualityCheck()) {</b>
+<b class="nc">&nbsp;			return !fastElementEquals(e1, e2, i);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type1.allowsDashIgnoringEqualityCheck() &amp;&amp; type2.allowsDashIgnoringEqualityCheck()) {</b>
+<b class="nc">&nbsp;			return !dashIgnoringElementEquals(e1, e2, i);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return !defaultElementEquals(e1, e2, i);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean fastElementEquals(Elements e1, Elements e2, int i) {
+<b class="nc">&nbsp;		int length1 = e1.getLength(i);</b>
+<b class="nc">&nbsp;		int length2 = e2.getLength(i);</b>
+<b class="nc">&nbsp;		if (length1 == length2) {</b>
+<b class="nc">&nbsp;			int i1 = 0;</b>
+<b class="nc">&nbsp;			while (length1-- != 0) {</b>
+<b class="nc">&nbsp;				char ch1 = e1.charAt(i, i1);</b>
+<b class="nc">&nbsp;				char ch2 = e2.charAt(i, i1);</b>
+<b class="nc">&nbsp;				if (ch1 != ch2) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				i1++;</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean dashIgnoringElementEquals(Elements e1, Elements e2, int i) {
+<b class="nc">&nbsp;		int l1 = e1.getLength(i);</b>
+<b class="nc">&nbsp;		int l2 = e2.getLength(i);</b>
+<b class="nc">&nbsp;		int i1 = 0;</b>
+<b class="nc">&nbsp;		int i2 = 0;</b>
+<b class="nc">&nbsp;		while (i1 &lt; l1) {</b>
+<b class="nc">&nbsp;			if (i2 &gt;= l2) {</b>
+<b class="nc">&nbsp;				return remainderIsDashes(e1, i, i1);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			char ch1 = e1.charAt(i, i1);</b>
+<b class="nc">&nbsp;			char ch2 = e2.charAt(i, i2);</b>
+<b class="nc">&nbsp;			if (ch1 == &#39;-&#39;) {</b>
+<b class="nc">&nbsp;				i1++;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (ch2 == &#39;-&#39;) {</b>
+<b class="nc">&nbsp;				i2++;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (ch1 != ch2) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				i1++;</b>
+<b class="nc">&nbsp;				i2++;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (i2 &lt; l2) {</b>
+<b class="nc">&nbsp;			if (e2.getType(i).isIndexed()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;			do {
+<b class="nc">&nbsp;				char ch2 = e2.charAt(i, i2++);</b>
+<b class="nc">&nbsp;				if (ch2 != &#39;-&#39;) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			while (i2 &lt; l2);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean defaultElementEquals(Elements e1, Elements e2, int i) {
+<b class="nc">&nbsp;		int l1 = e1.getLength(i);</b>
+<b class="nc">&nbsp;		int l2 = e2.getLength(i);</b>
+<b class="nc">&nbsp;		boolean indexed1 = e1.getType(i).isIndexed();</b>
+<b class="nc">&nbsp;		boolean indexed2 = e2.getType(i).isIndexed();</b>
+<b class="nc">&nbsp;		int i1 = 0;</b>
+<b class="nc">&nbsp;		int i2 = 0;</b>
+<b class="nc">&nbsp;		while (i1 &lt; l1) {</b>
+<b class="nc">&nbsp;			if (i2 &gt;= l2) {</b>
+<b class="nc">&nbsp;				return remainderIsNotAlphanumeric(e1, i, i1);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			char ch1 = indexed1 ? e1.charAt(i, i1) : Character.toLowerCase(e1.charAt(i, i1));</b>
+<b class="nc">&nbsp;			char ch2 = indexed2 ? e2.charAt(i, i2) : Character.toLowerCase(e2.charAt(i, i2));</b>
+<b class="nc">&nbsp;			if (!indexed1 &amp;&amp; !ElementsParser.isAlphaNumeric(ch1)) {</b>
+<b class="nc">&nbsp;				i1++;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (!indexed2 &amp;&amp; !ElementsParser.isAlphaNumeric(ch2)) {</b>
+<b class="nc">&nbsp;				i2++;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (ch1 != ch2) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				i1++;</b>
+<b class="nc">&nbsp;				i2++;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (i2 &lt; l2) {</b>
+<b class="nc">&nbsp;			return remainderIsNotAlphanumeric(e2, i, i2);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean remainderIsNotAlphanumeric(Elements elements, int element, int index) {
+<b class="nc">&nbsp;		if (elements.getType(element).isIndexed()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int length = elements.getLength(element);</b>
+&nbsp;		do {
+<b class="nc">&nbsp;			char c = Character.toLowerCase(elements.charAt(element, index++));</b>
+<b class="nc">&nbsp;			if (ElementsParser.isAlphaNumeric(c)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		while (index &lt; length);</b>
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean remainderIsDashes(Elements elements, int element, int index) {
+<b class="nc">&nbsp;		if (elements.getType(element).isIndexed()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int length = elements.getLength(element);</b>
+&nbsp;		do {
+<b class="nc">&nbsp;			char c = elements.charAt(element, index++);</b>
+<b class="nc">&nbsp;			if (c != &#39;-&#39;) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		while (index &lt; length);</b>
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="fc">&nbsp;		int hashCode = this.hashCode;</b>
+<b class="fc">&nbsp;		Elements elements = this.elements;</b>
+<b class="fc">&nbsp;		if (hashCode == 0 &amp;&amp; elements.getSize() != 0) {</b>
+<b class="fc">&nbsp;			for (int elementIndex = 0; elementIndex &lt; elements.getSize(); elementIndex++) {</b>
+<b class="fc">&nbsp;				int elementHashCode = 0;</b>
+<b class="fc">&nbsp;				boolean indexed = elements.getType(elementIndex).isIndexed();</b>
+<b class="fc">&nbsp;				int length = elements.getLength(elementIndex);</b>
+<b class="fc">&nbsp;				for (int i = 0; i &lt; length; i++) {</b>
+<b class="fc">&nbsp;					char ch = elements.charAt(elementIndex, i);</b>
+<b class="fc">&nbsp;					if (!indexed) {</b>
+<b class="fc">&nbsp;						ch = Character.toLowerCase(ch);</b>
+&nbsp;					}
+<b class="fc">&nbsp;					if (ElementsParser.isAlphaNumeric(ch)) {</b>
+<b class="fc">&nbsp;						elementHashCode = 31 * elementHashCode + ch;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="fc">&nbsp;				hashCode = 31 * hashCode + elementHashCode;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			this.hashCode = hashCode;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return hashCode;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="fc">&nbsp;		if (this.string == null) {</b>
+<b class="fc">&nbsp;			this.string = buildToString();</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return this.string;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String buildToString() {
+<b class="fc">&nbsp;		if (this.elements.canShortcutWithSource(ElementType.UNIFORM, ElementType.DASHED)) {</b>
+<b class="fc">&nbsp;			return this.elements.getSource().toString();</b>
+&nbsp;		}
+<b class="fc">&nbsp;		int elements = getNumberOfElements();</b>
+<b class="fc">&nbsp;		StringBuilder result = new StringBuilder(elements * 8);</b>
+<b class="fc">&nbsp;		for (int i = 0; i &lt; elements; i++) {</b>
+<b class="fc">&nbsp;			boolean indexed = isIndexed(i);</b>
+<b class="fc">&nbsp;			if (!result.isEmpty() &amp;&amp; !indexed) {</b>
+<b class="nc">&nbsp;				result.append(&#39;.&#39;);</b>
+&nbsp;			}
+<b class="fc">&nbsp;			if (indexed) {</b>
+<b class="nc">&nbsp;				result.append(&#39;[&#39;);</b>
+<b class="nc">&nbsp;				result.append(getElement(i, Form.ORIGINAL));</b>
+<b class="nc">&nbsp;				result.append(&#39;]&#39;);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="fc">&nbsp;				result.append(getElement(i, Form.DASHED));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="fc">&nbsp;		return result.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if the given name is valid. If this method returns {@code true} then the
+&nbsp;	 * name may be used with {@link #of(CharSequence)} without throwing an exception.
+&nbsp;	 * @param name the name to test
+&nbsp;	 * @return {@code true} if the name is valid
+&nbsp;	 */
+&nbsp;	public static boolean isValid(CharSequence name) {
+<b class="fc">&nbsp;		return of(name, true) != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link ConfigurationPropertyName} for the specified string.
+&nbsp;	 * @param name the source name
+&nbsp;	 * @return a {@link ConfigurationPropertyName} instance
+&nbsp;	 * @throws InvalidConfigurationPropertyNameException if the name is not valid
+&nbsp;	 */
+&nbsp;	public static ConfigurationPropertyName of(CharSequence name) {
+<b class="fc">&nbsp;		return of(name, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link ConfigurationPropertyName} for the specified string or {@code null}
+&nbsp;	 * if the name is not valid.
+&nbsp;	 * @param name the source name
+&nbsp;	 * @return a {@link ConfigurationPropertyName} instance
+&nbsp;	 * @since 2.3.1
+&nbsp;	 */
+&nbsp;	public static ConfigurationPropertyName ofIfValid(CharSequence name) {
+<b class="fc">&nbsp;		return of(name, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link ConfigurationPropertyName} for the specified string.
+&nbsp;	 * @param name the source name
+&nbsp;	 * @param returnNullIfInvalid if null should be returned if the name is not valid
+&nbsp;	 * @return a {@link ConfigurationPropertyName} instance
+&nbsp;	 * @throws InvalidConfigurationPropertyNameException if the name is not valid and
+&nbsp;	 * {@code returnNullIfInvalid} is {@code false}
+&nbsp;	 */
+&nbsp;	static ConfigurationPropertyName of(CharSequence name, boolean returnNullIfInvalid) {
+<b class="fc">&nbsp;		Elements elements = elementsOf(name, returnNullIfInvalid);</b>
+<b class="fc">&nbsp;		return (elements != null) ? new ConfigurationPropertyName(elements) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Elements probablySingleElementOf(CharSequence name) {
+<b class="nc">&nbsp;		return elementsOf(name, false, 1);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Elements elementsOf(CharSequence name, boolean returnNullIfInvalid) {
+<b class="fc">&nbsp;		return elementsOf(name, returnNullIfInvalid, ElementsParser.DEFAULT_CAPACITY);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Elements elementsOf(CharSequence name, boolean returnNullIfInvalid, int parserCapacity) {
+<b class="fc">&nbsp;		if (name == null) {</b>
+<b class="fc">&nbsp;			Assert.isTrue(returnNullIfInvalid, &quot;Name must not be null&quot;);</b>
+<b class="fc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (name.isEmpty()) {</b>
+<b class="nc">&nbsp;			return Elements.EMPTY;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (name.charAt(0) == &#39;.&#39; || name.charAt(name.length() - 1) == &#39;.&#39;) {</b>
+<b class="nc">&nbsp;			if (returnNullIfInvalid) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new InvalidConfigurationPropertyNameException(name, Collections.singletonList(&#39;.&#39;));</b>
+&nbsp;		}
+<b class="fc">&nbsp;		Elements elements = new ElementsParser(name, &#39;.&#39;, parserCapacity).parse();</b>
+<b class="fc">&nbsp;		for (int i = 0; i &lt; elements.getSize(); i++) {</b>
+<b class="fc">&nbsp;			if (elements.getType(i) == ElementType.NON_UNIFORM) {</b>
+<b class="fc">&nbsp;				if (returnNullIfInvalid) {</b>
+<b class="fc">&nbsp;					return null;</b>
+&nbsp;				}
+<b class="fc">&nbsp;				throw new InvalidConfigurationPropertyNameException(name, getInvalidChars(elements, i));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="fc">&nbsp;		return elements;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;Character&gt; getInvalidChars(Elements elements, int index) {
+<b class="fc">&nbsp;		List&lt;Character&gt; invalidChars = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;		for (int charIndex = 0; charIndex &lt; elements.getLength(index); charIndex++) {</b>
+<b class="fc">&nbsp;			char ch = elements.charAt(index, charIndex);</b>
+<b class="fc">&nbsp;			if (!ElementsParser.isValidChar(ch, charIndex)) {</b>
+<b class="fc">&nbsp;				invalidChars.add(ch);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="fc">&nbsp;		return invalidChars;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link ConfigurationPropertyName} by adapting the given source. See
+&nbsp;	 * {@link #adapt(CharSequence, char, Function)} for details.
+&nbsp;	 * @param name the name to parse
+&nbsp;	 * @param separator the separator used to split the name
+&nbsp;	 * @return a {@link ConfigurationPropertyName}
+&nbsp;	 */
+&nbsp;	public static ConfigurationPropertyName adapt(CharSequence name, char separator) {
+<b class="fc">&nbsp;		return adapt(name, separator, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link ConfigurationPropertyName} by adapting the given source. The name
+&nbsp;	 * is split into elements around the given {@code separator}. This method is more
+&nbsp;	 * lenient than {@link #of} in that it allows mixed case names and &#39;{@code _}&#39;
+&nbsp;	 * characters. Other invalid characters are stripped out during parsing.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * The {@code elementValueProcessor} function may be used if additional processing is
+&nbsp;	 * required on the extracted element values.
+&nbsp;	 * @param name the name to parse
+&nbsp;	 * @param separator the separator used to split the name
+&nbsp;	 * @param elementValueProcessor a function to process element values
+&nbsp;	 * @return a {@link ConfigurationPropertyName}
+&nbsp;	 */
+&nbsp;	static ConfigurationPropertyName adapt(CharSequence name, char separator,
+&nbsp;			Function&lt;CharSequence, CharSequence&gt; elementValueProcessor) {
+<b class="fc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="fc">&nbsp;		if (name.isEmpty()) {</b>
+<b class="nc">&nbsp;			return EMPTY;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		Elements elements = new ElementsParser(name, separator).parse(elementValueProcessor);</b>
+<b class="fc">&nbsp;		if (elements.getSize() == 0) {</b>
+<b class="nc">&nbsp;			return EMPTY;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return new ConfigurationPropertyName(elements);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The various forms that a non-indexed element value can take.
+&nbsp;	 */
+<b class="fc">&nbsp;	public enum Form {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The original form as specified when the name was created or adapted. For
+&nbsp;		 * example:
+&nbsp;		 * &lt;ul&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code foo-bar}&quot; = &quot;{@code foo-bar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code fooBar}&quot; = &quot;{@code fooBar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code foo_bar}&quot; = &quot;{@code foo_bar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code [Foo.bar]}&quot; = &quot;{@code Foo.bar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;/ul&gt;
+&nbsp;		 */
+<b class="fc">&nbsp;		ORIGINAL,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The dashed configuration form (used for toString; lower-case with only
+&nbsp;		 * alphanumeric characters and dashes).
+&nbsp;		 * &lt;ul&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code foo-bar}&quot; = &quot;{@code foo-bar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code fooBar}&quot; = &quot;{@code foobar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code foo_bar}&quot; = &quot;{@code foobar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code [Foo.bar]}&quot; = &quot;{@code Foo.bar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;/ul&gt;
+&nbsp;		 */
+<b class="fc">&nbsp;		DASHED,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The uniform configuration form (used for equals/hashCode; lower-case with only
+&nbsp;		 * alphanumeric characters).
+&nbsp;		 * &lt;ul&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code foo-bar}&quot; = &quot;{@code foobar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code fooBar}&quot; = &quot;{@code foobar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code foo_bar}&quot; = &quot;{@code foobar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;li&gt;&quot;{@code [Foo.bar]}&quot; = &quot;{@code Foo.bar}&quot;&lt;/li&gt;
+&nbsp;		 * &lt;/ul&gt;
+&nbsp;		 */
+<b class="fc">&nbsp;		UNIFORM</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Allows access to the individual elements that make up the name. We store the
+&nbsp;	 * indexes in arrays rather than a list of object in order to conserve memory.
+&nbsp;	 */
+&nbsp;	private static class Elements {
+&nbsp;
+<b class="fc">&nbsp;		private static final int[] NO_POSITION = {};</b>
+&nbsp;
+<b class="fc">&nbsp;		private static final ElementType[] NO_TYPE = {};</b>
+&nbsp;
+<b class="fc">&nbsp;		public static final Elements EMPTY = new Elements(&quot;&quot;, 0, NO_POSITION, NO_POSITION, NO_TYPE, null);</b>
+&nbsp;
+&nbsp;		private final CharSequence source;
+&nbsp;
+&nbsp;		private final int size;
+&nbsp;
+&nbsp;		private final int[] start;
+&nbsp;
+&nbsp;		private final int[] end;
+&nbsp;
+&nbsp;		private final ElementType[] type;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Contains any resolved elements or can be {@code null} if there aren&#39;t any.
+&nbsp;		 * Resolved elements allow us to modify the element values in some way (or example
+&nbsp;		 * when adapting with a mapping function, or when append has been called). Note
+&nbsp;		 * that this array is not used as a cache, in fact, when it&#39;s not null then
+&nbsp;		 * {@link #canShortcutWithSource} will always return false which may hurt
+&nbsp;		 * performance.
+&nbsp;		 */
+&nbsp;		private final CharSequence[] resolved;
+&nbsp;
+&nbsp;		Elements(CharSequence source, int size, int[] start, int[] end, ElementType[] type, CharSequence[] resolved) {
+<b class="fc">&nbsp;			super();</b>
+<b class="fc">&nbsp;			this.source = source;</b>
+<b class="fc">&nbsp;			this.size = size;</b>
+<b class="fc">&nbsp;			this.start = start;</b>
+<b class="fc">&nbsp;			this.end = end;</b>
+<b class="fc">&nbsp;			this.type = type;</b>
+<b class="fc">&nbsp;			this.resolved = resolved;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Elements append(Elements additional) {
+<b class="nc">&nbsp;			int size = this.size + additional.size;</b>
+<b class="nc">&nbsp;			ElementType[] type = new ElementType[size];</b>
+<b class="nc">&nbsp;			System.arraycopy(this.type, 0, type, 0, this.size);</b>
+<b class="nc">&nbsp;			System.arraycopy(additional.type, 0, type, this.size, additional.size);</b>
+<b class="nc">&nbsp;			CharSequence[] resolved = newResolved(size);</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; additional.size; i++) {</b>
+<b class="nc">&nbsp;				resolved[this.size + i] = additional.get(i);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new Elements(this.source, size, this.start, this.end, type, resolved);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Elements chop(int size) {
+<b class="nc">&nbsp;			CharSequence[] resolved = newResolved(size);</b>
+<b class="nc">&nbsp;			return new Elements(this.source, size, this.start, this.end, this.type, resolved);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Elements subElements(int offset) {
+<b class="nc">&nbsp;			int size = this.size - offset;</b>
+<b class="nc">&nbsp;			CharSequence[] resolved = newResolved(size);</b>
+<b class="nc">&nbsp;			int[] start = new int[size];</b>
+<b class="nc">&nbsp;			System.arraycopy(this.start, offset, start, 0, size);</b>
+<b class="nc">&nbsp;			int[] end = new int[size];</b>
+<b class="nc">&nbsp;			System.arraycopy(this.end, offset, end, 0, size);</b>
+<b class="nc">&nbsp;			ElementType[] type = new ElementType[size];</b>
+<b class="nc">&nbsp;			System.arraycopy(this.type, offset, type, 0, size);</b>
+<b class="nc">&nbsp;			return new Elements(this.source, size, start, end, type, resolved);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private CharSequence[] newResolved(int size) {
+<b class="nc">&nbsp;			CharSequence[] resolved = new CharSequence[size];</b>
+<b class="nc">&nbsp;			if (this.resolved != null) {</b>
+<b class="nc">&nbsp;				System.arraycopy(this.resolved, 0, resolved, 0, Math.min(size, this.size));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return resolved;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		int getSize() {
+<b class="fc">&nbsp;			return this.size;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		CharSequence get(int index) {
+<b class="fc">&nbsp;			if (this.resolved != null &amp;&amp; this.resolved[index] != null) {</b>
+<b class="nc">&nbsp;				return this.resolved[index];</b>
+&nbsp;			}
+<b class="fc">&nbsp;			int start = this.start[index];</b>
+<b class="fc">&nbsp;			int end = this.end[index];</b>
+<b class="fc">&nbsp;			return this.source.subSequence(start, end);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		int getLength(int index) {
+<b class="fc">&nbsp;			if (this.resolved != null &amp;&amp; this.resolved[index] != null) {</b>
+<b class="nc">&nbsp;				return this.resolved[index].length();</b>
+&nbsp;			}
+<b class="fc">&nbsp;			int start = this.start[index];</b>
+<b class="fc">&nbsp;			int end = this.end[index];</b>
+<b class="fc">&nbsp;			return end - start;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		char charAt(int index, int charIndex) {
+<b class="fc">&nbsp;			if (this.resolved != null &amp;&amp; this.resolved[index] != null) {</b>
+<b class="nc">&nbsp;				return this.resolved[index].charAt(charIndex);</b>
+&nbsp;			}
+<b class="fc">&nbsp;			int start = this.start[index];</b>
+<b class="fc">&nbsp;			return this.source.charAt(start + charIndex);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ElementType getType(int index) {
+<b class="fc">&nbsp;			return this.type[index];</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		CharSequence getSource() {
+<b class="fc">&nbsp;			return this.source;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns if the element source can be used as a shortcut for an operation such
+&nbsp;		 * as {@code equals} or {@code toString}.
+&nbsp;		 * @param requiredType the required type
+&nbsp;		 * @return {@code true} if all elements match at least one of the types
+&nbsp;		 */
+&nbsp;		boolean canShortcutWithSource(ElementType requiredType) {
+<b class="nc">&nbsp;			return canShortcutWithSource(requiredType, requiredType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns if the element source can be used as a shortcut for an operation such
+&nbsp;		 * as {@code equals} or {@code toString}.
+&nbsp;		 * @param requiredType the required type
+&nbsp;		 * @param alternativeType and alternative required type
+&nbsp;		 * @return {@code true} if all elements match at least one of the types
+&nbsp;		 */
+&nbsp;		boolean canShortcutWithSource(ElementType requiredType, ElementType alternativeType) {
+<b class="fc">&nbsp;			if (this.resolved != null) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			for (int i = 0; i &lt; this.size; i++) {</b>
+<b class="fc">&nbsp;				ElementType type = this.type[i];</b>
+<b class="fc">&nbsp;				if (type != requiredType &amp;&amp; type != alternativeType) {</b>
+<b class="fc">&nbsp;					return false;</b>
+&nbsp;				}
+<b class="fc">&nbsp;				if (i &gt; 0 &amp;&amp; this.end[i - 1] + 1 != this.start[i]) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="fc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Main parsing logic used to convert a {@link CharSequence} to {@link Elements}.
+&nbsp;	 */
+&nbsp;	private static class ElementsParser {
+&nbsp;
+&nbsp;		private static final int DEFAULT_CAPACITY = 6;
+&nbsp;
+&nbsp;		private final CharSequence source;
+&nbsp;
+&nbsp;		private final char separator;
+&nbsp;
+&nbsp;		private int size;
+&nbsp;
+&nbsp;		private int[] start;
+&nbsp;
+&nbsp;		private int[] end;
+&nbsp;
+&nbsp;		private ElementType[] type;
+&nbsp;
+&nbsp;		private CharSequence[] resolved;
+&nbsp;
+&nbsp;		ElementsParser(CharSequence source, char separator) {
+<b class="fc">&nbsp;			this(source, separator, DEFAULT_CAPACITY);</b>
+&nbsp;		}
+&nbsp;
+<b class="fc">&nbsp;		ElementsParser(CharSequence source, char separator, int capacity) {</b>
+<b class="fc">&nbsp;			this.source = source;</b>
+<b class="fc">&nbsp;			this.separator = separator;</b>
+<b class="fc">&nbsp;			this.start = new int[capacity];</b>
+<b class="fc">&nbsp;			this.end = new int[capacity];</b>
+<b class="fc">&nbsp;			this.type = new ElementType[capacity];</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Elements parse() {
+<b class="fc">&nbsp;			return parse(null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Elements parse(Function&lt;CharSequence, CharSequence&gt; valueProcessor) {
+<b class="fc">&nbsp;			int length = this.source.length();</b>
+<b class="fc">&nbsp;			int openBracketCount = 0;</b>
+<b class="fc">&nbsp;			int start = 0;</b>
+<b class="fc">&nbsp;			ElementType type = ElementType.EMPTY;</b>
+<b class="fc">&nbsp;			for (int i = 0; i &lt; length; i++) {</b>
+<b class="fc">&nbsp;				char ch = this.source.charAt(i);</b>
+<b class="fc">&nbsp;				if (ch == &#39;[&#39;) {</b>
+<b class="fc">&nbsp;					if (openBracketCount == 0) {</b>
+<b class="fc">&nbsp;						add(start, i, type, valueProcessor);</b>
+<b class="fc">&nbsp;						start = i + 1;</b>
+<b class="fc">&nbsp;						type = ElementType.NUMERICALLY_INDEXED;</b>
+&nbsp;					}
+<b class="fc">&nbsp;					openBracketCount++;</b>
+&nbsp;				}
+<b class="fc">&nbsp;				else if (ch == &#39;]&#39;) {</b>
+<b class="fc">&nbsp;					openBracketCount--;</b>
+<b class="fc">&nbsp;					if (openBracketCount == 0) {</b>
+<b class="fc">&nbsp;						add(start, i, type, valueProcessor);</b>
+<b class="fc">&nbsp;						start = i + 1;</b>
+<b class="fc">&nbsp;						type = ElementType.EMPTY;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="fc">&nbsp;				else if (!type.isIndexed() &amp;&amp; ch == this.separator) {</b>
+<b class="fc">&nbsp;					add(start, i, type, valueProcessor);</b>
+<b class="fc">&nbsp;					start = i + 1;</b>
+<b class="fc">&nbsp;					type = ElementType.EMPTY;</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="fc">&nbsp;					type = updateType(type, ch, i - start);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="fc">&nbsp;			if (openBracketCount != 0) {</b>
+<b class="nc">&nbsp;				type = ElementType.NON_UNIFORM;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			add(start, length, type, valueProcessor);</b>
+<b class="fc">&nbsp;			return new Elements(this.source, this.size, this.start, this.end, this.type, this.resolved);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ElementType updateType(ElementType existingType, char ch, int index) {
+<b class="fc">&nbsp;			if (existingType.isIndexed()) {</b>
+<b class="fc">&nbsp;				if (existingType == ElementType.NUMERICALLY_INDEXED &amp;&amp; !isNumeric(ch)) {</b>
+<b class="nc">&nbsp;					return ElementType.INDEXED;</b>
+&nbsp;				}
+<b class="fc">&nbsp;				return existingType;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			if (existingType == ElementType.EMPTY &amp;&amp; isValidChar(ch, index)) {</b>
+<b class="fc">&nbsp;				return (index == 0) ? ElementType.UNIFORM : ElementType.NON_UNIFORM;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			if (existingType == ElementType.UNIFORM &amp;&amp; ch == &#39;-&#39;) {</b>
+<b class="fc">&nbsp;				return ElementType.DASHED;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			if (!isValidChar(ch, index)) {</b>
+<b class="fc">&nbsp;				if (existingType == ElementType.EMPTY &amp;&amp; !isValidChar(Character.toLowerCase(ch), index)) {</b>
+<b class="nc">&nbsp;					return ElementType.EMPTY;</b>
+&nbsp;				}
+<b class="fc">&nbsp;				return ElementType.NON_UNIFORM;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			return existingType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void add(int start, int end, ElementType type, Function&lt;CharSequence, CharSequence&gt; valueProcessor) {
+<b class="fc">&nbsp;			if ((end - start) &lt; 1 || type == ElementType.EMPTY) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="fc">&nbsp;			if (this.start.length == this.size) {</b>
+<b class="nc">&nbsp;				this.start = expand(this.start);</b>
+<b class="nc">&nbsp;				this.end = expand(this.end);</b>
+<b class="nc">&nbsp;				this.type = expand(this.type);</b>
+<b class="nc">&nbsp;				this.resolved = expand(this.resolved);</b>
+&nbsp;			}
+<b class="fc">&nbsp;			if (valueProcessor != null) {</b>
+<b class="fc">&nbsp;				if (this.resolved == null) {</b>
+<b class="fc">&nbsp;					this.resolved = new CharSequence[this.start.length];</b>
+&nbsp;				}
+<b class="fc">&nbsp;				CharSequence resolved = valueProcessor.apply(this.source.subSequence(start, end));</b>
+<b class="fc">&nbsp;				Elements resolvedElements = new ElementsParser(resolved, &#39;.&#39;).parse();</b>
+<b class="nc">&nbsp;				Assert.state(resolvedElements.getSize() == 1, &quot;Resolved element must not contain multiple elements&quot;);</b>
+<b class="nc">&nbsp;				this.resolved[this.size] = resolvedElements.get(0);</b>
+<b class="nc">&nbsp;				type = resolvedElements.getType(0);</b>
+&nbsp;			}
+<b class="fc">&nbsp;			this.start[this.size] = start;</b>
+<b class="fc">&nbsp;			this.end[this.size] = end;</b>
+<b class="fc">&nbsp;			this.type[this.size] = type;</b>
+<b class="fc">&nbsp;			this.size++;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int[] expand(int[] src) {
+<b class="nc">&nbsp;			int[] dest = new int[src.length + DEFAULT_CAPACITY];</b>
+<b class="nc">&nbsp;			System.arraycopy(src, 0, dest, 0, src.length);</b>
+<b class="nc">&nbsp;			return dest;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ElementType[] expand(ElementType[] src) {
+<b class="nc">&nbsp;			ElementType[] dest = new ElementType[src.length + DEFAULT_CAPACITY];</b>
+<b class="nc">&nbsp;			System.arraycopy(src, 0, dest, 0, src.length);</b>
+<b class="nc">&nbsp;			return dest;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private CharSequence[] expand(CharSequence[] src) {
+<b class="nc">&nbsp;			if (src == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			CharSequence[] dest = new CharSequence[src.length + DEFAULT_CAPACITY];</b>
+<b class="nc">&nbsp;			System.arraycopy(src, 0, dest, 0, src.length);</b>
+<b class="nc">&nbsp;			return dest;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static boolean isValidChar(char ch, int index) {
+<b class="fc">&nbsp;			return isAlpha(ch) || isNumeric(ch) || (index != 0 &amp;&amp; ch == &#39;-&#39;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static boolean isAlphaNumeric(char ch) {
+<b class="fc">&nbsp;			return isAlpha(ch) || isNumeric(ch);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isAlpha(char ch) {
+<b class="fc">&nbsp;			return ch &gt;= &#39;a&#39; &amp;&amp; ch &lt;= &#39;z&#39;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isNumeric(char ch) {
+<b class="fc">&nbsp;			return ch &gt;= &#39;0&#39; &amp;&amp; ch &lt;= &#39;9&#39;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The various types of element that we can detect.
+&nbsp;	 */
+<b class="fc">&nbsp;	private enum ElementType {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The element is logically empty (contains no valid chars).
+&nbsp;		 */
+<b class="fc">&nbsp;		EMPTY(false),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The element is a uniform name (a-z, 0-9, no dashes, lowercase).
+&nbsp;		 */
+<b class="fc">&nbsp;		UNIFORM(false),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The element is almost uniform, but it contains (but does not start with) at
+&nbsp;		 * least one dash.
+&nbsp;		 */
+<b class="fc">&nbsp;		DASHED(false),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The element contains non-uniform characters and will need to be converted.
+&nbsp;		 */
+<b class="fc">&nbsp;		NON_UNIFORM(false),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The element is non-numerically indexed.
+&nbsp;		 */
+<b class="fc">&nbsp;		INDEXED(true),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The element is numerically indexed.
+&nbsp;		 */
+<b class="fc">&nbsp;		NUMERICALLY_INDEXED(true);</b>
+&nbsp;
+&nbsp;		private final boolean indexed;
+&nbsp;
+<b class="fc">&nbsp;		ElementType(boolean indexed) {</b>
+<b class="fc">&nbsp;			this.indexed = indexed;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isIndexed() {
+<b class="fc">&nbsp;			return this.indexed;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean allowsFastEqualityCheck() {
+<b class="nc">&nbsp;			return this == UNIFORM || this == NUMERICALLY_INDEXED;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean allowsDashIgnoringEqualityCheck() {
+<b class="nc">&nbsp;			return allowsFastEqualityCheck() || this == DASHED;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Predicate used to filter element chars.
+&nbsp;	 */
+&nbsp;	private interface ElementCharPredicate {
+&nbsp;
+&nbsp;		boolean test(char ch, int index);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

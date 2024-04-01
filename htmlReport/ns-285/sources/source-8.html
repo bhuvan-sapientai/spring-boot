@@ -1,0 +1,385 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DockerSpec</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.tasks.bundling</a>
+</div>
+
+<h1>Coverage Summary for Class: DockerSpec (org.springframework.boot.gradle.tasks.bundling)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DockerSpec</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DockerSpec$DockerRegistrySpec</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.tasks.bundling;
+&nbsp;
+&nbsp;import javax.inject.Inject;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.GradleException;
+&nbsp;import org.gradle.api.model.ObjectFactory;
+&nbsp;import org.gradle.api.provider.Property;
+&nbsp;import org.gradle.api.tasks.Input;
+&nbsp;import org.gradle.api.tasks.Nested;
+&nbsp;import org.gradle.api.tasks.Optional;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.configuration.DockerConfiguration;
+&nbsp;
+&nbsp;/**
+&nbsp; * Encapsulates Docker configuration options.
+&nbsp; *
+&nbsp; * @author Wei Jiang
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.4.0
+&nbsp; */
+&nbsp;public abstract class DockerSpec {
+&nbsp;
+&nbsp;	private final DockerRegistrySpec builderRegistry;
+&nbsp;
+&nbsp;	private final DockerRegistrySpec publishRegistry;
+&nbsp;
+&nbsp;	@Inject
+<b class="nc">&nbsp;	public DockerSpec(ObjectFactory objects) {</b>
+<b class="nc">&nbsp;		this.builderRegistry = objects.newInstance(DockerRegistrySpec.class);</b>
+<b class="nc">&nbsp;		this.publishRegistry = objects.newInstance(DockerRegistrySpec.class);</b>
+<b class="nc">&nbsp;		getBindHostToBuilder().convention(false);</b>
+<b class="nc">&nbsp;		getTlsVerify().convention(false);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	DockerSpec(DockerRegistrySpec builderRegistry, DockerRegistrySpec publishRegistry) {</b>
+<b class="nc">&nbsp;		this.builderRegistry = builderRegistry;</b>
+<b class="nc">&nbsp;		this.publishRegistry = publishRegistry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	public abstract Property&lt;String&gt; getContext();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	public abstract Property&lt;String&gt; getHost();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	public abstract Property&lt;Boolean&gt; getTlsVerify();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	public abstract Property&lt;String&gt; getCertPath();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	public abstract Property&lt;Boolean&gt; getBindHostToBuilder();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link DockerRegistrySpec} that configures authentication to the
+&nbsp;	 * builder registry.
+&nbsp;	 * @return the registry spec
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	public DockerRegistrySpec getBuilderRegistry() {
+<b class="nc">&nbsp;		return this.builderRegistry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Customizes the {@link DockerRegistrySpec} that configures authentication to the
+&nbsp;	 * builder registry.
+&nbsp;	 * @param action the action to apply
+&nbsp;	 */
+&nbsp;	public void builderRegistry(Action&lt;DockerRegistrySpec&gt; action) {
+<b class="nc">&nbsp;		action.execute(this.builderRegistry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link DockerRegistrySpec} that configures authentication to the
+&nbsp;	 * publishing registry.
+&nbsp;	 * @return the registry spec
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	public DockerRegistrySpec getPublishRegistry() {
+<b class="nc">&nbsp;		return this.publishRegistry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Customizes the {@link DockerRegistrySpec} that configures authentication to the
+&nbsp;	 * publishing registry.
+&nbsp;	 * @param action the action to apply
+&nbsp;	 */
+&nbsp;	public void publishRegistry(Action&lt;DockerRegistrySpec&gt; action) {
+<b class="nc">&nbsp;		action.execute(this.publishRegistry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns this configuration as a {@link DockerConfiguration} instance. This method
+&nbsp;	 * should only be called when the configuration is complete and will no longer be
+&nbsp;	 * changed.
+&nbsp;	 * @return the Docker configuration
+&nbsp;	 */
+&nbsp;	DockerConfiguration asDockerConfiguration() {
+<b class="nc">&nbsp;		DockerConfiguration dockerConfiguration = new DockerConfiguration();</b>
+<b class="nc">&nbsp;		dockerConfiguration = customizeHost(dockerConfiguration);</b>
+<b class="nc">&nbsp;		dockerConfiguration = dockerConfiguration.withBindHostToBuilder(getBindHostToBuilder().get());</b>
+<b class="nc">&nbsp;		dockerConfiguration = customizeBuilderAuthentication(dockerConfiguration);</b>
+<b class="nc">&nbsp;		dockerConfiguration = customizePublishAuthentication(dockerConfiguration);</b>
+<b class="nc">&nbsp;		return dockerConfiguration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private DockerConfiguration customizeHost(DockerConfiguration dockerConfiguration) {
+<b class="nc">&nbsp;		String context = getContext().getOrNull();</b>
+<b class="nc">&nbsp;		String host = getHost().getOrNull();</b>
+<b class="nc">&nbsp;		if (context != null &amp;&amp; host != null) {</b>
+<b class="nc">&nbsp;			throw new GradleException(</b>
+&nbsp;					&quot;Invalid Docker configuration, either context or host can be provided but not both&quot;);
+&nbsp;		}
+<b class="nc">&nbsp;		if (context != null) {</b>
+<b class="nc">&nbsp;			return dockerConfiguration.withContext(context);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (host != null) {</b>
+<b class="nc">&nbsp;			return dockerConfiguration.withHost(host, getTlsVerify().get(), getCertPath().getOrNull());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return dockerConfiguration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private DockerConfiguration customizeBuilderAuthentication(DockerConfiguration dockerConfiguration) {
+<b class="nc">&nbsp;		if (this.builderRegistry == null || this.builderRegistry.hasEmptyAuth()) {</b>
+<b class="nc">&nbsp;			return dockerConfiguration;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.builderRegistry.hasTokenAuth() &amp;&amp; !this.builderRegistry.hasUserAuth()) {</b>
+<b class="nc">&nbsp;			return dockerConfiguration.withBuilderRegistryTokenAuthentication(this.builderRegistry.getToken().get());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.builderRegistry.hasUserAuth() &amp;&amp; !this.builderRegistry.hasTokenAuth()) {</b>
+<b class="nc">&nbsp;			return dockerConfiguration.withBuilderRegistryUserAuthentication(this.builderRegistry.getUsername().get(),</b>
+<b class="nc">&nbsp;					this.builderRegistry.getPassword().get(), this.builderRegistry.getUrl().getOrNull(),</b>
+<b class="nc">&nbsp;					this.builderRegistry.getEmail().getOrNull());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new GradleException(</b>
+&nbsp;				&quot;Invalid Docker builder registry configuration, either token or username/password must be provided&quot;);
+&nbsp;	}
+&nbsp;
+&nbsp;	private DockerConfiguration customizePublishAuthentication(DockerConfiguration dockerConfiguration) {
+<b class="nc">&nbsp;		if (this.publishRegistry == null || this.publishRegistry.hasEmptyAuth()) {</b>
+<b class="nc">&nbsp;			return dockerConfiguration.withEmptyPublishRegistryAuthentication();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.publishRegistry.hasTokenAuth() &amp;&amp; !this.publishRegistry.hasUserAuth()) {</b>
+<b class="nc">&nbsp;			return dockerConfiguration.withPublishRegistryTokenAuthentication(this.publishRegistry.getToken().get());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.publishRegistry.hasUserAuth() &amp;&amp; !this.publishRegistry.hasTokenAuth()) {</b>
+<b class="nc">&nbsp;			return dockerConfiguration.withPublishRegistryUserAuthentication(this.publishRegistry.getUsername().get(),</b>
+<b class="nc">&nbsp;					this.publishRegistry.getPassword().get(), this.publishRegistry.getUrl().getOrNull(),</b>
+<b class="nc">&nbsp;					this.publishRegistry.getEmail().getOrNull());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new GradleException(</b>
+&nbsp;				&quot;Invalid Docker publish registry configuration, either token or username/password must be provided&quot;);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encapsulates Docker registry authentication configuration options.
+&nbsp;	 */
+<b class="nc">&nbsp;	public abstract static class DockerRegistrySpec {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns the username to use when authenticating to the Docker registry.
+&nbsp;		 * @return the registry username
+&nbsp;		 */
+&nbsp;		@Input
+&nbsp;		@Optional
+&nbsp;		public abstract Property&lt;String&gt; getUsername();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns the password to use when authenticating to the Docker registry.
+&nbsp;		 * @return the registry password
+&nbsp;		 */
+&nbsp;		@Input
+&nbsp;		@Optional
+&nbsp;		public abstract Property&lt;String&gt; getPassword();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns the Docker registry URL.
+&nbsp;		 * @return the registry URL
+&nbsp;		 */
+&nbsp;		@Input
+&nbsp;		@Optional
+&nbsp;		public abstract Property&lt;String&gt; getUrl();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns the email address associated with the Docker registry username.
+&nbsp;		 * @return the registry email address
+&nbsp;		 */
+&nbsp;		@Input
+&nbsp;		@Optional
+&nbsp;		public abstract Property&lt;String&gt; getEmail();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns the identity token to use when authenticating to the Docker registry.
+&nbsp;		 * @return the registry identity token
+&nbsp;		 */
+&nbsp;		@Input
+&nbsp;		@Optional
+&nbsp;		public abstract Property&lt;String&gt; getToken();
+&nbsp;
+&nbsp;		boolean hasEmptyAuth() {
+<b class="nc">&nbsp;			return nonePresent(getUsername(), getPassword(), getUrl(), getEmail(), getToken());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean nonePresent(Property&lt;?&gt;... properties) {
+<b class="nc">&nbsp;			for (Property&lt;?&gt; property : properties) {</b>
+<b class="nc">&nbsp;				if (property.isPresent()) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean hasUserAuth() {
+<b class="nc">&nbsp;			return allPresent(getUsername(), getPassword());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean allPresent(Property&lt;?&gt;... properties) {
+<b class="nc">&nbsp;			for (Property&lt;?&gt; property : properties) {</b>
+<b class="nc">&nbsp;				if (!property.isPresent()) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean hasTokenAuth() {
+<b class="nc">&nbsp;			return getToken().isPresent();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

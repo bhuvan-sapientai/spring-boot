@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NativeImageArgFile</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: NativeImageArgFile (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NativeImageArgFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.util.function.ThrowingConsumer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class to work with the native-image argfile.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Phil Webb
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;public final class NativeImageArgFile {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Location of the argfile.
+&nbsp;	 */
+&nbsp;	public static final String LOCATION = &quot;META-INF/native-image/argfile&quot;;
+&nbsp;
+&nbsp;	private final List&lt;String&gt; excludes;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Constructs a new instance with the given excludes.
+&nbsp;	 * @param excludes dependencies for which the reachability metadata should be excluded
+&nbsp;	 */
+<b class="nc">&nbsp;	public NativeImageArgFile(Collection&lt;String&gt; excludes) {</b>
+<b class="nc">&nbsp;		this.excludes = List.copyOf(excludes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Write the arguments file if it is necessary.
+&nbsp;	 * @param writer consumer that should write the contents
+&nbsp;	 */
+&nbsp;	public void writeIfNecessary(ThrowingConsumer&lt;List&lt;String&gt;&gt; writer) {
+<b class="nc">&nbsp;		if (this.excludes.isEmpty()) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;String&gt; lines = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String exclude : this.excludes) {</b>
+<b class="nc">&nbsp;			int lastSlash = exclude.lastIndexOf(&#39;/&#39;);</b>
+<b class="nc">&nbsp;			String jar = (lastSlash != -1) ? exclude.substring(lastSlash + 1) : exclude;</b>
+<b class="nc">&nbsp;			lines.add(&quot;--exclude-config&quot;);</b>
+<b class="nc">&nbsp;			lines.add(Pattern.quote(jar));</b>
+<b class="nc">&nbsp;			lines.add(&quot;^/META-INF/native-image/.*&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		writer.accept(lines);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

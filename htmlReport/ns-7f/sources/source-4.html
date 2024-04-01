@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReflectiveOperationInvoker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.invoke.reflect</a>
+</div>
+
+<h1>Coverage Summary for Class: ReflectiveOperationInvoker (org.springframework.boot.actuate.endpoint.invoke.reflect)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReflectiveOperationInvoker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.invoke.reflect;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.InvocationContext;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.MissingParametersException;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationInvoker;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.OperationParameter;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.ParameterValueMapper;
+&nbsp;import org.springframework.core.style.ToStringCreator;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@code OperationInvoker} that invokes an operation using reflection.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class ReflectiveOperationInvoker implements OperationInvoker {
+&nbsp;
+&nbsp;	private final Object target;
+&nbsp;
+&nbsp;	private final OperationMethod operationMethod;
+&nbsp;
+&nbsp;	private final ParameterValueMapper parameterValueMapper;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code ReflectiveOperationInvoker} that will invoke the given
+&nbsp;	 * {@code method} on the given {@code target}. The given {@code parameterMapper} will
+&nbsp;	 * be used to map parameters to the required types and the given
+&nbsp;	 * {@code parameterNameMapper} will be used map parameters by name.
+&nbsp;	 * @param target the target of the reflective call
+&nbsp;	 * @param operationMethod the method info
+&nbsp;	 * @param parameterValueMapper the parameter mapper
+&nbsp;	 */
+&nbsp;	public ReflectiveOperationInvoker(Object target, OperationMethod operationMethod,
+<b class="nc">&nbsp;			ParameterValueMapper parameterValueMapper) {</b>
+<b class="nc">&nbsp;		Assert.notNull(target, &quot;Target must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(operationMethod, &quot;OperationMethod must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(parameterValueMapper, &quot;ParameterValueMapper must not be null&quot;);</b>
+<b class="nc">&nbsp;		ReflectionUtils.makeAccessible(operationMethod.getMethod());</b>
+<b class="nc">&nbsp;		this.target = target;</b>
+<b class="nc">&nbsp;		this.operationMethod = operationMethod;</b>
+<b class="nc">&nbsp;		this.parameterValueMapper = parameterValueMapper;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object invoke(InvocationContext context) {
+<b class="nc">&nbsp;		validateRequiredParameters(context);</b>
+<b class="nc">&nbsp;		Method method = this.operationMethod.getMethod();</b>
+<b class="nc">&nbsp;		Object[] resolvedArguments = resolveArguments(context);</b>
+<b class="nc">&nbsp;		ReflectionUtils.makeAccessible(method);</b>
+<b class="nc">&nbsp;		return ReflectionUtils.invokeMethod(method, this.target, resolvedArguments);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void validateRequiredParameters(InvocationContext context) {
+<b class="nc">&nbsp;		Set&lt;OperationParameter&gt; missing = this.operationMethod.getParameters()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.filter((parameter) -&gt; isMissing(context, parameter))</b>
+<b class="nc">&nbsp;			.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;		if (!missing.isEmpty()) {</b>
+<b class="nc">&nbsp;			throw new MissingParametersException(missing);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isMissing(InvocationContext context, OperationParameter parameter) {
+<b class="nc">&nbsp;		if (!parameter.isMandatory()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (context.canResolve(parameter.getType())) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return context.getArguments().get(parameter.getName()) == null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object[] resolveArguments(InvocationContext context) {
+<b class="nc">&nbsp;		return this.operationMethod.getParameters()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map((parameter) -&gt; resolveArgument(parameter, context))</b>
+<b class="nc">&nbsp;			.toArray();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object resolveArgument(OperationParameter parameter, InvocationContext context) {
+<b class="nc">&nbsp;		Object resolvedByType = context.resolveArgument(parameter.getType());</b>
+<b class="nc">&nbsp;		if (resolvedByType != null) {</b>
+<b class="nc">&nbsp;			return resolvedByType;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Object value = context.getArguments().get(parameter.getName());</b>
+<b class="nc">&nbsp;		return this.parameterValueMapper.mapParameterValue(parameter, value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return new ToStringCreator(this).append(&quot;target&quot;, this.target)</b>
+<b class="nc">&nbsp;			.append(&quot;method&quot;, this.operationMethod)</b>
+<b class="nc">&nbsp;			.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

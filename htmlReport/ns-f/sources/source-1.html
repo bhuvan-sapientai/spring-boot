@@ -1,0 +1,345 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CloudFoundryActuatorAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.cloudfoundry.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: CloudFoundryActuatorAutoConfiguration (org.springframework.boot.actuate.autoconfigure.cloudfoundry.servlet)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CloudFoundryActuatorAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CloudFoundryActuatorAutoConfiguration$IgnoredCloudFoundryPathsWebSecurityConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CloudFoundryActuatorAutoConfiguration$IgnoredCloudFoundryPathsWebSecurityCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.cloudfoundry.servlet;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryWebEndpointDiscoverer;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.info.InfoEndpointAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.servlet.ServletManagementContextAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.endpoint.ExposableEndpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.invoke.ParameterValueMapper;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointMapping;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.ExposableWebEndpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.annotation.ServletEndpointsSupplier;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpoint;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpointWebExtension;
+&nbsp;import org.springframework.boot.actuate.info.GitInfoContributor;
+&nbsp;import org.springframework.boot.actuate.info.InfoContributor;
+&nbsp;import org.springframework.boot.actuate.info.InfoEndpoint;
+&nbsp;import org.springframework.boot.actuate.info.InfoPropertiesInfoContributor;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.autoconfigure.security.SecurityProperties;
+&nbsp;import org.springframework.boot.cloud.CloudPlatform;
+&nbsp;import org.springframework.boot.info.GitProperties;
+&nbsp;import org.springframework.boot.web.client.RestTemplateBuilder;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.http.HttpHeaders;
+&nbsp;import org.springframework.http.HttpMethod;
+&nbsp;import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
+&nbsp;import org.springframework.security.config.annotation.web.builders.WebSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+&nbsp;import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+&nbsp;import org.springframework.security.web.util.matcher.OrRequestMatcher;
+&nbsp;import org.springframework.security.web.util.matcher.RequestMatcher;
+&nbsp;import org.springframework.web.cors.CorsConfiguration;
+&nbsp;import org.springframework.web.servlet.DispatcherServlet;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} to expose actuator endpoints for
+&nbsp; * Cloud Foundry to use.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = { ServletManagementContextAutoConfiguration.class, HealthEndpointAutoConfiguration.class,
+&nbsp;		InfoEndpointAutoConfiguration.class })
+&nbsp;@ConditionalOnProperty(prefix = &quot;management.cloudfoundry&quot;, name = &quot;enabled&quot;, matchIfMissing = true)
+&nbsp;@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+&nbsp;@ConditionalOnClass(DispatcherServlet.class)
+&nbsp;@ConditionalOnBean(DispatcherServlet.class)
+&nbsp;@ConditionalOnCloudPlatform(CloudPlatform.CLOUD_FOUNDRY)
+<b class="nc">&nbsp;public class CloudFoundryActuatorAutoConfiguration {</b>
+&nbsp;
+&nbsp;	private static final String BASE_PATH = &quot;/cloudfoundryapplication&quot;;
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	@ConditionalOnAvailableEndpoint
+&nbsp;	@ConditionalOnBean({ HealthEndpoint.class, HealthEndpointWebExtension.class })
+&nbsp;	public CloudFoundryHealthEndpointWebExtension cloudFoundryHealthEndpointWebExtension(
+&nbsp;			HealthEndpointWebExtension healthEndpointWebExtension) {
+<b class="nc">&nbsp;		return new CloudFoundryHealthEndpointWebExtension(healthEndpointWebExtension);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	@ConditionalOnAvailableEndpoint
+&nbsp;	@ConditionalOnBean({ InfoEndpoint.class, GitProperties.class })
+&nbsp;	public CloudFoundryInfoEndpointWebExtension cloudFoundryInfoEndpointWebExtension(GitProperties properties,
+&nbsp;			ObjectProvider&lt;InfoContributor&gt; infoContributors) {
+<b class="nc">&nbsp;		List&lt;InfoContributor&gt; contributors = infoContributors.orderedStream()</b>
+<b class="nc">&nbsp;			.map((infoContributor) -&gt; (infoContributor instanceof GitInfoContributor)</b>
+<b class="nc">&nbsp;					? new GitInfoContributor(properties, InfoPropertiesInfoContributor.Mode.FULL) : infoContributor)</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		return new CloudFoundryInfoEndpointWebExtension(new InfoEndpoint(contributors));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	public CloudFoundryWebEndpointServletHandlerMapping cloudFoundryWebEndpointServletHandlerMapping(
+&nbsp;			ParameterValueMapper parameterMapper, EndpointMediaTypes endpointMediaTypes,
+&nbsp;			RestTemplateBuilder restTemplateBuilder, ServletEndpointsSupplier servletEndpointsSupplier,
+&nbsp;			ControllerEndpointsSupplier controllerEndpointsSupplier, ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		CloudFoundryWebEndpointDiscoverer discoverer = new CloudFoundryWebEndpointDiscoverer(applicationContext,</b>
+<b class="nc">&nbsp;				parameterMapper, endpointMediaTypes, null, Collections.emptyList(), Collections.emptyList());</b>
+<b class="nc">&nbsp;		CloudFoundrySecurityInterceptor securityInterceptor = getSecurityInterceptor(restTemplateBuilder,</b>
+<b class="nc">&nbsp;				applicationContext.getEnvironment());</b>
+<b class="nc">&nbsp;		Collection&lt;ExposableWebEndpoint&gt; webEndpoints = discoverer.getEndpoints();</b>
+<b class="nc">&nbsp;		List&lt;ExposableEndpoint&lt;?&gt;&gt; allEndpoints = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		allEndpoints.addAll(webEndpoints);</b>
+<b class="nc">&nbsp;		allEndpoints.addAll(servletEndpointsSupplier.getEndpoints());</b>
+<b class="nc">&nbsp;		allEndpoints.addAll(controllerEndpointsSupplier.getEndpoints());</b>
+<b class="nc">&nbsp;		return new CloudFoundryWebEndpointServletHandlerMapping(new EndpointMapping(BASE_PATH), webEndpoints,</b>
+<b class="nc">&nbsp;				endpointMediaTypes, getCorsConfiguration(), securityInterceptor, allEndpoints);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CloudFoundrySecurityInterceptor getSecurityInterceptor(RestTemplateBuilder restTemplateBuilder,
+&nbsp;			Environment environment) {
+<b class="nc">&nbsp;		CloudFoundrySecurityService cloudfoundrySecurityService = getCloudFoundrySecurityService(restTemplateBuilder,</b>
+&nbsp;				environment);
+<b class="nc">&nbsp;		TokenValidator tokenValidator = new TokenValidator(cloudfoundrySecurityService);</b>
+<b class="nc">&nbsp;		return new CloudFoundrySecurityInterceptor(tokenValidator, cloudfoundrySecurityService,</b>
+<b class="nc">&nbsp;				environment.getProperty(&quot;vcap.application.application_id&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CloudFoundrySecurityService getCloudFoundrySecurityService(RestTemplateBuilder restTemplateBuilder,
+&nbsp;			Environment environment) {
+<b class="nc">&nbsp;		String cloudControllerUrl = environment.getProperty(&quot;vcap.application.cf_api&quot;);</b>
+<b class="nc">&nbsp;		boolean skipSslValidation = environment.getProperty(&quot;management.cloudfoundry.skip-ssl-validation&quot;,</b>
+<b class="nc">&nbsp;				Boolean.class, false);</b>
+<b class="nc">&nbsp;		return (cloudControllerUrl != null)</b>
+<b class="nc">&nbsp;				? new CloudFoundrySecurityService(restTemplateBuilder, cloudControllerUrl, skipSslValidation) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CorsConfiguration getCorsConfiguration() {
+<b class="nc">&nbsp;		CorsConfiguration corsConfiguration = new CorsConfiguration();</b>
+<b class="nc">&nbsp;		corsConfiguration.addAllowedOrigin(CorsConfiguration.ALL);</b>
+<b class="nc">&nbsp;		corsConfiguration.setAllowedMethods(Arrays.asList(HttpMethod.GET.name(), HttpMethod.POST.name()));</b>
+<b class="nc">&nbsp;		corsConfiguration</b>
+<b class="nc">&nbsp;			.setAllowedHeaders(Arrays.asList(HttpHeaders.AUTHORIZATION, &quot;X-Cf-App-Instance&quot;, HttpHeaders.CONTENT_TYPE));</b>
+<b class="nc">&nbsp;		return corsConfiguration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link WebSecurityConfigurer} to tell Spring Security to ignore cloudfoundry
+&nbsp;	 * specific paths. The Cloud foundry endpoints are protected by their own security
+&nbsp;	 * interceptor.
+&nbsp;	 */
+&nbsp;	@ConditionalOnClass({ WebSecurityCustomizer.class, WebSecurity.class })
+&nbsp;	@Configuration(proxyBeanMethods = false)
+<b class="nc">&nbsp;	public static class IgnoredCloudFoundryPathsWebSecurityConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		IgnoredCloudFoundryPathsWebSecurityCustomizer ignoreCloudFoundryPathsWebSecurityCustomizer(
+&nbsp;				CloudFoundryWebEndpointServletHandlerMapping handlerMapping) {
+<b class="nc">&nbsp;			return new IgnoredCloudFoundryPathsWebSecurityCustomizer(handlerMapping);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Order(SecurityProperties.IGNORED_ORDER)
+&nbsp;	static class IgnoredCloudFoundryPathsWebSecurityCustomizer implements WebSecurityCustomizer {
+&nbsp;
+&nbsp;		private final PathMappedEndpoints pathMappedEndpoints;
+&nbsp;
+<b class="nc">&nbsp;		IgnoredCloudFoundryPathsWebSecurityCustomizer(CloudFoundryWebEndpointServletHandlerMapping handlerMapping) {</b>
+<b class="nc">&nbsp;			this.pathMappedEndpoints = new PathMappedEndpoints(BASE_PATH, handlerMapping::getAllEndpoints);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void customize(WebSecurity web) {
+<b class="nc">&nbsp;			List&lt;RequestMatcher&gt; requestMatchers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			this.pathMappedEndpoints.getAllPaths()</b>
+<b class="nc">&nbsp;				.forEach((path) -&gt; requestMatchers.add(new AntPathRequestMatcher(path + &quot;/**&quot;)));</b>
+<b class="nc">&nbsp;			requestMatchers.add(new AntPathRequestMatcher(BASE_PATH));</b>
+<b class="nc">&nbsp;			requestMatchers.add(new AntPathRequestMatcher(BASE_PATH + &quot;/&quot;));</b>
+<b class="nc">&nbsp;			web.ignoring().requestMatchers(new OrRequestMatcher(requestMatchers));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

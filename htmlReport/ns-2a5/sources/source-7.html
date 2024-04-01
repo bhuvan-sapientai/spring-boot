@@ -1,0 +1,278 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VirtualZipDataBlock</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.zip</a>
+</div>
+
+<h1>Coverage Summary for Class: VirtualZipDataBlock (org.springframework.boot.loader.zip)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VirtualZipDataBlock</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">VirtualZipDataBlock$DataPart</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.zip;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.file.FileSystem;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link DataBlock} that creates a virtual zip. This class allows us to create virtual
+&nbsp; * zip files that can be parsed by regular JDK classes such as the zip {@link FileSystem}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class VirtualZipDataBlock extends VirtualDataBlock implements CloseableDataBlock {
+&nbsp;
+&nbsp;	private final CloseableDataBlock data;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link VirtualZipDataBlock} for the given entries.
+&nbsp;	 * @param data the source zip data
+&nbsp;	 * @param nameOffsetLookups the name offsets to apply
+&nbsp;	 * @param centralRecords the records that should be copied to the virtual zip
+&nbsp;	 * @param centralRecordPositions the record positions in the data block.
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	VirtualZipDataBlock(CloseableDataBlock data, NameOffsetLookups nameOffsetLookups,
+<b class="nc">&nbsp;			ZipCentralDirectoryFileHeaderRecord[] centralRecords, long[] centralRecordPositions) throws IOException {</b>
+<b class="nc">&nbsp;		this.data = data;</b>
+<b class="nc">&nbsp;		List&lt;DataBlock&gt; parts = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		List&lt;DataBlock&gt; centralParts = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		long offset = 0;</b>
+<b class="nc">&nbsp;		long sizeOfCentralDirectory = 0;</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; centralRecords.length; i++) {</b>
+<b class="nc">&nbsp;			ZipCentralDirectoryFileHeaderRecord centralRecord = centralRecords[i];</b>
+<b class="nc">&nbsp;			int nameOffset = nameOffsetLookups.get(i);</b>
+<b class="nc">&nbsp;			long centralRecordPos = centralRecordPositions[i];</b>
+<b class="nc">&nbsp;			DataBlock name = new DataPart(</b>
+&nbsp;					centralRecordPos + ZipCentralDirectoryFileHeaderRecord.FILE_NAME_OFFSET + nameOffset,
+<b class="nc">&nbsp;					Short.toUnsignedLong(centralRecord.fileNameLength()) - nameOffset);</b>
+<b class="nc">&nbsp;			long localRecordPos = Integer.toUnsignedLong(centralRecord.offsetToLocalHeader());</b>
+<b class="nc">&nbsp;			ZipLocalFileHeaderRecord localRecord = ZipLocalFileHeaderRecord.load(this.data, localRecordPos);</b>
+<b class="nc">&nbsp;			DataBlock content = new DataPart(localRecordPos + localRecord.size(), centralRecord.compressedSize());</b>
+<b class="nc">&nbsp;			boolean hasDescriptorRecord = ZipDataDescriptorRecord.isPresentBasedOnFlag(centralRecord);</b>
+<b class="nc">&nbsp;			ZipDataDescriptorRecord dataDescriptorRecord = (!hasDescriptorRecord) ? null</b>
+<b class="nc">&nbsp;					: ZipDataDescriptorRecord.load(data, localRecordPos + localRecord.size() + content.size());</b>
+<b class="nc">&nbsp;			sizeOfCentralDirectory += addToCentral(centralParts, centralRecord, centralRecordPos, name, (int) offset);</b>
+<b class="nc">&nbsp;			offset += addToLocal(parts, centralRecord, localRecord, dataDescriptorRecord, name, content);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		parts.addAll(centralParts);</b>
+<b class="nc">&nbsp;		ZipEndOfCentralDirectoryRecord eocd = new ZipEndOfCentralDirectoryRecord((short) centralRecords.length,</b>
+&nbsp;				(int) sizeOfCentralDirectory, (int) offset);
+<b class="nc">&nbsp;		parts.add(new ByteArrayDataBlock(eocd.asByteArray()));</b>
+<b class="nc">&nbsp;		setParts(parts);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private long addToCentral(List&lt;DataBlock&gt; parts, ZipCentralDirectoryFileHeaderRecord originalRecord,
+&nbsp;			long originalRecordPos, DataBlock name, int offsetToLocalHeader) throws IOException {
+<b class="nc">&nbsp;		ZipCentralDirectoryFileHeaderRecord record = originalRecord.withFileNameLength((short) (name.size() &amp; 0xFFFF))</b>
+<b class="nc">&nbsp;			.withOffsetToLocalHeader(offsetToLocalHeader);</b>
+<b class="nc">&nbsp;		int originalExtraFieldLength = Short.toUnsignedInt(originalRecord.extraFieldLength());</b>
+<b class="nc">&nbsp;		int originalFileCommentLength = Short.toUnsignedInt(originalRecord.fileCommentLength());</b>
+<b class="nc">&nbsp;		DataBlock extraFieldAndComment = new DataPart(</b>
+<b class="nc">&nbsp;				originalRecordPos + originalRecord.size() - originalExtraFieldLength - originalFileCommentLength,</b>
+&nbsp;				originalExtraFieldLength + originalFileCommentLength);
+<b class="nc">&nbsp;		parts.add(new ByteArrayDataBlock(record.asByteArray()));</b>
+<b class="nc">&nbsp;		parts.add(name);</b>
+<b class="nc">&nbsp;		parts.add(extraFieldAndComment);</b>
+<b class="nc">&nbsp;		return record.size();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private long addToLocal(List&lt;DataBlock&gt; parts, ZipCentralDirectoryFileHeaderRecord centralRecord,
+&nbsp;			ZipLocalFileHeaderRecord originalRecord, ZipDataDescriptorRecord dataDescriptorRecord, DataBlock name,
+&nbsp;			DataBlock content) throws IOException {
+<b class="nc">&nbsp;		ZipLocalFileHeaderRecord record = originalRecord.withFileNameLength((short) (name.size() &amp; 0xFFFF));</b>
+<b class="nc">&nbsp;		long originalRecordPos = Integer.toUnsignedLong(centralRecord.offsetToLocalHeader());</b>
+<b class="nc">&nbsp;		int extraFieldLength = Short.toUnsignedInt(originalRecord.extraFieldLength());</b>
+<b class="nc">&nbsp;		parts.add(new ByteArrayDataBlock(record.asByteArray()));</b>
+<b class="nc">&nbsp;		parts.add(name);</b>
+<b class="nc">&nbsp;		parts.add(new DataPart(originalRecordPos + originalRecord.size() - extraFieldLength, extraFieldLength));</b>
+<b class="nc">&nbsp;		parts.add(content);</b>
+<b class="nc">&nbsp;		if (dataDescriptorRecord != null) {</b>
+<b class="nc">&nbsp;			parts.add(new ByteArrayDataBlock(dataDescriptorRecord.asByteArray()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return record.size() + content.size() + ((dataDescriptorRecord != null) ? dataDescriptorRecord.size() : 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void close() throws IOException {
+<b class="nc">&nbsp;		this.data.close();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link DataBlock} that points to part of the original data block.
+&nbsp;	 */
+&nbsp;	final class DataPart implements DataBlock {
+&nbsp;
+&nbsp;		private final long offset;
+&nbsp;
+&nbsp;		private final long size;
+&nbsp;
+<b class="nc">&nbsp;		DataPart(long offset, long size) {</b>
+<b class="nc">&nbsp;			this.offset = offset;</b>
+<b class="nc">&nbsp;			this.size = size;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public long size() throws IOException {
+<b class="nc">&nbsp;			return this.size;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int read(ByteBuffer dst, long pos) throws IOException {
+<b class="nc">&nbsp;			int remaining = (int) (this.size - pos);</b>
+<b class="nc">&nbsp;			if (remaining &lt;= 0) {</b>
+<b class="nc">&nbsp;				return -1;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			int originalLimit = -1;</b>
+<b class="nc">&nbsp;			if (dst.remaining() &gt; remaining) {</b>
+<b class="nc">&nbsp;				originalLimit = dst.limit();</b>
+<b class="nc">&nbsp;				dst.limit(dst.position() + remaining);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			int result = VirtualZipDataBlock.this.data.read(dst, this.offset + pos);</b>
+<b class="nc">&nbsp;			if (originalLimit != -1) {</b>
+<b class="nc">&nbsp;				dst.limit(originalLimit);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

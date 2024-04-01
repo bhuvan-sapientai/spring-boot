@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OnRepositoryTypeCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.data</a>
+</div>
+
+<h1>Coverage Summary for Class: OnRepositoryTypeCondition (org.springframework.boot.autoconfigure.data)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OnRepositoryTypeCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.data;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link SpringBootCondition} for controlling what type of Spring Data repositories are
+&nbsp; * auto-configured.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;class OnRepositoryTypeCondition extends SpringBootCondition {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; attributes = metadata.getAnnotationAttributes(ConditionalOnRepositoryType.class.getName(),</b>
+&nbsp;				true);
+<b class="nc">&nbsp;		RepositoryType configuredType = getTypeProperty(context.getEnvironment(), (String) attributes.get(&quot;store&quot;));</b>
+<b class="nc">&nbsp;		RepositoryType requiredType = (RepositoryType) attributes.get(&quot;type&quot;);</b>
+<b class="nc">&nbsp;		ConditionMessage.Builder message = ConditionMessage.forCondition(ConditionalOnRepositoryType.class);</b>
+<b class="nc">&nbsp;		if (configuredType == requiredType || configuredType == RepositoryType.AUTO) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome</b>
+<b class="nc">&nbsp;				.match(message.because(&quot;configured type of &#39;&quot; + configuredType.name() + &quot;&#39; matched required type&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConditionOutcome.noMatch(message.because(&quot;configured type (&quot; + configuredType.name()</b>
+<b class="nc">&nbsp;				+ &quot;) did not match required type (&quot; + requiredType.name() + &quot;)&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private RepositoryType getTypeProperty(Environment environment, String store) {
+<b class="nc">&nbsp;		return RepositoryType</b>
+<b class="nc">&nbsp;			.valueOf(environment.getProperty(String.format(&quot;spring.data.%s.repositories.type&quot;, store), &quot;auto&quot;)</b>
+<b class="nc">&nbsp;				.toUpperCase(Locale.ENGLISH));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

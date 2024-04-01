@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProcessRunner</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.core</a>
+</div>
+
+<h1>Coverage Summary for Class: ProcessRunner (org.springframework.boot.docker.compose.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProcessRunner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ProcessRunner$ReaderThread</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.core;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.concurrent.CountDownLatch;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;
+&nbsp;/**
+&nbsp; * Runs a process and captures the result.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ProcessRunner {
+&nbsp;
+&nbsp;	private static final String USR_LOCAL_BIN = &quot;/usr/local/bin&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final boolean MAC_OS = System.getProperty(&quot;os.name&quot;).toLowerCase().contains(&quot;mac&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ProcessRunner.class);</b>
+&nbsp;
+&nbsp;	private final File workingDirectory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ProcessRunner} instance.
+&nbsp;	 */
+&nbsp;	ProcessRunner() {
+<b class="nc">&nbsp;		this(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ProcessRunner} instance.
+&nbsp;	 * @param workingDirectory the working directory for the process
+&nbsp;	 */
+<b class="nc">&nbsp;	ProcessRunner(File workingDirectory) {</b>
+<b class="nc">&nbsp;		this.workingDirectory = workingDirectory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Runs the given {@code command}. If the process exits with an error code other than
+&nbsp;	 * zero, an {@link ProcessExitException} will be thrown.
+&nbsp;	 * @param command the command to run
+&nbsp;	 * @return the output of the command
+&nbsp;	 * @throws ProcessExitException if execution failed
+&nbsp;	 */
+&nbsp;	String run(String... command) {
+<b class="nc">&nbsp;		return run(null, command);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Runs the given {@code command}. If the process exits with an error code other than
+&nbsp;	 * zero, an {@link ProcessExitException} will be thrown.
+&nbsp;	 * @param outputConsumer consumer used to accept output one line at a time
+&nbsp;	 * @param command the command to run
+&nbsp;	 * @return the output of the command
+&nbsp;	 * @throws ProcessExitException if execution failed
+&nbsp;	 */
+&nbsp;	String run(Consumer&lt;String&gt; outputConsumer, String... command) {
+<b class="nc">&nbsp;		logger.trace(LogMessage.of(() -&gt; &quot;Running &#39;%s&#39;&quot;.formatted(String.join(&quot; &quot;, command))));</b>
+<b class="nc">&nbsp;		Process process = startProcess(command);</b>
+<b class="nc">&nbsp;		ReaderThread stdOutReader = new ReaderThread(process.getInputStream(), &quot;stdout&quot;, outputConsumer);</b>
+<b class="nc">&nbsp;		ReaderThread stdErrReader = new ReaderThread(process.getErrorStream(), &quot;stderr&quot;, outputConsumer);</b>
+<b class="nc">&nbsp;		logger.trace(&quot;Waiting for process exit&quot;);</b>
+<b class="nc">&nbsp;		int exitCode = waitForProcess(process);</b>
+<b class="nc">&nbsp;		logger.trace(LogMessage.format(&quot;Process exited with exit code %d&quot;, exitCode));</b>
+<b class="nc">&nbsp;		String stdOut = stdOutReader.toString();</b>
+<b class="nc">&nbsp;		String stdErr = stdErrReader.toString();</b>
+<b class="nc">&nbsp;		if (exitCode != 0) {</b>
+<b class="nc">&nbsp;			throw new ProcessExitException(exitCode, command, stdOut, stdErr);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return stdOut;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Process startProcess(String[] command) {
+<b class="nc">&nbsp;		ProcessBuilder processBuilder = new ProcessBuilder(command);</b>
+<b class="nc">&nbsp;		processBuilder.directory(this.workingDirectory);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return processBuilder.start();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			String path = processBuilder.environment().get(&quot;PATH&quot;);</b>
+<b class="nc">&nbsp;			if (MAC_OS &amp;&amp; path != null &amp;&amp; !path.contains(USR_LOCAL_BIN)</b>
+<b class="nc">&nbsp;					&amp;&amp; !command[0].startsWith(USR_LOCAL_BIN + &quot;/&quot;)) {</b>
+<b class="nc">&nbsp;				String[] localCommand = command.clone();</b>
+<b class="nc">&nbsp;				localCommand[0] = USR_LOCAL_BIN + &quot;/&quot; + localCommand[0];</b>
+<b class="nc">&nbsp;				return startProcess(localCommand);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new ProcessStartException(command, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private int waitForProcess(Process process) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return process.waitFor();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Interrupted waiting for %s&quot;.formatted(process));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Thread used to read stream input from the process.
+&nbsp;	 */
+&nbsp;	private static class ReaderThread extends Thread {
+&nbsp;
+&nbsp;		private final InputStream source;
+&nbsp;
+&nbsp;		private final Consumer&lt;String&gt; outputConsumer;
+&nbsp;
+<b class="nc">&nbsp;		private final StringBuilder output = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final CountDownLatch latch = new CountDownLatch(1);</b>
+&nbsp;
+<b class="nc">&nbsp;		ReaderThread(InputStream source, String name, Consumer&lt;String&gt; outputConsumer) {</b>
+<b class="nc">&nbsp;			this.source = source;</b>
+<b class="nc">&nbsp;			this.outputConsumer = outputConsumer;</b>
+<b class="nc">&nbsp;			setName(&quot;OutputReader-&quot; + name);</b>
+<b class="nc">&nbsp;			setDaemon(true);</b>
+<b class="nc">&nbsp;			start();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void run() {
+<b class="nc">&nbsp;			try (BufferedReader reader = new BufferedReader(</b>
+&nbsp;					new InputStreamReader(this.source, StandardCharsets.UTF_8))) {
+<b class="nc">&nbsp;				String line = reader.readLine();</b>
+<b class="nc">&nbsp;				while (line != null) {</b>
+<b class="nc">&nbsp;					this.output.append(line);</b>
+<b class="nc">&nbsp;					this.output.append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;					if (this.outputConsumer != null) {</b>
+<b class="nc">&nbsp;						this.outputConsumer.accept(line);</b>
+&nbsp;					}
+<b class="nc">&nbsp;					line = reader.readLine();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				this.latch.countDown();</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new UncheckedIOException(&quot;Failed to read process stream&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+&nbsp;			try {
+<b class="nc">&nbsp;				this.latch.await();</b>
+<b class="nc">&nbsp;				return this.output.toString();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

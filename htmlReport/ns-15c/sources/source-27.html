@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StandardConfigDataReference</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.config</a>
+</div>
+
+<h1>Coverage Summary for Class: StandardConfigDataReference (org.springframework.boot.context.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StandardConfigDataReference</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (4/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.5%
+  </span>
+  <span class="absValue">
+    (10/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.config;
+&nbsp;
+&nbsp;import org.springframework.boot.env.PropertySourceLoader;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A reference expanded from the original {@link ConfigDataLocation} that can ultimately
+&nbsp; * be resolved to one or more {@link StandardConfigDataResource resources}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class StandardConfigDataReference {
+&nbsp;
+&nbsp;	private final ConfigDataLocation configDataLocation;
+&nbsp;
+&nbsp;	private final String resourceLocation;
+&nbsp;
+&nbsp;	private final String directory;
+&nbsp;
+&nbsp;	private final String profile;
+&nbsp;
+&nbsp;	private final PropertySourceLoader propertySourceLoader;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link StandardConfigDataReference} instance.
+&nbsp;	 * @param configDataLocation the original location passed to the resolver
+&nbsp;	 * @param directory the directory of the resource or {@code null} if the reference is
+&nbsp;	 * to a file
+&nbsp;	 * @param root the root of the resource location
+&nbsp;	 * @param profile the profile being loaded
+&nbsp;	 * @param extension the file extension for the resource
+&nbsp;	 * @param propertySourceLoader the property source loader that should be used for this
+&nbsp;	 * reference
+&nbsp;	 */
+&nbsp;	StandardConfigDataReference(ConfigDataLocation configDataLocation, String directory, String root, String profile,
+<b class="fc">&nbsp;			String extension, PropertySourceLoader propertySourceLoader) {</b>
+<b class="fc">&nbsp;		this.configDataLocation = configDataLocation;</b>
+<b class="fc">&nbsp;		String profileSuffix = (StringUtils.hasText(profile)) ? &quot;-&quot; + profile : &quot;&quot;;</b>
+<b class="fc">&nbsp;		this.resourceLocation = root + profileSuffix + ((extension != null) ? &quot;.&quot; + extension : &quot;&quot;);</b>
+<b class="fc">&nbsp;		this.directory = directory;</b>
+<b class="fc">&nbsp;		this.profile = profile;</b>
+<b class="fc">&nbsp;		this.propertySourceLoader = propertySourceLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ConfigDataLocation getConfigDataLocation() {
+<b class="nc">&nbsp;		return this.configDataLocation;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getResourceLocation() {
+<b class="nc">&nbsp;		return this.resourceLocation;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isMandatoryDirectory() {
+<b class="fc">&nbsp;		return !this.configDataLocation.isOptional() &amp;&amp; this.directory != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getDirectory() {
+<b class="nc">&nbsp;		return this.directory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getProfile() {
+<b class="nc">&nbsp;		return this.profile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isSkippable() {
+<b class="fc">&nbsp;		return this.configDataLocation.isOptional() || this.directory != null || this.profile != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	PropertySourceLoader getPropertySourceLoader() {
+<b class="nc">&nbsp;		return this.propertySourceLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if ((obj == null) || (getClass() != obj.getClass())) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		StandardConfigDataReference other = (StandardConfigDataReference) obj;</b>
+<b class="nc">&nbsp;		return this.resourceLocation.equals(other.resourceLocation);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return this.resourceLocation.hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="fc">&nbsp;		return this.resourceLocation;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

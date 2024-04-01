@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CloudFoundrySecurityInterceptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.cloudfoundry.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: CloudFoundrySecurityInterceptor (org.springframework.boot.actuate.autoconfigure.cloudfoundry.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CloudFoundrySecurityInterceptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.cloudfoundry.servlet;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpServletRequest;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.AccessLevel;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException.Reason;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.SecurityResponse;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.Token;
+&nbsp;import org.springframework.boot.actuate.endpoint.EndpointId;
+&nbsp;import org.springframework.http.HttpMethod;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.cors.CorsUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Security interceptor to validate the cloud foundry token.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class CloudFoundrySecurityInterceptor {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(CloudFoundrySecurityInterceptor.class);</b>
+&nbsp;
+&nbsp;	private final TokenValidator tokenValidator;
+&nbsp;
+&nbsp;	private final CloudFoundrySecurityService cloudFoundrySecurityService;
+&nbsp;
+&nbsp;	private final String applicationId;
+&nbsp;
+<b class="nc">&nbsp;	private static final SecurityResponse SUCCESS = SecurityResponse.success();</b>
+&nbsp;
+&nbsp;	CloudFoundrySecurityInterceptor(TokenValidator tokenValidator,
+<b class="nc">&nbsp;			CloudFoundrySecurityService cloudFoundrySecurityService, String applicationId) {</b>
+<b class="nc">&nbsp;		this.tokenValidator = tokenValidator;</b>
+<b class="nc">&nbsp;		this.cloudFoundrySecurityService = cloudFoundrySecurityService;</b>
+<b class="nc">&nbsp;		this.applicationId = applicationId;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	SecurityResponse preHandle(HttpServletRequest request, EndpointId endpointId) {
+<b class="nc">&nbsp;		if (CorsUtils.isPreFlightRequest(request)) {</b>
+<b class="nc">&nbsp;			return SecurityResponse.success();</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			if (!StringUtils.hasText(this.applicationId)) {</b>
+<b class="nc">&nbsp;				throw new CloudFoundryAuthorizationException(Reason.SERVICE_UNAVAILABLE,</b>
+&nbsp;						&quot;Application id is not available&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.cloudFoundrySecurityService == null) {</b>
+<b class="nc">&nbsp;				throw new CloudFoundryAuthorizationException(Reason.SERVICE_UNAVAILABLE,</b>
+&nbsp;						&quot;Cloud controller URL is not available&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			if (HttpMethod.OPTIONS.matches(request.getMethod())) {</b>
+<b class="nc">&nbsp;				return SUCCESS;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			check(request, endpointId);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			logger.error(ex);</b>
+<b class="nc">&nbsp;			if (ex instanceof CloudFoundryAuthorizationException cfException) {</b>
+<b class="nc">&nbsp;				return new SecurityResponse(cfException.getStatusCode(),</b>
+<b class="nc">&nbsp;						&quot;{\&quot;security_error\&quot;:\&quot;&quot; + cfException.getMessage() + &quot;\&quot;}&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new SecurityResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return SecurityResponse.success();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void check(HttpServletRequest request, EndpointId endpointId) {
+<b class="nc">&nbsp;		Token token = getToken(request);</b>
+<b class="nc">&nbsp;		this.tokenValidator.validate(token);</b>
+<b class="nc">&nbsp;		AccessLevel accessLevel = this.cloudFoundrySecurityService.getAccessLevel(token.toString(), this.applicationId);</b>
+<b class="nc">&nbsp;		if (!accessLevel.isAccessAllowed((endpointId != null) ? endpointId.toLowerCaseString() : &quot;&quot;)) {</b>
+<b class="nc">&nbsp;			throw new CloudFoundryAuthorizationException(Reason.ACCESS_DENIED, &quot;Access denied&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		request.setAttribute(AccessLevel.REQUEST_ATTRIBUTE, accessLevel);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Token getToken(HttpServletRequest request) {
+<b class="nc">&nbsp;		String authorization = request.getHeader(&quot;Authorization&quot;);</b>
+<b class="nc">&nbsp;		String bearerPrefix = &quot;bearer &quot;;</b>
+<b class="nc">&nbsp;		if (authorization == null || !authorization.toLowerCase(Locale.ENGLISH).startsWith(bearerPrefix)) {</b>
+<b class="nc">&nbsp;			throw new CloudFoundryAuthorizationException(Reason.MISSING_AUTHORIZATION,</b>
+&nbsp;					&quot;Authorization header is missing or invalid&quot;);
+&nbsp;		}
+<b class="nc">&nbsp;		return new Token(authorization.substring(bearerPrefix.length()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

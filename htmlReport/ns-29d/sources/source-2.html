@@ -1,0 +1,294 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Handler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.net.protocol.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: Handler (org.springframework.boot.loader.net.protocol.jar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Handler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.net.protocol.jar;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.net.URLStreamHandler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link URLStreamHandler} alternative to {@code sun.net.www.protocol.jar.Handler} with
+&nbsp; * optimized support for nested jars.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.2.0
+&nbsp; * @see org.springframework.boot.loader.net.protocol.Handlers
+&nbsp; */
+<b class="nc">&nbsp;public class Handler extends URLStreamHandler {</b>
+&nbsp;
+&nbsp;	// NOTE: in order to be found as a URL protocol handler, this class must be public,
+&nbsp;	// must be named Handler and must be in a package ending &#39;.jar&#39;
+&nbsp;
+&nbsp;	private static final String PROTOCOL = &quot;jar&quot;;
+&nbsp;
+&nbsp;	private static final String SEPARATOR = &quot;!/&quot;;
+&nbsp;
+<b class="nc">&nbsp;	static final Handler INSTANCE = new Handler();</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected URLConnection openConnection(URL url) throws IOException {
+<b class="nc">&nbsp;		return JarUrlConnection.open(url);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void parseURL(URL url, String spec, int start, int limit) {
+<b class="nc">&nbsp;		if (spec.regionMatches(true, start, &quot;jar:&quot;, 0, 4)) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Nested JAR URLs are not supported&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int anchorIndex = spec.indexOf(&#39;#&#39;, limit);</b>
+<b class="nc">&nbsp;		String path = extractPath(url, spec, start, limit, anchorIndex);</b>
+<b class="nc">&nbsp;		String ref = (anchorIndex != -1) ? spec.substring(anchorIndex + 1) : null;</b>
+<b class="nc">&nbsp;		setURL(url, PROTOCOL, &quot;&quot;, -1, null, null, path, null, ref);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extractPath(URL url, String spec, int start, int limit, int anchorIndex) {
+<b class="nc">&nbsp;		if (anchorIndex == start) {</b>
+<b class="nc">&nbsp;			return extractAnchorOnlyPath(url);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (spec.length() &gt;= 4 &amp;&amp; spec.regionMatches(true, 0, &quot;jar:&quot;, 0, 4)) {</b>
+<b class="nc">&nbsp;			return extractAbsolutePath(spec, start, limit);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return extractRelativePath(url, spec, start, limit);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extractAnchorOnlyPath(URL url) {
+<b class="nc">&nbsp;		return url.getPath();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extractAbsolutePath(String spec, int start, int limit) {
+<b class="nc">&nbsp;		int indexOfSeparator = indexOfSeparator(spec, start, limit);</b>
+<b class="nc">&nbsp;		if (indexOfSeparator == -1) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;no !/ in spec&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String innerUrl = spec.substring(start, indexOfSeparator);</b>
+<b class="nc">&nbsp;		assertInnerUrlIsNotMalformed(spec, innerUrl);</b>
+<b class="nc">&nbsp;		return spec.substring(start, limit);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extractRelativePath(URL url, String spec, int start, int limit) {
+<b class="nc">&nbsp;		String contextPath = extractContextPath(url, spec, start);</b>
+<b class="nc">&nbsp;		String path = contextPath + spec.substring(start, limit);</b>
+<b class="nc">&nbsp;		return Canonicalizer.canonicalizeAfter(path, indexOfSeparator(path) + 1);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extractContextPath(URL url, String spec, int start) {
+<b class="nc">&nbsp;		String contextPath = url.getPath();</b>
+<b class="nc">&nbsp;		if (spec.regionMatches(false, start, &quot;/&quot;, 0, 1)) {</b>
+<b class="nc">&nbsp;			int indexOfContextPathSeparator = indexOfSeparator(contextPath);</b>
+<b class="nc">&nbsp;			if (indexOfContextPathSeparator == -1) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;malformed context url:%s: no !/&quot;.formatted(url));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return contextPath.substring(0, indexOfContextPathSeparator + 1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int lastSlash = contextPath.lastIndexOf(&#39;/&#39;);</b>
+<b class="nc">&nbsp;		if (lastSlash == -1) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;malformed context url:%s&quot;.formatted(url));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return contextPath.substring(0, lastSlash + 1);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertInnerUrlIsNotMalformed(String spec, String innerUrl) {
+<b class="nc">&nbsp;		if (innerUrl.startsWith(&quot;nested:&quot;)) {</b>
+<b class="nc">&nbsp;			org.springframework.boot.loader.net.protocol.nested.Handler.assertUrlIsNotMalformed(innerUrl);</b>
+&nbsp;			return;
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			new URL(innerUrl);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedURLException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;invalid url: %s (%s)&quot;.formatted(spec, ex));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected int hashCode(URL url) {
+<b class="nc">&nbsp;		String protocol = url.getProtocol();</b>
+<b class="nc">&nbsp;		int hash = (protocol != null) ? protocol.hashCode() : 0;</b>
+<b class="nc">&nbsp;		String file = url.getFile();</b>
+<b class="nc">&nbsp;		int indexOfSeparator = file.indexOf(SEPARATOR);</b>
+<b class="nc">&nbsp;		if (indexOfSeparator == -1) {</b>
+<b class="nc">&nbsp;			return hash + file.hashCode();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String fileWithoutEntry = file.substring(0, indexOfSeparator);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			hash += new URL(fileWithoutEntry).hashCode();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedURLException ex) {</b>
+<b class="nc">&nbsp;			hash += fileWithoutEntry.hashCode();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		String entry = file.substring(indexOfSeparator + 2);</b>
+<b class="nc">&nbsp;		return hash + entry.hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean sameFile(URL url1, URL url2) {
+<b class="nc">&nbsp;		if (!url1.getProtocol().equals(PROTOCOL) || !url2.getProtocol().equals(PROTOCOL)) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String file1 = url1.getFile();</b>
+<b class="nc">&nbsp;		String file2 = url2.getFile();</b>
+<b class="nc">&nbsp;		int indexOfSeparator1 = file1.indexOf(SEPARATOR);</b>
+<b class="nc">&nbsp;		int indexOfSeparator2 = file2.indexOf(SEPARATOR);</b>
+<b class="nc">&nbsp;		if (indexOfSeparator1 == -1 || indexOfSeparator2 == -1) {</b>
+<b class="nc">&nbsp;			return super.sameFile(url1, url2);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String entry1 = file1.substring(indexOfSeparator1 + 2);</b>
+<b class="nc">&nbsp;		String entry2 = file2.substring(indexOfSeparator2 + 2);</b>
+<b class="nc">&nbsp;		if (!entry1.equals(entry2)) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			URL innerUrl1 = new URL(file1.substring(0, indexOfSeparator1));</b>
+<b class="nc">&nbsp;			URL innerUrl2 = new URL(file2.substring(0, indexOfSeparator2));</b>
+<b class="nc">&nbsp;			if (!super.sameFile(innerUrl1, innerUrl2)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedURLException unused) {</b>
+<b class="nc">&nbsp;			return super.sameFile(url1, url2);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static int indexOfSeparator(String spec) {
+<b class="nc">&nbsp;		return indexOfSeparator(spec, 0, spec.length());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static int indexOfSeparator(String spec, int start, int limit) {
+<b class="nc">&nbsp;		for (int i = limit - 1; i &gt;= start; i--) {</b>
+<b class="nc">&nbsp;			if (spec.charAt(i) == &#39;!&#39; &amp;&amp; (i + 1) &lt; limit &amp;&amp; spec.charAt(i + 1) == &#39;/&#39;) {</b>
+<b class="nc">&nbsp;				return i;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return -1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clear any internal caches.
+&nbsp;	 */
+&nbsp;	public static void clearCache() {
+<b class="nc">&nbsp;		JarFileUrlKey.clearCache();</b>
+<b class="nc">&nbsp;		JarUrlConnection.clearCache();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

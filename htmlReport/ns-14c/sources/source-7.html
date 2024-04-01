@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProjectGenerator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command.init</a>
+</div>
+
+<h1>Coverage Summary for Class: ProjectGenerator (org.springframework.boot.cli.command.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProjectGenerator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command.init;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;import java.util.zip.ZipInputStream;
+&nbsp;
+&nbsp;import org.springframework.boot.cli.util.Log;
+&nbsp;import org.springframework.util.FileCopyUtils;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Helper class used to generate the project.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;class ProjectGenerator {
+&nbsp;
+&nbsp;	private static final String ZIP_MIME_TYPE = &quot;application/zip&quot;;
+&nbsp;
+&nbsp;	private final InitializrService initializrService;
+&nbsp;
+<b class="nc">&nbsp;	ProjectGenerator(InitializrService initializrService) {</b>
+<b class="nc">&nbsp;		this.initializrService = initializrService;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void generateProject(ProjectGenerationRequest request, boolean force) throws IOException {
+<b class="nc">&nbsp;		ProjectGenerationResponse response = this.initializrService.generate(request);</b>
+<b class="nc">&nbsp;		String fileName = (request.getOutput() != null) ? request.getOutput() : response.getFileName();</b>
+<b class="nc">&nbsp;		if (shouldExtract(request, response)) {</b>
+<b class="nc">&nbsp;			if (isZipArchive(response)) {</b>
+<b class="nc">&nbsp;				extractProject(response, request.getOutput(), force);</b>
+&nbsp;				return;
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				Log.info(&quot;Could not extract &#39;&quot; + response.getContentType() + &quot;&#39;&quot;);</b>
+&nbsp;				// Use value from the server since we can&#39;t extract it
+<b class="nc">&nbsp;				fileName = response.getFileName();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (fileName == null) {</b>
+<b class="nc">&nbsp;			throw new ReportableException(&quot;Could not save the project, the server did not set a preferred &quot;</b>
+&nbsp;					+ &quot;file name and no location was set. Specify the output location for the project.&quot;);
+&nbsp;		}
+<b class="nc">&nbsp;		writeProject(response, fileName, force);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Detect if the project should be extracted.
+&nbsp;	 * @param request the generation request
+&nbsp;	 * @param response the generation response
+&nbsp;	 * @return if the project should be extracted
+&nbsp;	 */
+&nbsp;	private boolean shouldExtract(ProjectGenerationRequest request, ProjectGenerationResponse response) {
+<b class="nc">&nbsp;		if (request.isExtract()) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;		// explicit name hasn&#39;t been provided for an archive and there is no extension
+<b class="nc">&nbsp;		return isZipArchive(response) &amp;&amp; request.getOutput() != null &amp;&amp; !request.getOutput().contains(&quot;.&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isZipArchive(ProjectGenerationResponse entity) {
+<b class="nc">&nbsp;		if (entity.getContentType() != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return ZIP_MIME_TYPE.equals(entity.getContentType().getMimeType());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+&nbsp;				// Ignore
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void extractProject(ProjectGenerationResponse entity, String output, boolean overwrite) throws IOException {
+<b class="nc">&nbsp;		File outputDirectory = (output != null) ? new File(output) : new File(System.getProperty(&quot;user.dir&quot;));</b>
+<b class="nc">&nbsp;		if (!outputDirectory.exists()) {</b>
+<b class="nc">&nbsp;			outputDirectory.mkdirs();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		try (ZipInputStream zipStream = new ZipInputStream(new ByteArrayInputStream(entity.getContent()))) {</b>
+<b class="nc">&nbsp;			extractFromStream(zipStream, overwrite, outputDirectory);</b>
+<b class="nc">&nbsp;			fixExecutableFlag(outputDirectory, &quot;mvnw&quot;);</b>
+<b class="nc">&nbsp;			fixExecutableFlag(outputDirectory, &quot;gradlew&quot;);</b>
+<b class="nc">&nbsp;			Log.info(&quot;Project extracted to &#39;&quot; + outputDirectory.getAbsolutePath() + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void extractFromStream(ZipInputStream zipStream, boolean overwrite, File outputDirectory)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		ZipEntry entry = zipStream.getNextEntry();</b>
+<b class="nc">&nbsp;		String canonicalOutputPath = outputDirectory.getCanonicalPath() + File.separator;</b>
+<b class="nc">&nbsp;		while (entry != null) {</b>
+<b class="nc">&nbsp;			File file = new File(outputDirectory, entry.getName());</b>
+<b class="nc">&nbsp;			String canonicalEntryPath = file.getCanonicalPath();</b>
+<b class="nc">&nbsp;			if (!canonicalEntryPath.startsWith(canonicalOutputPath)) {</b>
+<b class="nc">&nbsp;				throw new ReportableException(&quot;Entry &#39;&quot; + entry.getName() + &quot;&#39; would be written to &#39;&quot;</b>
+&nbsp;						+ canonicalEntryPath + &quot;&#39;. This is outside the output location of &#39;&quot; + canonicalOutputPath
+&nbsp;						+ &quot;&#39;. Verify your target server configuration.&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			if (file.exists() &amp;&amp; !overwrite) {</b>
+<b class="nc">&nbsp;				throw new ReportableException((file.isDirectory() ? &quot;Directory&quot; : &quot;File&quot;) + &quot; &#39;&quot; + file.getName()</b>
+&nbsp;						+ &quot;&#39; already exists. Use --force if you want to overwrite or &quot;
+&nbsp;						+ &quot;specify an alternate location.&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			if (!entry.isDirectory()) {</b>
+<b class="nc">&nbsp;				FileCopyUtils.copy(StreamUtils.nonClosing(zipStream), new FileOutputStream(file));</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				file.mkdir();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			zipStream.closeEntry();</b>
+<b class="nc">&nbsp;			entry = zipStream.getNextEntry();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeProject(ProjectGenerationResponse entity, String output, boolean overwrite) throws IOException {
+<b class="nc">&nbsp;		File outputFile = new File(output);</b>
+<b class="nc">&nbsp;		if (outputFile.exists()) {</b>
+<b class="nc">&nbsp;			if (!overwrite) {</b>
+<b class="nc">&nbsp;				throw new ReportableException(</b>
+<b class="nc">&nbsp;						&quot;File &#39;&quot; + outputFile.getName() + &quot;&#39; already exists. Use --force if you want to &quot;</b>
+&nbsp;								+ &quot;overwrite or specify an alternate location.&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			if (!outputFile.delete()) {</b>
+<b class="nc">&nbsp;				throw new ReportableException(&quot;Failed to delete existing file &quot; + outputFile.getPath());</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		FileCopyUtils.copy(entity.getContent(), outputFile);</b>
+<b class="nc">&nbsp;		Log.info(&quot;Content saved to &#39;&quot; + output + &quot;&#39;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void fixExecutableFlag(File dir, String fileName) {
+<b class="nc">&nbsp;		File f = new File(dir, fileName);</b>
+<b class="nc">&nbsp;		if (f.exists()) {</b>
+<b class="nc">&nbsp;			f.setExecutable(true, false);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

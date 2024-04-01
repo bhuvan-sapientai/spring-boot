@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HazelcastClientConfigAvailableCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.hazelcast</a>
+</div>
+
+<h1>Coverage Summary for Class: HazelcastClientConfigAvailableCondition (org.springframework.boot.autoconfigure.hazelcast)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HazelcastClientConfigAvailableCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HazelcastClientConfigAvailableCondition$HazelcastClientValidation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.hazelcast;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.URL;
+&nbsp;
+&nbsp;import com.hazelcast.client.config.ClientConfigRecognizer;
+&nbsp;import com.hazelcast.config.ConfigStream;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage.Builder;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link HazelcastConfigResourceCondition} that checks if the
+&nbsp; * {@code spring.hazelcast.config} configuration key is defined.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;class HazelcastClientConfigAvailableCondition extends HazelcastConfigResourceCondition {
+&nbsp;
+&nbsp;	HazelcastClientConfigAvailableCondition() {
+<b class="nc">&nbsp;		super(HazelcastClientConfiguration.CONFIG_SYSTEM_PROPERTY, &quot;file:./hazelcast-client.xml&quot;,</b>
+&nbsp;				&quot;classpath:/hazelcast-client.xml&quot;, &quot;file:./hazelcast-client.yaml&quot;, &quot;classpath:/hazelcast-client.yaml&quot;,
+&nbsp;				&quot;file:./hazelcast-client.yml&quot;, &quot;classpath:/hazelcast-client.yml&quot;);
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		if (context.getEnvironment().containsProperty(HAZELCAST_CONFIG_PROPERTY)) {</b>
+<b class="nc">&nbsp;			ConditionOutcome configValidationOutcome = HazelcastClientValidation.clientConfigOutcome(context,</b>
+<b class="nc">&nbsp;					HAZELCAST_CONFIG_PROPERTY, startConditionMessage());</b>
+<b class="nc">&nbsp;			return (configValidationOutcome != null) ? configValidationOutcome : ConditionOutcome</b>
+<b class="nc">&nbsp;				.match(startConditionMessage().foundExactly(&quot;property &quot; + HAZELCAST_CONFIG_PROPERTY));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getResourceOutcome(context, metadata);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class HazelcastClientValidation {</b>
+&nbsp;
+&nbsp;		static ConditionOutcome clientConfigOutcome(ConditionContext context, String propertyName, Builder builder) {
+<b class="nc">&nbsp;			String resourcePath = context.getEnvironment().getProperty(propertyName);</b>
+<b class="nc">&nbsp;			Resource resource = context.getResourceLoader().getResource(resourcePath);</b>
+<b class="nc">&nbsp;			if (!resource.exists()) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.noMatch(builder.because(&quot;Hazelcast configuration does not exist&quot;));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			try (InputStream in = resource.getInputStream()) {</b>
+<b class="nc">&nbsp;				boolean clientConfig = new ClientConfigRecognizer().isRecognized(new ConfigStream(in));</b>
+<b class="nc">&nbsp;				return new ConditionOutcome(clientConfig, existingConfigurationOutcome(resource, clientConfig));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			catch (Throwable ex) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private static String existingConfigurationOutcome(Resource resource, boolean client) throws IOException {
+<b class="nc">&nbsp;			URL location = resource.getURL();</b>
+<b class="nc">&nbsp;			return client ? &quot;Hazelcast client configuration detected at &#39;&quot; + location + &quot;&#39;&quot;</b>
+<b class="nc">&nbsp;					: &quot;Hazelcast server configuration detected  at &#39;&quot; + location + &quot;&#39;&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

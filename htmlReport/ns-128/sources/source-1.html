@@ -1,0 +1,393 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ArchitectureCheck</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.architecture</a>
+</div>
+
+<h1>Coverage Summary for Class: ArchitectureCheck (org.springframework.boot.build.architecture)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArchitectureCheck</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ArchitectureCheck$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ArchitectureCheck$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/92)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2022-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.architecture;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URLDecoder;
+&nbsp;import java.net.URLEncoder;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.StandardOpenOption;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import com.tngtech.archunit.base.DescribedPredicate;
+&nbsp;import com.tngtech.archunit.core.domain.JavaClass;
+&nbsp;import com.tngtech.archunit.core.domain.JavaClass.Predicates;
+&nbsp;import com.tngtech.archunit.core.domain.JavaClasses;
+&nbsp;import com.tngtech.archunit.core.domain.JavaMethod;
+&nbsp;import com.tngtech.archunit.core.domain.JavaParameter;
+&nbsp;import com.tngtech.archunit.core.domain.properties.CanBeAnnotated;
+&nbsp;import com.tngtech.archunit.core.importer.ClassFileImporter;
+&nbsp;import com.tngtech.archunit.lang.ArchCondition;
+&nbsp;import com.tngtech.archunit.lang.ArchRule;
+&nbsp;import com.tngtech.archunit.lang.ConditionEvents;
+&nbsp;import com.tngtech.archunit.lang.EvaluationResult;
+&nbsp;import com.tngtech.archunit.lang.SimpleConditionEvent;
+&nbsp;import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
+&nbsp;import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.GradleException;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.file.DirectoryProperty;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.file.FileTree;
+&nbsp;import org.gradle.api.provider.ListProperty;
+&nbsp;import org.gradle.api.tasks.IgnoreEmptyDirectories;
+&nbsp;import org.gradle.api.tasks.Input;
+&nbsp;import org.gradle.api.tasks.InputFiles;
+&nbsp;import org.gradle.api.tasks.Internal;
+&nbsp;import org.gradle.api.tasks.Optional;
+&nbsp;import org.gradle.api.tasks.OutputDirectory;
+&nbsp;import org.gradle.api.tasks.PathSensitive;
+&nbsp;import org.gradle.api.tasks.PathSensitivity;
+&nbsp;import org.gradle.api.tasks.SkipWhenEmpty;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Task} that checks for architecture problems.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Yanming Zhou
+&nbsp; */
+&nbsp;public abstract class ArchitectureCheck extends DefaultTask {
+&nbsp;
+&nbsp;	private FileCollection classes;
+&nbsp;
+<b class="nc">&nbsp;	public ArchitectureCheck() {</b>
+<b class="nc">&nbsp;		getOutputDirectory().convention(getProject().getLayout().getBuildDirectory().dir(getName()));</b>
+<b class="nc">&nbsp;		getRules().addAll(allPackagesShouldBeFreeOfTangles(),</b>
+<b class="nc">&nbsp;				allBeanPostProcessorBeanMethodsShouldBeStaticAndHaveParametersThatWillNotCausePrematureInitialization(),</b>
+<b class="nc">&nbsp;				allBeanFactoryPostProcessorBeanMethodsShouldBeStaticAndHaveNoParameters(),</b>
+<b class="nc">&nbsp;				noClassesShouldCallStepVerifierStepVerifyComplete(),</b>
+<b class="nc">&nbsp;				noClassesShouldConfigureDefaultStepVerifierTimeout(), noClassesShouldCallCollectorsToList(),</b>
+<b class="nc">&nbsp;				noClassesShouldCallURLEncoderWithStringEncoding(), noClassesShouldCallURLDecoderWithStringEncoding());</b>
+<b class="nc">&nbsp;		getRuleDescriptions().set(getRules().map((rules) -&gt; rules.stream().map(ArchRule::getDescription).toList()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void checkArchitecture() throws IOException {
+<b class="nc">&nbsp;		JavaClasses javaClasses = new ClassFileImporter()</b>
+<b class="nc">&nbsp;			.importPaths(this.classes.getFiles().stream().map(File::toPath).toList());</b>
+<b class="nc">&nbsp;		List&lt;EvaluationResult&gt; violations = getRules().get()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map((rule) -&gt; rule.evaluate(javaClasses))</b>
+<b class="nc">&nbsp;			.filter(EvaluationResult::hasViolation)</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		File outputFile = getOutputDirectory().file(&quot;failure-report.txt&quot;).get().getAsFile();</b>
+<b class="nc">&nbsp;		outputFile.getParentFile().mkdirs();</b>
+<b class="nc">&nbsp;		if (!violations.isEmpty()) {</b>
+<b class="nc">&nbsp;			StringBuilder report = new StringBuilder();</b>
+<b class="nc">&nbsp;			for (EvaluationResult violation : violations) {</b>
+<b class="nc">&nbsp;				report.append(violation.getFailureReport());</b>
+<b class="nc">&nbsp;				report.append(String.format(&quot;%n&quot;));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			Files.writeString(outputFile.toPath(), report.toString(), StandardOpenOption.CREATE,</b>
+&nbsp;					StandardOpenOption.TRUNCATE_EXISTING);
+<b class="nc">&nbsp;			throw new GradleException(&quot;Architecture check failed. See &#39;&quot; + outputFile + &quot;&#39; for details.&quot;);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			outputFile.createNewFile();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchRule allPackagesShouldBeFreeOfTangles() {
+<b class="nc">&nbsp;		return SlicesRuleDefinition.slices().matching(&quot;(**)&quot;).should().beFreeOfCycles();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchRule allBeanPostProcessorBeanMethodsShouldBeStaticAndHaveParametersThatWillNotCausePrematureInitialization() {
+<b class="nc">&nbsp;		return ArchRuleDefinition.methods()</b>
+<b class="nc">&nbsp;			.that()</b>
+<b class="nc">&nbsp;			.areAnnotatedWith(&quot;org.springframework.context.annotation.Bean&quot;)</b>
+<b class="nc">&nbsp;			.and()</b>
+<b class="nc">&nbsp;			.haveRawReturnType(Predicates.assignableTo(&quot;org.springframework.beans.factory.config.BeanPostProcessor&quot;))</b>
+<b class="nc">&nbsp;			.should(onlyHaveParametersThatWillNotCauseEagerInitialization())</b>
+<b class="nc">&nbsp;			.andShould()</b>
+<b class="nc">&nbsp;			.beStatic()</b>
+<b class="nc">&nbsp;			.allowEmptyShould(true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchCondition&lt;JavaMethod&gt; onlyHaveParametersThatWillNotCauseEagerInitialization() {
+<b class="nc">&nbsp;		DescribedPredicate&lt;CanBeAnnotated&gt; notAnnotatedWithLazy = DescribedPredicate</b>
+<b class="nc">&nbsp;			.not(CanBeAnnotated.Predicates.annotatedWith(&quot;org.springframework.context.annotation.Lazy&quot;));</b>
+<b class="nc">&nbsp;		DescribedPredicate&lt;JavaClass&gt; notOfASafeType = DescribedPredicate</b>
+<b class="nc">&nbsp;			.not(Predicates.assignableTo(&quot;org.springframework.beans.factory.ObjectProvider&quot;)</b>
+<b class="nc">&nbsp;				.or(Predicates.assignableTo(&quot;org.springframework.context.ApplicationContext&quot;))</b>
+<b class="nc">&nbsp;				.or(Predicates.assignableTo(&quot;org.springframework.core.env.Environment&quot;)));</b>
+<b class="nc">&nbsp;		return new ArchCondition&lt;&gt;(&quot;not have parameters that will cause eager initialization&quot;) {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void check(JavaMethod item, ConditionEvents events) {
+<b class="nc">&nbsp;				item.getParameters()</b>
+<b class="nc">&nbsp;					.stream()</b>
+<b class="nc">&nbsp;					.filter(notAnnotatedWithLazy)</b>
+<b class="nc">&nbsp;					.filter((parameter) -&gt; notOfASafeType.test(parameter.getRawType()))</b>
+<b class="nc">&nbsp;					.forEach((parameter) -&gt; events.add(SimpleConditionEvent.violated(parameter,</b>
+<b class="nc">&nbsp;							parameter.getDescription() + &quot; will cause eager initialization as it is &quot;</b>
+<b class="nc">&nbsp;									+ notAnnotatedWithLazy.getDescription() + &quot; and is &quot;</b>
+<b class="nc">&nbsp;									+ notOfASafeType.getDescription())));</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchRule allBeanFactoryPostProcessorBeanMethodsShouldBeStaticAndHaveNoParameters() {
+<b class="nc">&nbsp;		return ArchRuleDefinition.methods()</b>
+<b class="nc">&nbsp;			.that()</b>
+<b class="nc">&nbsp;			.areAnnotatedWith(&quot;org.springframework.context.annotation.Bean&quot;)</b>
+<b class="nc">&nbsp;			.and()</b>
+<b class="nc">&nbsp;			.haveRawReturnType(</b>
+<b class="nc">&nbsp;					Predicates.assignableTo(&quot;org.springframework.beans.factory.config.BeanFactoryPostProcessor&quot;))</b>
+<b class="nc">&nbsp;			.should(haveNoParameters())</b>
+<b class="nc">&nbsp;			.andShould()</b>
+<b class="nc">&nbsp;			.beStatic()</b>
+<b class="nc">&nbsp;			.allowEmptyShould(true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchCondition&lt;JavaMethod&gt; haveNoParameters() {
+<b class="nc">&nbsp;		return new ArchCondition&lt;&gt;(&quot;have no parameters&quot;) {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void check(JavaMethod item, ConditionEvents events) {
+<b class="nc">&nbsp;				List&lt;JavaParameter&gt; parameters = item.getParameters();</b>
+<b class="nc">&nbsp;				if (!parameters.isEmpty()) {</b>
+<b class="nc">&nbsp;					events</b>
+<b class="nc">&nbsp;						.add(SimpleConditionEvent.violated(item, item.getDescription() + &quot; should have no parameters&quot;));</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchRule noClassesShouldCallStepVerifierStepVerifyComplete() {
+<b class="nc">&nbsp;		return ArchRuleDefinition.noClasses()</b>
+<b class="nc">&nbsp;			.should()</b>
+<b class="nc">&nbsp;			.callMethod(&quot;reactor.test.StepVerifier$Step&quot;, &quot;verifyComplete&quot;)</b>
+<b class="nc">&nbsp;			.because(&quot;it can block indefinitely and expectComplete().verify(Duration) should be used instead&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchRule noClassesShouldConfigureDefaultStepVerifierTimeout() {
+<b class="nc">&nbsp;		return ArchRuleDefinition.noClasses()</b>
+<b class="nc">&nbsp;			.should()</b>
+<b class="nc">&nbsp;			.callMethod(&quot;reactor.test.StepVerifier&quot;, &quot;setDefaultTimeout&quot;, &quot;java.time.Duration&quot;)</b>
+<b class="nc">&nbsp;			.because(&quot;expectComplete().verify(Duration) should be used instead&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchRule noClassesShouldCallCollectorsToList() {
+<b class="nc">&nbsp;		return ArchRuleDefinition.noClasses()</b>
+<b class="nc">&nbsp;			.should()</b>
+<b class="nc">&nbsp;			.callMethod(Collectors.class, &quot;toList&quot;)</b>
+<b class="nc">&nbsp;			.because(&quot;java.util.stream.Stream.toList() should be used instead&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchRule noClassesShouldCallURLEncoderWithStringEncoding() {
+<b class="nc">&nbsp;		return ArchRuleDefinition.noClasses()</b>
+<b class="nc">&nbsp;			.should()</b>
+<b class="nc">&nbsp;			.callMethod(URLEncoder.class, &quot;encode&quot;, String.class, String.class)</b>
+<b class="nc">&nbsp;			.because(&quot;java.net.URLEncoder.encode(String s, Charset charset) should be used instead&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArchRule noClassesShouldCallURLDecoderWithStringEncoding() {
+<b class="nc">&nbsp;		return ArchRuleDefinition.noClasses()</b>
+<b class="nc">&nbsp;			.should()</b>
+<b class="nc">&nbsp;			.callMethod(URLDecoder.class, &quot;decode&quot;, String.class, String.class)</b>
+<b class="nc">&nbsp;			.because(&quot;java.net.URLDecoder.decode(String s, Charset charset) should be used instead&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setClasses(FileCollection classes) {
+<b class="nc">&nbsp;		this.classes = classes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Internal
+&nbsp;	public FileCollection getClasses() {
+<b class="nc">&nbsp;		return this.classes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@InputFiles
+&nbsp;	@SkipWhenEmpty
+&nbsp;	@IgnoreEmptyDirectories
+&nbsp;	@PathSensitive(PathSensitivity.RELATIVE)
+&nbsp;	final FileTree getInputClasses() {
+<b class="nc">&nbsp;		return this.classes.getAsFileTree();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Optional
+&nbsp;	@InputFiles
+&nbsp;	@PathSensitive(PathSensitivity.RELATIVE)
+&nbsp;	public abstract DirectoryProperty getResourcesDirectory();
+&nbsp;
+&nbsp;	@OutputDirectory
+&nbsp;	public abstract DirectoryProperty getOutputDirectory();
+&nbsp;
+&nbsp;	@Internal
+&nbsp;	public abstract ListProperty&lt;ArchRule&gt; getRules();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	// The rules themselves can&#39;t be an input as they aren&#39;t serializable so we use their
+&nbsp;	// descriptions instead
+&nbsp;	abstract ListProperty&lt;String&gt; getRuleDescriptions();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

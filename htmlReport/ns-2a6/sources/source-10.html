@@ -1,0 +1,416 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoggingSystemProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: LoggingSystemProperties (org.springframework.boot.logging)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoggingSystemProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/69)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.logging;
+&nbsp;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.springframework.boot.system.ApplicationPid;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.PropertyResolver;
+&nbsp;import org.springframework.core.env.PropertySourcesPropertyResolver;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility to set system properties that can later be used by log configuration files.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Vedran Pavic
+&nbsp; * @author Robert Thornton
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Jonatan Ivanov
+&nbsp; * @since 2.0.0
+&nbsp; * @see LoggingSystemProperty
+&nbsp; */
+&nbsp;public class LoggingSystemProperties {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the process ID.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#PID}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String PID_KEY = LoggingSystemProperty.PID.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the exception conversion word.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#EXCEPTION_CONVERSION_WORD}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String EXCEPTION_CONVERSION_WORD = LoggingSystemProperty.EXCEPTION_CONVERSION_WORD</b>
+<b class="nc">&nbsp;		.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the log file.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#LOG_FILE}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String LOG_FILE = LoggingSystemProperty.LOG_FILE.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the log path.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#LOG_PATH}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String LOG_PATH = LoggingSystemProperty.LOG_PATH.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the console log pattern.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#CONSOLE_PATTERN}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String CONSOLE_LOG_PATTERN = LoggingSystemProperty.CONSOLE_PATTERN.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the console log charset.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#CONSOLE_CHARSET}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String CONSOLE_LOG_CHARSET = LoggingSystemProperty.CONSOLE_CHARSET.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The log level threshold for console log.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#CONSOLE_THRESHOLD}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String CONSOLE_LOG_THRESHOLD = LoggingSystemProperty.CONSOLE_THRESHOLD</b>
+<b class="nc">&nbsp;		.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the file log pattern.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#FILE_PATTERN}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String FILE_LOG_PATTERN = LoggingSystemProperty.FILE_PATTERN.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the file log charset.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#FILE_CHARSET}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String FILE_LOG_CHARSET = LoggingSystemProperty.FILE_CHARSET.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The log level threshold for file log.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#FILE_THRESHOLD}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String FILE_LOG_THRESHOLD = LoggingSystemProperty.FILE_THRESHOLD.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the log level pattern.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#LEVEL_PATTERN}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String LOG_LEVEL_PATTERN = LoggingSystemProperty.LEVEL_PATTERN.getEnvironmentVariableName();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the System property that contains the log date-format pattern.
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of calling
+&nbsp;	 * {@link LoggingSystemProperty#getEnvironmentVariableName()} on
+&nbsp;	 * {@link LoggingSystemProperty#DATEFORMAT_PATTERN}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+<b class="nc">&nbsp;	public static final String LOG_DATEFORMAT_PATTERN = LoggingSystemProperty.DATEFORMAT_PATTERN</b>
+<b class="nc">&nbsp;		.getEnvironmentVariableName();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final BiConsumer&lt;String, String&gt; systemPropertySetter = (name, value) -&gt; {</b>
+<b class="nc">&nbsp;		if (System.getProperty(name) == null &amp;&amp; value != null) {</b>
+<b class="nc">&nbsp;			System.setProperty(name, value);</b>
+&nbsp;		}
+&nbsp;	};
+&nbsp;
+&nbsp;	private final Environment environment;
+&nbsp;
+&nbsp;	private final Function&lt;String, String&gt; defaultValueResolver;
+&nbsp;
+&nbsp;	private final BiConsumer&lt;String, String&gt; setter;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LoggingSystemProperties} instance.
+&nbsp;	 * @param environment the source environment
+&nbsp;	 */
+&nbsp;	public LoggingSystemProperties(Environment environment) {
+<b class="nc">&nbsp;		this(environment, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LoggingSystemProperties} instance.
+&nbsp;	 * @param environment the source environment
+&nbsp;	 * @param setter setter used to apply the property or {@code null} for system
+&nbsp;	 * properties
+&nbsp;	 * @since 2.4.2
+&nbsp;	 */
+&nbsp;	public LoggingSystemProperties(Environment environment, BiConsumer&lt;String, String&gt; setter) {
+<b class="nc">&nbsp;		this(environment, null, setter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LoggingSystemProperties} instance.
+&nbsp;	 * @param environment the source environment
+&nbsp;	 * @param defaultValueResolver function used to resolve default values or {@code null}
+&nbsp;	 * @param setter setter used to apply the property or {@code null} for system
+&nbsp;	 * properties
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public LoggingSystemProperties(Environment environment, Function&lt;String, String&gt; defaultValueResolver,
+<b class="nc">&nbsp;			BiConsumer&lt;String, String&gt; setter) {</b>
+<b class="nc">&nbsp;		Assert.notNull(environment, &quot;Environment must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.environment = environment;</b>
+<b class="nc">&nbsp;		this.defaultValueResolver = (defaultValueResolver != null) ? defaultValueResolver : (name) -&gt; null;</b>
+<b class="nc">&nbsp;		this.setter = (setter != null) ? setter : systemPropertySetter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Charset getDefaultCharset() {
+<b class="nc">&nbsp;		return StandardCharsets.UTF_8;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public final void apply() {
+<b class="nc">&nbsp;		apply(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public final void apply(LogFile logFile) {
+<b class="nc">&nbsp;		PropertyResolver resolver = getPropertyResolver();</b>
+<b class="nc">&nbsp;		apply(logFile, resolver);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private PropertyResolver getPropertyResolver() {
+<b class="nc">&nbsp;		if (this.environment instanceof ConfigurableEnvironment configurableEnvironment) {</b>
+<b class="nc">&nbsp;			PropertySourcesPropertyResolver resolver = new PropertySourcesPropertyResolver(</b>
+<b class="nc">&nbsp;					configurableEnvironment.getPropertySources());</b>
+<b class="nc">&nbsp;			resolver.setConversionService(((ConfigurableEnvironment) this.environment).getConversionService());</b>
+<b class="nc">&nbsp;			resolver.setIgnoreUnresolvableNestedPlaceholders(true);</b>
+<b class="nc">&nbsp;			return resolver;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.environment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void apply(LogFile logFile, PropertyResolver resolver) {
+<b class="nc">&nbsp;		String defaultCharsetName = getDefaultCharset().name();</b>
+<b class="nc">&nbsp;		setApplicationNameSystemProperty(resolver);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.PID, new ApplicationPid().toString());</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.CONSOLE_CHARSET, resolver, defaultCharsetName);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.FILE_CHARSET, resolver, defaultCharsetName);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.CONSOLE_THRESHOLD, resolver);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.FILE_THRESHOLD, resolver);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.EXCEPTION_CONVERSION_WORD, resolver);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.CONSOLE_PATTERN, resolver);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.FILE_PATTERN, resolver);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.LEVEL_PATTERN, resolver);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.DATEFORMAT_PATTERN, resolver);</b>
+<b class="nc">&nbsp;		setSystemProperty(LoggingSystemProperty.CORRELATION_PATTERN, resolver);</b>
+<b class="nc">&nbsp;		if (logFile != null) {</b>
+<b class="nc">&nbsp;			logFile.applyToSystemProperties();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setApplicationNameSystemProperty(PropertyResolver resolver) {
+<b class="nc">&nbsp;		if (resolver.getProperty(&quot;logging.include-application-name&quot;, Boolean.class, Boolean.TRUE)) {</b>
+<b class="nc">&nbsp;			String applicationName = resolver.getProperty(&quot;spring.application.name&quot;);</b>
+<b class="nc">&nbsp;			if (StringUtils.hasText(applicationName)) {</b>
+<b class="nc">&nbsp;				setSystemProperty(LoggingSystemProperty.APPLICATION_NAME.getEnvironmentVariableName(),</b>
+<b class="nc">&nbsp;						&quot;[%s] &quot;.formatted(applicationName));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setSystemProperty(LoggingSystemProperty property, PropertyResolver resolver) {
+<b class="nc">&nbsp;		setSystemProperty(property, resolver, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setSystemProperty(LoggingSystemProperty property, PropertyResolver resolver, String defaultValue) {
+<b class="nc">&nbsp;		String value = (property.getApplicationPropertyName() != null)</b>
+<b class="nc">&nbsp;				? resolver.getProperty(property.getApplicationPropertyName()) : null;</b>
+<b class="nc">&nbsp;		value = (value != null) ? value : this.defaultValueResolver.apply(property.getApplicationPropertyName());</b>
+<b class="nc">&nbsp;		value = (value != null) ? value : defaultValue;</b>
+<b class="nc">&nbsp;		setSystemProperty(property.getEnvironmentVariableName(), value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setSystemProperty(LoggingSystemProperty property, String value) {
+<b class="nc">&nbsp;		setSystemProperty(property.getEnvironmentVariableName(), value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set a system property.
+&nbsp;	 * @param resolver the resolver used to get the property value
+&nbsp;	 * @param systemPropertyName the system property name
+&nbsp;	 * @param propertyName the application property name
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 with no replacement
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	protected final void setSystemProperty(PropertyResolver resolver, String systemPropertyName, String propertyName) {
+<b class="nc">&nbsp;		setSystemProperty(resolver, systemPropertyName, propertyName, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set a system property.
+&nbsp;	 * @param resolver the resolver used to get the property value
+&nbsp;	 * @param systemPropertyName the system property name
+&nbsp;	 * @param propertyName the application property name
+&nbsp;	 * @param defaultValue the default value if none can be resolved
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 with no replacement
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	protected final void setSystemProperty(PropertyResolver resolver, String systemPropertyName, String propertyName,
+&nbsp;			String defaultValue) {
+<b class="nc">&nbsp;		String value = resolver.getProperty(propertyName);</b>
+<b class="nc">&nbsp;		value = (value != null) ? value : this.defaultValueResolver.apply(systemPropertyName);</b>
+<b class="nc">&nbsp;		value = (value != null) ? value : defaultValue;</b>
+<b class="nc">&nbsp;		setSystemProperty(systemPropertyName, value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set a system property.
+&nbsp;	 * @param name the property name
+&nbsp;	 * @param value the value
+&nbsp;	 */
+&nbsp;	protected final void setSystemProperty(String name, String value) {
+<b class="nc">&nbsp;		this.setter.accept(name, value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

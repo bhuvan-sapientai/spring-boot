@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SizeCalculatingEntryWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: SizeCalculatingEntryWriter (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SizeCalculatingEntryWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SizeCalculatingEntryWriter$SizeCalculatingOutputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EntryWriter} that always provides size information.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;final class SizeCalculatingEntryWriter implements EntryWriter {
+&nbsp;
+&nbsp;	static final int THRESHOLD = 1024 * 20;
+&nbsp;
+&nbsp;	private final Object content;
+&nbsp;
+&nbsp;	private final int size;
+&nbsp;
+<b class="nc">&nbsp;	private SizeCalculatingEntryWriter(EntryWriter entryWriter) throws IOException {</b>
+<b class="nc">&nbsp;		SizeCalculatingOutputStream outputStream = new SizeCalculatingOutputStream();</b>
+<b class="nc">&nbsp;		try (outputStream) {</b>
+<b class="nc">&nbsp;			entryWriter.write(outputStream);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		this.content = outputStream.getContent();</b>
+<b class="nc">&nbsp;		this.size = outputStream.getSize();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void write(OutputStream outputStream) throws IOException {
+<b class="nc">&nbsp;		InputStream inputStream = getContentInputStream();</b>
+<b class="nc">&nbsp;		copy(inputStream, outputStream);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private InputStream getContentInputStream() throws FileNotFoundException {
+<b class="nc">&nbsp;		if (this.content instanceof File file) {</b>
+<b class="nc">&nbsp;			return new FileInputStream(file);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ByteArrayInputStream((byte[]) this.content);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void copy(InputStream inputStream, OutputStream outputStream) throws IOException {
+<b class="nc">&nbsp;		try (inputStream) {</b>
+<b class="nc">&nbsp;			StreamUtils.copy(inputStream, outputStream);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int size() {
+<b class="nc">&nbsp;		return this.size;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static EntryWriter get(EntryWriter entryWriter) throws IOException {
+<b class="nc">&nbsp;		if (entryWriter == null || entryWriter.size() != -1) {</b>
+<b class="nc">&nbsp;			return entryWriter;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new SizeCalculatingEntryWriter(entryWriter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link OutputStream} to calculate the size and allow content to be written again.
+&nbsp;	 */
+&nbsp;	private static class SizeCalculatingOutputStream extends OutputStream {
+&nbsp;
+<b class="nc">&nbsp;		private int size = 0;</b>
+&nbsp;
+&nbsp;		private File tempFile;
+&nbsp;
+&nbsp;		private OutputStream outputStream;
+&nbsp;
+<b class="nc">&nbsp;		SizeCalculatingOutputStream() {</b>
+<b class="nc">&nbsp;			this.outputStream = new ByteArrayOutputStream();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void write(int b) throws IOException {
+<b class="nc">&nbsp;			write(new byte[] { (byte) b }, 0, 1);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void write(byte[] b, int off, int len) throws IOException {
+<b class="nc">&nbsp;			int updatedSize = this.size + len;</b>
+<b class="nc">&nbsp;			if (updatedSize &gt; THRESHOLD &amp;&amp; this.outputStream instanceof ByteArrayOutputStream byteArrayOutputStream) {</b>
+<b class="nc">&nbsp;				this.outputStream = convertToFileOutputStream(byteArrayOutputStream);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.outputStream.write(b, off, len);</b>
+<b class="nc">&nbsp;			this.size = updatedSize;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private OutputStream convertToFileOutputStream(ByteArrayOutputStream byteArrayOutputStream) throws IOException {
+<b class="nc">&nbsp;			initializeTempFile();</b>
+<b class="nc">&nbsp;			FileOutputStream fileOutputStream = new FileOutputStream(this.tempFile);</b>
+<b class="nc">&nbsp;			StreamUtils.copy(byteArrayOutputStream.toByteArray(), fileOutputStream);</b>
+<b class="nc">&nbsp;			return fileOutputStream;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void initializeTempFile() throws IOException {
+<b class="nc">&nbsp;			if (this.tempFile == null) {</b>
+<b class="nc">&nbsp;				this.tempFile = File.createTempFile(&quot;springboot-&quot;, &quot;-entrycontent&quot;);</b>
+<b class="nc">&nbsp;				this.tempFile.deleteOnExit();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+<b class="nc">&nbsp;			this.outputStream.close();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Object getContent() {
+<b class="nc">&nbsp;			return (this.outputStream instanceof ByteArrayOutputStream byteArrayOutputStream)</b>
+<b class="nc">&nbsp;					? byteArrayOutputStream.toByteArray() : this.tempFile;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		int getSize() {
+<b class="nc">&nbsp;			return this.size;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Archive</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.launch</a>
+</div>
+
+<h1>Coverage Summary for Class: Archive (org.springframework.boot.loader.launch)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Archive</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Archive$Entry</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.launch;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URL;
+&nbsp;import java.security.CodeSource;
+&nbsp;import java.security.ProtectionDomain;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;/**
+&nbsp; * An archive that can be launched by the {@link Launcher}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.2.0
+&nbsp; */
+&nbsp;public interface Archive extends AutoCloseable {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Predicate that accepts all entries.
+&nbsp;	 */
+<b class="nc">&nbsp;	Predicate&lt;Entry&gt; ALL_ENTRIES = (entry) -&gt; true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the manifest of the archive.
+&nbsp;	 * @return the manifest or {@code null}
+&nbsp;	 * @throws IOException if the manifest cannot be read
+&nbsp;	 */
+&nbsp;	Manifest getManifest() throws IOException;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns classpath URLs for the archive that match the specified filter.
+&nbsp;	 * @param includeFilter filter used to determine which entries should be included.
+&nbsp;	 * @return the classpath URLs
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	default Set&lt;URL&gt; getClassPathUrls(Predicate&lt;Entry&gt; includeFilter) throws IOException {
+<b class="nc">&nbsp;		return getClassPathUrls(includeFilter, ALL_ENTRIES);</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns classpath URLs for the archive that match the specified filters.
+&nbsp;	 * @param includeFilter filter used to determine which entries should be included
+&nbsp;	 * @param directorySearchFilter filter used to optimize tree walking for exploded
+&nbsp;	 * archives by determining if a directory needs to be searched or not
+&nbsp;	 * @return the classpath URLs
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	Set&lt;URL&gt; getClassPathUrls(Predicate&lt;Entry&gt; includeFilter, Predicate&lt;Entry&gt; directorySearchFilter)
+&nbsp;			throws IOException;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if this archive is backed by an exploded archive directory.
+&nbsp;	 * @return if the archive is exploded
+&nbsp;	 */
+&nbsp;	default boolean isExploded() {
+<b class="nc">&nbsp;		return getRootDirectory() != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the root directory of this archive or {@code null} if the archive is not
+&nbsp;	 * backed by a directory.
+&nbsp;	 * @return the root directory
+&nbsp;	 */
+&nbsp;	default File getRootDirectory() {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Closes the {@code Archive}, releasing any open resources.
+&nbsp;	 * @throws Exception if an error occurs during close processing
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	default void close() throws Exception {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create an appropriate {@link Archive} from the given
+&nbsp;	 * {@link Class} target.
+&nbsp;	 * @param target a target class that will be used to find the archive code source
+&nbsp;	 * @return an new {@link Archive} instance
+&nbsp;	 * @throws Exception if the archive cannot be created
+&nbsp;	 */
+&nbsp;	static Archive create(Class&lt;?&gt; target) throws Exception {
+<b class="nc">&nbsp;		return create(target.getProtectionDomain());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static Archive create(ProtectionDomain protectionDomain) throws Exception {
+<b class="nc">&nbsp;		CodeSource codeSource = protectionDomain.getCodeSource();</b>
+<b class="nc">&nbsp;		URI location = (codeSource != null) ? codeSource.getLocation().toURI() : null;</b>
+<b class="nc">&nbsp;		String path = (location != null) ? location.getSchemeSpecificPart() : null;</b>
+<b class="nc">&nbsp;		if (path == null) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to determine code source archive&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return create(new File(path));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create an {@link Archive} from the given {@link File} target.
+&nbsp;	 * @param target a target {@link File} used to create the archive. May be a directory
+&nbsp;	 * or a jar file.
+&nbsp;	 * @return a new {@link Archive} instance.
+&nbsp;	 * @throws Exception if the archive cannot be created
+&nbsp;	 */
+&nbsp;	static Archive create(File target) throws Exception {
+<b class="nc">&nbsp;		if (!target.exists()) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to determine code source archive from &quot; + target);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (target.isDirectory() ? new ExplodedArchive(target) : new JarFileArchive(target));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Represents a single entry in the archive.
+&nbsp;	 */
+&nbsp;	interface Entry {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns the name of the entry.
+&nbsp;		 * @return the name of the entry
+&nbsp;		 */
+&nbsp;		String name();
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns {@code true} if the entry represents a directory.
+&nbsp;		 * @return if the entry is a directory
+&nbsp;		 */
+&nbsp;		boolean isDirectory();
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

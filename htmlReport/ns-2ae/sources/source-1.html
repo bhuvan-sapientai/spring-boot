@@ -1,0 +1,497 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConnectionFactoryBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.r2dbc</a>
+</div>
+
+<h1>Coverage Summary for Class: ConnectionFactoryBuilder (org.springframework.boot.r2dbc)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConnectionFactoryBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConnectionFactoryBuilder$OptionsCapableWrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConnectionFactoryBuilder$PoolingAwareOptionsCapableWrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/79)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/119)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.r2dbc;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import io.r2dbc.pool.ConnectionPool;
+&nbsp;import io.r2dbc.pool.ConnectionPoolConfiguration;
+&nbsp;import io.r2dbc.pool.PoolingConnectionFactoryProvider;
+&nbsp;import io.r2dbc.spi.Connection;
+&nbsp;import io.r2dbc.spi.ConnectionFactories;
+&nbsp;import io.r2dbc.spi.ConnectionFactory;
+&nbsp;import io.r2dbc.spi.ConnectionFactoryOptions;
+&nbsp;import io.r2dbc.spi.ConnectionFactoryOptions.Builder;
+&nbsp;import io.r2dbc.spi.ValidationDepth;
+&nbsp;import org.reactivestreams.Publisher;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builder for {@link ConnectionFactory}.
+&nbsp; *
+&nbsp; * @author Mark Paluch
+&nbsp; * @author Tadaya Tsuyukubo
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 2.5.0
+&nbsp; */
+&nbsp;public final class ConnectionFactoryBuilder {
+&nbsp;
+&nbsp;	private static final OptionsCapableWrapper optionsCapableWrapper;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		if (ClassUtils.isPresent(&quot;io.r2dbc.pool.ConnectionPool&quot;, ConnectionFactoryBuilder.class.getClassLoader())) {</b>
+<b class="nc">&nbsp;			optionsCapableWrapper = new PoolingAwareOptionsCapableWrapper();</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			optionsCapableWrapper = new OptionsCapableWrapper();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final String COLON = &quot;:&quot;;
+&nbsp;
+&nbsp;	private final Builder optionsBuilder;
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;ConnectionFactoryDecorator&gt; decorators = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private ConnectionFactoryBuilder(Builder optionsBuilder) {</b>
+<b class="nc">&nbsp;		this.optionsBuilder = optionsBuilder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize a new {@link ConnectionFactoryBuilder} based on the specified R2DBC url.
+&nbsp;	 * @param url the url to use
+&nbsp;	 * @return a new builder initialized with the options exposed in the specified url
+&nbsp;	 * @see EmbeddedDatabaseConnection#getUrl(String)
+&nbsp;	 */
+&nbsp;	public static ConnectionFactoryBuilder withUrl(String url) {
+<b class="nc">&nbsp;		Assert.hasText(url, () -&gt; &quot;Url must not be null&quot;);</b>
+<b class="nc">&nbsp;		return withOptions(ConnectionFactoryOptions.parse(url).mutate());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize a new {@link ConnectionFactoryBuilder} based on the specified
+&nbsp;	 * {@link Builder options}.
+&nbsp;	 * @param options the options to use to initialize the builder
+&nbsp;	 * @return a new builder initialized with the settings defined in the given
+&nbsp;	 * {@link Builder options}
+&nbsp;	 */
+&nbsp;	public static ConnectionFactoryBuilder withOptions(Builder options) {
+<b class="nc">&nbsp;		return new ConnectionFactoryBuilder(options);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize a new {@link ConnectionFactoryBuilder} derived from the options of the
+&nbsp;	 * specified {@code connectionFactory}.
+&nbsp;	 * @param connectionFactory the connection factory whose options are to be used to
+&nbsp;	 * initialize the builder
+&nbsp;	 * @return a new builder initialized with the options from the connection factory
+&nbsp;	 * @since 2.5.1
+&nbsp;	 */
+&nbsp;	public static ConnectionFactoryBuilder derivedFrom(ConnectionFactory connectionFactory) {
+<b class="nc">&nbsp;		ConnectionFactoryOptions options = extractOptionsIfPossible(connectionFactory);</b>
+<b class="nc">&nbsp;		if (options == null) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(</b>
+&nbsp;					&quot;ConnectionFactoryOptions could not be extracted from &quot; + connectionFactory);
+&nbsp;		}
+<b class="nc">&nbsp;		return withOptions(options.mutate());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ConnectionFactoryOptions extractOptionsIfPossible(ConnectionFactory connectionFactory) {
+<b class="nc">&nbsp;		OptionsCapableConnectionFactory optionsCapable = OptionsCapableConnectionFactory.unwrapFrom(connectionFactory);</b>
+<b class="nc">&nbsp;		if (optionsCapable != null) {</b>
+<b class="nc">&nbsp;			return optionsCapable.getOptions();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure additional options.
+&nbsp;	 * @param options a {@link Consumer} to customize the options
+&nbsp;	 * @return this for method chaining
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryBuilder configure(Consumer&lt;Builder&gt; options) {
+<b class="nc">&nbsp;		options.accept(this.optionsBuilder);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the {@linkplain ConnectionFactoryOptions#USER username}.
+&nbsp;	 * @param username the connection factory username
+&nbsp;	 * @return this for method chaining
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryBuilder username(String username) {
+<b class="nc">&nbsp;		return configure((options) -&gt; options.option(ConnectionFactoryOptions.USER, username));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the {@linkplain ConnectionFactoryOptions#PASSWORD password}.
+&nbsp;	 * @param password the connection factory password
+&nbsp;	 * @return this for method chaining
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryBuilder password(CharSequence password) {
+<b class="nc">&nbsp;		return configure((options) -&gt; options.option(ConnectionFactoryOptions.PASSWORD, password));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the {@linkplain ConnectionFactoryOptions#HOST host name}.
+&nbsp;	 * @param host the connection factory hostname
+&nbsp;	 * @return this for method chaining
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryBuilder hostname(String host) {
+<b class="nc">&nbsp;		return configure((options) -&gt; options.option(ConnectionFactoryOptions.HOST, host));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the {@linkplain ConnectionFactoryOptions#PORT port}.
+&nbsp;	 * @param port the connection factory port
+&nbsp;	 * @return this for method chaining
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryBuilder port(int port) {
+<b class="nc">&nbsp;		return configure((options) -&gt; options.option(ConnectionFactoryOptions.PORT, port));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the {@linkplain ConnectionFactoryOptions#DATABASE database}.
+&nbsp;	 * @param database the connection factory database
+&nbsp;	 * @return this for method chaining
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryBuilder database(String database) {
+<b class="nc">&nbsp;		return configure((options) -&gt; options.option(ConnectionFactoryOptions.DATABASE, database));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add a {@link ConnectionFactoryDecorator decorator}.
+&nbsp;	 * @param decorator the decorator to add
+&nbsp;	 * @return this for method chaining
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryBuilder decorator(ConnectionFactoryDecorator decorator) {
+<b class="nc">&nbsp;		this.decorators.add(decorator);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link ConnectionFactoryDecorator decorators}.
+&nbsp;	 * @param decorators the decorators to add
+&nbsp;	 * @return this for method chaining
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryBuilder decorators(Iterable&lt;ConnectionFactoryDecorator&gt; decorators) {
+<b class="nc">&nbsp;		for (ConnectionFactoryDecorator decorator : decorators) {</b>
+<b class="nc">&nbsp;			this.decorators.add(decorator);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Build a {@link ConnectionFactory} based on the state of this builder.
+&nbsp;	 * @return a connection factory
+&nbsp;	 */
+&nbsp;	public ConnectionFactory build() {
+<b class="nc">&nbsp;		ConnectionFactoryOptions options = buildOptions();</b>
+<b class="nc">&nbsp;		ConnectionFactory connectionFactory = optionsCapableWrapper.buildAndWrap(options);</b>
+<b class="nc">&nbsp;		for (ConnectionFactoryDecorator decorator : this.decorators) {</b>
+<b class="nc">&nbsp;			connectionFactory = decorator.decorate(connectionFactory);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return connectionFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Build a {@link ConnectionFactoryOptions} based on the state of this builder.
+&nbsp;	 * @return the options
+&nbsp;	 */
+&nbsp;	public ConnectionFactoryOptions buildOptions() {
+<b class="nc">&nbsp;		return this.optionsBuilder.build();</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static class OptionsCapableWrapper {</b>
+&nbsp;
+&nbsp;		ConnectionFactory buildAndWrap(ConnectionFactoryOptions options) {
+<b class="nc">&nbsp;			ConnectionFactory connectionFactory = ConnectionFactories.get(options);</b>
+<b class="nc">&nbsp;			return new OptionsCapableConnectionFactory(options, connectionFactory);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static final class PoolingAwareOptionsCapableWrapper extends OptionsCapableWrapper {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final PoolingConnectionFactoryProvider poolingProvider = new PoolingConnectionFactoryProvider();</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		ConnectionFactory buildAndWrap(ConnectionFactoryOptions options) {
+<b class="nc">&nbsp;			if (!this.poolingProvider.supports(options)) {</b>
+<b class="nc">&nbsp;				return super.buildAndWrap(options);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			ConnectionFactoryOptions delegateOptions = delegateFactoryOptions(options);</b>
+<b class="nc">&nbsp;			ConnectionFactory connectionFactory = super.buildAndWrap(delegateOptions);</b>
+<b class="nc">&nbsp;			ConnectionPoolConfiguration poolConfiguration = connectionPoolConfiguration(delegateOptions,</b>
+&nbsp;					connectionFactory);
+<b class="nc">&nbsp;			return new ConnectionPool(poolConfiguration);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConnectionFactoryOptions delegateFactoryOptions(ConnectionFactoryOptions options) {
+<b class="nc">&nbsp;			String protocol = toString(options.getRequiredValue(ConnectionFactoryOptions.PROTOCOL));</b>
+<b class="nc">&nbsp;			if (protocol.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(String.format(&quot;Protocol %s is not valid.&quot;, protocol));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String[] protocols = protocol.split(COLON, 2);</b>
+<b class="nc">&nbsp;			String driverDelegate = protocols[0];</b>
+<b class="nc">&nbsp;			String protocolDelegate = (protocols.length != 2) ? &quot;&quot; : protocols[1];</b>
+<b class="nc">&nbsp;			return ConnectionFactoryOptions.builder()</b>
+<b class="nc">&nbsp;				.from(options)</b>
+<b class="nc">&nbsp;				.option(ConnectionFactoryOptions.DRIVER, driverDelegate)</b>
+<b class="nc">&nbsp;				.option(ConnectionFactoryOptions.PROTOCOL, protocolDelegate)</b>
+<b class="nc">&nbsp;				.build();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		ConnectionPoolConfiguration connectionPoolConfiguration(ConnectionFactoryOptions options,
+&nbsp;				ConnectionFactory connectionFactory) {
+<b class="nc">&nbsp;			ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration.builder(connectionFactory);</b>
+<b class="nc">&nbsp;			PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.BACKGROUND_EVICTION_INTERVAL))</b>
+<b class="nc">&nbsp;				.as(this::toDuration)</b>
+<b class="nc">&nbsp;				.to(builder::backgroundEvictionInterval);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.INITIAL_SIZE))</b>
+<b class="nc">&nbsp;				.as(this::toInteger)</b>
+<b class="nc">&nbsp;				.to(builder::initialSize);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.MAX_SIZE))</b>
+<b class="nc">&nbsp;				.as(this::toInteger)</b>
+<b class="nc">&nbsp;				.to(builder::maxSize);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.ACQUIRE_RETRY))</b>
+<b class="nc">&nbsp;				.as(this::toInteger)</b>
+<b class="nc">&nbsp;				.to(builder::acquireRetry);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.MAX_LIFE_TIME))</b>
+<b class="nc">&nbsp;				.as(this::toDuration)</b>
+<b class="nc">&nbsp;				.to(builder::maxLifeTime);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.MAX_ACQUIRE_TIME))</b>
+<b class="nc">&nbsp;				.as(this::toDuration)</b>
+<b class="nc">&nbsp;				.to(builder::maxAcquireTime);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.MAX_IDLE_TIME))</b>
+<b class="nc">&nbsp;				.as(this::toDuration)</b>
+<b class="nc">&nbsp;				.to(builder::maxIdleTime);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.MAX_CREATE_CONNECTION_TIME))</b>
+<b class="nc">&nbsp;				.as(this::toDuration)</b>
+<b class="nc">&nbsp;				.to(builder::maxCreateConnectionTime);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.MAX_VALIDATION_TIME))</b>
+<b class="nc">&nbsp;				.as(this::toDuration)</b>
+<b class="nc">&nbsp;				.to(builder::maxValidationTime);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.MIN_IDLE))</b>
+<b class="nc">&nbsp;				.as(this::toInteger)</b>
+<b class="nc">&nbsp;				.to(builder::minIdle);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.POOL_NAME)).as(this::toString).to(builder::name);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.PRE_RELEASE))</b>
+<b class="nc">&nbsp;				.to((function) -&gt; builder</b>
+<b class="nc">&nbsp;					.preRelease((Function&lt;? super Connection, ? extends Publisher&lt;Void&gt;&gt;) function));</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.POST_ALLOCATE))</b>
+<b class="nc">&nbsp;				.to((function) -&gt; builder</b>
+<b class="nc">&nbsp;					.postAllocate((Function&lt;? super Connection, ? extends Publisher&lt;Void&gt;&gt;) function));</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.REGISTER_JMX))</b>
+<b class="nc">&nbsp;				.as(this::toBoolean)</b>
+<b class="nc">&nbsp;				.to(builder::registerJmx);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.VALIDATION_QUERY))</b>
+<b class="nc">&nbsp;				.as(this::toString)</b>
+<b class="nc">&nbsp;				.to(builder::validationQuery);</b>
+<b class="nc">&nbsp;			map.from(options.getValue(PoolingConnectionFactoryProvider.VALIDATION_DEPTH))</b>
+<b class="nc">&nbsp;				.as(this::toValidationDepth)</b>
+<b class="nc">&nbsp;				.to(builder::validationDepth);</b>
+<b class="nc">&nbsp;			return builder.build();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String toString(Object object) {
+<b class="nc">&nbsp;			return toType(String.class, object, String::valueOf);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Integer toInteger(Object object) {
+<b class="nc">&nbsp;			return toType(Integer.class, object, Integer::valueOf);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Duration toDuration(Object object) {
+<b class="nc">&nbsp;			return toType(Duration.class, object, Duration::parse);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Boolean toBoolean(Object object) {
+<b class="nc">&nbsp;			return toType(Boolean.class, object, Boolean::valueOf);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ValidationDepth toValidationDepth(Object object) {
+<b class="nc">&nbsp;			return toType(ValidationDepth.class, object,</b>
+<b class="nc">&nbsp;					(string) -&gt; ValidationDepth.valueOf(string.toUpperCase(Locale.ENGLISH)));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; T toType(Class&lt;T&gt; type, Object object, Function&lt;String, T&gt; converter) {
+<b class="nc">&nbsp;			if (type.isInstance(object)) {</b>
+<b class="nc">&nbsp;				return type.cast(object);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (object instanceof String string) {</b>
+<b class="nc">&nbsp;				return converter.apply(string);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Cannot convert &#39;&quot; + object + &quot;&#39; to &quot; + type.getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

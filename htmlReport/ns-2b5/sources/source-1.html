@@ -1,0 +1,218 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApplicationContextRequestMatcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.security.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: ApplicationContextRequestMatcher (org.springframework.boot.security.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApplicationContextRequestMatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.security.servlet;
+&nbsp;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpServletRequest;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.security.web.util.matcher.RequestMatcher;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.context.WebApplicationContext;
+&nbsp;import org.springframework.web.context.support.WebApplicationContextUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ApplicationContext} backed {@link RequestMatcher}. Can work directly with the
+&nbsp; * {@link ApplicationContext}, obtain an existing bean or
+&nbsp; * {@link AutowireCapableBeanFactory#createBean(Class, int, boolean) create a new bean}
+&nbsp; * that is autowired in the usual way.
+&nbsp; *
+&nbsp; * @param &lt;C&gt; the type of the context that the match method actually needs to use. Can be
+&nbsp; * an {@link ApplicationContext} or a class of an {@link ApplicationContext#getBean(Class)
+&nbsp; * existing bean}.
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public abstract class ApplicationContextRequestMatcher&lt;C&gt; implements RequestMatcher {
+&nbsp;
+&nbsp;	private final Class&lt;? extends C&gt; contextClass;
+&nbsp;
+&nbsp;	private volatile boolean initialized;
+&nbsp;
+<b class="nc">&nbsp;	private final Object initializeLock = new Object();</b>
+&nbsp;
+<b class="nc">&nbsp;	public ApplicationContextRequestMatcher(Class&lt;? extends C&gt; contextClass) {</b>
+<b class="nc">&nbsp;		Assert.notNull(contextClass, &quot;Context class must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.contextClass = contextClass;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final boolean matches(HttpServletRequest request) {
+<b class="nc">&nbsp;		WebApplicationContext webApplicationContext = WebApplicationContextUtils</b>
+<b class="nc">&nbsp;			.getRequiredWebApplicationContext(request.getServletContext());</b>
+<b class="nc">&nbsp;		if (ignoreApplicationContext(webApplicationContext)) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Supplier&lt;C&gt; context = () -&gt; getContext(webApplicationContext);</b>
+<b class="nc">&nbsp;		if (!this.initialized) {</b>
+<b class="nc">&nbsp;			synchronized (this.initializeLock) {</b>
+<b class="nc">&nbsp;				if (!this.initialized) {</b>
+<b class="nc">&nbsp;					initialized(context);</b>
+<b class="nc">&nbsp;					this.initialized = true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return matches(request, context);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private C getContext(WebApplicationContext webApplicationContext) {
+<b class="nc">&nbsp;		if (this.contextClass.isInstance(webApplicationContext)) {</b>
+<b class="nc">&nbsp;			return (C) webApplicationContext;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return webApplicationContext.getBean(this.contextClass);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if the {@link WebApplicationContext} should be ignored and not used for
+&nbsp;	 * matching. If this method returns {@code true} then the context will not be used and
+&nbsp;	 * the {@link #matches(HttpServletRequest) matches} method will return {@code false}.
+&nbsp;	 * @param webApplicationContext the candidate web application context
+&nbsp;	 * @return if the application context should be ignored
+&nbsp;	 * @since 2.1.8
+&nbsp;	 */
+&nbsp;	protected boolean ignoreApplicationContext(WebApplicationContext webApplicationContext) {
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Method that can be implemented by subclasses that wish to initialize items the
+&nbsp;	 * first time that the matcher is called. This method will be called only once and
+&nbsp;	 * only if {@link #ignoreApplicationContext(WebApplicationContext)} returns
+&nbsp;	 * {@code false}. Note that the supplied context will be based on the
+&nbsp;	 * &lt;strong&gt;first&lt;/strong&gt; request sent to the matcher.
+&nbsp;	 * @param context a supplier for the initialized context (may throw an exception)
+&nbsp;	 * @see #ignoreApplicationContext(WebApplicationContext)
+&nbsp;	 */
+&nbsp;	protected void initialized(Supplier&lt;C&gt; context) {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Decides whether the rule implemented by the strategy matches the supplied request.
+&nbsp;	 * @param request the source request
+&nbsp;	 * @param context a supplier for the initialized context (may throw an exception)
+&nbsp;	 * @return if the request matches
+&nbsp;	 */
+&nbsp;	protected abstract boolean matches(HttpServletRequest request, Supplier&lt;C&gt; context);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

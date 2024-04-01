@@ -1,0 +1,196 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CacheMetricsRegistrarConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.metrics.cache</a>
+</div>
+
+<h1>Coverage Summary for Class: CacheMetricsRegistrarConfiguration (org.springframework.boot.actuate.autoconfigure.metrics.cache)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CacheMetricsRegistrarConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.metrics.cache;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import io.micrometer.core.instrument.MeterRegistry;
+&nbsp;import io.micrometer.core.instrument.Tag;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.metrics.cache.CacheMeterBinderProvider;
+&nbsp;import org.springframework.boot.actuate.metrics.cache.CacheMetricsRegistrar;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.cache.Cache;
+&nbsp;import org.springframework.cache.CacheManager;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configure a {@link CacheMetricsRegistrar} and register all available {@link Cache
+&nbsp; * caches}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@ConditionalOnBean({ CacheMeterBinderProvider.class, MeterRegistry.class })
+&nbsp;class CacheMetricsRegistrarConfiguration {
+&nbsp;
+&nbsp;	private static final String CACHE_MANAGER_SUFFIX = &quot;cacheManager&quot;;
+&nbsp;
+&nbsp;	private final MeterRegistry registry;
+&nbsp;
+&nbsp;	private final CacheMetricsRegistrar cacheMetricsRegistrar;
+&nbsp;
+&nbsp;	private final Map&lt;String, CacheManager&gt; cacheManagers;
+&nbsp;
+&nbsp;	CacheMetricsRegistrarConfiguration(MeterRegistry registry, Collection&lt;CacheMeterBinderProvider&lt;?&gt;&gt; binderProviders,
+<b class="nc">&nbsp;			Map&lt;String, CacheManager&gt; cacheManagers) {</b>
+<b class="nc">&nbsp;		this.registry = registry;</b>
+<b class="nc">&nbsp;		this.cacheManagers = cacheManagers;</b>
+<b class="nc">&nbsp;		this.cacheMetricsRegistrar = new CacheMetricsRegistrar(this.registry, binderProviders);</b>
+<b class="nc">&nbsp;		bindCachesToRegistry();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	CacheMetricsRegistrar cacheMetricsRegistrar() {
+<b class="nc">&nbsp;		return this.cacheMetricsRegistrar;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void bindCachesToRegistry() {
+<b class="nc">&nbsp;		this.cacheManagers.forEach(this::bindCacheManagerToRegistry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void bindCacheManagerToRegistry(String beanName, CacheManager cacheManager) {
+<b class="nc">&nbsp;		cacheManager.getCacheNames()</b>
+<b class="nc">&nbsp;			.forEach((cacheName) -&gt; bindCacheToRegistry(beanName, cacheManager.getCache(cacheName)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void bindCacheToRegistry(String beanName, Cache cache) {
+<b class="nc">&nbsp;		Tag cacheManagerTag = Tag.of(&quot;cache.manager&quot;, getCacheManagerName(beanName));</b>
+<b class="nc">&nbsp;		this.cacheMetricsRegistrar.bindCacheToRegistry(cache, cacheManagerTag);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get the name of a {@link CacheManager} based on its {@code beanName}.
+&nbsp;	 * @param beanName the name of the {@link CacheManager} bean
+&nbsp;	 * @return a name for the given cache manager
+&nbsp;	 */
+&nbsp;	private String getCacheManagerName(String beanName) {
+<b class="nc">&nbsp;		if (beanName.length() &gt; CACHE_MANAGER_SUFFIX.length()</b>
+<b class="nc">&nbsp;				&amp;&amp; StringUtils.endsWithIgnoreCase(beanName, CACHE_MANAGER_SUFFIX)) {</b>
+<b class="nc">&nbsp;			return beanName.substring(0, beanName.length() - CACHE_MANAGER_SUFFIX.length());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return beanName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

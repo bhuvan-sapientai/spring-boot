@@ -1,0 +1,339 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ArtifactsLibraries</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: ArtifactsLibraries (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArtifactsLibraries</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ArtifactsLibraries$ArtifactLibraryCoordinates</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.apache.maven.artifact.Artifact;
+&nbsp;import org.apache.maven.model.Dependency;
+&nbsp;import org.apache.maven.plugin.logging.Log;
+&nbsp;import org.apache.maven.project.MavenProject;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.Libraries;
+&nbsp;import org.springframework.boot.loader.tools.Library;
+&nbsp;import org.springframework.boot.loader.tools.LibraryCallback;
+&nbsp;import org.springframework.boot.loader.tools.LibraryCoordinates;
+&nbsp;import org.springframework.boot.loader.tools.LibraryScope;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Libraries} backed by Maven {@link Artifact}s.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class ArtifactsLibraries implements Libraries {
+&nbsp;
+&nbsp;	private static final Map&lt;String, LibraryScope&gt; SCOPES;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Map&lt;String, LibraryScope&gt; libraryScopes = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		libraryScopes.put(Artifact.SCOPE_COMPILE, LibraryScope.COMPILE);</b>
+<b class="nc">&nbsp;		libraryScopes.put(Artifact.SCOPE_RUNTIME, LibraryScope.RUNTIME);</b>
+<b class="nc">&nbsp;		libraryScopes.put(Artifact.SCOPE_PROVIDED, LibraryScope.PROVIDED);</b>
+<b class="nc">&nbsp;		libraryScopes.put(Artifact.SCOPE_SYSTEM, LibraryScope.PROVIDED);</b>
+<b class="nc">&nbsp;		SCOPES = Collections.unmodifiableMap(libraryScopes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final Set&lt;Artifact&gt; artifacts;
+&nbsp;
+&nbsp;	private final Set&lt;Artifact&gt; includedArtifacts;
+&nbsp;
+&nbsp;	private final Collection&lt;MavenProject&gt; localProjects;
+&nbsp;
+&nbsp;	private final Collection&lt;Dependency&gt; unpacks;
+&nbsp;
+&nbsp;	private final Log log;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code ArtifactsLibraries} from the given {@code artifacts}.
+&nbsp;	 * @param artifacts the artifacts to represent as libraries
+&nbsp;	 * @param localProjects projects for which {@link Library#isLocal() local} libraries
+&nbsp;	 * should be created
+&nbsp;	 * @param unpacks artifacts that should be unpacked on launch
+&nbsp;	 * @param log the log
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public ArtifactsLibraries(Set&lt;Artifact&gt; artifacts, Collection&lt;MavenProject&gt; localProjects,
+&nbsp;			Collection&lt;Dependency&gt; unpacks, Log log) {
+<b class="nc">&nbsp;		this(artifacts, artifacts, localProjects, unpacks, log);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code ArtifactsLibraries} from the given {@code artifacts}.
+&nbsp;	 * @param artifacts all artifacts that can be represented as libraries
+&nbsp;	 * @param includedArtifacts the actual artifacts to include in the uber jar
+&nbsp;	 * @param localProjects projects for which {@link Library#isLocal() local} libraries
+&nbsp;	 * should be created
+&nbsp;	 * @param unpacks artifacts that should be unpacked on launch
+&nbsp;	 * @param log the log
+&nbsp;	 * @since 2.4.8
+&nbsp;	 */
+&nbsp;	public ArtifactsLibraries(Set&lt;Artifact&gt; artifacts, Set&lt;Artifact&gt; includedArtifacts,
+<b class="nc">&nbsp;			Collection&lt;MavenProject&gt; localProjects, Collection&lt;Dependency&gt; unpacks, Log log) {</b>
+<b class="nc">&nbsp;		this.artifacts = artifacts;</b>
+<b class="nc">&nbsp;		this.includedArtifacts = includedArtifacts;</b>
+<b class="nc">&nbsp;		this.localProjects = localProjects;</b>
+<b class="nc">&nbsp;		this.unpacks = unpacks;</b>
+<b class="nc">&nbsp;		this.log = log;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void doWithLibraries(LibraryCallback callback) throws IOException {
+<b class="nc">&nbsp;		Set&lt;String&gt; duplicates = getDuplicates(this.artifacts);</b>
+<b class="nc">&nbsp;		for (Artifact artifact : this.artifacts) {</b>
+<b class="nc">&nbsp;			String name = getFileName(artifact);</b>
+<b class="nc">&nbsp;			File file = artifact.getFile();</b>
+<b class="nc">&nbsp;			LibraryScope scope = SCOPES.get(artifact.getScope());</b>
+<b class="nc">&nbsp;			if (scope == null || file == null) {</b>
+<b class="nc">&nbsp;				continue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (duplicates.contains(name)) {</b>
+<b class="nc">&nbsp;				this.log.debug(&quot;Duplicate found: &quot; + name);</b>
+<b class="nc">&nbsp;				name = artifact.getGroupId() + &quot;-&quot; + name;</b>
+<b class="nc">&nbsp;				this.log.debug(&quot;Renamed to: &quot; + name);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			LibraryCoordinates coordinates = new ArtifactLibraryCoordinates(artifact);</b>
+<b class="nc">&nbsp;			boolean unpackRequired = isUnpackRequired(artifact);</b>
+<b class="nc">&nbsp;			boolean local = isLocal(artifact);</b>
+<b class="nc">&nbsp;			boolean included = this.includedArtifacts.contains(artifact);</b>
+<b class="nc">&nbsp;			callback.library(new Library(name, file, scope, coordinates, unpackRequired, local, included));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Set&lt;String&gt; getDuplicates(Set&lt;Artifact&gt; artifacts) {
+<b class="nc">&nbsp;		Set&lt;String&gt; duplicates = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; seen = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Artifact artifact : artifacts) {</b>
+<b class="nc">&nbsp;			String fileName = getFileName(artifact);</b>
+<b class="nc">&nbsp;			if (artifact.getFile() != null &amp;&amp; !seen.add(fileName)) {</b>
+<b class="nc">&nbsp;				duplicates.add(fileName);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return duplicates;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isUnpackRequired(Artifact artifact) {
+<b class="nc">&nbsp;		if (this.unpacks != null) {</b>
+<b class="nc">&nbsp;			for (Dependency unpack : this.unpacks) {</b>
+<b class="nc">&nbsp;				if (artifact.getGroupId().equals(unpack.getGroupId())</b>
+<b class="nc">&nbsp;						&amp;&amp; artifact.getArtifactId().equals(unpack.getArtifactId())) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isLocal(Artifact artifact) {
+<b class="nc">&nbsp;		for (MavenProject localProject : this.localProjects) {</b>
+<b class="nc">&nbsp;			if (localProject.getArtifact().equals(artifact)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (Artifact attachedArtifact : localProject.getAttachedArtifacts()) {</b>
+<b class="nc">&nbsp;				if (attachedArtifact.equals(artifact)) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getFileName(Artifact artifact) {
+<b class="nc">&nbsp;		StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;		sb.append(artifact.getArtifactId()).append(&quot;-&quot;).append(artifact.getBaseVersion());</b>
+<b class="nc">&nbsp;		String classifier = artifact.getClassifier();</b>
+<b class="nc">&nbsp;		if (classifier != null) {</b>
+<b class="nc">&nbsp;			sb.append(&quot;-&quot;).append(classifier);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		sb.append(&quot;.&quot;).append(artifact.getArtifactHandler().getExtension());</b>
+<b class="nc">&nbsp;		return sb.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link LibraryCoordinates} backed by a Maven {@link Artifact}.
+&nbsp;	 */
+&nbsp;	private static class ArtifactLibraryCoordinates implements LibraryCoordinates {
+&nbsp;
+&nbsp;		private final Artifact artifact;
+&nbsp;
+<b class="nc">&nbsp;		ArtifactLibraryCoordinates(Artifact artifact) {</b>
+<b class="nc">&nbsp;			this.artifact = artifact;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getGroupId() {
+<b class="nc">&nbsp;			return this.artifact.getGroupId();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getArtifactId() {
+<b class="nc">&nbsp;			return this.artifact.getArtifactId();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getVersion() {
+<b class="nc">&nbsp;			return this.artifact.getBaseVersion();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return this.artifact.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

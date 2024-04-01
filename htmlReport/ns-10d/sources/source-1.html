@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConnectionDetailsFactories</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.service.connection</a>
+</div>
+
+<h1>Coverage Summary for Class: ConnectionDetailsFactories (org.springframework.boot.autoconfigure.service.connection)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConnectionDetailsFactories</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConnectionDetailsFactories$Registration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.service.connection;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+&nbsp;import org.springframework.core.io.support.SpringFactoriesLoader;
+&nbsp;import org.springframework.core.io.support.SpringFactoriesLoader.FailureHandler;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * A registry of {@link ConnectionDetailsFactory} instances.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.1.0
+&nbsp; */
+&nbsp;public class ConnectionDetailsFactories {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ConnectionDetailsFactories.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;Registration&lt;?, ?&gt;&gt; registrations = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	public ConnectionDetailsFactories() {
+<b class="nc">&nbsp;		this(SpringFactoriesLoader.forDefaultResourceLocation(ConnectionDetailsFactory.class.getClassLoader()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+<b class="nc">&nbsp;	ConnectionDetailsFactories(SpringFactoriesLoader loader) {</b>
+<b class="nc">&nbsp;		List&lt;ConnectionDetailsFactory&gt; factories = loader.load(ConnectionDetailsFactory.class,</b>
+<b class="nc">&nbsp;				FailureHandler.logging(logger));</b>
+<b class="nc">&nbsp;		Stream&lt;Registration&lt;?, ?&gt;&gt; registrations = factories.stream().map(Registration::get);</b>
+<b class="nc">&nbsp;		registrations.filter(Objects::nonNull).forEach(this.registrations::add);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link Map} of {@link ConnectionDetails} interface type to
+&nbsp;	 * {@link ConnectionDetails} instance created from the factories associated with the
+&nbsp;	 * given source.
+&nbsp;	 * @param &lt;S&gt; the source type
+&nbsp;	 * @param source the source
+&nbsp;	 * @param required if a connection details result is required
+&nbsp;	 * @return a map of {@link ConnectionDetails} instances
+&nbsp;	 * @throws ConnectionDetailsFactoryNotFoundException if a result is required but no
+&nbsp;	 * connection details factory is registered for the source
+&nbsp;	 * @throws ConnectionDetailsNotFoundException if a result is required but no
+&nbsp;	 * connection details instance was created from a registered factory
+&nbsp;	 */
+&nbsp;	public &lt;S&gt; Map&lt;Class&lt;?&gt;, ConnectionDetails&gt; getConnectionDetails(S source, boolean required)
+&nbsp;			throws ConnectionDetailsFactoryNotFoundException, ConnectionDetailsNotFoundException {
+<b class="nc">&nbsp;		List&lt;Registration&lt;S, ?&gt;&gt; registrations = getRegistrations(source, required);</b>
+<b class="nc">&nbsp;		Map&lt;Class&lt;?&gt;, ConnectionDetails&gt; result = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Registration&lt;S, ?&gt; registration : registrations) {</b>
+<b class="nc">&nbsp;			ConnectionDetails connectionDetails = registration.factory().getConnectionDetails(source);</b>
+<b class="nc">&nbsp;			if (connectionDetails != null) {</b>
+<b class="nc">&nbsp;				Class&lt;?&gt; connectionDetailsType = registration.connectionDetailsType();</b>
+<b class="nc">&nbsp;				ConnectionDetails previous = result.put(connectionDetailsType, connectionDetails);</b>
+<b class="nc">&nbsp;				Assert.state(previous == null, () -&gt; &quot;Duplicate connection details supplied for %s&quot;</b>
+<b class="nc">&nbsp;					.formatted(connectionDetailsType.getName()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (required &amp;&amp; result.isEmpty()) {</b>
+<b class="nc">&nbsp;			throw new ConnectionDetailsNotFoundException(source);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Map.copyOf(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	&lt;S&gt; List&lt;Registration&lt;S, ?&gt;&gt; getRegistrations(S source, boolean required) {
+<b class="nc">&nbsp;		Class&lt;S&gt; sourceType = (Class&lt;S&gt;) source.getClass();</b>
+<b class="nc">&nbsp;		List&lt;Registration&lt;S, ?&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Registration&lt;?, ?&gt; candidate : this.registrations) {</b>
+<b class="nc">&nbsp;			if (candidate.sourceType().isAssignableFrom(sourceType)) {</b>
+<b class="nc">&nbsp;				result.add((Registration&lt;S, ?&gt;) candidate);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (required &amp;&amp; result.isEmpty()) {</b>
+<b class="nc">&nbsp;			throw new ConnectionDetailsFactoryNotFoundException(source);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		result.sort(Comparator.comparing(Registration::factory, AnnotationAwareOrderComparator.INSTANCE));</b>
+<b class="nc">&nbsp;		return List.copyOf(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A {@link ConnectionDetailsFactory} registration.
+&nbsp;	 *
+&nbsp;	 * @param &lt;S&gt; the source type
+&nbsp;	 * @param &lt;D&gt; the connection details type
+&nbsp;	 * @param sourceType the source type
+&nbsp;	 * @param connectionDetailsType the connection details type
+&nbsp;	 * @param factory the factory
+&nbsp;	 */
+<b class="nc">&nbsp;	record Registration&lt;S, D extends ConnectionDetails&gt;(Class&lt;S&gt; sourceType, Class&lt;D&gt; connectionDetailsType,</b>
+&nbsp;			ConnectionDetailsFactory&lt;S, D&gt; factory) {
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		private static &lt;S, D extends ConnectionDetails&gt; Registration&lt;S, D&gt; get(ConnectionDetailsFactory&lt;S, D&gt; factory) {
+<b class="nc">&nbsp;			ResolvableType type = ResolvableType.forClass(ConnectionDetailsFactory.class, factory.getClass());</b>
+<b class="nc">&nbsp;			if (!type.hasUnresolvableGenerics()) {</b>
+<b class="nc">&nbsp;				Class&lt;?&gt;[] generics = type.resolveGenerics();</b>
+<b class="nc">&nbsp;				return new Registration&lt;&gt;((Class&lt;S&gt;) generics[0], (Class&lt;D&gt;) generics[1], factory);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

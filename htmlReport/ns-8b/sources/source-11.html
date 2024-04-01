@@ -1,0 +1,247 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HealthEndpointGroups</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.health</a>
+</div>
+
+<h1>Coverage Summary for Class: HealthEndpointGroups (org.springframework.boot.actuate.health)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HealthEndpointGroups</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HealthEndpointGroups$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.health;
+&nbsp;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebServerNamespace;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * A collection of {@link HealthEndpointGroup groups} for use with a health endpoint.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.2.0
+&nbsp; */
+&nbsp;public interface HealthEndpointGroups {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the primary group used by the endpoint.
+&nbsp;	 * @return the primary group (never {@code null})
+&nbsp;	 */
+&nbsp;	HealthEndpointGroup getPrimary();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the names of any additional groups.
+&nbsp;	 * @return the additional group names
+&nbsp;	 */
+&nbsp;	Set&lt;String&gt; getNames();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the group with the specified name or {@code null} if the name is not known.
+&nbsp;	 * @param name the name of the group
+&nbsp;	 * @return the {@link HealthEndpointGroup} or {@code null}
+&nbsp;	 */
+&nbsp;	HealthEndpointGroup get(String name);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the group with the specified additional path or {@code null} if no group
+&nbsp;	 * with that path is found.
+&nbsp;	 * @param path the additional path
+&nbsp;	 * @return the matching {@link HealthEndpointGroup} or {@code null}
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	default HealthEndpointGroup get(AdditionalHealthEndpointPath path) {
+<b class="nc">&nbsp;		Assert.notNull(path, &quot;Path must not be null&quot;);</b>
+<b class="nc">&nbsp;		for (String name : getNames()) {</b>
+<b class="nc">&nbsp;			HealthEndpointGroup group = get(name);</b>
+<b class="nc">&nbsp;			if (path.equals(group.getAdditionalPath())) {</b>
+<b class="nc">&nbsp;				return group;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return all the groups with an additional path on the specified
+&nbsp;	 * {@link WebServerNamespace}.
+&nbsp;	 * @param namespace the {@link WebServerNamespace}
+&nbsp;	 * @return the matching groups
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	default Set&lt;HealthEndpointGroup&gt; getAllWithAdditionalPath(WebServerNamespace namespace) {
+<b class="nc">&nbsp;		Assert.notNull(namespace, &quot;Namespace must not be null&quot;);</b>
+<b class="nc">&nbsp;		Set&lt;HealthEndpointGroup&gt; filteredGroups = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		getNames().stream()</b>
+<b class="nc">&nbsp;			.map(this::get)</b>
+<b class="nc">&nbsp;			.filter((group) -&gt; group.getAdditionalPath() != null &amp;&amp; group.getAdditionalPath().hasNamespace(namespace))</b>
+<b class="nc">&nbsp;			.forEach(filteredGroups::add);</b>
+<b class="nc">&nbsp;		return filteredGroups;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a {@link HealthEndpointGroups} instance.
+&nbsp;	 * @param primary the primary group
+&nbsp;	 * @param additional the additional groups
+&nbsp;	 * @return a new {@link HealthEndpointGroups} instance
+&nbsp;	 */
+&nbsp;	static HealthEndpointGroups of(HealthEndpointGroup primary, Map&lt;String, HealthEndpointGroup&gt; additional) {
+<b class="nc">&nbsp;		Assert.notNull(primary, &quot;Primary must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(additional, &quot;Additional must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new HealthEndpointGroups() {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public HealthEndpointGroup getPrimary() {
+<b class="nc">&nbsp;				return primary;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public Set&lt;String&gt; getNames() {
+<b class="nc">&nbsp;				return additional.keySet();</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public HealthEndpointGroup get(String name) {
+<b class="nc">&nbsp;				return additional.get(name);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

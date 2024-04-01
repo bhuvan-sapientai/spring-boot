@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultJmsListenerContainerFactoryConfigurer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.jms</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultJmsListenerContainerFactoryConfigurer (org.springframework.boot.autoconfigure.jms)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultJmsListenerContainerFactoryConfigurer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.jms;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;
+&nbsp;import io.micrometer.observation.ObservationRegistry;
+&nbsp;import jakarta.jms.ConnectionFactory;
+&nbsp;import jakarta.jms.ExceptionListener;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.jms.JmsProperties.Listener.Session;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+&nbsp;import org.springframework.jms.support.converter.MessageConverter;
+&nbsp;import org.springframework.jms.support.destination.DestinationResolver;
+&nbsp;import org.springframework.transaction.jta.JtaTransactionManager;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configure {@link DefaultJmsListenerContainerFactory} with sensible defaults.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Vedran Pavic
+&nbsp; * @author Lasse Wulff
+&nbsp; * @since 1.3.3
+&nbsp; */
+<b class="nc">&nbsp;public final class DefaultJmsListenerContainerFactoryConfigurer {</b>
+&nbsp;
+&nbsp;	private DestinationResolver destinationResolver;
+&nbsp;
+&nbsp;	private MessageConverter messageConverter;
+&nbsp;
+&nbsp;	private ExceptionListener exceptionListener;
+&nbsp;
+&nbsp;	private JtaTransactionManager transactionManager;
+&nbsp;
+&nbsp;	private JmsProperties jmsProperties;
+&nbsp;
+&nbsp;	private ObservationRegistry observationRegistry;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link DestinationResolver} to use or {@code null} if no destination
+&nbsp;	 * resolver should be associated with the factory by default.
+&nbsp;	 * @param destinationResolver the {@link DestinationResolver}
+&nbsp;	 */
+&nbsp;	void setDestinationResolver(DestinationResolver destinationResolver) {
+<b class="nc">&nbsp;		this.destinationResolver = destinationResolver;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link MessageConverter} to use or {@code null} if the out-of-the-box
+&nbsp;	 * converter should be used.
+&nbsp;	 * @param messageConverter the {@link MessageConverter}
+&nbsp;	 */
+&nbsp;	void setMessageConverter(MessageConverter messageConverter) {
+<b class="nc">&nbsp;		this.messageConverter = messageConverter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link ExceptionListener} to use or {@code null} if no exception listener
+&nbsp;	 * should be associated by default.
+&nbsp;	 * @param exceptionListener the {@link ExceptionListener}
+&nbsp;	 */
+&nbsp;	void setExceptionListener(ExceptionListener exceptionListener) {
+<b class="nc">&nbsp;		this.exceptionListener = exceptionListener;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link JtaTransactionManager} to use or {@code null} if the JTA support
+&nbsp;	 * should not be used.
+&nbsp;	 * @param transactionManager the {@link JtaTransactionManager}
+&nbsp;	 */
+&nbsp;	void setTransactionManager(JtaTransactionManager transactionManager) {
+<b class="nc">&nbsp;		this.transactionManager = transactionManager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link JmsProperties} to use.
+&nbsp;	 * @param jmsProperties the {@link JmsProperties}
+&nbsp;	 */
+&nbsp;	void setJmsProperties(JmsProperties jmsProperties) {
+<b class="nc">&nbsp;		this.jmsProperties = jmsProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link ObservationRegistry} to use.
+&nbsp;	 * @param observationRegistry the {@link ObservationRegistry}
+&nbsp;	 * @since 3.2.1
+&nbsp;	 */
+&nbsp;	public void setObservationRegistry(ObservationRegistry observationRegistry) {
+<b class="nc">&nbsp;		this.observationRegistry = observationRegistry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the specified jms listener container factory. The factory can be further
+&nbsp;	 * tuned and default settings can be overridden.
+&nbsp;	 * @param factory the {@link DefaultJmsListenerContainerFactory} instance to configure
+&nbsp;	 * @param connectionFactory the {@link ConnectionFactory} to use
+&nbsp;	 */
+&nbsp;	public void configure(DefaultJmsListenerContainerFactory factory, ConnectionFactory connectionFactory) {
+<b class="nc">&nbsp;		Assert.notNull(factory, &quot;Factory must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(connectionFactory, &quot;ConnectionFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		JmsProperties.Listener listenerProperties = this.jmsProperties.getListener();</b>
+<b class="nc">&nbsp;		Session sessionProperties = listenerProperties.getSession();</b>
+<b class="nc">&nbsp;		factory.setConnectionFactory(connectionFactory);</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(this.jmsProperties::isPubSubDomain).to(factory::setPubSubDomain);</b>
+<b class="nc">&nbsp;		map.from(this.jmsProperties::isSubscriptionDurable).to(factory::setSubscriptionDurable);</b>
+<b class="nc">&nbsp;		map.from(this.jmsProperties::getClientId).to(factory::setClientId);</b>
+<b class="nc">&nbsp;		map.from(this.transactionManager).to(factory::setTransactionManager);</b>
+<b class="nc">&nbsp;		map.from(this.destinationResolver).to(factory::setDestinationResolver);</b>
+<b class="nc">&nbsp;		map.from(this.messageConverter).to(factory::setMessageConverter);</b>
+<b class="nc">&nbsp;		map.from(this.exceptionListener).to(factory::setExceptionListener);</b>
+<b class="nc">&nbsp;		map.from(sessionProperties.getAcknowledgeMode()::getMode).to(factory::setSessionAcknowledgeMode);</b>
+<b class="nc">&nbsp;		if (this.transactionManager == null &amp;&amp; sessionProperties.getTransacted() == null) {</b>
+<b class="nc">&nbsp;			factory.setSessionTransacted(true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		map.from(this.observationRegistry).to(factory::setObservationRegistry);</b>
+<b class="nc">&nbsp;		map.from(sessionProperties::getTransacted).to(factory::setSessionTransacted);</b>
+<b class="nc">&nbsp;		map.from(listenerProperties::isAutoStartup).to(factory::setAutoStartup);</b>
+<b class="nc">&nbsp;		map.from(listenerProperties::formatConcurrency).to(factory::setConcurrency);</b>
+<b class="nc">&nbsp;		map.from(listenerProperties::getReceiveTimeout).as(Duration::toMillis).to(factory::setReceiveTimeout);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

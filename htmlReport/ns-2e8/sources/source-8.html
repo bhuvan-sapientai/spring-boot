@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServiceConnectionContextCustomizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testcontainers.service.connection</a>
+</div>
+
+<h1>Coverage Summary for Class: ServiceConnectionContextCustomizer (org.springframework.boot.testcontainers.service.connection)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServiceConnectionContextCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ServiceConnectionContextCustomizer$CacheKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testcontainers.service.connection;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.testcontainers.containers.Container;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetails;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetailsFactories;
+&nbsp;import org.springframework.boot.testcontainers.lifecycle.TestcontainersLifecycleApplicationContextInitializer;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.test.context.ContextCustomizer;
+&nbsp;import org.springframework.test.context.MergedContextConfiguration;
+&nbsp;
+&nbsp;/**
+&nbsp; * Spring Test {@link ContextCustomizer} to support registering {@link ConnectionDetails}.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ServiceConnectionContextCustomizer implements ContextCustomizer {
+&nbsp;
+&nbsp;	private final List&lt;ContainerConnectionSource&lt;?&gt;&gt; sources;
+&nbsp;
+&nbsp;	private final Set&lt;CacheKey&gt; keys;
+&nbsp;
+&nbsp;	private final ConnectionDetailsFactories connectionDetailsFactories;
+&nbsp;
+&nbsp;	ServiceConnectionContextCustomizer(List&lt;ContainerConnectionSource&lt;?&gt;&gt; sources) {
+<b class="nc">&nbsp;		this(sources, new ConnectionDetailsFactories());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ServiceConnectionContextCustomizer(List&lt;ContainerConnectionSource&lt;?&gt;&gt; sources,
+<b class="nc">&nbsp;			ConnectionDetailsFactories connectionDetailsFactories) {</b>
+<b class="nc">&nbsp;		this.sources = sources;</b>
+<b class="nc">&nbsp;		this.keys = sources.stream().map(CacheKey::new).collect(Collectors.toUnmodifiableSet());</b>
+<b class="nc">&nbsp;		this.connectionDetailsFactories = connectionDetailsFactories;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void customizeContext(ConfigurableApplicationContext context, MergedContextConfiguration mergedConfig) {
+<b class="nc">&nbsp;		new TestcontainersLifecycleApplicationContextInitializer().initialize(context);</b>
+<b class="nc">&nbsp;		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();</b>
+<b class="nc">&nbsp;		if (beanFactory instanceof BeanDefinitionRegistry registry) {</b>
+<b class="nc">&nbsp;			new ConnectionDetailsRegistrar(beanFactory, this.connectionDetailsFactories)</b>
+<b class="nc">&nbsp;				.registerBeanDefinitions(registry, this.sources);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.keys.equals(((ServiceConnectionContextCustomizer) obj).keys);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return this.keys.hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	List&lt;ContainerConnectionSource&lt;?&gt;&gt; getSources() {
+<b class="nc">&nbsp;		return this.sources;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Relevant details from {@link ContainerConnectionSource} used as a
+&nbsp;	 * MergedContextConfiguration cache key.
+&nbsp;	 */
+<b class="nc">&nbsp;	private record CacheKey(String connectionName, Set&lt;Class&lt;?&gt;&gt; connectionDetailsTypes, Container&lt;?&gt; container) {</b>
+&nbsp;
+&nbsp;		CacheKey(ContainerConnectionSource&lt;?&gt; source) {
+<b class="nc">&nbsp;			this(source.getConnectionName(), source.getConnectionDetailsTypes(), source.getContainerSupplier().get());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

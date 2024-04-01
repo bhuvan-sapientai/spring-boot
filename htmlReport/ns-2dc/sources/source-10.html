@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpyBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.mock.mockito</a>
+</div>
+
+<h1>Coverage Summary for Class: SpyBean (org.springframework.boot.test.mock.mockito)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">SpyBean</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.mock.mockito;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Repeatable;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.junit.runner.RunWith;
+&nbsp;import org.mockito.Mockito;
+&nbsp;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.core.annotation.AliasFor;
+&nbsp;import org.springframework.test.context.junit4.SpringRunner;
+&nbsp;
+&nbsp;/**
+&nbsp; * Annotation that can be used to apply Mockito spies to a Spring
+&nbsp; * {@link ApplicationContext}. Can be used as a class level annotation or on fields in
+&nbsp; * either {@code @Configuration} classes, or test classes that are
+&nbsp; * {@link RunWith @RunWith} the {@link SpringRunner}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Spies can be applied by type or by {@link #name() bean name}. All beans in the context
+&nbsp; * of a matching type (including subclasses) will be wrapped with the spy. If no existing
+&nbsp; * bean is defined a new one will be added. Dependencies that are known to the application
+&nbsp; * context but are not beans (such as those
+&nbsp; * {@link org.springframework.beans.factory.config.ConfigurableListableBeanFactory#registerResolvableDependency(Class, Object)
+&nbsp; * registered directly}) will not be found and a spied bean will be added to the context
+&nbsp; * alongside the existing dependency.
+&nbsp; * &lt;p&gt;
+&nbsp; * When {@code @SpyBean} is used on a field, as well as being registered in the
+&nbsp; * application context, the spy will also be injected into the field. Typical usage might
+&nbsp; * be: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;RunWith(SpringRunner.class)
+&nbsp; * public class ExampleTests {
+&nbsp; *
+&nbsp; *     &amp;#064;SpyBean
+&nbsp; *     private ExampleService service;
+&nbsp; *
+&nbsp; *     &amp;#064;Autowired
+&nbsp; *     private UserOfService userOfService;
+&nbsp; *
+&nbsp; *     &amp;#064;Test
+&nbsp; *     public void testUserOfService() {
+&nbsp; *         String actual = this.userOfService.makeUse();
+&nbsp; *         assertEquals(&quot;Was: Hello&quot;, actual);
+&nbsp; *         verify(this.service).greet();
+&nbsp; *     }
+&nbsp; *
+&nbsp; *     &amp;#064;Configuration
+&nbsp; *     &amp;#064;Import(UserOfService.class) // A &amp;#064;Component injected with ExampleService
+&nbsp; *     static class Config {
+&nbsp; *     }
+&nbsp; *
+&nbsp; *
+&nbsp; * }
+&nbsp; * &lt;/pre&gt; If there is more than one bean of the requested type, qualifier metadata must be
+&nbsp; * specified at field level: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;RunWith(SpringRunner.class)
+&nbsp; * public class ExampleTests {
+&nbsp; *
+&nbsp; *     &amp;#064;SpyBean
+&nbsp; *     &amp;#064;Qualifier(&quot;example&quot;)
+&nbsp; *     private ExampleService service;
+&nbsp; *
+&nbsp; *     ...
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * This annotation is {@code @Repeatable} and may be specified multiple times when working
+&nbsp; * with Java 8 or contained within a {@link SpyBeans @SpyBeans} annotation.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; * @see MockitoPostProcessor
+&nbsp; */
+&nbsp;@Target({ ElementType.TYPE, ElementType.FIELD })
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Documented
+&nbsp;@Repeatable(SpyBeans.class)
+&nbsp;public @interface SpyBean {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the bean to spy. If not specified the name will either be generated or,
+&nbsp;	 * if the spy is for an existing bean, the existing name will be used.
+&nbsp;	 * @return the name of the bean
+&nbsp;	 */
+&nbsp;	String name() default &quot;&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The classes to spy. This is an alias of {@link #classes()} which can be used for
+&nbsp;	 * brevity if no other attributes are defined. See {@link #classes()} for details.
+&nbsp;	 * @return the classes to spy
+&nbsp;	 */
+&nbsp;	@AliasFor(&quot;classes&quot;)
+&nbsp;	Class&lt;?&gt;[] value() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The classes to spy. Each class specified here will result in a spy being applied.
+&nbsp;	 * Classes can be omitted when the annotation is used on a field.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * When {@code @SpyBean} also defines a {@code name} this attribute can only contain a
+&nbsp;	 * single value.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * If this is the only specified attribute consider using the {@code value} alias
+&nbsp;	 * instead.
+&nbsp;	 * @return the classes to spy
+&nbsp;	 */
+&nbsp;	@AliasFor(&quot;value&quot;)
+&nbsp;	Class&lt;?&gt;[] classes() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The reset mode to apply to the spied bean. The default is {@link MockReset#AFTER}
+&nbsp;	 * meaning that spies are automatically reset after each test method is invoked.
+&nbsp;	 * @return the reset mode
+&nbsp;	 */
+&nbsp;	MockReset reset() default MockReset.AFTER;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Indicates that Mockito methods such as {@link Mockito#verify(Object) verify(mock)}
+&nbsp;	 * should use the {@code target} of AOP advised beans, rather than the proxy itself.
+&nbsp;	 * If set to {@code false} you may need to use the result of
+&nbsp;	 * {@link org.springframework.test.util.AopTestUtils#getUltimateTargetObject(Object)
+&nbsp;	 * AopTestUtils.getUltimateTargetObject(...)} when calling Mockito methods.
+&nbsp;	 * @return {@code true} if the target of AOP advised beans is used or {@code false} if
+&nbsp;	 * the proxy is used directly
+&nbsp;	 */
+&nbsp;	boolean proxyTargetAware() default true;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

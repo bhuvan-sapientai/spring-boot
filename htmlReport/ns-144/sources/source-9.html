@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ZipFileTarArchive</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.io</a>
+</div>
+
+<h1>Coverage Summary for Class: ZipFileTarArchive (org.springframework.boot.buildpack.platform.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ZipFileTarArchive</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.io;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.util.Enumeration;
+&nbsp;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarConstants;
+&nbsp;import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.zip.ZipFile;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Adapter class to convert a ZIP file to a {@link TarArchive}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class ZipFileTarArchive implements TarArchive {
+&nbsp;
+<b class="nc">&nbsp;	static final long NORMALIZED_MOD_TIME = TarArchive.NORMALIZED_TIME.toEpochMilli();</b>
+&nbsp;
+&nbsp;	private final File zip;
+&nbsp;
+&nbsp;	private final Owner owner;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates an archive from the contents of the given {@code zip}. Each entry in the
+&nbsp;	 * archive will be owned by the given {@code owner}.
+&nbsp;	 * @param zip the zip to use as a source
+&nbsp;	 * @param owner the owner of the tar entries
+&nbsp;	 */
+<b class="nc">&nbsp;	public ZipFileTarArchive(File zip, Owner owner) {</b>
+<b class="nc">&nbsp;		Assert.notNull(zip, &quot;Zip must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(owner, &quot;Owner must not be null&quot;);</b>
+<b class="nc">&nbsp;		assertArchiveHasEntries(zip);</b>
+<b class="nc">&nbsp;		this.zip = zip;</b>
+<b class="nc">&nbsp;		this.owner = owner;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void writeTo(OutputStream outputStream) throws IOException {
+<b class="nc">&nbsp;		TarArchiveOutputStream tar = new TarArchiveOutputStream(outputStream);</b>
+<b class="nc">&nbsp;		tar.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);</b>
+<b class="nc">&nbsp;		try (ZipFile zipFile = new ZipFile(this.zip)) {</b>
+<b class="nc">&nbsp;			Enumeration&lt;ZipArchiveEntry&gt; entries = zipFile.getEntries();</b>
+<b class="nc">&nbsp;			while (entries.hasMoreElements()) {</b>
+<b class="nc">&nbsp;				ZipArchiveEntry zipEntry = entries.nextElement();</b>
+<b class="nc">&nbsp;				copy(zipEntry, zipFile.getInputStream(zipEntry), tar);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		tar.finish();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertArchiveHasEntries(File file) {
+<b class="nc">&nbsp;		try (ZipFile zipFile = new ZipFile(file)) {</b>
+<b class="nc">&nbsp;			Assert.state(zipFile.getEntries().hasMoreElements(), () -&gt; &quot;Archive file &#39;&quot; + file + &quot;&#39; is not valid&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;File &#39;&quot; + file + &quot;&#39; is not readable&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void copy(ZipArchiveEntry zipEntry, InputStream zip, TarArchiveOutputStream tar) throws IOException {
+<b class="nc">&nbsp;		TarArchiveEntry tarEntry = convert(zipEntry);</b>
+<b class="nc">&nbsp;		tar.putArchiveEntry(tarEntry);</b>
+<b class="nc">&nbsp;		if (tarEntry.isFile()) {</b>
+<b class="nc">&nbsp;			StreamUtils.copyRange(zip, tar, 0, tarEntry.getSize());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		tar.closeArchiveEntry();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TarArchiveEntry convert(ZipArchiveEntry zipEntry) {
+<b class="nc">&nbsp;		byte linkFlag = (zipEntry.isDirectory()) ? TarConstants.LF_DIR : TarConstants.LF_NORMAL;</b>
+<b class="nc">&nbsp;		TarArchiveEntry tarEntry = new TarArchiveEntry(zipEntry.getName(), linkFlag, true);</b>
+<b class="nc">&nbsp;		tarEntry.setUserId(this.owner.getUid());</b>
+<b class="nc">&nbsp;		tarEntry.setGroupId(this.owner.getGid());</b>
+<b class="nc">&nbsp;		tarEntry.setModTime(NORMALIZED_MOD_TIME);</b>
+<b class="nc">&nbsp;		tarEntry.setMode(zipEntry.getUnixMode());</b>
+<b class="nc">&nbsp;		if (!zipEntry.isDirectory()) {</b>
+<b class="nc">&nbsp;			tarEntry.setSize(zipEntry.getSize());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return tarEntry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

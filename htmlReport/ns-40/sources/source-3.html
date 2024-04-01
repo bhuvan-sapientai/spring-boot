@@ -1,0 +1,203 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OtlpPropertiesConfigAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.metrics.export.otlp</a>
+</div>
+
+<h1>Coverage Summary for Class: OtlpPropertiesConfigAdapter (org.springframework.boot.actuate.autoconfigure.metrics.export.otlp)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OtlpPropertiesConfigAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.metrics.export.otlp;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import io.micrometer.registry.otlp.AggregationTemporality;
+&nbsp;import io.micrometer.registry.otlp.OtlpConfig;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.export.properties.StepRegistryPropertiesConfigAdapter;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.opentelemetry.OpenTelemetryProperties;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Adapter to convert {@link OtlpProperties} to an {@link OtlpConfig}.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Jonatan Ivanov
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;class OtlpPropertiesConfigAdapter extends StepRegistryPropertiesConfigAdapter&lt;OtlpProperties&gt; implements OtlpConfig {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Default value for application name if {@code spring.application.name} is not set.
+&nbsp;	 */
+&nbsp;	private static final String DEFAULT_APPLICATION_NAME = &quot;unknown_service&quot;;
+&nbsp;
+&nbsp;	private final OpenTelemetryProperties openTelemetryProperties;
+&nbsp;
+&nbsp;	private final OtlpMetricsConnectionDetails connectionDetails;
+&nbsp;
+&nbsp;	private final Environment environment;
+&nbsp;
+&nbsp;	OtlpPropertiesConfigAdapter(OtlpProperties properties, OpenTelemetryProperties openTelemetryProperties,
+&nbsp;			OtlpMetricsConnectionDetails connectionDetails, Environment environment) {
+<b class="nc">&nbsp;		super(properties);</b>
+<b class="nc">&nbsp;		this.connectionDetails = connectionDetails;</b>
+<b class="nc">&nbsp;		this.openTelemetryProperties = openTelemetryProperties;</b>
+<b class="nc">&nbsp;		this.environment = environment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String prefix() {
+<b class="nc">&nbsp;		return &quot;management.otlp.metrics.export&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String url() {
+<b class="nc">&nbsp;		return get((properties) -&gt; this.connectionDetails.getUrl(), OtlpConfig.super::url);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public AggregationTemporality aggregationTemporality() {
+<b class="nc">&nbsp;		return get(OtlpProperties::getAggregationTemporality, OtlpConfig.super::aggregationTemporality);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	@SuppressWarnings(&quot;removal&quot;)
+&nbsp;	public Map&lt;String, String&gt; resourceAttributes() {
+<b class="nc">&nbsp;		Map&lt;String, String&gt; resourceAttributes = this.openTelemetryProperties.getResourceAttributes();</b>
+<b class="nc">&nbsp;		Map&lt;String, String&gt; result = new HashMap&lt;&gt;((!CollectionUtils.isEmpty(resourceAttributes)) ? resourceAttributes</b>
+<b class="nc">&nbsp;				: get(OtlpProperties::getResourceAttributes, OtlpConfig.super::resourceAttributes));</b>
+<b class="nc">&nbsp;		result.computeIfAbsent(&quot;service.name&quot;, (key) -&gt; getApplicationName());</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getApplicationName() {
+<b class="nc">&nbsp;		return this.environment.getProperty(&quot;spring.application.name&quot;, DEFAULT_APPLICATION_NAME);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Map&lt;String, String&gt; headers() {
+<b class="nc">&nbsp;		return get(OtlpProperties::getHeaders, OtlpConfig.super::headers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public TimeUnit baseTimeUnit() {
+<b class="nc">&nbsp;		return get(OtlpProperties::getBaseTimeUnit, OtlpConfig.super::baseTimeUnit);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

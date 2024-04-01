@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NativeImagePluginAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.plugin</a>
+</div>
+
+<h1>Coverage Summary for Class: NativeImagePluginAction (org.springframework.boot.gradle.plugin)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NativeImagePluginAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.plugin;
+&nbsp;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.graalvm.buildtools.gradle.NativeImagePlugin;
+&nbsp;import org.graalvm.buildtools.gradle.dsl.GraalVMExtension;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.java.archives.Manifest;
+&nbsp;import org.gradle.api.plugins.JavaPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPluginExtension;
+&nbsp;import org.gradle.api.tasks.SourceSetContainer;
+&nbsp;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootBuildImage;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootJar;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Action} that is executed in response to the {@link NativeImagePlugin} being
+&nbsp; * applied.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+<b class="nc">&nbsp;class NativeImagePluginAction implements PluginApplicationAction {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;? extends Plugin&lt;? extends Project&gt;&gt; getPluginClass() {
+<b class="nc">&nbsp;		return NativeImagePlugin.class;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void execute(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().apply(SpringBootAotPlugin.class);</b>
+<b class="nc">&nbsp;		project.getPlugins().withType(JavaPlugin.class).all((plugin) -&gt; {</b>
+<b class="nc">&nbsp;			JavaPluginExtension javaPluginExtension = project.getExtensions().getByType(JavaPluginExtension.class);</b>
+<b class="nc">&nbsp;			SourceSetContainer sourceSets = javaPluginExtension.getSourceSets();</b>
+<b class="nc">&nbsp;			GraalVMExtension graalVmExtension = configureGraalVmExtension(project);</b>
+<b class="nc">&nbsp;			configureMainNativeBinaryClasspath(project, sourceSets, graalVmExtension);</b>
+<b class="nc">&nbsp;			configureTestNativeBinaryClasspath(sourceSets, graalVmExtension);</b>
+<b class="nc">&nbsp;			copyReachabilityMetadataToBootJar(project);</b>
+<b class="nc">&nbsp;			configureBootBuildImageToProduceANativeImage(project);</b>
+<b class="nc">&nbsp;			configureJarManifestNativeAttribute(project);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureMainNativeBinaryClasspath(Project project, SourceSetContainer sourceSets,
+&nbsp;			GraalVMExtension graalVmExtension) {
+<b class="nc">&nbsp;		FileCollection runtimeClasspath = sourceSets.getByName(SpringBootAotPlugin.AOT_SOURCE_SET_NAME)</b>
+<b class="nc">&nbsp;			.getRuntimeClasspath();</b>
+<b class="nc">&nbsp;		graalVmExtension.getBinaries().getByName(NativeImagePlugin.NATIVE_MAIN_EXTENSION).classpath(runtimeClasspath);</b>
+<b class="nc">&nbsp;		Configuration nativeImageClasspath = project.getConfigurations().getByName(&quot;nativeImageClasspath&quot;);</b>
+<b class="nc">&nbsp;		nativeImageClasspath.setExtendsFrom(removeDevelopmentOnly(nativeImageClasspath.getExtendsFrom()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Iterable&lt;Configuration&gt; removeDevelopmentOnly(Set&lt;Configuration&gt; configurations) {
+<b class="nc">&nbsp;		return configurations.stream()</b>
+<b class="nc">&nbsp;			.filter(this::isNotDevelopmentOnly)</b>
+<b class="nc">&nbsp;			.collect(Collectors.toCollection(LinkedHashSet::new));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isNotDevelopmentOnly(Configuration configuration) {
+<b class="nc">&nbsp;		return !SpringBootPlugin.DEVELOPMENT_ONLY_CONFIGURATION_NAME.equals(configuration.getName())</b>
+<b class="nc">&nbsp;				&amp;&amp; !SpringBootPlugin.TEST_AND_DEVELOPMENT_ONLY_CONFIGURATION_NAME.equals(configuration.getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureTestNativeBinaryClasspath(SourceSetContainer sourceSets, GraalVMExtension graalVmExtension) {
+<b class="nc">&nbsp;		FileCollection runtimeClasspath = sourceSets.getByName(SpringBootAotPlugin.AOT_TEST_SOURCE_SET_NAME)</b>
+<b class="nc">&nbsp;			.getRuntimeClasspath();</b>
+<b class="nc">&nbsp;		graalVmExtension.getBinaries().getByName(NativeImagePlugin.NATIVE_TEST_EXTENSION).classpath(runtimeClasspath);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private GraalVMExtension configureGraalVmExtension(Project project) {
+<b class="nc">&nbsp;		GraalVMExtension extension = project.getExtensions().getByType(GraalVMExtension.class);</b>
+<b class="nc">&nbsp;		extension.getToolchainDetection().set(false);</b>
+<b class="nc">&nbsp;		return extension;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void copyReachabilityMetadataToBootJar(Project project) {
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(SpringBootPlugin.BOOT_JAR_TASK_NAME, BootJar.class)</b>
+<b class="nc">&nbsp;			.configure((bootJar) -&gt; bootJar.from(project.getTasks().named(&quot;collectReachabilityMetadata&quot;)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureBootBuildImageToProduceANativeImage(Project project) {
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(SpringBootPlugin.BOOT_BUILD_IMAGE_TASK_NAME, BootBuildImage.class)</b>
+<b class="nc">&nbsp;			.configure((bootBuildImage) -&gt; {</b>
+<b class="nc">&nbsp;				bootBuildImage.getBuilder().convention(&quot;paketobuildpacks/builder-jammy-tiny:latest&quot;);</b>
+<b class="nc">&nbsp;				bootBuildImage.getEnvironment().put(&quot;BP_NATIVE_IMAGE&quot;, &quot;true&quot;);</b>
+&nbsp;			});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureJarManifestNativeAttribute(Project project) {
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(SpringBootPlugin.BOOT_JAR_TASK_NAME, BootJar.class)</b>
+<b class="nc">&nbsp;			.configure(this::addNativeProcessedAttribute);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addNativeProcessedAttribute(BootJar bootJar) {
+<b class="nc">&nbsp;		bootJar.manifest(this::addNativeProcessedAttribute);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addNativeProcessedAttribute(Manifest manifest) {
+<b class="nc">&nbsp;		manifest.getAttributes().put(&quot;Spring-Boot-Native-Processed&quot;, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

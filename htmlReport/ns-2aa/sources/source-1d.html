@@ -1,0 +1,574 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarIntegrationTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: JarIntegrationTests (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarIntegrationTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/241)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.TimeZone;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;import org.junit.jupiter.api.TestTemplate;
+&nbsp;import org.junit.jupiter.api.extension.ExtendWith;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.FileUtils;
+&nbsp;import org.springframework.boot.loader.tools.JarModeLibrary;
+&nbsp;import org.springframework.util.FileSystemUtils;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests for the Maven plugin&#39;s jar support.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;@ExtendWith(MavenBuildExtension.class)
+<b class="nc">&nbsp;class JarIntegrationTests extends AbstractArchiveIntegrationTests {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String getLayersIndexLocation() {
+<b class="nc">&nbsp;		return &quot;BOOT-INF/layers.idx&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJarIsRepackagedInPlaceOnlyRepackagedJarIsInstalled(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File original = new File(project, &quot;target/jar-0.0.1.BUILD-SNAPSHOT.jar.original&quot;);</b>
+<b class="nc">&nbsp;			assertThat(original).isFile();</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(launchScript(repackaged)).isEmpty();</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).manifest((manifest) -&gt; {</b>
+<b class="nc">&nbsp;				manifest.hasMainClass(&quot;org.springframework.boot.loader.launch.JarLauncher&quot;);</b>
+<b class="nc">&nbsp;				manifest.hasStartClass(&quot;some.random.Main&quot;);</b>
+<b class="nc">&nbsp;				manifest.hasAttribute(&quot;Not-Used&quot;, &quot;Foo&quot;);</b>
+&nbsp;			})
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-context&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-core&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-jcl&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jakarta.servlet-api-6&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithName(&quot;BOOT-INF/classes/org/test/SampleApplication.class&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithName(&quot;org/springframework/boot/loader/launch/JarLauncher.class&quot;);</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project))</b>
+<b class="nc">&nbsp;				.contains(&quot;Replacing main artifact &quot; + repackaged + &quot; with repackaged archive,&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;The original artifact has been renamed to &quot; + original)</b>
+<b class="nc">&nbsp;				.contains(&quot;Installing &quot; + repackaged + &quot; to&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;Installing &quot; + original + &quot; to&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJarWithClassicLoaderIsRepackagedInPlaceOnlyRepackagedJarIsInstalled(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-with-classic-loader&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File original = new File(project, &quot;target/jar-with-classic-loader-0.0.1.BUILD-SNAPSHOT.jar.original&quot;);</b>
+<b class="nc">&nbsp;			assertThat(original).isFile();</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-with-classic-loader-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(launchScript(repackaged)).isEmpty();</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).manifest((manifest) -&gt; {</b>
+<b class="nc">&nbsp;				manifest.hasMainClass(&quot;org.springframework.boot.loader.launch.JarLauncher&quot;);</b>
+<b class="nc">&nbsp;				manifest.hasStartClass(&quot;some.random.Main&quot;);</b>
+<b class="nc">&nbsp;				manifest.hasAttribute(&quot;Not-Used&quot;, &quot;Foo&quot;);</b>
+<b class="nc">&nbsp;			}).hasEntryWithName(&quot;org/springframework/boot/loader/launch/JarLauncher.class&quot;);</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project))</b>
+<b class="nc">&nbsp;				.contains(&quot;Replacing main artifact &quot; + repackaged + &quot; with repackaged archive,&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;The original artifact has been renamed to &quot; + original)</b>
+<b class="nc">&nbsp;				.contains(&quot;Installing &quot; + repackaged + &quot; to&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;Installing &quot; + original + &quot; to&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAttachIsDisabledOnlyTheOriginalJarIsInstalled(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-attach-disabled&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File original = new File(project, &quot;target/jar-attach-disabled-0.0.1.BUILD-SNAPSHOT.jar.original&quot;);</b>
+<b class="nc">&nbsp;			assertThat(original).isFile();</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-attach-disabled-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(main).isFile();</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project)).contains(&quot;Updating main artifact &quot; + main + &quot; to &quot; + original)</b>
+<b class="nc">&nbsp;				.contains(&quot;Installing &quot; + original + &quot; to&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;Installing &quot; + main + &quot; to&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAClassifierIsConfiguredTheRepackagedJarHasAClassifierAndBothItAndTheOriginalAreInstalled(
+&nbsp;			MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-classifier-main&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			assertThat(new File(project, &quot;target/jar-classifier-main-0.0.1.BUILD-SNAPSHOT.jar.original&quot;))</b>
+<b class="nc">&nbsp;				.doesNotExist();</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-classifier-main-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(main).isFile();</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-classifier-main-0.0.1.BUILD-SNAPSHOT-test.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;);</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project))</b>
+<b class="nc">&nbsp;				.contains(&quot;Attaching repackaged archive &quot; + repackaged + &quot; with classifier test&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;Creating repackaged archive &quot; + repackaged + &quot; with classifier test&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;Installing &quot; + main + &quot; to&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;Installing &quot; + repackaged + &quot; to&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenBothJarsHaveTheSameClassifierRepackagingIsDoneInPlaceAndOnlyRepackagedJarIsInstalled(
+&nbsp;			MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-classifier-source&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File original = new File(project, &quot;target/jar-classifier-source-0.0.1.BUILD-SNAPSHOT-test.jar.original&quot;);</b>
+<b class="nc">&nbsp;			assertThat(original).isFile();</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-classifier-source-0.0.1.BUILD-SNAPSHOT-test.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;);</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project))</b>
+<b class="nc">&nbsp;				.contains(&quot;Replacing artifact with classifier test &quot; + repackaged + &quot; with repackaged archive,&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;The original artifact has been renamed to &quot; + original)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;Installing &quot; + original + &quot; to&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;Installing &quot; + repackaged + &quot; to&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenBothJarsHaveTheSameClassifierAndAttachIsDisabledOnlyTheOriginalJarIsInstalled(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-classifier-source-attach-disabled&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File original = new File(project,</b>
+&nbsp;					&quot;target/jar-classifier-source-attach-disabled-0.0.1.BUILD-SNAPSHOT-test.jar.original&quot;);
+<b class="nc">&nbsp;			assertThat(original).isFile();</b>
+<b class="nc">&nbsp;			File repackaged = new File(project,</b>
+&nbsp;					&quot;target/jar-classifier-source-attach-disabled-0.0.1.BUILD-SNAPSHOT-test.jar&quot;);
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;);</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project))</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;Attaching repackaged archive &quot; + repackaged + &quot; with classifier test&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;Updating artifact with classifier test &quot; + repackaged + &quot; to &quot; + original)</b>
+<b class="nc">&nbsp;				.contains(&quot;Installing &quot; + original + &quot; to&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;Installing &quot; + repackaged + &quot; to&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAClassifierAndAnOutputDirectoryAreConfiguredTheRepackagedJarHasAClassifierAndIsWrittenToTheOutputDirectory(
+&nbsp;			MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-create-dir&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/foo/jar-create-dir-0.0.1.BUILD-SNAPSHOT-foo.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;);</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project)).contains(&quot;Installing &quot; + repackaged + &quot; to&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAnOutputDirectoryIsConfiguredTheRepackagedJarIsWrittenToIt(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-custom-dir&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/foo/jar-custom-dir-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;);</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project)).contains(&quot;Installing &quot; + repackaged + &quot; to&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenACustomLaunchScriptIsConfiguredItAppearsInTheRepackagedJar(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-custom-launcher&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;);</b>
+<b class="nc">&nbsp;			assertThat(launchScript(repackaged)).contains(&quot;Hello world&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAnEntryIsExcludedItDoesNotAppearInTheRepackagedJar(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-exclude-entry&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-exclude-entry-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-context&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-core&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-jcl&quot;)</b>
+<b class="nc">&nbsp;				.doesNotHaveEntryWithName(&quot;BOOT-INF/lib/servlet-api-2.5.jar&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAGroupIsExcludedNoEntriesInThatGroupAppearInTheRepackagedJar(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-exclude-group&quot;).goals(&quot;install&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-exclude-group-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-context&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-core&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-jcl&quot;)</b>
+<b class="nc">&nbsp;				.doesNotHaveEntryWithName(&quot;BOOT-INF/lib/log4j-api-2.4.1.jar&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAJarIsExecutableItBeginsWithTheDefaultLaunchScript(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-executable&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-executable-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;);</b>
+<b class="nc">&nbsp;			assertThat(launchScript(repackaged)).contains(&quot;Spring Boot Startup Script&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;MyFullyExecutableJarName&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;MyFullyExecutableJarDesc&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAJarIsBuiltWithLibrariesWithConflictingNamesTheyAreMadeUniqueUsingTheirGroupIds(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-lib-name-conflict&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;test-project/target/test-project-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithName(&quot;BOOT-INF/lib/org.springframework.boot.maven.it-acme-lib-0.0.1.BUILD-SNAPSHOT.jar&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithName(</b>
+&nbsp;						&quot;BOOT-INF/lib/org.springframework.boot.maven.it.another-acme-lib-0.0.1.BUILD-SNAPSHOT.jar&quot;);
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAProjectUsesPomPackagingRepackagingIsSkipped(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-pom&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File target = new File(project, &quot;target&quot;);</b>
+<b class="nc">&nbsp;			assertThat(target.listFiles()).containsExactly(new File(target, &quot;build.log&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenRepackagingIsSkippedTheJarIsNotRepackaged(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-skip&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-skip-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(main)).doesNotHaveEntryWithNameStartingWith(&quot;org/springframework/boot&quot;);</b>
+<b class="nc">&nbsp;			assertThat(new File(project, &quot;target/jar-skip-0.0.1.BUILD-SNAPSHOT.jar.original&quot;)).doesNotExist();</b>
+&nbsp;
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenADependencyHasSystemScopeAndInclusionOfSystemScopeDependenciesIsEnabledItIsIncludedInTheRepackagedJar(
+&nbsp;			MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-system-scope&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-system-scope-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(main)).hasEntryWithName(&quot;BOOT-INF/lib/sample-1.0.0.jar&quot;);</b>
+&nbsp;
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenADependencyHasSystemScopeItIsNotIncludedInTheRepackagedJar(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-system-scope-default&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-system-scope-default-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(main)).doesNotHaveEntryWithName(&quot;BOOT-INF/lib/sample-1.0.0.jar&quot;);</b>
+&nbsp;
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenADependencyHasTestScopeItIsNotIncludedInTheRepackagedJar(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-test-scope&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-test-scope-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(main)).doesNotHaveEntryWithNameStartingWith(&quot;BOOT-INF/lib/log4j&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAProjectUsesKotlinItsModuleMetadataIsRepackagedIntoBootInfClasses(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-with-kotlin-module&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-with-kotlin-module-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(main)).hasEntryWithName(&quot;BOOT-INF/classes/META-INF/jar-with-kotlin-module.kotlin_module&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAProjectIsBuiltWithALayoutPropertyTheSpecifiedLayoutIsUsed(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-with-layout-property&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;package&quot;, &quot;-Dspring-boot.repackage.layout=ZIP&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; {</b>
+<b class="nc">&nbsp;				File main = new File(project, &quot;target/jar-with-layout-property-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;				assertThat(jar(main)).manifest(</b>
+<b class="nc">&nbsp;						(manifest) -&gt; manifest.hasMainClass(&quot;org.springframework.boot.loader.launch.PropertiesLauncher&quot;)</b>
+<b class="nc">&nbsp;							.hasStartClass(&quot;org.test.SampleApplication&quot;));</b>
+<b class="nc">&nbsp;				assertThat(buildLog(project)).contains(&quot;Layout: ZIP&quot;);</b>
+&nbsp;			});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenALayoutIsConfiguredTheSpecifiedLayoutIsUsed(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-with-zip-layout&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-with-zip-layout-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(main)).manifest(</b>
+<b class="nc">&nbsp;					(manifest) -&gt; manifest.hasMainClass(&quot;org.springframework.boot.loader.launch.PropertiesLauncher&quot;)</b>
+<b class="nc">&nbsp;						.hasStartClass(&quot;org.test.SampleApplication&quot;));</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project)).contains(&quot;Layout: ZIP&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenRequiresUnpackConfigurationIsProvidedItIsReflectedInTheRepackagedJar(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-with-unpack&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File main = new File(project, &quot;target/jar-with-unpack-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(main)).hasUnpackEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-core-&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/spring-context-&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJarIsRepackagedWithACustomLayoutTheJarUsesTheLayout(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-custom-layout&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			assertThat(jar(new File(project, &quot;custom/target/custom-0.0.1.BUILD-SNAPSHOT.jar&quot;)))</b>
+<b class="nc">&nbsp;				.hasEntryWithName(&quot;custom&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(new File(project, &quot;default/target/default-0.0.1.BUILD-SNAPSHOT.jar&quot;)))</b>
+<b class="nc">&nbsp;				.hasEntryWithName(&quot;sample&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void repackagedJarContainsTheLayersIndexByDefault(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-layered&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;jar/target/jar-layered-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jar-release&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jar-snapshot&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(</b>
+<b class="nc">&nbsp;						&quot;BOOT-INF/lib/&quot; + JarModeLibrary.LAYER_TOOLS.getCoordinates().getArtifactId());</b>
+<b class="nc">&nbsp;			try (JarFile jarFile = new JarFile(repackaged)) {</b>
+<b class="nc">&nbsp;				Map&lt;String, List&lt;String&gt;&gt; layerIndex = readLayerIndex(jarFile);</b>
+<b class="nc">&nbsp;				assertThat(layerIndex.keySet()).containsExactly(&quot;dependencies&quot;, &quot;spring-boot-loader&quot;,</b>
+&nbsp;						&quot;snapshot-dependencies&quot;, &quot;application&quot;);
+<b class="nc">&nbsp;				assertThat(layerIndex.get(&quot;application&quot;)).contains(&quot;BOOT-INF/lib/jar-release-0.0.1.RELEASE.jar&quot;,</b>
+&nbsp;						&quot;BOOT-INF/lib/jar-snapshot-0.0.1.BUILD-SNAPSHOT.jar&quot;);
+<b class="nc">&nbsp;				assertThat(layerIndex.get(&quot;dependencies&quot;))</b>
+<b class="nc">&nbsp;					.anyMatch((dependency) -&gt; dependency.startsWith(&quot;BOOT-INF/lib/log4j-api-2&quot;));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJarIsRepackagedWithTheLayersDisabledDoesNotContainLayersIndex(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-layered-disabled&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;jar/target/jar-layered-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jar-release&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jar-snapshot&quot;)</b>
+<b class="nc">&nbsp;				.doesNotHaveEntryWithName(&quot;BOOT-INF/layers.idx&quot;)</b>
+<b class="nc">&nbsp;				.doesNotHaveEntryWithNameStartingWith(&quot;BOOT-INF/lib/&quot; + JarModeLibrary.LAYER_TOOLS.getName());</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJarIsRepackagedWithTheLayersEnabledAndLayerToolsExcluded(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-layered-no-layer-tools&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;jar/target/jar-layered-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jar-release&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jar-snapshot&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/layers.idx&quot;)</b>
+<b class="nc">&nbsp;				.doesNotHaveEntryWithNameStartingWith(&quot;BOOT-INF/lib/&quot; + JarModeLibrary.LAYER_TOOLS.getName());</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJarIsRepackagedWithTheCustomLayers(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-layered-custom&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;jar/target/jar-layered-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithNameStartingWith(&quot;BOOT-INF/classes/&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jar-release&quot;)</b>
+<b class="nc">&nbsp;				.hasEntryWithNameStartingWith(&quot;BOOT-INF/lib/jar-snapshot&quot;);</b>
+<b class="nc">&nbsp;			try (JarFile jarFile = new JarFile(repackaged)) {</b>
+<b class="nc">&nbsp;				Map&lt;String, List&lt;String&gt;&gt; layerIndex = readLayerIndex(jarFile);</b>
+<b class="nc">&nbsp;				assertThat(layerIndex.keySet()).containsExactly(&quot;my-dependencies-name&quot;, &quot;snapshot-dependencies&quot;,</b>
+&nbsp;						&quot;configuration&quot;, &quot;application&quot;);
+<b class="nc">&nbsp;				assertThat(layerIndex.get(&quot;application&quot;))</b>
+<b class="nc">&nbsp;					.contains(&quot;BOOT-INF/lib/jar-release-0.0.1.RELEASE.jar&quot;,</b>
+&nbsp;							&quot;BOOT-INF/lib/jar-snapshot-0.0.1.BUILD-SNAPSHOT.jar&quot;,
+&nbsp;							&quot;BOOT-INF/lib/jar-classifier-0.0.1-bravo.jar&quot;)
+<b class="nc">&nbsp;					.doesNotContain(&quot;BOOT-INF/lib/jar-classifier-0.0.1-alpha.jar&quot;);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void repackagedJarContainsClasspathIndex(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged))</b>
+<b class="nc">&nbsp;				.manifest((manifest) -&gt; manifest.hasAttribute(&quot;Spring-Boot-Classpath-Index&quot;, &quot;BOOT-INF/classpath.idx&quot;));</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithName(&quot;BOOT-INF/classpath.idx&quot;);</b>
+<b class="nc">&nbsp;			try (JarFile jarFile = new JarFile(repackaged)) {</b>
+<b class="nc">&nbsp;				List&lt;String&gt; index = readClasspathIndex(jarFile, &quot;BOOT-INF/classpath.idx&quot;);</b>
+<b class="nc">&nbsp;				assertThat(index).allMatch((entry) -&gt; entry.startsWith(&quot;BOOT-INF/lib/&quot;));</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJarIsRepackagedWithOutputTimestampConfiguredThenJarIsReproducible(MavenBuild mavenBuild)
+&nbsp;			throws InterruptedException {
+<b class="nc">&nbsp;		String firstHash = buildJarWithOutputTimestamp(mavenBuild);</b>
+<b class="nc">&nbsp;		Thread.sleep(1500);</b>
+<b class="nc">&nbsp;		String secondHash = buildJarWithOutputTimestamp(mavenBuild);</b>
+<b class="nc">&nbsp;		assertThat(firstHash).isEqualTo(secondHash);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String buildJarWithOutputTimestamp(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		AtomicReference&lt;String&gt; jarHash = new AtomicReference&lt;&gt;();</b>
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-output-timestamp&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-output-timestamp-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(repackaged).isFile();</b>
+<b class="nc">&nbsp;			long expectedModified = 1584352800000L;</b>
+<b class="nc">&nbsp;			long offsetExpectedModified = expectedModified - TimeZone.getDefault().getOffset(expectedModified);</b>
+<b class="nc">&nbsp;			assertThat(repackaged.lastModified()).isEqualTo(expectedModified);</b>
+<b class="nc">&nbsp;			try (JarFile jar = new JarFile(repackaged)) {</b>
+<b class="nc">&nbsp;				List&lt;String&gt; unreproducibleEntries = jar.stream()</b>
+<b class="nc">&nbsp;					.filter((entry) -&gt; entry.getLastModifiedTime().toMillis() != offsetExpectedModified)</b>
+<b class="nc">&nbsp;					.map((entry) -&gt; entry.getName() + &quot;: &quot; + entry.getLastModifiedTime())</b>
+<b class="nc">&nbsp;					.toList();</b>
+<b class="nc">&nbsp;				assertThat(unreproducibleEntries).isEmpty();</b>
+<b class="nc">&nbsp;				jarHash.set(FileUtils.sha1Hash(repackaged));</b>
+<b class="nc">&nbsp;				FileSystemUtils.deleteRecursively(project);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new RuntimeException(ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		});
+<b class="nc">&nbsp;		return jarHash.get();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJarIsRepackagedWithOutputTimestampConfiguredThenLibrariesAreSorted(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-output-timestamp&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-output-timestamp-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			List&lt;String&gt; sortedLibs = Arrays.asList(&quot;BOOT-INF/lib/jakarta.servlet-api&quot;,</b>
+&nbsp;					&quot;BOOT-INF/lib/micrometer-commons&quot;, &quot;BOOT-INF/lib/micrometer-observation&quot;, &quot;BOOT-INF/lib/spring-aop&quot;,
+&nbsp;					&quot;BOOT-INF/lib/spring-beans&quot;, &quot;BOOT-INF/lib/spring-boot-jarmode-layertools&quot;,
+&nbsp;					&quot;BOOT-INF/lib/spring-context&quot;, &quot;BOOT-INF/lib/spring-core&quot;, &quot;BOOT-INF/lib/spring-expression&quot;,
+&nbsp;					&quot;BOOT-INF/lib/spring-jcl&quot;);
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).entryNamesInPath(&quot;BOOT-INF/lib/&quot;)</b>
+<b class="nc">&nbsp;				.zipSatisfy(sortedLibs,</b>
+<b class="nc">&nbsp;						(String jarLib, String expectedLib) -&gt; assertThat(jarLib).startsWith(expectedLib));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenSigned(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;jar-signed&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			File repackaged = new File(project, &quot;target/jar-signed-0.0.1.BUILD-SNAPSHOT.jar&quot;);</b>
+<b class="nc">&nbsp;			assertThat(jar(repackaged)).hasEntryWithName(&quot;META-INF/BOOT.SF&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

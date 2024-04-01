@@ -1,0 +1,227 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NestedLocation</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.net.protocol.nested</a>
+</div>
+
+<h1>Coverage Summary for Class: NestedLocation (org.springframework.boot.loader.net.protocol.nested)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NestedLocation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.net.protocol.nested;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.net.util.UrlDecoder;
+&nbsp;
+&nbsp;/**
+&nbsp; * A location obtained from a {@code nested:} {@link URL} consisting of a jar file and an
+&nbsp; * optional nested entry.
+&nbsp; * &lt;p&gt;
+&nbsp; * The syntax of a nested JAR URL is: &lt;pre&gt;
+&nbsp; * nestedjar:&amp;lt;path&amp;gt;/!{entry}
+&nbsp; * &lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * for example:
+&nbsp; * &lt;p&gt;
+&nbsp; * {@code nested:/home/example/my.jar/!BOOT-INF/lib/my-nested.jar}
+&nbsp; * &lt;p&gt;
+&nbsp; * or:
+&nbsp; * &lt;p&gt;
+&nbsp; * {@code nested:/home/example/my.jar/!BOOT-INF/classes/}
+&nbsp; * &lt;p&gt;
+&nbsp; * The path must refer to a jar file on the file system. The entry refers to either an
+&nbsp; * uncompressed entry that contains the nested jar, or a directory entry. The entry must
+&nbsp; * not start with a {@code &#39;/&#39;}.
+&nbsp; *
+&nbsp; * @param path the path to the zip that contains the nested entry
+&nbsp; * @param nestedEntryName the nested entry name
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 3.2.0
+&nbsp; */
+<b class="nc">&nbsp;public record NestedLocation(Path path, String nestedEntryName) {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Map&lt;String, NestedLocation&gt; cache = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	public NestedLocation(Path path, String nestedEntryName) {</b>
+<b class="nc">&nbsp;		if (path == null) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;&#39;path&#39; must not be null&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.path = path;</b>
+<b class="nc">&nbsp;		this.nestedEntryName = (nestedEntryName != null &amp;&amp; !nestedEntryName.isEmpty()) ? nestedEntryName : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link NestedLocation} from the given URL.
+&nbsp;	 * @param url the nested URL
+&nbsp;	 * @return a new {@link NestedLocation} instance
+&nbsp;	 * @throws IllegalArgumentException if the URL is not valid
+&nbsp;	 */
+&nbsp;	public static NestedLocation fromUrl(URL url) {
+<b class="nc">&nbsp;		if (url == null || !&quot;nested&quot;.equalsIgnoreCase(url.getProtocol())) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;&#39;url&#39; must not be null and must use &#39;nested&#39; protocol&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return parse(UrlDecoder.decode(url.toString().substring(7)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link NestedLocation} from the given URI.
+&nbsp;	 * @param uri the nested URI
+&nbsp;	 * @return a new {@link NestedLocation} instance
+&nbsp;	 * @throws IllegalArgumentException if the URI is not valid
+&nbsp;	 */
+&nbsp;	public static NestedLocation fromUri(URI uri) {
+<b class="nc">&nbsp;		if (uri == null || !&quot;nested&quot;.equalsIgnoreCase(uri.getScheme())) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;&#39;uri&#39; must not be null and must use &#39;nested&#39; scheme&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return parse(uri.getSchemeSpecificPart());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static NestedLocation parse(String path) {
+<b class="nc">&nbsp;		if (path == null || path.isEmpty()) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;&#39;path&#39; must not be empty&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int index = path.lastIndexOf(&quot;/!&quot;);</b>
+<b class="nc">&nbsp;		return cache.computeIfAbsent(path, (l) -&gt; create(index, l));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static NestedLocation create(int index, String location) {
+<b class="nc">&nbsp;		String locationPath = (index != -1) ? location.substring(0, index) : location;</b>
+<b class="nc">&nbsp;		if (isWindows() &amp;&amp; !isUncPath(location)) {</b>
+<b class="nc">&nbsp;			while (locationPath.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;				locationPath = locationPath.substring(1, locationPath.length());</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		String nestedEntryName = (index != -1) ? location.substring(index + 2) : null;</b>
+<b class="nc">&nbsp;		return new NestedLocation((!locationPath.isEmpty()) ? Path.of(locationPath) : null, nestedEntryName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isWindows() {
+<b class="nc">&nbsp;		return File.separatorChar == &#39;\\&#39;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isUncPath(String input) {
+<b class="nc">&nbsp;		return !input.contains(&quot;:&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static void clearCache() {
+<b class="nc">&nbsp;		cache.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

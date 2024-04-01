@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultErrorAttributes</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.reactive.error</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultErrorAttributes (org.springframework.boot.web.reactive.error)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultErrorAttributes</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.reactive.error;
+&nbsp;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.springframework.boot.web.error.ErrorAttributeOptions;
+&nbsp;import org.springframework.boot.web.error.ErrorAttributeOptions.Include;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.validation.BindingResult;
+&nbsp;import org.springframework.validation.ObjectError;
+&nbsp;import org.springframework.web.bind.annotation.ResponseStatus;
+&nbsp;import org.springframework.web.reactive.function.server.ServerRequest;
+&nbsp;import org.springframework.web.server.ResponseStatusException;
+&nbsp;import org.springframework.web.server.ServerWebExchange;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default implementation of {@link ErrorAttributes}. Provides the following attributes
+&nbsp; * when possible:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;timestamp - The time that the errors were extracted&lt;/li&gt;
+&nbsp; * &lt;li&gt;status - The status code&lt;/li&gt;
+&nbsp; * &lt;li&gt;error - The error reason&lt;/li&gt;
+&nbsp; * &lt;li&gt;exception - The class name of the root exception (if configured)&lt;/li&gt;
+&nbsp; * &lt;li&gt;message - The exception message (if configured)&lt;/li&gt;
+&nbsp; * &lt;li&gt;errors - Any {@link ObjectError}s from a {@link BindingResult} exception (if
+&nbsp; * configured)&lt;/li&gt;
+&nbsp; * &lt;li&gt;trace - The exception stack trace (if configured)&lt;/li&gt;
+&nbsp; * &lt;li&gt;path - The URL path when the exception was raised&lt;/li&gt;
+&nbsp; * &lt;li&gt;requestId - Unique ID associated with the current request&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Michele Mancioppi
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 2.0.0
+&nbsp; * @see ErrorAttributes
+&nbsp; */
+<b class="nc">&nbsp;public class DefaultErrorAttributes implements ErrorAttributes {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final String ERROR_INTERNAL_ATTRIBUTE = DefaultErrorAttributes.class.getName() + &quot;.ERROR&quot;;</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Map&lt;String, Object&gt; getErrorAttributes(ServerRequest request, ErrorAttributeOptions options) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; errorAttributes = getErrorAttributes(request, options.isIncluded(Include.STACK_TRACE));</b>
+<b class="nc">&nbsp;		if (!options.isIncluded(Include.EXCEPTION)) {</b>
+<b class="nc">&nbsp;			errorAttributes.remove(&quot;exception&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!options.isIncluded(Include.STACK_TRACE)) {</b>
+<b class="nc">&nbsp;			errorAttributes.remove(&quot;trace&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!options.isIncluded(Include.MESSAGE) &amp;&amp; errorAttributes.get(&quot;message&quot;) != null) {</b>
+<b class="nc">&nbsp;			errorAttributes.remove(&quot;message&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!options.isIncluded(Include.BINDING_ERRORS)) {</b>
+<b class="nc">&nbsp;			errorAttributes.remove(&quot;errors&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!options.isIncluded(Include.PATH)) {</b>
+<b class="nc">&nbsp;			errorAttributes.remove(&quot;path&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return errorAttributes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Object&gt; getErrorAttributes(ServerRequest request, boolean includeStackTrace) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; errorAttributes = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		errorAttributes.put(&quot;timestamp&quot;, new Date());</b>
+<b class="nc">&nbsp;		errorAttributes.put(&quot;path&quot;, request.requestPath().value());</b>
+<b class="nc">&nbsp;		Throwable error = getError(request);</b>
+<b class="nc">&nbsp;		MergedAnnotation&lt;ResponseStatus&gt; responseStatusAnnotation = MergedAnnotations</b>
+<b class="nc">&nbsp;			.from(error.getClass(), SearchStrategy.TYPE_HIERARCHY)</b>
+<b class="nc">&nbsp;			.get(ResponseStatus.class);</b>
+<b class="nc">&nbsp;		HttpStatus errorStatus = determineHttpStatus(error, responseStatusAnnotation);</b>
+<b class="nc">&nbsp;		errorAttributes.put(&quot;status&quot;, errorStatus.value());</b>
+<b class="nc">&nbsp;		errorAttributes.put(&quot;error&quot;, errorStatus.getReasonPhrase());</b>
+<b class="nc">&nbsp;		errorAttributes.put(&quot;message&quot;, determineMessage(error, responseStatusAnnotation));</b>
+<b class="nc">&nbsp;		errorAttributes.put(&quot;requestId&quot;, request.exchange().getRequest().getId());</b>
+<b class="nc">&nbsp;		handleException(errorAttributes, determineException(error), includeStackTrace);</b>
+<b class="nc">&nbsp;		return errorAttributes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private HttpStatus determineHttpStatus(Throwable error, MergedAnnotation&lt;ResponseStatus&gt; responseStatusAnnotation) {
+<b class="nc">&nbsp;		if (error instanceof ResponseStatusException responseStatusException) {</b>
+<b class="nc">&nbsp;			HttpStatus httpStatus = HttpStatus.resolve(responseStatusException.getStatusCode().value());</b>
+<b class="nc">&nbsp;			if (httpStatus != null) {</b>
+<b class="nc">&nbsp;				return httpStatus;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return responseStatusAnnotation.getValue(&quot;code&quot;, HttpStatus.class).orElse(HttpStatus.INTERNAL_SERVER_ERROR);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String determineMessage(Throwable error, MergedAnnotation&lt;ResponseStatus&gt; responseStatusAnnotation) {
+<b class="nc">&nbsp;		if (error instanceof BindingResult) {</b>
+<b class="nc">&nbsp;			return error.getMessage();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (error instanceof ResponseStatusException responseStatusException) {</b>
+<b class="nc">&nbsp;			return responseStatusException.getReason();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String reason = responseStatusAnnotation.getValue(&quot;reason&quot;, String.class).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(reason)) {</b>
+<b class="nc">&nbsp;			return reason;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (error.getMessage() != null) ? error.getMessage() : &quot;&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Throwable determineException(Throwable error) {
+<b class="nc">&nbsp;		if (error instanceof ResponseStatusException) {</b>
+<b class="nc">&nbsp;			return (error.getCause() != null) ? error.getCause() : error;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return error;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addStackTrace(Map&lt;String, Object&gt; errorAttributes, Throwable error) {
+<b class="nc">&nbsp;		StringWriter stackTrace = new StringWriter();</b>
+<b class="nc">&nbsp;		error.printStackTrace(new PrintWriter(stackTrace));</b>
+<b class="nc">&nbsp;		stackTrace.flush();</b>
+<b class="nc">&nbsp;		errorAttributes.put(&quot;trace&quot;, stackTrace.toString());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void handleException(Map&lt;String, Object&gt; errorAttributes, Throwable error, boolean includeStackTrace) {
+<b class="nc">&nbsp;		errorAttributes.put(&quot;exception&quot;, error.getClass().getName());</b>
+<b class="nc">&nbsp;		if (includeStackTrace) {</b>
+<b class="nc">&nbsp;			addStackTrace(errorAttributes, error);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (error instanceof BindingResult result) {</b>
+<b class="nc">&nbsp;			if (result.hasErrors()) {</b>
+<b class="nc">&nbsp;				errorAttributes.put(&quot;errors&quot;, result.getAllErrors());</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Throwable getError(ServerRequest request) {
+<b class="nc">&nbsp;		Optional&lt;Object&gt; error = request.attribute(ERROR_INTERNAL_ATTRIBUTE);</b>
+<b class="nc">&nbsp;		return (Throwable) error</b>
+<b class="nc">&nbsp;			.orElseThrow(() -&gt; new IllegalStateException(&quot;Missing exception attribute in ServerWebExchange&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void storeErrorInformation(Throwable error, ServerWebExchange exchange) {
+<b class="nc">&nbsp;		exchange.getAttributes().putIfAbsent(ERROR_INTERNAL_ATTRIBUTE, error);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,331 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PulsarReactiveAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.pulsar</a>
+</div>
+
+<h1>Coverage Summary for Class: PulsarReactiveAutoConfiguration (org.springframework.boot.autoconfigure.pulsar)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PulsarReactiveAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PulsarReactiveAutoConfiguration$EnableReactivePulsarConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.pulsar;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.apache.pulsar.client.api.PulsarClient;
+&nbsp;import org.apache.pulsar.reactive.client.adapter.AdaptedReactivePulsarClientFactory;
+&nbsp;import org.apache.pulsar.reactive.client.adapter.ProducerCacheProvider;
+&nbsp;import org.apache.pulsar.reactive.client.api.ReactiveMessageConsumerBuilder;
+&nbsp;import org.apache.pulsar.reactive.client.api.ReactiveMessageReaderBuilder;
+&nbsp;import org.apache.pulsar.reactive.client.api.ReactiveMessageSenderBuilder;
+&nbsp;import org.apache.pulsar.reactive.client.api.ReactiveMessageSenderCache;
+&nbsp;import org.apache.pulsar.reactive.client.api.ReactivePulsarClient;
+&nbsp;import org.apache.pulsar.reactive.client.producercache.CaffeineShadedProducerCacheProvider;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.util.LambdaSafe;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.pulsar.config.PulsarAnnotationSupportBeanNames;
+&nbsp;import org.springframework.pulsar.core.SchemaResolver;
+&nbsp;import org.springframework.pulsar.core.TopicResolver;
+&nbsp;import org.springframework.pulsar.reactive.config.DefaultReactivePulsarListenerContainerFactory;
+&nbsp;import org.springframework.pulsar.reactive.config.annotation.EnableReactivePulsar;
+&nbsp;import org.springframework.pulsar.reactive.core.DefaultReactivePulsarConsumerFactory;
+&nbsp;import org.springframework.pulsar.reactive.core.DefaultReactivePulsarReaderFactory;
+&nbsp;import org.springframework.pulsar.reactive.core.DefaultReactivePulsarSenderFactory;
+&nbsp;import org.springframework.pulsar.reactive.core.ReactiveMessageConsumerBuilderCustomizer;
+&nbsp;import org.springframework.pulsar.reactive.core.ReactiveMessageReaderBuilderCustomizer;
+&nbsp;import org.springframework.pulsar.reactive.core.ReactiveMessageSenderBuilderCustomizer;
+&nbsp;import org.springframework.pulsar.reactive.core.ReactivePulsarConsumerFactory;
+&nbsp;import org.springframework.pulsar.reactive.core.ReactivePulsarReaderFactory;
+&nbsp;import org.springframework.pulsar.reactive.core.ReactivePulsarSenderFactory;
+&nbsp;import org.springframework.pulsar.reactive.core.ReactivePulsarTemplate;
+&nbsp;import org.springframework.pulsar.reactive.listener.ReactivePulsarContainerProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for Spring for Apache Pulsar
+&nbsp; * Reactive.
+&nbsp; *
+&nbsp; * @author Chris Bono
+&nbsp; * @author Christophe Bornet
+&nbsp; * @since 3.2.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = PulsarAutoConfiguration.class)
+&nbsp;@ConditionalOnClass({ PulsarClient.class, ReactivePulsarClient.class, ReactivePulsarTemplate.class })
+&nbsp;@Import(PulsarConfiguration.class)
+&nbsp;public class PulsarReactiveAutoConfiguration {
+&nbsp;
+&nbsp;	private final PulsarProperties properties;
+&nbsp;
+&nbsp;	private final PulsarReactivePropertiesMapper propertiesMapper;
+&nbsp;
+<b class="nc">&nbsp;	PulsarReactiveAutoConfiguration(PulsarProperties properties) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+<b class="nc">&nbsp;		this.propertiesMapper = new PulsarReactivePropertiesMapper(properties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	ReactivePulsarClient reactivePulsarClient(PulsarClient pulsarClient) {
+<b class="nc">&nbsp;		return AdaptedReactivePulsarClientFactory.create(pulsarClient);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(ProducerCacheProvider.class)
+&nbsp;	@ConditionalOnClass(CaffeineShadedProducerCacheProvider.class)
+&nbsp;	@ConditionalOnProperty(name = &quot;spring.pulsar.producer.cache.enabled&quot;, havingValue = &quot;true&quot;, matchIfMissing = true)
+&nbsp;	CaffeineShadedProducerCacheProvider reactivePulsarProducerCacheProvider() {
+<b class="nc">&nbsp;		PulsarProperties.Producer.Cache properties = this.properties.getProducer().getCache();</b>
+<b class="nc">&nbsp;		return new CaffeineShadedProducerCacheProvider(properties.getExpireAfterAccess(), Duration.ofMinutes(10),</b>
+<b class="nc">&nbsp;				properties.getMaximumSize(), properties.getInitialCapacity());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	@ConditionalOnProperty(name = &quot;spring.pulsar.producer.cache.enabled&quot;, havingValue = &quot;true&quot;, matchIfMissing = true)
+&nbsp;	ReactiveMessageSenderCache reactivePulsarMessageSenderCache(
+&nbsp;			ObjectProvider&lt;ProducerCacheProvider&gt; producerCacheProvider) {
+<b class="nc">&nbsp;		return reactivePulsarMessageSenderCache(producerCacheProvider.getIfAvailable());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ReactiveMessageSenderCache reactivePulsarMessageSenderCache(ProducerCacheProvider producerCacheProvider) {
+<b class="nc">&nbsp;		return (producerCacheProvider != null) ? AdaptedReactivePulsarClientFactory.createCache(producerCacheProvider)</b>
+<b class="nc">&nbsp;				: AdaptedReactivePulsarClientFactory.createCache();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(ReactivePulsarSenderFactory.class)
+&nbsp;	DefaultReactivePulsarSenderFactory&lt;?&gt; reactivePulsarSenderFactory(ReactivePulsarClient reactivePulsarClient,
+&nbsp;			ObjectProvider&lt;ReactiveMessageSenderCache&gt; reactiveMessageSenderCache, TopicResolver topicResolver,
+&nbsp;			ObjectProvider&lt;ReactiveMessageSenderBuilderCustomizer&lt;?&gt;&gt; customizersProvider) {
+<b class="nc">&nbsp;		List&lt;ReactiveMessageSenderBuilderCustomizer&lt;?&gt;&gt; customizers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		customizers.add(this.propertiesMapper::customizeMessageSenderBuilder);</b>
+<b class="nc">&nbsp;		customizers.addAll(customizersProvider.orderedStream().toList());</b>
+<b class="nc">&nbsp;		List&lt;ReactiveMessageSenderBuilderCustomizer&lt;Object&gt;&gt; lambdaSafeCustomizers = List</b>
+<b class="nc">&nbsp;			.of((builder) -&gt; applyMessageSenderBuilderCustomizers(customizers, builder));</b>
+<b class="nc">&nbsp;		return DefaultReactivePulsarSenderFactory.builderFor(reactivePulsarClient)</b>
+<b class="nc">&nbsp;			.withDefaultConfigCustomizers(lambdaSafeCustomizers)</b>
+<b class="nc">&nbsp;			.withMessageSenderCache(reactiveMessageSenderCache.getIfAvailable())</b>
+<b class="nc">&nbsp;			.withTopicResolver(topicResolver)</b>
+<b class="nc">&nbsp;			.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private void applyMessageSenderBuilderCustomizers(List&lt;ReactiveMessageSenderBuilderCustomizer&lt;?&gt;&gt; customizers,
+&nbsp;			ReactiveMessageSenderBuilder&lt;?&gt; builder) {
+<b class="nc">&nbsp;		LambdaSafe.callbacks(ReactiveMessageSenderBuilderCustomizer.class, customizers, builder)</b>
+<b class="nc">&nbsp;			.invoke((customizer) -&gt; customizer.customize(builder));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(ReactivePulsarConsumerFactory.class)
+&nbsp;	DefaultReactivePulsarConsumerFactory&lt;?&gt; reactivePulsarConsumerFactory(
+&nbsp;			ReactivePulsarClient pulsarReactivePulsarClient,
+&nbsp;			ObjectProvider&lt;ReactiveMessageConsumerBuilderCustomizer&lt;?&gt;&gt; customizersProvider) {
+<b class="nc">&nbsp;		List&lt;ReactiveMessageConsumerBuilderCustomizer&lt;?&gt;&gt; customizers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		customizers.add(this.propertiesMapper::customizeMessageConsumerBuilder);</b>
+<b class="nc">&nbsp;		customizers.addAll(customizersProvider.orderedStream().toList());</b>
+<b class="nc">&nbsp;		List&lt;ReactiveMessageConsumerBuilderCustomizer&lt;Object&gt;&gt; lambdaSafeCustomizers = List</b>
+<b class="nc">&nbsp;			.of((builder) -&gt; applyMessageConsumerBuilderCustomizers(customizers, builder));</b>
+<b class="nc">&nbsp;		return new DefaultReactivePulsarConsumerFactory&lt;&gt;(pulsarReactivePulsarClient, lambdaSafeCustomizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private void applyMessageConsumerBuilderCustomizers(List&lt;ReactiveMessageConsumerBuilderCustomizer&lt;?&gt;&gt; customizers,
+&nbsp;			ReactiveMessageConsumerBuilder&lt;?&gt; builder) {
+<b class="nc">&nbsp;		LambdaSafe.callbacks(ReactiveMessageConsumerBuilderCustomizer.class, customizers, builder)</b>
+<b class="nc">&nbsp;			.invoke((customizer) -&gt; customizer.customize(builder));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(name = &quot;reactivePulsarListenerContainerFactory&quot;)
+&nbsp;	DefaultReactivePulsarListenerContainerFactory&lt;?&gt; reactivePulsarListenerContainerFactory(
+&nbsp;			ReactivePulsarConsumerFactory&lt;Object&gt; reactivePulsarConsumerFactory, SchemaResolver schemaResolver,
+&nbsp;			TopicResolver topicResolver) {
+<b class="nc">&nbsp;		ReactivePulsarContainerProperties&lt;Object&gt; containerProperties = new ReactivePulsarContainerProperties&lt;&gt;();</b>
+<b class="nc">&nbsp;		containerProperties.setSchemaResolver(schemaResolver);</b>
+<b class="nc">&nbsp;		containerProperties.setTopicResolver(topicResolver);</b>
+<b class="nc">&nbsp;		this.propertiesMapper.customizeContainerProperties(containerProperties);</b>
+<b class="nc">&nbsp;		return new DefaultReactivePulsarListenerContainerFactory&lt;&gt;(reactivePulsarConsumerFactory, containerProperties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(ReactivePulsarReaderFactory.class)
+&nbsp;	DefaultReactivePulsarReaderFactory&lt;?&gt; reactivePulsarReaderFactory(ReactivePulsarClient reactivePulsarClient,
+&nbsp;			ObjectProvider&lt;ReactiveMessageReaderBuilderCustomizer&lt;?&gt;&gt; customizersProvider) {
+<b class="nc">&nbsp;		List&lt;ReactiveMessageReaderBuilderCustomizer&lt;?&gt;&gt; customizers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		customizers.add(this.propertiesMapper::customizeMessageReaderBuilder);</b>
+<b class="nc">&nbsp;		customizers.addAll(customizersProvider.orderedStream().toList());</b>
+<b class="nc">&nbsp;		List&lt;ReactiveMessageReaderBuilderCustomizer&lt;Object&gt;&gt; lambdaSafeCustomizers = List</b>
+<b class="nc">&nbsp;			.of((builder) -&gt; applyMessageReaderBuilderCustomizers(customizers, builder));</b>
+<b class="nc">&nbsp;		return new DefaultReactivePulsarReaderFactory&lt;&gt;(reactivePulsarClient, lambdaSafeCustomizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private void applyMessageReaderBuilderCustomizers(List&lt;ReactiveMessageReaderBuilderCustomizer&lt;?&gt;&gt; customizers,
+&nbsp;			ReactiveMessageReaderBuilder&lt;?&gt; builder) {
+<b class="nc">&nbsp;		LambdaSafe.callbacks(ReactiveMessageReaderBuilderCustomizer.class, customizers, builder)</b>
+<b class="nc">&nbsp;			.invoke((customizer) -&gt; customizer.customize(builder));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	ReactivePulsarTemplate&lt;?&gt; pulsarReactiveTemplate(ReactivePulsarSenderFactory&lt;?&gt; reactivePulsarSenderFactory,
+&nbsp;			SchemaResolver schemaResolver, TopicResolver topicResolver) {
+<b class="nc">&nbsp;		return new ReactivePulsarTemplate&lt;&gt;(reactivePulsarSenderFactory, schemaResolver, topicResolver);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@EnableReactivePulsar
+&nbsp;	@ConditionalOnMissingBean(
+&nbsp;			name = PulsarAnnotationSupportBeanNames.REACTIVE_PULSAR_LISTENER_ANNOTATION_PROCESSOR_BEAN_NAME)
+<b class="nc">&nbsp;	static class EnableReactivePulsarConfiguration {</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

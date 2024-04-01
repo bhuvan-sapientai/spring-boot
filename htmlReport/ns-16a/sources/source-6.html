@@ -1,0 +1,406 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LocalDevToolsAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: LocalDevToolsAutoConfiguration (org.springframework.boot.devtools.autoconfigure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LocalDevToolsAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LocalDevToolsAutoConfiguration$LiveReloadConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LocalDevToolsAutoConfiguration$LiveReloadServerEventListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LocalDevToolsAutoConfiguration$RestartConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LocalDevToolsAutoConfiguration$RestartingClassPathChangeChangedEventListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.autoconfigure;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.devtools.autoconfigure.DevToolsProperties.Restart;
+&nbsp;import org.springframework.boot.devtools.classpath.ClassPathChangedEvent;
+&nbsp;import org.springframework.boot.devtools.classpath.ClassPathFileSystemWatcher;
+&nbsp;import org.springframework.boot.devtools.classpath.ClassPathRestartStrategy;
+&nbsp;import org.springframework.boot.devtools.classpath.PatternClassPathRestartStrategy;
+&nbsp;import org.springframework.boot.devtools.filewatch.FileSystemWatcher;
+&nbsp;import org.springframework.boot.devtools.filewatch.FileSystemWatcherFactory;
+&nbsp;import org.springframework.boot.devtools.filewatch.SnapshotStateRepository;
+&nbsp;import org.springframework.boot.devtools.livereload.LiveReloadServer;
+&nbsp;import org.springframework.boot.devtools.restart.ConditionalOnInitializedRestarter;
+&nbsp;import org.springframework.boot.devtools.restart.RestartScope;
+&nbsp;import org.springframework.boot.devtools.restart.Restarter;
+&nbsp;import org.springframework.context.ApplicationEvent;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Lazy;
+&nbsp;import org.springframework.context.event.ContextRefreshedEvent;
+&nbsp;import org.springframework.context.event.GenericApplicationListener;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for local development support.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Vladimir Tsanev
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@ConditionalOnInitializedRestarter
+&nbsp;@EnableConfigurationProperties(DevToolsProperties.class)
+<b class="nc">&nbsp;public class LocalDevToolsAutoConfiguration {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Local LiveReload configuration.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;spring.devtools.livereload&quot;, name = &quot;enabled&quot;, matchIfMissing = true)
+<b class="nc">&nbsp;	static class LiveReloadConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@RestartScope
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		LiveReloadServer liveReloadServer(DevToolsProperties properties) {
+<b class="nc">&nbsp;			return new LiveReloadServer(properties.getLivereload().getPort(),</b>
+<b class="nc">&nbsp;					Restarter.getInstance().getThreadFactory());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		OptionalLiveReloadServer optionalLiveReloadServer(LiveReloadServer liveReloadServer) {
+<b class="nc">&nbsp;			return new OptionalLiveReloadServer(liveReloadServer);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		LiveReloadServerEventListener liveReloadServerEventListener(OptionalLiveReloadServer liveReloadServer) {
+<b class="nc">&nbsp;			return new LiveReloadServerEventListener(liveReloadServer);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Local Restart Configuration.
+&nbsp;	 */
+&nbsp;	@Lazy(false)
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;spring.devtools.restart&quot;, name = &quot;enabled&quot;, matchIfMissing = true)
+&nbsp;	static class RestartConfiguration {
+&nbsp;
+&nbsp;		private final DevToolsProperties properties;
+&nbsp;
+<b class="nc">&nbsp;		RestartConfiguration(DevToolsProperties properties) {</b>
+<b class="nc">&nbsp;			this.properties = properties;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		RestartingClassPathChangeChangedEventListener restartingClassPathChangedEventListener(
+&nbsp;				FileSystemWatcherFactory fileSystemWatcherFactory) {
+<b class="nc">&nbsp;			return new RestartingClassPathChangeChangedEventListener(fileSystemWatcherFactory);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		ClassPathFileSystemWatcher classPathFileSystemWatcher(FileSystemWatcherFactory fileSystemWatcherFactory,
+&nbsp;				ClassPathRestartStrategy classPathRestartStrategy) {
+<b class="nc">&nbsp;			URL[] urls = Restarter.getInstance().getInitialUrls();</b>
+<b class="nc">&nbsp;			ClassPathFileSystemWatcher watcher = new ClassPathFileSystemWatcher(fileSystemWatcherFactory,</b>
+&nbsp;					classPathRestartStrategy, urls);
+<b class="nc">&nbsp;			watcher.setStopWatcherOnRestart(true);</b>
+<b class="nc">&nbsp;			return watcher;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		ClassPathRestartStrategy classPathRestartStrategy() {
+<b class="nc">&nbsp;			return new PatternClassPathRestartStrategy(this.properties.getRestart().getAllExclude());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		FileSystemWatcherFactory fileSystemWatcherFactory() {
+<b class="nc">&nbsp;			return this::newFileSystemWatcher;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnProperty(prefix = &quot;spring.devtools.restart&quot;, name = &quot;log-condition-evaluation-delta&quot;,
+&nbsp;				matchIfMissing = true)
+&nbsp;		ConditionEvaluationDeltaLoggingListener conditionEvaluationDeltaLoggingListener() {
+<b class="nc">&nbsp;			return new ConditionEvaluationDeltaLoggingListener();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private FileSystemWatcher newFileSystemWatcher() {
+<b class="nc">&nbsp;			Restart restartProperties = this.properties.getRestart();</b>
+<b class="nc">&nbsp;			FileSystemWatcher watcher = new FileSystemWatcher(true, restartProperties.getPollInterval(),</b>
+<b class="nc">&nbsp;					restartProperties.getQuietPeriod(), SnapshotStateRepository.STATIC);</b>
+<b class="nc">&nbsp;			String triggerFile = restartProperties.getTriggerFile();</b>
+<b class="nc">&nbsp;			if (StringUtils.hasLength(triggerFile)) {</b>
+<b class="nc">&nbsp;				watcher.setTriggerFilter(new TriggerFileFilter(triggerFile));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			List&lt;File&gt; additionalPaths = restartProperties.getAdditionalPaths();</b>
+<b class="nc">&nbsp;			for (File path : additionalPaths) {</b>
+<b class="nc">&nbsp;				watcher.addSourceDirectory(path.getAbsoluteFile());</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return watcher;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static class LiveReloadServerEventListener implements GenericApplicationListener {
+&nbsp;
+&nbsp;		private final OptionalLiveReloadServer liveReloadServer;
+&nbsp;
+<b class="nc">&nbsp;		LiveReloadServerEventListener(OptionalLiveReloadServer liveReloadServer) {</b>
+<b class="nc">&nbsp;			this.liveReloadServer = liveReloadServer;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean supportsEventType(ResolvableType eventType) {
+<b class="nc">&nbsp;			Class&lt;?&gt; type = eventType.getRawClass();</b>
+<b class="nc">&nbsp;			if (type == null) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return ContextRefreshedEvent.class.isAssignableFrom(type)</b>
+<b class="nc">&nbsp;					|| ClassPathChangedEvent.class.isAssignableFrom(type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean supportsSourceType(Class&lt;?&gt; sourceType) {
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void onApplicationEvent(ApplicationEvent event) {
+<b class="nc">&nbsp;			if (event instanceof ContextRefreshedEvent || (event instanceof ClassPathChangedEvent classPathChangedEvent</b>
+<b class="nc">&nbsp;					&amp;&amp; !classPathChangedEvent.isRestartRequired())) {</b>
+<b class="nc">&nbsp;				this.liveReloadServer.triggerReload();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getOrder() {
+<b class="nc">&nbsp;			return 0;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static class RestartingClassPathChangeChangedEventListener implements ApplicationListener&lt;ClassPathChangedEvent&gt; {
+&nbsp;
+<b class="nc">&nbsp;		private static final Log logger = LogFactory.getLog(RestartingClassPathChangeChangedEventListener.class);</b>
+&nbsp;
+&nbsp;		private final FileSystemWatcherFactory fileSystemWatcherFactory;
+&nbsp;
+<b class="nc">&nbsp;		RestartingClassPathChangeChangedEventListener(FileSystemWatcherFactory fileSystemWatcherFactory) {</b>
+<b class="nc">&nbsp;			this.fileSystemWatcherFactory = fileSystemWatcherFactory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void onApplicationEvent(ClassPathChangedEvent event) {
+<b class="nc">&nbsp;			if (event.isRestartRequired()) {</b>
+<b class="nc">&nbsp;				logger.info(LogMessage.format(&quot;Restarting due to %s&quot;, event.overview()));</b>
+<b class="nc">&nbsp;				logger.debug(LogMessage.format(&quot;Change set: %s&quot;, event.getChangeSet()));</b>
+<b class="nc">&nbsp;				Restarter.getInstance().restart(new FileWatchingFailureHandler(this.fileSystemWatcherFactory));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

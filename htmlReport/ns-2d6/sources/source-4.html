@@ -1,0 +1,508 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImportsContextCustomizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.context</a>
+</div>
+
+<h1>Coverage Summary for Class: ImportsContextCustomizer (org.springframework.boot.test.context)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImportsContextCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ImportsContextCustomizer$ContextCustomizerKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ImportsContextCustomizer$ImportsCleanupPostProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ImportsContextCustomizer$ImportsConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ImportsContextCustomizer$ImportsSelector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.context;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.BeanFactoryAware;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+&nbsp;import org.springframework.boot.context.annotation.DeterminableImports;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.annotation.AnnotatedBeanDefinitionReader;
+&nbsp;import org.springframework.context.annotation.ComponentScan;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+&nbsp;import org.springframework.context.annotation.ImportSelector;
+&nbsp;import org.springframework.context.support.AbstractApplicationContext;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.AnnotationFilter;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.style.ToStringCreator;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.test.context.ContextCustomizer;
+&nbsp;import org.springframework.test.context.MergedContextConfiguration;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ContextCustomizer} to allow {@code @Import} annotations to be used directly on
+&nbsp; * test classes.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Laurent Martelli
+&nbsp; * @see ImportsContextCustomizerFactory
+&nbsp; */
+&nbsp;class ImportsContextCustomizer implements ContextCustomizer {
+&nbsp;
+&nbsp;	private static final String TEST_CLASS_NAME_ATTRIBUTE = &quot;testClassName&quot;;
+&nbsp;
+&nbsp;	private final String testClassName;
+&nbsp;
+&nbsp;	private final ContextCustomizerKey key;
+&nbsp;
+<b class="nc">&nbsp;	ImportsContextCustomizer(Class&lt;?&gt; testClass) {</b>
+<b class="nc">&nbsp;		this.testClassName = testClass.getName();</b>
+<b class="nc">&nbsp;		this.key = new ContextCustomizerKey(testClass);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void customizeContext(ConfigurableApplicationContext context,
+&nbsp;			MergedContextConfiguration mergedContextConfiguration) {
+<b class="nc">&nbsp;		BeanDefinitionRegistry registry = getBeanDefinitionRegistry(context);</b>
+<b class="nc">&nbsp;		AnnotatedBeanDefinitionReader reader = new AnnotatedBeanDefinitionReader(registry);</b>
+<b class="nc">&nbsp;		registerCleanupPostProcessor(registry, reader);</b>
+<b class="nc">&nbsp;		registerImportsConfiguration(registry, reader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerCleanupPostProcessor(BeanDefinitionRegistry registry, AnnotatedBeanDefinitionReader reader) {
+<b class="nc">&nbsp;		BeanDefinition definition = registerBean(registry, reader, ImportsCleanupPostProcessor.BEAN_NAME,</b>
+&nbsp;				ImportsCleanupPostProcessor.class);
+<b class="nc">&nbsp;		definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);</b>
+<b class="nc">&nbsp;		definition.getConstructorArgumentValues().addIndexedArgumentValue(0, this.testClassName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerImportsConfiguration(BeanDefinitionRegistry registry, AnnotatedBeanDefinitionReader reader) {
+<b class="nc">&nbsp;		BeanDefinition definition = registerBean(registry, reader, ImportsConfiguration.BEAN_NAME,</b>
+&nbsp;				ImportsConfiguration.class);
+<b class="nc">&nbsp;		definition.setAttribute(TEST_CLASS_NAME_ATTRIBUTE, this.testClassName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BeanDefinitionRegistry getBeanDefinitionRegistry(ApplicationContext context) {
+<b class="nc">&nbsp;		if (context instanceof BeanDefinitionRegistry beanDefinitionRegistry) {</b>
+<b class="nc">&nbsp;			return beanDefinitionRegistry;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (context instanceof AbstractApplicationContext abstractContext) {</b>
+<b class="nc">&nbsp;			return (BeanDefinitionRegistry) abstractContext.getBeanFactory();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;Could not locate BeanDefinitionRegistry&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BeanDefinition registerBean(BeanDefinitionRegistry registry, AnnotatedBeanDefinitionReader reader,
+&nbsp;			String beanName, Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		reader.registerBean(type, beanName);</b>
+<b class="nc">&nbsp;		return registry.getBeanDefinition(beanName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (obj == this) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || obj.getClass() != getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;		// ImportSelectors are flexible so the only safe cache key is the test class
+<b class="nc">&nbsp;		ImportsContextCustomizer other = (ImportsContextCustomizer) obj;</b>
+<b class="nc">&nbsp;		return this.key.equals(other.key);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return this.key.hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return new ToStringCreator(this).append(&quot;key&quot;, this.key).toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Configuration @Configuration} registered to trigger the
+&nbsp;	 * {@link ImportsSelector}.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@Import(ImportsSelector.class)
+<b class="nc">&nbsp;	static class ImportsConfiguration {</b>
+&nbsp;
+<b class="nc">&nbsp;		static final String BEAN_NAME = ImportsConfiguration.class.getName();</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ImportSelector} that returns the original test class so that direct
+&nbsp;	 * {@code @Import} annotations are processed.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class ImportsSelector implements ImportSelector, BeanFactoryAware {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final String[] NO_IMPORTS = {};</b>
+&nbsp;
+&nbsp;		private ConfigurableListableBeanFactory beanFactory;
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;			this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+<b class="nc">&nbsp;			BeanDefinition definition = this.beanFactory.getBeanDefinition(ImportsConfiguration.BEAN_NAME);</b>
+<b class="nc">&nbsp;			Object testClassName = definition.getAttribute(TEST_CLASS_NAME_ATTRIBUTE);</b>
+<b class="nc">&nbsp;			return (testClassName != null) ? new String[] { (String) testClassName } : NO_IMPORTS;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BeanDefinitionRegistryPostProcessor} to cleanup temporary configuration
+&nbsp;	 * added to load imports.
+&nbsp;	 */
+&nbsp;	@Order(Ordered.LOWEST_PRECEDENCE)
+&nbsp;	static class ImportsCleanupPostProcessor implements BeanDefinitionRegistryPostProcessor {
+&nbsp;
+<b class="nc">&nbsp;		static final String BEAN_NAME = ImportsCleanupPostProcessor.class.getName();</b>
+&nbsp;
+&nbsp;		private final String testClassName;
+&nbsp;
+<b class="nc">&nbsp;		ImportsCleanupPostProcessor(String testClassName) {</b>
+<b class="nc">&nbsp;			this.testClassName = testClassName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+&nbsp;			try {
+<b class="nc">&nbsp;				String[] names = registry.getBeanDefinitionNames();</b>
+<b class="nc">&nbsp;				for (String name : names) {</b>
+<b class="nc">&nbsp;					BeanDefinition definition = registry.getBeanDefinition(name);</b>
+<b class="nc">&nbsp;					if (this.testClassName.equals(definition.getBeanClassName())) {</b>
+<b class="nc">&nbsp;						registry.removeBeanDefinition(name);</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				registry.removeBeanDefinition(ImportsConfiguration.BEAN_NAME);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The key used to ensure correct application context caching. Keys are generated
+&nbsp;	 * based on &lt;em&gt;all&lt;/em&gt; the annotations used with the test that aren&#39;t core Java or
+&nbsp;	 * Kotlin annotations. We must use something broader than just {@link Import @Import}
+&nbsp;	 * annotations since an {@code @Import} may use an {@link ImportSelector} which could
+&nbsp;	 * make decisions based on anything available from {@link AnnotationMetadata}.
+&nbsp;	 */
+&nbsp;	static class ContextCustomizerKey {
+&nbsp;
+&nbsp;		private static final Set&lt;AnnotationFilter&gt; ANNOTATION_FILTERS;
+&nbsp;		static {
+<b class="nc">&nbsp;			Set&lt;AnnotationFilter&gt; annotationFilters = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			annotationFilters.add(AnnotationFilter.PLAIN);</b>
+<b class="nc">&nbsp;			annotationFilters.add(&quot;kotlin.Metadata&quot;::equals);</b>
+<b class="nc">&nbsp;			annotationFilters.add(AnnotationFilter.packages(&quot;kotlin.annotation&quot;));</b>
+<b class="nc">&nbsp;			annotationFilters.add(AnnotationFilter.packages(&quot;org.spockframework&quot;, &quot;spock&quot;));</b>
+<b class="nc">&nbsp;			annotationFilters.add(AnnotationFilter.packages(&quot;org.junit&quot;));</b>
+<b class="nc">&nbsp;			ANNOTATION_FILTERS = Collections.unmodifiableSet(annotationFilters);</b>
+&nbsp;		}
+&nbsp;		private final Set&lt;Object&gt; key;
+&nbsp;
+<b class="nc">&nbsp;		ContextCustomizerKey(Class&lt;?&gt; testClass) {</b>
+<b class="nc">&nbsp;			MergedAnnotations annotations = MergedAnnotations.search(MergedAnnotations.SearchStrategy.TYPE_HIERARCHY)</b>
+<b class="nc">&nbsp;				.withAnnotationFilter(this::isFilteredAnnotation)</b>
+<b class="nc">&nbsp;				.from(testClass);</b>
+<b class="nc">&nbsp;			Set&lt;Object&gt; determinedImports = determineImports(annotations, testClass);</b>
+<b class="nc">&nbsp;			if (determinedImports == null) {</b>
+<b class="nc">&nbsp;				this.key = Collections.unmodifiableSet(synthesize(annotations));</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				Set&lt;Object&gt; key = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;				key.addAll(determinedImports);</b>
+<b class="nc">&nbsp;				Set&lt;Annotation&gt; componentScanning = annotations.stream()</b>
+<b class="nc">&nbsp;					.filter((annotation) -&gt; annotation.getType().equals(ComponentScan.class))</b>
+<b class="nc">&nbsp;					.map(MergedAnnotation::synthesize)</b>
+<b class="nc">&nbsp;					.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;				key.addAll(componentScanning);</b>
+<b class="nc">&nbsp;				this.key = Collections.unmodifiableSet(key);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isFilteredAnnotation(String typeName) {
+<b class="nc">&nbsp;			return ANNOTATION_FILTERS.stream().anyMatch((filter) -&gt; filter.matches(typeName));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Set&lt;Object&gt; determineImports(MergedAnnotations annotations, Class&lt;?&gt; testClass) {
+<b class="nc">&nbsp;			Set&lt;Object&gt; determinedImports = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			AnnotationMetadata metadata = AnnotationMetadata.introspect(testClass);</b>
+<b class="nc">&nbsp;			for (MergedAnnotation&lt;Import&gt; annotation : annotations.stream(Import.class).toList()) {</b>
+<b class="nc">&nbsp;				for (Class&lt;?&gt; source : annotation.getClassArray(MergedAnnotation.VALUE)) {</b>
+<b class="nc">&nbsp;					Set&lt;Object&gt; determinedSourceImports = determineImports(source, metadata);</b>
+<b class="nc">&nbsp;					if (determinedSourceImports == null) {</b>
+<b class="nc">&nbsp;						return null;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					determinedImports.addAll(determinedSourceImports);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return determinedImports;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Set&lt;Object&gt; determineImports(Class&lt;?&gt; source, AnnotationMetadata metadata) {
+<b class="nc">&nbsp;			if (DeterminableImports.class.isAssignableFrom(source)) {</b>
+&nbsp;				// We can determine the imports
+<b class="nc">&nbsp;				return ((DeterminableImports) instantiate(source)).determineImports(metadata);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (ImportSelector.class.isAssignableFrom(source)</b>
+<b class="nc">&nbsp;					|| ImportBeanDefinitionRegistrar.class.isAssignableFrom(source)) {</b>
+&nbsp;				// Standard ImportSelector and ImportBeanDefinitionRegistrar could
+&nbsp;				// use anything to determine the imports so we can&#39;t be sure
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;			// The source itself is the import
+<b class="nc">&nbsp;			return Collections.singleton(source.getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Set&lt;Object&gt; synthesize(MergedAnnotations annotations) {
+<b class="nc">&nbsp;			return annotations.stream().map(MergedAnnotation::synthesize).collect(Collectors.toSet());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		private &lt;T&gt; T instantiate(Class&lt;T&gt; source) {
+&nbsp;			try {
+<b class="nc">&nbsp;				Constructor&lt;?&gt; constructor = source.getDeclaredConstructor();</b>
+<b class="nc">&nbsp;				ReflectionUtils.makeAccessible(constructor);</b>
+<b class="nc">&nbsp;				return (T) constructor.newInstance();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Throwable ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Unable to instantiate DeterminableImportSelector &quot; + source.getName(),</b>
+&nbsp;						ex);
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean equals(Object obj) {
+<b class="nc">&nbsp;			return (obj != null &amp;&amp; getClass() == obj.getClass() &amp;&amp; this.key.equals(((ContextCustomizerKey) obj).key));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int hashCode() {
+<b class="nc">&nbsp;			return this.key.hashCode();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return this.key.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

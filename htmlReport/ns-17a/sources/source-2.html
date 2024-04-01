@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultDockerCompose</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultDockerCompose (org.springframework.boot.docker.compose.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultDockerCompose</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.core;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.springframework.boot.logging.LogLevel;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default {@link DockerCompose} implementation backed by {@link DockerCli}.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class DefaultDockerCompose implements DockerCompose {
+&nbsp;
+&nbsp;	private final DockerCli cli;
+&nbsp;
+&nbsp;	private final DockerHost hostname;
+&nbsp;
+<b class="nc">&nbsp;	DefaultDockerCompose(DockerCli cli, String host) {</b>
+<b class="nc">&nbsp;		this.cli = cli;</b>
+<b class="nc">&nbsp;		this.hostname = DockerHost.get(host, () -&gt; cli.run(new DockerCliCommand.Context()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void up(LogLevel logLevel) {
+<b class="nc">&nbsp;		this.cli.run(new DockerCliCommand.ComposeUp(logLevel));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void down(Duration timeout) {
+<b class="nc">&nbsp;		this.cli.run(new DockerCliCommand.ComposeDown(timeout));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void start(LogLevel logLevel) {
+<b class="nc">&nbsp;		this.cli.run(new DockerCliCommand.ComposeStart(logLevel));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void stop(Duration timeout) {
+<b class="nc">&nbsp;		this.cli.run(new DockerCliCommand.ComposeStop(timeout));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean hasDefinedServices() {
+<b class="nc">&nbsp;		return !this.cli.run(new DockerCliCommand.ComposeConfig()).services().isEmpty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public List&lt;RunningService&gt; getRunningServices() {
+<b class="nc">&nbsp;		List&lt;DockerCliComposePsResponse&gt; runningPsResponses = runComposePs().stream().filter(this::isRunning).toList();</b>
+<b class="nc">&nbsp;		if (runningPsResponses.isEmpty()) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		DockerComposeFile dockerComposeFile = this.cli.getDockerComposeFile();</b>
+<b class="nc">&nbsp;		List&lt;RunningService&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		Map&lt;String, DockerCliInspectResponse&gt; inspected = inspect(runningPsResponses);</b>
+<b class="nc">&nbsp;		for (DockerCliComposePsResponse psResponse : runningPsResponses) {</b>
+<b class="nc">&nbsp;			DockerCliInspectResponse inspectResponse = inspectContainer(psResponse.id(), inspected);</b>
+<b class="nc">&nbsp;			Assert.notNull(inspectResponse, () -&gt; &quot;Failed to inspect container &#39;%s&#39;&quot;.formatted(psResponse.id()));</b>
+<b class="nc">&nbsp;			result.add(new DefaultRunningService(this.hostname, dockerComposeFile, psResponse, inspectResponse));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableList(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, DockerCliInspectResponse&gt; inspect(List&lt;DockerCliComposePsResponse&gt; runningPsResponses) {
+<b class="nc">&nbsp;		List&lt;String&gt; ids = runningPsResponses.stream().map(DockerCliComposePsResponse::id).toList();</b>
+<b class="nc">&nbsp;		List&lt;DockerCliInspectResponse&gt; inspectResponses = this.cli.run(new DockerCliCommand.Inspect(ids));</b>
+<b class="nc">&nbsp;		return inspectResponses.stream().collect(Collectors.toMap(DockerCliInspectResponse::id, Function.identity()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private DockerCliInspectResponse inspectContainer(String id, Map&lt;String, DockerCliInspectResponse&gt; inspected) {
+<b class="nc">&nbsp;		DockerCliInspectResponse inspect = inspected.get(id);</b>
+<b class="nc">&nbsp;		if (inspect != null) {</b>
+<b class="nc">&nbsp;			return inspect;</b>
+&nbsp;		}
+&nbsp;		// Docker Compose v2.23.0 returns truncated ids, so we have to do a prefix match
+<b class="nc">&nbsp;		for (Entry&lt;String, DockerCliInspectResponse&gt; entry : inspected.entrySet()) {</b>
+<b class="nc">&nbsp;			if (entry.getKey().startsWith(id)) {</b>
+<b class="nc">&nbsp;				return entry.getValue();</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;DockerCliComposePsResponse&gt; runComposePs() {
+<b class="nc">&nbsp;		return this.cli.run(new DockerCliCommand.ComposePs());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isRunning(DockerCliComposePsResponse psResponse) {
+<b class="nc">&nbsp;		return !&quot;exited&quot;.equals(psResponse.state());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

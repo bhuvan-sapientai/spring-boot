@@ -1,0 +1,1148 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FlywayProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.flyway</a>
+</div>
+
+<h1>Coverage Summary for Class: FlywayProperties (org.springframework.boot.autoconfigure.flyway)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FlywayProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/128)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/161)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FlywayProperties$Oracle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FlywayProperties$Postgresql</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FlywayProperties$Sqlserver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/143)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/176)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.flyway;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
+&nbsp;import org.springframework.boot.convert.DurationUnit;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration properties for Flyway database migrations.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Chris Bono
+&nbsp; * @since 1.1.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.flyway&quot;)
+<b class="nc">&nbsp;public class FlywayProperties {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to enable flyway.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean enabled = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to fail if a location of migration scripts doesn&#39;t exist.
+&nbsp;	 */
+&nbsp;	private boolean failOnMissingLocations;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Locations of migrations scripts. Can contain the special &quot;{vendor}&quot; placeholder to
+&nbsp;	 * use vendor-specific locations.
+&nbsp;	 */
+<b class="nc">&nbsp;	private List&lt;String&gt; locations = new ArrayList&lt;&gt;(Collections.singletonList(&quot;classpath:db/migration&quot;));</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encoding of SQL migrations.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Charset encoding = StandardCharsets.UTF_8;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maximum number of retries when attempting to connect to the database.
+&nbsp;	 */
+&nbsp;	private int connectRetries;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maximum time between retries when attempting to connect to the database. If a
+&nbsp;	 * duration suffix is not specified, seconds will be used.
+&nbsp;	 */
+<b class="nc">&nbsp;	@DurationUnit(ChronoUnit.SECONDS)</b>
+<b class="nc">&nbsp;	private Duration connectRetriesInterval = Duration.ofSeconds(120);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maximum number of retries when trying to obtain a lock.
+&nbsp;	 */
+<b class="nc">&nbsp;	private int lockRetryCount = 50;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Default schema name managed by Flyway (case-sensitive).
+&nbsp;	 */
+&nbsp;	private String defaultSchema;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Scheme names managed by Flyway (case-sensitive).
+&nbsp;	 */
+<b class="nc">&nbsp;	private List&lt;String&gt; schemas = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether Flyway should attempt to create the schemas specified in the schemas
+&nbsp;	 * property.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean createSchemas = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the schema history table that will be used by Flyway.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String table = &quot;flyway_schema_history&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Tablespace in which the schema history table is created. Ignored when using a
+&nbsp;	 * database that does not support tablespaces. Defaults to the default tablespace of
+&nbsp;	 * the connection used by Flyway.
+&nbsp;	 */
+&nbsp;	private String tablespace;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description to tag an existing schema with when applying a baseline.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String baselineDescription = &quot;&lt;&lt; Flyway Baseline &gt;&gt;&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Version to tag an existing schema with when executing baseline.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String baselineVersion = &quot;1&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Username recorded in the schema history table as having applied the migration.
+&nbsp;	 */
+&nbsp;	private String installedBy;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Placeholders and their replacements to apply to sql migration scripts.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Map&lt;String, String&gt; placeholders = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Prefix of placeholders in migration scripts.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String placeholderPrefix = &quot;${&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Suffix of placeholders in migration scripts.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String placeholderSuffix = &quot;}&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Separator of default placeholders.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String placeholderSeparator = &quot;:&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Perform placeholder replacement in migration scripts.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean placeholderReplacement = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * File name prefix for SQL migrations.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String sqlMigrationPrefix = &quot;V&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * File name suffix for SQL migrations.
+&nbsp;	 */
+<b class="nc">&nbsp;	private List&lt;String&gt; sqlMigrationSuffixes = new ArrayList&lt;&gt;(Collections.singleton(&quot;.sql&quot;));</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * File name separator for SQL migrations.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String sqlMigrationSeparator = &quot;__&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * File name prefix for repeatable SQL migrations.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String repeatableSqlMigrationPrefix = &quot;R&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Target version up to which migrations should be considered.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String target = &quot;latest&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login user of the database to migrate.
+&nbsp;	 */
+&nbsp;	private String user;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Login password of the database to migrate.
+&nbsp;	 */
+&nbsp;	private String password;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Fully qualified name of the JDBC driver. Auto-detected based on the URL by default.
+&nbsp;	 */
+&nbsp;	private String driverClassName;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * JDBC url of the database to migrate. If not set, the primary configured data source
+&nbsp;	 * is used.
+&nbsp;	 */
+&nbsp;	private String url;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * SQL statements to execute to initialize a connection immediately after obtaining
+&nbsp;	 * it.
+&nbsp;	 */
+<b class="nc">&nbsp;	private List&lt;String&gt; initSqls = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to automatically call baseline when migrating a non-empty schema.
+&nbsp;	 */
+&nbsp;	private boolean baselineOnMigrate;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to disable cleaning of the database.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean cleanDisabled = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to automatically call clean when a validation error occurs.
+&nbsp;	 */
+&nbsp;	private boolean cleanOnValidationError;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to group all pending migrations together in the same transaction when
+&nbsp;	 * applying them.
+&nbsp;	 */
+&nbsp;	private boolean group;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to allow mixing transactional and non-transactional statements within the
+&nbsp;	 * same migration.
+&nbsp;	 */
+&nbsp;	private boolean mixed;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to allow migrations to be run out of order.
+&nbsp;	 */
+&nbsp;	private boolean outOfOrder;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to skip default callbacks. If true, only custom callbacks are used.
+&nbsp;	 */
+&nbsp;	private boolean skipDefaultCallbacks;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to skip default resolvers. If true, only custom resolvers are used.
+&nbsp;	 */
+&nbsp;	private boolean skipDefaultResolvers;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to validate migrations and callbacks whose scripts do not obey the correct
+&nbsp;	 * naming convention.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean validateMigrationNaming = false;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to automatically call validate when performing a migration.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean validateOnMigrate = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Prefix of placeholders in migration scripts.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String scriptPlaceholderPrefix = &quot;FP__&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Suffix of placeholders in migration scripts.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String scriptPlaceholderSuffix = &quot;__&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether Flyway should execute SQL within a transaction.
+&nbsp;	 */
+<b class="nc">&nbsp;	private boolean executeInTransaction = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Loggers Flyway should use.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String[] loggers = { &quot;slf4j&quot; };</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to batch SQL statements when executing them. Requires Flyway Teams.
+&nbsp;	 */
+&nbsp;	private Boolean batch;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * File to which the SQL statements of a migration dry run should be output. Requires
+&nbsp;	 * Flyway Teams.
+&nbsp;	 */
+&nbsp;	private File dryRunOutput;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Rules for the built-in error handling to override specific SQL states and error
+&nbsp;	 * codes. Requires Flyway Teams.
+&nbsp;	 */
+&nbsp;	private String[] errorOverrides;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Licence key for Flyway Teams.
+&nbsp;	 */
+&nbsp;	private String licenseKey;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to stream SQL migrations when executing them. Requires Flyway Teams.
+&nbsp;	 */
+&nbsp;	private Boolean stream;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * File name prefix for undo SQL migrations. Requires Flyway Teams.
+&nbsp;	 */
+&nbsp;	private String undoSqlMigrationPrefix;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Migrations that Flyway should consider when migrating or undoing. When empty all
+&nbsp;	 * available migrations are considered. Requires Flyway Teams.
+&nbsp;	 */
+&nbsp;	private String[] cherryPick;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties to pass to the JDBC driver. Requires Flyway Teams.
+&nbsp;	 */
+<b class="nc">&nbsp;	private Map&lt;String, String&gt; jdbcProperties = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Path of the Kerberos config file. Requires Flyway Teams.
+&nbsp;	 */
+&nbsp;	private String kerberosConfigFile;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether Flyway should output a table with the results of queries when executing
+&nbsp;	 * migrations. Requires Flyway Teams.
+&nbsp;	 */
+&nbsp;	private Boolean outputQueryResults;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether Flyway should skip executing the contents of the migrations and only update
+&nbsp;	 * the schema history table. Requires Flyway teams.
+&nbsp;	 */
+&nbsp;	private Boolean skipExecutingMigrations;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Ignore migrations that match this comma-separated list of patterns when validating
+&nbsp;	 * migrations. Requires Flyway Teams.
+&nbsp;	 */
+&nbsp;	private List&lt;String&gt; ignoreMigrationPatterns;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to attempt to automatically detect SQL migration file encoding. Requires
+&nbsp;	 * Flyway Teams.
+&nbsp;	 */
+&nbsp;	private Boolean detectEncoding;
+&nbsp;
+<b class="nc">&nbsp;	private final Oracle oracle = new Oracle();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Postgresql postgresql = new Postgresql();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Sqlserver sqlserver = new Sqlserver();</b>
+&nbsp;
+&nbsp;	public boolean isEnabled() {
+<b class="nc">&nbsp;		return this.enabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setEnabled(boolean enabled) {
+<b class="nc">&nbsp;		this.enabled = enabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isFailOnMissingLocations() {
+<b class="nc">&nbsp;		return this.failOnMissingLocations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setFailOnMissingLocations(boolean failOnMissingLocations) {
+<b class="nc">&nbsp;		this.failOnMissingLocations = failOnMissingLocations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;String&gt; getLocations() {
+<b class="nc">&nbsp;		return this.locations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setLocations(List&lt;String&gt; locations) {
+<b class="nc">&nbsp;		this.locations = locations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Charset getEncoding() {
+<b class="nc">&nbsp;		return this.encoding;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setEncoding(Charset encoding) {
+<b class="nc">&nbsp;		this.encoding = encoding;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public int getConnectRetries() {
+<b class="nc">&nbsp;		return this.connectRetries;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setConnectRetries(int connectRetries) {
+<b class="nc">&nbsp;		this.connectRetries = connectRetries;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Duration getConnectRetriesInterval() {
+<b class="nc">&nbsp;		return this.connectRetriesInterval;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setConnectRetriesInterval(Duration connectRetriesInterval) {
+<b class="nc">&nbsp;		this.connectRetriesInterval = connectRetriesInterval;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public int getLockRetryCount() {
+<b class="nc">&nbsp;		return this.lockRetryCount;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setLockRetryCount(Integer lockRetryCount) {
+<b class="nc">&nbsp;		this.lockRetryCount = lockRetryCount;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getDefaultSchema() {
+<b class="nc">&nbsp;		return this.defaultSchema;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setDefaultSchema(String defaultSchema) {
+<b class="nc">&nbsp;		this.defaultSchema = defaultSchema;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;String&gt; getSchemas() {
+<b class="nc">&nbsp;		return this.schemas;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setSchemas(List&lt;String&gt; schemas) {
+<b class="nc">&nbsp;		this.schemas = schemas;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isCreateSchemas() {
+<b class="nc">&nbsp;		return this.createSchemas;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setCreateSchemas(boolean createSchemas) {
+<b class="nc">&nbsp;		this.createSchemas = createSchemas;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getTable() {
+<b class="nc">&nbsp;		return this.table;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setTable(String table) {
+<b class="nc">&nbsp;		this.table = table;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getTablespace() {
+<b class="nc">&nbsp;		return this.tablespace;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setTablespace(String tablespace) {
+<b class="nc">&nbsp;		this.tablespace = tablespace;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getBaselineDescription() {
+<b class="nc">&nbsp;		return this.baselineDescription;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBaselineDescription(String baselineDescription) {
+<b class="nc">&nbsp;		this.baselineDescription = baselineDescription;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getBaselineVersion() {
+<b class="nc">&nbsp;		return this.baselineVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBaselineVersion(String baselineVersion) {
+<b class="nc">&nbsp;		this.baselineVersion = baselineVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getInstalledBy() {
+<b class="nc">&nbsp;		return this.installedBy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setInstalledBy(String installedBy) {
+<b class="nc">&nbsp;		this.installedBy = installedBy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Map&lt;String, String&gt; getPlaceholders() {
+<b class="nc">&nbsp;		return this.placeholders;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPlaceholders(Map&lt;String, String&gt; placeholders) {
+<b class="nc">&nbsp;		this.placeholders = placeholders;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getPlaceholderPrefix() {
+<b class="nc">&nbsp;		return this.placeholderPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPlaceholderPrefix(String placeholderPrefix) {
+<b class="nc">&nbsp;		this.placeholderPrefix = placeholderPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getPlaceholderSuffix() {
+<b class="nc">&nbsp;		return this.placeholderSuffix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPlaceholderSuffix(String placeholderSuffix) {
+<b class="nc">&nbsp;		this.placeholderSuffix = placeholderSuffix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getPlaceholderSeparator() {
+<b class="nc">&nbsp;		return this.placeholderSeparator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPlaceholderSeparator(String placeholderSeparator) {
+<b class="nc">&nbsp;		this.placeholderSeparator = placeholderSeparator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isPlaceholderReplacement() {
+<b class="nc">&nbsp;		return this.placeholderReplacement;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPlaceholderReplacement(boolean placeholderReplacement) {
+<b class="nc">&nbsp;		this.placeholderReplacement = placeholderReplacement;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getSqlMigrationPrefix() {
+<b class="nc">&nbsp;		return this.sqlMigrationPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setSqlMigrationPrefix(String sqlMigrationPrefix) {
+<b class="nc">&nbsp;		this.sqlMigrationPrefix = sqlMigrationPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;String&gt; getSqlMigrationSuffixes() {
+<b class="nc">&nbsp;		return this.sqlMigrationSuffixes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setSqlMigrationSuffixes(List&lt;String&gt; sqlMigrationSuffixes) {
+<b class="nc">&nbsp;		this.sqlMigrationSuffixes = sqlMigrationSuffixes;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getSqlMigrationSeparator() {
+<b class="nc">&nbsp;		return this.sqlMigrationSeparator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setSqlMigrationSeparator(String sqlMigrationSeparator) {
+<b class="nc">&nbsp;		this.sqlMigrationSeparator = sqlMigrationSeparator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getRepeatableSqlMigrationPrefix() {
+<b class="nc">&nbsp;		return this.repeatableSqlMigrationPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setRepeatableSqlMigrationPrefix(String repeatableSqlMigrationPrefix) {
+<b class="nc">&nbsp;		this.repeatableSqlMigrationPrefix = repeatableSqlMigrationPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getTarget() {
+<b class="nc">&nbsp;		return this.target;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setTarget(String target) {
+<b class="nc">&nbsp;		this.target = target;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUser() {
+<b class="nc">&nbsp;		return this.user;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUser(String user) {
+<b class="nc">&nbsp;		this.user = user;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getPassword() {
+<b class="nc">&nbsp;		return this.password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPassword(String password) {
+<b class="nc">&nbsp;		this.password = password;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getDriverClassName() {
+<b class="nc">&nbsp;		return this.driverClassName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setDriverClassName(String driverClassName) {
+<b class="nc">&nbsp;		this.driverClassName = driverClassName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUrl() {
+<b class="nc">&nbsp;		return this.url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUrl(String url) {
+<b class="nc">&nbsp;		this.url = url;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;String&gt; getInitSqls() {
+<b class="nc">&nbsp;		return this.initSqls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setInitSqls(List&lt;String&gt; initSqls) {
+<b class="nc">&nbsp;		this.initSqls = initSqls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isBaselineOnMigrate() {
+<b class="nc">&nbsp;		return this.baselineOnMigrate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBaselineOnMigrate(boolean baselineOnMigrate) {
+<b class="nc">&nbsp;		this.baselineOnMigrate = baselineOnMigrate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isCleanDisabled() {
+<b class="nc">&nbsp;		return this.cleanDisabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setCleanDisabled(boolean cleanDisabled) {
+<b class="nc">&nbsp;		this.cleanDisabled = cleanDisabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isCleanOnValidationError() {
+<b class="nc">&nbsp;		return this.cleanOnValidationError;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setCleanOnValidationError(boolean cleanOnValidationError) {
+<b class="nc">&nbsp;		this.cleanOnValidationError = cleanOnValidationError;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isGroup() {
+<b class="nc">&nbsp;		return this.group;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setGroup(boolean group) {
+<b class="nc">&nbsp;		this.group = group;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isMixed() {
+<b class="nc">&nbsp;		return this.mixed;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setMixed(boolean mixed) {
+<b class="nc">&nbsp;		this.mixed = mixed;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isOutOfOrder() {
+<b class="nc">&nbsp;		return this.outOfOrder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOutOfOrder(boolean outOfOrder) {
+<b class="nc">&nbsp;		this.outOfOrder = outOfOrder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isSkipDefaultCallbacks() {
+<b class="nc">&nbsp;		return this.skipDefaultCallbacks;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setSkipDefaultCallbacks(boolean skipDefaultCallbacks) {
+<b class="nc">&nbsp;		this.skipDefaultCallbacks = skipDefaultCallbacks;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isSkipDefaultResolvers() {
+<b class="nc">&nbsp;		return this.skipDefaultResolvers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setSkipDefaultResolvers(boolean skipDefaultResolvers) {
+<b class="nc">&nbsp;		this.skipDefaultResolvers = skipDefaultResolvers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isValidateMigrationNaming() {
+<b class="nc">&nbsp;		return this.validateMigrationNaming;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setValidateMigrationNaming(boolean validateMigrationNaming) {
+<b class="nc">&nbsp;		this.validateMigrationNaming = validateMigrationNaming;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isValidateOnMigrate() {
+<b class="nc">&nbsp;		return this.validateOnMigrate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setValidateOnMigrate(boolean validateOnMigrate) {
+<b class="nc">&nbsp;		this.validateOnMigrate = validateOnMigrate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getScriptPlaceholderPrefix() {
+<b class="nc">&nbsp;		return this.scriptPlaceholderPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setScriptPlaceholderPrefix(String scriptPlaceholderPrefix) {
+<b class="nc">&nbsp;		this.scriptPlaceholderPrefix = scriptPlaceholderPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getScriptPlaceholderSuffix() {
+<b class="nc">&nbsp;		return this.scriptPlaceholderSuffix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setScriptPlaceholderSuffix(String scriptPlaceholderSuffix) {
+<b class="nc">&nbsp;		this.scriptPlaceholderSuffix = scriptPlaceholderSuffix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isExecuteInTransaction() {
+<b class="nc">&nbsp;		return this.executeInTransaction;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setExecuteInTransaction(boolean executeInTransaction) {
+<b class="nc">&nbsp;		this.executeInTransaction = executeInTransaction;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String[] getLoggers() {
+<b class="nc">&nbsp;		return this.loggers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setLoggers(String[] loggers) {
+<b class="nc">&nbsp;		this.loggers = loggers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Boolean getBatch() {
+<b class="nc">&nbsp;		return this.batch;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBatch(Boolean batch) {
+<b class="nc">&nbsp;		this.batch = batch;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public File getDryRunOutput() {
+<b class="nc">&nbsp;		return this.dryRunOutput;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setDryRunOutput(File dryRunOutput) {
+<b class="nc">&nbsp;		this.dryRunOutput = dryRunOutput;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String[] getErrorOverrides() {
+<b class="nc">&nbsp;		return this.errorOverrides;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setErrorOverrides(String[] errorOverrides) {
+<b class="nc">&nbsp;		this.errorOverrides = errorOverrides;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getLicenseKey() {
+<b class="nc">&nbsp;		return this.licenseKey;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setLicenseKey(String licenseKey) {
+<b class="nc">&nbsp;		this.licenseKey = licenseKey;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@DeprecatedConfigurationProperty(replacement = &quot;spring.flyway.oracle.sqlplus&quot;, since = &quot;3.2.0&quot;)
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public Boolean getOracleSqlplus() {
+<b class="nc">&nbsp;		return getOracle().getSqlplus();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public void setOracleSqlplus(Boolean oracleSqlplus) {
+<b class="nc">&nbsp;		getOracle().setSqlplus(oracleSqlplus);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@DeprecatedConfigurationProperty(replacement = &quot;spring.flyway.oracle.sqlplus-warn&quot;, since = &quot;3.2.0&quot;)
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public Boolean getOracleSqlplusWarn() {
+<b class="nc">&nbsp;		return getOracle().getSqlplusWarn();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public void setOracleSqlplusWarn(Boolean oracleSqlplusWarn) {
+<b class="nc">&nbsp;		getOracle().setSqlplusWarn(oracleSqlplusWarn);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@DeprecatedConfigurationProperty(replacement = &quot;spring.flyway.oracle.wallet-location&quot;, since = &quot;3.2.0&quot;)
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public String getOracleWalletLocation() {
+<b class="nc">&nbsp;		return getOracle().getWalletLocation();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public void setOracleWalletLocation(String oracleWalletLocation) {
+<b class="nc">&nbsp;		getOracle().setWalletLocation(oracleWalletLocation);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Boolean getStream() {
+<b class="nc">&nbsp;		return this.stream;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setStream(Boolean stream) {
+<b class="nc">&nbsp;		this.stream = stream;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getUndoSqlMigrationPrefix() {
+<b class="nc">&nbsp;		return this.undoSqlMigrationPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setUndoSqlMigrationPrefix(String undoSqlMigrationPrefix) {
+<b class="nc">&nbsp;		this.undoSqlMigrationPrefix = undoSqlMigrationPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String[] getCherryPick() {
+<b class="nc">&nbsp;		return this.cherryPick;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setCherryPick(String[] cherryPick) {
+<b class="nc">&nbsp;		this.cherryPick = cherryPick;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Map&lt;String, String&gt; getJdbcProperties() {
+<b class="nc">&nbsp;		return this.jdbcProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setJdbcProperties(Map&lt;String, String&gt; jdbcProperties) {
+<b class="nc">&nbsp;		this.jdbcProperties = jdbcProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getKerberosConfigFile() {
+<b class="nc">&nbsp;		return this.kerberosConfigFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setKerberosConfigFile(String kerberosConfigFile) {
+<b class="nc">&nbsp;		this.kerberosConfigFile = kerberosConfigFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@DeprecatedConfigurationProperty(replacement = &quot;spring.flyway.oracle.kerberos-cache-file&quot;, since = &quot;3.2.0&quot;)
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public String getOracleKerberosCacheFile() {
+<b class="nc">&nbsp;		return getOracle().getKerberosCacheFile();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public void setOracleKerberosCacheFile(String oracleKerberosCacheFile) {
+<b class="nc">&nbsp;		getOracle().setKerberosCacheFile(oracleKerberosCacheFile);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Boolean getOutputQueryResults() {
+<b class="nc">&nbsp;		return this.outputQueryResults;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOutputQueryResults(Boolean outputQueryResults) {
+<b class="nc">&nbsp;		this.outputQueryResults = outputQueryResults;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@DeprecatedConfigurationProperty(replacement = &quot;spring.flyway.sqlserver.kerberos-login-file&quot;)
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public String getSqlServerKerberosLoginFile() {
+<b class="nc">&nbsp;		return getSqlserver().getKerberosLoginFile();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public void setSqlServerKerberosLoginFile(String sqlServerKerberosLoginFile) {
+<b class="nc">&nbsp;		getSqlserver().setKerberosLoginFile(sqlServerKerberosLoginFile);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Boolean getSkipExecutingMigrations() {
+<b class="nc">&nbsp;		return this.skipExecutingMigrations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setSkipExecutingMigrations(Boolean skipExecutingMigrations) {
+<b class="nc">&nbsp;		this.skipExecutingMigrations = skipExecutingMigrations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;String&gt; getIgnoreMigrationPatterns() {
+<b class="nc">&nbsp;		return this.ignoreMigrationPatterns;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setIgnoreMigrationPatterns(List&lt;String&gt; ignoreMigrationPatterns) {
+<b class="nc">&nbsp;		this.ignoreMigrationPatterns = ignoreMigrationPatterns;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Boolean getDetectEncoding() {
+<b class="nc">&nbsp;		return this.detectEncoding;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setDetectEncoding(final Boolean detectEncoding) {
+<b class="nc">&nbsp;		this.detectEncoding = detectEncoding;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Oracle getOracle() {
+<b class="nc">&nbsp;		return this.oracle;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Postgresql getPostgresql() {
+<b class="nc">&nbsp;		return this.postgresql;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Sqlserver getSqlserver() {
+<b class="nc">&nbsp;		return this.sqlserver;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code OracleConfigurationExtension} properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Oracle {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether to enable support for Oracle SQL*Plus commands. Requires Flyway Teams.
+&nbsp;		 */
+&nbsp;		private Boolean sqlplus;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether to issue a warning rather than an error when a not-yet-supported Oracle
+&nbsp;		 * SQL*Plus statement is encountered. Requires Flyway Teams.
+&nbsp;		 */
+&nbsp;		private Boolean sqlplusWarn;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Path of the Oracle Kerberos cache file. Requires Flyway Teams.
+&nbsp;		 */
+&nbsp;		private String kerberosCacheFile;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Location of the Oracle Wallet, used to sign in to the database automatically.
+&nbsp;		 * Requires Flyway Teams.
+&nbsp;		 */
+&nbsp;		private String walletLocation;
+&nbsp;
+&nbsp;		public Boolean getSqlplus() {
+<b class="nc">&nbsp;			return this.sqlplus;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setSqlplus(Boolean sqlplus) {
+<b class="nc">&nbsp;			this.sqlplus = sqlplus;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Boolean getSqlplusWarn() {
+<b class="nc">&nbsp;			return this.sqlplusWarn;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setSqlplusWarn(Boolean sqlplusWarn) {
+<b class="nc">&nbsp;			this.sqlplusWarn = sqlplusWarn;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getKerberosCacheFile() {
+<b class="nc">&nbsp;			return this.kerberosCacheFile;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setKerberosCacheFile(String kerberosCacheFile) {
+<b class="nc">&nbsp;			this.kerberosCacheFile = kerberosCacheFile;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getWalletLocation() {
+<b class="nc">&nbsp;			return this.walletLocation;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setWalletLocation(String walletLocation) {
+<b class="nc">&nbsp;			this.walletLocation = walletLocation;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code PostgreSQLConfigurationExtension} properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Postgresql {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether transactional advisory locks should be used. If set to false,
+&nbsp;		 * session-level locks are used instead.
+&nbsp;		 */
+&nbsp;		private Boolean transactionalLock;
+&nbsp;
+&nbsp;		public Boolean getTransactionalLock() {
+<b class="nc">&nbsp;			return this.transactionalLock;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setTransactionalLock(Boolean transactionalLock) {
+<b class="nc">&nbsp;			this.transactionalLock = transactionalLock;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code SQLServerConfigurationExtension} properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Sqlserver {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Path to the SQL Server Kerberos login file. Requires Flyway Teams.
+&nbsp;		 */
+&nbsp;		private String kerberosLoginFile;
+&nbsp;
+&nbsp;		public String getKerberosLoginFile() {
+<b class="nc">&nbsp;			return this.kerberosLoginFile;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setKerberosLoginFile(String kerberosLoginFile) {
+<b class="nc">&nbsp;			this.kerberosLoginFile = kerberosLoginFile;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

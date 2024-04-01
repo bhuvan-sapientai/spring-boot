@@ -1,0 +1,302 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MicrometerTracingAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.tracing</a>
+</div>
+
+<h1>Coverage Summary for Class: MicrometerTracingAutoConfiguration (org.springframework.boot.actuate.autoconfigure.tracing)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MicrometerTracingAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MicrometerTracingAutoConfiguration$SpanAspectConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MicrometerTracingAutoConfiguration$SpelTagValueExpressionResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.tracing;
+&nbsp;
+&nbsp;import io.micrometer.common.annotation.ValueExpressionResolver;
+&nbsp;import io.micrometer.tracing.Tracer;
+&nbsp;import io.micrometer.tracing.annotation.DefaultNewSpanParser;
+&nbsp;import io.micrometer.tracing.annotation.ImperativeMethodInvocationProcessor;
+&nbsp;import io.micrometer.tracing.annotation.MethodInvocationProcessor;
+&nbsp;import io.micrometer.tracing.annotation.NewSpanParser;
+&nbsp;import io.micrometer.tracing.annotation.SpanAspect;
+&nbsp;import io.micrometer.tracing.annotation.SpanTagAnnotationHandler;
+&nbsp;import io.micrometer.tracing.handler.DefaultTracingObservationHandler;
+&nbsp;import io.micrometer.tracing.handler.PropagatingReceiverTracingObservationHandler;
+&nbsp;import io.micrometer.tracing.handler.PropagatingSenderTracingObservationHandler;
+&nbsp;import io.micrometer.tracing.propagation.Propagator;
+&nbsp;import org.aspectj.weaver.Advice;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.expression.Expression;
+&nbsp;import org.springframework.expression.ExpressionParser;
+&nbsp;import org.springframework.expression.spel.standard.SpelExpressionParser;
+&nbsp;import org.springframework.expression.spel.support.SimpleEvaluationContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for the Micrometer Tracing API.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Jonatan Ivanov
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@ConditionalOnClass(Tracer.class)
+&nbsp;@ConditionalOnBean(Tracer.class)
+<b class="nc">&nbsp;public class MicrometerTracingAutoConfiguration {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code @Order} value of {@link #defaultTracingObservationHandler(Tracer)}.
+&nbsp;	 */
+&nbsp;	public static final int DEFAULT_TRACING_OBSERVATION_HANDLER_ORDER = Ordered.LOWEST_PRECEDENCE - 1000;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code @Order} value of
+&nbsp;	 * {@link #propagatingReceiverTracingObservationHandler(Tracer, Propagator)}.
+&nbsp;	 */
+&nbsp;	public static final int RECEIVER_TRACING_OBSERVATION_HANDLER_ORDER = 1000;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code @Order} value of
+&nbsp;	 * {@link #propagatingSenderTracingObservationHandler(Tracer, Propagator)}.
+&nbsp;	 */
+&nbsp;	public static final int SENDER_TRACING_OBSERVATION_HANDLER_ORDER = 2000;
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	@Order(DEFAULT_TRACING_OBSERVATION_HANDLER_ORDER)
+&nbsp;	public DefaultTracingObservationHandler defaultTracingObservationHandler(Tracer tracer) {
+<b class="nc">&nbsp;		return new DefaultTracingObservationHandler(tracer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	@ConditionalOnBean(Propagator.class)
+&nbsp;	@Order(SENDER_TRACING_OBSERVATION_HANDLER_ORDER)
+&nbsp;	public PropagatingSenderTracingObservationHandler&lt;?&gt; propagatingSenderTracingObservationHandler(Tracer tracer,
+&nbsp;			Propagator propagator) {
+<b class="nc">&nbsp;		return new PropagatingSenderTracingObservationHandler&lt;&gt;(tracer, propagator);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	@ConditionalOnBean(Propagator.class)
+&nbsp;	@Order(RECEIVER_TRACING_OBSERVATION_HANDLER_ORDER)
+&nbsp;	public PropagatingReceiverTracingObservationHandler&lt;?&gt; propagatingReceiverTracingObservationHandler(Tracer tracer,
+&nbsp;			Propagator propagator) {
+<b class="nc">&nbsp;		return new PropagatingReceiverTracingObservationHandler&lt;&gt;(tracer, propagator);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass(Advice.class)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;micrometer.observations.annotations&quot;, name = &quot;enabled&quot;, havingValue = &quot;true&quot;)
+<b class="nc">&nbsp;	static class SpanAspectConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(NewSpanParser.class)
+&nbsp;		DefaultNewSpanParser newSpanParser() {
+<b class="nc">&nbsp;			return new DefaultNewSpanParser();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		SpanTagAnnotationHandler spanTagAnnotationHandler(BeanFactory beanFactory) {
+<b class="nc">&nbsp;			ValueExpressionResolver valueExpressionResolver = new SpelTagValueExpressionResolver();</b>
+<b class="nc">&nbsp;			return new SpanTagAnnotationHandler(beanFactory::getBean, (ignored) -&gt; valueExpressionResolver);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(MethodInvocationProcessor.class)
+&nbsp;		ImperativeMethodInvocationProcessor imperativeMethodInvocationProcessor(NewSpanParser newSpanParser,
+&nbsp;				Tracer tracer, SpanTagAnnotationHandler spanTagAnnotationHandler) {
+<b class="nc">&nbsp;			return new ImperativeMethodInvocationProcessor(newSpanParser, tracer, spanTagAnnotationHandler);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		SpanAspect spanAspect(MethodInvocationProcessor methodInvocationProcessor) {
+<b class="nc">&nbsp;			return new SpanAspect(methodInvocationProcessor);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class SpelTagValueExpressionResolver implements ValueExpressionResolver {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String resolve(String expression, Object parameter) {
+&nbsp;			try {
+<b class="nc">&nbsp;				SimpleEvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding().build();</b>
+<b class="nc">&nbsp;				ExpressionParser expressionParser = new SpelExpressionParser();</b>
+<b class="nc">&nbsp;				Expression expressionToEvaluate = expressionParser.parseExpression(expression);</b>
+<b class="nc">&nbsp;				return expressionToEvaluate.getValue(context, parameter, String.class);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Unable to evaluate SpEL expression &#39;%s&#39;&quot;.formatted(expression), ex);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

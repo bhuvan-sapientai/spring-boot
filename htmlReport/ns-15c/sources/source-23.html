@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LocationResourceLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.config</a>
+</div>
+
+<h1>Coverage Summary for Class: LocationResourceLoader (org.springframework.boot.context.config)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LocationResourceLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (8/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.4%
+  </span>
+  <span class="absValue">
+    (27/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LocationResourceLoader$ResourceType</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    76.9%
+  </span>
+  <span class="absValue">
+    (10/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (30/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.config;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FilenameFilter;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.core.io.FileSystemResource;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.core.io.support.ResourcePatternResolver;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ResourceUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Strategy interface for loading resources from a location. Supports single resource and
+&nbsp; * simple wildcard directory patterns.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class LocationResourceLoader {
+&nbsp;
+<b class="fc">&nbsp;	private static final Resource[] EMPTY_RESOURCES = {};</b>
+&nbsp;
+<b class="fc">&nbsp;	private static final Comparator&lt;File&gt; FILE_PATH_COMPARATOR = Comparator.comparing(File::getAbsolutePath);</b>
+&nbsp;
+<b class="fc">&nbsp;	private static final Comparator&lt;File&gt; FILE_NAME_COMPARATOR = Comparator.comparing(File::getName);</b>
+&nbsp;
+&nbsp;	private final ResourceLoader resourceLoader;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LocationResourceLoader} instance.
+&nbsp;	 * @param resourceLoader the underlying resource loader
+&nbsp;	 */
+<b class="fc">&nbsp;	LocationResourceLoader(ResourceLoader resourceLoader) {</b>
+<b class="fc">&nbsp;		this.resourceLoader = resourceLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns if the location contains a pattern.
+&nbsp;	 * @param location the location to check
+&nbsp;	 * @return if the location is a pattern
+&nbsp;	 */
+&nbsp;	boolean isPattern(String location) {
+<b class="fc">&nbsp;		return StringUtils.hasLength(location) &amp;&amp; location.contains(&quot;*&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get a single resource from a non-pattern location.
+&nbsp;	 * @param location the location
+&nbsp;	 * @return the resource
+&nbsp;	 * @see #isPattern(String)
+&nbsp;	 */
+&nbsp;	Resource getResource(String location) {
+<b class="fc">&nbsp;		validateNonPattern(location);</b>
+<b class="fc">&nbsp;		location = StringUtils.cleanPath(location);</b>
+<b class="fc">&nbsp;		if (!ResourceUtils.isUrl(location)) {</b>
+<b class="fc">&nbsp;			location = ResourceUtils.FILE_URL_PREFIX + location;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return this.resourceLoader.getResource(location);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void validateNonPattern(String location) {
+<b class="fc">&nbsp;		Assert.state(!isPattern(location), () -&gt; String.format(&quot;Location &#39;%s&#39; must not be a pattern&quot;, location));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get a multiple resources from a location pattern.
+&nbsp;	 * @param location the location pattern
+&nbsp;	 * @param type the type of resource to return
+&nbsp;	 * @return the resources
+&nbsp;	 * @see #isPattern(String)
+&nbsp;	 */
+&nbsp;	Resource[] getResources(String location, ResourceType type) {
+<b class="fc">&nbsp;		validatePattern(location, type);</b>
+<b class="fc">&nbsp;		String directoryPath = location.substring(0, location.indexOf(&quot;*/&quot;));</b>
+<b class="fc">&nbsp;		String fileName = location.substring(location.lastIndexOf(&quot;/&quot;) + 1);</b>
+<b class="fc">&nbsp;		Resource resource = getResource(directoryPath);</b>
+<b class="fc">&nbsp;		if (!resource.exists()) {</b>
+<b class="nc">&nbsp;			return EMPTY_RESOURCES;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		File file = getFile(location, resource);</b>
+<b class="fc">&nbsp;		if (!file.isDirectory()) {</b>
+<b class="fc">&nbsp;			return EMPTY_RESOURCES;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		File[] subDirectories = file.listFiles(this::isVisibleDirectory);</b>
+<b class="nc">&nbsp;		if (subDirectories == null) {</b>
+<b class="nc">&nbsp;			return EMPTY_RESOURCES;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Arrays.sort(subDirectories, FILE_PATH_COMPARATOR);</b>
+<b class="nc">&nbsp;		if (type == ResourceType.DIRECTORY) {</b>
+<b class="nc">&nbsp;			return Arrays.stream(subDirectories).map(FileSystemResource::new).toArray(Resource[]::new);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;Resource&gt; resources = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		FilenameFilter filter = (dir, name) -&gt; name.equals(fileName);</b>
+<b class="nc">&nbsp;		for (File subDirectory : subDirectories) {</b>
+<b class="nc">&nbsp;			File[] files = subDirectory.listFiles(filter);</b>
+<b class="nc">&nbsp;			if (files != null) {</b>
+<b class="nc">&nbsp;				Arrays.sort(files, FILE_NAME_COMPARATOR);</b>
+<b class="nc">&nbsp;				Arrays.stream(files).map(FileSystemResource::new).forEach(resources::add);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return resources.toArray(EMPTY_RESOURCES);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void validatePattern(String location, ResourceType type) {
+<b class="fc">&nbsp;		Assert.state(isPattern(location), () -&gt; String.format(&quot;Location &#39;%s&#39; must be a pattern&quot;, location));</b>
+<b class="fc">&nbsp;		Assert.state(!location.startsWith(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX),</b>
+<b class="nc">&nbsp;				() -&gt; String.format(&quot;Location &#39;%s&#39; cannot use classpath wildcards&quot;, location));</b>
+<b class="fc">&nbsp;		Assert.state(StringUtils.countOccurrencesOf(location, &quot;*&quot;) == 1,</b>
+<b class="nc">&nbsp;				() -&gt; String.format(&quot;Location &#39;%s&#39; cannot contain multiple wildcards&quot;, location));</b>
+<b class="fc">&nbsp;		String directoryPath = (type != ResourceType.DIRECTORY) ? location.substring(0, location.lastIndexOf(&quot;/&quot;) + 1)</b>
+<b class="fc">&nbsp;				: location;</b>
+<b class="fc">&nbsp;		Assert.state(directoryPath.endsWith(&quot;*/&quot;), () -&gt; String.format(&quot;Location &#39;%s&#39; must end with &#39;*/&#39;&quot;, location));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getFile(String patternLocation, Resource resource) {
+&nbsp;		try {
+<b class="fc">&nbsp;			return resource.getFile();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(</b>
+&nbsp;					&quot;Unable to load config data resource from pattern &#39;&quot; + patternLocation + &quot;&#39;&quot;, ex);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isVisibleDirectory(File file) {
+<b class="nc">&nbsp;		return file.isDirectory() &amp;&amp; !file.getName().startsWith(&quot;..&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resource types that can be returned.
+&nbsp;	 */
+<b class="fc">&nbsp;	enum ResourceType {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return file resources.
+&nbsp;		 */
+<b class="fc">&nbsp;		FILE,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return directory resources.
+&nbsp;		 */
+<b class="fc">&nbsp;		DIRECTORY</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

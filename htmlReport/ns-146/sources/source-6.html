@@ -1,0 +1,418 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NamedPipeSocket</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.socket</a>
+</div>
+
+<h1>Coverage Summary for Class: NamedPipeSocket (org.springframework.boot.buildpack.platform.socket)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NamedPipeSocket</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NamedPipeSocket$AsynchronousFileByteChannel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NamedPipeSocket$AsynchronousFileByteChannel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NamedPipeSocket$AsynchronousFileByteChannel$CompletableFutureHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NamedPipeSocket$SleepAwaiter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NamedPipeSocket$WindowsAwaiter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.socket;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.net.Socket;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.channels.AsynchronousByteChannel;
+&nbsp;import java.nio.channels.AsynchronousCloseException;
+&nbsp;import java.nio.channels.AsynchronousFileChannel;
+&nbsp;import java.nio.channels.Channels;
+&nbsp;import java.nio.channels.CompletionHandler;
+&nbsp;import java.nio.file.FileSystemException;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.nio.file.StandardOpenOption;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import com.sun.jna.Platform;
+&nbsp;import com.sun.jna.platform.win32.Kernel32;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Socket} implementation for named pipes.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class NamedPipeSocket extends Socket {
+&nbsp;
+&nbsp;	private static final int WAIT_INTERVAL = 100;
+&nbsp;
+<b class="nc">&nbsp;	private static final long TIMEOUT = TimeUnit.MILLISECONDS.toNanos(1000);</b>
+&nbsp;
+&nbsp;	private final AsynchronousFileByteChannel channel;
+&nbsp;
+<b class="nc">&nbsp;	NamedPipeSocket(String path) throws IOException {</b>
+<b class="nc">&nbsp;		this.channel = open(path);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private AsynchronousFileByteChannel open(String path) throws IOException {
+<b class="nc">&nbsp;		Consumer&lt;String&gt; awaiter = Platform.isWindows() ? new WindowsAwaiter() : new SleepAwaiter();</b>
+<b class="nc">&nbsp;		long startTime = System.nanoTime();</b>
+&nbsp;		while (true) {
+&nbsp;			try {
+<b class="nc">&nbsp;				return new AsynchronousFileByteChannel(AsynchronousFileChannel.open(Paths.get(path),</b>
+&nbsp;						StandardOpenOption.READ, StandardOpenOption.WRITE));
+&nbsp;			}
+<b class="nc">&nbsp;			catch (FileSystemException ex) {</b>
+<b class="nc">&nbsp;				if (System.nanoTime() - startTime &gt;= TIMEOUT) {</b>
+<b class="nc">&nbsp;					throw ex;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				awaiter.accept(path);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public InputStream getInputStream() {
+<b class="nc">&nbsp;		return Channels.newInputStream(this.channel);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public OutputStream getOutputStream() {
+<b class="nc">&nbsp;		return Channels.newOutputStream(this.channel);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void close() throws IOException {
+<b class="nc">&nbsp;		if (this.channel != null) {</b>
+<b class="nc">&nbsp;			this.channel.close();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link NamedPipeSocket} for the given path.
+&nbsp;	 * @param path the path to the domain socket
+&nbsp;	 * @return a {@link NamedPipeSocket} instance
+&nbsp;	 * @throws IOException if the socket cannot be opened
+&nbsp;	 */
+&nbsp;	public static NamedPipeSocket get(String path) throws IOException {
+<b class="nc">&nbsp;		return new NamedPipeSocket(path);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Adapt an {@code AsynchronousByteChannel} to an {@code AsynchronousFileChannel}.
+&nbsp;	 */
+&nbsp;	private static class AsynchronousFileByteChannel implements AsynchronousByteChannel {
+&nbsp;
+&nbsp;		private final AsynchronousFileChannel fileChannel;
+&nbsp;
+<b class="nc">&nbsp;		AsynchronousFileByteChannel(AsynchronousFileChannel fileChannel) {</b>
+<b class="nc">&nbsp;			this.fileChannel = fileChannel;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public &lt;A&gt; void read(ByteBuffer dst, A attachment, CompletionHandler&lt;Integer, ? super A&gt; handler) {
+<b class="nc">&nbsp;			this.fileChannel.read(dst, 0, attachment, new CompletionHandler&lt;&gt;() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public void completed(Integer read, A attachment) {
+<b class="nc">&nbsp;					handler.completed((read &gt; 0) ? read : -1, attachment);</b>
+&nbsp;				}
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public void failed(Throwable exc, A attachment) {
+<b class="nc">&nbsp;					if (exc instanceof AsynchronousCloseException) {</b>
+<b class="nc">&nbsp;						handler.completed(-1, attachment);</b>
+&nbsp;						return;
+&nbsp;					}
+<b class="nc">&nbsp;					handler.failed(exc, attachment);</b>
+&nbsp;				}
+&nbsp;			});
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Future&lt;Integer&gt; read(ByteBuffer dst) {
+<b class="nc">&nbsp;			CompletableFutureHandler future = new CompletableFutureHandler();</b>
+<b class="nc">&nbsp;			this.fileChannel.read(dst, 0, null, future);</b>
+<b class="nc">&nbsp;			return future;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public &lt;A&gt; void write(ByteBuffer src, A attachment, CompletionHandler&lt;Integer, ? super A&gt; handler) {
+<b class="nc">&nbsp;			this.fileChannel.write(src, 0, attachment, handler);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Future&lt;Integer&gt; write(ByteBuffer src) {
+<b class="nc">&nbsp;			return this.fileChannel.write(src, 0);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+<b class="nc">&nbsp;			this.fileChannel.close();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isOpen() {
+<b class="nc">&nbsp;			return this.fileChannel.isOpen();</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		private static final class CompletableFutureHandler extends CompletableFuture&lt;Integer&gt;</b>
+&nbsp;				implements CompletionHandler&lt;Integer, Object&gt; {
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void completed(Integer read, Object attachment) {
+<b class="nc">&nbsp;				complete((read &gt; 0) ? read : -1);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void failed(Throwable exc, Object attachment) {
+<b class="nc">&nbsp;				if (exc instanceof AsynchronousCloseException) {</b>
+<b class="nc">&nbsp;					complete(-1);</b>
+&nbsp;					return;
+&nbsp;				}
+<b class="nc">&nbsp;				completeExceptionally(exc);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Waits for the name pipe file using a simple sleep.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class SleepAwaiter implements Consumer&lt;String&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void accept(String path) {
+&nbsp;			try {
+<b class="nc">&nbsp;				Thread.sleep(WAIT_INTERVAL);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Waits for the name pipe file using Windows specific logic.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class WindowsAwaiter implements Consumer&lt;String&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void accept(String path) {
+<b class="nc">&nbsp;			Kernel32.INSTANCE.WaitNamedPipe(path, WAIT_INTERVAL);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,339 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChangelogWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationmetadata.changelog</a>
+</div>
+
+<h1>Coverage Summary for Class: ChangelogWriter (org.springframework.boot.configurationmetadata.changelog)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChangelogWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationmetadata.changelog;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.Writer;
+&nbsp;import java.text.BreakIterator;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+&nbsp;import org.springframework.boot.configurationmetadata.Deprecation;
+&nbsp;
+&nbsp;/**
+&nbsp; * Writes a {@link Changelog} using asciidoc markup.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;class ChangelogWriter implements AutoCloseable {
+&nbsp;
+<b class="nc">&nbsp;	private static final Comparator&lt;ConfigurationMetadataProperty&gt; COMPARING_ID = Comparator</b>
+<b class="nc">&nbsp;		.comparing(ConfigurationMetadataProperty::getId);</b>
+&nbsp;
+&nbsp;	private final PrintWriter out;
+&nbsp;
+&nbsp;	ChangelogWriter(File out) throws IOException {
+<b class="nc">&nbsp;		this(new FileWriter(out));</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	ChangelogWriter(Writer out) {</b>
+<b class="nc">&nbsp;		this.out = new PrintWriter(out);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void write(Changelog changelog) {
+<b class="nc">&nbsp;		String oldVersionNumber = changelog.oldVersionNumber();</b>
+<b class="nc">&nbsp;		String newVersionNumber = changelog.newVersionNumber();</b>
+<b class="nc">&nbsp;		Map&lt;DifferenceType, List&lt;Difference&gt;&gt; differencesByType = collateByType(changelog);</b>
+<b class="nc">&nbsp;		write(&quot;Configuration property changes between `%s` and `%s`%n&quot;, oldVersionNumber, newVersionNumber);</b>
+<b class="nc">&nbsp;		write(&quot;%n%n%n== Deprecated in %s%n&quot;, newVersionNumber);</b>
+<b class="nc">&nbsp;		writeDeprecated(differencesByType.get(DifferenceType.DEPRECATED));</b>
+<b class="nc">&nbsp;		write(&quot;%n%n%n== Added in %s%n&quot;, newVersionNumber);</b>
+<b class="nc">&nbsp;		writeAdded(differencesByType.get(DifferenceType.ADDED));</b>
+<b class="nc">&nbsp;		write(&quot;%n%n%n== Removed in %s%n&quot;, newVersionNumber);</b>
+<b class="nc">&nbsp;		writeRemoved(differencesByType.get(DifferenceType.DELETED), differencesByType.get(DifferenceType.DEPRECATED));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;DifferenceType, List&lt;Difference&gt;&gt; collateByType(Changelog differences) {
+<b class="nc">&nbsp;		Map&lt;DifferenceType, List&lt;Difference&gt;&gt; byType = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (DifferenceType type : DifferenceType.values()) {</b>
+<b class="nc">&nbsp;			byType.put(type, new ArrayList&lt;&gt;());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (Difference difference : differences.differences()) {</b>
+<b class="nc">&nbsp;			byType.get(difference.type()).add(difference);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return byType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeDeprecated(List&lt;Difference&gt; differences) {
+<b class="nc">&nbsp;		List&lt;Difference&gt; rows = sortProperties(differences, Difference::newProperty).stream()</b>
+<b class="nc">&nbsp;			.filter(this::isDeprecatedInRelease)</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		writeTable(&quot;| Key | Replacement | Reason&quot;, rows, this::writeDeprecated);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeDeprecated(Difference difference) {
+<b class="nc">&nbsp;		writeDeprecatedPropertyRow(difference.newProperty());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeAdded(List&lt;Difference&gt; differences) {
+<b class="nc">&nbsp;		List&lt;Difference&gt; rows = sortProperties(differences, Difference::newProperty);</b>
+<b class="nc">&nbsp;		writeTable(&quot;| Key | Default value | Description&quot;, rows, this::writeAdded);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeAdded(Difference difference) {
+<b class="nc">&nbsp;		writeRegularPropertyRow(difference.newProperty());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeRemoved(List&lt;Difference&gt; deleted, List&lt;Difference&gt; deprecated) {
+<b class="nc">&nbsp;		List&lt;Difference&gt; rows = getRemoved(deleted, deprecated);</b>
+<b class="nc">&nbsp;		writeTable(&quot;| Key | Replacement | Reason&quot;, rows, this::writeRemoved);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Difference&gt; getRemoved(List&lt;Difference&gt; deleted, List&lt;Difference&gt; deprecated) {
+<b class="nc">&nbsp;		List&lt;Difference&gt; result = new ArrayList&lt;&gt;(deleted);</b>
+<b class="nc">&nbsp;		deprecated.stream().filter(Predicate.not(this::isDeprecatedInRelease)).forEach(result::remove);</b>
+<b class="nc">&nbsp;		return sortProperties(result,</b>
+<b class="nc">&nbsp;				(difference) -&gt; getFirstNonNull(difference, Difference::oldProperty, Difference::newProperty));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeRemoved(Difference difference) {
+<b class="nc">&nbsp;		writeDeprecatedPropertyRow(getFirstNonNull(difference, Difference::newProperty, Difference::oldProperty));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Difference&gt; sortProperties(List&lt;Difference&gt; differences,
+&nbsp;			Function&lt;Difference, ConfigurationMetadataProperty&gt; extractor) {
+<b class="nc">&nbsp;		return differences.stream().sorted(Comparator.comparing(extractor, COMPARING_ID)).toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SafeVarargs
+&nbsp;	@SuppressWarnings(&quot;varargs&quot;)
+&nbsp;	private &lt;T, P&gt; P getFirstNonNull(T t, Function&lt;T, P&gt;... extractors) {
+<b class="nc">&nbsp;		return Stream.of(extractors)</b>
+<b class="nc">&nbsp;			.map((extractor) -&gt; extractor.apply(t))</b>
+<b class="nc">&nbsp;			.filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;			.findFirst()</b>
+<b class="nc">&nbsp;			.orElse(null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeTable(String header, List&lt;Difference&gt; rows, Consumer&lt;Difference&gt; action) {
+<b class="nc">&nbsp;		if (rows.isEmpty()) {</b>
+<b class="nc">&nbsp;			write(&quot;_None_.%n&quot;);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			writeTableBreak();</b>
+<b class="nc">&nbsp;			write(header + &quot;%n%n&quot;);</b>
+<b class="nc">&nbsp;			for (Iterator&lt;Difference&gt; iterator = rows.iterator(); iterator.hasNext();) {</b>
+<b class="nc">&nbsp;				action.accept(iterator.next());</b>
+<b class="nc">&nbsp;				write((!iterator.hasNext()) ? null : &quot;%n&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			writeTableBreak();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeTableBreak() {
+<b class="nc">&nbsp;		write(&quot;|======================%n&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeRegularPropertyRow(ConfigurationMetadataProperty property) {
+<b class="nc">&nbsp;		writeCell(monospace(property.getId()));</b>
+<b class="nc">&nbsp;		writeCell(monospace(asString(property.getDefaultValue())));</b>
+<b class="nc">&nbsp;		writeCell(property.getShortDescription());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeDeprecatedPropertyRow(ConfigurationMetadataProperty property) {
+<b class="nc">&nbsp;		Deprecation deprecation = (property.getDeprecation() != null) ? property.getDeprecation() : new Deprecation();</b>
+<b class="nc">&nbsp;		writeCell(monospace(property.getId()));</b>
+<b class="nc">&nbsp;		writeCell(monospace(deprecation.getReplacement()));</b>
+<b class="nc">&nbsp;		writeCell(getFirstSentence(deprecation.getReason()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getFirstSentence(String text) {
+<b class="nc">&nbsp;		if (text == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		int dot = text.indexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;		if (dot != -1) {</b>
+<b class="nc">&nbsp;			BreakIterator breakIterator = BreakIterator.getSentenceInstance(Locale.US);</b>
+<b class="nc">&nbsp;			breakIterator.setText(text);</b>
+<b class="nc">&nbsp;			String sentence = text.substring(breakIterator.first(), breakIterator.next()).trim();</b>
+<b class="nc">&nbsp;			return removeSpaceBetweenLine(sentence);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String[] lines = text.split(System.lineSeparator());</b>
+<b class="nc">&nbsp;		return lines[0].trim();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String removeSpaceBetweenLine(String text) {
+<b class="nc">&nbsp;		String[] lines = text.split(System.lineSeparator());</b>
+<b class="nc">&nbsp;		return Arrays.stream(lines).map(String::trim).collect(Collectors.joining(&quot; &quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isDeprecatedInRelease(Difference difference) {
+<b class="nc">&nbsp;		Deprecation deprecation = difference.newProperty().getDeprecation();</b>
+<b class="nc">&nbsp;		return (deprecation != null) &amp;&amp; (deprecation.getLevel() != Deprecation.Level.ERROR);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String monospace(String value) {
+<b class="nc">&nbsp;		return (value != null) ? &quot;`%s`&quot;.formatted(value) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeCell(String content) {
+<b class="nc">&nbsp;		if (content == null) {</b>
+<b class="nc">&nbsp;			write(&quot;|%n&quot;);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			String escaped = escapeForTableCell(content);</b>
+<b class="nc">&nbsp;			write(&quot;| %s%n&quot;.formatted(escaped));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String escapeForTableCell(String content) {
+<b class="nc">&nbsp;		return content.replace(&quot;|&quot;, &quot;\\|&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void write(String format, Object... args) {
+<b class="nc">&nbsp;		if (format != null) {</b>
+<b class="nc">&nbsp;			Object[] strings = Arrays.stream(args).map(this::asString).toArray();</b>
+<b class="nc">&nbsp;			this.out.append(format.formatted(strings));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String asString(Object value) {
+<b class="nc">&nbsp;		if (value instanceof Object[] array) {</b>
+<b class="nc">&nbsp;			return Stream.of(array).map(this::asString).collect(Collectors.joining(&quot;, &quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (value != null) ? value.toString() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void close() {
+<b class="nc">&nbsp;		this.out.close();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

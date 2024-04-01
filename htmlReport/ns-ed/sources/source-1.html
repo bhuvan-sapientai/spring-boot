@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultExceptionTranslatorExecuteListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.jooq</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultExceptionTranslatorExecuteListener (org.springframework.boot.autoconfigure.jooq)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultExceptionTranslatorExecuteListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DefaultExceptionTranslatorExecuteListener$DefaultTranslatorFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.jooq;
+&nbsp;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import org.jooq.ExecuteContext;
+&nbsp;import org.jooq.SQLDialect;
+&nbsp;
+&nbsp;import org.springframework.dao.DataAccessException;
+&nbsp;import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+&nbsp;import org.springframework.jdbc.support.SQLExceptionTranslator;
+&nbsp;import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default implementation of {@link ExceptionTranslatorExecuteListener} that delegates to
+&nbsp; * an {@link SQLExceptionTranslator}.
+&nbsp; *
+&nbsp; * @author Lukas Eder
+&nbsp; * @author Andreas Ahlenstorf
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;final class DefaultExceptionTranslatorExecuteListener implements ExceptionTranslatorExecuteListener {
+&nbsp;
+&nbsp;	// Based on the jOOQ-spring-example from https://github.com/jOOQ/jOOQ
+&nbsp;
+<b class="nc">&nbsp;	private static final Log defaultLogger = LogFactory.getLog(ExceptionTranslatorExecuteListener.class);</b>
+&nbsp;
+&nbsp;	private final Log logger;
+&nbsp;
+&nbsp;	private Function&lt;ExecuteContext, SQLExceptionTranslator&gt; translatorFactory;
+&nbsp;
+&nbsp;	DefaultExceptionTranslatorExecuteListener() {
+<b class="nc">&nbsp;		this(defaultLogger, new DefaultTranslatorFactory());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	DefaultExceptionTranslatorExecuteListener(Function&lt;ExecuteContext, SQLExceptionTranslator&gt; translatorFactory) {
+<b class="nc">&nbsp;		this(defaultLogger, translatorFactory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	DefaultExceptionTranslatorExecuteListener(Log logger) {
+<b class="nc">&nbsp;		this(logger, new DefaultTranslatorFactory());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private DefaultExceptionTranslatorExecuteListener(Log logger,
+<b class="nc">&nbsp;			Function&lt;ExecuteContext, SQLExceptionTranslator&gt; translatorFactory) {</b>
+<b class="nc">&nbsp;		Assert.notNull(translatorFactory, &quot;TranslatorFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.logger = logger;</b>
+<b class="nc">&nbsp;		this.translatorFactory = translatorFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void exception(ExecuteContext context) {
+<b class="nc">&nbsp;		SQLExceptionTranslator translator = this.translatorFactory.apply(context);</b>
+&nbsp;		// The exception() callback is not only triggered for SQL exceptions but also for
+&nbsp;		// &quot;normal&quot; exceptions. In those cases sqlException() returns null.
+<b class="nc">&nbsp;		SQLException exception = context.sqlException();</b>
+<b class="nc">&nbsp;		while (exception != null) {</b>
+<b class="nc">&nbsp;			handle(context, translator, exception);</b>
+<b class="nc">&nbsp;			exception = exception.getNextException();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Handle a single exception in the chain. SQLExceptions might be nested multiple
+&nbsp;	 * levels deep. The outermost exception is usually the least interesting one (&quot;Call
+&nbsp;	 * getNextException to see the cause.&quot;). Therefore the innermost exception is
+&nbsp;	 * propagated and all other exceptions are logged.
+&nbsp;	 * @param context the execute context
+&nbsp;	 * @param translator the exception translator
+&nbsp;	 * @param exception the exception
+&nbsp;	 */
+&nbsp;	private void handle(ExecuteContext context, SQLExceptionTranslator translator, SQLException exception) {
+<b class="nc">&nbsp;		DataAccessException translated = translator.translate(&quot;jOOQ&quot;, context.sql(), exception);</b>
+<b class="nc">&nbsp;		if (exception.getNextException() != null) {</b>
+<b class="nc">&nbsp;			this.logger.error(&quot;Execution of SQL statement failed.&quot;, (translated != null) ? translated : exception);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		if (translated != null) {</b>
+<b class="nc">&nbsp;			context.exception(translated);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Default {@link SQLExceptionTranslator} factory that creates the translator based on
+&nbsp;	 * the Spring DB name.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class DefaultTranslatorFactory implements Function&lt;ExecuteContext, SQLExceptionTranslator&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public SQLExceptionTranslator apply(ExecuteContext context) {
+<b class="nc">&nbsp;			return apply(context.configuration().dialect());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private SQLExceptionTranslator apply(SQLDialect dialect) {
+<b class="nc">&nbsp;			String dbName = getSpringDbName(dialect);</b>
+<b class="nc">&nbsp;			return (dbName != null) ? new SQLErrorCodeSQLExceptionTranslator(dbName)</b>
+<b class="nc">&nbsp;					: new SQLStateSQLExceptionTranslator();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getSpringDbName(SQLDialect dialect) {
+<b class="nc">&nbsp;			return (dialect != null &amp;&amp; dialect.thirdParty() != null) ? dialect.thirdParty().springDbName() : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

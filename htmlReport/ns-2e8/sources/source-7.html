@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServiceConnectionAutoConfigurationRegistrar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testcontainers.service.connection</a>
+</div>
+
+<h1>Coverage Summary for Class: ServiceConnectionAutoConfigurationRegistrar (org.springframework.boot.testcontainers.service.connection)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServiceConnectionAutoConfigurationRegistrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testcontainers.service.connection;
+&nbsp;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.testcontainers.containers.Container;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetailsFactories;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.testcontainers.beans.TestcontainerBeanDefinition;
+&nbsp;import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ImportBeanDefinitionRegistrar} used by
+&nbsp; * {@link ServiceConnectionAutoConfiguration}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ServiceConnectionAutoConfigurationRegistrar implements ImportBeanDefinitionRegistrar {
+&nbsp;
+&nbsp;	private final BeanFactory beanFactory;
+&nbsp;
+<b class="nc">&nbsp;	ServiceConnectionAutoConfigurationRegistrar(BeanFactory beanFactory) {</b>
+<b class="nc">&nbsp;		this.beanFactory = beanFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;		if (this.beanFactory instanceof ConfigurableListableBeanFactory listableBeanFactory) {</b>
+<b class="nc">&nbsp;			registerBeanDefinitions(listableBeanFactory, registry);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerBeanDefinitions(ConfigurableListableBeanFactory beanFactory, BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;		ConnectionDetailsRegistrar registrar = new ConnectionDetailsRegistrar(beanFactory,</b>
+&nbsp;				new ConnectionDetailsFactories());
+<b class="nc">&nbsp;		for (String beanName : beanFactory.getBeanNamesForType(Container.class)) {</b>
+<b class="nc">&nbsp;			BeanDefinition beanDefinition = getBeanDefinition(beanFactory, beanName);</b>
+<b class="nc">&nbsp;			for (ServiceConnection annotation : getAnnotations(beanFactory, beanName, beanDefinition)) {</b>
+<b class="nc">&nbsp;				ContainerConnectionSource&lt;?&gt; source = createSource(beanFactory, beanName, beanDefinition, annotation);</b>
+<b class="nc">&nbsp;				registrar.registerBeanDefinitions(registry, source);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Set&lt;ServiceConnection&gt; getAnnotations(ConfigurableListableBeanFactory beanFactory, String beanName,
+&nbsp;			BeanDefinition beanDefinition) {
+<b class="nc">&nbsp;		Set&lt;ServiceConnection&gt; annotations = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		annotations.addAll(beanFactory.findAllAnnotationsOnBean(beanName, ServiceConnection.class, false));</b>
+<b class="nc">&nbsp;		if (beanDefinition instanceof TestcontainerBeanDefinition testcontainerBeanDefinition) {</b>
+<b class="nc">&nbsp;			testcontainerBeanDefinition.getAnnotations()</b>
+<b class="nc">&nbsp;				.stream(ServiceConnection.class)</b>
+<b class="nc">&nbsp;				.map(MergedAnnotation::synthesize)</b>
+<b class="nc">&nbsp;				.forEach(annotations::add);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return annotations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BeanDefinition getBeanDefinition(ConfigurableListableBeanFactory beanFactory, String beanName) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return beanFactory.getBeanDefinition(beanName);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;C extends Container&lt;?&gt;&gt; ContainerConnectionSource&lt;C&gt; createSource(
+&nbsp;			ConfigurableListableBeanFactory beanFactory, String beanName, BeanDefinition beanDefinition,
+&nbsp;			ServiceConnection annotation) {
+<b class="nc">&nbsp;		Origin origin = new BeanOrigin(beanName, beanDefinition);</b>
+<b class="nc">&nbsp;		Class&lt;C&gt; containerType = (Class&lt;C&gt;) beanFactory.getType(beanName, false);</b>
+<b class="nc">&nbsp;		String containerImageName = (beanDefinition instanceof TestcontainerBeanDefinition testcontainerBeanDefinition)</b>
+<b class="nc">&nbsp;				? testcontainerBeanDefinition.getContainerImageName() : null;</b>
+<b class="nc">&nbsp;		return new ContainerConnectionSource&lt;&gt;(beanName, origin, containerType, containerImageName, annotation,</b>
+<b class="nc">&nbsp;				() -&gt; beanFactory.getBean(beanName, containerType));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

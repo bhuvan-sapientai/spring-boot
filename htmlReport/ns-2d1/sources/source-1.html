@@ -1,0 +1,289 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MockRestServiceServerAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.autoconfigure.web.client</a>
+</div>
+
+<h1>Coverage Summary for Class: MockRestServiceServerAutoConfiguration (org.springframework.boot.test.autoconfigure.web.client)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MockRestServiceServerAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MockRestServiceServerAutoConfiguration$DeferredRequestExpectationManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.autoconfigure.web.client;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
+&nbsp;import org.springframework.boot.test.web.client.MockServerRestTemplateCustomizer;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.http.client.ClientHttpRequest;
+&nbsp;import org.springframework.http.client.ClientHttpResponse;
+&nbsp;import org.springframework.test.web.client.ExpectedCount;
+&nbsp;import org.springframework.test.web.client.MockRestServiceServer;
+&nbsp;import org.springframework.test.web.client.RequestExpectationManager;
+&nbsp;import org.springframework.test.web.client.RequestMatcher;
+&nbsp;import org.springframework.test.web.client.ResponseActions;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.client.RestClient;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;
+&nbsp;/**
+&nbsp; * Auto-configuration for {@link MockRestServiceServer} support.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.4.0
+&nbsp; * @see AutoConfigureMockRestServiceServer
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@ConditionalOnProperty(prefix = &quot;spring.test.webclient.mockrestserviceserver&quot;, name = &quot;enabled&quot;)
+<b class="nc">&nbsp;public class MockRestServiceServerAutoConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	public MockServerRestTemplateCustomizer mockServerRestTemplateCustomizer() {
+<b class="nc">&nbsp;		return new MockServerRestTemplateCustomizer();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	public MockServerRestClientCustomizer mockServerRestClientCustomizer() {
+<b class="nc">&nbsp;		return new MockServerRestClientCustomizer();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	public MockRestServiceServer mockRestServiceServer(MockServerRestTemplateCustomizer restTemplateCustomizer,
+&nbsp;			MockServerRestClientCustomizer restClientCustomizer) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return createDeferredMockRestServiceServer(restTemplateCustomizer, restClientCustomizer);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private MockRestServiceServer createDeferredMockRestServiceServer(
+&nbsp;			MockServerRestTemplateCustomizer restTemplateCustomizer,
+&nbsp;			MockServerRestClientCustomizer restClientCustomizer) throws Exception {
+<b class="nc">&nbsp;		Constructor&lt;MockRestServiceServer&gt; constructor = MockRestServiceServer.class</b>
+<b class="nc">&nbsp;			.getDeclaredConstructor(RequestExpectationManager.class);</b>
+<b class="nc">&nbsp;		constructor.setAccessible(true);</b>
+<b class="nc">&nbsp;		return constructor</b>
+<b class="nc">&nbsp;			.newInstance(new DeferredRequestExpectationManager(restTemplateCustomizer, restClientCustomizer));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link RequestExpectationManager} with the injected {@link MockRestServiceServer}
+&nbsp;	 * so that the bean can be created before the
+&nbsp;	 * {@link MockServerRestTemplateCustomizer#customize(RestTemplate)
+&nbsp;	 * MockServerRestTemplateCustomizer} has been called.
+&nbsp;	 */
+&nbsp;	private static class DeferredRequestExpectationManager implements RequestExpectationManager {
+&nbsp;
+&nbsp;		private final MockServerRestTemplateCustomizer restTemplateCustomizer;
+&nbsp;
+&nbsp;		private final MockServerRestClientCustomizer restClientCustomizer;
+&nbsp;
+&nbsp;		DeferredRequestExpectationManager(MockServerRestTemplateCustomizer restTemplateCustomizer,
+<b class="nc">&nbsp;				MockServerRestClientCustomizer restClientCustomizer) {</b>
+<b class="nc">&nbsp;			this.restTemplateCustomizer = restTemplateCustomizer;</b>
+<b class="nc">&nbsp;			this.restClientCustomizer = restClientCustomizer;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ResponseActions expectRequest(ExpectedCount count, RequestMatcher requestMatcher) {
+<b class="nc">&nbsp;			return getDelegate().expectRequest(count, requestMatcher);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ClientHttpResponse validateRequest(ClientHttpRequest request) throws IOException {
+<b class="nc">&nbsp;			return getDelegate().validateRequest(request);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void verify() {
+<b class="nc">&nbsp;			getDelegate().verify();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void verify(Duration timeout) {
+<b class="nc">&nbsp;			getDelegate().verify(timeout);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void reset() {
+<b class="nc">&nbsp;			resetExpectations(this.restTemplateCustomizer.getExpectationManagers().values());</b>
+<b class="nc">&nbsp;			resetExpectations(this.restClientCustomizer.getExpectationManagers().values());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void resetExpectations(Collection&lt;RequestExpectationManager&gt; expectationManagers) {
+<b class="nc">&nbsp;			if (expectationManagers.size() == 1) {</b>
+<b class="nc">&nbsp;				expectationManagers.iterator().next().reset();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private RequestExpectationManager getDelegate() {
+<b class="nc">&nbsp;			Map&lt;RestTemplate, RequestExpectationManager&gt; restTemplateExpectationManagers = this.restTemplateCustomizer</b>
+<b class="nc">&nbsp;				.getExpectationManagers();</b>
+<b class="nc">&nbsp;			Map&lt;RestClient.Builder, RequestExpectationManager&gt; restClientExpectationManagers = this.restClientCustomizer</b>
+<b class="nc">&nbsp;				.getExpectationManagers();</b>
+<b class="nc">&nbsp;			boolean neitherBound = restTemplateExpectationManagers.isEmpty() &amp;&amp; restClientExpectationManagers.isEmpty();</b>
+<b class="nc">&nbsp;			boolean bothBound = !restTemplateExpectationManagers.isEmpty() &amp;&amp; !restClientExpectationManagers.isEmpty();</b>
+<b class="nc">&nbsp;			Assert.state(!neitherBound, &quot;Unable to use auto-configured MockRestServiceServer since &quot;</b>
+&nbsp;					+ &quot;a mock server customizer has not been bound to a RestTemplate or RestClient&quot;);
+<b class="nc">&nbsp;			Assert.state(!bothBound, &quot;Unable to use auto-configured MockRestServiceServer since &quot;</b>
+&nbsp;					+ &quot;mock server customizers have been bound to both a RestTemplate and a RestClient&quot;);
+<b class="nc">&nbsp;			if (!restTemplateExpectationManagers.isEmpty()) {</b>
+<b class="nc">&nbsp;				Assert.state(restTemplateExpectationManagers.size() == 1,</b>
+&nbsp;						&quot;Unable to use auto-configured MockRestServiceServer since &quot;
+&nbsp;								+ &quot;MockServerRestTemplateCustomizer has been bound to more than one RestTemplate&quot;);
+<b class="nc">&nbsp;				return restTemplateExpectationManagers.values().iterator().next();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Assert.state(restClientExpectationManagers.size() == 1,</b>
+&nbsp;					&quot;Unable to use auto-configured MockRestServiceServer since &quot;
+&nbsp;							+ &quot;MockServerRestClientCustomizer has been bound to more than one RestClient&quot;);
+<b class="nc">&nbsp;			return restClientExpectationManagers.values().iterator().next();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

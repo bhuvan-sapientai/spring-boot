@@ -1,0 +1,471 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConditionEvaluationReport</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionEvaluationReport (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConditionEvaluationReport</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConditionEvaluationReport$AncestorsMatchedCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConditionEvaluationReport$ConditionAndOutcome</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConditionEvaluationReport$ConditionAndOutcomes</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.TreeMap;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.context.annotation.Condition;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Records condition evaluation details for reporting and logging.
+&nbsp; *
+&nbsp; * @author Greg Turnquist
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public final class ConditionEvaluationReport {
+&nbsp;
+&nbsp;	private static final String BEAN_NAME = &quot;autoConfigurationReport&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final AncestorsMatchedCondition ANCESTOR_CONDITION = new AncestorsMatchedCondition();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final SortedMap&lt;String, ConditionAndOutcomes&gt; outcomes = new TreeMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private boolean addedAncestorOutcomes;
+&nbsp;
+&nbsp;	private ConditionEvaluationReport parent;
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;String&gt; exclusions = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;String&gt; unconditionalClasses = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Private constructor.
+&nbsp;	 * @see #get(ConfigurableListableBeanFactory)
+&nbsp;	 */
+<b class="nc">&nbsp;	private ConditionEvaluationReport() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Record the occurrence of condition evaluation.
+&nbsp;	 * @param source the source of the condition (class or method name)
+&nbsp;	 * @param condition the condition evaluated
+&nbsp;	 * @param outcome the condition outcome
+&nbsp;	 */
+&nbsp;	public void recordConditionEvaluation(String source, Condition condition, ConditionOutcome outcome) {
+<b class="nc">&nbsp;		Assert.notNull(source, &quot;Source must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(condition, &quot;Condition must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(outcome, &quot;Outcome must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.unconditionalClasses.remove(source);</b>
+<b class="nc">&nbsp;		this.outcomes.computeIfAbsent(source, (key) -&gt; new ConditionAndOutcomes()).add(condition, outcome);</b>
+<b class="nc">&nbsp;		this.addedAncestorOutcomes = false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Records the names of the classes that have been excluded from condition evaluation.
+&nbsp;	 * @param exclusions the names of the excluded classes
+&nbsp;	 */
+&nbsp;	public void recordExclusions(Collection&lt;String&gt; exclusions) {
+<b class="nc">&nbsp;		Assert.notNull(exclusions, &quot;exclusions must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.exclusions.addAll(exclusions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Records the names of the classes that are candidates for condition evaluation.
+&nbsp;	 * @param evaluationCandidates the names of the classes whose conditions will be
+&nbsp;	 * evaluated
+&nbsp;	 */
+&nbsp;	public void recordEvaluationCandidates(List&lt;String&gt; evaluationCandidates) {
+<b class="nc">&nbsp;		Assert.notNull(evaluationCandidates, &quot;evaluationCandidates must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.unconditionalClasses.addAll(evaluationCandidates);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns condition outcomes from this report, grouped by the source.
+&nbsp;	 * @return the condition outcomes
+&nbsp;	 */
+&nbsp;	public Map&lt;String, ConditionAndOutcomes&gt; getConditionAndOutcomesBySource() {
+<b class="nc">&nbsp;		if (!this.addedAncestorOutcomes) {</b>
+<b class="nc">&nbsp;			this.outcomes.forEach((source, sourceOutcomes) -&gt; {</b>
+<b class="nc">&nbsp;				if (!sourceOutcomes.isFullMatch()) {</b>
+<b class="nc">&nbsp;					addNoMatchOutcomeToAncestors(source);</b>
+&nbsp;				}
+&nbsp;			});
+<b class="nc">&nbsp;			this.addedAncestorOutcomes = true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(this.outcomes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addNoMatchOutcomeToAncestors(String source) {
+<b class="nc">&nbsp;		String prefix = source + &quot;$&quot;;</b>
+<b class="nc">&nbsp;		this.outcomes.forEach((candidateSource, sourceOutcomes) -&gt; {</b>
+<b class="nc">&nbsp;			if (candidateSource.startsWith(prefix)) {</b>
+<b class="nc">&nbsp;				ConditionOutcome outcome = ConditionOutcome</b>
+<b class="nc">&nbsp;					.noMatch(ConditionMessage.forCondition(&quot;Ancestor &quot; + source).because(&quot;did not match&quot;));</b>
+<b class="nc">&nbsp;				sourceOutcomes.add(ANCESTOR_CONDITION, outcome);</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the names of the classes that have been excluded from condition evaluation.
+&nbsp;	 * @return the names of the excluded classes
+&nbsp;	 */
+&nbsp;	public List&lt;String&gt; getExclusions() {
+<b class="nc">&nbsp;		return Collections.unmodifiableList(this.exclusions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the names of the classes that were evaluated but were not conditional.
+&nbsp;	 * @return the names of the unconditional classes
+&nbsp;	 */
+&nbsp;	public Set&lt;String&gt; getUnconditionalClasses() {
+<b class="nc">&nbsp;		Set&lt;String&gt; filtered = new HashSet&lt;&gt;(this.unconditionalClasses);</b>
+<b class="nc">&nbsp;		this.exclusions.forEach(filtered::remove);</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableSet(filtered);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The parent report (from a parent BeanFactory if there is one).
+&nbsp;	 * @return the parent report (or null if there isn&#39;t one)
+&nbsp;	 */
+&nbsp;	public ConditionEvaluationReport getParent() {
+<b class="nc">&nbsp;		return this.parent;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Attempt to find the {@link ConditionEvaluationReport} for the specified bean
+&nbsp;	 * factory.
+&nbsp;	 * @param beanFactory the bean factory (may be {@code null})
+&nbsp;	 * @return the {@link ConditionEvaluationReport} or {@code null}
+&nbsp;	 */
+&nbsp;	public static ConditionEvaluationReport find(BeanFactory beanFactory) {
+<b class="nc">&nbsp;		if (beanFactory instanceof ConfigurableListableBeanFactory) {</b>
+<b class="nc">&nbsp;			return ConditionEvaluationReport.get((ConfigurableListableBeanFactory) beanFactory);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Obtain a {@link ConditionEvaluationReport} for the specified bean factory.
+&nbsp;	 * @param beanFactory the bean factory
+&nbsp;	 * @return an existing or new {@link ConditionEvaluationReport}
+&nbsp;	 */
+&nbsp;	public static ConditionEvaluationReport get(ConfigurableListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;		synchronized (beanFactory) {</b>
+&nbsp;			ConditionEvaluationReport report;
+<b class="nc">&nbsp;			if (beanFactory.containsSingleton(BEAN_NAME)) {</b>
+<b class="nc">&nbsp;				report = beanFactory.getBean(BEAN_NAME, ConditionEvaluationReport.class);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				report = new ConditionEvaluationReport();</b>
+<b class="nc">&nbsp;				beanFactory.registerSingleton(BEAN_NAME, report);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			locateParent(beanFactory.getParentBeanFactory(), report);</b>
+<b class="nc">&nbsp;			return report;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void locateParent(BeanFactory beanFactory, ConditionEvaluationReport report) {
+<b class="nc">&nbsp;		if (beanFactory != null &amp;&amp; report.parent == null &amp;&amp; beanFactory.containsBean(BEAN_NAME)) {</b>
+<b class="nc">&nbsp;			report.parent = beanFactory.getBean(BEAN_NAME, ConditionEvaluationReport.class);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public ConditionEvaluationReport getDelta(ConditionEvaluationReport previousReport) {
+<b class="nc">&nbsp;		ConditionEvaluationReport delta = new ConditionEvaluationReport();</b>
+<b class="nc">&nbsp;		this.outcomes.forEach((source, sourceOutcomes) -&gt; {</b>
+<b class="nc">&nbsp;			ConditionAndOutcomes previous = previousReport.outcomes.get(source);</b>
+<b class="nc">&nbsp;			if (previous == null || previous.isFullMatch() != sourceOutcomes.isFullMatch()) {</b>
+<b class="nc">&nbsp;				sourceOutcomes.forEach((conditionAndOutcome) -&gt; delta.recordConditionEvaluation(source,</b>
+<b class="nc">&nbsp;						conditionAndOutcome.getCondition(), conditionAndOutcome.getOutcome()));</b>
+&nbsp;			}
+&nbsp;		});
+<b class="nc">&nbsp;		List&lt;String&gt; newExclusions = new ArrayList&lt;&gt;(this.exclusions);</b>
+<b class="nc">&nbsp;		newExclusions.removeAll(previousReport.getExclusions());</b>
+<b class="nc">&nbsp;		delta.recordExclusions(newExclusions);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; newUnconditionalClasses = new ArrayList&lt;&gt;(this.unconditionalClasses);</b>
+<b class="nc">&nbsp;		newUnconditionalClasses.removeAll(previousReport.unconditionalClasses);</b>
+<b class="nc">&nbsp;		delta.unconditionalClasses.addAll(newUnconditionalClasses);</b>
+<b class="nc">&nbsp;		return delta;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Provides access to a number of {@link ConditionAndOutcome} items.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class ConditionAndOutcomes implements Iterable&lt;ConditionAndOutcome&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Set&lt;ConditionAndOutcome&gt; outcomes = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;		public void add(Condition condition, ConditionOutcome outcome) {
+<b class="nc">&nbsp;			this.outcomes.add(new ConditionAndOutcome(condition, outcome));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return {@code true} if all outcomes match.
+&nbsp;		 * @return {@code true} if a full match
+&nbsp;		 */
+&nbsp;		public boolean isFullMatch() {
+<b class="nc">&nbsp;			for (ConditionAndOutcome conditionAndOutcomes : this) {</b>
+<b class="nc">&nbsp;				if (!conditionAndOutcomes.getOutcome().isMatch()) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Iterator&lt;ConditionAndOutcome&gt; iterator() {
+<b class="nc">&nbsp;			return Collections.unmodifiableSet(this.outcomes).iterator();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Provides access to a single {@link Condition} and {@link ConditionOutcome}.
+&nbsp;	 */
+&nbsp;	public static class ConditionAndOutcome {
+&nbsp;
+&nbsp;		private final Condition condition;
+&nbsp;
+&nbsp;		private final ConditionOutcome outcome;
+&nbsp;
+<b class="nc">&nbsp;		public ConditionAndOutcome(Condition condition, ConditionOutcome outcome) {</b>
+<b class="nc">&nbsp;			this.condition = condition;</b>
+<b class="nc">&nbsp;			this.outcome = outcome;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Condition getCondition() {
+<b class="nc">&nbsp;			return this.condition;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public ConditionOutcome getOutcome() {
+<b class="nc">&nbsp;			return this.outcome;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean equals(Object obj) {
+<b class="nc">&nbsp;			if (this == obj) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			ConditionAndOutcome other = (ConditionAndOutcome) obj;</b>
+<b class="nc">&nbsp;			return (ObjectUtils.nullSafeEquals(this.condition.getClass(), other.condition.getClass())</b>
+<b class="nc">&nbsp;					&amp;&amp; ObjectUtils.nullSafeEquals(this.outcome, other.outcome));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int hashCode() {
+<b class="nc">&nbsp;			return this.condition.getClass().hashCode() * 31 + this.outcome.hashCode();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return this.condition.getClass() + &quot; &quot; + this.outcome;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class AncestorsMatchedCondition implements Condition {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;			throw new UnsupportedOperationException();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

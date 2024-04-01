@@ -1,0 +1,351 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JsonComponentModule</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.jackson</a>
+</div>
+
+<h1>Coverage Summary for Class: JsonComponentModule (org.springframework.boot.jackson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JsonComponentModule</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JsonComponentModule$JsonComponentAotContribution</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JsonComponentModule$JsonComponentBeanFactoryInitializationAotProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.jackson;
+&nbsp;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonDeserializer;
+&nbsp;import com.fasterxml.jackson.databind.JsonSerializer;
+&nbsp;import com.fasterxml.jackson.databind.KeyDeserializer;
+&nbsp;import com.fasterxml.jackson.databind.Module;
+&nbsp;import com.fasterxml.jackson.databind.module.SimpleModule;
+&nbsp;
+&nbsp;import org.springframework.aot.generate.GenerationContext;
+&nbsp;import org.springframework.aot.hint.MemberCategory;
+&nbsp;import org.springframework.aot.hint.ReflectionHints;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.BeanFactoryAware;
+&nbsp;import org.springframework.beans.factory.HierarchicalBeanFactory;
+&nbsp;import org.springframework.beans.factory.InitializingBean;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.aot.BeanFactoryInitializationAotContribution;
+&nbsp;import org.springframework.beans.factory.aot.BeanFactoryInitializationAotProcessor;
+&nbsp;import org.springframework.beans.factory.aot.BeanFactoryInitializationCode;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.boot.jackson.JsonComponent.Scope;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Spring Bean and Jackson {@link Module} to register {@link JsonComponent @JsonComponent}
+&nbsp; * annotated beans.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Paul Aly
+&nbsp; * @since 1.4.0
+&nbsp; * @see JsonComponent
+&nbsp; */
+<b class="nc">&nbsp;public class JsonComponentModule extends SimpleModule implements BeanFactoryAware, InitializingBean {</b>
+&nbsp;
+&nbsp;	private BeanFactory beanFactory;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;		this.beanFactory = beanFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterPropertiesSet() {
+<b class="nc">&nbsp;		registerJsonComponents();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void registerJsonComponents() {
+<b class="nc">&nbsp;		BeanFactory beanFactory = this.beanFactory;</b>
+<b class="nc">&nbsp;		while (beanFactory != null) {</b>
+<b class="nc">&nbsp;			if (beanFactory instanceof ListableBeanFactory listableBeanFactory) {</b>
+<b class="nc">&nbsp;				addJsonBeans(listableBeanFactory);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			beanFactory = (beanFactory instanceof HierarchicalBeanFactory hierarchicalBeanFactory)</b>
+<b class="nc">&nbsp;					? hierarchicalBeanFactory.getParentBeanFactory() : null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addJsonBeans(ListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; beans = beanFactory.getBeansWithAnnotation(JsonComponent.class);</b>
+<b class="nc">&nbsp;		for (Object bean : beans.values()) {</b>
+<b class="nc">&nbsp;			addJsonBean(bean);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addJsonBean(Object bean) {
+<b class="nc">&nbsp;		MergedAnnotation&lt;JsonComponent&gt; annotation = MergedAnnotations</b>
+<b class="nc">&nbsp;			.from(bean.getClass(), SearchStrategy.TYPE_HIERARCHY)</b>
+<b class="nc">&nbsp;			.get(JsonComponent.class);</b>
+<b class="nc">&nbsp;		Class&lt;?&gt;[] types = annotation.getClassArray(&quot;type&quot;);</b>
+<b class="nc">&nbsp;		Scope scope = annotation.getEnum(&quot;scope&quot;, JsonComponent.Scope.class);</b>
+<b class="nc">&nbsp;		addJsonBean(bean, types, scope);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addJsonBean(Object bean, Class&lt;?&gt;[] types, Scope scope) {
+<b class="nc">&nbsp;		if (bean instanceof JsonSerializer) {</b>
+<b class="nc">&nbsp;			addJsonSerializerBean((JsonSerializer&lt;?&gt;) bean, scope, types);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (bean instanceof JsonDeserializer) {</b>
+<b class="nc">&nbsp;			addJsonDeserializerBean((JsonDeserializer&lt;?&gt;) bean, types);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (bean instanceof KeyDeserializer) {</b>
+<b class="nc">&nbsp;			addKeyDeserializerBean((KeyDeserializer) bean, types);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (Class&lt;?&gt; innerClass : bean.getClass().getDeclaredClasses()) {</b>
+<b class="nc">&nbsp;			if (isSuitableInnerClass(innerClass)) {</b>
+<b class="nc">&nbsp;				Object innerInstance = BeanUtils.instantiateClass(innerClass);</b>
+<b class="nc">&nbsp;				addJsonBean(innerInstance, types, scope);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isSuitableInnerClass(Class&lt;?&gt; innerClass) {
+<b class="nc">&nbsp;		return !Modifier.isAbstract(innerClass.getModifiers()) &amp;&amp; (JsonSerializer.class.isAssignableFrom(innerClass)</b>
+<b class="nc">&nbsp;				|| JsonDeserializer.class.isAssignableFrom(innerClass)</b>
+<b class="nc">&nbsp;				|| KeyDeserializer.class.isAssignableFrom(innerClass));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T&gt; void addJsonSerializerBean(JsonSerializer&lt;T&gt; serializer, JsonComponent.Scope scope, Class&lt;?&gt;[] types) {
+<b class="nc">&nbsp;		Class&lt;T&gt; baseType = (Class&lt;T&gt;) ResolvableType.forClass(JsonSerializer.class, serializer.getClass())</b>
+<b class="nc">&nbsp;			.resolveGeneric();</b>
+<b class="nc">&nbsp;		addBeanToModule(serializer, baseType, types,</b>
+<b class="nc">&nbsp;				(scope == Scope.VALUES) ? this::addSerializer : this::addKeySerializer);</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T&gt; void addJsonDeserializerBean(JsonDeserializer&lt;T&gt; deserializer, Class&lt;?&gt;[] types) {
+<b class="nc">&nbsp;		Class&lt;T&gt; baseType = (Class&lt;T&gt;) ResolvableType.forClass(JsonDeserializer.class, deserializer.getClass())</b>
+<b class="nc">&nbsp;			.resolveGeneric();</b>
+<b class="nc">&nbsp;		addBeanToModule(deserializer, baseType, types, this::addDeserializer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addKeyDeserializerBean(KeyDeserializer deserializer, Class&lt;?&gt;[] types) {
+<b class="nc">&nbsp;		Assert.notEmpty(types, &quot;Type must be specified for KeyDeserializer&quot;);</b>
+<b class="nc">&nbsp;		addBeanToModule(deserializer, Object.class, types, this::addKeyDeserializer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;E, T&gt; void addBeanToModule(E element, Class&lt;T&gt; baseType, Class&lt;?&gt;[] types,
+&nbsp;			BiConsumer&lt;Class&lt;T&gt;, E&gt; consumer) {
+<b class="nc">&nbsp;		if (ObjectUtils.isEmpty(types)) {</b>
+<b class="nc">&nbsp;			consumer.accept(baseType, element);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		for (Class&lt;?&gt; type : types) {</b>
+<b class="nc">&nbsp;			Assert.isAssignable(baseType, type);</b>
+<b class="nc">&nbsp;			consumer.accept((Class&lt;T&gt;) type, element);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class JsonComponentBeanFactoryInitializationAotProcessor implements BeanFactoryInitializationAotProcessor {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public BeanFactoryInitializationAotContribution processAheadOfTime(
+&nbsp;				ConfigurableListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;			String[] jsonComponents = beanFactory.getBeanNamesForAnnotation(JsonComponent.class);</b>
+<b class="nc">&nbsp;			Map&lt;Class&lt;?&gt;, List&lt;Class&lt;?&gt;&gt;&gt; innerComponents = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (String jsonComponent : jsonComponents) {</b>
+<b class="nc">&nbsp;				Class&lt;?&gt; type = beanFactory.getType(jsonComponent, true);</b>
+<b class="nc">&nbsp;				for (Class&lt;?&gt; declaredClass : type.getDeclaredClasses()) {</b>
+<b class="nc">&nbsp;					if (isSuitableInnerClass(declaredClass)) {</b>
+<b class="nc">&nbsp;						innerComponents.computeIfAbsent(type, (t) -&gt; new ArrayList&lt;&gt;()).add(declaredClass);</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return innerComponents.isEmpty() ? null : new JsonComponentAotContribution(innerComponents);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class JsonComponentAotContribution implements BeanFactoryInitializationAotContribution {
+&nbsp;
+&nbsp;		private final Map&lt;Class&lt;?&gt;, List&lt;Class&lt;?&gt;&gt;&gt; innerComponents;
+&nbsp;
+<b class="nc">&nbsp;		private JsonComponentAotContribution(Map&lt;Class&lt;?&gt;, List&lt;Class&lt;?&gt;&gt;&gt; innerComponents) {</b>
+<b class="nc">&nbsp;			this.innerComponents = innerComponents;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void applyTo(GenerationContext generationContext,
+&nbsp;				BeanFactoryInitializationCode beanFactoryInitializationCode) {
+<b class="nc">&nbsp;			ReflectionHints reflection = generationContext.getRuntimeHints().reflection();</b>
+<b class="nc">&nbsp;			this.innerComponents.forEach((outer, inners) -&gt; {</b>
+<b class="nc">&nbsp;				reflection.registerType(outer, MemberCategory.DECLARED_CLASSES);</b>
+<b class="nc">&nbsp;				inners.forEach((inner) -&gt; reflection.registerType(inner, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS));</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

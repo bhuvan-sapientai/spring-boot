@@ -1,0 +1,528 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ErrorPageFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet.support</a>
+</div>
+
+<h1>Coverage Summary for Class: ErrorPageFilter (org.springframework.boot.web.servlet.support)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ErrorPageFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/100)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ErrorPageFilter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ErrorPageFilter$ErrorWrapperResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/122)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet.support;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import jakarta.servlet.Filter;
+&nbsp;import jakarta.servlet.FilterChain;
+&nbsp;import jakarta.servlet.FilterConfig;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;import jakarta.servlet.ServletOutputStream;
+&nbsp;import jakarta.servlet.ServletRequest;
+&nbsp;import jakarta.servlet.ServletResponse;
+&nbsp;import jakarta.servlet.http.HttpServletRequest;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import jakarta.servlet.http.HttpServletResponseWrapper;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.web.server.ErrorPage;
+&nbsp;import org.springframework.boot.web.server.ErrorPageRegistrar;
+&nbsp;import org.springframework.boot.web.server.ErrorPageRegistry;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.web.filter.OncePerRequestFilter;
+&nbsp;
+&nbsp;/**
+&nbsp; * A Servlet {@link Filter} that provides an {@link ErrorPageRegistry} for non-embedded
+&nbsp; * applications (i.e. deployed WAR files). It registers error pages and handles
+&nbsp; * application errors by filtering requests and forwarding to the error pages instead of
+&nbsp; * letting the server handle them. Error pages are a feature of the servlet spec but there
+&nbsp; * is no Java API for registering them in the spec. This filter works around that by
+&nbsp; * accepting error page registrations from Spring Boot&#39;s {@link ErrorPageRegistrar} (any
+&nbsp; * beans of that type in the context will be applied to this server).
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+<b class="nc">&nbsp;public class ErrorPageFilter implements Filter, ErrorPageRegistry, Ordered {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ErrorPageFilter.class);</b>
+&nbsp;
+&nbsp;	// From RequestDispatcher but not referenced to remain compatible with Servlet 2.5
+&nbsp;
+&nbsp;	private static final String ERROR_EXCEPTION = &quot;jakarta.servlet.error.exception&quot;;
+&nbsp;
+&nbsp;	private static final String ERROR_EXCEPTION_TYPE = &quot;jakarta.servlet.error.exception_type&quot;;
+&nbsp;
+&nbsp;	private static final String ERROR_MESSAGE = &quot;jakarta.servlet.error.message&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the servlet attribute containing request URI.
+&nbsp;	 */
+&nbsp;	public static final String ERROR_REQUEST_URI = &quot;jakarta.servlet.error.request_uri&quot;;
+&nbsp;
+&nbsp;	private static final String ERROR_STATUS_CODE = &quot;jakarta.servlet.error.status_code&quot;;
+&nbsp;
+&nbsp;	private static final Set&lt;Class&lt;?&gt;&gt; CLIENT_ABORT_EXCEPTIONS;
+&nbsp;	static {
+<b class="nc">&nbsp;		Set&lt;Class&lt;?&gt;&gt; clientAbortExceptions = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		addClassIfPresent(clientAbortExceptions, &quot;org.apache.catalina.connector.ClientAbortException&quot;);</b>
+<b class="nc">&nbsp;		CLIENT_ABORT_EXCEPTIONS = Collections.unmodifiableSet(clientAbortExceptions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String global;
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;Integer, String&gt; statuses = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;Class&lt;?&gt;, String&gt; exceptions = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final OncePerRequestFilter delegate = new OncePerRequestFilter() {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+&nbsp;				throws ServletException, IOException {
+<b class="nc">&nbsp;			ErrorPageFilter.this.doFilter(request, response, chain);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected boolean shouldNotFilterAsyncDispatch() {
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	};
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void init(FilterConfig filterConfig) throws ServletException {
+<b class="nc">&nbsp;		this.delegate.init(filterConfig);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+&nbsp;			throws IOException, ServletException {
+<b class="nc">&nbsp;		this.delegate.doFilter(request, response, chain);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+&nbsp;			throws IOException, ServletException {
+<b class="nc">&nbsp;		ErrorWrapperResponse wrapped = new ErrorWrapperResponse(response);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			chain.doFilter(request, wrapped);</b>
+<b class="nc">&nbsp;			if (wrapped.hasErrorToSend()) {</b>
+<b class="nc">&nbsp;				handleErrorStatus(request, response, wrapped.getStatus(), wrapped.getMessage());</b>
+<b class="nc">&nbsp;				response.flushBuffer();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (!request.isAsyncStarted() &amp;&amp; !response.isCommitted()) {</b>
+<b class="nc">&nbsp;				response.flushBuffer();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			Throwable exceptionToHandle = ex;</b>
+<b class="nc">&nbsp;			if (ex instanceof ServletException servletException) {</b>
+<b class="nc">&nbsp;				Throwable rootCause = servletException.getRootCause();</b>
+<b class="nc">&nbsp;				if (rootCause != null) {</b>
+<b class="nc">&nbsp;					exceptionToHandle = rootCause;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			handleException(request, response, wrapped, exceptionToHandle);</b>
+<b class="nc">&nbsp;			response.flushBuffer();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void handleErrorStatus(HttpServletRequest request, HttpServletResponse response, int status, String message)
+&nbsp;			throws ServletException, IOException {
+<b class="nc">&nbsp;		if (response.isCommitted()) {</b>
+<b class="nc">&nbsp;			handleCommittedResponse(request, null);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		String errorPath = getErrorPath(this.statuses, status);</b>
+<b class="nc">&nbsp;		if (errorPath == null) {</b>
+<b class="nc">&nbsp;			response.sendError(status, message);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		response.setStatus(status);</b>
+<b class="nc">&nbsp;		setErrorAttributes(request, status, message);</b>
+<b class="nc">&nbsp;		request.getRequestDispatcher(errorPath).forward(request, response);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void handleException(HttpServletRequest request, HttpServletResponse response, ErrorWrapperResponse wrapped,
+&nbsp;			Throwable ex) throws IOException, ServletException {
+<b class="nc">&nbsp;		Class&lt;?&gt; type = ex.getClass();</b>
+<b class="nc">&nbsp;		String errorPath = getErrorPath(type);</b>
+<b class="nc">&nbsp;		if (errorPath == null) {</b>
+<b class="nc">&nbsp;			rethrow(ex);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		if (response.isCommitted()) {</b>
+<b class="nc">&nbsp;			handleCommittedResponse(request, ex);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		forwardToErrorPage(errorPath, request, wrapped, ex);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void forwardToErrorPage(String path, HttpServletRequest request, HttpServletResponse response, Throwable ex)
+&nbsp;			throws ServletException, IOException {
+<b class="nc">&nbsp;		if (logger.isErrorEnabled()) {</b>
+<b class="nc">&nbsp;			String message = &quot;Forwarding to error page from request &quot; + getDescription(request) + &quot; due to exception [&quot;</b>
+<b class="nc">&nbsp;					+ ex.getMessage() + &quot;]&quot;;</b>
+<b class="nc">&nbsp;			logger.error(message, ex);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		setErrorAttributes(request, 500, ex.getMessage());</b>
+<b class="nc">&nbsp;		request.setAttribute(ERROR_EXCEPTION, ex);</b>
+<b class="nc">&nbsp;		request.setAttribute(ERROR_EXCEPTION_TYPE, ex.getClass());</b>
+<b class="nc">&nbsp;		response.reset();</b>
+<b class="nc">&nbsp;		response.setStatus(500);</b>
+<b class="nc">&nbsp;		request.getRequestDispatcher(path).forward(request, response);</b>
+<b class="nc">&nbsp;		request.removeAttribute(ERROR_EXCEPTION);</b>
+<b class="nc">&nbsp;		request.removeAttribute(ERROR_EXCEPTION_TYPE);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the description for the given request. By default this method will return a
+&nbsp;	 * description based on the request {@code servletPath} and {@code pathInfo}.
+&nbsp;	 * @param request the source request
+&nbsp;	 * @return the description
+&nbsp;	 * @since 1.5.0
+&nbsp;	 */
+&nbsp;	protected String getDescription(HttpServletRequest request) {
+<b class="nc">&nbsp;		String pathInfo = (request.getPathInfo() != null) ? request.getPathInfo() : &quot;&quot;;</b>
+<b class="nc">&nbsp;		return &quot;[&quot; + request.getServletPath() + pathInfo + &quot;]&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void handleCommittedResponse(HttpServletRequest request, Throwable ex) {
+<b class="nc">&nbsp;		if (isClientAbortException(ex)) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		String message = &quot;Cannot forward to error page for request &quot; + getDescription(request)</b>
+&nbsp;				+ &quot; as the response has already been&quot;
+&nbsp;				+ &quot; committed. As a result, the response may have the wrong status&quot;
+&nbsp;				+ &quot; code. If your application is running on WebSphere Application&quot;
+&nbsp;				+ &quot; Server you may be able to resolve this problem by setting&quot;
+&nbsp;				+ &quot; com.ibm.ws.webcontainer.invokeFlushAfterService to false&quot;;
+<b class="nc">&nbsp;		if (ex == null) {</b>
+<b class="nc">&nbsp;			logger.error(message);</b>
+&nbsp;		}
+&nbsp;		else {
+&nbsp;			// User might see the error page without all the data here but throwing the
+&nbsp;			// exception isn&#39;t going to help anyone (we&#39;ll log it to be on the safe side)
+<b class="nc">&nbsp;			logger.error(message, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isClientAbortException(Throwable ex) {
+<b class="nc">&nbsp;		if (ex == null) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (Class&lt;?&gt; candidate : CLIENT_ABORT_EXCEPTIONS) {</b>
+<b class="nc">&nbsp;			if (candidate.isInstance(ex)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return isClientAbortException(ex.getCause());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getErrorPath(Map&lt;Integer, String&gt; map, Integer status) {
+<b class="nc">&nbsp;		if (map.containsKey(status)) {</b>
+<b class="nc">&nbsp;			return map.get(status);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.global;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getErrorPath(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		while (type != Object.class) {</b>
+<b class="nc">&nbsp;			String path = this.exceptions.get(type);</b>
+<b class="nc">&nbsp;			if (path != null) {</b>
+<b class="nc">&nbsp;				return path;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			type = type.getSuperclass();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return this.global;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setErrorAttributes(HttpServletRequest request, int status, String message) {
+<b class="nc">&nbsp;		request.setAttribute(ERROR_STATUS_CODE, status);</b>
+<b class="nc">&nbsp;		request.setAttribute(ERROR_MESSAGE, message);</b>
+<b class="nc">&nbsp;		request.setAttribute(ERROR_REQUEST_URI, request.getRequestURI());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void rethrow(Throwable ex) throws IOException, ServletException {
+<b class="nc">&nbsp;		if (ex instanceof RuntimeException runtimeException) {</b>
+<b class="nc">&nbsp;			throw runtimeException;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (ex instanceof Error error) {</b>
+<b class="nc">&nbsp;			throw error;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (ex instanceof IOException ioException) {</b>
+<b class="nc">&nbsp;			throw ioException;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (ex instanceof ServletException servletException) {</b>
+<b class="nc">&nbsp;			throw servletException;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(ex);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addErrorPages(ErrorPage... errorPages) {
+<b class="nc">&nbsp;		for (ErrorPage errorPage : errorPages) {</b>
+<b class="nc">&nbsp;			if (errorPage.isGlobal()) {</b>
+<b class="nc">&nbsp;				this.global = errorPage.getPath();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (errorPage.getStatus() != null) {</b>
+<b class="nc">&nbsp;				this.statuses.put(errorPage.getStatus().value(), errorPage.getPath());</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				this.exceptions.put(errorPage.getException(), errorPage.getPath());</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void destroy() {
+<b class="nc">&nbsp;	}</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return Ordered.HIGHEST_PRECEDENCE + 1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void addClassIfPresent(Collection&lt;Class&lt;?&gt;&gt; collection, String className) {
+&nbsp;		try {
+<b class="nc">&nbsp;			collection.add(ClassUtils.forName(className, null));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class ErrorWrapperResponse extends HttpServletResponseWrapper {
+&nbsp;
+&nbsp;		private int status;
+&nbsp;
+&nbsp;		private String message;
+&nbsp;
+<b class="nc">&nbsp;		private boolean hasErrorToSend = false;</b>
+&nbsp;
+&nbsp;		ErrorWrapperResponse(HttpServletResponse response) {
+<b class="nc">&nbsp;			super(response);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void sendError(int status) throws IOException {
+<b class="nc">&nbsp;			sendError(status, null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void sendError(int status, String message) throws IOException {
+<b class="nc">&nbsp;			this.status = status;</b>
+<b class="nc">&nbsp;			this.message = message;</b>
+<b class="nc">&nbsp;			this.hasErrorToSend = true;</b>
+&nbsp;			// Do not call super because the container may prevent us from handling the
+&nbsp;			// error ourselves
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getStatus() {
+<b class="nc">&nbsp;			if (this.hasErrorToSend) {</b>
+<b class="nc">&nbsp;				return this.status;</b>
+&nbsp;			}
+&nbsp;			// If there was no error we need to trust the wrapped response
+<b class="nc">&nbsp;			return super.getStatus();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void flushBuffer() throws IOException {
+<b class="nc">&nbsp;			sendErrorIfNecessary();</b>
+<b class="nc">&nbsp;			super.flushBuffer();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void sendErrorIfNecessary() throws IOException {
+<b class="nc">&nbsp;			if (this.hasErrorToSend &amp;&amp; !isCommitted()) {</b>
+<b class="nc">&nbsp;				((HttpServletResponse) getResponse()).sendError(this.status, this.message);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		String getMessage() {
+<b class="nc">&nbsp;			return this.message;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean hasErrorToSend() {
+<b class="nc">&nbsp;			return this.hasErrorToSend;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public PrintWriter getWriter() throws IOException {
+<b class="nc">&nbsp;			sendErrorIfNecessary();</b>
+<b class="nc">&nbsp;			return super.getWriter();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ServletOutputStream getOutputStream() throws IOException {
+<b class="nc">&nbsp;			sendErrorIfNecessary();</b>
+<b class="nc">&nbsp;			return super.getOutputStream();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

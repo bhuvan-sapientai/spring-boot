@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConnectionFactoryOptionsBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.service.connection.r2dbc</a>
+</div>
+
+<h1>Coverage Summary for Class: ConnectionFactoryOptionsBuilder (org.springframework.boot.docker.compose.service.connection.r2dbc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConnectionFactoryOptionsBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.service.connection.r2dbc;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import io.r2dbc.spi.ConnectionFactoryOptions;
+&nbsp;import io.r2dbc.spi.Option;
+&nbsp;
+&nbsp;import org.springframework.boot.docker.compose.core.RunningService;
+&nbsp;import org.springframework.boot.docker.compose.service.connection.jdbc.JdbcUrlBuilder;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility used to build an R2DBC {@link ConnectionFactoryOptions} for a
+&nbsp; * {@link RunningService}.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.1.0
+&nbsp; */
+&nbsp;public class ConnectionFactoryOptionsBuilder {
+&nbsp;
+&nbsp;	private static final String PARAMETERS_LABEL = &quot;org.springframework.boot.r2dbc.parameters&quot;;
+&nbsp;
+&nbsp;	private final String driver;
+&nbsp;
+&nbsp;	private final int sourcePort;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JdbcUrlBuilder} instance.
+&nbsp;	 * @param driver the driver protocol
+&nbsp;	 * @param containerPort the source container port
+&nbsp;	 */
+<b class="nc">&nbsp;	public ConnectionFactoryOptionsBuilder(String driver, int containerPort) {</b>
+<b class="nc">&nbsp;		Assert.notNull(driver, &quot;Driver must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.driver = driver;</b>
+<b class="nc">&nbsp;		this.sourcePort = containerPort;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public ConnectionFactoryOptions build(RunningService service, String database, String user, String password) {
+<b class="nc">&nbsp;		Assert.notNull(service, &quot;Service must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(database, &quot;Database must not be null&quot;);</b>
+<b class="nc">&nbsp;		ConnectionFactoryOptions.Builder builder = ConnectionFactoryOptions.builder()</b>
+<b class="nc">&nbsp;			.option(ConnectionFactoryOptions.DRIVER, this.driver)</b>
+<b class="nc">&nbsp;			.option(ConnectionFactoryOptions.HOST, service.host())</b>
+<b class="nc">&nbsp;			.option(ConnectionFactoryOptions.PORT, service.ports().get(this.sourcePort))</b>
+<b class="nc">&nbsp;			.option(ConnectionFactoryOptions.DATABASE, database);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(user)) {</b>
+<b class="nc">&nbsp;			builder.option(ConnectionFactoryOptions.USER, user);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasLength(password)) {</b>
+<b class="nc">&nbsp;			builder.option(ConnectionFactoryOptions.PASSWORD, password);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		applyParameters(service, builder);</b>
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyParameters(RunningService service, ConnectionFactoryOptions.Builder builder) {
+<b class="nc">&nbsp;		String parameters = service.labels().get(PARAMETERS_LABEL);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			if (StringUtils.hasText(parameters)) {</b>
+<b class="nc">&nbsp;				parseParameters(parameters).forEach((name, value) -&gt; builder.option(Option.valueOf(name), value));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(</b>
+<b class="nc">&nbsp;					&quot;Unable to apply R2DBC label parameters &#39;%s&#39; defined on service %s&quot;.formatted(parameters, service));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, String&gt; parseParameters(String parameters) {
+<b class="nc">&nbsp;		Map&lt;String, String&gt; result = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String parameter : StringUtils.commaDelimitedListToStringArray(parameters)) {</b>
+<b class="nc">&nbsp;			String[] parts = parameter.split(&quot;=&quot;);</b>
+<b class="nc">&nbsp;			Assert.state(parts.length == 2, () -&gt; &quot;Unable to parse parameter &#39;%s&#39;&quot;.formatted(parameter));</b>
+<b class="nc">&nbsp;			result.put(parts[0], parts[1]);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

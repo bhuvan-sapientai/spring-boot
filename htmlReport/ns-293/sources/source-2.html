@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarLaunchScriptIntegrationTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.launchscript</a>
+</div>
+
+<h1>Coverage Summary for Class: JarLaunchScriptIntegrationTests (org.springframework.boot.launchscript)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarLaunchScriptIntegrationTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.launchscript;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.junit.jupiter.params.ParameterizedTest;
+&nbsp;import org.junit.jupiter.params.provider.MethodSource;
+&nbsp;
+&nbsp;import org.springframework.boot.testsupport.testcontainers.DisabledIfDockerUnavailable;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests of Spring Boot&#39;s launch script when executing the jar directly.
+&nbsp; *
+&nbsp; * @author Alexey Vinogradov
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;@DisabledIfDockerUnavailable
+&nbsp;class JarLaunchScriptIntegrationTests extends AbstractLaunchScriptIntegrationTests {
+&nbsp;
+&nbsp;	JarLaunchScriptIntegrationTests() {
+<b class="nc">&nbsp;		super(&quot;jar/&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static List&lt;Object[]&gt; parameters() {
+<b class="nc">&nbsp;		return filterParameters((file) -&gt; true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void basicLaunch(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;basic-launch.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithDebugEnv(String os, String version) throws Exception {
+<b class="nc">&nbsp;		final String output = doTest(os, version, &quot;launch-with-debug.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;++ pwd&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithDifferentJarFileEnv(String os, String version) throws Exception {
+<b class="nc">&nbsp;		final String output = doTest(os, version, &quot;launch-with-jarfile.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;app-another.jar&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).doesNotContain(&quot;spring-boot-launch-script-tests.jar&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithSingleCommandLineArgument(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-single-command-line-argument.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithMultipleCommandLineArguments(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-multiple-command-line-arguments.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithSingleRunArg(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-single-run-arg.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithMultipleRunArgs(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-multiple-run-args.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithSingleJavaOpt(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-single-java-opt.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithMultipleJavaOpts(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-multiple-java-opts.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

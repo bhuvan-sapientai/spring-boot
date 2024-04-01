@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildInfoMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildInfoMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildInfoMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.apache.maven.execution.MavenSession;
+&nbsp;import org.apache.maven.plugin.AbstractMojo;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;import org.apache.maven.plugin.MojoFailureException;
+&nbsp;import org.apache.maven.plugins.annotations.Component;
+&nbsp;import org.apache.maven.plugins.annotations.LifecyclePhase;
+&nbsp;import org.apache.maven.plugins.annotations.Mojo;
+&nbsp;import org.apache.maven.plugins.annotations.Parameter;
+&nbsp;import org.apache.maven.project.MavenProject;
+&nbsp;import org.sonatype.plexus.build.incremental.BuildContext;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.BuildPropertiesWriter;
+&nbsp;import org.springframework.boot.loader.tools.BuildPropertiesWriter.NullAdditionalPropertyValueException;
+&nbsp;import org.springframework.boot.loader.tools.BuildPropertiesWriter.ProjectDetails;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generate a {@code build-info.properties} file based on the content of the current
+&nbsp; * {@link MavenProject}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Vedran Pavic
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;@Mojo(name = &quot;build-info&quot;, defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true)
+<b class="nc">&nbsp;public class BuildInfoMojo extends AbstractMojo {</b>
+&nbsp;
+&nbsp;	@Component
+&nbsp;	private BuildContext buildContext;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The Maven session.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${session}&quot;, readonly = true, required = true)
+&nbsp;	private MavenSession session;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The Maven project.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project}&quot;, readonly = true, required = true)
+&nbsp;	private MavenProject project;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The location of the generated {@code build-info.properties} file.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.outputDirectory}/META-INF/build-info.properties&quot;)
+&nbsp;	private File outputFile;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The value used for the {@code build.time} property in a form suitable for
+&nbsp;	 * {@link Instant#parse(CharSequence)}. Defaults to
+&nbsp;	 * {@code project.build.outputTimestamp} or {@code session.request.startTime} if the
+&nbsp;	 * former is not set. To disable the {@code build.time} property entirely, use
+&nbsp;	 * {@code &#39;off&#39;} or add it to {@code excludeInfoProperties}.
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.outputTimestamp}&quot;)
+&nbsp;	private String time;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Additional properties to store in the {@code build-info.properties} file. Each
+&nbsp;	 * entry is prefixed by {@code build.} in the generated {@code build-info.properties}.
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private Map&lt;String, String&gt; additionalProperties;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Properties that should be excluded {@code build-info.properties} file. Can be used
+&nbsp;	 * to exclude the standard {@code group}, {@code artifact}, {@code name},
+&nbsp;	 * {@code version} or {@code time} properties as well as items from
+&nbsp;	 * {@code additionalProperties}.
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private List&lt;String&gt; excludeInfoProperties;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Skip the execution.
+&nbsp;	 * @since 3.1.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.build-info.skip&quot;, defaultValue = &quot;false&quot;)
+&nbsp;	private boolean skip;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void execute() throws MojoExecutionException, MojoFailureException {
+<b class="nc">&nbsp;		if (this.skip) {</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;skipping build-info as per configuration.&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			ProjectDetails details = getProjectDetails();</b>
+<b class="nc">&nbsp;			new BuildPropertiesWriter(this.outputFile).writeBuildProperties(details);</b>
+<b class="nc">&nbsp;			this.buildContext.refresh(this.outputFile);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NullAdditionalPropertyValueException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoFailureException(&quot;Failed to generate build-info.properties. &quot; + ex.getMessage(), ex);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(ex.getMessage(), ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ProjectDetails getProjectDetails() {
+<b class="nc">&nbsp;		String group = getIfNotExcluded(&quot;group&quot;, this.project.getGroupId());</b>
+<b class="nc">&nbsp;		String artifact = getIfNotExcluded(&quot;artifact&quot;, this.project.getArtifactId());</b>
+<b class="nc">&nbsp;		String version = getIfNotExcluded(&quot;version&quot;, this.project.getVersion());</b>
+<b class="nc">&nbsp;		String name = getIfNotExcluded(&quot;name&quot;, this.project.getName());</b>
+<b class="nc">&nbsp;		Instant time = getIfNotExcluded(&quot;time&quot;, getBuildTime());</b>
+<b class="nc">&nbsp;		Map&lt;String, String&gt; additionalProperties = applyExclusions(this.additionalProperties);</b>
+<b class="nc">&nbsp;		return new ProjectDetails(group, artifact, version, name, time, additionalProperties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T getIfNotExcluded(String name, T value) {
+<b class="nc">&nbsp;		return (this.excludeInfoProperties == null || !this.excludeInfoProperties.contains(name)) ? value : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, String&gt; applyExclusions(Map&lt;String, String&gt; source) {
+<b class="nc">&nbsp;		if (source == null || this.excludeInfoProperties == null) {</b>
+<b class="nc">&nbsp;			return source;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Map&lt;String, String&gt; result = new LinkedHashMap&lt;&gt;(source);</b>
+<b class="nc">&nbsp;		this.excludeInfoProperties.forEach(result::remove);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Instant getBuildTime() {
+<b class="nc">&nbsp;		if (this.time == null || this.time.isEmpty()) {</b>
+<b class="nc">&nbsp;			Date startTime = this.session.getRequest().getStartTime();</b>
+<b class="nc">&nbsp;			return (startTime != null) ? startTime.toInstant() : Instant.now();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (&quot;off&quot;.equalsIgnoreCase(this.time)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Instant.parse(this.time);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

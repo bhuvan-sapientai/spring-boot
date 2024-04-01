@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConnectionDetailsRegistrar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testcontainers.service.connection</a>
+</div>
+
+<h1>Coverage Summary for Class: ConnectionDetailsRegistrar (org.springframework.boot.testcontainers.service.connection)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConnectionDetailsRegistrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConnectionDetailsRegistrar$ServiceConnectionBeanRegistrationExcludeFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testcontainers.service.connection;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.aot.BeanRegistrationExcludeFilter;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.RegisteredBean;
+&nbsp;import org.springframework.beans.factory.support.RootBeanDefinition;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetails;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetailsFactories;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetailsFactoryNotFoundException;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetailsNotFoundException;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class used to register {@link ConnectionDetails} bean definitions from
+&nbsp; * {@link ContainerConnectionSource} instances.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ConnectionDetailsRegistrar {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ConnectionDetailsRegistrar.class);</b>
+&nbsp;
+&nbsp;	private final ListableBeanFactory beanFactory;
+&nbsp;
+&nbsp;	private final ConnectionDetailsFactories connectionDetailsFactories;
+&nbsp;
+<b class="nc">&nbsp;	ConnectionDetailsRegistrar(ListableBeanFactory beanFactory, ConnectionDetailsFactories connectionDetailsFactories) {</b>
+<b class="nc">&nbsp;		this.beanFactory = beanFactory;</b>
+<b class="nc">&nbsp;		this.connectionDetailsFactories = connectionDetailsFactories;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void registerBeanDefinitions(BeanDefinitionRegistry registry, Collection&lt;ContainerConnectionSource&lt;?&gt;&gt; sources) {
+<b class="nc">&nbsp;		sources.forEach((source) -&gt; registerBeanDefinitions(registry, source));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void registerBeanDefinitions(BeanDefinitionRegistry registry, ContainerConnectionSource&lt;?&gt; source) {
+&nbsp;		try {
+<b class="nc">&nbsp;			this.connectionDetailsFactories.getConnectionDetails(source, true)</b>
+<b class="nc">&nbsp;				.forEach((connectionDetailsType, connectionDetails) -&gt; registerBeanDefinition(registry, source,</b>
+&nbsp;						connectionDetailsType, connectionDetails));
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ConnectionDetailsFactoryNotFoundException ex) {</b>
+<b class="nc">&nbsp;			rethrowConnectionDetails(source, ex, ConnectionDetailsFactoryNotFoundException::new);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ConnectionDetailsNotFoundException ex) {</b>
+<b class="nc">&nbsp;			rethrowConnectionDetails(source, ex, ConnectionDetailsNotFoundException::new);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void rethrowConnectionDetails(ContainerConnectionSource&lt;?&gt; source, RuntimeException ex,
+&nbsp;			BiFunction&lt;String, Throwable, RuntimeException&gt; exceptionFactory) {
+<b class="nc">&nbsp;		if (!StringUtils.hasText(source.getConnectionName())) {</b>
+<b class="nc">&nbsp;			StringBuilder message = new StringBuilder(ex.getMessage());</b>
+<b class="nc">&nbsp;			message.append((!message.toString().endsWith(&quot;.&quot;)) ? &quot;.&quot; : &quot;&quot;);</b>
+<b class="nc">&nbsp;			message.append(&quot; You may need to add a &#39;name&#39; to your @ServiceConnection annotation&quot;);</b>
+<b class="nc">&nbsp;			throw exceptionFactory.apply(message.toString(), ex.getCause());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw ex;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T&gt; void registerBeanDefinition(BeanDefinitionRegistry registry, ContainerConnectionSource&lt;?&gt; source,
+&nbsp;			Class&lt;?&gt; connectionDetailsType, ConnectionDetails connectionDetails) {
+<b class="nc">&nbsp;		String[] existingBeans = this.beanFactory.getBeanNamesForType(connectionDetailsType);</b>
+<b class="nc">&nbsp;		if (!ObjectUtils.isEmpty(existingBeans)) {</b>
+<b class="nc">&nbsp;			logger.debug(LogMessage.of(() -&gt; &quot;Skipping registration of %s due to existing beans %s&quot;.formatted(source,</b>
+<b class="nc">&nbsp;					Arrays.asList(existingBeans))));</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		String beanName = getBeanName(source, connectionDetails);</b>
+<b class="nc">&nbsp;		Class&lt;T&gt; beanType = (Class&lt;T&gt;) connectionDetails.getClass();</b>
+<b class="nc">&nbsp;		Supplier&lt;T&gt; beanSupplier = () -&gt; (T) connectionDetails;</b>
+<b class="nc">&nbsp;		logger.debug(LogMessage.of(() -&gt; &quot;Registering &#39;%s&#39; for %s&quot;.formatted(beanName, source)));</b>
+<b class="nc">&nbsp;		RootBeanDefinition beanDefinition = new RootBeanDefinition(beanType, beanSupplier);</b>
+<b class="nc">&nbsp;		beanDefinition.setAttribute(ServiceConnection.class.getName(), true);</b>
+<b class="nc">&nbsp;		registry.registerBeanDefinition(beanName, beanDefinition);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getBeanName(ContainerConnectionSource&lt;?&gt; source, ConnectionDetails connectionDetails) {
+<b class="nc">&nbsp;		List&lt;String&gt; parts = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		parts.add(ClassUtils.getShortNameAsProperty(connectionDetails.getClass()));</b>
+<b class="nc">&nbsp;		parts.add(&quot;for&quot;);</b>
+<b class="nc">&nbsp;		parts.add(source.getBeanNameSuffix());</b>
+<b class="nc">&nbsp;		return StringUtils.uncapitalize(parts.stream().map(StringUtils::capitalize).collect(Collectors.joining()));</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	class ServiceConnectionBeanRegistrationExcludeFilter implements BeanRegistrationExcludeFilter {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isExcludedFromAotProcessing(RegisteredBean registeredBean) {
+<b class="nc">&nbsp;			return registeredBean.getMergedBeanDefinition().getAttribute(ServiceConnection.class.getName()) != null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

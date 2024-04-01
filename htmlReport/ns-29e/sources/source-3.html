@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NestedUrlConnection</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.net.protocol.nested</a>
+</div>
+
+<h1>Coverage Summary for Class: NestedUrlConnection (org.springframework.boot.loader.net.protocol.nested)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NestedUrlConnection</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NestedUrlConnection$ConnectionInputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.net.protocol.nested;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FilePermission;
+&nbsp;import java.io.FilterInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.lang.ref.Cleaner.Cleanable;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.security.Permission;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.ZoneId;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.ref.Cleaner;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link URLConnection} to support {@code nested:} URLs. See {@link NestedLocation} for
+&nbsp; * details of the URL format.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class NestedUrlConnection extends URLConnection {
+&nbsp;
+<b class="nc">&nbsp;	private static final DateTimeFormatter RFC_1123_DATE_TIME = DateTimeFormatter.RFC_1123_DATE_TIME</b>
+<b class="nc">&nbsp;		.withZone(ZoneId.of(&quot;GMT&quot;));</b>
+&nbsp;
+&nbsp;	private static final String CONTENT_TYPE = &quot;x-java/jar&quot;;
+&nbsp;
+&nbsp;	private final NestedUrlConnectionResources resources;
+&nbsp;
+&nbsp;	private final Cleanable cleanup;
+&nbsp;
+<b class="nc">&nbsp;	private long lastModified = -1;</b>
+&nbsp;
+&nbsp;	private FilePermission permission;
+&nbsp;
+&nbsp;	private Map&lt;String, List&lt;String&gt;&gt; headerFields;
+&nbsp;
+&nbsp;	NestedUrlConnection(URL url) throws MalformedURLException {
+<b class="nc">&nbsp;		this(url, Cleaner.instance);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	NestedUrlConnection(URL url, Cleaner cleaner) throws MalformedURLException {
+<b class="nc">&nbsp;		super(url);</b>
+<b class="nc">&nbsp;		NestedLocation location = parseNestedLocation(url);</b>
+<b class="nc">&nbsp;		this.resources = new NestedUrlConnectionResources(location);</b>
+<b class="nc">&nbsp;		this.cleanup = cleaner.register(this, this.resources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private NestedLocation parseNestedLocation(URL url) throws MalformedURLException {
+&nbsp;		try {
+<b class="nc">&nbsp;			return NestedLocation.parse(url.getPath());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IllegalArgumentException ex) {</b>
+<b class="nc">&nbsp;			throw new MalformedURLException(ex.getMessage());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getHeaderField(String name) {
+<b class="nc">&nbsp;		List&lt;String&gt; values = getHeaderFields().get(name);</b>
+<b class="nc">&nbsp;		return (values != null &amp;&amp; !values.isEmpty()) ? values.get(0) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getHeaderField(int n) {
+<b class="nc">&nbsp;		Entry&lt;String, List&lt;String&gt;&gt; entry = getHeaderEntry(n);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; values = (entry != null) ? entry.getValue() : null;</b>
+<b class="nc">&nbsp;		return (values != null &amp;&amp; !values.isEmpty()) ? values.get(0) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getHeaderFieldKey(int n) {
+<b class="nc">&nbsp;		Entry&lt;String, List&lt;String&gt;&gt; entry = getHeaderEntry(n);</b>
+<b class="nc">&nbsp;		return (entry != null) ? entry.getKey() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Entry&lt;String, List&lt;String&gt;&gt; getHeaderEntry(int n) {
+<b class="nc">&nbsp;		Iterator&lt;Entry&lt;String, List&lt;String&gt;&gt;&gt; iterator = getHeaderFields().entrySet().iterator();</b>
+<b class="nc">&nbsp;		Entry&lt;String, List&lt;String&gt;&gt; entry = null;</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; n; i++) {</b>
+<b class="nc">&nbsp;			entry = (!iterator.hasNext()) ? null : iterator.next();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return entry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Map&lt;String, List&lt;String&gt;&gt; getHeaderFields() {
+&nbsp;		try {
+<b class="nc">&nbsp;			connect();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return Collections.emptyMap();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		Map&lt;String, List&lt;String&gt;&gt; headerFields = this.headerFields;</b>
+<b class="nc">&nbsp;		if (headerFields == null) {</b>
+<b class="nc">&nbsp;			headerFields = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			long contentLength = getContentLengthLong();</b>
+<b class="nc">&nbsp;			long lastModified = getLastModified();</b>
+<b class="nc">&nbsp;			if (contentLength &gt; 0) {</b>
+<b class="nc">&nbsp;				headerFields.put(&quot;content-length&quot;, List.of(String.valueOf(contentLength)));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (getLastModified() &gt; 0) {</b>
+<b class="nc">&nbsp;				headerFields.put(&quot;last-modified&quot;,</b>
+<b class="nc">&nbsp;						List.of(RFC_1123_DATE_TIME.format(Instant.ofEpochMilli(lastModified))));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			headerFields = Collections.unmodifiableMap(headerFields);</b>
+<b class="nc">&nbsp;			this.headerFields = headerFields;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return headerFields;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getContentLength() {
+<b class="nc">&nbsp;		long contentLength = getContentLengthLong();</b>
+<b class="nc">&nbsp;		return (contentLength &lt;= Integer.MAX_VALUE) ? (int) contentLength : -1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public long getContentLengthLong() {
+&nbsp;		try {
+<b class="nc">&nbsp;			connect();</b>
+<b class="nc">&nbsp;			return this.resources.getContentLength();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return -1;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getContentType() {
+<b class="nc">&nbsp;		return CONTENT_TYPE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public long getLastModified() {
+<b class="nc">&nbsp;		if (this.lastModified == -1) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				this.lastModified = Files.getLastModifiedTime(this.resources.getLocation().path()).toMillis();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				this.lastModified = 0;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.lastModified;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Permission getPermission() throws IOException {
+<b class="nc">&nbsp;		if (this.permission == null) {</b>
+<b class="nc">&nbsp;			File file = this.resources.getLocation().path().toFile();</b>
+<b class="nc">&nbsp;			this.permission = new FilePermission(file.getCanonicalPath(), &quot;read&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.permission;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public InputStream getInputStream() throws IOException {
+<b class="nc">&nbsp;		connect();</b>
+<b class="nc">&nbsp;		return new ConnectionInputStream(this.resources.getInputStream());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void connect() throws IOException {
+<b class="nc">&nbsp;		if (this.connected) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		this.resources.connect();</b>
+<b class="nc">&nbsp;		this.connected = true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Connection {@link InputStream}.
+&nbsp;	 */
+&nbsp;	class ConnectionInputStream extends FilterInputStream {
+&nbsp;
+&nbsp;		private volatile boolean closing;
+&nbsp;
+<b class="nc">&nbsp;		ConnectionInputStream(InputStream in) {</b>
+<b class="nc">&nbsp;			super(in);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+<b class="nc">&nbsp;			if (this.closing) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			this.closing = true;</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				super.close();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				try {</b>
+<b class="nc">&nbsp;					NestedUrlConnection.this.cleanup.clean();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (UncheckedIOException ex) {</b>
+<b class="nc">&nbsp;					throw ex.getCause();</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

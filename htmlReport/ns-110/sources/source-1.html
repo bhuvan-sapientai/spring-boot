@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BundleContentProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: BundleContentProperty (org.springframework.boot.autoconfigure.ssl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BundleContentProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.ssl;
+&nbsp;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import org.springframework.boot.ssl.pem.PemContent;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ResourceUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Helper utility to manage a single bundle content configuration property. May possibly
+&nbsp; * contain PEM content, a location or a directory search pattern.
+&nbsp; *
+&nbsp; * @param name the configuration property name (excluding any prefix)
+&nbsp; * @param value the configuration property value
+&nbsp; * @author Phillip Webb
+&nbsp; */
+<b class="nc">&nbsp;record BundleContentProperty(String name, String value) {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the property value is PEM content.
+&nbsp;	 * @return if the value is PEM content
+&nbsp;	 */
+&nbsp;	boolean isPemContent() {
+<b class="nc">&nbsp;		return PemContent.isPresentInText(this.value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if there is any property value present.
+&nbsp;	 * @return if the value is present
+&nbsp;	 */
+&nbsp;	boolean hasValue() {
+<b class="nc">&nbsp;		return StringUtils.hasText(this.value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Path toWatchPath() {
+<b class="nc">&nbsp;		return toPath();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Path toPath() {
+&nbsp;		try {
+<b class="nc">&nbsp;			URL url = toUrl();</b>
+<b class="nc">&nbsp;			Assert.state(isFileUrl(url), () -&gt; &quot;Value &#39;%s&#39; is not a file URL&quot;.formatted(url));</b>
+<b class="nc">&nbsp;			return Path.of(url.toURI()).toAbsolutePath();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to convert value of property &#39;%s&#39; to a path&quot;.formatted(this.name),</b>
+&nbsp;					ex);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private URL toUrl() throws FileNotFoundException {
+<b class="nc">&nbsp;		Assert.state(!isPemContent(), &quot;Value contains PEM content&quot;);</b>
+<b class="nc">&nbsp;		return ResourceUtils.getURL(this.value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isFileUrl(URL url) {
+<b class="nc">&nbsp;		return &quot;file&quot;.equalsIgnoreCase(url.getProtocol());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

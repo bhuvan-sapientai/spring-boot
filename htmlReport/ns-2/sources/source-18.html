@@ -1,0 +1,378 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringApplicationShutdownHook</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringApplicationShutdownHook (org.springframework.boot)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringApplicationShutdownHook</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.4%
+  </span>
+  <span class="absValue">
+    (2/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.8%
+  </span>
+  <span class="absValue">
+    (9/57)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpringApplicationShutdownHook$ApplicationContextClosedListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SpringApplicationShutdownHook$Handlers</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (2/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (4/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15%
+  </span>
+  <span class="absValue">
+    (12/80)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.IdentityHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.TimeoutException;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.event.ContextClosedEvent;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Runnable} to be used as a {@link Runtime#addShutdownHook(Thread) shutdown
+&nbsp; * hook} to perform graceful shutdown of Spring Boot applications. This hook tracks
+&nbsp; * registered application contexts as well as any actions registered via
+&nbsp; * {@link SpringApplication#getShutdownHandlers()}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Brian Clozel
+&nbsp; */
+<b class="fc">&nbsp;class SpringApplicationShutdownHook implements Runnable {</b>
+&nbsp;
+&nbsp;	private static final int SLEEP = 50;
+&nbsp;
+<b class="fc">&nbsp;	private static final long TIMEOUT = TimeUnit.MINUTES.toMillis(10);</b>
+&nbsp;
+<b class="fc">&nbsp;	private static final Log logger = LogFactory.getLog(SpringApplicationShutdownHook.class);</b>
+&nbsp;
+<b class="fc">&nbsp;	private final Handlers handlers = new Handlers();</b>
+&nbsp;
+<b class="fc">&nbsp;	private final Set&lt;ConfigurableApplicationContext&gt; contexts = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;	private final Set&lt;ConfigurableApplicationContext&gt; closedContexts = Collections.newSetFromMap(new WeakHashMap&lt;&gt;());</b>
+&nbsp;
+<b class="fc">&nbsp;	private final ApplicationContextClosedListener contextCloseListener = new ApplicationContextClosedListener();</b>
+&nbsp;
+<b class="fc">&nbsp;	private final AtomicBoolean shutdownHookAdded = new AtomicBoolean();</b>
+&nbsp;
+<b class="fc">&nbsp;	private volatile boolean shutdownHookAdditionEnabled = false;</b>
+&nbsp;
+&nbsp;	private boolean inProgress;
+&nbsp;
+&nbsp;	SpringApplicationShutdownHandlers getHandlers() {
+<b class="nc">&nbsp;		return this.handlers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void enableShutdownHookAddition() {
+<b class="nc">&nbsp;		this.shutdownHookAdditionEnabled = true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void registerApplicationContext(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;		addRuntimeShutdownHookIfNecessary();</b>
+<b class="nc">&nbsp;		synchronized (SpringApplicationShutdownHook.class) {</b>
+<b class="nc">&nbsp;			assertNotInProgress();</b>
+<b class="nc">&nbsp;			context.addApplicationListener(this.contextCloseListener);</b>
+<b class="nc">&nbsp;			this.contexts.add(context);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addRuntimeShutdownHookIfNecessary() {
+<b class="nc">&nbsp;		if (this.shutdownHookAdditionEnabled &amp;&amp; this.shutdownHookAdded.compareAndSet(false, true)) {</b>
+<b class="nc">&nbsp;			addRuntimeShutdownHook();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	void addRuntimeShutdownHook() {
+<b class="nc">&nbsp;		Runtime.getRuntime().addShutdownHook(new Thread(this, &quot;SpringApplicationShutdownHook&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void deregisterFailedApplicationContext(ConfigurableApplicationContext applicationContext) {
+<b class="nc">&nbsp;		synchronized (SpringApplicationShutdownHook.class) {</b>
+<b class="nc">&nbsp;			Assert.state(!applicationContext.isActive(), &quot;Cannot unregister active application context&quot;);</b>
+<b class="nc">&nbsp;			SpringApplicationShutdownHook.this.contexts.remove(applicationContext);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void run() {
+&nbsp;		Set&lt;ConfigurableApplicationContext&gt; contexts;
+&nbsp;		Set&lt;ConfigurableApplicationContext&gt; closedContexts;
+&nbsp;		Set&lt;Runnable&gt; actions;
+<b class="nc">&nbsp;		synchronized (SpringApplicationShutdownHook.class) {</b>
+<b class="nc">&nbsp;			this.inProgress = true;</b>
+<b class="nc">&nbsp;			contexts = new LinkedHashSet&lt;&gt;(this.contexts);</b>
+<b class="nc">&nbsp;			closedContexts = new LinkedHashSet&lt;&gt;(this.closedContexts);</b>
+<b class="nc">&nbsp;			actions = new LinkedHashSet&lt;&gt;(this.handlers.getActions());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		contexts.forEach(this::closeAndWait);</b>
+<b class="nc">&nbsp;		closedContexts.forEach(this::closeAndWait);</b>
+<b class="nc">&nbsp;		actions.forEach(Runnable::run);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isApplicationContextRegistered(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;		synchronized (SpringApplicationShutdownHook.class) {</b>
+<b class="nc">&nbsp;			return this.contexts.contains(context);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void reset() {
+<b class="nc">&nbsp;		synchronized (SpringApplicationShutdownHook.class) {</b>
+<b class="nc">&nbsp;			this.contexts.clear();</b>
+<b class="nc">&nbsp;			this.closedContexts.clear();</b>
+<b class="nc">&nbsp;			this.handlers.getActions().clear();</b>
+<b class="nc">&nbsp;			this.inProgress = false;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Call {@link ConfigurableApplicationContext#close()} and wait until the context
+&nbsp;	 * becomes inactive. We can&#39;t assume that just because the close method returns that
+&nbsp;	 * the context is actually inactive. It could be that another thread is still in the
+&nbsp;	 * process of disposing beans.
+&nbsp;	 * @param context the context to clean
+&nbsp;	 */
+&nbsp;	private void closeAndWait(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;		if (!context.isActive()) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		context.close();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			int waited = 0;</b>
+<b class="nc">&nbsp;			while (context.isActive()) {</b>
+<b class="nc">&nbsp;				if (waited &gt; TIMEOUT) {</b>
+<b class="nc">&nbsp;					throw new TimeoutException();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				Thread.sleep(SLEEP);</b>
+<b class="nc">&nbsp;				waited += SLEEP;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;			Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;			logger.warn(&quot;Interrupted waiting for application context &quot; + context + &quot; to become inactive&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (TimeoutException ex) {</b>
+<b class="nc">&nbsp;			logger.warn(&quot;Timed out waiting for application context &quot; + context + &quot; to become inactive&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertNotInProgress() {
+<b class="nc">&nbsp;		Assert.state(!SpringApplicationShutdownHook.this.inProgress, &quot;Shutdown in progress&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The handler actions for this shutdown hook.
+&nbsp;	 */
+<b class="fc">&nbsp;	private final class Handlers implements SpringApplicationShutdownHandlers, Runnable {</b>
+&nbsp;
+<b class="fc">&nbsp;		private final Set&lt;Runnable&gt; actions = Collections.newSetFromMap(new IdentityHashMap&lt;&gt;());</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void add(Runnable action) {
+<b class="nc">&nbsp;			Assert.notNull(action, &quot;Action must not be null&quot;);</b>
+<b class="nc">&nbsp;			addRuntimeShutdownHookIfNecessary();</b>
+<b class="nc">&nbsp;			synchronized (SpringApplicationShutdownHook.class) {</b>
+<b class="nc">&nbsp;				assertNotInProgress();</b>
+<b class="nc">&nbsp;				this.actions.add(action);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void remove(Runnable action) {
+<b class="nc">&nbsp;			Assert.notNull(action, &quot;Action must not be null&quot;);</b>
+<b class="nc">&nbsp;			synchronized (SpringApplicationShutdownHook.class) {</b>
+<b class="nc">&nbsp;				assertNotInProgress();</b>
+<b class="nc">&nbsp;				this.actions.remove(action);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;Runnable&gt; getActions() {
+<b class="nc">&nbsp;			return this.actions;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void run() {
+<b class="nc">&nbsp;			SpringApplicationShutdownHook.this.run();</b>
+<b class="nc">&nbsp;			SpringApplicationShutdownHook.this.reset();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ApplicationListener} to track closed contexts.
+&nbsp;	 */
+<b class="fc">&nbsp;	private final class ApplicationContextClosedListener implements ApplicationListener&lt;ContextClosedEvent&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void onApplicationEvent(ContextClosedEvent event) {
+&nbsp;			// The ContextClosedEvent is fired at the start of a call to {@code close()}
+&nbsp;			// and if that happens in a different thread then the context may still be
+&nbsp;			// active. Rather than just removing the context, we add it to a {@code
+&nbsp;			// closedContexts} set. This is weak set so that the context can be GC&#39;d once
+&nbsp;			// the {@code close()} method returns.
+<b class="nc">&nbsp;			synchronized (SpringApplicationShutdownHook.class) {</b>
+<b class="nc">&nbsp;				ApplicationContext applicationContext = event.getApplicationContext();</b>
+<b class="nc">&nbsp;				SpringApplicationShutdownHook.this.contexts.remove(applicationContext);</b>
+<b class="nc">&nbsp;				SpringApplicationShutdownHook.this.closedContexts</b>
+<b class="nc">&nbsp;					.add((ConfigurableApplicationContext) applicationContext);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

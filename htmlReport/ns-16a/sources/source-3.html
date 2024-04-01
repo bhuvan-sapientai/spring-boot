@@ -1,0 +1,368 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DevToolsProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: DevToolsProperties (org.springframework.boot.devtools.autoconfigure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DevToolsProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DevToolsProperties$Livereload</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DevToolsProperties$Restart</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.autoconfigure;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.NestedConfigurationProperty;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration properties for developer tools.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.devtools&quot;)
+<b class="nc">&nbsp;public class DevToolsProperties {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Restart restart = new Restart();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Livereload livereload = new Livereload();</b>
+&nbsp;
+<b class="nc">&nbsp;	@NestedConfigurationProperty</b>
+&nbsp;	private final RemoteDevToolsProperties remote = new RemoteDevToolsProperties();
+&nbsp;
+&nbsp;	public Restart getRestart() {
+<b class="nc">&nbsp;		return this.restart;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Livereload getLivereload() {
+<b class="nc">&nbsp;		return this.livereload;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public RemoteDevToolsProperties getRemote() {
+<b class="nc">&nbsp;		return this.remote;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Restart properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Restart {</b>
+&nbsp;
+&nbsp;		private static final String DEFAULT_RESTART_EXCLUDES = &quot;META-INF/maven/**,&quot;
+&nbsp;				+ &quot;META-INF/resources/**,resources/**,static/**,public/**,templates/**,&quot;
+&nbsp;				+ &quot;**/*Test.class,**/*Tests.class,git.properties,META-INF/build-info.properties&quot;;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether to enable automatic restart.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean enabled = true;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Patterns that should be excluded from triggering a full restart.
+&nbsp;		 */
+<b class="nc">&nbsp;		private String exclude = DEFAULT_RESTART_EXCLUDES;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Additional patterns that should be excluded from triggering a full restart.
+&nbsp;		 */
+&nbsp;		private String additionalExclude;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Amount of time to wait between polling for classpath changes.
+&nbsp;		 */
+<b class="nc">&nbsp;		private Duration pollInterval = Duration.ofSeconds(1);</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Amount of quiet time required without any classpath changes before a restart is
+&nbsp;		 * triggered.
+&nbsp;		 */
+<b class="nc">&nbsp;		private Duration quietPeriod = Duration.ofMillis(400);</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Name of a specific file that, when changed, triggers the restart check. Must be
+&nbsp;		 * a simple name (without any path) of a file that appears on your classpath. If
+&nbsp;		 * not specified, any classpath file change triggers the restart.
+&nbsp;		 */
+&nbsp;		private String triggerFile;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Additional paths to watch for changes.
+&nbsp;		 */
+<b class="nc">&nbsp;		private List&lt;File&gt; additionalPaths = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether to log the condition evaluation delta upon restart.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean logConditionEvaluationDelta = true;</b>
+&nbsp;
+&nbsp;		public boolean isEnabled() {
+<b class="nc">&nbsp;			return this.enabled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setEnabled(boolean enabled) {
+<b class="nc">&nbsp;			this.enabled = enabled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String[] getAllExclude() {
+<b class="nc">&nbsp;			List&lt;String&gt; allExclude = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			if (StringUtils.hasText(this.exclude)) {</b>
+<b class="nc">&nbsp;				allExclude.addAll(StringUtils.commaDelimitedListToSet(this.exclude));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (StringUtils.hasText(this.additionalExclude)) {</b>
+<b class="nc">&nbsp;				allExclude.addAll(StringUtils.commaDelimitedListToSet(this.additionalExclude));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return StringUtils.toStringArray(allExclude);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getExclude() {
+<b class="nc">&nbsp;			return this.exclude;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setExclude(String exclude) {
+<b class="nc">&nbsp;			this.exclude = exclude;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getAdditionalExclude() {
+<b class="nc">&nbsp;			return this.additionalExclude;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setAdditionalExclude(String additionalExclude) {
+<b class="nc">&nbsp;			this.additionalExclude = additionalExclude;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Duration getPollInterval() {
+<b class="nc">&nbsp;			return this.pollInterval;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setPollInterval(Duration pollInterval) {
+<b class="nc">&nbsp;			this.pollInterval = pollInterval;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Duration getQuietPeriod() {
+<b class="nc">&nbsp;			return this.quietPeriod;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setQuietPeriod(Duration quietPeriod) {
+<b class="nc">&nbsp;			this.quietPeriod = quietPeriod;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getTriggerFile() {
+<b class="nc">&nbsp;			return this.triggerFile;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setTriggerFile(String triggerFile) {
+<b class="nc">&nbsp;			this.triggerFile = triggerFile;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public List&lt;File&gt; getAdditionalPaths() {
+<b class="nc">&nbsp;			return this.additionalPaths;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setAdditionalPaths(List&lt;File&gt; additionalPaths) {
+<b class="nc">&nbsp;			this.additionalPaths = additionalPaths;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isLogConditionEvaluationDelta() {
+<b class="nc">&nbsp;			return this.logConditionEvaluationDelta;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setLogConditionEvaluationDelta(boolean logConditionEvaluationDelta) {
+<b class="nc">&nbsp;			this.logConditionEvaluationDelta = logConditionEvaluationDelta;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * LiveReload properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Livereload {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether to enable a livereload.com-compatible server.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean enabled = true;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Server port.
+&nbsp;		 */
+<b class="nc">&nbsp;		private int port = 35729;</b>
+&nbsp;
+&nbsp;		public boolean isEnabled() {
+<b class="nc">&nbsp;			return this.enabled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setEnabled(boolean enabled) {
+<b class="nc">&nbsp;			this.enabled = enabled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public int getPort() {
+<b class="nc">&nbsp;			return this.port;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setPort(int port) {
+<b class="nc">&nbsp;			this.port = port;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

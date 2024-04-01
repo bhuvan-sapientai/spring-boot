@@ -1,0 +1,474 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EndpointRequest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.security.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: EndpointRequest (org.springframework.boot.actuate.autoconfigure.security.reactive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EndpointRequest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EndpointRequest$AbstractWebExchangeMatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EndpointRequest$EndpointServerWebExchangeMatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EndpointRequest$LinksServerWebExchangeMatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/69)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.security.reactive;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.server.ManagementPortType;
+&nbsp;import org.springframework.boot.actuate.endpoint.EndpointId;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;
+&nbsp;import org.springframework.boot.security.reactive.ApplicationContextServerWebExchangeMatcher;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
+&nbsp;import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
+&nbsp;import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+&nbsp;import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.server.ServerWebExchange;
+&nbsp;
+&nbsp;/**
+&nbsp; * Factory that can be used to create a {@link ServerWebExchangeMatcher} for actuator
+&nbsp; * endpoint locations.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public final class EndpointRequest {
+&nbsp;
+<b class="nc">&nbsp;	private static final ServerWebExchangeMatcher EMPTY_MATCHER = (request) -&gt; MatchResult.notMatch();</b>
+&nbsp;
+&nbsp;	private EndpointRequest() {
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a matcher that includes all {@link Endpoint actuator endpoints}. It also
+&nbsp;	 * includes the links endpoint which is present at the base path of the actuator
+&nbsp;	 * endpoints. The {@link EndpointServerWebExchangeMatcher#excluding(Class...)
+&nbsp;	 * excluding} method can be used to further remove specific endpoints if required. For
+&nbsp;	 * example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * EndpointRequest.toAnyEndpoint().excluding(ShutdownEndpoint.class)
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @return the configured {@link ServerWebExchangeMatcher}
+&nbsp;	 */
+&nbsp;	public static EndpointServerWebExchangeMatcher toAnyEndpoint() {
+<b class="nc">&nbsp;		return new EndpointServerWebExchangeMatcher(true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a matcher that includes the specified {@link Endpoint actuator endpoints}.
+&nbsp;	 * For example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * EndpointRequest.to(ShutdownEndpoint.class, HealthEndpoint.class)
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @param endpoints the endpoints to include
+&nbsp;	 * @return the configured {@link ServerWebExchangeMatcher}
+&nbsp;	 */
+&nbsp;	public static EndpointServerWebExchangeMatcher to(Class&lt;?&gt;... endpoints) {
+<b class="nc">&nbsp;		return new EndpointServerWebExchangeMatcher(endpoints, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a matcher that includes the specified {@link Endpoint actuator endpoints}.
+&nbsp;	 * For example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * EndpointRequest.to(&quot;shutdown&quot;, &quot;health&quot;)
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @param endpoints the endpoints to include
+&nbsp;	 * @return the configured {@link ServerWebExchangeMatcher}
+&nbsp;	 */
+&nbsp;	public static EndpointServerWebExchangeMatcher to(String... endpoints) {
+<b class="nc">&nbsp;		return new EndpointServerWebExchangeMatcher(endpoints, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a matcher that matches only on the links endpoint. It can be used when
+&nbsp;	 * security configuration for the links endpoint is different from the other
+&nbsp;	 * {@link Endpoint actuator endpoints}. The
+&nbsp;	 * {@link EndpointServerWebExchangeMatcher#excludingLinks() excludingLinks} method can
+&nbsp;	 * be used in combination with this to remove the links endpoint from
+&nbsp;	 * {@link EndpointRequest#toAnyEndpoint() toAnyEndpoint}. For example:
+&nbsp;	 * &lt;pre class=&quot;code&quot;&gt;
+&nbsp;	 * EndpointRequest.toLinks()
+&nbsp;	 * &lt;/pre&gt;
+&nbsp;	 * @return the configured {@link ServerWebExchangeMatcher}
+&nbsp;	 */
+&nbsp;	public static LinksServerWebExchangeMatcher toLinks() {
+<b class="nc">&nbsp;		return new LinksServerWebExchangeMatcher();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Base class for supported request matchers.
+&nbsp;	 */
+&nbsp;	private abstract static class AbstractWebExchangeMatcher&lt;T&gt; extends ApplicationContextServerWebExchangeMatcher&lt;T&gt; {
+&nbsp;
+&nbsp;		private ManagementPortType managementPortType;
+&nbsp;
+&nbsp;		AbstractWebExchangeMatcher(Class&lt;? extends T&gt; contextClass) {
+<b class="nc">&nbsp;			super(contextClass);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected boolean ignoreApplicationContext(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;			if (this.managementPortType == null) {</b>
+<b class="nc">&nbsp;				this.managementPortType = ManagementPortType.get(applicationContext.getEnvironment());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.managementPortType == ManagementPortType.DIFFERENT) {</b>
+<b class="nc">&nbsp;				if (applicationContext.getParent() == null) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				String managementContextId = applicationContext.getParent().getId() + &quot;:management&quot;;</b>
+<b class="nc">&nbsp;				return !managementContextId.equals(applicationContext.getId());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The {@link ServerWebExchangeMatcher} used to match against {@link Endpoint actuator
+&nbsp;	 * endpoints}.
+&nbsp;	 */
+&nbsp;	public static final class EndpointServerWebExchangeMatcher extends AbstractWebExchangeMatcher&lt;PathMappedEndpoints&gt; {
+&nbsp;
+&nbsp;		private final List&lt;Object&gt; includes;
+&nbsp;
+&nbsp;		private final List&lt;Object&gt; excludes;
+&nbsp;
+&nbsp;		private final boolean includeLinks;
+&nbsp;
+&nbsp;		private volatile ServerWebExchangeMatcher delegate;
+&nbsp;
+&nbsp;		private EndpointServerWebExchangeMatcher(boolean includeLinks) {
+<b class="nc">&nbsp;			this(Collections.emptyList(), Collections.emptyList(), includeLinks);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private EndpointServerWebExchangeMatcher(Class&lt;?&gt;[] endpoints, boolean includeLinks) {
+<b class="nc">&nbsp;			this(Arrays.asList((Object[]) endpoints), Collections.emptyList(), includeLinks);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private EndpointServerWebExchangeMatcher(String[] endpoints, boolean includeLinks) {
+<b class="nc">&nbsp;			this(Arrays.asList((Object[]) endpoints), Collections.emptyList(), includeLinks);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private EndpointServerWebExchangeMatcher(List&lt;Object&gt; includes, List&lt;Object&gt; excludes, boolean includeLinks) {
+<b class="nc">&nbsp;			super(PathMappedEndpoints.class);</b>
+<b class="nc">&nbsp;			this.includes = includes;</b>
+<b class="nc">&nbsp;			this.excludes = excludes;</b>
+<b class="nc">&nbsp;			this.includeLinks = includeLinks;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public EndpointServerWebExchangeMatcher excluding(Class&lt;?&gt;... endpoints) {
+<b class="nc">&nbsp;			List&lt;Object&gt; excludes = new ArrayList&lt;&gt;(this.excludes);</b>
+<b class="nc">&nbsp;			excludes.addAll(Arrays.asList((Object[]) endpoints));</b>
+<b class="nc">&nbsp;			return new EndpointServerWebExchangeMatcher(this.includes, excludes, this.includeLinks);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public EndpointServerWebExchangeMatcher excluding(String... endpoints) {
+<b class="nc">&nbsp;			List&lt;Object&gt; excludes = new ArrayList&lt;&gt;(this.excludes);</b>
+<b class="nc">&nbsp;			excludes.addAll(Arrays.asList((Object[]) endpoints));</b>
+<b class="nc">&nbsp;			return new EndpointServerWebExchangeMatcher(this.includes, excludes, this.includeLinks);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public EndpointServerWebExchangeMatcher excludingLinks() {
+<b class="nc">&nbsp;			return new EndpointServerWebExchangeMatcher(this.includes, this.excludes, false);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected void initialized(Supplier&lt;PathMappedEndpoints&gt; pathMappedEndpoints) {
+<b class="nc">&nbsp;			this.delegate = createDelegate(pathMappedEndpoints);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ServerWebExchangeMatcher createDelegate(Supplier&lt;PathMappedEndpoints&gt; pathMappedEndpoints) {
+&nbsp;			try {
+<b class="nc">&nbsp;				return createDelegate(pathMappedEndpoints.get());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;				return EMPTY_MATCHER;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private ServerWebExchangeMatcher createDelegate(PathMappedEndpoints pathMappedEndpoints) {
+<b class="nc">&nbsp;			Set&lt;String&gt; paths = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			if (this.includes.isEmpty()) {</b>
+<b class="nc">&nbsp;				paths.addAll(pathMappedEndpoints.getAllPaths());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			streamPaths(this.includes, pathMappedEndpoints).forEach(paths::add);</b>
+<b class="nc">&nbsp;			streamPaths(this.excludes, pathMappedEndpoints).forEach(paths::remove);</b>
+<b class="nc">&nbsp;			List&lt;ServerWebExchangeMatcher&gt; delegateMatchers = getDelegateMatchers(paths);</b>
+<b class="nc">&nbsp;			if (this.includeLinks &amp;&amp; StringUtils.hasText(pathMappedEndpoints.getBasePath())) {</b>
+<b class="nc">&nbsp;				delegateMatchers.add(new LinksServerWebExchangeMatcher());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new OrServerWebExchangeMatcher(delegateMatchers);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Stream&lt;String&gt; streamPaths(List&lt;Object&gt; source, PathMappedEndpoints pathMappedEndpoints) {
+<b class="nc">&nbsp;			return source.stream().filter(Objects::nonNull).map(this::getEndpointId).map(pathMappedEndpoints::getPath);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected Mono&lt;MatchResult&gt; matches(ServerWebExchange exchange, Supplier&lt;PathMappedEndpoints&gt; context) {
+<b class="nc">&nbsp;			return this.delegate.matches(exchange);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private List&lt;ServerWebExchangeMatcher&gt; getDelegateMatchers(Set&lt;String&gt; paths) {
+<b class="nc">&nbsp;			return paths.stream().map(this::getDelegateMatcher).collect(Collectors.toCollection(ArrayList::new));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private PathPatternParserServerWebExchangeMatcher getDelegateMatcher(String path) {
+<b class="nc">&nbsp;			return new PathPatternParserServerWebExchangeMatcher(path + &quot;/**&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return String.format(&quot;EndpointRequestMatcher includes=%s, excludes=%s, includeLinks=%s&quot;,</b>
+<b class="nc">&nbsp;					toString(this.includes, &quot;[*]&quot;), toString(this.excludes, &quot;[]&quot;), this.includeLinks);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String toString(List&lt;Object&gt; endpoints, String emptyValue) {
+<b class="nc">&nbsp;			return (!endpoints.isEmpty()) ? endpoints.stream()</b>
+<b class="nc">&nbsp;				.map(this::getEndpointId)</b>
+<b class="nc">&nbsp;				.map(Object::toString)</b>
+<b class="nc">&nbsp;				.collect(Collectors.joining(&quot;, &quot;, &quot;[&quot;, &quot;]&quot;)) : emptyValue;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private EndpointId getEndpointId(Object source) {
+<b class="nc">&nbsp;			if (source instanceof EndpointId endpointId) {</b>
+<b class="nc">&nbsp;				return endpointId;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (source instanceof String string) {</b>
+<b class="nc">&nbsp;				return EndpointId.of(string);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (source instanceof Class) {</b>
+<b class="nc">&nbsp;				return getEndpointId((Class&lt;?&gt;) source);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unsupported source &quot; + source);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private EndpointId getEndpointId(Class&lt;?&gt; source) {
+<b class="nc">&nbsp;			MergedAnnotation&lt;Endpoint&gt; annotation = MergedAnnotations.from(source).get(Endpoint.class);</b>
+<b class="nc">&nbsp;			Assert.state(annotation.isPresent(), () -&gt; &quot;Class &quot; + source + &quot; is not annotated with @Endpoint&quot;);</b>
+<b class="nc">&nbsp;			return EndpointId.of(annotation.getString(&quot;id&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The {@link ServerWebExchangeMatcher} used to match against the links endpoint.
+&nbsp;	 */
+&nbsp;	public static final class LinksServerWebExchangeMatcher extends AbstractWebExchangeMatcher&lt;WebEndpointProperties&gt; {
+&nbsp;
+&nbsp;		private volatile ServerWebExchangeMatcher delegate;
+&nbsp;
+&nbsp;		private LinksServerWebExchangeMatcher() {
+<b class="nc">&nbsp;			super(WebEndpointProperties.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected void initialized(Supplier&lt;WebEndpointProperties&gt; properties) {
+<b class="nc">&nbsp;			this.delegate = createDelegate(properties.get());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ServerWebExchangeMatcher createDelegate(WebEndpointProperties properties) {
+<b class="nc">&nbsp;			if (StringUtils.hasText(properties.getBasePath())) {</b>
+<b class="nc">&nbsp;				return new OrServerWebExchangeMatcher(</b>
+<b class="nc">&nbsp;						new PathPatternParserServerWebExchangeMatcher(properties.getBasePath()),</b>
+<b class="nc">&nbsp;						new PathPatternParserServerWebExchangeMatcher(properties.getBasePath() + &quot;/&quot;));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return EMPTY_MATCHER;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected Mono&lt;MatchResult&gt; matches(ServerWebExchange exchange, Supplier&lt;WebEndpointProperties&gt; context) {
+<b class="nc">&nbsp;			return this.delegate.matches(exchange);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

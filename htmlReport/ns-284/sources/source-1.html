@@ -1,0 +1,211 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildInfo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.tasks.buildinfo</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildInfo (org.springframework.boot.gradle.tasks.buildinfo)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildInfo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.tasks.buildinfo;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.file.DirectoryProperty;
+&nbsp;import org.gradle.api.provider.SetProperty;
+&nbsp;import org.gradle.api.tasks.Internal;
+&nbsp;import org.gradle.api.tasks.Nested;
+&nbsp;import org.gradle.api.tasks.OutputDirectory;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;import org.gradle.api.tasks.TaskExecutionException;
+&nbsp;import org.gradle.work.DisableCachingByDefault;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.BuildPropertiesWriter;
+&nbsp;import org.springframework.boot.loader.tools.BuildPropertiesWriter.ProjectDetails;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Task} for generating a {@code build-info.properties} file from a
+&nbsp; * {@code Project}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@DisableCachingByDefault(because = &quot;Not worth caching&quot;)
+&nbsp;public abstract class BuildInfo extends DefaultTask {
+&nbsp;
+&nbsp;	private final BuildInfoProperties properties;
+&nbsp;
+<b class="nc">&nbsp;	public BuildInfo() {</b>
+<b class="nc">&nbsp;		this.properties = getProject().getObjects().newInstance(BuildInfoProperties.class, getExcludes());</b>
+<b class="nc">&nbsp;		getDestinationDir().convention(getProject().getLayout().getBuildDirectory().dir(getName()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the names of the properties to exclude from the output.
+&nbsp;	 * @return names of the properties to exclude
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	@Internal
+&nbsp;	public abstract SetProperty&lt;String&gt; getExcludes();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Generates the {@code build-info.properties} file in the configured
+&nbsp;	 * {@link #getDestinationDir destination}.
+&nbsp;	 */
+&nbsp;	@TaskAction
+&nbsp;	public void generateBuildProperties() {
+&nbsp;		try {
+<b class="nc">&nbsp;			ProjectDetails details = new ProjectDetails(this.properties.getGroupIfNotExcluded(),</b>
+<b class="nc">&nbsp;					this.properties.getArtifactIfNotExcluded(), this.properties.getVersionIfNotExcluded(),</b>
+<b class="nc">&nbsp;					this.properties.getNameIfNotExcluded(), this.properties.getTimeIfNotExcluded(),</b>
+<b class="nc">&nbsp;					this.properties.getAdditionalIfNotExcluded());</b>
+<b class="nc">&nbsp;			new BuildPropertiesWriter(new File(getDestinationDir().get().getAsFile(), &quot;build-info.properties&quot;))</b>
+<b class="nc">&nbsp;				.writeBuildProperties(details);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new TaskExecutionException(this, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the directory to which the {@code build-info.properties} file will be
+&nbsp;	 * written.
+&nbsp;	 * @return the destination directory
+&nbsp;	 */
+&nbsp;	@OutputDirectory
+&nbsp;	public abstract DirectoryProperty getDestinationDir();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link BuildInfoProperties properties} that will be included in the
+&nbsp;	 * {@code build-info.properties} file.
+&nbsp;	 * @return the properties
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	public BuildInfoProperties getProperties() {
+<b class="nc">&nbsp;		return this.properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Executes the given {@code action} on the {@link #getProperties()} properties.
+&nbsp;	 * @param action the action
+&nbsp;	 */
+&nbsp;	public void properties(Action&lt;BuildInfoProperties&gt; action) {
+<b class="nc">&nbsp;		action.execute(this.properties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DockerComposeConnectionDetailsFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.service.connection</a>
+</div>
+
+<h1>Coverage Summary for Class: DockerComposeConnectionDetailsFactory (org.springframework.boot.docker.compose.service.connection)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DockerComposeConnectionDetailsFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DockerComposeConnectionDetailsFactory$DockerComposeConnectionDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.service.connection;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetails;
+&nbsp;import org.springframework.boot.autoconfigure.service.connection.ConnectionDetailsFactory;
+&nbsp;import org.springframework.boot.docker.compose.core.RunningService;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginProvider;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for {@link ConnectionDetailsFactory} implementations that provide
+&nbsp; * {@link ConnectionDetails} from a {@link DockerComposeConnectionSource}.
+&nbsp; *
+&nbsp; * @param &lt;D&gt; the connection details type
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.1.0
+&nbsp; */
+&nbsp;public abstract class DockerComposeConnectionDetailsFactory&lt;D extends ConnectionDetails&gt;
+&nbsp;		implements ConnectionDetailsFactory&lt;DockerComposeConnectionSource, D&gt; {
+&nbsp;
+&nbsp;	private final Predicate&lt;DockerComposeConnectionSource&gt; predicate;
+&nbsp;
+&nbsp;	private final String[] requiredClassNames;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link DockerComposeConnectionDetailsFactory} instance.
+&nbsp;	 * @param connectionName the required connection name
+&nbsp;	 * @param requiredClassNames the names of classes that must be present
+&nbsp;	 */
+&nbsp;	protected DockerComposeConnectionDetailsFactory(String connectionName, String... requiredClassNames) {
+<b class="nc">&nbsp;		this(new ConnectionNamePredicate(connectionName), requiredClassNames);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link DockerComposeConnectionDetailsFactory} instance.
+&nbsp;	 * @param connectionNames the required connection name
+&nbsp;	 * @param requiredClassNames the names of classes that must be present
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	protected DockerComposeConnectionDetailsFactory(String[] connectionNames, String... requiredClassNames) {
+<b class="nc">&nbsp;		this(new ConnectionNamePredicate(connectionNames), requiredClassNames);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link DockerComposeConnectionDetailsFactory} instance.
+&nbsp;	 * @param predicate a predicate used to check when a service is accepted
+&nbsp;	 * @param requiredClassNames the names of classes that must be present
+&nbsp;	 */
+&nbsp;	protected DockerComposeConnectionDetailsFactory(Predicate&lt;DockerComposeConnectionSource&gt; predicate,
+<b class="nc">&nbsp;			String... requiredClassNames) {</b>
+<b class="nc">&nbsp;		this.predicate = predicate;</b>
+<b class="nc">&nbsp;		this.requiredClassNames = requiredClassNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final D getConnectionDetails(DockerComposeConnectionSource source) {
+<b class="nc">&nbsp;		return (!accept(source)) ? null : getDockerComposeConnectionDetails(source);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean accept(DockerComposeConnectionSource source) {
+<b class="nc">&nbsp;		return hasRequiredClasses() &amp;&amp; this.predicate.test(source);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasRequiredClasses() {
+<b class="nc">&nbsp;		return ObjectUtils.isEmpty(this.requiredClassNames) || Arrays.stream(this.requiredClassNames)</b>
+<b class="nc">&nbsp;			.allMatch((requiredClassName) -&gt; ClassUtils.isPresent(requiredClassName, null));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get the {@link ConnectionDetails} from the given {@link RunningService}
+&nbsp;	 * {@code source}. May return {@code null} if no connection can be created. Result
+&nbsp;	 * types should consider extending {@link DockerComposeConnectionDetails}.
+&nbsp;	 * @param source the source
+&nbsp;	 * @return the service connection or {@code null}.
+&nbsp;	 */
+&nbsp;	protected abstract D getDockerComposeConnectionDetails(DockerComposeConnectionSource source);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Convenient base class for {@link ConnectionDetails} results that are backed by a
+&nbsp;	 * {@link RunningService}.
+&nbsp;	 */
+&nbsp;	protected static class DockerComposeConnectionDetails implements ConnectionDetails, OriginProvider {
+&nbsp;
+&nbsp;		private final Origin origin;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Create a new {@link DockerComposeConnectionDetails} instance.
+&nbsp;		 * @param runningService the source {@link RunningService}
+&nbsp;		 */
+<b class="nc">&nbsp;		protected DockerComposeConnectionDetails(RunningService runningService) {</b>
+<b class="nc">&nbsp;			Assert.notNull(runningService, &quot;RunningService must not be null&quot;);</b>
+<b class="nc">&nbsp;			this.origin = Origin.from(runningService);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Origin getOrigin() {
+<b class="nc">&nbsp;			return this.origin;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

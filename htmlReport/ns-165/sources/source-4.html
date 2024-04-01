@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertyMigration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.migrator</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertyMigration (org.springframework.boot.context.properties.migrator)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertyMigration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.migrator;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+&nbsp;import org.springframework.boot.configurationmetadata.Deprecation;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.TextResourceOrigin;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Description of a property migration.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;class PropertyMigration {
+&nbsp;
+<b class="nc">&nbsp;	public static final Comparator&lt;PropertyMigration&gt; COMPARATOR = Comparator</b>
+<b class="nc">&nbsp;		.comparing((property) -&gt; property.getMetadata().getId());</b>
+&nbsp;
+&nbsp;	private final ConfigurationProperty property;
+&nbsp;
+&nbsp;	private final Integer lineNumber;
+&nbsp;
+&nbsp;	private final ConfigurationMetadataProperty metadata;
+&nbsp;
+&nbsp;	private final ConfigurationMetadataProperty replacementMetadata;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether this migration happened from a map type.
+&nbsp;	 */
+&nbsp;	private final boolean mapMigration;
+&nbsp;
+&nbsp;	private final boolean compatibleType;
+&nbsp;
+&nbsp;	PropertyMigration(ConfigurationProperty property, ConfigurationMetadataProperty metadata,
+<b class="nc">&nbsp;			ConfigurationMetadataProperty replacementMetadata, boolean mapMigration) {</b>
+<b class="nc">&nbsp;		this.property = property;</b>
+<b class="nc">&nbsp;		this.lineNumber = determineLineNumber(property);</b>
+<b class="nc">&nbsp;		this.metadata = metadata;</b>
+<b class="nc">&nbsp;		this.replacementMetadata = replacementMetadata;</b>
+<b class="nc">&nbsp;		this.mapMigration = mapMigration;</b>
+<b class="nc">&nbsp;		this.compatibleType = determineCompatibleType(metadata, replacementMetadata);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Integer determineLineNumber(ConfigurationProperty property) {
+<b class="nc">&nbsp;		Origin origin = property.getOrigin();</b>
+<b class="nc">&nbsp;		if (origin instanceof TextResourceOrigin textOrigin) {</b>
+<b class="nc">&nbsp;			if (textOrigin.getLocation() != null) {</b>
+<b class="nc">&nbsp;				return textOrigin.getLocation().getLine() + 1;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean determineCompatibleType(ConfigurationMetadataProperty metadata,
+&nbsp;			ConfigurationMetadataProperty replacementMetadata) {
+<b class="nc">&nbsp;		String currentType = determineType(metadata);</b>
+<b class="nc">&nbsp;		String replacementType = determineType(replacementMetadata);</b>
+<b class="nc">&nbsp;		if (currentType == null || replacementType == null) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (replacementType.equals(currentType)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return replacementType.equals(Duration.class.getName())</b>
+<b class="nc">&nbsp;				&amp;&amp; (currentType.equals(Long.class.getName()) || currentType.equals(Integer.class.getName()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String determineType(ConfigurationMetadataProperty metadata) {
+<b class="nc">&nbsp;		if (metadata == null || metadata.getType() == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String candidate = metadata.getType();</b>
+<b class="nc">&nbsp;		if (candidate.startsWith(Map.class.getName())) {</b>
+<b class="nc">&nbsp;			int lastComma = candidate.lastIndexOf(&#39;,&#39;);</b>
+<b class="nc">&nbsp;			if (lastComma != -1) {</b>
+&nbsp;				// Use Map value type
+<b class="nc">&nbsp;				return candidate.substring(lastComma + 1, candidate.length() - 1).trim();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return candidate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ConfigurationProperty getProperty() {
+<b class="nc">&nbsp;		return this.property;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Integer getLineNumber() {
+<b class="nc">&nbsp;		return this.lineNumber;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ConfigurationMetadataProperty getMetadata() {
+<b class="nc">&nbsp;		return this.metadata;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isCompatibleType() {
+<b class="nc">&nbsp;		return this.compatibleType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getNewPropertyName() {
+<b class="nc">&nbsp;		if (this.mapMigration) {</b>
+<b class="nc">&nbsp;			return getNewMapPropertyName(this.property, this.metadata, this.replacementMetadata).toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.metadata.getDeprecation().getReplacement();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String determineReason() {
+<b class="nc">&nbsp;		if (this.compatibleType) {</b>
+<b class="nc">&nbsp;			return &quot;Replacement: &quot; + getNewPropertyName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Deprecation deprecation = this.metadata.getDeprecation();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(deprecation.getShortReason())) {</b>
+<b class="nc">&nbsp;			return &quot;Reason: &quot; + deprecation.getShortReason();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasText(deprecation.getReplacement())) {</b>
+<b class="nc">&nbsp;			if (this.replacementMetadata != null) {</b>
+<b class="nc">&nbsp;				return String.format(&quot;Reason: Replacement key &#39;%s&#39; uses an incompatible target type&quot;,</b>
+<b class="nc">&nbsp;						deprecation.getReplacement());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return String.format(&quot;Reason: No metadata found for replacement key &#39;%s&#39;&quot;, deprecation.getReplacement());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return &quot;Reason: none&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ConfigurationPropertyName getNewMapPropertyName(ConfigurationProperty property,
+&nbsp;			ConfigurationMetadataProperty metadata, ConfigurationMetadataProperty replacement) {
+<b class="nc">&nbsp;		ConfigurationPropertyName oldName = property.getName();</b>
+<b class="nc">&nbsp;		ConfigurationPropertyName oldPrefix = ConfigurationPropertyName.of(metadata.getId());</b>
+<b class="nc">&nbsp;		Assert.state(oldPrefix.isAncestorOf(oldName),</b>
+<b class="nc">&nbsp;				String.format(&quot;&#39;%s&#39; is not an ancestor of &#39;%s&#39;&quot;, oldPrefix, oldName));</b>
+<b class="nc">&nbsp;		ConfigurationPropertyName newPrefix = ConfigurationPropertyName.of(replacement.getId());</b>
+<b class="nc">&nbsp;		return newPrefix.append(oldName.subName(oldPrefix.getNumberOfElements()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

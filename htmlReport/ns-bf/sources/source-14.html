@@ -1,0 +1,179 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OnResourceCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: OnResourceCondition (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OnResourceCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage.Style;
+&nbsp;import org.springframework.context.annotation.Condition;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.MultiValueMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Condition} that checks for specific resources.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @see ConditionalOnResource
+&nbsp; */
+&nbsp;@Order(Ordered.HIGHEST_PRECEDENCE + 20)
+<b class="nc">&nbsp;class OnResourceCondition extends SpringBootCondition {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;		MultiValueMap&lt;String, Object&gt; attributes = metadata</b>
+<b class="nc">&nbsp;			.getAllAnnotationAttributes(ConditionalOnResource.class.getName(), true);</b>
+<b class="nc">&nbsp;		ResourceLoader loader = context.getResourceLoader();</b>
+<b class="nc">&nbsp;		List&lt;String&gt; locations = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		collectValues(locations, attributes.get(&quot;resources&quot;));</b>
+<b class="nc">&nbsp;		Assert.isTrue(!locations.isEmpty(),</b>
+&nbsp;				&quot;@ConditionalOnResource annotations must specify at least one resource location&quot;);
+<b class="nc">&nbsp;		List&lt;String&gt; missing = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String location : locations) {</b>
+<b class="nc">&nbsp;			String resource = context.getEnvironment().resolvePlaceholders(location);</b>
+<b class="nc">&nbsp;			if (!loader.getResource(resource).exists()) {</b>
+<b class="nc">&nbsp;				missing.add(location);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (!missing.isEmpty()) {</b>
+<b class="nc">&nbsp;			return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnResource.class)</b>
+<b class="nc">&nbsp;				.didNotFind(&quot;resource&quot;, &quot;resources&quot;)</b>
+<b class="nc">&nbsp;				.items(Style.QUOTE, missing));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConditionOutcome.match(ConditionMessage.forCondition(ConditionalOnResource.class)</b>
+<b class="nc">&nbsp;			.found(&quot;location&quot;, &quot;locations&quot;)</b>
+<b class="nc">&nbsp;			.items(locations));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void collectValues(List&lt;String&gt; names, List&lt;Object&gt; values) {
+<b class="nc">&nbsp;		for (Object value : values) {</b>
+<b class="nc">&nbsp;			for (Object item : (Object[]) value) {</b>
+<b class="nc">&nbsp;				names.add((String) item);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,409 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoggersEndpoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: LoggersEndpoint (org.springframework.boot.actuate.logging)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoggersEndpoint</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoggersEndpoint$GroupLoggerLevelsDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LoggersEndpoint$LoggerLevelsDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LoggersEndpoint$LoggersDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LoggersEndpoint$SingleLoggerLevelsDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.logging;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.NavigableSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationResponseBody;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Selector;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+&nbsp;import org.springframework.boot.actuate.logging.LoggersEndpoint.GroupLoggerLevelsDescriptor;
+&nbsp;import org.springframework.boot.actuate.logging.LoggersEndpoint.SingleLoggerLevelsDescriptor;
+&nbsp;import org.springframework.boot.logging.LogLevel;
+&nbsp;import org.springframework.boot.logging.LoggerConfiguration;
+&nbsp;import org.springframework.boot.logging.LoggerConfiguration.ConfigurationScope;
+&nbsp;import org.springframework.boot.logging.LoggerConfiguration.LevelConfiguration;
+&nbsp;import org.springframework.boot.logging.LoggerGroup;
+&nbsp;import org.springframework.boot.logging.LoggerGroups;
+&nbsp;import org.springframework.boot.logging.LoggingSystem;
+&nbsp;import org.springframework.lang.Nullable;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Endpoint @Endpoint} to expose a collection of {@link LoggerConfiguration}s.
+&nbsp; *
+&nbsp; * @author Ben Hale
+&nbsp; * @author Phillip Webb
+&nbsp; * @author HaiTao Zhang
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@Endpoint(id = &quot;loggers&quot;)
+&nbsp;@RegisterReflectionForBinding({ GroupLoggerLevelsDescriptor.class, SingleLoggerLevelsDescriptor.class })
+&nbsp;public class LoggersEndpoint {
+&nbsp;
+&nbsp;	private final LoggingSystem loggingSystem;
+&nbsp;
+&nbsp;	private final LoggerGroups loggerGroups;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LoggersEndpoint} instance.
+&nbsp;	 * @param loggingSystem the logging system to expose
+&nbsp;	 * @param loggerGroups the logger group to expose
+&nbsp;	 */
+<b class="nc">&nbsp;	public LoggersEndpoint(LoggingSystem loggingSystem, LoggerGroups loggerGroups) {</b>
+<b class="nc">&nbsp;		Assert.notNull(loggingSystem, &quot;LoggingSystem must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(loggerGroups, &quot;LoggerGroups must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.loggingSystem = loggingSystem;</b>
+<b class="nc">&nbsp;		this.loggerGroups = loggerGroups;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ReadOperation
+&nbsp;	public LoggersDescriptor loggers() {
+<b class="nc">&nbsp;		Collection&lt;LoggerConfiguration&gt; configurations = this.loggingSystem.getLoggerConfigurations();</b>
+<b class="nc">&nbsp;		if (configurations == null) {</b>
+<b class="nc">&nbsp;			return LoggersDescriptor.NONE;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new LoggersDescriptor(getLevels(), getLoggers(configurations), getGroups());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, GroupLoggerLevelsDescriptor&gt; getGroups() {
+<b class="nc">&nbsp;		Map&lt;String, GroupLoggerLevelsDescriptor&gt; groups = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		this.loggerGroups.forEach((group) -&gt; groups.put(group.getName(),</b>
+<b class="nc">&nbsp;				new GroupLoggerLevelsDescriptor(group.getConfiguredLevel(), group.getMembers())));</b>
+<b class="nc">&nbsp;		return groups;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ReadOperation
+&nbsp;	public LoggerLevelsDescriptor loggerLevels(@Selector String name) {
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		LoggerGroup group = this.loggerGroups.get(name);</b>
+<b class="nc">&nbsp;		if (group != null) {</b>
+<b class="nc">&nbsp;			return new GroupLoggerLevelsDescriptor(group.getConfiguredLevel(), group.getMembers());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		LoggerConfiguration configuration = this.loggingSystem.getLoggerConfiguration(name);</b>
+<b class="nc">&nbsp;		return (configuration != null) ? new SingleLoggerLevelsDescriptor(configuration) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@WriteOperation
+&nbsp;	public void configureLogLevel(@Selector String name, @Nullable LogLevel configuredLevel) {
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be empty&quot;);</b>
+<b class="nc">&nbsp;		LoggerGroup group = this.loggerGroups.get(name);</b>
+<b class="nc">&nbsp;		if (group != null &amp;&amp; group.hasMembers()) {</b>
+<b class="nc">&nbsp;			group.configureLogLevel(configuredLevel, this.loggingSystem::setLogLevel);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		this.loggingSystem.setLogLevel(name, configuredLevel);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private NavigableSet&lt;LogLevel&gt; getLevels() {
+<b class="nc">&nbsp;		Set&lt;LogLevel&gt; levels = this.loggingSystem.getSupportedLogLevels();</b>
+<b class="nc">&nbsp;		return new TreeSet&lt;&gt;(levels).descendingSet();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, LoggerLevelsDescriptor&gt; getLoggers(Collection&lt;LoggerConfiguration&gt; configurations) {
+<b class="nc">&nbsp;		Map&lt;String, LoggerLevelsDescriptor&gt; loggers = new LinkedHashMap&lt;&gt;(configurations.size());</b>
+<b class="nc">&nbsp;		for (LoggerConfiguration configuration : configurations) {</b>
+<b class="nc">&nbsp;			loggers.put(configuration.getName(), new SingleLoggerLevelsDescriptor(configuration));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return loggers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of loggers.
+&nbsp;	 */
+&nbsp;	public static class LoggersDescriptor implements OperationResponseBody {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Empty description.
+&nbsp;		 */
+<b class="nc">&nbsp;		public static final LoggersDescriptor NONE = new LoggersDescriptor(null, null, null);</b>
+&nbsp;
+&nbsp;		private final NavigableSet&lt;LogLevel&gt; levels;
+&nbsp;
+&nbsp;		private final Map&lt;String, LoggerLevelsDescriptor&gt; loggers;
+&nbsp;
+&nbsp;		private final Map&lt;String, GroupLoggerLevelsDescriptor&gt; groups;
+&nbsp;
+&nbsp;		public LoggersDescriptor(NavigableSet&lt;LogLevel&gt; levels, Map&lt;String, LoggerLevelsDescriptor&gt; loggers,
+<b class="nc">&nbsp;				Map&lt;String, GroupLoggerLevelsDescriptor&gt; groups) {</b>
+<b class="nc">&nbsp;			this.levels = levels;</b>
+<b class="nc">&nbsp;			this.loggers = loggers;</b>
+<b class="nc">&nbsp;			this.groups = groups;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public NavigableSet&lt;LogLevel&gt; getLevels() {
+<b class="nc">&nbsp;			return this.levels;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, LoggerLevelsDescriptor&gt; getLoggers() {
+<b class="nc">&nbsp;			return this.loggers;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, GroupLoggerLevelsDescriptor&gt; getGroups() {
+<b class="nc">&nbsp;			return this.groups;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of levels configured for a given logger.
+&nbsp;	 */
+&nbsp;	public static class LoggerLevelsDescriptor implements OperationResponseBody {
+&nbsp;
+&nbsp;		private final String configuredLevel;
+&nbsp;
+<b class="nc">&nbsp;		public LoggerLevelsDescriptor(LogLevel configuredLevel) {</b>
+<b class="nc">&nbsp;			this.configuredLevel = (configuredLevel != null) ? configuredLevel.name() : null;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		LoggerLevelsDescriptor(LevelConfiguration directConfiguration) {</b>
+<b class="nc">&nbsp;			this.configuredLevel = (directConfiguration != null) ? directConfiguration.getName() : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected final String getName(LogLevel level) {
+<b class="nc">&nbsp;			return (level != null) ? level.name() : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getConfiguredLevel() {
+<b class="nc">&nbsp;			return this.configuredLevel;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of levels configured for a given group logger.
+&nbsp;	 */
+&nbsp;	public static class GroupLoggerLevelsDescriptor extends LoggerLevelsDescriptor {
+&nbsp;
+&nbsp;		private final List&lt;String&gt; members;
+&nbsp;
+&nbsp;		public GroupLoggerLevelsDescriptor(LogLevel configuredLevel, List&lt;String&gt; members) {
+<b class="nc">&nbsp;			super(configuredLevel);</b>
+<b class="nc">&nbsp;			this.members = members;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public List&lt;String&gt; getMembers() {
+<b class="nc">&nbsp;			return this.members;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of levels configured for a given single logger.
+&nbsp;	 */
+&nbsp;	public static class SingleLoggerLevelsDescriptor extends LoggerLevelsDescriptor {
+&nbsp;
+&nbsp;		private final String effectiveLevel;
+&nbsp;
+&nbsp;		public SingleLoggerLevelsDescriptor(LoggerConfiguration configuration) {
+<b class="nc">&nbsp;			super(configuration.getLevelConfiguration(ConfigurationScope.DIRECT));</b>
+<b class="nc">&nbsp;			this.effectiveLevel = configuration.getLevelConfiguration().getName();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getEffectiveLevel() {
+<b class="nc">&nbsp;			return this.effectiveLevel;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

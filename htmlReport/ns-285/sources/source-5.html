@@ -1,0 +1,791 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BootZipCopyAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.tasks.bundling</a>
+</div>
+
+<h1>Coverage Summary for Class: BootZipCopyAction (org.springframework.boot.gradle.tasks.bundling)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BootZipCopyAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BootZipCopyAction$CrcAndSize</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BootZipCopyAction$Processor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/155)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BootZipCopyAction$ZipEntryContentWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BootZipCopyAction$ZipEntryCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/231)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.tasks.bundling;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.OffsetDateTime;
+&nbsp;import java.time.ZoneOffset;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.zip.CRC32;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;
+&nbsp;import org.apache.commons.compress.archivers.zip.UnixStat;
+&nbsp;import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+&nbsp;import org.gradle.api.GradleException;
+&nbsp;import org.gradle.api.file.FileCopyDetails;
+&nbsp;import org.gradle.api.file.FileTreeElement;
+&nbsp;import org.gradle.api.internal.file.copy.CopyAction;
+&nbsp;import org.gradle.api.internal.file.copy.CopyActionProcessingStream;
+&nbsp;import org.gradle.api.java.archives.Attributes;
+&nbsp;import org.gradle.api.java.archives.Manifest;
+&nbsp;import org.gradle.api.specs.Spec;
+&nbsp;import org.gradle.api.tasks.WorkResult;
+&nbsp;import org.gradle.api.tasks.WorkResults;
+&nbsp;import org.gradle.util.GradleVersion;
+&nbsp;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.ResolvedDependencies.DependencyDescriptor;
+&nbsp;import org.springframework.boot.loader.tools.DefaultLaunchScript;
+&nbsp;import org.springframework.boot.loader.tools.FileUtils;
+&nbsp;import org.springframework.boot.loader.tools.JarModeLibrary;
+&nbsp;import org.springframework.boot.loader.tools.Layer;
+&nbsp;import org.springframework.boot.loader.tools.LayersIndex;
+&nbsp;import org.springframework.boot.loader.tools.LibraryCoordinates;
+&nbsp;import org.springframework.boot.loader.tools.LoaderImplementation;
+&nbsp;import org.springframework.boot.loader.tools.NativeImageArgFile;
+&nbsp;import org.springframework.boot.loader.tools.ReachabilityMetadataProperties;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link CopyAction} for creating a Spring Boot zip archive (typically a jar or war).
+&nbsp; * Stores jar files without compression as required by Spring Boot&#39;s loader.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;class BootZipCopyAction implements CopyAction {
+&nbsp;
+<b class="nc">&nbsp;	static final long CONSTANT_TIME_FOR_ZIP_ENTRIES = OffsetDateTime.of(1980, 2, 1, 0, 0, 0, 0, ZoneOffset.UTC)</b>
+<b class="nc">&nbsp;		.toInstant()</b>
+<b class="nc">&nbsp;		.toEpochMilli();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern REACHABILITY_METADATA_PROPERTIES_LOCATION_PATTERN = Pattern</b>
+<b class="nc">&nbsp;		.compile(ReachabilityMetadataProperties.REACHABILITY_METADATA_PROPERTIES_LOCATION_TEMPLATE.formatted(&quot;.*&quot;, &quot;.*&quot;,</b>
+&nbsp;				&quot;.*&quot;));
+&nbsp;
+&nbsp;	private final File output;
+&nbsp;
+&nbsp;	private final Manifest manifest;
+&nbsp;
+&nbsp;	private final boolean preserveFileTimestamps;
+&nbsp;
+&nbsp;	private final Integer dirMode;
+&nbsp;
+&nbsp;	private final Integer fileMode;
+&nbsp;
+&nbsp;	private final boolean includeDefaultLoader;
+&nbsp;
+&nbsp;	private final String layerToolsLocation;
+&nbsp;
+&nbsp;	private final Spec&lt;FileTreeElement&gt; requiresUnpack;
+&nbsp;
+&nbsp;	private final Spec&lt;FileTreeElement&gt; exclusions;
+&nbsp;
+&nbsp;	private final LaunchScriptConfiguration launchScript;
+&nbsp;
+&nbsp;	private final Spec&lt;FileCopyDetails&gt; librarySpec;
+&nbsp;
+&nbsp;	private final Function&lt;FileCopyDetails, ZipCompression&gt; compressionResolver;
+&nbsp;
+&nbsp;	private final String encoding;
+&nbsp;
+&nbsp;	private final ResolvedDependencies resolvedDependencies;
+&nbsp;
+&nbsp;	private final boolean supportsSignatureFile;
+&nbsp;
+&nbsp;	private final LayerResolver layerResolver;
+&nbsp;
+&nbsp;	private final LoaderImplementation loaderImplementation;
+&nbsp;
+&nbsp;	BootZipCopyAction(File output, Manifest manifest, boolean preserveFileTimestamps, Integer dirMode, Integer fileMode,
+&nbsp;			boolean includeDefaultLoader, String layerToolsLocation, Spec&lt;FileTreeElement&gt; requiresUnpack,
+&nbsp;			Spec&lt;FileTreeElement&gt; exclusions, LaunchScriptConfiguration launchScript, Spec&lt;FileCopyDetails&gt; librarySpec,
+&nbsp;			Function&lt;FileCopyDetails, ZipCompression&gt; compressionResolver, String encoding,
+&nbsp;			ResolvedDependencies resolvedDependencies, boolean supportsSignatureFile, LayerResolver layerResolver,
+<b class="nc">&nbsp;			LoaderImplementation loaderImplementation) {</b>
+<b class="nc">&nbsp;		this.output = output;</b>
+<b class="nc">&nbsp;		this.manifest = manifest;</b>
+<b class="nc">&nbsp;		this.preserveFileTimestamps = preserveFileTimestamps;</b>
+<b class="nc">&nbsp;		this.dirMode = dirMode;</b>
+<b class="nc">&nbsp;		this.fileMode = fileMode;</b>
+<b class="nc">&nbsp;		this.includeDefaultLoader = includeDefaultLoader;</b>
+<b class="nc">&nbsp;		this.layerToolsLocation = layerToolsLocation;</b>
+<b class="nc">&nbsp;		this.requiresUnpack = requiresUnpack;</b>
+<b class="nc">&nbsp;		this.exclusions = exclusions;</b>
+<b class="nc">&nbsp;		this.launchScript = launchScript;</b>
+<b class="nc">&nbsp;		this.librarySpec = librarySpec;</b>
+<b class="nc">&nbsp;		this.compressionResolver = compressionResolver;</b>
+<b class="nc">&nbsp;		this.encoding = encoding;</b>
+<b class="nc">&nbsp;		this.resolvedDependencies = resolvedDependencies;</b>
+<b class="nc">&nbsp;		this.supportsSignatureFile = supportsSignatureFile;</b>
+<b class="nc">&nbsp;		this.layerResolver = layerResolver;</b>
+<b class="nc">&nbsp;		this.loaderImplementation = loaderImplementation;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public WorkResult execute(CopyActionProcessingStream copyActions) {
+&nbsp;		try {
+<b class="nc">&nbsp;			writeArchive(copyActions);</b>
+<b class="nc">&nbsp;			return WorkResults.didWork(true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new GradleException(&quot;Failed to create &quot; + this.output, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeArchive(CopyActionProcessingStream copyActions) throws IOException {
+<b class="nc">&nbsp;		OutputStream output = new FileOutputStream(this.output);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			writeArchive(copyActions, output);</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			closeQuietly(output);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeArchive(CopyActionProcessingStream copyActions, OutputStream output) throws IOException {
+<b class="nc">&nbsp;		ZipArchiveOutputStream zipOutput = new ZipArchiveOutputStream(output);</b>
+<b class="nc">&nbsp;		writeLaunchScriptIfNecessary(zipOutput);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			setEncodingIfNecessary(zipOutput);</b>
+<b class="nc">&nbsp;			Processor processor = new Processor(zipOutput);</b>
+<b class="nc">&nbsp;			copyActions.process(processor::process);</b>
+<b class="nc">&nbsp;			processor.finish();</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			closeQuietly(zipOutput);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeLaunchScriptIfNecessary(ZipArchiveOutputStream outputStream) {
+<b class="nc">&nbsp;		if (this.launchScript == null) {</b>
+&nbsp;			return;
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			File file = this.launchScript.getScript();</b>
+<b class="nc">&nbsp;			Map&lt;String, String&gt; properties = this.launchScript.getProperties();</b>
+<b class="nc">&nbsp;			outputStream.writePreamble(new DefaultLaunchScript(file, properties).toByteArray());</b>
+<b class="nc">&nbsp;			this.output.setExecutable(true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new GradleException(&quot;Failed to write launch script to &quot; + this.output, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setEncodingIfNecessary(ZipArchiveOutputStream zipOutputStream) {
+<b class="nc">&nbsp;		if (this.encoding != null) {</b>
+<b class="nc">&nbsp;			zipOutputStream.setEncoding(this.encoding);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void closeQuietly(OutputStream outputStream) {
+&nbsp;		try {
+<b class="nc">&nbsp;			outputStream.close();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Internal process used to copy {@link FileCopyDetails file details} to the zip file.
+&nbsp;	 */
+&nbsp;	private class Processor {
+&nbsp;
+&nbsp;		private final ZipArchiveOutputStream out;
+&nbsp;
+&nbsp;		private final LayersIndex layerIndex;
+&nbsp;
+&nbsp;		private LoaderZipEntries.WrittenEntries writtenLoaderEntries;
+&nbsp;
+<b class="nc">&nbsp;		private final Set&lt;String&gt; writtenDirectories = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, FileCopyDetails&gt; writtenLibraries = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, FileCopyDetails&gt; reachabilityMetadataProperties = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		Processor(ZipArchiveOutputStream out) {</b>
+<b class="nc">&nbsp;			this.out = out;</b>
+<b class="nc">&nbsp;			this.layerIndex = (BootZipCopyAction.this.layerResolver != null)</b>
+<b class="nc">&nbsp;					? new LayersIndex(BootZipCopyAction.this.layerResolver.getLayers()) : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void process(FileCopyDetails details) {
+<b class="nc">&nbsp;			if (skipProcessing(details)) {</b>
+&nbsp;				return;
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				writeLoaderEntriesIfNecessary(details);</b>
+<b class="nc">&nbsp;				if (details.isDirectory()) {</b>
+<b class="nc">&nbsp;					processDirectory(details);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					processFile(details);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new GradleException(&quot;Failed to add &quot; + details + &quot; to &quot; + BootZipCopyAction.this.output, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean skipProcessing(FileCopyDetails details) {
+<b class="nc">&nbsp;			return BootZipCopyAction.this.exclusions.isSatisfiedBy(details)</b>
+<b class="nc">&nbsp;					|| (this.writtenLoaderEntries != null &amp;&amp; this.writtenLoaderEntries.isWrittenDirectory(details));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void processDirectory(FileCopyDetails details) throws IOException {
+<b class="nc">&nbsp;			String name = details.getRelativePath().getPathString();</b>
+<b class="nc">&nbsp;			ZipArchiveEntry entry = new ZipArchiveEntry(name + &#39;/&#39;);</b>
+<b class="nc">&nbsp;			prepareEntry(entry, name, getTime(details), getFileMode(details));</b>
+<b class="nc">&nbsp;			this.out.putArchiveEntry(entry);</b>
+<b class="nc">&nbsp;			this.out.closeArchiveEntry();</b>
+<b class="nc">&nbsp;			this.writtenDirectories.add(name);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void processFile(FileCopyDetails details) throws IOException {
+<b class="nc">&nbsp;			String name = details.getRelativePath().getPathString();</b>
+<b class="nc">&nbsp;			ZipArchiveEntry entry = new ZipArchiveEntry(name);</b>
+<b class="nc">&nbsp;			prepareEntry(entry, name, getTime(details), getFileMode(details));</b>
+<b class="nc">&nbsp;			ZipCompression compression = BootZipCopyAction.this.compressionResolver.apply(details);</b>
+<b class="nc">&nbsp;			if (compression == ZipCompression.STORED) {</b>
+<b class="nc">&nbsp;				prepareStoredEntry(details, entry);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.out.putArchiveEntry(entry);</b>
+<b class="nc">&nbsp;			details.copyTo(this.out);</b>
+<b class="nc">&nbsp;			this.out.closeArchiveEntry();</b>
+<b class="nc">&nbsp;			if (BootZipCopyAction.this.librarySpec.isSatisfiedBy(details)) {</b>
+<b class="nc">&nbsp;				this.writtenLibraries.put(name, details);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (REACHABILITY_METADATA_PROPERTIES_LOCATION_PATTERN.matcher(name).matches()) {</b>
+<b class="nc">&nbsp;				this.reachabilityMetadataProperties.put(name, details);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (BootZipCopyAction.this.layerResolver != null) {</b>
+<b class="nc">&nbsp;				Layer layer = BootZipCopyAction.this.layerResolver.getLayer(details);</b>
+<b class="nc">&nbsp;				this.layerIndex.add(layer, name);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeParentDirectoriesIfNecessary(String name, Long time) throws IOException {
+<b class="nc">&nbsp;			String parentDirectory = getParentDirectory(name);</b>
+<b class="nc">&nbsp;			if (parentDirectory != null &amp;&amp; this.writtenDirectories.add(parentDirectory)) {</b>
+<b class="nc">&nbsp;				ZipArchiveEntry entry = new ZipArchiveEntry(parentDirectory + &#39;/&#39;);</b>
+<b class="nc">&nbsp;				prepareEntry(entry, parentDirectory, time, getDirMode());</b>
+<b class="nc">&nbsp;				this.out.putArchiveEntry(entry);</b>
+<b class="nc">&nbsp;				this.out.closeArchiveEntry();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getParentDirectory(String name) {
+<b class="nc">&nbsp;			int lastSlash = name.lastIndexOf(&#39;/&#39;);</b>
+<b class="nc">&nbsp;			if (lastSlash == -1) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return name.substring(0, lastSlash);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void finish() throws IOException {
+<b class="nc">&nbsp;			writeLoaderEntriesIfNecessary(null);</b>
+<b class="nc">&nbsp;			writeJarToolsIfNecessary();</b>
+<b class="nc">&nbsp;			writeSignatureFileIfNecessary();</b>
+<b class="nc">&nbsp;			writeClassPathIndexIfNecessary();</b>
+<b class="nc">&nbsp;			writeNativeImageArgFileIfNecessary();</b>
+&nbsp;			// We must write the layer index last
+<b class="nc">&nbsp;			writeLayersIndexIfNecessary();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeLoaderEntriesIfNecessary(FileCopyDetails details) throws IOException {
+<b class="nc">&nbsp;			if (!BootZipCopyAction.this.includeDefaultLoader || this.writtenLoaderEntries != null) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			if (isInMetaInf(details)) {</b>
+&nbsp;				// Always write loader entries after META-INF directory (see gh-16698)
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			LoaderZipEntries loaderEntries = new LoaderZipEntries(getTime(), getDirMode(), getFileMode(),</b>
+&nbsp;					BootZipCopyAction.this.loaderImplementation);
+<b class="nc">&nbsp;			this.writtenLoaderEntries = loaderEntries.writeTo(this.out);</b>
+<b class="nc">&nbsp;			if (BootZipCopyAction.this.layerResolver != null) {</b>
+<b class="nc">&nbsp;				for (String name : this.writtenLoaderEntries.getFiles()) {</b>
+<b class="nc">&nbsp;					Layer layer = BootZipCopyAction.this.layerResolver.getLayer(name);</b>
+<b class="nc">&nbsp;					this.layerIndex.add(layer, name);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isInMetaInf(FileCopyDetails details) {
+<b class="nc">&nbsp;			if (details == null) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String[] segments = details.getRelativePath().getSegments();</b>
+<b class="nc">&nbsp;			return segments.length &gt; 0 &amp;&amp; &quot;META-INF&quot;.equals(segments[0]);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeJarToolsIfNecessary() throws IOException {
+<b class="nc">&nbsp;			if (BootZipCopyAction.this.layerToolsLocation != null) {</b>
+<b class="nc">&nbsp;				writeJarModeLibrary(BootZipCopyAction.this.layerToolsLocation, JarModeLibrary.LAYER_TOOLS);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeJarModeLibrary(String location, JarModeLibrary library) throws IOException {
+<b class="nc">&nbsp;			String name = location + library.getName();</b>
+<b class="nc">&nbsp;			writeEntry(name, ZipEntryContentWriter.fromInputStream(library.openStream()), false,</b>
+<b class="nc">&nbsp;					(entry) -&gt; prepareStoredEntry(library.openStream(), entry));</b>
+<b class="nc">&nbsp;			if (BootZipCopyAction.this.layerResolver != null) {</b>
+<b class="nc">&nbsp;				Layer layer = BootZipCopyAction.this.layerResolver.getLayer(library);</b>
+<b class="nc">&nbsp;				this.layerIndex.add(layer, name);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeSignatureFileIfNecessary() throws IOException {
+<b class="nc">&nbsp;			if (BootZipCopyAction.this.supportsSignatureFile &amp;&amp; hasSignedLibrary()) {</b>
+<b class="nc">&nbsp;				writeEntry(&quot;META-INF/BOOT.SF&quot;, (out) -&gt; {</b>
+<b class="nc">&nbsp;				}, false);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean hasSignedLibrary() throws IOException {
+<b class="nc">&nbsp;			for (FileCopyDetails writtenLibrary : this.writtenLibraries.values()) {</b>
+<b class="nc">&nbsp;				if (FileUtils.isSignedJarFile(writtenLibrary.getFile())) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeClassPathIndexIfNecessary() throws IOException {
+<b class="nc">&nbsp;			Attributes manifestAttributes = BootZipCopyAction.this.manifest.getAttributes();</b>
+<b class="nc">&nbsp;			String classPathIndex = (String) manifestAttributes.get(&quot;Spring-Boot-Classpath-Index&quot;);</b>
+<b class="nc">&nbsp;			if (classPathIndex != null) {</b>
+<b class="nc">&nbsp;				Set&lt;String&gt; libraryNames = this.writtenLibraries.keySet();</b>
+<b class="nc">&nbsp;				List&lt;String&gt; lines = libraryNames.stream().map((line) -&gt; &quot;- \&quot;&quot; + line + &quot;\&quot;&quot;).toList();</b>
+<b class="nc">&nbsp;				ZipEntryContentWriter writer = ZipEntryContentWriter.fromLines(BootZipCopyAction.this.encoding, lines);</b>
+<b class="nc">&nbsp;				writeEntry(classPathIndex, writer, true);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeNativeImageArgFileIfNecessary() throws IOException {
+<b class="nc">&nbsp;			Set&lt;String&gt; excludes = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (Map.Entry&lt;String, FileCopyDetails&gt; entry : this.writtenLibraries.entrySet()) {</b>
+<b class="nc">&nbsp;				DependencyDescriptor descriptor = BootZipCopyAction.this.resolvedDependencies</b>
+<b class="nc">&nbsp;					.find(entry.getValue().getFile());</b>
+<b class="nc">&nbsp;				LibraryCoordinates coordinates = (descriptor != null) ? descriptor.getCoordinates() : null;</b>
+<b class="nc">&nbsp;				FileCopyDetails propertiesFile = (coordinates != null) ? this.reachabilityMetadataProperties</b>
+<b class="nc">&nbsp;					.get(ReachabilityMetadataProperties.getLocation(coordinates)) : null;</b>
+<b class="nc">&nbsp;				if (propertiesFile != null) {</b>
+<b class="nc">&nbsp;					try (InputStream inputStream = propertiesFile.open()) {</b>
+<b class="nc">&nbsp;						ReachabilityMetadataProperties properties = ReachabilityMetadataProperties</b>
+<b class="nc">&nbsp;							.fromInputStream(inputStream);</b>
+<b class="nc">&nbsp;						if (properties.isOverridden()) {</b>
+<b class="nc">&nbsp;							excludes.add(entry.getKey());</b>
+&nbsp;						}
+<b class="nc">&nbsp;					}</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			NativeImageArgFile argFile = new NativeImageArgFile(excludes);</b>
+<b class="nc">&nbsp;			argFile.writeIfNecessary((lines) -&gt; {</b>
+<b class="nc">&nbsp;				ZipEntryContentWriter writer = ZipEntryContentWriter.fromLines(BootZipCopyAction.this.encoding, lines);</b>
+<b class="nc">&nbsp;				writeEntry(NativeImageArgFile.LOCATION, writer, true);</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeLayersIndexIfNecessary() throws IOException {
+<b class="nc">&nbsp;			if (BootZipCopyAction.this.layerResolver != null) {</b>
+<b class="nc">&nbsp;				Attributes manifestAttributes = BootZipCopyAction.this.manifest.getAttributes();</b>
+<b class="nc">&nbsp;				String name = (String) manifestAttributes.get(&quot;Spring-Boot-Layers-Index&quot;);</b>
+<b class="nc">&nbsp;				Assert.state(StringUtils.hasText(name), &quot;Missing layer index manifest attribute&quot;);</b>
+<b class="nc">&nbsp;				Layer layer = BootZipCopyAction.this.layerResolver.getLayer(name);</b>
+<b class="nc">&nbsp;				this.layerIndex.add(layer, name);</b>
+<b class="nc">&nbsp;				writeEntry(name, this.layerIndex::writeTo, false);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeEntry(String name, ZipEntryContentWriter entryWriter, boolean addToLayerIndex)
+&nbsp;				throws IOException {
+<b class="nc">&nbsp;			writeEntry(name, entryWriter, addToLayerIndex, ZipEntryCustomizer.NONE);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void writeEntry(String name, ZipEntryContentWriter entryWriter, boolean addToLayerIndex,
+&nbsp;				ZipEntryCustomizer entryCustomizer) throws IOException {
+<b class="nc">&nbsp;			ZipArchiveEntry entry = new ZipArchiveEntry(name);</b>
+<b class="nc">&nbsp;			prepareEntry(entry, name, getTime(), getFileMode());</b>
+<b class="nc">&nbsp;			entryCustomizer.customize(entry);</b>
+<b class="nc">&nbsp;			this.out.putArchiveEntry(entry);</b>
+<b class="nc">&nbsp;			entryWriter.writeTo(this.out);</b>
+<b class="nc">&nbsp;			this.out.closeArchiveEntry();</b>
+<b class="nc">&nbsp;			if (addToLayerIndex &amp;&amp; BootZipCopyAction.this.layerResolver != null) {</b>
+<b class="nc">&nbsp;				Layer layer = BootZipCopyAction.this.layerResolver.getLayer(name);</b>
+<b class="nc">&nbsp;				this.layerIndex.add(layer, name);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void prepareEntry(ZipArchiveEntry entry, String name, Long time, int mode) throws IOException {
+<b class="nc">&nbsp;			writeParentDirectoriesIfNecessary(name, time);</b>
+<b class="nc">&nbsp;			entry.setUnixMode(mode);</b>
+<b class="nc">&nbsp;			if (time != null) {</b>
+<b class="nc">&nbsp;				entry.setTime(DefaultTimeZoneOffset.INSTANCE.removeFrom(time));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void prepareStoredEntry(FileCopyDetails details, ZipArchiveEntry archiveEntry) throws IOException {
+<b class="nc">&nbsp;			prepareStoredEntry(details.open(), archiveEntry);</b>
+<b class="nc">&nbsp;			if (BootZipCopyAction.this.requiresUnpack.isSatisfiedBy(details)) {</b>
+<b class="nc">&nbsp;				archiveEntry.setComment(&quot;UNPACK:&quot; + FileUtils.sha1Hash(details.getFile()));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void prepareStoredEntry(InputStream input, ZipArchiveEntry archiveEntry) throws IOException {
+<b class="nc">&nbsp;			new CrcAndSize(input).setUpStoredEntry(archiveEntry);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Long getTime() {
+<b class="nc">&nbsp;			return getTime(null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Long getTime(FileCopyDetails details) {
+<b class="nc">&nbsp;			if (!BootZipCopyAction.this.preserveFileTimestamps) {</b>
+<b class="nc">&nbsp;				return CONSTANT_TIME_FOR_ZIP_ENTRIES;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (details != null) {</b>
+<b class="nc">&nbsp;				return details.getLastModified();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int getDirMode() {
+<b class="nc">&nbsp;			return (BootZipCopyAction.this.dirMode != null) ? BootZipCopyAction.this.dirMode</b>
+<b class="nc">&nbsp;					: UnixStat.DIR_FLAG | UnixStat.DEFAULT_DIR_PERM;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int getFileMode() {
+<b class="nc">&nbsp;			return (BootZipCopyAction.this.fileMode != null) ? BootZipCopyAction.this.fileMode</b>
+<b class="nc">&nbsp;					: UnixStat.FILE_FLAG | UnixStat.DEFAULT_FILE_PERM;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int getFileMode(FileCopyDetails details) {
+<b class="nc">&nbsp;			return (BootZipCopyAction.this.fileMode != null) ? BootZipCopyAction.this.fileMode</b>
+<b class="nc">&nbsp;					: UnixStat.FILE_FLAG | getPermissions(details);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int getPermissions(FileCopyDetails details) {
+<b class="nc">&nbsp;			if (GradleVersion.current().compareTo(GradleVersion.version(&quot;8.3&quot;)) &gt;= 0) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					Method getPermissionsMethod = details.getClass().getMethod(&quot;getPermissions&quot;);</b>
+<b class="nc">&nbsp;					getPermissionsMethod.setAccessible(true);</b>
+<b class="nc">&nbsp;					Object permissions = getPermissionsMethod.invoke(details);</b>
+<b class="nc">&nbsp;					return (int) permissions.getClass().getMethod(&quot;toUnixNumeric&quot;).invoke(permissions);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (Exception ex) {</b>
+<b class="nc">&nbsp;					throw new GradleException(&quot;Failed to get permissions&quot;, ex);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return details.getMode();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Callback interface used to customize a {@link ZipArchiveEntry}.
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	private interface ZipEntryCustomizer {
+&nbsp;
+<b class="nc">&nbsp;		ZipEntryCustomizer NONE = (entry) -&gt; {</b>
+<b class="nc">&nbsp;		};</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Customize the entry.
+&nbsp;		 * @param entry the entry to customize
+&nbsp;		 * @throws IOException on IO error
+&nbsp;		 */
+&nbsp;		void customize(ZipArchiveEntry entry) throws IOException;
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Callback used to write a zip entry data.
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	private interface ZipEntryContentWriter {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Write the entry data.
+&nbsp;		 * @param out the output stream used to write the data
+&nbsp;		 * @throws IOException on IO error
+&nbsp;		 */
+&nbsp;		void writeTo(ZipArchiveOutputStream out) throws IOException;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Create a new {@link ZipEntryContentWriter} that will copy content from the
+&nbsp;		 * given {@link InputStream}.
+&nbsp;		 * @param in the source input stream
+&nbsp;		 * @return a new {@link ZipEntryContentWriter} instance
+&nbsp;		 */
+&nbsp;		static ZipEntryContentWriter fromInputStream(InputStream in) {
+<b class="nc">&nbsp;			return (out) -&gt; {</b>
+<b class="nc">&nbsp;				StreamUtils.copy(in, out);</b>
+<b class="nc">&nbsp;				in.close();</b>
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Create a new {@link ZipEntryContentWriter} that will copy content from the
+&nbsp;		 * given lines.
+&nbsp;		 * @param encoding the required character encoding
+&nbsp;		 * @param lines the lines to write
+&nbsp;		 * @return a new {@link ZipEntryContentWriter} instance
+&nbsp;		 */
+&nbsp;		static ZipEntryContentWriter fromLines(String encoding, Collection&lt;String&gt; lines) {
+<b class="nc">&nbsp;			return (out) -&gt; {</b>
+<b class="nc">&nbsp;				OutputStreamWriter writer = new OutputStreamWriter(out, encoding);</b>
+<b class="nc">&nbsp;				for (String line : lines) {</b>
+<b class="nc">&nbsp;					writer.append(line).append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				writer.flush();</b>
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Data holder for CRC and Size.
+&nbsp;	 */
+&nbsp;	private static class CrcAndSize {
+&nbsp;
+&nbsp;		private static final int BUFFER_SIZE = 32 * 1024;
+&nbsp;
+<b class="nc">&nbsp;		private final CRC32 crc = new CRC32();</b>
+&nbsp;
+&nbsp;		private long size;
+&nbsp;
+<b class="nc">&nbsp;		CrcAndSize(InputStream inputStream) throws IOException {</b>
+<b class="nc">&nbsp;			try (inputStream) {</b>
+<b class="nc">&nbsp;				load(inputStream);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void load(InputStream inputStream) throws IOException {
+<b class="nc">&nbsp;			byte[] buffer = new byte[BUFFER_SIZE];</b>
+&nbsp;			int bytesRead;
+<b class="nc">&nbsp;			while ((bytesRead = inputStream.read(buffer)) != -1) {</b>
+<b class="nc">&nbsp;				this.crc.update(buffer, 0, bytesRead);</b>
+<b class="nc">&nbsp;				this.size += bytesRead;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		void setUpStoredEntry(ZipArchiveEntry entry) {
+<b class="nc">&nbsp;			entry.setSize(this.size);</b>
+<b class="nc">&nbsp;			entry.setCompressedSize(this.size);</b>
+<b class="nc">&nbsp;			entry.setCrc(this.crc.getValue());</b>
+<b class="nc">&nbsp;			entry.setMethod(ZipEntry.STORED);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

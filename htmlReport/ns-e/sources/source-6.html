@@ -1,0 +1,248 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReactiveTokenValidator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.cloudfoundry.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: ReactiveTokenValidator (org.springframework.boot.actuate.autoconfigure.cloudfoundry.reactive)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReactiveTokenValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.cloudfoundry.reactive;
+&nbsp;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.security.KeyFactory;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.security.PublicKey;
+&nbsp;import java.security.Signature;
+&nbsp;import java.security.spec.InvalidKeySpecException;
+&nbsp;import java.security.spec.X509EncodedKeySpec;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException.Reason;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.Token;
+&nbsp;
+&nbsp;/**
+&nbsp; * Validator used to ensure that a signed {@link Token} has not been tampered with.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class ReactiveTokenValidator {
+&nbsp;
+&nbsp;	private final ReactiveCloudFoundrySecurityService securityService;
+&nbsp;
+<b class="nc">&nbsp;	private volatile Map&lt;String, String&gt; cachedTokenKeys = Collections.emptyMap();</b>
+&nbsp;
+<b class="nc">&nbsp;	ReactiveTokenValidator(ReactiveCloudFoundrySecurityService securityService) {</b>
+<b class="nc">&nbsp;		this.securityService = securityService;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Mono&lt;Void&gt; validate(Token token) {
+<b class="nc">&nbsp;		return validateAlgorithm(token).then(validateKeyIdAndSignature(token))</b>
+<b class="nc">&nbsp;			.then(validateExpiry(token))</b>
+<b class="nc">&nbsp;			.then(validateIssuer(token))</b>
+<b class="nc">&nbsp;			.then(validateAudience(token));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;Void&gt; validateAlgorithm(Token token) {
+<b class="nc">&nbsp;		String algorithm = token.getSignatureAlgorithm();</b>
+<b class="nc">&nbsp;		if (algorithm == null) {</b>
+<b class="nc">&nbsp;			return Mono.error(new CloudFoundryAuthorizationException(Reason.INVALID_SIGNATURE,</b>
+&nbsp;					&quot;Signing algorithm cannot be null&quot;));
+&nbsp;		}
+<b class="nc">&nbsp;		if (!algorithm.equals(&quot;RS256&quot;)) {</b>
+<b class="nc">&nbsp;			return Mono.error(new CloudFoundryAuthorizationException(Reason.UNSUPPORTED_TOKEN_SIGNING_ALGORITHM,</b>
+&nbsp;					&quot;Signing algorithm &quot; + algorithm + &quot; not supported&quot;));
+&nbsp;		}
+<b class="nc">&nbsp;		return Mono.empty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;Void&gt; validateKeyIdAndSignature(Token token) {
+<b class="nc">&nbsp;		return getTokenKey(token).filter((tokenKey) -&gt; hasValidSignature(token, tokenKey))</b>
+<b class="nc">&nbsp;			.switchIfEmpty(Mono.error(new CloudFoundryAuthorizationException(Reason.INVALID_SIGNATURE,</b>
+&nbsp;					&quot;RSA Signature did not match content&quot;)))
+<b class="nc">&nbsp;			.then();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;String&gt; getTokenKey(Token token) {
+<b class="nc">&nbsp;		String keyId = token.getKeyId();</b>
+<b class="nc">&nbsp;		String cached = this.cachedTokenKeys.get(keyId);</b>
+<b class="nc">&nbsp;		if (cached != null) {</b>
+<b class="nc">&nbsp;			return Mono.just(cached);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.securityService.fetchTokenKeys()</b>
+<b class="nc">&nbsp;			.doOnSuccess(this::cacheTokenKeys)</b>
+<b class="nc">&nbsp;			.filter((tokenKeys) -&gt; tokenKeys.containsKey(keyId))</b>
+<b class="nc">&nbsp;			.map((tokenKeys) -&gt; tokenKeys.get(keyId))</b>
+<b class="nc">&nbsp;			.switchIfEmpty(Mono.error(new CloudFoundryAuthorizationException(Reason.INVALID_KEY_ID,</b>
+&nbsp;					&quot;Key Id present in token header does not match&quot;)));
+&nbsp;	}
+&nbsp;
+&nbsp;	private void cacheTokenKeys(Map&lt;String, String&gt; tokenKeys) {
+<b class="nc">&nbsp;		this.cachedTokenKeys = Map.copyOf(tokenKeys);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasValidSignature(Token token, String key) {
+&nbsp;		try {
+<b class="nc">&nbsp;			PublicKey publicKey = getPublicKey(key);</b>
+<b class="nc">&nbsp;			Signature signature = Signature.getInstance(&quot;SHA256withRSA&quot;);</b>
+<b class="nc">&nbsp;			signature.initVerify(publicKey);</b>
+<b class="nc">&nbsp;			signature.update(token.getContent());</b>
+<b class="nc">&nbsp;			return signature.verify(token.getSignature());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (GeneralSecurityException ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private PublicKey getPublicKey(String key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+<b class="nc">&nbsp;		key = key.replace(&quot;-----BEGIN PUBLIC KEY-----\n&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;		key = key.replace(&quot;-----END PUBLIC KEY-----&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;		key = key.trim().replace(&quot;\n&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;		byte[] bytes = Base64.getDecoder().decode(key);</b>
+<b class="nc">&nbsp;		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(bytes);</b>
+<b class="nc">&nbsp;		return KeyFactory.getInstance(&quot;RSA&quot;).generatePublic(keySpec);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;Void&gt; validateExpiry(Token token) {
+<b class="nc">&nbsp;		long currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());</b>
+<b class="nc">&nbsp;		if (currentTime &gt; token.getExpiry()) {</b>
+<b class="nc">&nbsp;			return Mono.error(new CloudFoundryAuthorizationException(Reason.TOKEN_EXPIRED, &quot;Token expired&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Mono.empty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;Void&gt; validateIssuer(Token token) {
+<b class="nc">&nbsp;		return this.securityService.getUaaUrl()</b>
+<b class="nc">&nbsp;			.map((uaaUrl) -&gt; String.format(&quot;%s/oauth/token&quot;, uaaUrl))</b>
+<b class="nc">&nbsp;			.filter((issuerUri) -&gt; issuerUri.equals(token.getIssuer()))</b>
+<b class="nc">&nbsp;			.switchIfEmpty(Mono</b>
+<b class="nc">&nbsp;				.error(new CloudFoundryAuthorizationException(Reason.INVALID_ISSUER, &quot;Token issuer does not match&quot;)))</b>
+<b class="nc">&nbsp;			.then();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;Void&gt; validateAudience(Token token) {
+<b class="nc">&nbsp;		if (!token.getScope().contains(&quot;actuator.read&quot;)) {</b>
+<b class="nc">&nbsp;			return Mono.error(new CloudFoundryAuthorizationException(Reason.INVALID_AUDIENCE,</b>
+&nbsp;					&quot;Token does not have audience actuator&quot;));
+&nbsp;		}
+<b class="nc">&nbsp;		return Mono.empty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

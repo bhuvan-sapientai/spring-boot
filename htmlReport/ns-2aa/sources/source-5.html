@@ -1,0 +1,570 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractRunMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractRunMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractRunMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/104)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractRunMojo$SystemPropertyFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/110)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.apache.maven.artifact.Artifact;
+&nbsp;import org.apache.maven.execution.MavenSession;
+&nbsp;import org.apache.maven.model.Resource;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;import org.apache.maven.plugin.MojoFailureException;
+&nbsp;import org.apache.maven.plugins.annotations.Component;
+&nbsp;import org.apache.maven.plugins.annotations.Parameter;
+&nbsp;import org.apache.maven.project.MavenProject;
+&nbsp;import org.apache.maven.toolchain.ToolchainManager;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.FileUtils;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class to run a Spring Boot application.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author David Liu
+&nbsp; * @author Daniel Young
+&nbsp; * @author Dmytro Nosan
+&nbsp; * @since 1.3.0
+&nbsp; * @see RunMojo
+&nbsp; * @see StartMojo
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AbstractRunMojo extends AbstractDependencyFilterMojo {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The Maven project.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project}&quot;, readonly = true, required = true)
+&nbsp;	private MavenProject project;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The current Maven session. This is used for toolchain manager API calls.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${session}&quot;, readonly = true)
+&nbsp;	private MavenSession session;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The toolchain manager to use to locate a custom JDK.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Component
+&nbsp;	private ToolchainManager toolchainManager;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add maven resources to the classpath directly, this allows live in-place editing of
+&nbsp;	 * resources. Duplicate resources are removed from {@code target/classes} to prevent
+&nbsp;	 * them from appearing twice if {@code ClassLoader.getResources()} is called. Please
+&nbsp;	 * consider adding {@code spring-boot-devtools} to your project instead as it provides
+&nbsp;	 * this feature and many more.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+<b class="nc">&nbsp;	@Parameter(property = &quot;spring-boot.run.addResources&quot;, defaultValue = &quot;false&quot;)</b>
+&nbsp;	private boolean addResources = false;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Path to agent jars.
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.agents&quot;)
+&nbsp;	private File[] agents;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flag to say that the agent requires -noverify.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+<b class="nc">&nbsp;	@Parameter(property = &quot;spring-boot.run.noverify&quot;)</b>
+&nbsp;	private boolean noverify = false;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Current working directory to use for the application. If not specified, basedir
+&nbsp;	 * will be used.
+&nbsp;	 * @since 1.5.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.workingDirectory&quot;)
+&nbsp;	private File workingDirectory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * JVM arguments that should be associated with the forked process used to run the
+&nbsp;	 * application. On command line, make sure to wrap multiple values between quotes.
+&nbsp;	 * @since 1.1.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.jvmArguments&quot;)
+&nbsp;	private String jvmArguments;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * List of JVM system properties to pass to the process.
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private Map&lt;String, String&gt; systemPropertyVariables;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * List of Environment variables that should be associated with the forked process
+&nbsp;	 * used to run the application.
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private Map&lt;String, String&gt; environmentVariables;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Arguments that should be passed to the application.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private String[] arguments;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Arguments from the command line that should be passed to the application. Use
+&nbsp;	 * spaces to separate multiple arguments and make sure to wrap multiple values between
+&nbsp;	 * quotes. When specified, takes precedence over {@link #arguments}.
+&nbsp;	 * @since 2.2.3
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.arguments&quot;)
+&nbsp;	private String commandlineArguments;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The spring profiles to activate. Convenience shortcut of specifying the
+&nbsp;	 * &#39;spring.profiles.active&#39; argument. On command line use commas to separate multiple
+&nbsp;	 * profiles.
+&nbsp;	 * @since 1.3.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.profiles&quot;)
+&nbsp;	private String[] profiles;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the main class. If not specified the first compiled class found that
+&nbsp;	 * contains a &#39;main&#39; method will be used.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.main-class&quot;)
+&nbsp;	private String mainClass;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Additional directories containing classes or resources that should be added to the
+&nbsp;	 * classpath.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of
+&nbsp;	 * &#39;additionalClasspathElements&#39;
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.directories&quot;)
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	private String[] directories;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Additional classpath elements that should be added to the classpath. An element can
+&nbsp;	 * be a directory with classes and resources or a jar file.
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.additional-classpath-elements&quot;)
+&nbsp;	private String[] additionalClasspathElements;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the classes and resource files that should be used to run the
+&nbsp;	 * application.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.outputDirectory}&quot;, required = true)
+&nbsp;	private File classesDirectory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Skip the execution.
+&nbsp;	 * @since 1.3.2
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.skip&quot;, defaultValue = &quot;false&quot;)
+&nbsp;	private boolean skip;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void execute() throws MojoExecutionException, MojoFailureException {
+<b class="nc">&nbsp;		if (this.skip) {</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;skipping run as per configuration.&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		run(determineMainClass());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String determineMainClass() throws MojoExecutionException {
+<b class="nc">&nbsp;		if (this.mainClass != null) {</b>
+<b class="nc">&nbsp;			return this.mainClass;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return SpringBootApplicationClassFinder.findSingleClass(getClassesDirectories());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the directories that contain the application&#39;s classes and resources. When
+&nbsp;	 * the application&#39;s main class has not been configured, each directory is searched in
+&nbsp;	 * turn for an appropriate main class.
+&nbsp;	 * @return the directories that contain the application&#39;s classes and resources
+&nbsp;	 * @since 3.1.0
+&nbsp;	 */
+&nbsp;	protected List&lt;File&gt; getClassesDirectories() {
+<b class="nc">&nbsp;		return List.of(this.classesDirectory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected abstract boolean isUseTestClasspath();
+&nbsp;
+&nbsp;	private void run(String startClassName) throws MojoExecutionException, MojoFailureException {
+<b class="nc">&nbsp;		List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		addAgents(args);</b>
+<b class="nc">&nbsp;		addJvmArgs(args);</b>
+<b class="nc">&nbsp;		addClasspath(args);</b>
+<b class="nc">&nbsp;		args.add(startClassName);</b>
+<b class="nc">&nbsp;		addArgs(args);</b>
+<b class="nc">&nbsp;		JavaProcessExecutor processExecutor = new JavaProcessExecutor(this.session, this.toolchainManager);</b>
+<b class="nc">&nbsp;		File workingDirectoryToUse = (this.workingDirectory != null) ? this.workingDirectory</b>
+<b class="nc">&nbsp;				: this.project.getBasedir();</b>
+<b class="nc">&nbsp;		run(processExecutor, workingDirectoryToUse, args, determineEnvironmentVariables());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Run the application.
+&nbsp;	 * @param processExecutor the {@link JavaProcessExecutor} to use
+&nbsp;	 * @param workingDirectory the working directory of the forked JVM
+&nbsp;	 * @param args the arguments (JVM arguments and application arguments)
+&nbsp;	 * @param environmentVariables the environment variables
+&nbsp;	 * @throws MojoExecutionException in case of MOJO execution errors
+&nbsp;	 * @throws MojoFailureException in case of MOJO failures
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	protected abstract void run(JavaProcessExecutor processExecutor, File workingDirectory, List&lt;String&gt; args,
+&nbsp;			Map&lt;String, String&gt; environmentVariables) throws MojoExecutionException, MojoFailureException;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolve the application arguments to use.
+&nbsp;	 * @return a {@link RunArguments} defining the application arguments
+&nbsp;	 */
+&nbsp;	protected RunArguments resolveApplicationArguments() {
+<b class="nc">&nbsp;		RunArguments runArguments = (this.arguments != null) ? new RunArguments(this.arguments)</b>
+<b class="nc">&nbsp;				: new RunArguments(this.commandlineArguments);</b>
+<b class="nc">&nbsp;		addActiveProfileArgument(runArguments);</b>
+<b class="nc">&nbsp;		return runArguments;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolve the environment variables to use.
+&nbsp;	 * @return an {@link EnvVariables} defining the environment variables
+&nbsp;	 */
+&nbsp;	protected EnvVariables resolveEnvVariables() {
+<b class="nc">&nbsp;		return new EnvVariables(this.environmentVariables);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addArgs(List&lt;String&gt; args) {
+<b class="nc">&nbsp;		RunArguments applicationArguments = resolveApplicationArguments();</b>
+<b class="nc">&nbsp;		Collections.addAll(args, applicationArguments.asArray());</b>
+<b class="nc">&nbsp;		logArguments(&quot;Application argument&quot;, applicationArguments.asArray());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, String&gt; determineEnvironmentVariables() {
+<b class="nc">&nbsp;		EnvVariables envVariables = resolveEnvVariables();</b>
+<b class="nc">&nbsp;		logArguments(&quot;Environment variable&quot;, envVariables.asArray());</b>
+<b class="nc">&nbsp;		return envVariables.asMap();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolve the JVM arguments to use.
+&nbsp;	 * @return a {@link RunArguments} defining the JVM arguments
+&nbsp;	 */
+&nbsp;	protected RunArguments resolveJvmArguments() {
+<b class="nc">&nbsp;		StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;		if (this.systemPropertyVariables != null) {</b>
+<b class="nc">&nbsp;			stringBuilder.append(this.systemPropertyVariables.entrySet()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.map((e) -&gt; SystemPropertyFormatter.format(e.getKey(), e.getValue()))</b>
+<b class="nc">&nbsp;				.collect(Collectors.joining(&quot; &quot;)));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.jvmArguments != null) {</b>
+<b class="nc">&nbsp;			stringBuilder.append(&quot; &quot;).append(this.jvmArguments);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new RunArguments(stringBuilder.toString());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addJvmArgs(List&lt;String&gt; args) {
+<b class="nc">&nbsp;		RunArguments jvmArguments = resolveJvmArguments();</b>
+<b class="nc">&nbsp;		Collections.addAll(args, jvmArguments.asArray());</b>
+<b class="nc">&nbsp;		logArguments(&quot;JVM argument&quot;, jvmArguments.asArray());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addAgents(List&lt;String&gt; args) {
+<b class="nc">&nbsp;		if (this.agents != null) {</b>
+<b class="nc">&nbsp;			if (getLog().isInfoEnabled()) {</b>
+<b class="nc">&nbsp;				getLog().info(&quot;Attaching agents: &quot; + Arrays.asList(this.agents));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (File agent : this.agents) {</b>
+<b class="nc">&nbsp;				args.add(&quot;-javaagent:&quot; + agent);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.noverify) {</b>
+<b class="nc">&nbsp;			args.add(&quot;-noverify&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addActiveProfileArgument(RunArguments arguments) {
+<b class="nc">&nbsp;		if (this.profiles.length &gt; 0) {</b>
+<b class="nc">&nbsp;			StringBuilder arg = new StringBuilder(&quot;--spring.profiles.active=&quot;);</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; this.profiles.length; i++) {</b>
+<b class="nc">&nbsp;				arg.append(this.profiles[i]);</b>
+<b class="nc">&nbsp;				if (i &lt; this.profiles.length - 1) {</b>
+<b class="nc">&nbsp;					arg.append(&quot;,&quot;);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			arguments.getArgs().addFirst(arg.toString());</b>
+<b class="nc">&nbsp;			logArguments(&quot;Active profile&quot;, this.profiles);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addClasspath(List&lt;String&gt; args) throws MojoExecutionException {
+&nbsp;		try {
+<b class="nc">&nbsp;			StringBuilder classpath = new StringBuilder();</b>
+<b class="nc">&nbsp;			for (URL ele : getClassPathUrls()) {</b>
+<b class="nc">&nbsp;				if (!classpath.isEmpty()) {</b>
+<b class="nc">&nbsp;					classpath.append(File.pathSeparator);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				classpath.append(new File(ele.toURI()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (getLog().isDebugEnabled()) {</b>
+<b class="nc">&nbsp;				getLog().debug(&quot;Classpath for forked process: &quot; + classpath);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			args.add(&quot;-cp&quot;);</b>
+<b class="nc">&nbsp;			args.add(classpath.toString());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Could not build classpath&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected URL[] getClassPathUrls() throws MojoExecutionException {
+&nbsp;		try {
+<b class="nc">&nbsp;			List&lt;URL&gt; urls = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			addAdditionalClasspathLocations(urls);</b>
+<b class="nc">&nbsp;			addResources(urls);</b>
+<b class="nc">&nbsp;			addProjectClasses(urls);</b>
+<b class="nc">&nbsp;			addDependencies(urls);</b>
+<b class="nc">&nbsp;			return urls.toArray(new URL[0]);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Unable to build classpath&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;removal&quot;)
+&nbsp;	private void addAdditionalClasspathLocations(List&lt;URL&gt; urls) throws MalformedURLException {
+<b class="nc">&nbsp;		Assert.state(ObjectUtils.isEmpty(this.directories) || ObjectUtils.isEmpty(this.additionalClasspathElements),</b>
+&nbsp;				&quot;Either additionalClasspathElements or directories (deprecated) should be set, not both&quot;);
+<b class="nc">&nbsp;		String[] elements = !ObjectUtils.isEmpty(this.additionalClasspathElements) ? this.additionalClasspathElements</b>
+<b class="nc">&nbsp;				: this.directories;</b>
+<b class="nc">&nbsp;		if (elements != null) {</b>
+<b class="nc">&nbsp;			for (String element : elements) {</b>
+<b class="nc">&nbsp;				urls.add(new File(element).toURI().toURL());</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addResources(List&lt;URL&gt; urls) throws IOException {
+<b class="nc">&nbsp;		if (this.addResources) {</b>
+<b class="nc">&nbsp;			for (Resource resource : this.project.getResources()) {</b>
+<b class="nc">&nbsp;				File directory = new File(resource.getDirectory());</b>
+<b class="nc">&nbsp;				urls.add(directory.toURI().toURL());</b>
+<b class="nc">&nbsp;				for (File classesDirectory : getClassesDirectories()) {</b>
+<b class="nc">&nbsp;					FileUtils.removeDuplicatesFromOutputDirectory(classesDirectory, directory);</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addProjectClasses(List&lt;URL&gt; urls) throws MalformedURLException {
+<b class="nc">&nbsp;		for (File classesDirectory : getClassesDirectories()) {</b>
+<b class="nc">&nbsp;			urls.add(classesDirectory.toURI().toURL());</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addDependencies(List&lt;URL&gt; urls) throws MalformedURLException, MojoExecutionException {
+<b class="nc">&nbsp;		Set&lt;Artifact&gt; artifacts = (isUseTestClasspath()) ? filterDependencies(this.project.getArtifacts())</b>
+<b class="nc">&nbsp;				: filterDependencies(this.project.getArtifacts(), new ExcludeTestScopeArtifactFilter());</b>
+<b class="nc">&nbsp;		for (Artifact artifact : artifacts) {</b>
+<b class="nc">&nbsp;			if (artifact.getFile() != null) {</b>
+<b class="nc">&nbsp;				urls.add(artifact.getFile().toURI().toURL());</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logArguments(String name, String[] args) {
+<b class="nc">&nbsp;		if (getLog().isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			String message = (args.length == 1) ? name + &quot;: &quot; : name + &quot;s: &quot;;</b>
+<b class="nc">&nbsp;			getLog().debug(Arrays.stream(args).collect(Collectors.joining(&quot; &quot;, message, &quot;&quot;)));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Format System properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class SystemPropertyFormatter {</b>
+&nbsp;
+&nbsp;		static String format(String key, String value) {
+<b class="nc">&nbsp;			if (key == null) {</b>
+<b class="nc">&nbsp;				return &quot;&quot;;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (value == null || value.isEmpty()) {</b>
+<b class="nc">&nbsp;				return String.format(&quot;-D%s&quot;, key);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return String.format(&quot;-D%s=\&quot;%s\&quot;&quot;, key, value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

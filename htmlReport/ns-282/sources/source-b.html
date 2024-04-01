@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WarPluginAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.plugin</a>
+</div>
+
+<h1>Coverage Summary for Class: WarPluginAction (org.springframework.boot.gradle.plugin)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WarPluginAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.plugin;
+&nbsp;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.artifacts.ConfigurationContainer;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.plugins.BasePlugin;
+&nbsp;import org.gradle.api.plugins.JavaPluginExtension;
+&nbsp;import org.gradle.api.plugins.WarPlugin;
+&nbsp;import org.gradle.api.provider.Provider;
+&nbsp;import org.gradle.api.tasks.SourceSet;
+&nbsp;import org.gradle.api.tasks.SourceSetContainer;
+&nbsp;import org.gradle.api.tasks.TaskProvider;
+&nbsp;import org.gradle.api.tasks.bundling.War;
+&nbsp;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootBuildImage;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootWar;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Action} that is executed in response to the {@link WarPlugin} being applied.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;class WarPluginAction implements PluginApplicationAction {
+&nbsp;
+&nbsp;	private final SinglePublishedArtifact singlePublishedArtifact;
+&nbsp;
+<b class="nc">&nbsp;	WarPluginAction(SinglePublishedArtifact singlePublishedArtifact) {</b>
+<b class="nc">&nbsp;		this.singlePublishedArtifact = singlePublishedArtifact;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;? extends Plugin&lt;? extends Project&gt;&gt; getPluginClass() {
+<b class="nc">&nbsp;		return WarPlugin.class;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void execute(Project project) {
+<b class="nc">&nbsp;		classifyWarTask(project);</b>
+<b class="nc">&nbsp;		TaskProvider&lt;BootWar&gt; bootWar = configureBootWarTask(project);</b>
+<b class="nc">&nbsp;		configureBootBuildImageTask(project, bootWar);</b>
+<b class="nc">&nbsp;		configureArtifactPublication(bootWar);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void classifyWarTask(Project project) {
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(WarPlugin.WAR_TASK_NAME, War.class)</b>
+<b class="nc">&nbsp;			.configure((war) -&gt; war.getArchiveClassifier().convention(&quot;plain&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TaskProvider&lt;BootWar&gt; configureBootWarTask(Project project) {
+<b class="nc">&nbsp;		Configuration developmentOnly = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(SpringBootPlugin.DEVELOPMENT_ONLY_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		Configuration testAndDevelopmentOnly = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(SpringBootPlugin.TEST_AND_DEVELOPMENT_ONLY_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		Configuration productionRuntimeClasspath = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(SpringBootPlugin.PRODUCTION_RUNTIME_CLASSPATH_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		SourceSet mainSourceSet = project.getExtensions()</b>
+<b class="nc">&nbsp;			.getByType(SourceSetContainer.class)</b>
+<b class="nc">&nbsp;			.getByName(SourceSet.MAIN_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;		Configuration runtimeClasspath = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(mainSourceSet.getRuntimeClasspathConfigurationName());</b>
+<b class="nc">&nbsp;		Callable&lt;FileCollection&gt; classpath = () -&gt; mainSourceSet.getRuntimeClasspath()</b>
+<b class="nc">&nbsp;			.minus(providedRuntimeConfiguration(project))</b>
+<b class="nc">&nbsp;			.minus((developmentOnly.minus(productionRuntimeClasspath)))</b>
+<b class="nc">&nbsp;			.minus((testAndDevelopmentOnly.minus(productionRuntimeClasspath)))</b>
+<b class="nc">&nbsp;			.filter(new JarTypeFileSpec());</b>
+<b class="nc">&nbsp;		TaskProvider&lt;ResolveMainClassName&gt; resolveMainClassName = project.getTasks()</b>
+<b class="nc">&nbsp;			.named(SpringBootPlugin.RESOLVE_MAIN_CLASS_NAME_TASK_NAME, ResolveMainClassName.class);</b>
+<b class="nc">&nbsp;		TaskProvider&lt;BootWar&gt; bootWarProvider = project.getTasks()</b>
+<b class="nc">&nbsp;			.register(SpringBootPlugin.BOOT_WAR_TASK_NAME, BootWar.class, (bootWar) -&gt; {</b>
+<b class="nc">&nbsp;				bootWar.setGroup(BasePlugin.BUILD_GROUP);</b>
+<b class="nc">&nbsp;				bootWar.setDescription(&quot;Assembles an executable war archive containing webapp&quot;</b>
+&nbsp;						+ &quot; content, and the main classes and their dependencies.&quot;);
+<b class="nc">&nbsp;				bootWar.providedClasspath(providedRuntimeConfiguration(project));</b>
+<b class="nc">&nbsp;				bootWar.setClasspath(classpath);</b>
+<b class="nc">&nbsp;				Provider&lt;String&gt; manifestStartClass = project</b>
+<b class="nc">&nbsp;					.provider(() -&gt; (String) bootWar.getManifest().getAttributes().get(&quot;Start-Class&quot;));</b>
+<b class="nc">&nbsp;				bootWar.getMainClass()</b>
+<b class="nc">&nbsp;					.convention(resolveMainClassName.flatMap((resolver) -&gt; manifestStartClass.isPresent()</b>
+<b class="nc">&nbsp;							? manifestStartClass : resolveMainClassName.get().readMainClassName()));</b>
+<b class="nc">&nbsp;				bootWar.getTargetJavaVersion()</b>
+<b class="nc">&nbsp;					.set(project.provider(() -&gt; javaPluginExtension(project).getTargetCompatibility()));</b>
+<b class="nc">&nbsp;				bootWar.resolvedArtifacts(runtimeClasspath.getIncoming().getArtifacts().getResolvedArtifacts());</b>
+&nbsp;			});
+<b class="nc">&nbsp;		bootWarProvider.map(War::getClasspath);</b>
+<b class="nc">&nbsp;		return bootWarProvider;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private FileCollection providedRuntimeConfiguration(Project project) {
+<b class="nc">&nbsp;		ConfigurationContainer configurations = project.getConfigurations();</b>
+<b class="nc">&nbsp;		return configurations.getByName(WarPlugin.PROVIDED_RUNTIME_CONFIGURATION_NAME);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureBootBuildImageTask(Project project, TaskProvider&lt;BootWar&gt; bootWar) {
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(SpringBootPlugin.BOOT_BUILD_IMAGE_TASK_NAME, BootBuildImage.class)</b>
+<b class="nc">&nbsp;			.configure((buildImage) -&gt; buildImage.getArchiveFile().set(bootWar.get().getArchiveFile()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureArtifactPublication(TaskProvider&lt;BootWar&gt; bootWar) {
+<b class="nc">&nbsp;		this.singlePublishedArtifact.addWarCandidate(bootWar);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JavaPluginExtension javaPluginExtension(Project project) {
+<b class="nc">&nbsp;		return project.getExtensions().getByType(JavaPluginExtension.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

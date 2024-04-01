@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JedisConnectionConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.data.redis</a>
+</div>
+
+<h1>Coverage Summary for Class: JedisConnectionConfiguration (org.springframework.boot.autoconfigure.data.redis)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JedisConnectionConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.data.redis;
+&nbsp;
+&nbsp;import javax.net.ssl.SSLParameters;
+&nbsp;
+&nbsp;import org.apache.commons.pool2.impl.GenericObjectPool;
+&nbsp;import redis.clients.jedis.Jedis;
+&nbsp;import redis.clients.jedis.JedisPoolConfig;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnThreading;
+&nbsp;import org.springframework.boot.autoconfigure.thread.Threading;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.ssl.SslBundle;
+&nbsp;import org.springframework.boot.ssl.SslBundles;
+&nbsp;import org.springframework.boot.ssl.SslOptions;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.task.SimpleAsyncTaskExecutor;
+&nbsp;import org.springframework.data.redis.connection.RedisClusterConfiguration;
+&nbsp;import org.springframework.data.redis.connection.RedisConnectionFactory;
+&nbsp;import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+&nbsp;import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+&nbsp;import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
+&nbsp;import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
+&nbsp;import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisSslClientConfigurationBuilder;
+&nbsp;import org.springframework.data.redis.connection.jedis.JedisConnection;
+&nbsp;import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Redis connection configuration using Jedis.
+&nbsp; *
+&nbsp; * @author Mark Paluch
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@ConditionalOnClass({ GenericObjectPool.class, JedisConnection.class, Jedis.class })
+&nbsp;@ConditionalOnMissingBean(RedisConnectionFactory.class)
+&nbsp;@ConditionalOnProperty(name = &quot;spring.data.redis.client-type&quot;, havingValue = &quot;jedis&quot;, matchIfMissing = true)
+&nbsp;class JedisConnectionConfiguration extends RedisConnectionConfiguration {
+&nbsp;
+&nbsp;	JedisConnectionConfiguration(RedisProperties properties,
+&nbsp;			ObjectProvider&lt;RedisStandaloneConfiguration&gt; standaloneConfigurationProvider,
+&nbsp;			ObjectProvider&lt;RedisSentinelConfiguration&gt; sentinelConfiguration,
+&nbsp;			ObjectProvider&lt;RedisClusterConfiguration&gt; clusterConfiguration, RedisConnectionDetails connectionDetails,
+&nbsp;			ObjectProvider&lt;SslBundles&gt; sslBundles) {
+<b class="nc">&nbsp;		super(properties, connectionDetails, standaloneConfigurationProvider, sentinelConfiguration,</b>
+&nbsp;				clusterConfiguration, sslBundles);
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnThreading(Threading.PLATFORM)
+&nbsp;	JedisConnectionFactory redisConnectionFactory(
+&nbsp;			ObjectProvider&lt;JedisClientConfigurationBuilderCustomizer&gt; builderCustomizers) {
+<b class="nc">&nbsp;		return createJedisConnectionFactory(builderCustomizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnThreading(Threading.VIRTUAL)
+&nbsp;	JedisConnectionFactory redisConnectionFactoryVirtualThreads(
+&nbsp;			ObjectProvider&lt;JedisClientConfigurationBuilderCustomizer&gt; builderCustomizers) {
+<b class="nc">&nbsp;		JedisConnectionFactory factory = createJedisConnectionFactory(builderCustomizers);</b>
+<b class="nc">&nbsp;		SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor(&quot;redis-&quot;);</b>
+<b class="nc">&nbsp;		executor.setVirtualThreads(true);</b>
+<b class="nc">&nbsp;		factory.setExecutor(executor);</b>
+<b class="nc">&nbsp;		return factory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JedisConnectionFactory createJedisConnectionFactory(
+&nbsp;			ObjectProvider&lt;JedisClientConfigurationBuilderCustomizer&gt; builderCustomizers) {
+<b class="nc">&nbsp;		JedisClientConfiguration clientConfiguration = getJedisClientConfiguration(builderCustomizers);</b>
+<b class="nc">&nbsp;		if (getSentinelConfig() != null) {</b>
+<b class="nc">&nbsp;			return new JedisConnectionFactory(getSentinelConfig(), clientConfiguration);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (getClusterConfiguration() != null) {</b>
+<b class="nc">&nbsp;			return new JedisConnectionFactory(getClusterConfiguration(), clientConfiguration);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new JedisConnectionFactory(getStandaloneConfig(), clientConfiguration);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JedisClientConfiguration getJedisClientConfiguration(
+&nbsp;			ObjectProvider&lt;JedisClientConfigurationBuilderCustomizer&gt; builderCustomizers) {
+<b class="nc">&nbsp;		JedisClientConfigurationBuilder builder = applyProperties(JedisClientConfiguration.builder());</b>
+<b class="nc">&nbsp;		if (isSslEnabled()) {</b>
+<b class="nc">&nbsp;			applySsl(builder);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		RedisProperties.Pool pool = getProperties().getJedis().getPool();</b>
+<b class="nc">&nbsp;		if (isPoolEnabled(pool)) {</b>
+<b class="nc">&nbsp;			applyPooling(pool, builder);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasText(getProperties().getUrl())) {</b>
+<b class="nc">&nbsp;			customizeConfigurationFromUrl(builder);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		builderCustomizers.orderedStream().forEach((customizer) -&gt; customizer.customize(builder));</b>
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JedisClientConfigurationBuilder applyProperties(JedisClientConfigurationBuilder builder) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(getProperties().getTimeout()).to(builder::readTimeout);</b>
+<b class="nc">&nbsp;		map.from(getProperties().getConnectTimeout()).to(builder::connectTimeout);</b>
+<b class="nc">&nbsp;		map.from(getProperties().getClientName()).whenHasText().to(builder::clientName);</b>
+<b class="nc">&nbsp;		return builder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applySsl(JedisClientConfigurationBuilder builder) {
+<b class="nc">&nbsp;		JedisSslClientConfigurationBuilder sslBuilder = builder.useSsl();</b>
+<b class="nc">&nbsp;		if (getProperties().getSsl().getBundle() != null) {</b>
+<b class="nc">&nbsp;			SslBundle sslBundle = getSslBundles().getBundle(getProperties().getSsl().getBundle());</b>
+<b class="nc">&nbsp;			sslBuilder.sslSocketFactory(sslBundle.createSslContext().getSocketFactory());</b>
+<b class="nc">&nbsp;			SslOptions sslOptions = sslBundle.getOptions();</b>
+<b class="nc">&nbsp;			SSLParameters sslParameters = new SSLParameters();</b>
+<b class="nc">&nbsp;			PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;			map.from(sslOptions.getCiphers()).to(sslParameters::setCipherSuites);</b>
+<b class="nc">&nbsp;			map.from(sslOptions.getEnabledProtocols()).to(sslParameters::setProtocols);</b>
+<b class="nc">&nbsp;			sslBuilder.sslParameters(sslParameters);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyPooling(RedisProperties.Pool pool,
+&nbsp;			JedisClientConfiguration.JedisClientConfigurationBuilder builder) {
+<b class="nc">&nbsp;		builder.usePooling().poolConfig(jedisPoolConfig(pool));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JedisPoolConfig jedisPoolConfig(RedisProperties.Pool pool) {
+<b class="nc">&nbsp;		JedisPoolConfig config = new JedisPoolConfig();</b>
+<b class="nc">&nbsp;		config.setMaxTotal(pool.getMaxActive());</b>
+<b class="nc">&nbsp;		config.setMaxIdle(pool.getMaxIdle());</b>
+<b class="nc">&nbsp;		config.setMinIdle(pool.getMinIdle());</b>
+<b class="nc">&nbsp;		if (pool.getTimeBetweenEvictionRuns() != null) {</b>
+<b class="nc">&nbsp;			config.setTimeBetweenEvictionRuns(pool.getTimeBetweenEvictionRuns());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (pool.getMaxWait() != null) {</b>
+<b class="nc">&nbsp;			config.setMaxWait(pool.getMaxWait());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return config;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeConfigurationFromUrl(JedisClientConfiguration.JedisClientConfigurationBuilder builder) {
+<b class="nc">&nbsp;		if (urlUsesSsl()) {</b>
+<b class="nc">&nbsp;			builder.useSsl();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

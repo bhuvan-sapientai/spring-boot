@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Phase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: Phase (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Phase</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Binding;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ContainerConfig;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * An individual build phase executed as part of a {@link Lifecycle} run.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Jeroen Meijer
+&nbsp; */
+&nbsp;class Phase {
+&nbsp;
+&nbsp;	private final String name;
+&nbsp;
+&nbsp;	private final boolean verboseLogging;
+&nbsp;
+<b class="nc">&nbsp;	private boolean daemonAccess = false;</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;Binding&gt; bindings = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, String&gt; env = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;String&gt; securityOptions = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private String networkMode;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Phase} instance.
+&nbsp;	 * @param name the name of the phase
+&nbsp;	 * @param verboseLogging if verbose logging is requested
+&nbsp;	 */
+<b class="nc">&nbsp;	Phase(String name, boolean verboseLogging) {</b>
+<b class="nc">&nbsp;		this.name = name;</b>
+<b class="nc">&nbsp;		this.verboseLogging = verboseLogging;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update this phase with Docker daemon access.
+&nbsp;	 */
+&nbsp;	void withDaemonAccess() {
+<b class="nc">&nbsp;		this.daemonAccess = true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update this phase with a debug log level arguments if verbose logging has been
+&nbsp;	 * requested.
+&nbsp;	 */
+&nbsp;	void withLogLevelArg() {
+<b class="nc">&nbsp;		if (this.verboseLogging) {</b>
+<b class="nc">&nbsp;			this.args.add(&quot;-log-level&quot;);</b>
+<b class="nc">&nbsp;			this.args.add(&quot;debug&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update this phase with additional run arguments.
+&nbsp;	 * @param args the arguments to add
+&nbsp;	 */
+&nbsp;	void withArgs(Object... args) {
+<b class="nc">&nbsp;		Arrays.stream(args).map(Object::toString).forEach(this.args::add);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update this phase with an addition volume binding.
+&nbsp;	 * @param binding the binding
+&nbsp;	 */
+&nbsp;	void withBinding(Binding binding) {
+<b class="nc">&nbsp;		this.bindings.add(binding);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update this phase with an additional environment variable.
+&nbsp;	 * @param name the variable name
+&nbsp;	 * @param value the variable value
+&nbsp;	 */
+&nbsp;	void withEnv(String name, String value) {
+<b class="nc">&nbsp;		this.env.put(name, value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update this phase with the network the build container will connect to.
+&nbsp;	 * @param networkMode the network
+&nbsp;	 */
+&nbsp;	void withNetworkMode(String networkMode) {
+<b class="nc">&nbsp;		this.networkMode = networkMode;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update this phase with a security option.
+&nbsp;	 * @param option the security option
+&nbsp;	 */
+&nbsp;	void withSecurityOption(String option) {
+<b class="nc">&nbsp;		this.securityOptions.add(option);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of the phase.
+&nbsp;	 * @return the phase name
+&nbsp;	 */
+&nbsp;	String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Apply this phase settings to a {@link ContainerConfig} update.
+&nbsp;	 * @param update the update to apply the phase to
+&nbsp;	 */
+&nbsp;	void apply(ContainerConfig.Update update) {
+<b class="nc">&nbsp;		if (this.daemonAccess) {</b>
+<b class="nc">&nbsp;			update.withUser(&quot;root&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		update.withCommand(&quot;/cnb/lifecycle/&quot; + this.name, StringUtils.toStringArray(this.args));</b>
+<b class="nc">&nbsp;		update.withLabel(&quot;author&quot;, &quot;spring-boot&quot;);</b>
+<b class="nc">&nbsp;		this.bindings.forEach(update::withBinding);</b>
+<b class="nc">&nbsp;		this.env.forEach(update::withEnv);</b>
+<b class="nc">&nbsp;		if (this.networkMode != null) {</b>
+<b class="nc">&nbsp;			update.withNetworkMode(this.networkMode);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.securityOptions.forEach(update::withSecurityOption);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

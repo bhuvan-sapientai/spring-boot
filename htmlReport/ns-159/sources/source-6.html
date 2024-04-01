@@ -1,0 +1,319 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JsonConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor.metadata</a>
+</div>
+
+<h1>Coverage Summary for Class: JsonConverter (org.springframework.boot.configurationprocessor.metadata)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JsonConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JsonConverter$ItemMetadataComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/93)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor.metadata;
+&nbsp;
+&nbsp;import java.lang.reflect.Array;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.configurationprocessor.json.JSONArray;
+&nbsp;import org.springframework.boot.configurationprocessor.json.JSONObject;
+&nbsp;import org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType;
+&nbsp;
+&nbsp;/**
+&nbsp; * Converter to change meta-data objects into JSON objects.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; */
+<b class="nc">&nbsp;class JsonConverter {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final ItemMetadataComparator ITEM_COMPARATOR = new ItemMetadataComparator();</b>
+&nbsp;
+&nbsp;	JSONArray toJsonArray(ConfigurationMetadata metadata, ItemType itemType) throws Exception {
+<b class="nc">&nbsp;		JSONArray jsonArray = new JSONArray();</b>
+<b class="nc">&nbsp;		List&lt;ItemMetadata&gt; items = metadata.getItems()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.filter((item) -&gt; item.isOfItemType(itemType))</b>
+<b class="nc">&nbsp;			.sorted(ITEM_COMPARATOR)</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		for (ItemMetadata item : items) {</b>
+<b class="nc">&nbsp;			if (item.isOfItemType(itemType)) {</b>
+<b class="nc">&nbsp;				jsonArray.put(toJsonObject(item));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return jsonArray;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	JSONArray toJsonArray(Collection&lt;ItemHint&gt; hints) throws Exception {
+<b class="nc">&nbsp;		JSONArray jsonArray = new JSONArray();</b>
+<b class="nc">&nbsp;		for (ItemHint hint : hints) {</b>
+<b class="nc">&nbsp;			jsonArray.put(toJsonObject(hint));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return jsonArray;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	JSONObject toJsonObject(ItemMetadata item) throws Exception {
+<b class="nc">&nbsp;		JSONObject jsonObject = new JSONObject();</b>
+<b class="nc">&nbsp;		jsonObject.put(&quot;name&quot;, item.getName());</b>
+<b class="nc">&nbsp;		jsonObject.putOpt(&quot;type&quot;, item.getType());</b>
+<b class="nc">&nbsp;		jsonObject.putOpt(&quot;description&quot;, item.getDescription());</b>
+<b class="nc">&nbsp;		jsonObject.putOpt(&quot;sourceType&quot;, item.getSourceType());</b>
+<b class="nc">&nbsp;		jsonObject.putOpt(&quot;sourceMethod&quot;, item.getSourceMethod());</b>
+<b class="nc">&nbsp;		Object defaultValue = item.getDefaultValue();</b>
+<b class="nc">&nbsp;		if (defaultValue != null) {</b>
+<b class="nc">&nbsp;			putDefaultValue(jsonObject, defaultValue);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ItemDeprecation deprecation = item.getDeprecation();</b>
+<b class="nc">&nbsp;		if (deprecation != null) {</b>
+<b class="nc">&nbsp;			jsonObject.put(&quot;deprecated&quot;, true); // backward compatibility</b>
+<b class="nc">&nbsp;			JSONObject deprecationJsonObject = new JSONObject();</b>
+<b class="nc">&nbsp;			if (deprecation.getLevel() != null) {</b>
+<b class="nc">&nbsp;				deprecationJsonObject.put(&quot;level&quot;, deprecation.getLevel());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (deprecation.getReason() != null) {</b>
+<b class="nc">&nbsp;				deprecationJsonObject.put(&quot;reason&quot;, deprecation.getReason());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (deprecation.getReplacement() != null) {</b>
+<b class="nc">&nbsp;				deprecationJsonObject.put(&quot;replacement&quot;, deprecation.getReplacement());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (deprecation.getSince() != null) {</b>
+<b class="nc">&nbsp;				deprecationJsonObject.put(&quot;since&quot;, deprecation.getSince());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			jsonObject.put(&quot;deprecation&quot;, deprecationJsonObject);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return jsonObject;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONObject toJsonObject(ItemHint hint) throws Exception {
+<b class="nc">&nbsp;		JSONObject jsonObject = new JSONObject();</b>
+<b class="nc">&nbsp;		jsonObject.put(&quot;name&quot;, hint.getName());</b>
+<b class="nc">&nbsp;		if (!hint.getValues().isEmpty()) {</b>
+<b class="nc">&nbsp;			jsonObject.put(&quot;values&quot;, getItemHintValues(hint));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!hint.getProviders().isEmpty()) {</b>
+<b class="nc">&nbsp;			jsonObject.put(&quot;providers&quot;, getItemHintProviders(hint));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return jsonObject;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONArray getItemHintValues(ItemHint hint) throws Exception {
+<b class="nc">&nbsp;		JSONArray values = new JSONArray();</b>
+<b class="nc">&nbsp;		for (ItemHint.ValueHint value : hint.getValues()) {</b>
+<b class="nc">&nbsp;			values.put(getItemHintValue(value));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return values;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONObject getItemHintValue(ItemHint.ValueHint value) throws Exception {
+<b class="nc">&nbsp;		JSONObject result = new JSONObject();</b>
+<b class="nc">&nbsp;		putHintValue(result, value.getValue());</b>
+<b class="nc">&nbsp;		result.putOpt(&quot;description&quot;, value.getDescription());</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONArray getItemHintProviders(ItemHint hint) throws Exception {
+<b class="nc">&nbsp;		JSONArray providers = new JSONArray();</b>
+<b class="nc">&nbsp;		for (ItemHint.ValueProvider provider : hint.getProviders()) {</b>
+<b class="nc">&nbsp;			providers.put(getItemHintProvider(provider));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return providers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONObject getItemHintProvider(ItemHint.ValueProvider provider) throws Exception {
+<b class="nc">&nbsp;		JSONObject result = new JSONObject();</b>
+<b class="nc">&nbsp;		result.put(&quot;name&quot;, provider.getName());</b>
+<b class="nc">&nbsp;		if (provider.getParameters() != null &amp;&amp; !provider.getParameters().isEmpty()) {</b>
+<b class="nc">&nbsp;			JSONObject parameters = new JSONObject();</b>
+<b class="nc">&nbsp;			for (Map.Entry&lt;String, Object&gt; entry : provider.getParameters().entrySet()) {</b>
+<b class="nc">&nbsp;				parameters.put(entry.getKey(), extractItemValue(entry.getValue()));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			result.put(&quot;parameters&quot;, parameters);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void putHintValue(JSONObject jsonObject, Object value) throws Exception {
+<b class="nc">&nbsp;		Object hintValue = extractItemValue(value);</b>
+<b class="nc">&nbsp;		jsonObject.put(&quot;value&quot;, hintValue);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void putDefaultValue(JSONObject jsonObject, Object value) throws Exception {
+<b class="nc">&nbsp;		Object defaultValue = extractItemValue(value);</b>
+<b class="nc">&nbsp;		jsonObject.put(&quot;defaultValue&quot;, defaultValue);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object extractItemValue(Object value) {
+<b class="nc">&nbsp;		Object defaultValue = value;</b>
+<b class="nc">&nbsp;		if (value.getClass().isArray()) {</b>
+<b class="nc">&nbsp;			JSONArray array = new JSONArray();</b>
+<b class="nc">&nbsp;			int length = Array.getLength(value);</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; length; i++) {</b>
+<b class="nc">&nbsp;				array.put(Array.get(value, i));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			defaultValue = array;</b>
+&nbsp;
+&nbsp;		}
+<b class="nc">&nbsp;		return defaultValue;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class ItemMetadataComparator implements Comparator&lt;ItemMetadata&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final Comparator&lt;ItemMetadata&gt; GROUP = Comparator.comparing(ItemMetadata::getName)</b>
+<b class="nc">&nbsp;			.thenComparing(ItemMetadata::getSourceType, Comparator.nullsFirst(Comparator.naturalOrder()));</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final Comparator&lt;ItemMetadata&gt; ITEM = Comparator.comparing(ItemMetadataComparator::isDeprecated)</b>
+<b class="nc">&nbsp;			.thenComparing(ItemMetadata::getName)</b>
+<b class="nc">&nbsp;			.thenComparing(ItemMetadata::getSourceType, Comparator.nullsFirst(Comparator.naturalOrder()));</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int compare(ItemMetadata o1, ItemMetadata o2) {
+<b class="nc">&nbsp;			if (o1.isOfItemType(ItemType.GROUP)) {</b>
+<b class="nc">&nbsp;				return GROUP.compare(o1, o2);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return ITEM.compare(o1, o2);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isDeprecated(ItemMetadata item) {
+<b class="nc">&nbsp;			return item.getDeprecation() != null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

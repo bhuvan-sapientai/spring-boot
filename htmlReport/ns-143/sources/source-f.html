@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Regex</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.type</a>
+</div>
+
+<h1>Coverage Summary for Class: Regex (org.springframework.boot.buildpack.platform.docker.type)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Regex</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.type;
+&nbsp;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;/**
+&nbsp; * Regular Expressions for image names and references based on those found in the Docker
+&nbsp; * codebase.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Phillip Webb
+&nbsp; * @see &lt;a href=
+&nbsp; * &quot;https://github.com/docker/distribution/blob/master/reference/reference.go&quot;&gt;Docker
+&nbsp; * grammar reference&lt;/a&gt;
+&nbsp; * @see &lt;a href=
+&nbsp; * &quot;https://github.com/docker/distribution/blob/master/reference/regexp.go&quot;&gt;Docker grammar
+&nbsp; * implementation&lt;/a&gt;
+&nbsp; * @see &lt;a href=
+&nbsp; * &quot;https://stackoverflow.com/questions/37861791/how-are-docker-image-names-parsed&quot;&gt;How
+&nbsp; * are Docker image names parsed?&lt;/a&gt;
+&nbsp; */
+&nbsp;final class Regex implements CharSequence {
+&nbsp;
+&nbsp;	static final Pattern DOMAIN;
+&nbsp;	static {
+<b class="nc">&nbsp;		Regex component = Regex.oneOf(&quot;[a-zA-Z0-9]&quot;, &quot;[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]&quot;);</b>
+<b class="nc">&nbsp;		Regex dotComponent = Regex.group(&quot;[.]&quot;, component);</b>
+<b class="nc">&nbsp;		Regex colonPort = Regex.of(&quot;[:][0-9]+&quot;);</b>
+<b class="nc">&nbsp;		Regex dottedDomain = Regex.group(component, dotComponent.oneOrMoreTimes());</b>
+<b class="nc">&nbsp;		Regex dottedDomainAndPort = Regex.group(component, dotComponent.oneOrMoreTimes(), colonPort);</b>
+<b class="nc">&nbsp;		Regex nameAndPort = Regex.group(component, colonPort);</b>
+<b class="nc">&nbsp;		DOMAIN = Regex.oneOf(dottedDomain, nameAndPort, dottedDomainAndPort, &quot;localhost&quot;).compile();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final Regex PATH_COMPONENT;
+&nbsp;	static {
+<b class="nc">&nbsp;		Regex segment = Regex.of(&quot;[a-z0-9]+&quot;);</b>
+<b class="nc">&nbsp;		Regex separator = Regex.group(&quot;[._]|__|[-]*&quot;);</b>
+<b class="nc">&nbsp;		Regex separatedSegment = Regex.group(separator, segment).oneOrMoreTimes();</b>
+<b class="nc">&nbsp;		PATH_COMPONENT = Regex.of(segment, Regex.group(separatedSegment).zeroOrOnce());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static final Pattern PATH;
+&nbsp;	static {
+<b class="nc">&nbsp;		Regex component = PATH_COMPONENT;</b>
+<b class="nc">&nbsp;		Regex slashComponent = Regex.group(&quot;[/]&quot;, component);</b>
+<b class="nc">&nbsp;		Regex slashComponents = Regex.group(slashComponent.oneOrMoreTimes());</b>
+<b class="nc">&nbsp;		PATH = Regex.of(component, slashComponents.zeroOrOnce()).compile();</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static final Pattern TAG = Regex.of(&quot;^[\\w][\\w.-]{0,127}&quot;).compile();</b>
+&nbsp;
+<b class="nc">&nbsp;	static final Pattern DIGEST = Regex.of(&quot;^[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[A-Fa-f0-9]]{32,}&quot;)</b>
+<b class="nc">&nbsp;		.compile();</b>
+&nbsp;
+&nbsp;	private final String value;
+&nbsp;
+<b class="nc">&nbsp;	private Regex(CharSequence value) {</b>
+<b class="nc">&nbsp;		this.value = value.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Regex oneOrMoreTimes() {
+<b class="nc">&nbsp;		return new Regex(this.value + &quot;+&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Regex zeroOrOnce() {
+<b class="nc">&nbsp;		return new Regex(this.value + &quot;?&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Pattern compile() {
+<b class="nc">&nbsp;		return Pattern.compile(&quot;^&quot; + this.value + &quot;$&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int length() {
+<b class="nc">&nbsp;		return this.value.length();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public char charAt(int index) {
+<b class="nc">&nbsp;		return this.value.charAt(index);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public CharSequence subSequence(int start, int end) {
+<b class="nc">&nbsp;		return this.value.subSequence(start, end);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Regex of(CharSequence... expressions) {
+<b class="nc">&nbsp;		return new Regex(String.join(&quot;&quot;, expressions));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Regex oneOf(CharSequence... expressions) {
+<b class="nc">&nbsp;		return new Regex(&quot;(?:&quot; + String.join(&quot;|&quot;, expressions) + &quot;)&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Regex group(CharSequence... expressions) {
+<b class="nc">&nbsp;		return new Regex(&quot;(?:&quot; + String.join(&quot;&quot;, expressions) + &quot;)&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

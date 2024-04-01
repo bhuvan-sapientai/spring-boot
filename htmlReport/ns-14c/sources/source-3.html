@@ -1,0 +1,356 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InitializrService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command.init</a>
+</div>
+
+<h1>Coverage Summary for Class: InitializrService (org.springframework.boot.cli.command.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InitializrService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/80)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command.init;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;
+&nbsp;import org.apache.hc.client5.http.classic.HttpClient;
+&nbsp;import org.apache.hc.client5.http.classic.methods.HttpGet;
+&nbsp;import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+&nbsp;import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+&nbsp;import org.apache.hc.core5.http.ClassicHttpResponse;
+&nbsp;import org.apache.hc.core5.http.ContentType;
+&nbsp;import org.apache.hc.core5.http.Header;
+&nbsp;import org.apache.hc.core5.http.HttpEntity;
+&nbsp;import org.apache.hc.core5.http.HttpHeaders;
+&nbsp;import org.apache.hc.core5.http.HttpHost;
+&nbsp;import org.apache.hc.core5.http.message.BasicHeader;
+&nbsp;import org.apache.hc.core5.http.message.StatusLine;
+&nbsp;import org.json.JSONException;
+&nbsp;import org.json.JSONObject;
+&nbsp;
+&nbsp;import org.springframework.boot.cli.util.Log;
+&nbsp;import org.springframework.util.FileCopyUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Invokes the initializr service over HTTP.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;class InitializrService {
+&nbsp;
+&nbsp;	private static final String FILENAME_HEADER_PREFIX = &quot;filename=\&quot;&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Accept header to use to retrieve the json meta-data.
+&nbsp;	 */
+&nbsp;	public static final String ACCEPT_META_DATA = &quot;application/vnd.initializr.v2.1+&quot;
+&nbsp;			+ &quot;json,application/vnd.initializr.v2+json&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Accept header to use to retrieve the service capabilities of the service. If the
+&nbsp;	 * service does not offer such feature, the json meta-data are retrieved instead.
+&nbsp;	 */
+&nbsp;	public static final String ACCEPT_SERVICE_CAPABILITIES = &quot;text/plain,&quot; + ACCEPT_META_DATA;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Late binding HTTP client.
+&nbsp;	 */
+&nbsp;	private HttpClient http;
+&nbsp;
+<b class="nc">&nbsp;	InitializrService() {</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	InitializrService(HttpClient http) {</b>
+<b class="nc">&nbsp;		this.http = http;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected HttpClient getHttp() {
+<b class="nc">&nbsp;		if (this.http == null) {</b>
+<b class="nc">&nbsp;			this.http = HttpClientBuilder.create().useSystemProperties().build();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.http;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Generate a project based on the specified {@link ProjectGenerationRequest}.
+&nbsp;	 * @param request the generation request
+&nbsp;	 * @return an entity defining the project
+&nbsp;	 * @throws IOException if generation fails
+&nbsp;	 */
+&nbsp;	ProjectGenerationResponse generate(ProjectGenerationRequest request) throws IOException {
+<b class="nc">&nbsp;		Log.info(&quot;Using service at &quot; + request.getServiceUrl());</b>
+<b class="nc">&nbsp;		InitializrServiceMetadata metadata = loadMetadata(request.getServiceUrl());</b>
+<b class="nc">&nbsp;		URI url = request.generateUrl(metadata);</b>
+<b class="nc">&nbsp;		ClassicHttpResponse httpResponse = executeProjectGenerationRequest(url);</b>
+<b class="nc">&nbsp;		HttpEntity httpEntity = httpResponse.getEntity();</b>
+<b class="nc">&nbsp;		validateResponse(httpResponse, request.getServiceUrl());</b>
+<b class="nc">&nbsp;		return createResponse(httpResponse, httpEntity);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load the {@link InitializrServiceMetadata} at the specified url.
+&nbsp;	 * @param serviceUrl to url of the initializer service
+&nbsp;	 * @return the metadata describing the service
+&nbsp;	 * @throws IOException if the service&#39;s metadata cannot be loaded
+&nbsp;	 */
+&nbsp;	InitializrServiceMetadata loadMetadata(String serviceUrl) throws IOException {
+<b class="nc">&nbsp;		ClassicHttpResponse httpResponse = executeInitializrMetadataRetrieval(serviceUrl);</b>
+<b class="nc">&nbsp;		validateResponse(httpResponse, serviceUrl);</b>
+<b class="nc">&nbsp;		return parseJsonMetadata(httpResponse.getEntity());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Loads the service capabilities of the service at the specified URL. If the service
+&nbsp;	 * supports generating a textual representation of the capabilities, it is returned,
+&nbsp;	 * otherwise {@link InitializrServiceMetadata} is returned.
+&nbsp;	 * @param serviceUrl to url of the initializer service
+&nbsp;	 * @return the service capabilities (as a String) or the
+&nbsp;	 * {@link InitializrServiceMetadata} describing the service
+&nbsp;	 * @throws IOException if the service capabilities cannot be loaded
+&nbsp;	 */
+&nbsp;	Object loadServiceCapabilities(String serviceUrl) throws IOException {
+<b class="nc">&nbsp;		HttpGet request = new HttpGet(serviceUrl);</b>
+<b class="nc">&nbsp;		request.setHeader(new BasicHeader(HttpHeaders.ACCEPT, ACCEPT_SERVICE_CAPABILITIES));</b>
+<b class="nc">&nbsp;		ClassicHttpResponse httpResponse = execute(request, URI.create(serviceUrl), &quot;retrieve help&quot;);</b>
+<b class="nc">&nbsp;		validateResponse(httpResponse, serviceUrl);</b>
+<b class="nc">&nbsp;		HttpEntity httpEntity = httpResponse.getEntity();</b>
+<b class="nc">&nbsp;		ContentType contentType = ContentType.create(httpEntity.getContentType());</b>
+<b class="nc">&nbsp;		if (contentType.getMimeType().equals(&quot;text/plain&quot;)) {</b>
+<b class="nc">&nbsp;			return getContent(httpEntity);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return parseJsonMetadata(httpEntity);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private InitializrServiceMetadata parseJsonMetadata(HttpEntity httpEntity) throws IOException {
+&nbsp;		try {
+<b class="nc">&nbsp;			return new InitializrServiceMetadata(getContentAsJson(httpEntity));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (JSONException ex) {</b>
+<b class="nc">&nbsp;			throw new ReportableException(&quot;Invalid content received from server (&quot; + ex.getMessage() + &quot;)&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void validateResponse(ClassicHttpResponse httpResponse, String serviceUrl) {
+<b class="nc">&nbsp;		if (httpResponse.getEntity() == null) {</b>
+<b class="nc">&nbsp;			throw new ReportableException(&quot;No content received from server &#39;&quot; + serviceUrl + &quot;&#39;&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (httpResponse.getCode() != 200) {</b>
+<b class="nc">&nbsp;			throw createException(serviceUrl, httpResponse);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ProjectGenerationResponse createResponse(ClassicHttpResponse httpResponse, HttpEntity httpEntity)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		ProjectGenerationResponse response = new ProjectGenerationResponse(</b>
+<b class="nc">&nbsp;				ContentType.create(httpEntity.getContentType()));</b>
+<b class="nc">&nbsp;		response.setContent(FileCopyUtils.copyToByteArray(httpEntity.getContent()));</b>
+<b class="nc">&nbsp;		String fileName = extractFileName(httpResponse.getFirstHeader(&quot;Content-Disposition&quot;));</b>
+<b class="nc">&nbsp;		if (fileName != null) {</b>
+<b class="nc">&nbsp;			response.setFileName(fileName);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return response;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Request the creation of the project using the specified URL.
+&nbsp;	 * @param url the URL
+&nbsp;	 * @return the response
+&nbsp;	 */
+&nbsp;	private ClassicHttpResponse executeProjectGenerationRequest(URI url) {
+<b class="nc">&nbsp;		return execute(new HttpGet(url), url, &quot;generate project&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Retrieves the meta-data of the service at the specified URL.
+&nbsp;	 * @param url the URL
+&nbsp;	 * @return the response
+&nbsp;	 */
+&nbsp;	private ClassicHttpResponse executeInitializrMetadataRetrieval(String url) {
+<b class="nc">&nbsp;		HttpGet request = new HttpGet(url);</b>
+<b class="nc">&nbsp;		request.setHeader(new BasicHeader(HttpHeaders.ACCEPT, ACCEPT_META_DATA));</b>
+<b class="nc">&nbsp;		return execute(request, URI.create(url), &quot;retrieve metadata&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ClassicHttpResponse execute(HttpUriRequest request, URI url, String description) {
+&nbsp;		try {
+<b class="nc">&nbsp;			HttpHost host = HttpHost.create(url);</b>
+<b class="nc">&nbsp;			request.addHeader(&quot;User-Agent&quot;, &quot;SpringBootCli/&quot; + getClass().getPackage().getImplementationVersion());</b>
+<b class="nc">&nbsp;			return getHttp().executeOpen(host, request, null);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new ReportableException(</b>
+<b class="nc">&nbsp;					&quot;Failed to &quot; + description + &quot; from service at &#39;&quot; + url + &quot;&#39; (&quot; + ex.getMessage() + &quot;)&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ReportableException createException(String url, ClassicHttpResponse httpResponse) {
+<b class="nc">&nbsp;		StatusLine statusLine = new StatusLine(httpResponse);</b>
+<b class="nc">&nbsp;		String message = &quot;Initializr service call failed using &#39;&quot; + url + &quot;&#39; - service returned &quot;</b>
+<b class="nc">&nbsp;				+ statusLine.getReasonPhrase();</b>
+<b class="nc">&nbsp;		String error = extractMessage(httpResponse.getEntity());</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(error)) {</b>
+<b class="nc">&nbsp;			message += &quot;: &#39;&quot; + error + &quot;&#39;&quot;;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			int statusCode = statusLine.getStatusCode();</b>
+<b class="nc">&nbsp;			message += &quot; (unexpected &quot; + statusCode + &quot; error)&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new ReportableException(message);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extractMessage(HttpEntity entity) {
+<b class="nc">&nbsp;		if (entity != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				JSONObject error = getContentAsJson(entity);</b>
+<b class="nc">&nbsp;				if (error.has(&quot;message&quot;)) {</b>
+<b class="nc">&nbsp;					return error.getString(&quot;message&quot;);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+&nbsp;				// Ignore
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JSONObject getContentAsJson(HttpEntity entity) throws IOException, JSONException {
+<b class="nc">&nbsp;		return new JSONObject(getContent(entity));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getContent(HttpEntity entity) throws IOException {
+<b class="nc">&nbsp;		ContentType contentType = ContentType.create(entity.getContentType());</b>
+<b class="nc">&nbsp;		Charset charset = contentType.getCharset();</b>
+<b class="nc">&nbsp;		charset = (charset != null) ? charset : StandardCharsets.UTF_8;</b>
+<b class="nc">&nbsp;		byte[] content = FileCopyUtils.copyToByteArray(entity.getContent());</b>
+<b class="nc">&nbsp;		return new String(content, charset);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extractFileName(Header header) {
+<b class="nc">&nbsp;		if (header != null) {</b>
+<b class="nc">&nbsp;			String value = header.getValue();</b>
+<b class="nc">&nbsp;			int start = value.indexOf(FILENAME_HEADER_PREFIX);</b>
+<b class="nc">&nbsp;			if (start != -1) {</b>
+<b class="nc">&nbsp;				value = value.substring(start + FILENAME_HEADER_PREFIX.length());</b>
+<b class="nc">&nbsp;				int end = value.indexOf(&#39;\&quot;&#39;);</b>
+<b class="nc">&nbsp;				if (end != -1) {</b>
+<b class="nc">&nbsp;					return value.substring(0, end);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

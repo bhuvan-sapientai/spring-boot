@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Repackager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: Repackager (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Repackager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.attribute.FileTime;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility class that can be used to repackage an archive so that it can be executed using
+&nbsp; * &#39;{@literal java -jar}&#39;.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class Repackager extends Packager {
+&nbsp;
+<b class="nc">&nbsp;	private boolean backupSource = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Repackager} instance.
+&nbsp;	 * @param source the source archive file to package
+&nbsp;	 */
+&nbsp;	public Repackager(File source) {
+<b class="nc">&nbsp;		super(source);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void writeSignatureFileIfNecessary(Map&lt;String, Library&gt; writtenLibraries, AbstractJarWriter writer)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		if (getSource().getName().toLowerCase().endsWith(&quot;.jar&quot;) &amp;&amp; hasSignedLibrary(writtenLibraries)) {</b>
+<b class="nc">&nbsp;			writer.writeEntry(&quot;META-INF/BOOT.SF&quot;, (entryWriter) -&gt; {</b>
+<b class="nc">&nbsp;			});</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasSignedLibrary(Map&lt;String, Library&gt; writtenLibraries) throws IOException {
+<b class="nc">&nbsp;		for (Library library : writtenLibraries.values()) {</b>
+<b class="nc">&nbsp;			if (!(library instanceof JarModeLibrary) &amp;&amp; FileUtils.isSignedJarFile(library.getFile())) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets if source files should be backed up when they would be overwritten.
+&nbsp;	 * @param backupSource if source files should be backed up
+&nbsp;	 */
+&nbsp;	public void setBackupSource(boolean backupSource) {
+<b class="nc">&nbsp;		this.backupSource = backupSource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Repackage the source file so that it can be run using &#39;{@literal java -jar}&#39;.
+&nbsp;	 * @param libraries the libraries required to run the archive
+&nbsp;	 * @throws IOException if the file cannot be repackaged
+&nbsp;	 */
+&nbsp;	public void repackage(Libraries libraries) throws IOException {
+<b class="nc">&nbsp;		repackage(getSource(), libraries);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Repackage to the given destination so that it can be launched using &#39;
+&nbsp;	 * {@literal java -jar}&#39;.
+&nbsp;	 * @param destination the destination file (may be the same as the source)
+&nbsp;	 * @param libraries the libraries required to run the archive
+&nbsp;	 * @throws IOException if the file cannot be repackaged
+&nbsp;	 */
+&nbsp;	public void repackage(File destination, Libraries libraries) throws IOException {
+<b class="nc">&nbsp;		repackage(destination, libraries, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Repackage to the given destination so that it can be launched using &#39;
+&nbsp;	 * {@literal java -jar}&#39;.
+&nbsp;	 * @param destination the destination file (may be the same as the source)
+&nbsp;	 * @param libraries the libraries required to run the archive
+&nbsp;	 * @param launchScript an optional launch script prepended to the front of the jar
+&nbsp;	 * @throws IOException if the file cannot be repackaged
+&nbsp;	 * @since 1.3.0
+&nbsp;	 */
+&nbsp;	public void repackage(File destination, Libraries libraries, LaunchScript launchScript) throws IOException {
+<b class="nc">&nbsp;		repackage(destination, libraries, launchScript, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Repackage to the given destination so that it can be launched using &#39;
+&nbsp;	 * {@literal java -jar}&#39;.
+&nbsp;	 * @param destination the destination file (may be the same as the source)
+&nbsp;	 * @param libraries the libraries required to run the archive
+&nbsp;	 * @param launchScript an optional launch script prepended to the front of the jar
+&nbsp;	 * @param lastModifiedTime an optional last modified time to apply to the archive and
+&nbsp;	 * its contents
+&nbsp;	 * @throws IOException if the file cannot be repackaged
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	public void repackage(File destination, Libraries libraries, LaunchScript launchScript, FileTime lastModifiedTime)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		Assert.isTrue(destination != null &amp;&amp; !destination.isDirectory(), &quot;Invalid destination&quot;);</b>
+<b class="nc">&nbsp;		getLayout(); // get layout early</b>
+<b class="nc">&nbsp;		destination = destination.getAbsoluteFile();</b>
+<b class="nc">&nbsp;		File source = getSource();</b>
+<b class="nc">&nbsp;		if (isAlreadyPackaged() &amp;&amp; source.equals(destination)) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		File workingSource = source;</b>
+<b class="nc">&nbsp;		if (source.equals(destination)) {</b>
+<b class="nc">&nbsp;			workingSource = getBackupFile();</b>
+<b class="nc">&nbsp;			workingSource.delete();</b>
+<b class="nc">&nbsp;			renameFile(source, workingSource);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		destination.delete();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			try (JarFile sourceJar = new JarFile(workingSource)) {</b>
+<b class="nc">&nbsp;				repackage(sourceJar, destination, libraries, launchScript, lastModifiedTime);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			if (!this.backupSource &amp;&amp; !source.equals(workingSource)) {</b>
+<b class="nc">&nbsp;				deleteFile(workingSource);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void repackage(JarFile sourceJar, File destination, Libraries libraries, LaunchScript launchScript,
+&nbsp;			FileTime lastModifiedTime) throws IOException {
+<b class="nc">&nbsp;		try (JarWriter writer = new JarWriter(destination, launchScript, lastModifiedTime)) {</b>
+<b class="nc">&nbsp;			write(sourceJar, libraries, writer, lastModifiedTime != null);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (lastModifiedTime != null) {</b>
+<b class="nc">&nbsp;			destination.setLastModified(lastModifiedTime.toMillis());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void renameFile(File file, File dest) {
+<b class="nc">&nbsp;		if (!file.renameTo(dest)) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to rename &#39;&quot; + file + &quot;&#39; to &#39;&quot; + dest + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void deleteFile(File file) {
+<b class="nc">&nbsp;		if (!file.delete()) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to delete &#39;&quot; + file + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

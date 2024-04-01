@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EncodePasswordCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command.encodepassword</a>
+</div>
+
+<h1>Coverage Summary for Class: EncodePasswordCommand (org.springframework.boot.cli.command.encodepassword)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EncodePasswordCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EncodePasswordCommand$EncodePasswordOptionHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command.encodepassword;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import joptsimple.OptionSet;
+&nbsp;import joptsimple.OptionSpec;
+&nbsp;
+&nbsp;import org.springframework.boot.cli.command.Command;
+&nbsp;import org.springframework.boot.cli.command.HelpExample;
+&nbsp;import org.springframework.boot.cli.command.OptionParsingCommand;
+&nbsp;import org.springframework.boot.cli.command.options.OptionHandler;
+&nbsp;import org.springframework.boot.cli.command.status.ExitStatus;
+&nbsp;import org.springframework.boot.cli.util.Log;
+&nbsp;import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+&nbsp;import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Command} to encode passwords for use with Spring Security.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class EncodePasswordCommand extends OptionParsingCommand {
+&nbsp;
+&nbsp;	private static final Map&lt;String, Supplier&lt;PasswordEncoder&gt;&gt; ENCODERS;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Map&lt;String, Supplier&lt;PasswordEncoder&gt;&gt; encoders = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		encoders.put(&quot;default&quot;, PasswordEncoderFactories::createDelegatingPasswordEncoder);</b>
+<b class="nc">&nbsp;		encoders.put(&quot;bcrypt&quot;, BCryptPasswordEncoder::new);</b>
+<b class="nc">&nbsp;		encoders.put(&quot;pbkdf2&quot;, Pbkdf2PasswordEncoder::defaultsForSpringSecurity_v5_8);</b>
+<b class="nc">&nbsp;		ENCODERS = Collections.unmodifiableMap(encoders);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public EncodePasswordCommand() {
+<b class="nc">&nbsp;		super(&quot;encodepassword&quot;, &quot;Encode a password for use with Spring Security&quot;, new EncodePasswordOptionHandler());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getUsageHelp() {
+<b class="nc">&nbsp;		return &quot;[options] &lt;password to encode&gt;&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Collection&lt;HelpExample&gt; getExamples() {
+<b class="nc">&nbsp;		List&lt;HelpExample&gt; examples = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		examples.add(new HelpExample(&quot;To encode a password with the default (bcrypt) encoder&quot;,</b>
+&nbsp;				&quot;spring encodepassword mypassword&quot;));
+<b class="nc">&nbsp;		examples.add(new HelpExample(&quot;To encode a password with pbkdf2&quot;, &quot;spring encodepassword -a pbkdf2 mypassword&quot;));</b>
+<b class="nc">&nbsp;		return examples;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class EncodePasswordOptionHandler extends OptionHandler {</b>
+&nbsp;
+&nbsp;		private OptionSpec&lt;String&gt; algorithm;
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected void options() {
+<b class="nc">&nbsp;			this.algorithm = option(Arrays.asList(&quot;algorithm&quot;, &quot;a&quot;),</b>
+&nbsp;					&quot;The algorithm to use. Supported algorithms: &quot;
+<b class="nc">&nbsp;							+ StringUtils.collectionToDelimitedString(ENCODERS.keySet(), &quot;, &quot;)</b>
+&nbsp;							+ &quot;. The default algorithm uses bcrypt&quot;)
+<b class="nc">&nbsp;				.withRequiredArg()</b>
+<b class="nc">&nbsp;				.defaultsTo(&quot;default&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected ExitStatus run(OptionSet options) {
+<b class="nc">&nbsp;			if (options.nonOptionArguments().size() != 1) {</b>
+<b class="nc">&nbsp;				Log.error(&quot;A single password option must be provided&quot;);</b>
+<b class="nc">&nbsp;				return ExitStatus.ERROR;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String algorithm = options.valueOf(this.algorithm);</b>
+<b class="nc">&nbsp;			String password = (String) options.nonOptionArguments().get(0);</b>
+<b class="nc">&nbsp;			Supplier&lt;PasswordEncoder&gt; encoder = ENCODERS.get(algorithm);</b>
+<b class="nc">&nbsp;			if (encoder == null) {</b>
+<b class="nc">&nbsp;				Log.error(&quot;Unknown algorithm, valid options are: &quot;</b>
+<b class="nc">&nbsp;						+ StringUtils.collectionToCommaDelimitedString(ENCODERS.keySet()));</b>
+<b class="nc">&nbsp;				return ExitStatus.ERROR;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Log.info(encoder.get().encode(password));</b>
+<b class="nc">&nbsp;			return ExitStatus.OK;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

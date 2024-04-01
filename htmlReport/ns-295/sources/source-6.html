@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoaderIntegrationTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader</a>
+</div>
+
+<h1>Coverage Summary for Class: LoaderIntegrationTests (org.springframework.boot.loader)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoaderIntegrationTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoaderIntegrationTests$JavaRuntime</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.junit.jupiter.params.ParameterizedTest;
+&nbsp;import org.junit.jupiter.params.provider.MethodSource;
+&nbsp;import org.testcontainers.containers.GenericContainer;
+&nbsp;import org.testcontainers.containers.output.ToStringConsumer;
+&nbsp;import org.testcontainers.containers.startupcheck.OneShotStartupCheckStrategy;
+&nbsp;import org.testcontainers.images.builder.ImageFromDockerfile;
+&nbsp;import org.testcontainers.utility.DockerImageName;
+&nbsp;import org.testcontainers.utility.MountableFile;
+&nbsp;
+&nbsp;import org.springframework.boot.system.JavaVersion;
+&nbsp;import org.springframework.boot.testsupport.testcontainers.DisabledIfDockerUnavailable;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests loader that supports fat jars.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;@DisabledIfDockerUnavailable
+<b class="nc">&nbsp;class LoaderIntegrationTests {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final ToStringConsumer output = new ToStringConsumer();</b>
+&nbsp;
+&nbsp;	@ParameterizedTest
+&nbsp;	@MethodSource(&quot;javaRuntimes&quot;)
+&nbsp;	void runJar(JavaRuntime javaRuntime) {
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = createContainer(javaRuntime, &quot;spring-boot-loader-tests-app&quot;, null)) {</b>
+<b class="nc">&nbsp;			container.start();</b>
+<b class="nc">&nbsp;			System.out.println(this.output.toUtf8String());</b>
+<b class="nc">&nbsp;			assertThat(this.output.toUtf8String()).contains(&quot;&gt;&gt;&gt;&gt;&gt; 287649 BYTES from&quot;)</b>
+<b class="nc">&nbsp;				.contains(&quot;&gt;&gt;&gt;&gt;&gt; gh-7161 [/gh-7161/example.txt]&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;WARNING:&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;illegal&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContain(&quot;jar written to temp&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	@ParameterizedTest</b>
+<b class="nc">&nbsp;	@MethodSource(&quot;javaRuntimes&quot;)</b>
+<b class="nc">&nbsp;	void runSignedJar(JavaRuntime javaRuntime) {</b>
+<b class="nc">&nbsp;		try (GenericContainer&lt;?&gt; container = createContainer(javaRuntime, &quot;spring-boot-loader-tests-signed-jar&quot;,</b>
+<b class="nc">&nbsp;				null)) {</b>
+&nbsp;			container.start();
+&nbsp;			System.out.println(this.output.toUtf8String());
+&nbsp;			assertThat(this.output.toUtf8String()).contains(&quot;Legion of the Bouncy Castle&quot;);
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;	}</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;	@ParameterizedTest</b>
+&nbsp;	@MethodSource(&quot;javaRuntimes&quot;)
+&nbsp;	void runSignedJarWhenUnpack(JavaRuntime javaRuntime) {
+&nbsp;		try (GenericContainer&lt;?&gt; container = createContainer(javaRuntime, &quot;spring-boot-loader-tests-signed-jar&quot;,
+<b class="nc">&nbsp;				&quot;unpack&quot;)) {</b>
+<b class="nc">&nbsp;			container.start();</b>
+<b class="nc">&nbsp;			System.out.println(this.output.toUtf8String());</b>
+<b class="nc">&nbsp;			assertThat(this.output.toUtf8String()).contains(&quot;Legion of the Bouncy Castle&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private GenericContainer&lt;?&gt; createContainer(JavaRuntime javaRuntime, String name, String classifier) {
+&nbsp;		return javaRuntime.getContainer()
+&nbsp;			.withLogConsumer(this.output)
+&nbsp;			.withCopyFileToContainer(findApplication(name, classifier), &quot;/app.jar&quot;)
+&nbsp;			.withStartupCheckStrategy(new OneShotStartupCheckStrategy().withTimeout(Duration.ofMinutes(5)))
+&nbsp;			.withCommand(&quot;java&quot;, &quot;-jar&quot;, &quot;app.jar&quot;);
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private MountableFile findApplication(String name, String classifier) {</b>
+<b class="nc">&nbsp;		return MountableFile.forHostPath(findJarFile(name, classifier).toPath());</b>
+<b class="nc">&nbsp;	}</b>
+<b class="nc">&nbsp;</b>
+&nbsp;	private File findJarFile(String name, String classifier) {
+&nbsp;		classifier = (classifier != null) ? &quot;-&quot; + classifier : &quot;&quot;;
+&nbsp;		String path = String.format(&quot;build/%1$s/build/libs/%1$s%2$s.jar&quot;, name, classifier);
+<b class="nc">&nbsp;		File jar = new File(path);</b>
+&nbsp;		Assert.state(jar.isFile(), () -&gt; &quot;Could not find &quot; + path + &quot;. Have you built it?&quot;);
+&nbsp;		return jar;
+&nbsp;	}
+<b class="nc">&nbsp;</b>
+&nbsp;	static Stream&lt;JavaRuntime&gt; javaRuntimes() {
+&nbsp;		List&lt;JavaRuntime&gt; javaRuntimes = new ArrayList&lt;&gt;();
+&nbsp;		javaRuntimes.add(JavaRuntime.openJdk(JavaVersion.SEVENTEEN));
+&nbsp;		javaRuntimes.add(JavaRuntime.openJdk(JavaVersion.TWENTY));
+<b class="nc">&nbsp;		javaRuntimes.add(JavaRuntime.oracleJdk17());</b>
+&nbsp;		javaRuntimes.add(JavaRuntime.openJdkEarlyAccess(JavaVersion.TWENTY_ONE));
+&nbsp;		return javaRuntimes.stream().filter(JavaRuntime::isCompatible);
+&nbsp;	}
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;	static final class JavaRuntime {</b>
+<b class="nc">&nbsp;</b>
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final JavaVersion version;
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;		private final Supplier&lt;GenericContainer&lt;?&gt;&gt; container;</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;		private JavaRuntime(String name, JavaVersion version, Supplier&lt;GenericContainer&lt;?&gt;&gt; container) {</b>
+<b class="nc">&nbsp;			this.name = name;</b>
+&nbsp;			this.version = version;
+&nbsp;			this.container = container;
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isCompatible() {
+&nbsp;			return this.version.isEqualOrNewerThan(JavaVersion.getJavaVersion());
+&nbsp;		}
+&nbsp;
+&nbsp;		GenericContainer&lt;?&gt; getContainer() {
+&nbsp;			return this.container.get();
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+&nbsp;			return this.name;
+&nbsp;		}
+&nbsp;
+&nbsp;		static JavaRuntime openJdkEarlyAccess(JavaVersion version) {
+&nbsp;			String imageVersion = version.toString();
+&nbsp;			DockerImageName image = DockerImageName.parse(&quot;openjdk:%s-ea-jdk&quot;.formatted(imageVersion));
+&nbsp;			return new JavaRuntime(&quot;OpenJDK Early Access &quot; + imageVersion, version,
+&nbsp;					() -&gt; new GenericContainer&lt;&gt;(image));
+&nbsp;		}
+&nbsp;
+&nbsp;		static JavaRuntime openJdk(JavaVersion version) {
+&nbsp;			String imageVersion = version.toString();
+&nbsp;			DockerImageName image = DockerImageName.parse(&quot;bellsoft/liberica-openjdk-debian:&quot; + imageVersion);
+&nbsp;			return new JavaRuntime(&quot;OpenJDK &quot; + imageVersion, version, () -&gt; new GenericContainer&lt;&gt;(image));
+&nbsp;		}
+&nbsp;
+&nbsp;		static JavaRuntime oracleJdk17() {
+&nbsp;			ImageFromDockerfile image = new ImageFromDockerfile(&quot;spring-boot-loader/oracle-jdk&quot;);
+&nbsp;			image.withFileFromFile(&quot;Dockerfile&quot;, new File(&quot;src/intTest/resources/conf/oracle-jdk-17/Dockerfile&quot;));
+&nbsp;			for (File file : new File(&quot;build/downloads/jdk/oracle&quot;).listFiles()) {
+&nbsp;				image.withFileFromFile(&quot;downloads/&quot; + file.getName(), file);
+&nbsp;			}
+&nbsp;			return new JavaRuntime(&quot;Oracle JDK 17&quot;, JavaVersion.SEVENTEEN, () -&gt; new GenericContainer&lt;&gt;(image));
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

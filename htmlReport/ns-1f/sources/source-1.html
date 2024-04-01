@@ -1,0 +1,321 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebFluxEndpointManagementContextConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.endpoint.web.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: WebFluxEndpointManagementContextConfiguration (org.springframework.boot.actuate.autoconfigure.endpoint.web.reactive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebFluxEndpointManagementContextConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebFluxEndpointManagementContextConfiguration$ServerCodecConfigurerEndpointObjectMapperBeanPostProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.endpoint.web.reactive;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.BeanPostProcessor;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.expose.EndpointExposure;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.server.ConditionalOnManagementPort;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.server.ManagementPortType;
+&nbsp;import org.springframework.boot.actuate.endpoint.ExposableEndpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationResponseBody;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.jackson.EndpointObjectMapper;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointMapping;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.ExposableWebEndpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebServerNamespace;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.reactive.AdditionalHealthEndpointPathsWebFluxHandlerMapping;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.reactive.ControllerEndpointHandlerMapping;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.reactive.WebFluxEndpointHandlerMapping;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpoint;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpointGroups;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Role;
+&nbsp;import org.springframework.core.codec.Encoder;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.http.MediaType;
+&nbsp;import org.springframework.http.codec.EncoderHttpMessageWriter;
+&nbsp;import org.springframework.http.codec.HttpMessageWriter;
+&nbsp;import org.springframework.http.codec.ServerCodecConfigurer;
+&nbsp;import org.springframework.http.codec.json.Jackson2JsonEncoder;
+&nbsp;import org.springframework.http.server.reactive.HttpHandler;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.util.function.SingletonSupplier;
+&nbsp;import org.springframework.web.reactive.DispatcherHandler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ManagementContextConfiguration @ManagementContextConfiguration} for Reactive
+&nbsp; * {@link Endpoint @Endpoint} concerns.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@ManagementContextConfiguration(proxyBeanMethods = false)
+&nbsp;@ConditionalOnWebApplication(type = Type.REACTIVE)
+&nbsp;@ConditionalOnClass({ DispatcherHandler.class, HttpHandler.class })
+&nbsp;@ConditionalOnBean(WebEndpointsSupplier.class)
+&nbsp;@EnableConfigurationProperties(CorsEndpointProperties.class)
+<b class="nc">&nbsp;public class WebFluxEndpointManagementContextConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public WebFluxEndpointHandlerMapping webEndpointReactiveHandlerMapping(WebEndpointsSupplier webEndpointsSupplier,
+&nbsp;			ControllerEndpointsSupplier controllerEndpointsSupplier, EndpointMediaTypes endpointMediaTypes,
+&nbsp;			CorsEndpointProperties corsProperties, WebEndpointProperties webEndpointProperties,
+&nbsp;			Environment environment) {
+<b class="nc">&nbsp;		String basePath = webEndpointProperties.getBasePath();</b>
+<b class="nc">&nbsp;		EndpointMapping endpointMapping = new EndpointMapping(basePath);</b>
+<b class="nc">&nbsp;		Collection&lt;ExposableWebEndpoint&gt; endpoints = webEndpointsSupplier.getEndpoints();</b>
+<b class="nc">&nbsp;		List&lt;ExposableEndpoint&lt;?&gt;&gt; allEndpoints = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		allEndpoints.addAll(endpoints);</b>
+<b class="nc">&nbsp;		allEndpoints.addAll(controllerEndpointsSupplier.getEndpoints());</b>
+<b class="nc">&nbsp;		return new WebFluxEndpointHandlerMapping(endpointMapping, endpoints, endpointMediaTypes,</b>
+<b class="nc">&nbsp;				corsProperties.toCorsConfiguration(), new EndpointLinksResolver(allEndpoints, basePath),</b>
+<b class="nc">&nbsp;				shouldRegisterLinksMapping(webEndpointProperties, environment, basePath));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean shouldRegisterLinksMapping(WebEndpointProperties properties, Environment environment,
+&nbsp;			String basePath) {
+<b class="nc">&nbsp;		return properties.getDiscovery().isEnabled() &amp;&amp; (StringUtils.hasText(basePath)</b>
+<b class="nc">&nbsp;				|| ManagementPortType.get(environment) == ManagementPortType.DIFFERENT);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnManagementPort(ManagementPortType.DIFFERENT)
+&nbsp;	@ConditionalOnAvailableEndpoint(endpoint = HealthEndpoint.class, exposure = EndpointExposure.WEB)
+&nbsp;	@ConditionalOnBean(HealthEndpoint.class)
+&nbsp;	public AdditionalHealthEndpointPathsWebFluxHandlerMapping managementHealthEndpointWebFluxHandlerMapping(
+&nbsp;			WebEndpointsSupplier webEndpointsSupplier, HealthEndpointGroups groups) {
+<b class="nc">&nbsp;		Collection&lt;ExposableWebEndpoint&gt; webEndpoints = webEndpointsSupplier.getEndpoints();</b>
+<b class="nc">&nbsp;		ExposableWebEndpoint health = webEndpoints.stream()</b>
+<b class="nc">&nbsp;			.filter((endpoint) -&gt; endpoint.getEndpointId().equals(HealthEndpoint.ID))</b>
+<b class="nc">&nbsp;			.findFirst()</b>
+<b class="nc">&nbsp;			.orElseThrow(</b>
+<b class="nc">&nbsp;					() -&gt; new IllegalStateException(&quot;No endpoint with id &#39;%s&#39; found&quot;.formatted(HealthEndpoint.ID)));</b>
+<b class="nc">&nbsp;		return new AdditionalHealthEndpointPathsWebFluxHandlerMapping(new EndpointMapping(&quot;&quot;), health,</b>
+<b class="nc">&nbsp;				groups.getAllWithAdditionalPath(WebServerNamespace.MANAGEMENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public ControllerEndpointHandlerMapping controllerEndpointHandlerMapping(
+&nbsp;			ControllerEndpointsSupplier controllerEndpointsSupplier, CorsEndpointProperties corsProperties,
+&nbsp;			WebEndpointProperties webEndpointProperties) {
+<b class="nc">&nbsp;		EndpointMapping endpointMapping = new EndpointMapping(webEndpointProperties.getBasePath());</b>
+<b class="nc">&nbsp;		return new ControllerEndpointHandlerMapping(endpointMapping, controllerEndpointsSupplier.getEndpoints(),</b>
+<b class="nc">&nbsp;				corsProperties.toCorsConfiguration());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnBean(EndpointObjectMapper.class)
+&nbsp;	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+&nbsp;	static ServerCodecConfigurerEndpointObjectMapperBeanPostProcessor serverCodecConfigurerEndpointObjectMapperBeanPostProcessor(
+&nbsp;			ObjectProvider&lt;EndpointObjectMapper&gt; endpointObjectMapper) {
+<b class="nc">&nbsp;		return new ServerCodecConfigurerEndpointObjectMapperBeanPostProcessor(</b>
+<b class="nc">&nbsp;				SingletonSupplier.of(endpointObjectMapper::getObject));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BeanPostProcessor} to apply {@link EndpointObjectMapper} for
+&nbsp;	 * {@link OperationResponseBody} to {@link Jackson2JsonEncoder} instances.
+&nbsp;	 */
+&nbsp;	static class ServerCodecConfigurerEndpointObjectMapperBeanPostProcessor implements BeanPostProcessor {
+&nbsp;
+<b class="nc">&nbsp;		private static final List&lt;MediaType&gt; MEDIA_TYPES = Collections</b>
+<b class="nc">&nbsp;			.unmodifiableList(Arrays.asList(MediaType.APPLICATION_JSON, new MediaType(&quot;application&quot;, &quot;*+json&quot;)));</b>
+&nbsp;
+&nbsp;		private final Supplier&lt;EndpointObjectMapper&gt; endpointObjectMapper;
+&nbsp;
+&nbsp;		ServerCodecConfigurerEndpointObjectMapperBeanPostProcessor(
+<b class="nc">&nbsp;				Supplier&lt;EndpointObjectMapper&gt; endpointObjectMapper) {</b>
+<b class="nc">&nbsp;			this.endpointObjectMapper = endpointObjectMapper;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+<b class="nc">&nbsp;			if (bean instanceof ServerCodecConfigurer serverCodecConfigurer) {</b>
+<b class="nc">&nbsp;				process(serverCodecConfigurer);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return bean;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void process(ServerCodecConfigurer configurer) {
+<b class="nc">&nbsp;			for (HttpMessageWriter&lt;?&gt; writer : configurer.getWriters()) {</b>
+<b class="nc">&nbsp;				if (writer instanceof EncoderHttpMessageWriter&lt;?&gt; encoderHttpMessageWriter) {</b>
+<b class="nc">&nbsp;					process((encoderHttpMessageWriter).getEncoder());</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void process(Encoder&lt;?&gt; encoder) {
+<b class="nc">&nbsp;			if (encoder instanceof Jackson2JsonEncoder jackson2JsonEncoder) {</b>
+<b class="nc">&nbsp;				jackson2JsonEncoder.registerObjectMappersForType(OperationResponseBody.class, (associations) -&gt; {</b>
+<b class="nc">&nbsp;					ObjectMapper objectMapper = this.endpointObjectMapper.get().get();</b>
+<b class="nc">&nbsp;					MEDIA_TYPES.forEach((mimeType) -&gt; associations.put(mimeType, objectMapper));</b>
+&nbsp;				});
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AnsiString</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command.shell</a>
+</div>
+
+<h1>Coverage Summary for Class: AnsiString (org.springframework.boot.cli.command.shell)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AnsiString</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command.shell;
+&nbsp;
+&nbsp;import jline.Terminal;
+&nbsp;import org.fusesource.jansi.Ansi;
+&nbsp;import org.fusesource.jansi.AnsiRenderer.Code;
+&nbsp;
+&nbsp;/**
+&nbsp; * Simple utility class to build an ANSI string when supported by the {@link Terminal}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class AnsiString {
+&nbsp;
+&nbsp;	private final Terminal terminal;
+&nbsp;
+<b class="nc">&nbsp;	private final StringBuilder value = new StringBuilder();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AnsiString} for the given {@link Terminal}.
+&nbsp;	 * @param terminal the terminal used to test if {@link Terminal#isAnsiSupported() ANSI
+&nbsp;	 * is supported}.
+&nbsp;	 */
+<b class="nc">&nbsp;	AnsiString(Terminal terminal) {</b>
+<b class="nc">&nbsp;		this.terminal = terminal;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Append text with the given ANSI codes.
+&nbsp;	 * @param text the text to append
+&nbsp;	 * @param codes the ANSI codes
+&nbsp;	 * @return this string
+&nbsp;	 */
+&nbsp;	AnsiString append(String text, Code... codes) {
+<b class="nc">&nbsp;		if (codes.length == 0 || !isAnsiSupported()) {</b>
+<b class="nc">&nbsp;			this.value.append(text);</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Ansi ansi = Ansi.ansi();</b>
+<b class="nc">&nbsp;		for (Code code : codes) {</b>
+<b class="nc">&nbsp;			ansi = applyCode(ansi, code);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.value.append(ansi.a(text).reset().toString());</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Ansi applyCode(Ansi ansi, Code code) {
+<b class="nc">&nbsp;		if (code.isColor()) {</b>
+<b class="nc">&nbsp;			if (code.isBackground()) {</b>
+<b class="nc">&nbsp;				return ansi.bg(code.getColor());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return ansi.fg(code.getColor());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ansi.a(code.getAttribute());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isAnsiSupported() {
+<b class="nc">&nbsp;		return this.terminal.isAnsiSupported();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.value.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

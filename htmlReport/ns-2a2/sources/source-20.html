@@ -1,0 +1,275 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RunProcess</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: RunProcess (org.springframework.boot.loader.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RunProcess</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.tools;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility used to run a process.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Dmytro Nosan
+&nbsp; * @since 1.1.0
+&nbsp; */
+&nbsp;public class RunProcess {
+&nbsp;
+&nbsp;	private static final long JUST_ENDED_LIMIT = 500;
+&nbsp;
+&nbsp;	private final File workingDirectory;
+&nbsp;
+&nbsp;	private final String[] command;
+&nbsp;
+&nbsp;	private volatile Process process;
+&nbsp;
+&nbsp;	private volatile long endTime;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates new {@link RunProcess} instance for the specified command.
+&nbsp;	 * @param command the program to execute and its arguments
+&nbsp;	 */
+&nbsp;	public RunProcess(String... command) {
+<b class="nc">&nbsp;		this(null, command);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates new {@link RunProcess} instance for the specified working directory and
+&nbsp;	 * command.
+&nbsp;	 * @param workingDirectory the working directory of the child process or {@code null}
+&nbsp;	 * to run in the working directory of the current Java process
+&nbsp;	 * @param command the program to execute and its arguments
+&nbsp;	 */
+<b class="nc">&nbsp;	public RunProcess(File workingDirectory, String... command) {</b>
+<b class="nc">&nbsp;		this.workingDirectory = workingDirectory;</b>
+<b class="nc">&nbsp;		this.command = command;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public int run(boolean waitForProcess, String... args) throws IOException {
+<b class="nc">&nbsp;		return run(waitForProcess, Arrays.asList(args), Collections.emptyMap());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public int run(boolean waitForProcess, Collection&lt;String&gt; args, Map&lt;String, String&gt; environmentVariables)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		ProcessBuilder builder = new ProcessBuilder(this.command);</b>
+<b class="nc">&nbsp;		builder.directory(this.workingDirectory);</b>
+<b class="nc">&nbsp;		builder.command().addAll(args);</b>
+<b class="nc">&nbsp;		builder.environment().putAll(environmentVariables);</b>
+<b class="nc">&nbsp;		builder.redirectErrorStream(true);</b>
+<b class="nc">&nbsp;		builder.inheritIO();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			Process process = builder.start();</b>
+<b class="nc">&nbsp;			this.process = process;</b>
+<b class="nc">&nbsp;			SignalUtils.attachSignalHandler(this::handleSigInt);</b>
+<b class="nc">&nbsp;			if (waitForProcess) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					return process.waitFor();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;					Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;					return 1;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return 5;</b>
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			if (waitForProcess) {</b>
+<b class="nc">&nbsp;				this.endTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;				this.process = null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the running process.
+&nbsp;	 * @return the process or {@code null}
+&nbsp;	 */
+&nbsp;	public Process getRunningProcess() {
+<b class="nc">&nbsp;		return this.process;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the process was stopped.
+&nbsp;	 * @return {@code true} if stopped
+&nbsp;	 */
+&nbsp;	public boolean handleSigInt() {
+<b class="nc">&nbsp;		if (allowChildToHandleSigInt()) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return doKill();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean allowChildToHandleSigInt() {
+<b class="nc">&nbsp;		Process process = this.process;</b>
+<b class="nc">&nbsp;		if (process == null) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		long end = System.currentTimeMillis() + 5000;</b>
+<b class="nc">&nbsp;		while (System.currentTimeMillis() &lt; end) {</b>
+<b class="nc">&nbsp;			if (!process.isAlive()) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				Thread.sleep(500);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;				return false;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Kill this process.
+&nbsp;	 */
+&nbsp;	public void kill() {
+<b class="nc">&nbsp;		doKill();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean doKill() {
+&nbsp;		// destroy the running process
+<b class="nc">&nbsp;		Process process = this.process;</b>
+<b class="nc">&nbsp;		if (process != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				process.destroy();</b>
+<b class="nc">&nbsp;				process.waitFor();</b>
+<b class="nc">&nbsp;				this.process = null;</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				Thread.currentThread().interrupt();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean hasJustEnded() {
+<b class="nc">&nbsp;		return System.currentTimeMillis() &lt; (this.endTime + JUST_ENDED_LIMIT);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

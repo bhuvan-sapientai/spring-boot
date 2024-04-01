@@ -1,0 +1,395 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SysVinitLaunchScriptIntegrationTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.launchscript</a>
+</div>
+
+<h1>Coverage Summary for Class: SysVinitLaunchScriptIntegrationTests (org.springframework.boot.launchscript)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SysVinitLaunchScriptIntegrationTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.launchscript;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.junit.jupiter.params.ParameterizedTest;
+&nbsp;import org.junit.jupiter.params.provider.MethodSource;
+&nbsp;
+&nbsp;import org.springframework.boot.ansi.AnsiColor;
+&nbsp;import org.springframework.boot.testsupport.testcontainers.DisabledIfDockerUnavailable;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests for Spring Boot&#39;s launch script on OSs that use SysVinit.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Ali Shahbour
+&nbsp; * @author Alexey Vinogradov
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;@DisabledIfDockerUnavailable
+&nbsp;class SysVinitLaunchScriptIntegrationTests extends AbstractLaunchScriptIntegrationTests {
+&nbsp;
+&nbsp;	SysVinitLaunchScriptIntegrationTests() {
+<b class="nc">&nbsp;		super(&quot;init.d/&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static List&lt;Object[]&gt; parameters() {
+<b class="nc">&nbsp;		return filterParameters((file) -&gt; !file.getName().contains(&quot;RedHat&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void statusWhenStopped(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;status-when-stopped.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 3&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.RED, &quot;Not running&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void statusWhenStarted(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;status-when-started.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 0&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Started [&quot; + extractPid(output) + &quot;]&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void statusWhenKilled(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;status-when-killed.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 1&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output)</b>
+<b class="nc">&nbsp;			.has(coloredString(AnsiColor.RED, &quot;Not running (process &quot; + extractPid(output) + &quot; not found)&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void stopWhenStopped(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;stop-when-stopped.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 0&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.YELLOW, &quot;Not running (pidfile not found)&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void forceStopWhenStopped(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;force-stop-when-stopped.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 0&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.YELLOW, &quot;Not running (pidfile not found)&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void startWhenStarted(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;start-when-started.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 0&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.YELLOW, &quot;Already running [&quot; + extractPid(output) + &quot;]&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void restartWhenStopped(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;restart-when-stopped.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 0&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.YELLOW, &quot;Not running (pidfile not found)&quot;));</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Started [&quot; + extractPid(output) + &quot;]&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void restartWhenStarted(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;restart-when-started.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 0&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Started [&quot; + extract(&quot;PID1&quot;, output) + &quot;]&quot;));</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Stopped [&quot; + extract(&quot;PID1&quot;, output) + &quot;]&quot;));</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Started [&quot; + extract(&quot;PID2&quot;, output) + &quot;]&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void startWhenStopped(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;start-when-stopped.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 0&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Started [&quot; + extractPid(output) + &quot;]&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void basicLaunch(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;basic-launch.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).doesNotContain(&quot;PID_FOLDER&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithMissingLogFolderGeneratesAWarning(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;launch-with-missing-log-folder.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output)</b>
+<b class="nc">&nbsp;			.has(coloredString(AnsiColor.YELLOW, &quot;LOG_FOLDER /does/not/exist does not exist. Falling back to /tmp&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithMissingPidFolderGeneratesAWarning(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;launch-with-missing-pid-folder.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output)</b>
+<b class="nc">&nbsp;			.has(coloredString(AnsiColor.YELLOW, &quot;PID_FOLDER /does/not/exist does not exist. Falling back to /tmp&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithSingleCommandLineArgument(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-single-command-line-argument.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithMultipleCommandLineArguments(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-multiple-command-line-arguments.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithSingleRunArg(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-single-run-arg.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithMultipleRunArgs(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-multiple-run-args.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithSingleJavaOpt(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-single-java-opt.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithDoubleLinkSingleJavaOpt(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-double-link-single-java-opt.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithMultipleJavaOpts(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-multiple-java-opts.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithUseOfStartStopDaemonDisabled(String os, String version) throws Exception {
+<b class="nc">&nbsp;		doLaunch(os, version, &quot;launch-with-use-of-start-stop-daemon-disabled.sh&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithRelativePidFolder(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;launch-with-relative-pid-folder.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Started [&quot; + extractPid(output) + &quot;]&quot;));</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Running [&quot; + extractPid(output) + &quot;]&quot;));</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.GREEN, &quot;Stopped [&quot; + extractPid(output) + &quot;]&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void pidFolderOwnership(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;pid-folder-ownership.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;phil root&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void pidFileOwnership(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;pid-file-ownership.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;phil root&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void logFileOwnership(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;log-file-ownership.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;phil root&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void logFileOwnershipIsChangedWhenCreated(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;log-file-ownership-is-changed-when-created.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;andy root&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void logFileOwnershipIsUnchangedWhenExists(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;log-file-ownership-is-unchanged-when-exists.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;root root&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithRelativeLogFolder(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;launch-with-relative-log-folder.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Log written&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void launchWithRunAsUser(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;launch-with-run-as-user.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;wagner root&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void whenRunAsUserDoesNotExistLaunchFailsWithInvalidArgument(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;launch-with-run-as-invalid-user.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 2&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.RED, &quot;Cannot run as &#39;johndoe&#39;: no such user&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void whenJarOwnerAndRunAsUserAreBothSpecifiedRunAsUserTakesPrecedence(String os, String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;launch-with-run-as-user-preferred-to-jar-owner.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;wagner root&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ParameterizedTest(name = &quot;{0} {1}&quot;)
+&nbsp;	@MethodSource(&quot;parameters&quot;)
+&nbsp;	void whenLaunchedUsingNonRootUserWithRunAsUserSpecifiedLaunchFailsWithInsufficientPrivilege(String os,
+&nbsp;			String version) throws Exception {
+<b class="nc">&nbsp;		String output = doTest(os, version, &quot;launch-with-run-as-user-root-required.sh&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).contains(&quot;Status: 4&quot;);</b>
+<b class="nc">&nbsp;		assertThat(output).has(coloredString(AnsiColor.RED, &quot;Cannot run as &#39;wagner&#39;: current user is not root&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extractPid(String output) {
+<b class="nc">&nbsp;		return extract(&quot;PID&quot;, output);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String extract(String label, String output) {
+<b class="nc">&nbsp;		Pattern pattern = Pattern.compile(&quot;.*&quot; + label + &quot;: ([0-9]+).*&quot;, Pattern.DOTALL);</b>
+<b class="nc">&nbsp;		java.util.regex.Matcher matcher = pattern.matcher(output);</b>
+<b class="nc">&nbsp;		if (matcher.matches()) {</b>
+<b class="nc">&nbsp;			return matcher.group(1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalArgumentException(&quot;Failed to extract &quot; + label + &quot; from output: &quot; + output);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

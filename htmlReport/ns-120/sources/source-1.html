@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractErrorController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.servlet.error</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractErrorController (org.springframework.boot.autoconfigure.web.servlet.error)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractErrorController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.servlet.error;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import jakarta.servlet.RequestDispatcher;
+&nbsp;import jakarta.servlet.http.HttpServletRequest;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;
+&nbsp;import org.springframework.boot.web.error.ErrorAttributeOptions;
+&nbsp;import org.springframework.boot.web.servlet.error.ErrorAttributes;
+&nbsp;import org.springframework.boot.web.servlet.error.ErrorController;
+&nbsp;import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.stereotype.Controller;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.context.request.ServletWebRequest;
+&nbsp;import org.springframework.web.context.request.WebRequest;
+&nbsp;import org.springframework.web.servlet.ModelAndView;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base class for error {@link Controller @Controller} implementations.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 1.3.0
+&nbsp; * @see ErrorAttributes
+&nbsp; */
+&nbsp;public abstract class AbstractErrorController implements ErrorController {
+&nbsp;
+&nbsp;	private final ErrorAttributes errorAttributes;
+&nbsp;
+&nbsp;	private final List&lt;ErrorViewResolver&gt; errorViewResolvers;
+&nbsp;
+&nbsp;	public AbstractErrorController(ErrorAttributes errorAttributes) {
+<b class="nc">&nbsp;		this(errorAttributes, null);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public AbstractErrorController(ErrorAttributes errorAttributes, List&lt;ErrorViewResolver&gt; errorViewResolvers) {</b>
+<b class="nc">&nbsp;		Assert.notNull(errorAttributes, &quot;ErrorAttributes must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.errorAttributes = errorAttributes;</b>
+<b class="nc">&nbsp;		this.errorViewResolvers = sortErrorViewResolvers(errorViewResolvers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;ErrorViewResolver&gt; sortErrorViewResolvers(List&lt;ErrorViewResolver&gt; resolvers) {
+<b class="nc">&nbsp;		List&lt;ErrorViewResolver&gt; sorted = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (resolvers != null) {</b>
+<b class="nc">&nbsp;			sorted.addAll(resolvers);</b>
+<b class="nc">&nbsp;			AnnotationAwareOrderComparator.sortIfNecessary(sorted);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return sorted;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Map&lt;String, Object&gt; getErrorAttributes(HttpServletRequest request, ErrorAttributeOptions options) {
+<b class="nc">&nbsp;		WebRequest webRequest = new ServletWebRequest(request);</b>
+<b class="nc">&nbsp;		return this.errorAttributes.getErrorAttributes(webRequest, options);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the trace parameter is set.
+&nbsp;	 * @param request the request
+&nbsp;	 * @return whether the trace parameter is set
+&nbsp;	 */
+&nbsp;	protected boolean getTraceParameter(HttpServletRequest request) {
+<b class="nc">&nbsp;		return getBooleanParameter(request, &quot;trace&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the message parameter is set.
+&nbsp;	 * @param request the request
+&nbsp;	 * @return whether the message parameter is set
+&nbsp;	 */
+&nbsp;	protected boolean getMessageParameter(HttpServletRequest request) {
+<b class="nc">&nbsp;		return getBooleanParameter(request, &quot;message&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the errors parameter is set.
+&nbsp;	 * @param request the request
+&nbsp;	 * @return whether the errors parameter is set
+&nbsp;	 */
+&nbsp;	protected boolean getErrorsParameter(HttpServletRequest request) {
+<b class="nc">&nbsp;		return getBooleanParameter(request, &quot;errors&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the path parameter is set.
+&nbsp;	 * @param request the request
+&nbsp;	 * @return whether the path parameter is set
+&nbsp;	 * @since 3.3.0
+&nbsp;	 */
+&nbsp;	protected boolean getPathParameter(HttpServletRequest request) {
+<b class="nc">&nbsp;		return getBooleanParameter(request, &quot;path&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected boolean getBooleanParameter(HttpServletRequest request, String parameterName) {
+<b class="nc">&nbsp;		String parameter = request.getParameter(parameterName);</b>
+<b class="nc">&nbsp;		if (parameter == null) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return !&quot;false&quot;.equalsIgnoreCase(parameter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected HttpStatus getStatus(HttpServletRequest request) {
+<b class="nc">&nbsp;		Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);</b>
+<b class="nc">&nbsp;		if (statusCode == null) {</b>
+<b class="nc">&nbsp;			return HttpStatus.INTERNAL_SERVER_ERROR;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return HttpStatus.valueOf(statusCode);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return HttpStatus.INTERNAL_SERVER_ERROR;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolve any specific error views. By default this method delegates to
+&nbsp;	 * {@link ErrorViewResolver ErrorViewResolvers}.
+&nbsp;	 * @param request the request
+&nbsp;	 * @param response the response
+&nbsp;	 * @param status the HTTP status
+&nbsp;	 * @param model the suggested model
+&nbsp;	 * @return a specific {@link ModelAndView} or {@code null} if the default should be
+&nbsp;	 * used
+&nbsp;	 * @since 1.4.0
+&nbsp;	 */
+&nbsp;	protected ModelAndView resolveErrorView(HttpServletRequest request, HttpServletResponse response, HttpStatus status,
+&nbsp;			Map&lt;String, Object&gt; model) {
+<b class="nc">&nbsp;		for (ErrorViewResolver resolver : this.errorViewResolvers) {</b>
+<b class="nc">&nbsp;			ModelAndView modelAndView = resolver.resolveErrorView(request, status, model);</b>
+<b class="nc">&nbsp;			if (modelAndView != null) {</b>
+<b class="nc">&nbsp;				return modelAndView;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

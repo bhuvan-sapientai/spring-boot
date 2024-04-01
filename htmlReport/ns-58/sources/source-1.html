@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebFluxObservationAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.observation.web.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: WebFluxObservationAutoConfiguration (org.springframework.boot.actuate.autoconfigure.observation.web.reactive)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebFluxObservationAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.observation.web.reactive;
+&nbsp;
+&nbsp;import io.micrometer.core.instrument.MeterRegistry;
+&nbsp;import io.micrometer.core.instrument.config.MeterFilter;
+&nbsp;import io.micrometer.observation.Observation;
+&nbsp;import io.micrometer.observation.ObservationRegistry;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.OnlyOnceLoggingDenyMeterFilter;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.observation.ObservationAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.http.server.reactive.observation.DefaultServerRequestObservationConvention;
+&nbsp;import org.springframework.http.server.reactive.observation.ServerRequestObservationConvention;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for instrumentation of Spring
+&nbsp; * WebFlux applications.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Jon Schneider
+&nbsp; * @author Dmytro Nosan
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = { SimpleMetricsExportAutoConfiguration.class, ObservationAutoConfiguration.class })
+&nbsp;@ConditionalOnClass({ Observation.class, MeterRegistry.class })
+&nbsp;@ConditionalOnBean({ ObservationRegistry.class, MeterRegistry.class })
+&nbsp;@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+&nbsp;@EnableConfigurationProperties({ MetricsProperties.class, ObservationProperties.class })
+&nbsp;public class WebFluxObservationAutoConfiguration {
+&nbsp;
+&nbsp;	private final ObservationProperties observationProperties;
+&nbsp;
+<b class="nc">&nbsp;	WebFluxObservationAutoConfiguration(ObservationProperties observationProperties) {</b>
+<b class="nc">&nbsp;		this.observationProperties = observationProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@Order(0)
+&nbsp;	MeterFilter metricsHttpServerUriTagFilter(MetricsProperties metricsProperties) {
+<b class="nc">&nbsp;		String name = this.observationProperties.getHttp().getServer().getRequests().getName();</b>
+<b class="nc">&nbsp;		MeterFilter filter = new OnlyOnceLoggingDenyMeterFilter(</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Reached the maximum number of URI tags for &#39;%s&#39;.&quot;.formatted(name));</b>
+<b class="nc">&nbsp;		return MeterFilter.maximumAllowableTags(name, &quot;uri&quot;, metricsProperties.getWeb().getServer().getMaxUriTags(),</b>
+&nbsp;				filter);
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(ServerRequestObservationConvention.class)
+&nbsp;	DefaultServerRequestObservationConvention defaultServerRequestObservationConvention() {
+<b class="nc">&nbsp;		return new DefaultServerRequestObservationConvention(</b>
+<b class="nc">&nbsp;				this.observationProperties.getHttp().getServer().getRequests().getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

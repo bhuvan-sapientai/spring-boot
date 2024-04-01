@@ -1,0 +1,525 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProjectGenerationRequest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.cli.command.init</a>
+</div>
+
+<h1>Coverage Summary for Class: ProjectGenerationRequest (org.springframework.boot.cli.command.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProjectGenerationRequest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/105)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.cli.command.init;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represent the settings to apply to generating the project.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Eddú Meléndez
+&nbsp; */
+<b class="nc">&nbsp;class ProjectGenerationRequest {</b>
+&nbsp;
+&nbsp;	public static final String DEFAULT_SERVICE_URL = &quot;https://start.spring.io&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private String serviceUrl = DEFAULT_SERVICE_URL;</b>
+&nbsp;
+&nbsp;	private String output;
+&nbsp;
+&nbsp;	private boolean extract;
+&nbsp;
+&nbsp;	private String groupId;
+&nbsp;
+&nbsp;	private String artifactId;
+&nbsp;
+&nbsp;	private String version;
+&nbsp;
+&nbsp;	private String name;
+&nbsp;
+&nbsp;	private String description;
+&nbsp;
+&nbsp;	private String packageName;
+&nbsp;
+&nbsp;	private String type;
+&nbsp;
+&nbsp;	private String packaging;
+&nbsp;
+&nbsp;	private String build;
+&nbsp;
+&nbsp;	private String format;
+&nbsp;
+&nbsp;	private boolean detectType;
+&nbsp;
+&nbsp;	private String javaVersion;
+&nbsp;
+&nbsp;	private String language;
+&nbsp;
+&nbsp;	private String bootVersion;
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;String&gt; dependencies = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The URL of the service to use.
+&nbsp;	 * @return the service URL
+&nbsp;	 * @see #DEFAULT_SERVICE_URL
+&nbsp;	 */
+&nbsp;	String getServiceUrl() {
+<b class="nc">&nbsp;		return this.serviceUrl;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setServiceUrl(String serviceUrl) {
+<b class="nc">&nbsp;		this.serviceUrl = serviceUrl;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The location of the generated project.
+&nbsp;	 * @return the location of the generated project
+&nbsp;	 */
+&nbsp;	String getOutput() {
+<b class="nc">&nbsp;		return this.output;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setOutput(String output) {
+<b class="nc">&nbsp;		if (output != null &amp;&amp; output.endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			this.output = output.substring(0, output.length() - 1);</b>
+<b class="nc">&nbsp;			this.extract = true;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			this.output = output;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether the project archive should be extracted in the output location. If the
+&nbsp;	 * {@link #getOutput() output} ends with &quot;/&quot;, the project is extracted automatically.
+&nbsp;	 * @return {@code true} if the archive should be extracted, otherwise {@code false}
+&nbsp;	 */
+&nbsp;	boolean isExtract() {
+<b class="nc">&nbsp;		return this.extract;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setExtract(boolean extract) {
+<b class="nc">&nbsp;		this.extract = extract;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The groupId to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the groupId or {@code null}
+&nbsp;	 */
+&nbsp;	String getGroupId() {
+<b class="nc">&nbsp;		return this.groupId;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setGroupId(String groupId) {
+<b class="nc">&nbsp;		this.groupId = groupId;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The artifactId to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the artifactId or {@code null}
+&nbsp;	 */
+&nbsp;	String getArtifactId() {
+<b class="nc">&nbsp;		return this.artifactId;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setArtifactId(String artifactId) {
+<b class="nc">&nbsp;		this.artifactId = artifactId;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The artifact version to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the artifact version or {@code null}
+&nbsp;	 */
+&nbsp;	String getVersion() {
+<b class="nc">&nbsp;		return this.version;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setVersion(String version) {
+<b class="nc">&nbsp;		this.version = version;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the name or {@code null}
+&nbsp;	 */
+&nbsp;	String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setName(String name) {
+<b class="nc">&nbsp;		this.name = name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The description to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the description or {@code null}
+&nbsp;	 */
+&nbsp;	String getDescription() {
+<b class="nc">&nbsp;		return this.description;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setDescription(String description) {
+<b class="nc">&nbsp;		this.description = description;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the package name or {@code null} if it should not be customized.
+&nbsp;	 * @return the package name or {@code null}
+&nbsp;	 */
+&nbsp;	String getPackageName() {
+<b class="nc">&nbsp;		return this.packageName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setPackageName(String packageName) {
+<b class="nc">&nbsp;		this.packageName = packageName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The type of project to generate. Should match one of the advertised type that the
+&nbsp;	 * service supports. If not set, the default is retrieved from the service metadata.
+&nbsp;	 * @return the project type
+&nbsp;	 */
+&nbsp;	String getType() {
+<b class="nc">&nbsp;		return this.type;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setType(String type) {
+<b class="nc">&nbsp;		this.type = type;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The packaging type or {@code null} if it should not be customized.
+&nbsp;	 * @return the packaging type or {@code null}
+&nbsp;	 */
+&nbsp;	String getPackaging() {
+<b class="nc">&nbsp;		return this.packaging;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setPackaging(String packaging) {
+<b class="nc">&nbsp;		this.packaging = packaging;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The build type to use. Ignored if a type is set. Can be used alongside the
+&nbsp;	 * {@link #getFormat() format} to identify the type to use.
+&nbsp;	 * @return the build type
+&nbsp;	 */
+&nbsp;	String getBuild() {
+<b class="nc">&nbsp;		return this.build;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setBuild(String build) {
+<b class="nc">&nbsp;		this.build = build;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The project format to use. Ignored if a type is set. Can be used alongside the
+&nbsp;	 * {@link #getBuild() build} to identify the type to use.
+&nbsp;	 * @return the project format
+&nbsp;	 */
+&nbsp;	String getFormat() {
+<b class="nc">&nbsp;		return this.format;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setFormat(String format) {
+<b class="nc">&nbsp;		this.format = format;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether the type should be detected based on the build and format value.
+&nbsp;	 * @return {@code true} if type detection will be performed, otherwise {@code false}
+&nbsp;	 */
+&nbsp;	boolean isDetectType() {
+<b class="nc">&nbsp;		return this.detectType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setDetectType(boolean detectType) {
+<b class="nc">&nbsp;		this.detectType = detectType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The Java version to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the Java version or {@code null}
+&nbsp;	 */
+&nbsp;	String getJavaVersion() {
+<b class="nc">&nbsp;		return this.javaVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setJavaVersion(String javaVersion) {
+<b class="nc">&nbsp;		this.javaVersion = javaVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The programming language to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the programming language or {@code null}
+&nbsp;	 */
+&nbsp;	String getLanguage() {
+<b class="nc">&nbsp;		return this.language;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setLanguage(String language) {
+<b class="nc">&nbsp;		this.language = language;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The Spring Boot version to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the Spring Boot version or {@code null}
+&nbsp;	 */
+&nbsp;	String getBootVersion() {
+<b class="nc">&nbsp;		return this.bootVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setBootVersion(String bootVersion) {
+<b class="nc">&nbsp;		this.bootVersion = bootVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The identifiers of the dependencies to include in the project.
+&nbsp;	 * @return the dependency identifiers
+&nbsp;	 */
+&nbsp;	List&lt;String&gt; getDependencies() {
+<b class="nc">&nbsp;		return this.dependencies;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Generates the URI to use to generate a project represented by this request.
+&nbsp;	 * @param metadata the metadata that describes the service
+&nbsp;	 * @return the project generation URI
+&nbsp;	 */
+&nbsp;	URI generateUrl(InitializrServiceMetadata metadata) {
+&nbsp;		try {
+<b class="nc">&nbsp;			URIBuilder builder = new URIBuilder(this.serviceUrl);</b>
+<b class="nc">&nbsp;			StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;			if (builder.getPath() != null) {</b>
+<b class="nc">&nbsp;				sb.append(builder.getPath());</b>
+&nbsp;			}
+&nbsp;
+<b class="nc">&nbsp;			ProjectType projectType = determineProjectType(metadata);</b>
+<b class="nc">&nbsp;			this.type = projectType.getId();</b>
+<b class="nc">&nbsp;			sb.append(projectType.getAction());</b>
+<b class="nc">&nbsp;			builder.setPath(sb.toString());</b>
+&nbsp;
+<b class="nc">&nbsp;			if (!this.dependencies.isEmpty()) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;dependencies&quot;, StringUtils.collectionToCommaDelimitedString(this.dependencies));</b>
+&nbsp;			}
+&nbsp;
+<b class="nc">&nbsp;			if (this.groupId != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;groupId&quot;, this.groupId);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String resolvedArtifactId = resolveArtifactId();</b>
+<b class="nc">&nbsp;			if (resolvedArtifactId != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;artifactId&quot;, resolvedArtifactId);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.version != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;version&quot;, this.version);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.name != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;name&quot;, this.name);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.description != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;description&quot;, this.description);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.packageName != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;packageName&quot;, this.packageName);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.type != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;type&quot;, projectType.getId());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.packaging != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;packaging&quot;, this.packaging);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.javaVersion != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;javaVersion&quot;, this.javaVersion);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.language != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;language&quot;, this.language);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.bootVersion != null) {</b>
+<b class="nc">&nbsp;				builder.setParameter(&quot;bootVersion&quot;, this.bootVersion);</b>
+&nbsp;			}
+&nbsp;
+<b class="nc">&nbsp;			return builder.build();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (URISyntaxException ex) {</b>
+<b class="nc">&nbsp;			throw new ReportableException(&quot;Invalid service URL (&quot; + ex.getMessage() + &quot;)&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected ProjectType determineProjectType(InitializrServiceMetadata metadata) {
+<b class="nc">&nbsp;		if (this.type != null) {</b>
+<b class="nc">&nbsp;			ProjectType result = metadata.getProjectTypes().get(this.type);</b>
+<b class="nc">&nbsp;			if (result == null) {</b>
+<b class="nc">&nbsp;				throw new ReportableException(</b>
+&nbsp;						(&quot;No project type with id &#39;&quot; + this.type + &quot;&#39; - check the service capabilities (--list)&quot;));
+&nbsp;			}
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (isDetectType()) {</b>
+<b class="nc">&nbsp;			Map&lt;String, ProjectType&gt; types = new HashMap&lt;&gt;(metadata.getProjectTypes());</b>
+<b class="nc">&nbsp;			if (this.build != null) {</b>
+<b class="nc">&nbsp;				filter(types, &quot;build&quot;, this.build);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.format != null) {</b>
+<b class="nc">&nbsp;				filter(types, &quot;format&quot;, this.format);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (types.size() == 1) {</b>
+<b class="nc">&nbsp;				return types.values().iterator().next();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (types.isEmpty()) {</b>
+<b class="nc">&nbsp;				throw new ReportableException(&quot;No type found with build &#39;&quot; + this.build + &quot;&#39; and format &#39;&quot; + this.format</b>
+&nbsp;						+ &quot;&#39; check the service capabilities (--list)&quot;);
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				throw new ReportableException(&quot;Multiple types found with build &#39;&quot; + this.build + &quot;&#39; and format &#39;&quot;</b>
+<b class="nc">&nbsp;						+ this.format + &quot;&#39; use --type with a more specific value &quot; + types.keySet());</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			ProjectType defaultType = metadata.getDefaultType();</b>
+<b class="nc">&nbsp;			if (defaultType == null) {</b>
+<b class="nc">&nbsp;				throw new ReportableException((&quot;No project type is set and no default is defined. &quot;</b>
+&nbsp;						+ &quot;Check the service capabilities (--list)&quot;));
+&nbsp;			}
+<b class="nc">&nbsp;			return defaultType;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolve the artifactId to use or {@code null} if it should not be customized.
+&nbsp;	 * @return the artifactId
+&nbsp;	 */
+&nbsp;	protected String resolveArtifactId() {
+<b class="nc">&nbsp;		if (this.artifactId != null) {</b>
+<b class="nc">&nbsp;			return this.artifactId;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.output != null) {</b>
+<b class="nc">&nbsp;			int i = this.output.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;			return (i != -1) ? this.output.substring(0, i) : this.output;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void filter(Map&lt;String, ProjectType&gt; projects, String tag, String tagValue) {
+<b class="nc">&nbsp;		projects.entrySet().removeIf((entry) -&gt; !tagValue.equals(entry.getValue().getTags().get(tag)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,560 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarUrlConnection</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.net.protocol.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: JarUrlConnection (org.springframework.boot.loader.net.protocol.jar)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarUrlConnection</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/128)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JarUrlConnection$ConnectionInputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JarUrlConnection$EmptyUrlStreamHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/136)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.net.protocol.jar;
+&nbsp;
+&nbsp;import java.io.BufferedInputStream;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.FilterInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.net.URLStreamHandler;
+&nbsp;import java.security.Permission;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.jar.JarEntry;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.jar.NestedJarFile;
+&nbsp;import org.springframework.boot.loader.net.util.UrlDecoder;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link java.net.JarURLConnection} alternative to
+&nbsp; * {@code sun.net.www.protocol.jar.JarURLConnection} with optimized support for nested
+&nbsp; * jars.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Rostyslav Dudka
+&nbsp; */
+&nbsp;final class JarUrlConnection extends java.net.JarURLConnection {
+&nbsp;
+<b class="nc">&nbsp;	static final UrlJarFiles jarFiles = new UrlJarFiles();</b>
+&nbsp;
+<b class="nc">&nbsp;	static final InputStream emptyInputStream = new ByteArrayInputStream(new byte[0]);</b>
+&nbsp;
+<b class="nc">&nbsp;	static final FileNotFoundException FILE_NOT_FOUND_EXCEPTION = new FileNotFoundException(</b>
+&nbsp;			&quot;Jar file or entry not found&quot;);
+&nbsp;
+&nbsp;	private static final URL NOT_FOUND_URL;
+&nbsp;
+&nbsp;	static final JarUrlConnection NOT_FOUND_CONNECTION;
+&nbsp;	static {
+&nbsp;		try {
+<b class="nc">&nbsp;			NOT_FOUND_URL = new URL(&quot;jar:&quot;, null, 0, &quot;nested:!/&quot;, new EmptyUrlStreamHandler());</b>
+<b class="nc">&nbsp;			NOT_FOUND_CONNECTION = new JarUrlConnection(() -&gt; FILE_NOT_FOUND_EXCEPTION);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final String entryName;
+&nbsp;
+&nbsp;	private final Supplier&lt;FileNotFoundException&gt; notFound;
+&nbsp;
+&nbsp;	private JarFile jarFile;
+&nbsp;
+&nbsp;	private URLConnection jarFileConnection;
+&nbsp;
+&nbsp;	private JarEntry jarEntry;
+&nbsp;
+&nbsp;	private String contentType;
+&nbsp;
+&nbsp;	private JarUrlConnection(URL url) throws IOException {
+<b class="nc">&nbsp;		super(url);</b>
+<b class="nc">&nbsp;		this.entryName = getEntryName();</b>
+<b class="nc">&nbsp;		this.notFound = null;</b>
+<b class="nc">&nbsp;		this.jarFileConnection = getJarFileURL().openConnection();</b>
+<b class="nc">&nbsp;		this.jarFileConnection.setUseCaches(this.useCaches);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarUrlConnection(Supplier&lt;FileNotFoundException&gt; notFound) throws IOException {
+<b class="nc">&nbsp;		super(NOT_FOUND_URL);</b>
+<b class="nc">&nbsp;		this.entryName = null;</b>
+<b class="nc">&nbsp;		this.notFound = notFound;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public JarFile getJarFile() throws IOException {
+<b class="nc">&nbsp;		connect();</b>
+<b class="nc">&nbsp;		return this.jarFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public JarEntry getJarEntry() throws IOException {
+<b class="nc">&nbsp;		connect();</b>
+<b class="nc">&nbsp;		return this.jarEntry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getContentLength() {
+<b class="nc">&nbsp;		long contentLength = getContentLengthLong();</b>
+<b class="nc">&nbsp;		return (contentLength &lt;= Integer.MAX_VALUE) ? (int) contentLength : -1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public long getContentLengthLong() {
+&nbsp;		try {
+<b class="nc">&nbsp;			connect();</b>
+<b class="nc">&nbsp;			return (this.jarEntry != null) ? this.jarEntry.getSize() : this.jarFileConnection.getContentLengthLong();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return -1;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getContentType() {
+<b class="nc">&nbsp;		if (this.contentType == null) {</b>
+<b class="nc">&nbsp;			this.contentType = deduceContentType();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.contentType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String deduceContentType() {
+<b class="nc">&nbsp;		String type = (this.entryName != null) ? null : &quot;x-java/jar&quot;;</b>
+<b class="nc">&nbsp;		type = (type != null) ? type : deduceContentTypeFromStream();</b>
+<b class="nc">&nbsp;		type = (type != null) ? type : deduceContentTypeFromEntryName();</b>
+<b class="nc">&nbsp;		return (type != null) ? type : &quot;content/unknown&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String deduceContentTypeFromStream() {
+&nbsp;		try {
+<b class="nc">&nbsp;			connect();</b>
+<b class="nc">&nbsp;			try (InputStream in = this.jarFile.getInputStream(this.jarEntry)) {</b>
+<b class="nc">&nbsp;				return guessContentTypeFromStream(new BufferedInputStream(in));</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String deduceContentTypeFromEntryName() {
+<b class="nc">&nbsp;		return guessContentTypeFromName(this.entryName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public long getLastModified() {
+<b class="nc">&nbsp;		return (this.jarFileConnection != null) ? this.jarFileConnection.getLastModified() : super.getLastModified();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getHeaderField(String name) {
+<b class="nc">&nbsp;		return (this.jarFileConnection != null) ? this.jarFileConnection.getHeaderField(name) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object getContent() throws IOException {
+<b class="nc">&nbsp;		connect();</b>
+<b class="nc">&nbsp;		return (this.entryName != null) ? super.getContent() : this.jarFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Permission getPermission() throws IOException {
+<b class="nc">&nbsp;		return this.jarFileConnection.getPermission();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public InputStream getInputStream() throws IOException {
+<b class="nc">&nbsp;		if (this.notFound != null) {</b>
+<b class="nc">&nbsp;			throwFileNotFound();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		URL jarFileURL = getJarFileURL();</b>
+<b class="nc">&nbsp;		if (this.entryName == null &amp;&amp; !UrlJarFileFactory.isNestedUrl(jarFileURL)) {</b>
+<b class="nc">&nbsp;			throw new IOException(&quot;no entry name specified&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!getUseCaches() &amp;&amp; Optimizations.isEnabled(false) &amp;&amp; this.entryName != null) {</b>
+<b class="nc">&nbsp;			JarFile cached = jarFiles.getCached(jarFileURL);</b>
+<b class="nc">&nbsp;			if (cached != null) {</b>
+<b class="nc">&nbsp;				if (cached.getEntry(this.entryName) != null) {</b>
+<b class="nc">&nbsp;					return emptyInputStream;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		connect();</b>
+<b class="nc">&nbsp;		if (this.jarEntry == null) {</b>
+<b class="nc">&nbsp;			if (this.jarFile instanceof NestedJarFile nestedJarFile) {</b>
+&nbsp;				// In order to work with Tomcat&#39;s TLD scanning and WarURLConnection we
+&nbsp;				// return the raw zip data rather than failing because there is no entry.
+&nbsp;				// See gh-38047 for details.
+<b class="nc">&nbsp;				return nestedJarFile.getRawZipDataInputStream();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throwFileNotFound();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ConnectionInputStream();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean getAllowUserInteraction() {
+<b class="nc">&nbsp;		return (this.jarFileConnection != null) &amp;&amp; this.jarFileConnection.getAllowUserInteraction();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAllowUserInteraction(boolean allowuserinteraction) {
+<b class="nc">&nbsp;		if (this.jarFileConnection != null) {</b>
+<b class="nc">&nbsp;			this.jarFileConnection.setAllowUserInteraction(allowuserinteraction);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean getUseCaches() {
+<b class="nc">&nbsp;		return (this.jarFileConnection == null) || this.jarFileConnection.getUseCaches();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setUseCaches(boolean usecaches) {
+<b class="nc">&nbsp;		if (this.jarFileConnection != null) {</b>
+<b class="nc">&nbsp;			this.jarFileConnection.setUseCaches(usecaches);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean getDefaultUseCaches() {
+<b class="nc">&nbsp;		return (this.jarFileConnection == null) || this.jarFileConnection.getDefaultUseCaches();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setDefaultUseCaches(boolean defaultusecaches) {
+<b class="nc">&nbsp;		if (this.jarFileConnection != null) {</b>
+<b class="nc">&nbsp;			this.jarFileConnection.setDefaultUseCaches(defaultusecaches);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setIfModifiedSince(long ifModifiedSince) {
+<b class="nc">&nbsp;		if (this.jarFileConnection != null) {</b>
+<b class="nc">&nbsp;			this.jarFileConnection.setIfModifiedSince(ifModifiedSince);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getRequestProperty(String key) {
+<b class="nc">&nbsp;		return (this.jarFileConnection != null) ? this.jarFileConnection.getRequestProperty(key) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setRequestProperty(String key, String value) {
+<b class="nc">&nbsp;		if (this.jarFileConnection != null) {</b>
+<b class="nc">&nbsp;			this.jarFileConnection.setRequestProperty(key, value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addRequestProperty(String key, String value) {
+<b class="nc">&nbsp;		if (this.jarFileConnection != null) {</b>
+<b class="nc">&nbsp;			this.jarFileConnection.addRequestProperty(key, value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Map&lt;String, List&lt;String&gt;&gt; getRequestProperties() {
+<b class="nc">&nbsp;		return (this.jarFileConnection != null) ? this.jarFileConnection.getRequestProperties()</b>
+<b class="nc">&nbsp;				: Collections.emptyMap();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void connect() throws IOException {
+<b class="nc">&nbsp;		if (this.connected) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.notFound != null) {</b>
+<b class="nc">&nbsp;			throwFileNotFound();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		boolean useCaches = getUseCaches();</b>
+<b class="nc">&nbsp;		URL jarFileURL = getJarFileURL();</b>
+<b class="nc">&nbsp;		if (this.entryName != null &amp;&amp; Optimizations.isEnabled()) {</b>
+<b class="nc">&nbsp;			assertCachedJarFileHasEntry(jarFileURL, this.entryName);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.jarFile = jarFiles.getOrCreate(useCaches, jarFileURL);</b>
+<b class="nc">&nbsp;		this.jarEntry = getJarEntry(jarFileURL);</b>
+<b class="nc">&nbsp;		boolean addedToCache = jarFiles.cacheIfAbsent(useCaches, jarFileURL, this.jarFile);</b>
+<b class="nc">&nbsp;		if (addedToCache) {</b>
+<b class="nc">&nbsp;			this.jarFileConnection = jarFiles.reconnect(this.jarFile, this.jarFileConnection);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.connected = true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The {@link URLClassLoader} connects often to check if a resource exists, we can
+&nbsp;	 * save some object allocations by using the cached copy if we have one.
+&nbsp;	 * @param jarFileURL the jar file to check
+&nbsp;	 * @param entryName the entry name to check
+&nbsp;	 * @throws FileNotFoundException on a missing entry
+&nbsp;	 */
+&nbsp;	private void assertCachedJarFileHasEntry(URL jarFileURL, String entryName) throws FileNotFoundException {
+<b class="nc">&nbsp;		JarFile cachedJarFile = jarFiles.getCached(jarFileURL);</b>
+<b class="nc">&nbsp;		if (cachedJarFile != null &amp;&amp; cachedJarFile.getJarEntry(entryName) == null) {</b>
+<b class="nc">&nbsp;			throw FILE_NOT_FOUND_EXCEPTION;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarEntry getJarEntry(URL jarFileUrl) throws IOException {
+<b class="nc">&nbsp;		if (this.entryName == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		JarEntry jarEntry = this.jarFile.getJarEntry(this.entryName);</b>
+<b class="nc">&nbsp;		if (jarEntry == null) {</b>
+<b class="nc">&nbsp;			jarFiles.closeIfNotCached(jarFileUrl, this.jarFile);</b>
+<b class="nc">&nbsp;			throwFileNotFound();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return jarEntry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void throwFileNotFound() throws FileNotFoundException {
+<b class="nc">&nbsp;		if (Optimizations.isEnabled()) {</b>
+<b class="nc">&nbsp;			throw FILE_NOT_FOUND_EXCEPTION;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.notFound != null) {</b>
+<b class="nc">&nbsp;			throw this.notFound.get();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new FileNotFoundException(&quot;JAR entry &quot; + this.entryName + &quot; not found in &quot; + this.jarFile.getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static JarUrlConnection open(URL url) throws IOException {
+<b class="nc">&nbsp;		String spec = url.getFile();</b>
+<b class="nc">&nbsp;		if (spec.startsWith(&quot;nested:&quot;)) {</b>
+<b class="nc">&nbsp;			int separator = spec.indexOf(&quot;!/&quot;);</b>
+<b class="nc">&nbsp;			boolean specHasEntry = (separator != -1) &amp;&amp; (separator + 2 != spec.length());</b>
+<b class="nc">&nbsp;			if (specHasEntry) {</b>
+<b class="nc">&nbsp;				URL jarFileUrl = new URL(spec.substring(0, separator));</b>
+<b class="nc">&nbsp;				if (&quot;runtime&quot;.equals(url.getRef())) {</b>
+<b class="nc">&nbsp;					jarFileUrl = new URL(jarFileUrl, &quot;#runtime&quot;);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				String entryName = UrlDecoder.decode(spec.substring(separator + 2));</b>
+<b class="nc">&nbsp;				JarFile jarFile = jarFiles.getOrCreate(true, jarFileUrl);</b>
+<b class="nc">&nbsp;				jarFiles.cacheIfAbsent(true, jarFileUrl, jarFile);</b>
+<b class="nc">&nbsp;				if (!hasEntry(jarFile, entryName)) {</b>
+<b class="nc">&nbsp;					return notFoundConnection(jarFile.getName(), entryName);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return new JarUrlConnection(url);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean hasEntry(JarFile jarFile, String name) {
+<b class="nc">&nbsp;		return (jarFile instanceof NestedJarFile nestedJarFile) ? nestedJarFile.hasEntry(name)</b>
+<b class="nc">&nbsp;				: jarFile.getEntry(name) != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static JarUrlConnection notFoundConnection(String jarFileName, String entryName) throws IOException {
+<b class="nc">&nbsp;		if (Optimizations.isEnabled()) {</b>
+<b class="nc">&nbsp;			return NOT_FOUND_CONNECTION;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new JarUrlConnection(</b>
+<b class="nc">&nbsp;				() -&gt; new FileNotFoundException(&quot;JAR entry &quot; + entryName + &quot; not found in &quot; + jarFileName));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static void clearCache() {
+<b class="nc">&nbsp;		jarFiles.clearCache();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Connection {@link InputStream}. This is not a {@link FilterInputStream} since
+&nbsp;	 * {@link URLClassLoader} often creates streams that it doesn&#39;t call and we want to be
+&nbsp;	 * lazy about getting the underlying {@link InputStream}.
+&nbsp;	 */
+<b class="nc">&nbsp;	class ConnectionInputStream extends LazyDelegatingInputStream {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+&nbsp;			try {
+<b class="nc">&nbsp;				super.close();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				if (!getUseCaches()) {</b>
+<b class="nc">&nbsp;					JarUrlConnection.this.jarFile.close();</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected InputStream getDelegateInputStream() throws IOException {
+<b class="nc">&nbsp;			return JarUrlConnection.this.jarFile.getInputStream(JarUrlConnection.this.jarEntry);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Empty {@link URLStreamHandler} used to prevent the wrong JAR Handler from being
+&nbsp;	 * Instantiated and cached.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class EmptyUrlStreamHandler extends URLStreamHandler {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected URLConnection openConnection(URL url) {
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

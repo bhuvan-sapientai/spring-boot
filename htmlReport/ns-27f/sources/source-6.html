@@ -1,0 +1,352 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OriginTrackedYamlLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.env</a>
+</div>
+
+<h1>Coverage Summary for Class: OriginTrackedYamlLoader (org.springframework.boot.env)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OriginTrackedYamlLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OriginTrackedYamlLoader$KeyScalarNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OriginTrackedYamlLoader$NoTimestampResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OriginTrackedYamlLoader$OriginTrackingConstructor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.env;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.yaml.snakeyaml.DumperOptions;
+&nbsp;import org.yaml.snakeyaml.LoaderOptions;
+&nbsp;import org.yaml.snakeyaml.Yaml;
+&nbsp;import org.yaml.snakeyaml.constructor.BaseConstructor;
+&nbsp;import org.yaml.snakeyaml.constructor.Constructor;
+&nbsp;import org.yaml.snakeyaml.constructor.SafeConstructor;
+&nbsp;import org.yaml.snakeyaml.error.Mark;
+&nbsp;import org.yaml.snakeyaml.nodes.CollectionNode;
+&nbsp;import org.yaml.snakeyaml.nodes.MappingNode;
+&nbsp;import org.yaml.snakeyaml.nodes.Node;
+&nbsp;import org.yaml.snakeyaml.nodes.NodeTuple;
+&nbsp;import org.yaml.snakeyaml.nodes.ScalarNode;
+&nbsp;import org.yaml.snakeyaml.nodes.Tag;
+&nbsp;import org.yaml.snakeyaml.representer.Representer;
+&nbsp;import org.yaml.snakeyaml.resolver.Resolver;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.YamlProcessor;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginTrackedValue;
+&nbsp;import org.springframework.boot.origin.TextResourceOrigin;
+&nbsp;import org.springframework.boot.origin.TextResourceOrigin.Location;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class to load {@code .yml} files into a map of {@code String} to
+&nbsp; * {@link OriginTrackedValue}.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class OriginTrackedYamlLoader extends YamlProcessor {
+&nbsp;
+&nbsp;	private final Resource resource;
+&nbsp;
+<b class="nc">&nbsp;	OriginTrackedYamlLoader(Resource resource) {</b>
+<b class="nc">&nbsp;		this.resource = resource;</b>
+<b class="nc">&nbsp;		setResources(resource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Yaml createYaml() {
+<b class="nc">&nbsp;		LoaderOptions loaderOptions = new LoaderOptions();</b>
+<b class="nc">&nbsp;		loaderOptions.setAllowDuplicateKeys(false);</b>
+<b class="nc">&nbsp;		loaderOptions.setMaxAliasesForCollections(Integer.MAX_VALUE);</b>
+<b class="nc">&nbsp;		loaderOptions.setAllowRecursiveKeys(true);</b>
+<b class="nc">&nbsp;		loaderOptions.setCodePointLimit(Integer.MAX_VALUE);</b>
+<b class="nc">&nbsp;		return createYaml(loaderOptions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Yaml createYaml(LoaderOptions loaderOptions) {
+<b class="nc">&nbsp;		BaseConstructor constructor = new OriginTrackingConstructor(loaderOptions);</b>
+<b class="nc">&nbsp;		DumperOptions dumperOptions = new DumperOptions();</b>
+<b class="nc">&nbsp;		Representer representer = new Representer(dumperOptions);</b>
+<b class="nc">&nbsp;		NoTimestampResolver resolver = new NoTimestampResolver();</b>
+<b class="nc">&nbsp;		return new Yaml(constructor, representer, dumperOptions, loaderOptions, resolver);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	List&lt;Map&lt;String, Object&gt;&gt; load() {
+<b class="nc">&nbsp;		List&lt;Map&lt;String, Object&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		process((properties, map) -&gt; result.add(getFlattenedMap(map)));</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Constructor} that tracks property origins.
+&nbsp;	 */
+&nbsp;	private class OriginTrackingConstructor extends SafeConstructor {
+&nbsp;
+<b class="nc">&nbsp;		OriginTrackingConstructor(LoaderOptions loadingConfig) {</b>
+<b class="nc">&nbsp;			super(loadingConfig);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object getData() throws NoSuchElementException {
+<b class="nc">&nbsp;			Object data = super.getData();</b>
+<b class="nc">&nbsp;			if (data instanceof CharSequence charSequence &amp;&amp; charSequence.isEmpty()) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return data;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected Object constructObject(Node node) {
+<b class="nc">&nbsp;			if (node instanceof CollectionNode &amp;&amp; ((CollectionNode&lt;?&gt;) node).getValue().isEmpty()) {</b>
+<b class="nc">&nbsp;				return constructTrackedObject(node, super.constructObject(node));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (node instanceof ScalarNode) {</b>
+<b class="nc">&nbsp;				if (!(node instanceof KeyScalarNode)) {</b>
+<b class="nc">&nbsp;					return constructTrackedObject(node, super.constructObject(node));</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			if (node instanceof MappingNode mappingNode) {</b>
+<b class="nc">&nbsp;				replaceMappingNodeKeys(mappingNode);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return super.constructObject(node);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void replaceMappingNodeKeys(MappingNode node) {
+<b class="nc">&nbsp;			List&lt;NodeTuple&gt; newValue = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			node.getValue().stream().map(KeyScalarNode::get).forEach(newValue::add);</b>
+<b class="nc">&nbsp;			node.setValue(newValue);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object constructTrackedObject(Node node, Object value) {
+<b class="nc">&nbsp;			Origin origin = getOrigin(node);</b>
+<b class="nc">&nbsp;			return OriginTrackedValue.of(getValue(value), origin);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object getValue(Object value) {
+<b class="nc">&nbsp;			return (value != null) ? value : &quot;&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Origin getOrigin(Node node) {
+<b class="nc">&nbsp;			Mark mark = node.getStartMark();</b>
+<b class="nc">&nbsp;			Location location = new Location(mark.getLine(), mark.getColumn());</b>
+<b class="nc">&nbsp;			return new TextResourceOrigin(OriginTrackedYamlLoader.this.resource, location);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ScalarNode} that replaces the key node in a {@link NodeTuple}.
+&nbsp;	 */
+&nbsp;	private static class KeyScalarNode extends ScalarNode {
+&nbsp;
+&nbsp;		KeyScalarNode(ScalarNode node) {
+<b class="nc">&nbsp;			super(node.getTag(), node.getValue(), node.getStartMark(), node.getEndMark(), node.getScalarStyle());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static NodeTuple get(NodeTuple nodeTuple) {
+<b class="nc">&nbsp;			Node keyNode = nodeTuple.getKeyNode();</b>
+<b class="nc">&nbsp;			Node valueNode = nodeTuple.getValueNode();</b>
+<b class="nc">&nbsp;			return new NodeTuple(KeyScalarNode.get(keyNode), valueNode);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Node get(Node node) {
+<b class="nc">&nbsp;			if (node instanceof ScalarNode scalarNode) {</b>
+<b class="nc">&nbsp;				return new KeyScalarNode(scalarNode);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return node;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Resolver} that limits {@link Tag#TIMESTAMP} tags.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class NoTimestampResolver extends Resolver {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void addImplicitResolver(Tag tag, Pattern regexp, String first, int limit) {
+<b class="nc">&nbsp;			if (tag == Tag.TIMESTAMP) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			super.addImplicitResolver(tag, regexp, first, limit);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

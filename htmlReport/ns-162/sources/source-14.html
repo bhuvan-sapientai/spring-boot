@@ -1,0 +1,611 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JavaBeanBinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: JavaBeanBinder (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JavaBeanBinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (2/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.7%
+  </span>
+  <span class="absValue">
+    (2/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JavaBeanBinder$Bean</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JavaBeanBinder$BeanProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    30.8%
+  </span>
+  <span class="absValue">
+    (4/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20.4%
+  </span>
+  <span class="absValue">
+    (10/49)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JavaBeanBinder$BeanProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JavaBeanBinder$BeanSupplier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    14%
+  </span>
+  <span class="absValue">
+    (6/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.5%
+  </span>
+  <span class="absValue">
+    (12/159)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import java.beans.Introspector;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder.Context;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyState;
+&nbsp;import org.springframework.core.BridgeMethodResolver;
+&nbsp;import org.springframework.core.MethodParameter;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link DataObjectBinder} for mutable Java Beans.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+<b class="fc">&nbsp;class JavaBeanBinder implements DataObjectBinder {</b>
+&nbsp;
+<b class="fc">&nbsp;	static final JavaBeanBinder INSTANCE = new JavaBeanBinder();</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;T&gt; T bind(ConfigurationPropertyName name, Bindable&lt;T&gt; target, Context context,
+&nbsp;			DataObjectPropertyBinder propertyBinder) {
+<b class="nc">&nbsp;		boolean hasKnownBindableProperties = target.getValue() != null &amp;&amp; hasKnownBindableProperties(name, context);</b>
+<b class="nc">&nbsp;		Bean&lt;T&gt; bean = Bean.get(target, hasKnownBindableProperties);</b>
+<b class="nc">&nbsp;		if (bean == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		BeanSupplier&lt;T&gt; beanSupplier = bean.getSupplier(target);</b>
+<b class="nc">&nbsp;		boolean bound = bind(propertyBinder, bean, beanSupplier, context);</b>
+<b class="nc">&nbsp;		return (bound ? beanSupplier.get() : null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public &lt;T&gt; T create(Bindable&lt;T&gt; target, Context context) {
+<b class="nc">&nbsp;		Class&lt;T&gt; type = (Class&lt;T&gt;) target.getType().resolve();</b>
+<b class="nc">&nbsp;		return (type != null) ? BeanUtils.instantiateClass(type) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasKnownBindableProperties(ConfigurationPropertyName name, Context context) {
+<b class="nc">&nbsp;		for (ConfigurationPropertySource source : context.getSources()) {</b>
+<b class="nc">&nbsp;			if (source.containsDescendantOf(name) == ConfigurationPropertyState.PRESENT) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; boolean bind(DataObjectPropertyBinder propertyBinder, Bean&lt;T&gt; bean, BeanSupplier&lt;T&gt; beanSupplier,
+&nbsp;			Context context) {
+<b class="nc">&nbsp;		boolean bound = false;</b>
+<b class="nc">&nbsp;		for (BeanProperty beanProperty : bean.getProperties().values()) {</b>
+<b class="nc">&nbsp;			bound |= bind(beanSupplier, propertyBinder, beanProperty);</b>
+<b class="nc">&nbsp;			context.clearConfigurationProperty();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return bound;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; boolean bind(BeanSupplier&lt;T&gt; beanSupplier, DataObjectPropertyBinder propertyBinder,
+&nbsp;			BeanProperty property) {
+<b class="nc">&nbsp;		String propertyName = property.getName();</b>
+<b class="nc">&nbsp;		ResolvableType type = property.getType();</b>
+<b class="nc">&nbsp;		Supplier&lt;Object&gt; value = property.getValue(beanSupplier);</b>
+<b class="nc">&nbsp;		Annotation[] annotations = property.getAnnotations();</b>
+<b class="nc">&nbsp;		Object bound = propertyBinder.bindProperty(propertyName,</b>
+<b class="nc">&nbsp;				Bindable.of(type).withSuppliedValue(value).withAnnotations(annotations));</b>
+<b class="nc">&nbsp;		if (bound == null) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (property.isSettable()) {</b>
+<b class="nc">&nbsp;			property.setValue(beanSupplier, bound);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (value == null || !bound.equals(value.get())) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;No setter found for property: &quot; + property.getName());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The properties of a bean that may be bound.
+&nbsp;	 */
+&nbsp;	static class BeanProperties {
+&nbsp;
+<b class="fc">&nbsp;		private final Map&lt;String, BeanProperty&gt; properties = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private final ResolvableType type;
+&nbsp;
+&nbsp;		private final Class&lt;?&gt; resolvedType;
+&nbsp;
+<b class="fc">&nbsp;		BeanProperties(ResolvableType type, Class&lt;?&gt; resolvedType) {</b>
+<b class="fc">&nbsp;			this.type = type;</b>
+<b class="fc">&nbsp;			this.resolvedType = resolvedType;</b>
+<b class="fc">&nbsp;			addProperties(resolvedType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addProperties(Class&lt;?&gt; type) {
+<b class="fc">&nbsp;			while (type != null &amp;&amp; !Object.class.equals(type)) {</b>
+<b class="nc">&nbsp;				Method[] declaredMethods = getSorted(type, this::getDeclaredMethods, Method::getName);</b>
+<b class="nc">&nbsp;				Field[] declaredFields = getSorted(type, Class::getDeclaredFields, Field::getName);</b>
+<b class="nc">&nbsp;				addProperties(declaredMethods, declaredFields);</b>
+<b class="nc">&nbsp;				type = type.getSuperclass();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Method[] getDeclaredMethods(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			Method[] methods = type.getDeclaredMethods();</b>
+<b class="nc">&nbsp;			Set&lt;Method&gt; result = new LinkedHashSet&lt;&gt;(methods.length);</b>
+<b class="nc">&nbsp;			for (Method method : methods) {</b>
+<b class="nc">&nbsp;				result.add(BridgeMethodResolver.findBridgedMethod(method));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return result.toArray(new Method[0]);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;S, E&gt; E[] getSorted(S source, Function&lt;S, E[]&gt; elements, Function&lt;E, String&gt; name) {
+<b class="nc">&nbsp;			E[] result = elements.apply(source);</b>
+<b class="nc">&nbsp;			Arrays.sort(result, Comparator.comparing(name));</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected void addProperties(Method[] declaredMethods, Field[] declaredFields) {
+<b class="nc">&nbsp;			for (int i = 0; i &lt; declaredMethods.length; i++) {</b>
+<b class="nc">&nbsp;				if (!isCandidate(declaredMethods[i])) {</b>
+<b class="nc">&nbsp;					declaredMethods[i] = null;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			for (Method method : declaredMethods) {</b>
+<b class="nc">&nbsp;				addMethodIfPossible(method, &quot;is&quot;, 0, BeanProperty::addGetter);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (Method method : declaredMethods) {</b>
+<b class="nc">&nbsp;				addMethodIfPossible(method, &quot;get&quot;, 0, BeanProperty::addGetter);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (Method method : declaredMethods) {</b>
+<b class="nc">&nbsp;				addMethodIfPossible(method, &quot;set&quot;, 1, BeanProperty::addSetter);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (Field field : declaredFields) {</b>
+<b class="nc">&nbsp;				addField(field);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isCandidate(Method method) {
+<b class="nc">&nbsp;			int modifiers = method.getModifiers();</b>
+<b class="nc">&nbsp;			return !Modifier.isPrivate(modifiers) &amp;&amp; !Modifier.isProtected(modifiers) &amp;&amp; !Modifier.isAbstract(modifiers)</b>
+<b class="nc">&nbsp;					&amp;&amp; !Modifier.isStatic(modifiers) &amp;&amp; !method.isBridge()</b>
+<b class="nc">&nbsp;					&amp;&amp; !Object.class.equals(method.getDeclaringClass())</b>
+<b class="nc">&nbsp;					&amp;&amp; !Class.class.equals(method.getDeclaringClass()) &amp;&amp; method.getName().indexOf(&#39;$&#39;) == -1;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addMethodIfPossible(Method method, String prefix, int parameterCount,
+&nbsp;				BiConsumer&lt;BeanProperty, Method&gt; consumer) {
+<b class="nc">&nbsp;			if (method != null &amp;&amp; method.getParameterCount() == parameterCount &amp;&amp; method.getName().startsWith(prefix)</b>
+<b class="nc">&nbsp;					&amp;&amp; method.getName().length() &gt; prefix.length()) {</b>
+<b class="nc">&nbsp;				String propertyName = Introspector.decapitalize(method.getName().substring(prefix.length()));</b>
+<b class="nc">&nbsp;				consumer.accept(this.properties.computeIfAbsent(propertyName, this::getBeanProperty), method);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private BeanProperty getBeanProperty(String name) {
+<b class="nc">&nbsp;			return new BeanProperty(name, this.type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addField(Field field) {
+<b class="nc">&nbsp;			BeanProperty property = this.properties.get(field.getName());</b>
+<b class="nc">&nbsp;			if (property != null) {</b>
+<b class="nc">&nbsp;				property.addField(field);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		protected final ResolvableType getType() {
+<b class="nc">&nbsp;			return this.type;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected final Class&lt;?&gt; getResolvedType() {
+<b class="nc">&nbsp;			return this.resolvedType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		final Map&lt;String, BeanProperty&gt; getProperties() {
+<b class="fc">&nbsp;			return this.properties;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static BeanProperties of(Bindable&lt;?&gt; bindable) {
+<b class="fc">&nbsp;			ResolvableType type = bindable.getType();</b>
+<b class="fc">&nbsp;			Class&lt;?&gt; resolvedType = type.resolve(Object.class);</b>
+<b class="fc">&nbsp;			return new BeanProperties(type, resolvedType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The bean being bound.
+&nbsp;	 *
+&nbsp;	 * @param &lt;T&gt; the bean type
+&nbsp;	 */
+&nbsp;	static class Bean&lt;T&gt; extends BeanProperties {
+&nbsp;
+&nbsp;		private static Bean&lt;?&gt; cached;
+&nbsp;
+&nbsp;		Bean(ResolvableType type, Class&lt;?&gt; resolvedType) {
+<b class="nc">&nbsp;			super(type, resolvedType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		BeanSupplier&lt;T&gt; getSupplier(Bindable&lt;T&gt; target) {
+<b class="nc">&nbsp;			return new BeanSupplier&lt;&gt;(() -&gt; {</b>
+<b class="nc">&nbsp;				T instance = null;</b>
+<b class="nc">&nbsp;				if (target.getValue() != null) {</b>
+<b class="nc">&nbsp;					instance = target.getValue().get();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (instance == null) {</b>
+<b class="nc">&nbsp;					instance = (T) BeanUtils.instantiateClass(getResolvedType());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return instance;</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		static &lt;T&gt; Bean&lt;T&gt; get(Bindable&lt;T&gt; bindable, boolean canCallGetValue) {
+<b class="nc">&nbsp;			ResolvableType type = bindable.getType();</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; resolvedType = type.resolve(Object.class);</b>
+<b class="nc">&nbsp;			Supplier&lt;T&gt; value = bindable.getValue();</b>
+<b class="nc">&nbsp;			T instance = null;</b>
+<b class="nc">&nbsp;			if (canCallGetValue &amp;&amp; value != null) {</b>
+<b class="nc">&nbsp;				instance = value.get();</b>
+<b class="nc">&nbsp;				resolvedType = (instance != null) ? instance.getClass() : resolvedType;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (instance == null &amp;&amp; !isInstantiable(resolvedType)) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Bean&lt;?&gt; bean = Bean.cached;</b>
+<b class="nc">&nbsp;			if (bean == null || !bean.isOfType(type, resolvedType)) {</b>
+<b class="nc">&nbsp;				bean = new Bean&lt;&gt;(type, resolvedType);</b>
+<b class="nc">&nbsp;				cached = bean;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return (Bean&lt;T&gt;) bean;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isInstantiable(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			if (type.isInterface()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				type.getDeclaredConstructor();</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isOfType(ResolvableType type, Class&lt;?&gt; resolvedType) {
+<b class="nc">&nbsp;			if (getType().hasGenerics() || type.hasGenerics()) {</b>
+<b class="nc">&nbsp;				return getType().equals(type);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return getResolvedType() != null &amp;&amp; getResolvedType().equals(resolvedType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class BeanSupplier&lt;T&gt; implements Supplier&lt;T&gt; {
+&nbsp;
+&nbsp;		private final Supplier&lt;T&gt; factory;
+&nbsp;
+&nbsp;		private T instance;
+&nbsp;
+<b class="nc">&nbsp;		BeanSupplier(Supplier&lt;T&gt; factory) {</b>
+<b class="nc">&nbsp;			this.factory = factory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public T get() {
+<b class="nc">&nbsp;			if (this.instance == null) {</b>
+<b class="nc">&nbsp;				this.instance = this.factory.get();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.instance;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A bean property being bound.
+&nbsp;	 */
+&nbsp;	static class BeanProperty {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final ResolvableType declaringClassType;
+&nbsp;
+&nbsp;		private Method getter;
+&nbsp;
+&nbsp;		private Method setter;
+&nbsp;
+&nbsp;		private Field field;
+&nbsp;
+<b class="nc">&nbsp;		BeanProperty(String name, ResolvableType declaringClassType) {</b>
+<b class="nc">&nbsp;			this.name = DataObjectPropertyName.toDashedForm(name);</b>
+<b class="nc">&nbsp;			this.declaringClassType = declaringClassType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void addGetter(Method getter) {
+<b class="nc">&nbsp;			if (this.getter == null || this.getter.getName().startsWith(&quot;is&quot;)) {</b>
+<b class="nc">&nbsp;				this.getter = getter;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		void addSetter(Method setter) {
+<b class="nc">&nbsp;			if (this.setter == null || isBetterSetter(setter)) {</b>
+<b class="nc">&nbsp;				this.setter = setter;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isBetterSetter(Method setter) {
+<b class="nc">&nbsp;			return this.getter != null &amp;&amp; this.getter.getReturnType().equals(setter.getParameterTypes()[0]);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void addField(Field field) {
+<b class="nc">&nbsp;			if (this.field == null) {</b>
+<b class="nc">&nbsp;				this.field = field;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		String getName() {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ResolvableType getType() {
+<b class="nc">&nbsp;			if (this.setter != null) {</b>
+<b class="nc">&nbsp;				MethodParameter methodParameter = new MethodParameter(this.setter, 0);</b>
+<b class="nc">&nbsp;				return ResolvableType.forMethodParameter(methodParameter, this.declaringClassType);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			MethodParameter methodParameter = new MethodParameter(this.getter, -1);</b>
+<b class="nc">&nbsp;			return ResolvableType.forMethodParameter(methodParameter, this.declaringClassType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Annotation[] getAnnotations() {
+&nbsp;			try {
+<b class="nc">&nbsp;				return (this.field != null) ? this.field.getDeclaredAnnotations() : null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		Supplier&lt;Object&gt; getValue(Supplier&lt;?&gt; instance) {
+<b class="nc">&nbsp;			if (this.getter == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return () -&gt; {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					this.getter.setAccessible(true);</b>
+<b class="nc">&nbsp;					return this.getter.invoke(instance.get());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (Exception ex) {</b>
+<b class="nc">&nbsp;					if (isUninitializedKotlinProperty(ex)) {</b>
+<b class="nc">&nbsp;						return null;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					throw new IllegalStateException(&quot;Unable to get value for property &quot; + this.name, ex);</b>
+&nbsp;				}
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isUninitializedKotlinProperty(Exception ex) {
+<b class="nc">&nbsp;			return (ex instanceof InvocationTargetException invocationTargetException)</b>
+<b class="nc">&nbsp;					&amp;&amp; &quot;kotlin.UninitializedPropertyAccessException&quot;</b>
+<b class="nc">&nbsp;						.equals(invocationTargetException.getTargetException().getClass().getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isSettable() {
+<b class="nc">&nbsp;			return this.setter != null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void setValue(Supplier&lt;?&gt; instance, Object value) {
+&nbsp;			try {
+<b class="nc">&nbsp;				this.setter.setAccessible(true);</b>
+<b class="nc">&nbsp;				this.setter.invoke(instance.get(), value);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Unable to set value for property &quot; + this.name, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Method getGetter() {
+<b class="nc">&nbsp;			return this.getter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Method getSetter() {
+<b class="nc">&nbsp;			return this.setter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,400 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoConfigurationSorter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoConfigurationSorter (org.springframework.boot.autoconfigure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoConfigurationSorter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoConfigurationSorter$AutoConfigurationClass</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoConfigurationSorter$AutoConfigurationClasses</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/98)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.core.type.classreading.MetadataReader;
+&nbsp;import org.springframework.core.type.classreading.MetadataReaderFactory;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Sort {@link EnableAutoConfiguration auto-configuration} classes into priority order by
+&nbsp; * reading {@link AutoConfigureOrder @AutoConfigureOrder},
+&nbsp; * {@link AutoConfigureBefore @AutoConfigureBefore} and
+&nbsp; * {@link AutoConfigureAfter @AutoConfigureAfter} annotations (without loading classes).
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class AutoConfigurationSorter {
+&nbsp;
+&nbsp;	private final MetadataReaderFactory metadataReaderFactory;
+&nbsp;
+&nbsp;	private final AutoConfigurationMetadata autoConfigurationMetadata;
+&nbsp;
+&nbsp;	AutoConfigurationSorter(MetadataReaderFactory metadataReaderFactory,
+<b class="nc">&nbsp;			AutoConfigurationMetadata autoConfigurationMetadata) {</b>
+<b class="nc">&nbsp;		Assert.notNull(metadataReaderFactory, &quot;MetadataReaderFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.metadataReaderFactory = metadataReaderFactory;</b>
+<b class="nc">&nbsp;		this.autoConfigurationMetadata = autoConfigurationMetadata;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	List&lt;String&gt; getInPriorityOrder(Collection&lt;String&gt; classNames) {
+&nbsp;		// Initially sort alphabetically
+<b class="nc">&nbsp;		List&lt;String&gt; alphabeticallyOrderedClassNames = new ArrayList&lt;&gt;(classNames);</b>
+<b class="nc">&nbsp;		Collections.sort(alphabeticallyOrderedClassNames);</b>
+&nbsp;		// Then sort by order
+<b class="nc">&nbsp;		AutoConfigurationClasses classes = new AutoConfigurationClasses(this.metadataReaderFactory,</b>
+&nbsp;				this.autoConfigurationMetadata, alphabeticallyOrderedClassNames);
+<b class="nc">&nbsp;		List&lt;String&gt; orderedClassNames = new ArrayList&lt;&gt;(classNames);</b>
+<b class="nc">&nbsp;		Collections.sort(orderedClassNames);</b>
+<b class="nc">&nbsp;		orderedClassNames.sort((o1, o2) -&gt; {</b>
+<b class="nc">&nbsp;			int i1 = classes.get(o1).getOrder();</b>
+<b class="nc">&nbsp;			int i2 = classes.get(o2).getOrder();</b>
+<b class="nc">&nbsp;			return Integer.compare(i1, i2);</b>
+&nbsp;		});
+&nbsp;		// Then respect @AutoConfigureBefore @AutoConfigureAfter
+<b class="nc">&nbsp;		orderedClassNames = sortByAnnotation(classes, orderedClassNames);</b>
+<b class="nc">&nbsp;		return orderedClassNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; sortByAnnotation(AutoConfigurationClasses classes, List&lt;String&gt; classNames) {
+<b class="nc">&nbsp;		List&lt;String&gt; toSort = new ArrayList&lt;&gt;(classNames);</b>
+<b class="nc">&nbsp;		toSort.addAll(classes.getAllNames());</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; sorted = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; processing = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		while (!toSort.isEmpty()) {</b>
+<b class="nc">&nbsp;			doSortByAfterAnnotation(classes, toSort, sorted, processing, null);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		sorted.retainAll(classNames);</b>
+<b class="nc">&nbsp;		return new ArrayList&lt;&gt;(sorted);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void doSortByAfterAnnotation(AutoConfigurationClasses classes, List&lt;String&gt; toSort, Set&lt;String&gt; sorted,
+&nbsp;			Set&lt;String&gt; processing, String current) {
+<b class="nc">&nbsp;		if (current == null) {</b>
+<b class="nc">&nbsp;			current = toSort.remove(0);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		processing.add(current);</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; afters = new TreeSet&lt;&gt;(Comparator.comparing(toSort::indexOf));</b>
+<b class="nc">&nbsp;		afters.addAll(classes.getClassesRequestedAfter(current));</b>
+<b class="nc">&nbsp;		for (String after : afters) {</b>
+<b class="nc">&nbsp;			checkForCycles(processing, current, after);</b>
+<b class="nc">&nbsp;			if (!sorted.contains(after) &amp;&amp; toSort.contains(after)) {</b>
+<b class="nc">&nbsp;				doSortByAfterAnnotation(classes, toSort, sorted, processing, after);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		processing.remove(current);</b>
+<b class="nc">&nbsp;		sorted.add(current);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkForCycles(Set&lt;String&gt; processing, String current, String after) {
+<b class="nc">&nbsp;		Assert.state(!processing.contains(after),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;AutoConfigure cycle detected between &quot; + current + &quot; and &quot; + after);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class AutoConfigurationClasses {
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, AutoConfigurationClass&gt; classes = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		AutoConfigurationClasses(MetadataReaderFactory metadataReaderFactory,
+<b class="nc">&nbsp;				AutoConfigurationMetadata autoConfigurationMetadata, Collection&lt;String&gt; classNames) {</b>
+<b class="nc">&nbsp;			addToClasses(metadataReaderFactory, autoConfigurationMetadata, classNames, true);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;String&gt; getAllNames() {
+<b class="nc">&nbsp;			return this.classes.keySet();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addToClasses(MetadataReaderFactory metadataReaderFactory,
+&nbsp;				AutoConfigurationMetadata autoConfigurationMetadata, Collection&lt;String&gt; classNames, boolean required) {
+<b class="nc">&nbsp;			for (String className : classNames) {</b>
+<b class="nc">&nbsp;				if (!this.classes.containsKey(className)) {</b>
+<b class="nc">&nbsp;					AutoConfigurationClass autoConfigurationClass = new AutoConfigurationClass(className,</b>
+&nbsp;							metadataReaderFactory, autoConfigurationMetadata);
+<b class="nc">&nbsp;					boolean available = autoConfigurationClass.isAvailable();</b>
+<b class="nc">&nbsp;					if (required || available) {</b>
+<b class="nc">&nbsp;						this.classes.put(className, autoConfigurationClass);</b>
+&nbsp;					}
+<b class="nc">&nbsp;					if (available) {</b>
+<b class="nc">&nbsp;						addToClasses(metadataReaderFactory, autoConfigurationMetadata,</b>
+<b class="nc">&nbsp;								autoConfigurationClass.getBefore(), false);</b>
+<b class="nc">&nbsp;						addToClasses(metadataReaderFactory, autoConfigurationMetadata,</b>
+<b class="nc">&nbsp;								autoConfigurationClass.getAfter(), false);</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		AutoConfigurationClass get(String className) {
+<b class="nc">&nbsp;			return this.classes.get(className);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;String&gt; getClassesRequestedAfter(String className) {
+<b class="nc">&nbsp;			Set&lt;String&gt; classesRequestedAfter = new LinkedHashSet&lt;&gt;(get(className).getAfter());</b>
+<b class="nc">&nbsp;			this.classes.forEach((name, autoConfigurationClass) -&gt; {</b>
+<b class="nc">&nbsp;				if (autoConfigurationClass.getBefore().contains(className)) {</b>
+<b class="nc">&nbsp;					classesRequestedAfter.add(name);</b>
+&nbsp;				}
+&nbsp;			});
+<b class="nc">&nbsp;			return classesRequestedAfter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class AutoConfigurationClass {
+&nbsp;
+&nbsp;		private final String className;
+&nbsp;
+&nbsp;		private final MetadataReaderFactory metadataReaderFactory;
+&nbsp;
+&nbsp;		private final AutoConfigurationMetadata autoConfigurationMetadata;
+&nbsp;
+&nbsp;		private volatile AnnotationMetadata annotationMetadata;
+&nbsp;
+&nbsp;		private volatile Set&lt;String&gt; before;
+&nbsp;
+&nbsp;		private volatile Set&lt;String&gt; after;
+&nbsp;
+&nbsp;		AutoConfigurationClass(String className, MetadataReaderFactory metadataReaderFactory,
+<b class="nc">&nbsp;				AutoConfigurationMetadata autoConfigurationMetadata) {</b>
+<b class="nc">&nbsp;			this.className = className;</b>
+<b class="nc">&nbsp;			this.metadataReaderFactory = metadataReaderFactory;</b>
+<b class="nc">&nbsp;			this.autoConfigurationMetadata = autoConfigurationMetadata;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isAvailable() {
+&nbsp;			try {
+<b class="nc">&nbsp;				if (!wasProcessed()) {</b>
+<b class="nc">&nbsp;					getAnnotationMetadata();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;String&gt; getBefore() {
+<b class="nc">&nbsp;			if (this.before == null) {</b>
+<b class="nc">&nbsp;				this.before = (wasProcessed() ? this.autoConfigurationMetadata.getSet(this.className,</b>
+<b class="nc">&nbsp;						&quot;AutoConfigureBefore&quot;, Collections.emptySet()) : getAnnotationValue(AutoConfigureBefore.class));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.before;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;String&gt; getAfter() {
+<b class="nc">&nbsp;			if (this.after == null) {</b>
+<b class="nc">&nbsp;				this.after = (wasProcessed() ? this.autoConfigurationMetadata.getSet(this.className,</b>
+<b class="nc">&nbsp;						&quot;AutoConfigureAfter&quot;, Collections.emptySet()) : getAnnotationValue(AutoConfigureAfter.class));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.after;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int getOrder() {
+<b class="nc">&nbsp;			if (wasProcessed()) {</b>
+<b class="nc">&nbsp;				return this.autoConfigurationMetadata.getInteger(this.className, &quot;AutoConfigureOrder&quot;,</b>
+<b class="nc">&nbsp;						AutoConfigureOrder.DEFAULT_ORDER);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Map&lt;String, Object&gt; attributes = getAnnotationMetadata()</b>
+<b class="nc">&nbsp;				.getAnnotationAttributes(AutoConfigureOrder.class.getName());</b>
+<b class="nc">&nbsp;			return (attributes != null) ? (Integer) attributes.get(&quot;value&quot;) : AutoConfigureOrder.DEFAULT_ORDER;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean wasProcessed() {
+<b class="nc">&nbsp;			return (this.autoConfigurationMetadata != null</b>
+<b class="nc">&nbsp;					&amp;&amp; this.autoConfigurationMetadata.wasProcessed(this.className));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Set&lt;String&gt; getAnnotationValue(Class&lt;?&gt; annotation) {
+<b class="nc">&nbsp;			Map&lt;String, Object&gt; attributes = getAnnotationMetadata().getAnnotationAttributes(annotation.getName(),</b>
+&nbsp;					true);
+<b class="nc">&nbsp;			if (attributes == null) {</b>
+<b class="nc">&nbsp;				return Collections.emptySet();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Set&lt;String&gt; value = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			Collections.addAll(value, (String[]) attributes.get(&quot;value&quot;));</b>
+<b class="nc">&nbsp;			Collections.addAll(value, (String[]) attributes.get(&quot;name&quot;));</b>
+<b class="nc">&nbsp;			return value;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private AnnotationMetadata getAnnotationMetadata() {
+<b class="nc">&nbsp;			if (this.annotationMetadata == null) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(this.className);</b>
+<b class="nc">&nbsp;					this.annotationMetadata = metadataReader.getAnnotationMetadata();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IOException ex) {</b>
+<b class="nc">&nbsp;					throw new IllegalStateException(&quot;Unable to read meta-data for class &quot; + this.className, ex);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.annotationMetadata;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SystemPropertyUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.launch</a>
+</div>
+
+<h1>Coverage Summary for Class: SystemPropertyUtils (org.springframework.boot.loader.launch)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SystemPropertyUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.launch;
+&nbsp;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Internal helper class adapted from Spring Framework for resolving placeholders in
+&nbsp; * texts.
+&nbsp; *
+&nbsp; * @author Juergen Hoeller
+&nbsp; * @author Rob Harrop
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;final class SystemPropertyUtils {
+&nbsp;
+&nbsp;	private static final String PLACEHOLDER_PREFIX = &quot;${&quot;;
+&nbsp;
+&nbsp;	private static final String PLACEHOLDER_SUFFIX = &quot;}&quot;;
+&nbsp;
+&nbsp;	private static final String VALUE_SEPARATOR = &quot;:&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final String SIMPLE_PREFIX = PLACEHOLDER_PREFIX.substring(1);</b>
+&nbsp;
+&nbsp;	private SystemPropertyUtils() {
+&nbsp;	}
+&nbsp;
+&nbsp;	static String resolvePlaceholders(Properties properties, String text) {
+<b class="nc">&nbsp;		return (text != null) ? parseStringValue(properties, text, text, new HashSet&lt;&gt;()) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String parseStringValue(Properties properties, String value, String current,
+&nbsp;			Set&lt;String&gt; visitedPlaceholders) {
+<b class="nc">&nbsp;		StringBuilder result = new StringBuilder(current);</b>
+<b class="nc">&nbsp;		int startIndex = current.indexOf(PLACEHOLDER_PREFIX);</b>
+<b class="nc">&nbsp;		while (startIndex != -1) {</b>
+<b class="nc">&nbsp;			int endIndex = findPlaceholderEndIndex(result, startIndex);</b>
+<b class="nc">&nbsp;			if (endIndex == -1) {</b>
+<b class="nc">&nbsp;				startIndex = -1;</b>
+<b class="nc">&nbsp;				continue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String placeholder = result.substring(startIndex + PLACEHOLDER_PREFIX.length(), endIndex);</b>
+<b class="nc">&nbsp;			String originalPlaceholder = placeholder;</b>
+<b class="nc">&nbsp;			if (!visitedPlaceholders.add(originalPlaceholder)) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(</b>
+&nbsp;						&quot;Circular placeholder reference &#39;&quot; + originalPlaceholder + &quot;&#39; in property definitions&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			placeholder = parseStringValue(properties, value, placeholder, visitedPlaceholders);</b>
+<b class="nc">&nbsp;			String propertyValue = resolvePlaceholder(properties, value, placeholder);</b>
+<b class="nc">&nbsp;			if (propertyValue == null) {</b>
+<b class="nc">&nbsp;				int separatorIndex = placeholder.indexOf(VALUE_SEPARATOR);</b>
+<b class="nc">&nbsp;				if (separatorIndex != -1) {</b>
+<b class="nc">&nbsp;					String actualPlaceholder = placeholder.substring(0, separatorIndex);</b>
+<b class="nc">&nbsp;					String defaultValue = placeholder.substring(separatorIndex + VALUE_SEPARATOR.length());</b>
+<b class="nc">&nbsp;					propertyValue = resolvePlaceholder(properties, value, actualPlaceholder);</b>
+<b class="nc">&nbsp;					propertyValue = (propertyValue != null) ? propertyValue : defaultValue;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			if (propertyValue != null) {</b>
+<b class="nc">&nbsp;				propertyValue = parseStringValue(properties, value, propertyValue, visitedPlaceholders);</b>
+<b class="nc">&nbsp;				result.replace(startIndex, endIndex + PLACEHOLDER_SUFFIX.length(), propertyValue);</b>
+<b class="nc">&nbsp;				startIndex = result.indexOf(PLACEHOLDER_PREFIX, startIndex + propertyValue.length());</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				startIndex = result.indexOf(PLACEHOLDER_PREFIX, endIndex + PLACEHOLDER_SUFFIX.length());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			visitedPlaceholders.remove(originalPlaceholder);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return result.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String resolvePlaceholder(Properties properties, String text, String placeholderName) {
+<b class="nc">&nbsp;		String propertyValue = getProperty(placeholderName, null, text);</b>
+<b class="nc">&nbsp;		if (propertyValue != null) {</b>
+<b class="nc">&nbsp;			return propertyValue;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (properties != null) ? properties.getProperty(placeholderName) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static String getProperty(String key) {
+<b class="nc">&nbsp;		return getProperty(key, null, &quot;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getProperty(String key, String defaultValue, String text) {
+&nbsp;		try {
+<b class="nc">&nbsp;			String value = System.getProperty(key);</b>
+<b class="nc">&nbsp;			value = (value != null) ? value : System.getenv(key);</b>
+<b class="nc">&nbsp;			value = (value != null) ? value : System.getenv(key.replace(&#39;.&#39;, &#39;_&#39;));</b>
+<b class="nc">&nbsp;			value = (value != null) ? value : System.getenv(key.toUpperCase(Locale.ENGLISH).replace(&#39;.&#39;, &#39;_&#39;));</b>
+<b class="nc">&nbsp;			return (value != null) ? value : defaultValue;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			System.err.println(&quot;Could not resolve key &#39;&quot; + key + &quot;&#39; in &#39;&quot; + text</b>
+&nbsp;					+ &quot;&#39; as system property or in environment: &quot; + ex);
+<b class="nc">&nbsp;			return defaultValue;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static int findPlaceholderEndIndex(CharSequence buf, int startIndex) {
+<b class="nc">&nbsp;		int index = startIndex + PLACEHOLDER_PREFIX.length();</b>
+<b class="nc">&nbsp;		int withinNestedPlaceholder = 0;</b>
+<b class="nc">&nbsp;		while (index &lt; buf.length()) {</b>
+<b class="nc">&nbsp;			if (substringMatch(buf, index, PLACEHOLDER_SUFFIX)) {</b>
+<b class="nc">&nbsp;				if (withinNestedPlaceholder &gt; 0) {</b>
+<b class="nc">&nbsp;					withinNestedPlaceholder--;</b>
+<b class="nc">&nbsp;					index = index + PLACEHOLDER_SUFFIX.length();</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					return index;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			else if (substringMatch(buf, index, SIMPLE_PREFIX)) {</b>
+<b class="nc">&nbsp;				withinNestedPlaceholder++;</b>
+<b class="nc">&nbsp;				index = index + SIMPLE_PREFIX.length();</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				index++;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return -1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
+<b class="nc">&nbsp;		for (int j = 0; j &lt; substring.length(); j++) {</b>
+<b class="nc">&nbsp;			int i = index + j;</b>
+<b class="nc">&nbsp;			if (i &gt;= str.length() || str.charAt(i) != substring.charAt(j)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

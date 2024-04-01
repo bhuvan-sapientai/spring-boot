@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JavaProcessExecutor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: JavaProcessExecutor (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JavaProcessExecutor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.apache.maven.execution.MavenSession;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;import org.apache.maven.toolchain.Toolchain;
+&nbsp;import org.apache.maven.toolchain.ToolchainManager;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.JavaExecutable;
+&nbsp;import org.springframework.boot.loader.tools.RunProcess;
+&nbsp;
+&nbsp;/**
+&nbsp; * Ease the execution of a Java process using Maven&#39;s toolchain support.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;class JavaProcessExecutor {
+&nbsp;
+&nbsp;	private static final int EXIT_CODE_SIGINT = 130;
+&nbsp;
+&nbsp;	private final MavenSession mavenSession;
+&nbsp;
+&nbsp;	private final ToolchainManager toolchainManager;
+&nbsp;
+&nbsp;	private final Consumer&lt;RunProcess&gt; runProcessCustomizer;
+&nbsp;
+&nbsp;	JavaProcessExecutor(MavenSession mavenSession, ToolchainManager toolchainManager) {
+<b class="nc">&nbsp;		this(mavenSession, toolchainManager, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JavaProcessExecutor(MavenSession mavenSession, ToolchainManager toolchainManager,
+<b class="nc">&nbsp;			Consumer&lt;RunProcess&gt; runProcessCustomizer) {</b>
+<b class="nc">&nbsp;		this.mavenSession = mavenSession;</b>
+<b class="nc">&nbsp;		this.toolchainManager = toolchainManager;</b>
+<b class="nc">&nbsp;		this.runProcessCustomizer = runProcessCustomizer;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	JavaProcessExecutor withRunProcessCustomizer(Consumer&lt;RunProcess&gt; customizer) {
+<b class="nc">&nbsp;		Consumer&lt;RunProcess&gt; combinedCustomizer = (this.runProcessCustomizer != null)</b>
+<b class="nc">&nbsp;				? this.runProcessCustomizer.andThen(customizer) : customizer;</b>
+<b class="nc">&nbsp;		return new JavaProcessExecutor(this.mavenSession, this.toolchainManager, combinedCustomizer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	int run(File workingDirectory, List&lt;String&gt; args, Map&lt;String, String&gt; environmentVariables)
+&nbsp;			throws MojoExecutionException {
+<b class="nc">&nbsp;		RunProcess runProcess = new RunProcess(workingDirectory, getJavaExecutable());</b>
+<b class="nc">&nbsp;		if (this.runProcessCustomizer != null) {</b>
+<b class="nc">&nbsp;			this.runProcessCustomizer.accept(runProcess);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			int exitCode = runProcess.run(true, args, environmentVariables);</b>
+<b class="nc">&nbsp;			if (!hasTerminatedSuccessfully(exitCode)) {</b>
+<b class="nc">&nbsp;				throw new MojoExecutionException(&quot;Process terminated with exit code: &quot; + exitCode);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return exitCode;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Process execution failed&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	RunProcess runAsync(File workingDirectory, List&lt;String&gt; args, Map&lt;String, String&gt; environmentVariables)
+&nbsp;			throws MojoExecutionException {
+&nbsp;		try {
+<b class="nc">&nbsp;			RunProcess runProcess = new RunProcess(workingDirectory, getJavaExecutable());</b>
+<b class="nc">&nbsp;			runProcess.run(false, args, environmentVariables);</b>
+<b class="nc">&nbsp;			return runProcess;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Process execution failed&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasTerminatedSuccessfully(int exitCode) {
+<b class="nc">&nbsp;		return (exitCode == 0 || exitCode == EXIT_CODE_SIGINT);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getJavaExecutable() {
+<b class="nc">&nbsp;		Toolchain toolchain = this.toolchainManager.getToolchainFromBuildContext(&quot;jdk&quot;, this.mavenSession);</b>
+<b class="nc">&nbsp;		String javaExecutable = (toolchain != null) ? toolchain.findTool(&quot;java&quot;) : null;</b>
+<b class="nc">&nbsp;		return (javaExecutable != null) ? javaExecutable : new JavaExecutable().toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

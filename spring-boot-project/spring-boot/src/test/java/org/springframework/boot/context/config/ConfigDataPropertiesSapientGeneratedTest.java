@@ -13,13 +13,16 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
+import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Disabled;
 
@@ -30,7 +33,7 @@ class ConfigDataPropertiesSapientGeneratedTest {
 
 	private final ConfigDataActivationContext configDataActivationContextMock = mock(ConfigDataActivationContext.class);
 
-	//Sapient generated method id: ${a7686ba3-4398-3c4f-8a12-0630458f6b73}
+	//Sapient generated method id: ${a7686ba3-4398-3c4f-8a12-0630458f6b73}, hash: 52D6F8385125C8A3EF8DEF5AA356F394
 	@Test()
 	void isActiveWhenThisActivateIsActiveActivationContext() {
 		/* Branches:
@@ -50,7 +53,7 @@ class ConfigDataPropertiesSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${367670c8-7071-3de6-ae86-91f98de36d72}
+	//Sapient generated method id: ${367670c8-7071-3de6-ae86-91f98de36d72}, hash: 828BD9BF88B881749577E23D5589FE0D
 	@Test()
 	void isActiveWhenThisActivateNotIsActiveActivationContext() {
 		/* Branches:
@@ -70,14 +73,32 @@ class ConfigDataPropertiesSapientGeneratedTest {
 		});
 	}
 
+	//Sapient generated method id: ${c0df80b8-42ee-3e61-b9ff-afe788883f2a}, hash: 55EBE83AE760D203F0C02541CC3302CB
+	@Test()
+	void withoutImportsWhenDefaultBranch() {
+		/* Branches:
+		 * (branch expression (line 53)) : false  #  inside <init> method
+		 */
+		//Arrange Statement(s)
+		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
+		ConfigDataProperties target = new ConfigDataProperties(configDataLocationList, activateMock);
+		//Act Statement(s)
+		ConfigDataProperties result = target.withoutImports();
+		//Assert statement(s)
+		//TODO: Please implement equals method in ConfigDataProperties for verification of the entire object or you need to adjust respective assertion statements
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
+	}
 
-	//Sapient generated method id: ${9c25887d-767d-38e9-b5ae-c2e4012c49be}
+	//Sapient generated method id: ${9c25887d-767d-38e9-b5ae-c2e4012c49be}, hash: 17A79804B8CFB1BFF9885464099CC761
+	@Disabled()
 	@Test()
 	void getTest() {
 		//Arrange Statement(s)
 		Binder binderMock = mock(Binder.class);
 		BindResult bindResultMock = mock(BindResult.class);
-		doReturn(bindResultMock).when(binderMock).bind((ConfigurationPropertyName) any(), (Bindable) any(), (ConfigDataLocationBindHandler) any());
+		ConfigurationPropertyName configurationPropertyNameMock = mock(ConfigurationPropertyName.class);
+		Bindable<ConfigDataProperties> bindableMock = mock(Bindable.class);
+		doReturn(bindResultMock).when(binderMock).bind(eq(configurationPropertyNameMock), eq(bindableMock), (ConfigDataLocationBindHandler) any());
 		ConfigDataProperties configDataPropertiesMock = mock(ConfigDataProperties.class);
 		doReturn(configDataPropertiesMock).when(bindResultMock).orElse(null);
 		//Act Statement(s)
@@ -85,7 +106,7 @@ class ConfigDataPropertiesSapientGeneratedTest {
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(configDataPropertiesMock));
-			verify(binderMock).bind((ConfigurationPropertyName) any(), (Bindable) any(), (ConfigDataLocationBindHandler) any());
+			verify(binderMock).bind(eq(configurationPropertyNameMock), eq(bindableMock), (ConfigDataLocationBindHandler) any());
 			verify(bindResultMock).orElse(null);
 		});
 	}

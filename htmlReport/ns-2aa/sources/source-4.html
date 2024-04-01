@@ -1,0 +1,431 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractPackagerMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractPackagerMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractPackagerMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractPackagerMojo$LayoutType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/69)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;
+&nbsp;import org.apache.maven.artifact.Artifact;
+&nbsp;import org.apache.maven.execution.MavenSession;
+&nbsp;import org.apache.maven.model.Dependency;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;import org.apache.maven.plugins.annotations.Component;
+&nbsp;import org.apache.maven.plugins.annotations.Parameter;
+&nbsp;import org.apache.maven.project.MavenProject;
+&nbsp;import org.apache.maven.project.MavenProjectHelper;
+&nbsp;import org.apache.maven.shared.artifact.filter.collection.ArtifactsFilter;
+&nbsp;import org.apache.maven.shared.artifact.filter.collection.ScopeFilter;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.xml.sax.InputSource;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.Layout;
+&nbsp;import org.springframework.boot.loader.tools.LayoutFactory;
+&nbsp;import org.springframework.boot.loader.tools.Layouts.Expanded;
+&nbsp;import org.springframework.boot.loader.tools.Layouts.Jar;
+&nbsp;import org.springframework.boot.loader.tools.Layouts.None;
+&nbsp;import org.springframework.boot.loader.tools.Layouts.War;
+&nbsp;import org.springframework.boot.loader.tools.Libraries;
+&nbsp;import org.springframework.boot.loader.tools.LoaderImplementation;
+&nbsp;import org.springframework.boot.loader.tools.Packager;
+&nbsp;import org.springframework.boot.loader.tools.layer.CustomLayers;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base class for classes that work with an {@link Packager}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.3.0
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AbstractPackagerMojo extends AbstractDependencyFilterMojo {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final org.springframework.boot.loader.tools.Layers IMPLICIT_LAYERS = org.springframework.boot.loader.tools.Layers.IMPLICIT;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The Maven project.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project}&quot;, readonly = true, required = true)
+&nbsp;	protected MavenProject project;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The Maven session.
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${session}&quot;, readonly = true, required = true)
+&nbsp;	protected MavenSession session;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Maven project helper utils.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+&nbsp;	@Component
+&nbsp;	protected MavenProjectHelper projectHelper;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the main class. If not specified the first compiled class found that
+&nbsp;	 * contains a {@code main} method will be used.
+&nbsp;	 * @since 1.0.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private String mainClass;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Exclude Spring Boot devtools from the repackaged archive.
+&nbsp;	 * @since 1.3.0
+&nbsp;	 */
+<b class="nc">&nbsp;	@Parameter(property = &quot;spring-boot.repackage.excludeDevtools&quot;, defaultValue = &quot;true&quot;)</b>
+&nbsp;	private boolean excludeDevtools = true;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Exclude Spring Boot dev services from the repackaged archive.
+&nbsp;	 * @since 3.1.0
+&nbsp;	 */
+<b class="nc">&nbsp;	@Parameter(property = &quot;spring-boot.repackage.excludeDockerCompose&quot;, defaultValue = &quot;true&quot;)</b>
+&nbsp;	private boolean excludeDockerCompose = true;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Include system scoped dependencies.
+&nbsp;	 * @since 1.4.0
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;false&quot;)
+&nbsp;	public boolean includeSystemScope;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Layer configuration with options to disable layer creation, exclude layer tools
+&nbsp;	 * jar, and provide a custom layers configuration file.
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private Layers layers;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the type of archive that should be packaged by this MOJO.
+&nbsp;	 * @return {@code null}, indicating a layout type will be chosen based on the original
+&nbsp;	 * archive type
+&nbsp;	 */
+&nbsp;	protected LayoutType getLayout() {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the loader implementation that should be used.
+&nbsp;	 * @return the loader implementation or {@code null}
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	protected LoaderImplementation getLoaderImplementation() {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the layout factory that will be used to determine the {@link LayoutType} if
+&nbsp;	 * no explicit layout is set.
+&nbsp;	 * @return {@code null}, indicating a default layout factory will be chosen
+&nbsp;	 */
+&nbsp;	protected LayoutFactory getLayoutFactory() {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link Packager} configured for this MOJO.
+&nbsp;	 * @param &lt;P&gt; the packager type
+&nbsp;	 * @param supplier a packager supplier
+&nbsp;	 * @return a configured packager
+&nbsp;	 */
+&nbsp;	protected &lt;P extends Packager&gt; P getConfiguredPackager(Supplier&lt;P&gt; supplier) {
+<b class="nc">&nbsp;		P packager = supplier.get();</b>
+<b class="nc">&nbsp;		packager.setLoaderImplementation(getLoaderImplementation());</b>
+<b class="nc">&nbsp;		packager.setLayoutFactory(getLayoutFactory());</b>
+<b class="nc">&nbsp;		packager.addMainClassTimeoutWarningListener(new LoggingMainClassTimeoutWarningListener(this::getLog));</b>
+<b class="nc">&nbsp;		packager.setMainClass(this.mainClass);</b>
+<b class="nc">&nbsp;		LayoutType layout = getLayout();</b>
+<b class="nc">&nbsp;		if (layout != null) {</b>
+<b class="nc">&nbsp;			getLog().info(&quot;Layout: &quot; + layout);</b>
+<b class="nc">&nbsp;			packager.setLayout(layout.layout());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.layers == null) {</b>
+<b class="nc">&nbsp;			packager.setLayers(IMPLICIT_LAYERS);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (this.layers.isEnabled()) {</b>
+<b class="nc">&nbsp;			packager.setLayers((this.layers.getConfiguration() != null)</b>
+<b class="nc">&nbsp;					? getCustomLayers(this.layers.getConfiguration()) : IMPLICIT_LAYERS);</b>
+<b class="nc">&nbsp;			packager.setIncludeRelevantJarModeJars(this.layers.isIncludeLayerTools());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return packager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CustomLayers getCustomLayers(File configuration) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Document document = getDocumentIfAvailable(configuration);</b>
+<b class="nc">&nbsp;			return new CustomLayersProvider().getLayers(document);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(</b>
+<b class="nc">&nbsp;					&quot;Failed to process custom layers configuration &quot; + configuration.getAbsolutePath(), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Document getDocumentIfAvailable(File xmlFile) throws Exception {
+<b class="nc">&nbsp;		InputSource inputSource = new InputSource(new FileInputStream(xmlFile));</b>
+<b class="nc">&nbsp;		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</b>
+<b class="nc">&nbsp;		factory.setNamespaceAware(true);</b>
+<b class="nc">&nbsp;		DocumentBuilder builder = factory.newDocumentBuilder();</b>
+<b class="nc">&nbsp;		return builder.parse(inputSource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return {@link Libraries} that the packager can use.
+&nbsp;	 * @param unpacks any libraries that require unpack
+&nbsp;	 * @return the libraries to use
+&nbsp;	 * @throws MojoExecutionException on execution error
+&nbsp;	 */
+&nbsp;	protected final Libraries getLibraries(Collection&lt;Dependency&gt; unpacks) throws MojoExecutionException {
+<b class="nc">&nbsp;		Set&lt;Artifact&gt; artifacts = this.project.getArtifacts();</b>
+<b class="nc">&nbsp;		Set&lt;Artifact&gt; includedArtifacts = filterDependencies(artifacts, getAdditionalFilters());</b>
+<b class="nc">&nbsp;		return new ArtifactsLibraries(artifacts, includedArtifacts, this.session.getProjects(), unpacks, getLog());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ArtifactsFilter[] getAdditionalFilters() {
+<b class="nc">&nbsp;		List&lt;ArtifactsFilter&gt; filters = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (this.excludeDevtools) {</b>
+<b class="nc">&nbsp;			filters.add(DEVTOOLS_EXCLUDE_FILTER);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.excludeDockerCompose) {</b>
+<b class="nc">&nbsp;			filters.add(DOCKER_COMPOSE_EXCLUDE_FILTER);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!this.includeSystemScope) {</b>
+<b class="nc">&nbsp;			filters.add(new ScopeFilter(null, Artifact.SCOPE_SYSTEM));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return filters.toArray(new ArtifactsFilter[0]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the source {@link Artifact} to repackage. If a classifier is specified and
+&nbsp;	 * an artifact with that classifier exists, it is used. Otherwise, the main artifact
+&nbsp;	 * is used.
+&nbsp;	 * @param classifier the artifact classifier
+&nbsp;	 * @return the source artifact to repackage
+&nbsp;	 */
+&nbsp;	protected Artifact getSourceArtifact(String classifier) {
+<b class="nc">&nbsp;		Artifact sourceArtifact = getArtifact(classifier);</b>
+<b class="nc">&nbsp;		return (sourceArtifact != null) ? sourceArtifact : this.project.getArtifact();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Artifact getArtifact(String classifier) {
+<b class="nc">&nbsp;		if (classifier != null) {</b>
+<b class="nc">&nbsp;			for (Artifact attachedArtifact : this.project.getAttachedArtifacts()) {</b>
+<b class="nc">&nbsp;				if (classifier.equals(attachedArtifact.getClassifier()) &amp;&amp; attachedArtifact.getFile() != null</b>
+<b class="nc">&nbsp;						&amp;&amp; attachedArtifact.getFile().isFile()) {</b>
+<b class="nc">&nbsp;					return attachedArtifact;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected File getTargetFile(String finalName, String classifier, File targetDirectory) {
+<b class="nc">&nbsp;		String classifierSuffix = (classifier != null) ? classifier.trim() : &quot;&quot;;</b>
+<b class="nc">&nbsp;		if (!classifierSuffix.isEmpty() &amp;&amp; !classifierSuffix.startsWith(&quot;-&quot;)) {</b>
+<b class="nc">&nbsp;			classifierSuffix = &quot;-&quot; + classifierSuffix;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!targetDirectory.exists()) {</b>
+<b class="nc">&nbsp;			targetDirectory.mkdirs();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new File(targetDirectory,</b>
+<b class="nc">&nbsp;				finalName + classifierSuffix + &quot;.&quot; + this.project.getArtifact().getArtifactHandler().getExtension());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Archive layout types.
+&nbsp;	 */
+<b class="nc">&nbsp;	public enum LayoutType {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Jar Layout.
+&nbsp;		 */
+<b class="nc">&nbsp;		JAR(new Jar()),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * War Layout.
+&nbsp;		 */
+<b class="nc">&nbsp;		WAR(new War()),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Zip Layout.
+&nbsp;		 */
+<b class="nc">&nbsp;		ZIP(new Expanded()),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Directory Layout.
+&nbsp;		 */
+<b class="nc">&nbsp;		DIR(new Expanded()),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * No Layout.
+&nbsp;		 */
+<b class="nc">&nbsp;		NONE(new None());</b>
+&nbsp;
+&nbsp;		private final Layout layout;
+&nbsp;
+<b class="nc">&nbsp;		LayoutType(Layout layout) {</b>
+<b class="nc">&nbsp;			this.layout = layout;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Layout layout() {
+<b class="nc">&nbsp;			return this.layout;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

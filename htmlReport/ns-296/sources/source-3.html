@@ -1,0 +1,497 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JarFileArchive</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.archive</a>
+</div>
+
+<h1>Coverage Summary for Class: JarFileArchive (org.springframework.boot.loader.archive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JarFileArchive</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JarFileArchive$AbstractIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JarFileArchive$EntryIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JarFileArchive$JarFileEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JarFileArchive$NestedArchiveIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.archive;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.FileSystem;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.nio.file.StandardOpenOption;
+&nbsp;import java.nio.file.attribute.FileAttribute;
+&nbsp;import java.nio.file.attribute.PosixFilePermission;
+&nbsp;import java.nio.file.attribute.PosixFilePermissions;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.jar.JarEntry;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.jar.JarFile;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Archive} implementation backed by a {@link JarFile}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class JarFileArchive implements Archive {
+&nbsp;
+&nbsp;	private static final String UNPACK_MARKER = &quot;UNPACK:&quot;;
+&nbsp;
+&nbsp;	private static final int BUFFER_SIZE = 32 * 1024;
+&nbsp;
+<b class="nc">&nbsp;	private static final FileAttribute&lt;?&gt;[] NO_FILE_ATTRIBUTES = {};</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final EnumSet&lt;PosixFilePermission&gt; DIRECTORY_PERMISSIONS = EnumSet.of(PosixFilePermission.OWNER_READ,</b>
+&nbsp;			PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE);
+&nbsp;
+<b class="nc">&nbsp;	private static final EnumSet&lt;PosixFilePermission&gt; FILE_PERMISSIONS = EnumSet.of(PosixFilePermission.OWNER_READ,</b>
+&nbsp;			PosixFilePermission.OWNER_WRITE);
+&nbsp;
+&nbsp;	private final JarFile jarFile;
+&nbsp;
+&nbsp;	private URL url;
+&nbsp;
+&nbsp;	private Path tempUnpackDirectory;
+&nbsp;
+&nbsp;	public JarFileArchive(File file) throws IOException {
+<b class="nc">&nbsp;		this(file, file.toURI().toURL());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public JarFileArchive(File file, URL url) throws IOException {
+<b class="nc">&nbsp;		this(new JarFile(file));</b>
+<b class="nc">&nbsp;		this.url = url;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public JarFileArchive(JarFile jarFile) {</b>
+<b class="nc">&nbsp;		this.jarFile = jarFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URL getUrl() throws MalformedURLException {
+<b class="nc">&nbsp;		if (this.url != null) {</b>
+<b class="nc">&nbsp;			return this.url;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.jarFile.getUrl();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Manifest getManifest() throws IOException {
+<b class="nc">&nbsp;		return this.jarFile.getManifest();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;Archive&gt; getNestedArchives(EntryFilter searchFilter, EntryFilter includeFilter) throws IOException {
+<b class="nc">&nbsp;		return new NestedArchiveIterator(this.jarFile.iterator(), searchFilter, includeFilter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	@Deprecated(since = &quot;2.3.10&quot;, forRemoval = false)
+&nbsp;	public Iterator&lt;Entry&gt; iterator() {
+<b class="nc">&nbsp;		return new EntryIterator(this.jarFile.iterator(), null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void close() throws IOException {
+<b class="nc">&nbsp;		this.jarFile.close();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Archive getNestedArchive(Entry entry) throws IOException {
+<b class="nc">&nbsp;		JarEntry jarEntry = ((JarFileEntry) entry).getJarEntry();</b>
+<b class="nc">&nbsp;		if (jarEntry.getComment().startsWith(UNPACK_MARKER)) {</b>
+<b class="nc">&nbsp;			return getUnpackedNestedArchive(jarEntry);</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			JarFile jarFile = this.jarFile.getNestedJarFile(jarEntry);</b>
+<b class="nc">&nbsp;			return new JarFileArchive(jarFile);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Failed to get nested archive for entry &quot; + entry.getName(), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Archive getUnpackedNestedArchive(JarEntry jarEntry) throws IOException {
+<b class="nc">&nbsp;		String name = jarEntry.getName();</b>
+<b class="nc">&nbsp;		if (name.lastIndexOf(&#39;/&#39;) != -1) {</b>
+<b class="nc">&nbsp;			name = name.substring(name.lastIndexOf(&#39;/&#39;) + 1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Path path = getTempUnpackDirectory().resolve(name);</b>
+<b class="nc">&nbsp;		if (!Files.exists(path) || Files.size(path) != jarEntry.getSize()) {</b>
+<b class="nc">&nbsp;			unpack(jarEntry, path);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new JarFileArchive(path.toFile(), path.toUri().toURL());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Path getTempUnpackDirectory() {
+<b class="nc">&nbsp;		if (this.tempUnpackDirectory == null) {</b>
+<b class="nc">&nbsp;			Path tempDirectory = Paths.get(System.getProperty(&quot;java.io.tmpdir&quot;));</b>
+<b class="nc">&nbsp;			this.tempUnpackDirectory = createUnpackDirectory(tempDirectory);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.tempUnpackDirectory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Path createUnpackDirectory(Path parent) {
+<b class="nc">&nbsp;		int attempts = 0;</b>
+<b class="nc">&nbsp;		while (attempts++ &lt; 1000) {</b>
+<b class="nc">&nbsp;			String fileName = Paths.get(this.jarFile.getName()).getFileName().toString();</b>
+<b class="nc">&nbsp;			Path unpackDirectory = parent.resolve(fileName + &quot;-spring-boot-libs-&quot; + UUID.randomUUID());</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				createDirectory(unpackDirectory);</b>
+<b class="nc">&nbsp;				return unpackDirectory;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;Failed to create unpack directory in directory &#39;&quot; + parent + &quot;&#39;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void unpack(JarEntry entry, Path path) throws IOException {
+<b class="nc">&nbsp;		createFile(path);</b>
+<b class="nc">&nbsp;		path.toFile().deleteOnExit();</b>
+<b class="nc">&nbsp;		try (InputStream inputStream = this.jarFile.getInputStream(entry);</b>
+<b class="nc">&nbsp;				OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.WRITE,</b>
+&nbsp;						StandardOpenOption.TRUNCATE_EXISTING)) {
+<b class="nc">&nbsp;			byte[] buffer = new byte[BUFFER_SIZE];</b>
+&nbsp;			int bytesRead;
+<b class="nc">&nbsp;			while ((bytesRead = inputStream.read(buffer)) != -1) {</b>
+<b class="nc">&nbsp;				outputStream.write(buffer, 0, bytesRead);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			outputStream.flush();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createDirectory(Path path) throws IOException {
+<b class="nc">&nbsp;		Files.createDirectory(path, getFileAttributes(path.getFileSystem(), DIRECTORY_PERMISSIONS));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createFile(Path path) throws IOException {
+<b class="nc">&nbsp;		Files.createFile(path, getFileAttributes(path.getFileSystem(), FILE_PERMISSIONS));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private FileAttribute&lt;?&gt;[] getFileAttributes(FileSystem fileSystem, EnumSet&lt;PosixFilePermission&gt; ownerReadWrite) {
+<b class="nc">&nbsp;		if (!fileSystem.supportedFileAttributeViews().contains(&quot;posix&quot;)) {</b>
+<b class="nc">&nbsp;			return NO_FILE_ATTRIBUTES;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new FileAttribute&lt;?&gt;[] { PosixFilePermissions.asFileAttribute(ownerReadWrite) };</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+&nbsp;		try {
+<b class="nc">&nbsp;			return getUrl().toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return &quot;jar archive&quot;;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Abstract base class for iterator implementations.
+&nbsp;	 */
+&nbsp;	private abstract static class AbstractIterator&lt;T&gt; implements Iterator&lt;T&gt; {
+&nbsp;
+&nbsp;		private final Iterator&lt;JarEntry&gt; iterator;
+&nbsp;
+&nbsp;		private final EntryFilter searchFilter;
+&nbsp;
+&nbsp;		private final EntryFilter includeFilter;
+&nbsp;
+&nbsp;		private Entry current;
+&nbsp;
+<b class="nc">&nbsp;		AbstractIterator(Iterator&lt;JarEntry&gt; iterator, EntryFilter searchFilter, EntryFilter includeFilter) {</b>
+<b class="nc">&nbsp;			this.iterator = iterator;</b>
+<b class="nc">&nbsp;			this.searchFilter = searchFilter;</b>
+<b class="nc">&nbsp;			this.includeFilter = includeFilter;</b>
+<b class="nc">&nbsp;			this.current = poll();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean hasNext() {
+<b class="nc">&nbsp;			return this.current != null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public T next() {
+<b class="nc">&nbsp;			T result = adapt(this.current);</b>
+<b class="nc">&nbsp;			this.current = poll();</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Entry poll() {
+<b class="nc">&nbsp;			while (this.iterator.hasNext()) {</b>
+<b class="nc">&nbsp;				JarFileEntry candidate = new JarFileEntry(this.iterator.next());</b>
+<b class="nc">&nbsp;				if ((this.searchFilter == null || this.searchFilter.matches(candidate))</b>
+<b class="nc">&nbsp;						&amp;&amp; (this.includeFilter == null || this.includeFilter.matches(candidate))) {</b>
+<b class="nc">&nbsp;					return candidate;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected abstract T adapt(Entry entry);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Archive.Entry} iterator implementation backed by {@link JarEntry}.
+&nbsp;	 */
+&nbsp;	private static class EntryIterator extends AbstractIterator&lt;Entry&gt; {
+&nbsp;
+&nbsp;		EntryIterator(Iterator&lt;JarEntry&gt; iterator, EntryFilter searchFilter, EntryFilter includeFilter) {
+<b class="nc">&nbsp;			super(iterator, searchFilter, includeFilter);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected Entry adapt(Entry entry) {
+<b class="nc">&nbsp;			return entry;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Nested {@link Archive} iterator implementation backed by {@link JarEntry}.
+&nbsp;	 */
+&nbsp;	private class NestedArchiveIterator extends AbstractIterator&lt;Archive&gt; {
+&nbsp;
+<b class="nc">&nbsp;		NestedArchiveIterator(Iterator&lt;JarEntry&gt; iterator, EntryFilter searchFilter, EntryFilter includeFilter) {</b>
+<b class="nc">&nbsp;			super(iterator, searchFilter, includeFilter);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected Archive adapt(Entry entry) {
+&nbsp;			try {
+<b class="nc">&nbsp;				return getNestedArchive(entry);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(ex);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Archive.Entry} implementation backed by a {@link JarEntry}.
+&nbsp;	 */
+&nbsp;	private static class JarFileEntry implements Entry {
+&nbsp;
+&nbsp;		private final JarEntry jarEntry;
+&nbsp;
+<b class="nc">&nbsp;		JarFileEntry(JarEntry jarEntry) {</b>
+<b class="nc">&nbsp;			this.jarEntry = jarEntry;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		JarEntry getJarEntry() {
+<b class="nc">&nbsp;			return this.jarEntry;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isDirectory() {
+<b class="nc">&nbsp;			return this.jarEntry.isDirectory();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getName() {
+<b class="nc">&nbsp;			return this.jarEntry.getName();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

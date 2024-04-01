@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImportTestcontainersRegistrar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testcontainers.context</a>
+</div>
+
+<h1>Coverage Summary for Class: ImportTestcontainersRegistrar (org.springframework.boot.testcontainers.context)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImportTestcontainersRegistrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testcontainers.context;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ImportBeanDefinitionRegistrar} for
+&nbsp; * {@link ImportTestcontainers @ImportTestcontainers}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @see ContainerFieldsImporter
+&nbsp; * @see DynamicPropertySourceMethodsImporter
+&nbsp; */
+&nbsp;class ImportTestcontainersRegistrar implements ImportBeanDefinitionRegistrar {
+&nbsp;
+&nbsp;	private static final String DYNAMIC_PROPERTY_SOURCE_CLASS = &quot;org.springframework.test.context.DynamicPropertySource&quot;;
+&nbsp;
+&nbsp;	private final ContainerFieldsImporter containerFieldsImporter;
+&nbsp;
+&nbsp;	private final DynamicPropertySourceMethodsImporter dynamicPropertySourceMethodsImporter;
+&nbsp;
+<b class="nc">&nbsp;	ImportTestcontainersRegistrar(Environment environment) {</b>
+<b class="nc">&nbsp;		this.containerFieldsImporter = new ContainerFieldsImporter();</b>
+<b class="nc">&nbsp;		this.dynamicPropertySourceMethodsImporter = (!ClassUtils.isPresent(DYNAMIC_PROPERTY_SOURCE_CLASS, null)) ? null</b>
+<b class="nc">&nbsp;				: new DynamicPropertySourceMethodsImporter(environment);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;		MergedAnnotation&lt;ImportTestcontainers&gt; annotation = importingClassMetadata.getAnnotations()</b>
+<b class="nc">&nbsp;			.get(ImportTestcontainers.class);</b>
+<b class="nc">&nbsp;		Class&lt;?&gt;[] definitionClasses = annotation.getClassArray(MergedAnnotation.VALUE);</b>
+<b class="nc">&nbsp;		if (ObjectUtils.isEmpty(definitionClasses)) {</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; importingClass = ClassUtils.resolveClassName(importingClassMetadata.getClassName(), null);</b>
+<b class="nc">&nbsp;			definitionClasses = new Class&lt;?&gt;[] { importingClass };</b>
+&nbsp;		}
+<b class="nc">&nbsp;		registerBeanDefinitions(registry, definitionClasses);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerBeanDefinitions(BeanDefinitionRegistry registry, Class&lt;?&gt;[] definitionClasses) {
+<b class="nc">&nbsp;		for (Class&lt;?&gt; definitionClass : definitionClasses) {</b>
+<b class="nc">&nbsp;			this.containerFieldsImporter.registerBeanDefinitions(registry, definitionClass);</b>
+<b class="nc">&nbsp;			if (this.dynamicPropertySourceMethodsImporter != null) {</b>
+<b class="nc">&nbsp;				this.dynamicPropertySourceMethodsImporter.registerDynamicPropertySources(registry, definitionClass);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

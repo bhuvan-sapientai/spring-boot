@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EndpointServlet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.endpoint.web</a>
+</div>
+
+<h1>Coverage Summary for Class: EndpointServlet (org.springframework.boot.actuate.endpoint.web)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EndpointServlet</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.endpoint.web;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import jakarta.servlet.Servlet;
+&nbsp;import jakarta.servlet.ServletRegistration.Dynamic;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains details of a servlet that is exposed as an actuator endpoint.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Julio José Gómez Díaz
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public final class EndpointServlet {
+&nbsp;
+&nbsp;	private final Servlet servlet;
+&nbsp;
+&nbsp;	private final Map&lt;String, String&gt; initParameters;
+&nbsp;
+&nbsp;	private final int loadOnStartup;
+&nbsp;
+&nbsp;	public EndpointServlet(Class&lt;? extends Servlet&gt; servlet) {
+<b class="nc">&nbsp;		this(instantiateClass(servlet));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Servlet instantiateClass(Class&lt;? extends Servlet&gt; servlet) {
+<b class="nc">&nbsp;		Assert.notNull(servlet, &quot;Servlet must not be null&quot;);</b>
+<b class="nc">&nbsp;		return BeanUtils.instantiateClass(servlet);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public EndpointServlet(Servlet servlet) {
+<b class="nc">&nbsp;		this(servlet, Collections.emptyMap(), -1);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private EndpointServlet(Servlet servlet, Map&lt;String, String&gt; initParameters, int loadOnStartup) {</b>
+<b class="nc">&nbsp;		Assert.notNull(servlet, &quot;Servlet must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.servlet = servlet;</b>
+<b class="nc">&nbsp;		this.initParameters = Collections.unmodifiableMap(initParameters);</b>
+<b class="nc">&nbsp;		this.loadOnStartup = loadOnStartup;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public EndpointServlet withInitParameter(String name, String value) {
+<b class="nc">&nbsp;		Assert.hasText(name, &quot;Name must not be empty&quot;);</b>
+<b class="nc">&nbsp;		return withInitParameters(Collections.singletonMap(name, value));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public EndpointServlet withInitParameters(Map&lt;String, String&gt; initParameters) {
+<b class="nc">&nbsp;		Assert.notNull(initParameters, &quot;InitParameters must not be null&quot;);</b>
+<b class="nc">&nbsp;		boolean hasEmptyName = initParameters.keySet().stream().anyMatch((name) -&gt; !StringUtils.hasText(name));</b>
+<b class="nc">&nbsp;		Assert.isTrue(!hasEmptyName, &quot;InitParameters must not contain empty names&quot;);</b>
+<b class="nc">&nbsp;		Map&lt;String, String&gt; mergedInitParameters = new LinkedHashMap&lt;&gt;(this.initParameters);</b>
+<b class="nc">&nbsp;		mergedInitParameters.putAll(initParameters);</b>
+<b class="nc">&nbsp;		return new EndpointServlet(this.servlet, mergedInitParameters, this.loadOnStartup);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the {@code loadOnStartup} priority that will be set on Servlet registration.
+&nbsp;	 * The default value for {@code loadOnStartup} is {@code -1}.
+&nbsp;	 * @param loadOnStartup the initialization priority of the Servlet
+&nbsp;	 * @return a new instance of {@link EndpointServlet} with the provided
+&nbsp;	 * {@code loadOnStartup} value set
+&nbsp;	 * @since 2.2.0
+&nbsp;	 * @see Dynamic#setLoadOnStartup(int)
+&nbsp;	 */
+&nbsp;	public EndpointServlet withLoadOnStartup(int loadOnStartup) {
+<b class="nc">&nbsp;		return new EndpointServlet(this.servlet, this.initParameters, loadOnStartup);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Servlet getServlet() {
+<b class="nc">&nbsp;		return this.servlet;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Map&lt;String, String&gt; getInitParameters() {
+<b class="nc">&nbsp;		return this.initParameters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	int getLoadOnStartup() {
+<b class="nc">&nbsp;		return this.loadOnStartup;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

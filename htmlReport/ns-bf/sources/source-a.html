@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FilteringSpringBootCondition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: FilteringSpringBootCondition (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FilteringSpringBootCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FilteringSpringBootCondition$ClassNameFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FilteringSpringBootCondition$ClassNameFilter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FilteringSpringBootCondition$ClassNameFilter$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.BeanClassLoaderAware;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.BeanFactoryAware;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfigurationImportFilter;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfigurationMetadata;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base class for a {@link SpringBootCondition} that also implements
+&nbsp; * {@link AutoConfigurationImportFilter}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+<b class="nc">&nbsp;abstract class FilteringSpringBootCondition extends SpringBootCondition</b>
+&nbsp;		implements AutoConfigurationImportFilter, BeanFactoryAware, BeanClassLoaderAware {
+&nbsp;
+&nbsp;	private BeanFactory beanFactory;
+&nbsp;
+&nbsp;	private ClassLoader beanClassLoader;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
+<b class="nc">&nbsp;		ConditionEvaluationReport report = ConditionEvaluationReport.find(this.beanFactory);</b>
+<b class="nc">&nbsp;		ConditionOutcome[] outcomes = getOutcomes(autoConfigurationClasses, autoConfigurationMetadata);</b>
+<b class="nc">&nbsp;		boolean[] match = new boolean[outcomes.length];</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; outcomes.length; i++) {</b>
+<b class="nc">&nbsp;			match[i] = (outcomes[i] == null || outcomes[i].isMatch());</b>
+<b class="nc">&nbsp;			if (!match[i] &amp;&amp; outcomes[i] != null) {</b>
+<b class="nc">&nbsp;				logOutcome(autoConfigurationClasses[i], outcomes[i]);</b>
+<b class="nc">&nbsp;				if (report != null) {</b>
+<b class="nc">&nbsp;					report.recordConditionEvaluation(autoConfigurationClasses[i], this, outcomes[i]);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return match;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected abstract ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
+&nbsp;			AutoConfigurationMetadata autoConfigurationMetadata);
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;		this.beanFactory = beanFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final BeanFactory getBeanFactory() {
+<b class="nc">&nbsp;		return this.beanFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final ClassLoader getBeanClassLoader() {
+<b class="nc">&nbsp;		return this.beanClassLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBeanClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		this.beanClassLoader = classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final List&lt;String&gt; filter(Collection&lt;String&gt; classNames, ClassNameFilter classNameFilter,
+&nbsp;			ClassLoader classLoader) {
+<b class="nc">&nbsp;		if (CollectionUtils.isEmpty(classNames)) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;String&gt; matches = new ArrayList&lt;&gt;(classNames.size());</b>
+<b class="nc">&nbsp;		for (String candidate : classNames) {</b>
+<b class="nc">&nbsp;			if (classNameFilter.matches(candidate, classLoader)) {</b>
+<b class="nc">&nbsp;				matches.add(candidate);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return matches;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Slightly faster variant of {@link ClassUtils#forName(String, ClassLoader)} that
+&nbsp;	 * doesn&#39;t deal with primitives, arrays or inner types.
+&nbsp;	 * @param className the class name to resolve
+&nbsp;	 * @param classLoader the class loader to use
+&nbsp;	 * @return a resolved class
+&nbsp;	 * @throws ClassNotFoundException if the class cannot be found
+&nbsp;	 */
+&nbsp;	protected static Class&lt;?&gt; resolve(String className, ClassLoader classLoader) throws ClassNotFoundException {
+<b class="nc">&nbsp;		if (classLoader != null) {</b>
+<b class="nc">&nbsp;			return Class.forName(className, false, classLoader);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Class.forName(className);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	protected enum ClassNameFilter {</b>
+&nbsp;
+<b class="nc">&nbsp;		PRESENT {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public boolean matches(String className, ClassLoader classLoader) {
+<b class="nc">&nbsp;				return isPresent(className, classLoader);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		},
+&nbsp;
+<b class="nc">&nbsp;		MISSING {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public boolean matches(String className, ClassLoader classLoader) {
+<b class="nc">&nbsp;				return !isPresent(className, classLoader);</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+&nbsp;
+&nbsp;		abstract boolean matches(String className, ClassLoader classLoader);
+&nbsp;
+&nbsp;		static boolean isPresent(String className, ClassLoader classLoader) {
+<b class="nc">&nbsp;			if (classLoader == null) {</b>
+<b class="nc">&nbsp;				classLoader = ClassUtils.getDefaultClassLoader();</b>
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				resolve(className, classLoader);</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Throwable ex) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

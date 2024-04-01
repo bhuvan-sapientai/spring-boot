@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > QualifierDefinition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.mock.mockito</a>
+</div>
+
+<h1>Coverage Summary for Class: QualifierDefinition (org.springframework.boot.test.mock.mockito)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QualifierDefinition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.mock.mockito;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.AnnotatedElement;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.annotation.Qualifier;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.config.DependencyDescriptor;
+&nbsp;import org.springframework.beans.factory.support.RootBeanDefinition;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;
+&nbsp;/**
+&nbsp; * Definition of a Spring {@link Qualifier @Qualifier}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @see Definition
+&nbsp; */
+&nbsp;class QualifierDefinition {
+&nbsp;
+&nbsp;	private final Field field;
+&nbsp;
+&nbsp;	private final DependencyDescriptor descriptor;
+&nbsp;
+&nbsp;	private final Set&lt;Annotation&gt; annotations;
+&nbsp;
+<b class="nc">&nbsp;	QualifierDefinition(Field field, Set&lt;Annotation&gt; annotations) {</b>
+&nbsp;		// We can&#39;t use the field or descriptor as part of the context key
+&nbsp;		// but we can assume that if two fields have the same qualifiers then
+&nbsp;		// it&#39;s safe for Spring to use either for qualifier logic
+<b class="nc">&nbsp;		this.field = field;</b>
+<b class="nc">&nbsp;		this.descriptor = new DependencyDescriptor(field, true);</b>
+<b class="nc">&nbsp;		this.annotations = annotations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean matches(ConfigurableListableBeanFactory beanFactory, String beanName) {
+<b class="nc">&nbsp;		return beanFactory.isAutowireCandidate(beanName, this.descriptor);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void applyTo(RootBeanDefinition definition) {
+<b class="nc">&nbsp;		definition.setQualifiedElement(this.field);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (obj == this) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || !getClass().isAssignableFrom(obj.getClass())) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		QualifierDefinition other = (QualifierDefinition) obj;</b>
+<b class="nc">&nbsp;		return this.annotations.equals(other.annotations);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return this.annotations.hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static QualifierDefinition forElement(AnnotatedElement element) {
+<b class="nc">&nbsp;		if (element != null &amp;&amp; element instanceof Field field) {</b>
+<b class="nc">&nbsp;			Set&lt;Annotation&gt; annotations = getQualifierAnnotations(field);</b>
+<b class="nc">&nbsp;			if (!annotations.isEmpty()) {</b>
+<b class="nc">&nbsp;				return new QualifierDefinition(field, annotations);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Set&lt;Annotation&gt; getQualifierAnnotations(Field field) {
+&nbsp;		// Assume that any annotations other than @MockBean/@SpyBean are qualifiers
+<b class="nc">&nbsp;		Annotation[] candidates = field.getDeclaredAnnotations();</b>
+<b class="nc">&nbsp;		Set&lt;Annotation&gt; annotations = new HashSet&lt;&gt;(candidates.length);</b>
+<b class="nc">&nbsp;		for (Annotation candidate : candidates) {</b>
+<b class="nc">&nbsp;			if (!isMockOrSpyAnnotation(candidate.annotationType())) {</b>
+<b class="nc">&nbsp;				annotations.add(candidate);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return annotations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isMockOrSpyAnnotation(Class&lt;? extends Annotation&gt; type) {
+<b class="nc">&nbsp;		if (type.equals(MockBean.class) || type.equals(SpyBean.class)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		MergedAnnotations metaAnnotations = MergedAnnotations.from(type);</b>
+<b class="nc">&nbsp;		return metaAnnotations.isPresent(MockBean.class) || metaAnnotations.isPresent(SpyBean.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

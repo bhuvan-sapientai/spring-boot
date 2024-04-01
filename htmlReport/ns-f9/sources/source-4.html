@@ -1,0 +1,418 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HibernateJpaConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.orm.jpa</a>
+</div>
+
+<h1>Coverage Summary for Class: HibernateJpaConfiguration (org.springframework.boot.autoconfigure.orm.jpa)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HibernateJpaConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HibernateJpaConfiguration$HibernateRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HibernateJpaConfiguration$NamingStrategiesHibernatePropertiesCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.orm.jpa;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
+&nbsp;import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
+&nbsp;import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
+&nbsp;import org.hibernate.cfg.AvailableSettings;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.MemberCategory;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.aot.hint.TypeHint;
+&nbsp;import org.springframework.aot.hint.TypeHint.Builder;
+&nbsp;import org.springframework.aot.hint.TypeReference;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+&nbsp;import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration.HibernateRuntimeHints;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.jdbc.SchemaManagementProvider;
+&nbsp;import org.springframework.boot.jdbc.metadata.CompositeDataSourcePoolMetadataProvider;
+&nbsp;import org.springframework.boot.jdbc.metadata.DataSourcePoolMetadata;
+&nbsp;import org.springframework.boot.jdbc.metadata.DataSourcePoolMetadataProvider;
+&nbsp;import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
+&nbsp;import org.springframework.boot.orm.jpa.hibernate.SpringJtaPlatform;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;import org.springframework.jndi.JndiLocatorDelegate;
+&nbsp;import org.springframework.orm.hibernate5.SpringBeanContainer;
+&nbsp;import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
+&nbsp;import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+&nbsp;import org.springframework.transaction.jta.JtaTransactionManager;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link JpaBaseConfiguration} implementation for Hibernate.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Josh Long
+&nbsp; * @author Manuel Doninger
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@EnableConfigurationProperties(HibernateProperties.class)
+&nbsp;@ConditionalOnSingleCandidate(DataSource.class)
+&nbsp;@ImportRuntimeHints(HibernateRuntimeHints.class)
+&nbsp;class HibernateJpaConfiguration extends JpaBaseConfiguration {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(HibernateJpaConfiguration.class);</b>
+&nbsp;
+&nbsp;	private static final String JTA_PLATFORM = &quot;hibernate.transaction.jta.platform&quot;;
+&nbsp;
+&nbsp;	private static final String PROVIDER_DISABLES_AUTOCOMMIT = &quot;hibernate.connection.provider_disables_autocommit&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@code NoJtaPlatform} implementations for various Hibernate versions.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final String[] NO_JTA_PLATFORM_CLASSES = {</b>
+&nbsp;			&quot;org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform&quot;,
+&nbsp;			&quot;org.hibernate.service.jta.platform.internal.NoJtaPlatform&quot; };
+&nbsp;
+&nbsp;	private final HibernateProperties hibernateProperties;
+&nbsp;
+&nbsp;	private final HibernateDefaultDdlAutoProvider defaultDdlAutoProvider;
+&nbsp;
+&nbsp;	private final DataSourcePoolMetadataProvider poolMetadataProvider;
+&nbsp;
+&nbsp;	private final List&lt;HibernatePropertiesCustomizer&gt; hibernatePropertiesCustomizers;
+&nbsp;
+&nbsp;	HibernateJpaConfiguration(DataSource dataSource, JpaProperties jpaProperties,
+&nbsp;			ConfigurableListableBeanFactory beanFactory, ObjectProvider&lt;JtaTransactionManager&gt; jtaTransactionManager,
+&nbsp;			HibernateProperties hibernateProperties,
+&nbsp;			ObjectProvider&lt;Collection&lt;DataSourcePoolMetadataProvider&gt;&gt; metadataProviders,
+&nbsp;			ObjectProvider&lt;SchemaManagementProvider&gt; providers,
+&nbsp;			ObjectProvider&lt;PhysicalNamingStrategy&gt; physicalNamingStrategy,
+&nbsp;			ObjectProvider&lt;ImplicitNamingStrategy&gt; implicitNamingStrategy,
+&nbsp;			ObjectProvider&lt;HibernatePropertiesCustomizer&gt; hibernatePropertiesCustomizers) {
+<b class="nc">&nbsp;		super(dataSource, jpaProperties, jtaTransactionManager);</b>
+<b class="nc">&nbsp;		this.hibernateProperties = hibernateProperties;</b>
+<b class="nc">&nbsp;		this.defaultDdlAutoProvider = new HibernateDefaultDdlAutoProvider(providers);</b>
+<b class="nc">&nbsp;		this.poolMetadataProvider = new CompositeDataSourcePoolMetadataProvider(metadataProviders.getIfAvailable());</b>
+<b class="nc">&nbsp;		this.hibernatePropertiesCustomizers = determineHibernatePropertiesCustomizers(</b>
+<b class="nc">&nbsp;				physicalNamingStrategy.getIfAvailable(), implicitNamingStrategy.getIfAvailable(), beanFactory,</b>
+<b class="nc">&nbsp;				hibernatePropertiesCustomizers.orderedStream().toList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;HibernatePropertiesCustomizer&gt; determineHibernatePropertiesCustomizers(
+&nbsp;			PhysicalNamingStrategy physicalNamingStrategy, ImplicitNamingStrategy implicitNamingStrategy,
+&nbsp;			ConfigurableListableBeanFactory beanFactory,
+&nbsp;			List&lt;HibernatePropertiesCustomizer&gt; hibernatePropertiesCustomizers) {
+<b class="nc">&nbsp;		List&lt;HibernatePropertiesCustomizer&gt; customizers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (ClassUtils.isPresent(&quot;org.hibernate.resource.beans.container.spi.BeanContainer&quot;,</b>
+<b class="nc">&nbsp;				getClass().getClassLoader())) {</b>
+<b class="nc">&nbsp;			customizers.add((properties) -&gt; properties.put(AvailableSettings.BEAN_CONTAINER,</b>
+&nbsp;					new SpringBeanContainer(beanFactory)));
+&nbsp;		}
+<b class="nc">&nbsp;		if (physicalNamingStrategy != null || implicitNamingStrategy != null) {</b>
+<b class="nc">&nbsp;			customizers</b>
+<b class="nc">&nbsp;				.add(new NamingStrategiesHibernatePropertiesCustomizer(physicalNamingStrategy, implicitNamingStrategy));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		customizers.addAll(hibernatePropertiesCustomizers);</b>
+<b class="nc">&nbsp;		return customizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected AbstractJpaVendorAdapter createJpaVendorAdapter() {
+<b class="nc">&nbsp;		return new HibernateJpaVendorAdapter();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Map&lt;String, Object&gt; getVendorProperties() {
+<b class="nc">&nbsp;		Supplier&lt;String&gt; defaultDdlMode = () -&gt; this.defaultDdlAutoProvider.getDefaultDdlAuto(getDataSource());</b>
+<b class="nc">&nbsp;		return new LinkedHashMap&lt;&gt;(this.hibernateProperties.determineHibernateProperties(</b>
+<b class="nc">&nbsp;				getProperties().getProperties(), new HibernateSettings().ddlAuto(defaultDdlMode)</b>
+<b class="nc">&nbsp;					.hibernatePropertiesCustomizers(this.hibernatePropertiesCustomizers)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void customizeVendorProperties(Map&lt;String, Object&gt; vendorProperties) {
+<b class="nc">&nbsp;		super.customizeVendorProperties(vendorProperties);</b>
+<b class="nc">&nbsp;		if (!vendorProperties.containsKey(JTA_PLATFORM)) {</b>
+<b class="nc">&nbsp;			configureJtaPlatform(vendorProperties);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!vendorProperties.containsKey(PROVIDER_DISABLES_AUTOCOMMIT)) {</b>
+<b class="nc">&nbsp;			configureProviderDisablesAutocommit(vendorProperties);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureJtaPlatform(Map&lt;String, Object&gt; vendorProperties) throws LinkageError {
+<b class="nc">&nbsp;		JtaTransactionManager jtaTransactionManager = getJtaTransactionManager();</b>
+&nbsp;		// Make sure Hibernate doesn&#39;t attempt to auto-detect a JTA platform
+<b class="nc">&nbsp;		if (jtaTransactionManager == null) {</b>
+<b class="nc">&nbsp;			vendorProperties.put(JTA_PLATFORM, getNoJtaPlatformManager());</b>
+&nbsp;		}
+&nbsp;		// As of Hibernate 5.2, Hibernate can fully integrate with the WebSphere
+&nbsp;		// transaction manager on its own.
+<b class="nc">&nbsp;		else if (!runningOnWebSphere()) {</b>
+<b class="nc">&nbsp;			configureSpringJtaPlatform(vendorProperties, jtaTransactionManager);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureProviderDisablesAutocommit(Map&lt;String, Object&gt; vendorProperties) {
+<b class="nc">&nbsp;		if (isDataSourceAutoCommitDisabled() &amp;&amp; !isJta()) {</b>
+<b class="nc">&nbsp;			vendorProperties.put(PROVIDER_DISABLES_AUTOCOMMIT, &quot;true&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isDataSourceAutoCommitDisabled() {
+<b class="nc">&nbsp;		DataSourcePoolMetadata poolMetadata = this.poolMetadataProvider.getDataSourcePoolMetadata(getDataSource());</b>
+<b class="nc">&nbsp;		return poolMetadata != null &amp;&amp; Boolean.FALSE.equals(poolMetadata.getDefaultAutoCommit());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean runningOnWebSphere() {
+<b class="nc">&nbsp;		return ClassUtils.isPresent(&quot;com.ibm.websphere.jtaextensions.ExtendedJTATransaction&quot;,</b>
+<b class="nc">&nbsp;				getClass().getClassLoader());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureSpringJtaPlatform(Map&lt;String, Object&gt; vendorProperties,
+&nbsp;			JtaTransactionManager jtaTransactionManager) {
+&nbsp;		try {
+<b class="nc">&nbsp;			vendorProperties.put(JTA_PLATFORM, new SpringJtaPlatform(jtaTransactionManager));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (LinkageError ex) {</b>
+&nbsp;			// NoClassDefFoundError can happen if Hibernate 4.2 is used and some
+&nbsp;			// containers (e.g. JBoss EAP 6) wrap it in the superclass LinkageError
+<b class="nc">&nbsp;			if (!isUsingJndi()) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(</b>
+&nbsp;						&quot;Unable to set Hibernate JTA platform, are you using the correct version of Hibernate?&quot;, ex);
+&nbsp;			}
+&nbsp;			// Assume that Hibernate will use JNDI
+<b class="nc">&nbsp;			if (logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;				logger.debug(&quot;Unable to set Hibernate JTA platform : &quot; + ex.getMessage());</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isUsingJndi() {
+&nbsp;		try {
+<b class="nc">&nbsp;			return JndiLocatorDelegate.isDefaultJndiEnvironmentAvailable();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Error ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getNoJtaPlatformManager() {
+<b class="nc">&nbsp;		for (String candidate : NO_JTA_PLATFORM_CLASSES) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return Class.forName(candidate).getDeclaredConstructor().newInstance();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+&nbsp;				// Continue searching
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(</b>
+<b class="nc">&nbsp;				&quot;No available JtaPlatform candidates amongst &quot; + Arrays.toString(NO_JTA_PLATFORM_CLASSES));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class NamingStrategiesHibernatePropertiesCustomizer implements HibernatePropertiesCustomizer {
+&nbsp;
+&nbsp;		private final PhysicalNamingStrategy physicalNamingStrategy;
+&nbsp;
+&nbsp;		private final ImplicitNamingStrategy implicitNamingStrategy;
+&nbsp;
+&nbsp;		NamingStrategiesHibernatePropertiesCustomizer(PhysicalNamingStrategy physicalNamingStrategy,
+<b class="nc">&nbsp;				ImplicitNamingStrategy implicitNamingStrategy) {</b>
+<b class="nc">&nbsp;			this.physicalNamingStrategy = physicalNamingStrategy;</b>
+<b class="nc">&nbsp;			this.implicitNamingStrategy = implicitNamingStrategy;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void customize(Map&lt;String, Object&gt; hibernateProperties) {
+<b class="nc">&nbsp;			if (this.physicalNamingStrategy != null) {</b>
+<b class="nc">&nbsp;				hibernateProperties.put(&quot;hibernate.physical_naming_strategy&quot;, this.physicalNamingStrategy);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.implicitNamingStrategy != null) {</b>
+<b class="nc">&nbsp;				hibernateProperties.put(&quot;hibernate.implicit_naming_strategy&quot;, this.implicitNamingStrategy);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class HibernateRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final Consumer&lt;Builder&gt; INVOKE_DECLARED_CONSTRUCTORS = TypeHint</b>
+<b class="nc">&nbsp;			.builtWith(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS);</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			for (String noJtaPlatformClass : NO_JTA_PLATFORM_CLASSES) {</b>
+<b class="nc">&nbsp;				hints.reflection().registerType(TypeReference.of(noJtaPlatformClass), INVOKE_DECLARED_CONSTRUCTORS);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			hints.reflection().registerType(SpringImplicitNamingStrategy.class, INVOKE_DECLARED_CONSTRUCTORS);</b>
+<b class="nc">&nbsp;			hints.reflection().registerType(CamelCaseToUnderscoresNamingStrategy.class, INVOKE_DECLARED_CONSTRUCTORS);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

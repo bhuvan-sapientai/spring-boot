@@ -1,0 +1,490 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JavaPluginAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.plugin</a>
+</div>
+
+<h1>Coverage Summary for Class: JavaPluginAction (org.springframework.boot.gradle.plugin)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JavaPluginAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/164)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JavaPluginAction$AdditionalMetadataLocationsConfigurer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/178)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.plugin;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.attributes.Attribute;
+&nbsp;import org.gradle.api.attributes.AttributeContainer;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.plugins.ApplicationPlugin;
+&nbsp;import org.gradle.api.plugins.BasePlugin;
+&nbsp;import org.gradle.api.plugins.ExtensionContainer;
+&nbsp;import org.gradle.api.plugins.JavaApplication;
+&nbsp;import org.gradle.api.plugins.JavaPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPluginExtension;
+&nbsp;import org.gradle.api.provider.Provider;
+&nbsp;import org.gradle.api.provider.ProviderFactory;
+&nbsp;import org.gradle.api.tasks.SourceSet;
+&nbsp;import org.gradle.api.tasks.SourceSetContainer;
+&nbsp;import org.gradle.api.tasks.TaskProvider;
+&nbsp;import org.gradle.api.tasks.bundling.Jar;
+&nbsp;import org.gradle.api.tasks.compile.JavaCompile;
+&nbsp;import org.gradle.jvm.toolchain.JavaToolchainService;
+&nbsp;import org.gradle.jvm.toolchain.JavaToolchainSpec;
+&nbsp;
+&nbsp;import org.springframework.boot.gradle.dsl.SpringBootExtension;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootBuildImage;
+&nbsp;import org.springframework.boot.gradle.tasks.bundling.BootJar;
+&nbsp;import org.springframework.boot.gradle.tasks.run.BootRun;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Action} that is executed in response to the {@link JavaPlugin} being applied.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;final class JavaPluginAction implements PluginApplicationAction {
+&nbsp;
+&nbsp;	private static final String PARAMETERS_COMPILER_ARG = &quot;-parameters&quot;;
+&nbsp;
+&nbsp;	private final SinglePublishedArtifact singlePublishedArtifact;
+&nbsp;
+<b class="nc">&nbsp;	JavaPluginAction(SinglePublishedArtifact singlePublishedArtifact) {</b>
+<b class="nc">&nbsp;		this.singlePublishedArtifact = singlePublishedArtifact;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;? extends Plugin&lt;? extends Project&gt;&gt; getPluginClass() {
+<b class="nc">&nbsp;		return JavaPlugin.class;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void execute(Project project) {
+<b class="nc">&nbsp;		classifyJarTask(project);</b>
+<b class="nc">&nbsp;		configureBuildTask(project);</b>
+<b class="nc">&nbsp;		configureProductionRuntimeClasspathConfiguration(project);</b>
+<b class="nc">&nbsp;		configureDevelopmentOnlyConfiguration(project);</b>
+<b class="nc">&nbsp;		configureTestAndDevelopmentOnlyConfiguration(project);</b>
+<b class="nc">&nbsp;		TaskProvider&lt;ResolveMainClassName&gt; resolveMainClassName = configureResolveMainClassNameTask(project);</b>
+<b class="nc">&nbsp;		TaskProvider&lt;BootJar&gt; bootJar = configureBootJarTask(project, resolveMainClassName);</b>
+<b class="nc">&nbsp;		configureBootBuildImageTask(project, bootJar);</b>
+<b class="nc">&nbsp;		configureArtifactPublication(bootJar);</b>
+<b class="nc">&nbsp;		configureBootRunTask(project, resolveMainClassName);</b>
+<b class="nc">&nbsp;		TaskProvider&lt;ResolveMainClassName&gt; resolveMainTestClassName = configureResolveMainTestClassNameTask(project);</b>
+<b class="nc">&nbsp;		configureBootTestRunTask(project, resolveMainTestClassName);</b>
+<b class="nc">&nbsp;		project.afterEvaluate(this::configureUtf8Encoding);</b>
+<b class="nc">&nbsp;		configureParametersCompilerArg(project);</b>
+<b class="nc">&nbsp;		configureAdditionalMetadataLocations(project);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void classifyJarTask(Project project) {
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(JavaPlugin.JAR_TASK_NAME, Jar.class)</b>
+<b class="nc">&nbsp;			.configure((task) -&gt; task.getArchiveClassifier().convention(&quot;plain&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureBuildTask(Project project) {
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.named(BasePlugin.ASSEMBLE_TASK_NAME)</b>
+<b class="nc">&nbsp;			.configure((task) -&gt; task.dependsOn(this.singlePublishedArtifact));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TaskProvider&lt;ResolveMainClassName&gt; configureResolveMainClassNameTask(Project project) {
+<b class="nc">&nbsp;		return project.getTasks()</b>
+<b class="nc">&nbsp;			.register(SpringBootPlugin.RESOLVE_MAIN_CLASS_NAME_TASK_NAME, ResolveMainClassName.class,</b>
+&nbsp;					(resolveMainClassName) -&gt; {
+<b class="nc">&nbsp;						ExtensionContainer extensions = project.getExtensions();</b>
+<b class="nc">&nbsp;						resolveMainClassName.setDescription(&quot;Resolves the name of the application&#39;s main class.&quot;);</b>
+<b class="nc">&nbsp;						resolveMainClassName.setGroup(BasePlugin.BUILD_GROUP);</b>
+<b class="nc">&nbsp;						Callable&lt;FileCollection&gt; classpath = () -&gt; project.getExtensions()</b>
+<b class="nc">&nbsp;							.getByType(SourceSetContainer.class)</b>
+<b class="nc">&nbsp;							.getByName(SourceSet.MAIN_SOURCE_SET_NAME)</b>
+<b class="nc">&nbsp;							.getOutput();</b>
+<b class="nc">&nbsp;						resolveMainClassName.setClasspath(classpath);</b>
+<b class="nc">&nbsp;						resolveMainClassName.getConfiguredMainClassName().convention(project.provider(() -&gt; {</b>
+<b class="nc">&nbsp;							String javaApplicationMainClass = getJavaApplicationMainClass(extensions);</b>
+<b class="nc">&nbsp;							if (javaApplicationMainClass != null) {</b>
+<b class="nc">&nbsp;								return javaApplicationMainClass;</b>
+&nbsp;							}
+<b class="nc">&nbsp;							SpringBootExtension springBootExtension = project.getExtensions()</b>
+<b class="nc">&nbsp;								.findByType(SpringBootExtension.class);</b>
+<b class="nc">&nbsp;							return springBootExtension.getMainClass().getOrNull();</b>
+&nbsp;						}));
+<b class="nc">&nbsp;						resolveMainClassName.getOutputFile()</b>
+<b class="nc">&nbsp;							.set(project.getLayout().getBuildDirectory().file(&quot;resolvedMainClassName&quot;));</b>
+&nbsp;					});
+&nbsp;	}
+&nbsp;
+&nbsp;	private TaskProvider&lt;ResolveMainClassName&gt; configureResolveMainTestClassNameTask(Project project) {
+<b class="nc">&nbsp;		return project.getTasks()</b>
+<b class="nc">&nbsp;			.register(SpringBootPlugin.RESOLVE_TEST_MAIN_CLASS_NAME_TASK_NAME, ResolveMainClassName.class,</b>
+&nbsp;					(resolveMainClassName) -&gt; {
+<b class="nc">&nbsp;						resolveMainClassName.setDescription(&quot;Resolves the name of the application&#39;s test main class.&quot;);</b>
+<b class="nc">&nbsp;						resolveMainClassName.setGroup(BasePlugin.BUILD_GROUP);</b>
+<b class="nc">&nbsp;						Callable&lt;FileCollection&gt; classpath = () -&gt; {</b>
+<b class="nc">&nbsp;							SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);</b>
+<b class="nc">&nbsp;							return project.files(sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME).getOutput(),</b>
+<b class="nc">&nbsp;									sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME).getOutput());</b>
+&nbsp;						};
+<b class="nc">&nbsp;						resolveMainClassName.setClasspath(classpath);</b>
+<b class="nc">&nbsp;						resolveMainClassName.getOutputFile()</b>
+<b class="nc">&nbsp;							.set(project.getLayout().getBuildDirectory().file(&quot;resolvedMainTestClassName&quot;));</b>
+&nbsp;					});
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getJavaApplicationMainClass(ExtensionContainer extensions) {
+<b class="nc">&nbsp;		JavaApplication javaApplication = extensions.findByType(JavaApplication.class);</b>
+<b class="nc">&nbsp;		if (javaApplication == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return javaApplication.getMainClass().getOrNull();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TaskProvider&lt;BootJar&gt; configureBootJarTask(Project project,
+&nbsp;			TaskProvider&lt;ResolveMainClassName&gt; resolveMainClassName) {
+<b class="nc">&nbsp;		SourceSet mainSourceSet = javaPluginExtension(project).getSourceSets()</b>
+<b class="nc">&nbsp;			.getByName(SourceSet.MAIN_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;		Configuration developmentOnly = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(SpringBootPlugin.DEVELOPMENT_ONLY_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		Configuration testAndDevelopmentOnly = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(SpringBootPlugin.TEST_AND_DEVELOPMENT_ONLY_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		Configuration productionRuntimeClasspath = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(SpringBootPlugin.PRODUCTION_RUNTIME_CLASSPATH_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		Configuration runtimeClasspath = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(mainSourceSet.getRuntimeClasspathConfigurationName());</b>
+<b class="nc">&nbsp;		Callable&lt;FileCollection&gt; classpath = () -&gt; mainSourceSet.getRuntimeClasspath()</b>
+<b class="nc">&nbsp;			.minus((developmentOnly.minus(productionRuntimeClasspath)))</b>
+<b class="nc">&nbsp;			.minus((testAndDevelopmentOnly.minus(productionRuntimeClasspath)))</b>
+<b class="nc">&nbsp;			.filter(new JarTypeFileSpec());</b>
+<b class="nc">&nbsp;		return project.getTasks().register(SpringBootPlugin.BOOT_JAR_TASK_NAME, BootJar.class, (bootJar) -&gt; {</b>
+<b class="nc">&nbsp;			bootJar.setDescription(</b>
+&nbsp;					&quot;Assembles an executable jar archive containing the main classes and their dependencies.&quot;);
+<b class="nc">&nbsp;			bootJar.setGroup(BasePlugin.BUILD_GROUP);</b>
+<b class="nc">&nbsp;			bootJar.classpath(classpath);</b>
+<b class="nc">&nbsp;			Provider&lt;String&gt; manifestStartClass = project</b>
+<b class="nc">&nbsp;				.provider(() -&gt; (String) bootJar.getManifest().getAttributes().get(&quot;Start-Class&quot;));</b>
+<b class="nc">&nbsp;			bootJar.getMainClass()</b>
+<b class="nc">&nbsp;				.convention(resolveMainClassName.flatMap((resolver) -&gt; manifestStartClass.isPresent()</b>
+<b class="nc">&nbsp;						? manifestStartClass : resolveMainClassName.get().readMainClassName()));</b>
+<b class="nc">&nbsp;			bootJar.getTargetJavaVersion()</b>
+<b class="nc">&nbsp;				.set(project.provider(() -&gt; javaPluginExtension(project).getTargetCompatibility()));</b>
+<b class="nc">&nbsp;			bootJar.resolvedArtifacts(runtimeClasspath.getIncoming().getArtifacts().getResolvedArtifacts());</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureBootBuildImageTask(Project project, TaskProvider&lt;BootJar&gt; bootJar) {
+<b class="nc">&nbsp;		project.getTasks().register(SpringBootPlugin.BOOT_BUILD_IMAGE_TASK_NAME, BootBuildImage.class, (buildImage) -&gt; {</b>
+<b class="nc">&nbsp;			buildImage.setDescription(&quot;Builds an OCI image of the application using the output of the bootJar task&quot;);</b>
+<b class="nc">&nbsp;			buildImage.setGroup(BasePlugin.BUILD_GROUP);</b>
+<b class="nc">&nbsp;			buildImage.getArchiveFile().set(bootJar.get().getArchiveFile());</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureArtifactPublication(TaskProvider&lt;BootJar&gt; bootJar) {
+<b class="nc">&nbsp;		this.singlePublishedArtifact.addJarCandidate(bootJar);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureBootRunTask(Project project, TaskProvider&lt;ResolveMainClassName&gt; resolveMainClassName) {
+<b class="nc">&nbsp;		Callable&lt;FileCollection&gt; classpath = () -&gt; javaPluginExtension(project).getSourceSets()</b>
+<b class="nc">&nbsp;			.findByName(SourceSet.MAIN_SOURCE_SET_NAME)</b>
+<b class="nc">&nbsp;			.getRuntimeClasspath()</b>
+<b class="nc">&nbsp;			.filter(new JarTypeFileSpec());</b>
+<b class="nc">&nbsp;		project.getTasks().register(SpringBootPlugin.BOOT_RUN_TASK_NAME, BootRun.class, (run) -&gt; {</b>
+<b class="nc">&nbsp;			run.setDescription(&quot;Runs this project as a Spring Boot application.&quot;);</b>
+<b class="nc">&nbsp;			run.setGroup(ApplicationPlugin.APPLICATION_GROUP);</b>
+<b class="nc">&nbsp;			run.classpath(classpath);</b>
+<b class="nc">&nbsp;			run.getMainClass().convention(resolveMainClassName.flatMap(ResolveMainClassName::readMainClassName));</b>
+<b class="nc">&nbsp;			configureToolchainConvention(project, run);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureBootTestRunTask(Project project, TaskProvider&lt;ResolveMainClassName&gt; resolveMainClassName) {
+<b class="nc">&nbsp;		Callable&lt;FileCollection&gt; classpath = () -&gt; javaPluginExtension(project).getSourceSets()</b>
+<b class="nc">&nbsp;			.findByName(SourceSet.TEST_SOURCE_SET_NAME)</b>
+<b class="nc">&nbsp;			.getRuntimeClasspath()</b>
+<b class="nc">&nbsp;			.filter(new JarTypeFileSpec());</b>
+<b class="nc">&nbsp;		project.getTasks().register(&quot;bootTestRun&quot;, BootRun.class, (run) -&gt; {</b>
+<b class="nc">&nbsp;			run.setDescription(&quot;Runs this project as a Spring Boot application using the test runtime classpath.&quot;);</b>
+<b class="nc">&nbsp;			run.setGroup(ApplicationPlugin.APPLICATION_GROUP);</b>
+<b class="nc">&nbsp;			run.classpath(classpath);</b>
+<b class="nc">&nbsp;			run.getMainClass().convention(resolveMainClassName.flatMap(ResolveMainClassName::readMainClassName));</b>
+<b class="nc">&nbsp;			configureToolchainConvention(project, run);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureToolchainConvention(Project project, BootRun run) {
+<b class="nc">&nbsp;		JavaToolchainSpec toolchain = project.getExtensions().getByType(JavaPluginExtension.class).getToolchain();</b>
+<b class="nc">&nbsp;		JavaToolchainService toolchainService = project.getExtensions().getByType(JavaToolchainService.class);</b>
+<b class="nc">&nbsp;		run.getJavaLauncher().convention(toolchainService.launcherFor(toolchain));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JavaPluginExtension javaPluginExtension(Project project) {
+<b class="nc">&nbsp;		return project.getExtensions().getByType(JavaPluginExtension.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureUtf8Encoding(Project evaluatedProject) {
+<b class="nc">&nbsp;		evaluatedProject.getTasks().withType(JavaCompile.class).configureEach(this::configureUtf8Encoding);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureUtf8Encoding(JavaCompile compile) {
+<b class="nc">&nbsp;		if (compile.getOptions().getEncoding() == null) {</b>
+<b class="nc">&nbsp;			compile.getOptions().setEncoding(&quot;UTF-8&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureParametersCompilerArg(Project project) {
+<b class="nc">&nbsp;		project.getTasks().withType(JavaCompile.class).configureEach((compile) -&gt; {</b>
+<b class="nc">&nbsp;			List&lt;String&gt; compilerArgs = compile.getOptions().getCompilerArgs();</b>
+<b class="nc">&nbsp;			if (!compilerArgs.contains(PARAMETERS_COMPILER_ARG)) {</b>
+<b class="nc">&nbsp;				compilerArgs.add(PARAMETERS_COMPILER_ARG);</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureAdditionalMetadataLocations(Project project) {
+<b class="nc">&nbsp;		project.afterEvaluate((evaluated) -&gt; evaluated.getTasks()</b>
+<b class="nc">&nbsp;			.withType(JavaCompile.class)</b>
+<b class="nc">&nbsp;			.configureEach(this::configureAdditionalMetadataLocations));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureAdditionalMetadataLocations(JavaCompile compile) {
+<b class="nc">&nbsp;		SourceSetContainer sourceSets = compile.getProject()</b>
+<b class="nc">&nbsp;			.getExtensions()</b>
+<b class="nc">&nbsp;			.getByType(JavaPluginExtension.class)</b>
+<b class="nc">&nbsp;			.getSourceSets();</b>
+<b class="nc">&nbsp;		sourceSets.stream()</b>
+<b class="nc">&nbsp;			.filter((candidate) -&gt; candidate.getCompileJavaTaskName().equals(compile.getName()))</b>
+<b class="nc">&nbsp;			.map((match) -&gt; match.getResources().getSrcDirs())</b>
+<b class="nc">&nbsp;			.findFirst()</b>
+<b class="nc">&nbsp;			.ifPresent((locations) -&gt; compile.doFirst(new AdditionalMetadataLocationsConfigurer(locations)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+&nbsp;	private void configureProductionRuntimeClasspathConfiguration(Project project) {
+<b class="nc">&nbsp;		Configuration productionRuntimeClasspath = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.create(SpringBootPlugin.PRODUCTION_RUNTIME_CLASSPATH_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		productionRuntimeClasspath.setVisible(false);</b>
+<b class="nc">&nbsp;		Configuration runtimeClasspath = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		productionRuntimeClasspath.attributes((attributes) -&gt; {</b>
+<b class="nc">&nbsp;			ProviderFactory providers = project.getProviders();</b>
+<b class="nc">&nbsp;			AttributeContainer sourceAttributes = runtimeClasspath.getAttributes();</b>
+<b class="nc">&nbsp;			for (Attribute attribute : sourceAttributes.keySet()) {</b>
+<b class="nc">&nbsp;				attributes.attributeProvider(attribute,</b>
+<b class="nc">&nbsp;						providers.provider(() -&gt; sourceAttributes.getAttribute(attribute)));</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		});
+<b class="nc">&nbsp;		productionRuntimeClasspath.setExtendsFrom(runtimeClasspath.getExtendsFrom());</b>
+<b class="nc">&nbsp;		productionRuntimeClasspath.setCanBeResolved(runtimeClasspath.isCanBeResolved());</b>
+<b class="nc">&nbsp;		productionRuntimeClasspath.setCanBeConsumed(runtimeClasspath.isCanBeConsumed());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureDevelopmentOnlyConfiguration(Project project) {
+<b class="nc">&nbsp;		Configuration developmentOnly = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.create(SpringBootPlugin.DEVELOPMENT_ONLY_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		developmentOnly</b>
+<b class="nc">&nbsp;			.setDescription(&quot;Configuration for development-only dependencies such as Spring Boot&#39;s DevTools.&quot;);</b>
+<b class="nc">&nbsp;		Configuration runtimeClasspath = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);</b>
+&nbsp;
+<b class="nc">&nbsp;		runtimeClasspath.extendsFrom(developmentOnly);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureTestAndDevelopmentOnlyConfiguration(Project project) {
+<b class="nc">&nbsp;		Configuration testAndDevelopmentOnly = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.create(SpringBootPlugin.TEST_AND_DEVELOPMENT_ONLY_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		testAndDevelopmentOnly</b>
+<b class="nc">&nbsp;			.setDescription(&quot;Configuration for test and development-only dependencies such as Spring Boot&#39;s DevTools.&quot;);</b>
+<b class="nc">&nbsp;		Configuration runtimeClasspath = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		runtimeClasspath.extendsFrom(testAndDevelopmentOnly);</b>
+<b class="nc">&nbsp;		Configuration testImplementation = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		testImplementation.extendsFrom(testAndDevelopmentOnly);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Task {@link Action} to add additional meta-data locations. We need to use an
+&nbsp;	 * inner-class rather than a lambda due to
+&nbsp;	 * https://github.com/gradle/gradle/issues/5510.
+&nbsp;	 */
+&nbsp;	private static final class AdditionalMetadataLocationsConfigurer implements Action&lt;Task&gt; {
+&nbsp;
+&nbsp;		private final Set&lt;File&gt; locations;
+&nbsp;
+<b class="nc">&nbsp;		private AdditionalMetadataLocationsConfigurer(Set&lt;File&gt; locations) {</b>
+<b class="nc">&nbsp;			this.locations = locations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void execute(Task task) {
+<b class="nc">&nbsp;			if (!(task instanceof JavaCompile compile)) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			if (hasConfigurationProcessorOnClasspath(compile)) {</b>
+<b class="nc">&nbsp;				configureAdditionalMetadataLocations(compile);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean hasConfigurationProcessorOnClasspath(JavaCompile compile) {
+<b class="nc">&nbsp;			Set&lt;File&gt; files = (compile.getOptions().getAnnotationProcessorPath() != null)</b>
+<b class="nc">&nbsp;					? compile.getOptions().getAnnotationProcessorPath().getFiles() : compile.getClasspath().getFiles();</b>
+<b class="nc">&nbsp;			return files.stream()</b>
+<b class="nc">&nbsp;				.map(File::getName)</b>
+<b class="nc">&nbsp;				.anyMatch((name) -&gt; name.startsWith(&quot;spring-boot-configuration-processor&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configureAdditionalMetadataLocations(JavaCompile compile) {
+<b class="nc">&nbsp;			compile.getOptions()</b>
+<b class="nc">&nbsp;				.getCompilerArgs()</b>
+<b class="nc">&nbsp;				.add(&quot;-Aorg.springframework.boot.configurationprocessor.additionalMetadataLocations=&quot;</b>
+<b class="nc">&nbsp;						+ StringUtils.collectionToCommaDelimitedString(this.locations));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

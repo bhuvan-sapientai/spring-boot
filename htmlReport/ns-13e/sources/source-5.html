@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildOwner</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildOwner (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildOwner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.io.Owner;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * The {@link Owner} that should perform the build.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;class BuildOwner implements Owner {
+&nbsp;
+&nbsp;	private static final String USER_PROPERTY_NAME = &quot;CNB_USER_ID&quot;;
+&nbsp;
+&nbsp;	private static final String GROUP_PROPERTY_NAME = &quot;CNB_GROUP_ID&quot;;
+&nbsp;
+&nbsp;	private final long uid;
+&nbsp;
+&nbsp;	private final long gid;
+&nbsp;
+<b class="nc">&nbsp;	BuildOwner(Map&lt;String, String&gt; env) {</b>
+<b class="nc">&nbsp;		this.uid = getValue(env, USER_PROPERTY_NAME);</b>
+<b class="nc">&nbsp;		this.gid = getValue(env, GROUP_PROPERTY_NAME);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	BuildOwner(long uid, long gid) {</b>
+<b class="nc">&nbsp;		this.uid = uid;</b>
+<b class="nc">&nbsp;		this.gid = gid;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private long getValue(Map&lt;String, String&gt; env, String name) {
+<b class="nc">&nbsp;		String value = env.get(name);</b>
+<b class="nc">&nbsp;		Assert.state(StringUtils.hasText(value),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Missing &#39;&quot; + name + &quot;&#39; value from the builder environment &#39;&quot; + env + &quot;&#39;&quot;);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			return Long.parseLong(value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NumberFormatException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(</b>
+&nbsp;					&quot;Malformed &#39;&quot; + name + &quot;&#39; value &#39;&quot; + value + &quot;&#39; in the builder environment &#39;&quot; + env + &quot;&#39;&quot;, ex);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public long getUid() {
+<b class="nc">&nbsp;		return this.uid;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public long getGid() {
+<b class="nc">&nbsp;		return this.gid;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.uid + &quot;/&quot; + this.gid;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create the {@link BuildOwner} by inspecting the image env for
+&nbsp;	 * {@code CNB_USER_ID}/{@code CNB_GROUP_ID} variables.
+&nbsp;	 * @param env the env to parse
+&nbsp;	 * @return a {@link BuildOwner} instance extracted from the env
+&nbsp;	 * @throws IllegalStateException if the env does not contain the correct CNB variables
+&nbsp;	 */
+&nbsp;	static BuildOwner fromEnv(Map&lt;String, String&gt; env) {
+<b class="nc">&nbsp;		Assert.notNull(env, &quot;Env must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new BuildOwner(env);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link BuildOwner} with specified user/group
+&nbsp;	 * identifier.
+&nbsp;	 * @param uid the user identifier
+&nbsp;	 * @param gid the group identifier
+&nbsp;	 * @return a new {@link BuildOwner} instance
+&nbsp;	 */
+&nbsp;	static BuildOwner of(long uid, long gid) {
+<b class="nc">&nbsp;		return new BuildOwner(uid, gid);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

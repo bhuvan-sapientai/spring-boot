@@ -1,0 +1,378 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileWatcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: FileWatcher (org.springframework.boot.autoconfigure.ssl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileWatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FileWatcher$Registration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FileWatcher$WatcherThread</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/82)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.ssl;
+&nbsp;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.file.ClosedWatchServiceException;
+&nbsp;import java.nio.file.FileSystems;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardWatchEventKinds;
+&nbsp;import java.nio.file.WatchEvent;
+&nbsp;import java.nio.file.WatchKey;
+&nbsp;import java.nio.file.WatchService;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Watches files and directories and triggers a callback on change.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class FileWatcher implements Closeable {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(FileWatcher.class);</b>
+&nbsp;
+&nbsp;	private final Duration quietPeriod;
+&nbsp;
+<b class="nc">&nbsp;	private final Object lock = new Object();</b>
+&nbsp;
+&nbsp;	private WatcherThread thread;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link FileWatcher} instance.
+&nbsp;	 * @param quietPeriod the duration that no file changes should occur before triggering
+&nbsp;	 * actions
+&nbsp;	 */
+<b class="nc">&nbsp;	FileWatcher(Duration quietPeriod) {</b>
+<b class="nc">&nbsp;		Assert.notNull(quietPeriod, &quot;QuietPeriod must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.quietPeriod = quietPeriod;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Watch the given files or directories for changes.
+&nbsp;	 * @param paths the files or directories to watch
+&nbsp;	 * @param action the action to take when changes are detected
+&nbsp;	 */
+&nbsp;	void watch(Set&lt;Path&gt; paths, Runnable action) {
+<b class="nc">&nbsp;		Assert.notNull(paths, &quot;Paths must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(action, &quot;Action must not be null&quot;);</b>
+<b class="nc">&nbsp;		if (paths.isEmpty()) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		synchronized (this.lock) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				if (this.thread == null) {</b>
+<b class="nc">&nbsp;					this.thread = new WatcherThread();</b>
+<b class="nc">&nbsp;					this.thread.start();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				this.thread.register(new Registration(paths, action));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new UncheckedIOException(&quot;Failed to register paths for watching: &quot; + paths, ex);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void close() throws IOException {
+<b class="nc">&nbsp;		synchronized (this.lock) {</b>
+<b class="nc">&nbsp;			if (this.thread != null) {</b>
+<b class="nc">&nbsp;				this.thread.close();</b>
+<b class="nc">&nbsp;				this.thread.interrupt();</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					this.thread.join();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;					Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				this.thread = null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The watcher thread used to check for changes.
+&nbsp;	 */
+&nbsp;	private class WatcherThread extends Thread implements Closeable {
+&nbsp;
+<b class="nc">&nbsp;		private final WatchService watchService = FileSystems.getDefault().newWatchService();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;WatchKey, List&lt;Registration&gt;&gt; registrations = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		private volatile boolean running = true;</b>
+&nbsp;
+<b class="nc">&nbsp;		WatcherThread() throws IOException {</b>
+<b class="nc">&nbsp;			setName(&quot;ssl-bundle-watcher&quot;);</b>
+<b class="nc">&nbsp;			setDaemon(true);</b>
+<b class="nc">&nbsp;			setUncaughtExceptionHandler(this::onThreadException);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void onThreadException(Thread thread, Throwable throwable) {
+<b class="nc">&nbsp;			logger.error(&quot;Uncaught exception in file watcher thread&quot;, throwable);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void register(Registration registration) throws IOException {
+<b class="nc">&nbsp;			for (Path path : registration.paths()) {</b>
+<b class="nc">&nbsp;				if (!Files.isRegularFile(path) &amp;&amp; !Files.isDirectory(path)) {</b>
+<b class="nc">&nbsp;					throw new IOException(&quot;&#39;%s&#39; is neither a file nor a directory&quot;.formatted(path));</b>
+&nbsp;				}
+<b class="nc">&nbsp;				Path directory = Files.isDirectory(path) ? path : path.getParent();</b>
+<b class="nc">&nbsp;				WatchKey watchKey = register(directory);</b>
+<b class="nc">&nbsp;				this.registrations.computeIfAbsent(watchKey, (key) -&gt; new CopyOnWriteArrayList&lt;&gt;()).add(registration);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private WatchKey register(Path directory) throws IOException {
+<b class="nc">&nbsp;			logger.debug(LogMessage.format(&quot;Registering &#39;%s&#39;&quot;, directory));</b>
+<b class="nc">&nbsp;			return directory.register(this.watchService, StandardWatchEventKinds.ENTRY_CREATE,</b>
+&nbsp;					StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void run() {
+<b class="nc">&nbsp;			logger.debug(&quot;Watch thread started&quot;);</b>
+<b class="nc">&nbsp;			Set&lt;Runnable&gt; actions = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			while (this.running) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					long timeout = FileWatcher.this.quietPeriod.toMillis();</b>
+<b class="nc">&nbsp;					WatchKey key = this.watchService.poll(timeout, TimeUnit.MILLISECONDS);</b>
+<b class="nc">&nbsp;					if (key == null) {</b>
+<b class="nc">&nbsp;						actions.forEach(this::runSafely);</b>
+<b class="nc">&nbsp;						actions.clear();</b>
+&nbsp;					}
+&nbsp;					else {
+<b class="nc">&nbsp;						accumulate(key, actions);</b>
+<b class="nc">&nbsp;						key.reset();</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;					Thread.currentThread().interrupt();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (ClosedWatchServiceException ex) {</b>
+<b class="nc">&nbsp;					logger.debug(&quot;File watcher has been closed&quot;);</b>
+<b class="nc">&nbsp;					this.running = false;</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			logger.debug(&quot;Watch thread stopped&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void runSafely(Runnable action) {
+&nbsp;			try {
+<b class="nc">&nbsp;				action.run();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Throwable ex) {</b>
+<b class="nc">&nbsp;				logger.error(&quot;Unexpected SSL reload error&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void accumulate(WatchKey key, Set&lt;Runnable&gt; actions) {
+<b class="nc">&nbsp;			List&lt;Registration&gt; registrations = this.registrations.get(key);</b>
+<b class="nc">&nbsp;			Path directory = (Path) key.watchable();</b>
+<b class="nc">&nbsp;			for (WatchEvent&lt;?&gt; event : key.pollEvents()) {</b>
+<b class="nc">&nbsp;				Path file = directory.resolve((Path) event.context());</b>
+<b class="nc">&nbsp;				for (Registration registration : registrations) {</b>
+<b class="nc">&nbsp;					if (registration.manages(file)) {</b>
+<b class="nc">&nbsp;						actions.add(registration.action());</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+<b class="nc">&nbsp;			this.running = false;</b>
+<b class="nc">&nbsp;			this.watchService.close();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * An individual watch registration.
+&nbsp;	 */
+<b class="nc">&nbsp;	private record Registration(Set&lt;Path&gt; paths, Runnable action) {</b>
+&nbsp;
+<b class="nc">&nbsp;		Registration {</b>
+<b class="nc">&nbsp;			paths = paths.stream().map(Path::toAbsolutePath).collect(Collectors.toSet());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean manages(Path file) {
+<b class="nc">&nbsp;			Path absolutePath = file.toAbsolutePath();</b>
+<b class="nc">&nbsp;			return this.paths.contains(absolutePath) || isInDirectories(absolutePath);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isInDirectories(Path file) {
+<b class="nc">&nbsp;			return this.paths.stream().filter(Files::isDirectory).anyMatch(file::startsWith);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

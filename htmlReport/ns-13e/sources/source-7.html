@@ -1,0 +1,431 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Builder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.build</a>
+</div>
+
+<h1>Coverage Summary for Class: Builder (org.springframework.boot.buildpack.platform.build)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Builder$BuilderResolverContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Builder$ImageFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/93)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.build;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.build.BuilderMetadata.Stack;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.DockerApi;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.TotalProgressEvent;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.TotalProgressPullListener;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.TotalProgressPushListener;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.UpdateListener;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.configuration.DockerConfiguration;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.configuration.ResolvedDockerHost;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.transport.DockerEngineException;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Image;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageReference;
+&nbsp;import org.springframework.boot.buildpack.platform.io.IOBiConsumer;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Central API for running buildpack operations.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Andrey Shlykov
+&nbsp; * @author Rafael Ceccone
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class Builder {
+&nbsp;
+&nbsp;	private final BuildLog log;
+&nbsp;
+&nbsp;	private final DockerApi docker;
+&nbsp;
+&nbsp;	private final DockerConfiguration dockerConfiguration;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new builder instance.
+&nbsp;	 */
+&nbsp;	public Builder() {
+<b class="nc">&nbsp;		this(BuildLog.toSystemOut());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new builder instance.
+&nbsp;	 * @param dockerConfiguration the docker configuration
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public Builder(DockerConfiguration dockerConfiguration) {
+<b class="nc">&nbsp;		this(BuildLog.toSystemOut(), dockerConfiguration);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new builder instance.
+&nbsp;	 * @param log a logger used to record output
+&nbsp;	 */
+&nbsp;	public Builder(BuildLog log) {
+<b class="nc">&nbsp;		this(log, new DockerApi(), null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new builder instance.
+&nbsp;	 * @param log a logger used to record output
+&nbsp;	 * @param dockerConfiguration the docker configuration
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public Builder(BuildLog log, DockerConfiguration dockerConfiguration) {
+<b class="nc">&nbsp;		this(log, new DockerApi((dockerConfiguration != null) ? dockerConfiguration.getHost() : null),</b>
+&nbsp;				dockerConfiguration);
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	Builder(BuildLog log, DockerApi docker, DockerConfiguration dockerConfiguration) {</b>
+<b class="nc">&nbsp;		Assert.notNull(log, &quot;Log must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.log = log;</b>
+<b class="nc">&nbsp;		this.docker = docker;</b>
+<b class="nc">&nbsp;		this.dockerConfiguration = dockerConfiguration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void build(BuildRequest request) throws DockerEngineException, IOException {
+<b class="nc">&nbsp;		Assert.notNull(request, &quot;Request must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.log.start(request);</b>
+<b class="nc">&nbsp;		String domain = request.getBuilder().getDomain();</b>
+<b class="nc">&nbsp;		PullPolicy pullPolicy = request.getPullPolicy();</b>
+<b class="nc">&nbsp;		ImageFetcher imageFetcher = new ImageFetcher(domain, getBuilderAuthHeader(), pullPolicy);</b>
+<b class="nc">&nbsp;		Image builderImage = imageFetcher.fetchImage(ImageType.BUILDER, request.getBuilder());</b>
+<b class="nc">&nbsp;		BuilderMetadata builderMetadata = BuilderMetadata.fromImage(builderImage);</b>
+<b class="nc">&nbsp;		request = withRunImageIfNeeded(request, builderMetadata.getStack());</b>
+<b class="nc">&nbsp;		Image runImage = imageFetcher.fetchImage(ImageType.RUNNER, request.getRunImage());</b>
+<b class="nc">&nbsp;		assertStackIdsMatch(runImage, builderImage);</b>
+<b class="nc">&nbsp;		BuildOwner buildOwner = BuildOwner.fromEnv(builderImage.getConfig().getEnv());</b>
+<b class="nc">&nbsp;		BuildpackLayersMetadata buildpackLayersMetadata = BuildpackLayersMetadata.fromImage(builderImage);</b>
+<b class="nc">&nbsp;		Buildpacks buildpacks = getBuildpacks(request, imageFetcher, builderMetadata, buildpackLayersMetadata);</b>
+<b class="nc">&nbsp;		EphemeralBuilder ephemeralBuilder = new EphemeralBuilder(buildOwner, builderImage, request.getName(),</b>
+<b class="nc">&nbsp;				builderMetadata, request.getCreator(), request.getEnv(), buildpacks);</b>
+<b class="nc">&nbsp;		this.docker.image().load(ephemeralBuilder.getArchive(), UpdateListener.none());</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			executeLifecycle(request, ephemeralBuilder);</b>
+<b class="nc">&nbsp;			tagImage(request.getName(), request.getTags());</b>
+<b class="nc">&nbsp;			if (request.isPublish()) {</b>
+<b class="nc">&nbsp;				pushImages(request.getName(), request.getTags());</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			this.docker.image().remove(ephemeralBuilder.getName(), true);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest withRunImageIfNeeded(BuildRequest request, Stack builderStack) {
+<b class="nc">&nbsp;		if (request.getRunImage() != null) {</b>
+<b class="nc">&nbsp;			return request;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request.withRunImage(getRunImageReferenceForStack(builderStack));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ImageReference getRunImageReferenceForStack(Stack stack) {
+<b class="nc">&nbsp;		String name = stack.getRunImage().getImage();</b>
+<b class="nc">&nbsp;		Assert.state(StringUtils.hasText(name), &quot;Run image must be specified in the builder image stack&quot;);</b>
+<b class="nc">&nbsp;		return ImageReference.of(name).inTaggedOrDigestForm();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertStackIdsMatch(Image runImage, Image builderImage) {
+<b class="nc">&nbsp;		StackId runImageStackId = StackId.fromImage(runImage);</b>
+<b class="nc">&nbsp;		StackId builderImageStackId = StackId.fromImage(builderImage);</b>
+<b class="nc">&nbsp;		Assert.state(runImageStackId.equals(builderImageStackId), () -&gt; &quot;Run image stack &#39;&quot; + runImageStackId</b>
+&nbsp;				+ &quot;&#39; does not match builder stack &#39;&quot; + builderImageStackId + &quot;&#39;&quot;);
+&nbsp;	}
+&nbsp;
+&nbsp;	private Buildpacks getBuildpacks(BuildRequest request, ImageFetcher imageFetcher, BuilderMetadata builderMetadata,
+&nbsp;			BuildpackLayersMetadata buildpackLayersMetadata) {
+<b class="nc">&nbsp;		BuildpackResolverContext resolverContext = new BuilderResolverContext(imageFetcher, builderMetadata,</b>
+&nbsp;				buildpackLayersMetadata);
+<b class="nc">&nbsp;		return BuildpackResolvers.resolveAll(resolverContext, request.getBuildpacks());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void executeLifecycle(BuildRequest request, EphemeralBuilder builder) throws IOException {
+<b class="nc">&nbsp;		ResolvedDockerHost dockerHost = null;</b>
+<b class="nc">&nbsp;		if (this.dockerConfiguration != null &amp;&amp; this.dockerConfiguration.isBindHostToBuilder()) {</b>
+<b class="nc">&nbsp;			dockerHost = ResolvedDockerHost.from(this.dockerConfiguration.getHost());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		try (Lifecycle lifecycle = new Lifecycle(this.log, this.docker, dockerHost, request, builder)) {</b>
+<b class="nc">&nbsp;			lifecycle.execute();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void tagImage(ImageReference sourceReference, List&lt;ImageReference&gt; tags) throws IOException {
+<b class="nc">&nbsp;		for (ImageReference tag : tags) {</b>
+<b class="nc">&nbsp;			this.docker.image().tag(sourceReference, tag);</b>
+<b class="nc">&nbsp;			this.log.taggedImage(tag);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void pushImages(ImageReference name, List&lt;ImageReference&gt; tags) throws IOException {
+<b class="nc">&nbsp;		pushImage(name);</b>
+<b class="nc">&nbsp;		for (ImageReference tag : tags) {</b>
+<b class="nc">&nbsp;			pushImage(tag);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void pushImage(ImageReference reference) throws IOException {
+<b class="nc">&nbsp;		Consumer&lt;TotalProgressEvent&gt; progressConsumer = this.log.pushingImage(reference);</b>
+<b class="nc">&nbsp;		TotalProgressPushListener listener = new TotalProgressPushListener(progressConsumer);</b>
+<b class="nc">&nbsp;		this.docker.image().push(reference, listener, getPublishAuthHeader());</b>
+<b class="nc">&nbsp;		this.log.pushedImage(reference);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getBuilderAuthHeader() {
+<b class="nc">&nbsp;		return (this.dockerConfiguration != null &amp;&amp; this.dockerConfiguration.getBuilderRegistryAuthentication() != null)</b>
+<b class="nc">&nbsp;				? this.dockerConfiguration.getBuilderRegistryAuthentication().getAuthHeader() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getPublishAuthHeader() {
+<b class="nc">&nbsp;		return (this.dockerConfiguration != null &amp;&amp; this.dockerConfiguration.getPublishRegistryAuthentication() != null)</b>
+<b class="nc">&nbsp;				? this.dockerConfiguration.getPublishRegistryAuthentication().getAuthHeader() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Internal utility class used to fetch images.
+&nbsp;	 */
+&nbsp;	private class ImageFetcher {
+&nbsp;
+&nbsp;		private final String domain;
+&nbsp;
+&nbsp;		private final String authHeader;
+&nbsp;
+&nbsp;		private final PullPolicy pullPolicy;
+&nbsp;
+<b class="nc">&nbsp;		ImageFetcher(String domain, String authHeader, PullPolicy pullPolicy) {</b>
+<b class="nc">&nbsp;			this.domain = domain;</b>
+<b class="nc">&nbsp;			this.authHeader = authHeader;</b>
+<b class="nc">&nbsp;			this.pullPolicy = pullPolicy;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Image fetchImage(ImageType type, ImageReference reference) throws IOException {
+<b class="nc">&nbsp;			Assert.notNull(type, &quot;Type must not be null&quot;);</b>
+<b class="nc">&nbsp;			Assert.notNull(reference, &quot;Reference must not be null&quot;);</b>
+<b class="nc">&nbsp;			Assert.state(this.authHeader == null || reference.getDomain().equals(this.domain),</b>
+<b class="nc">&nbsp;					() -&gt; String.format(&quot;%s &#39;%s&#39; must be pulled from the &#39;%s&#39; authenticated registry&quot;,</b>
+<b class="nc">&nbsp;							StringUtils.capitalize(type.getDescription()), reference, this.domain));</b>
+<b class="nc">&nbsp;			if (this.pullPolicy == PullPolicy.ALWAYS) {</b>
+<b class="nc">&nbsp;				return pullImage(reference, type);</b>
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				return Builder.this.docker.image().inspect(reference);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (DockerEngineException ex) {</b>
+<b class="nc">&nbsp;				if (this.pullPolicy == PullPolicy.IF_NOT_PRESENT &amp;&amp; ex.getStatusCode() == 404) {</b>
+<b class="nc">&nbsp;					return pullImage(reference, type);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private Image pullImage(ImageReference reference, ImageType imageType) throws IOException {
+<b class="nc">&nbsp;			TotalProgressPullListener listener = new TotalProgressPullListener(</b>
+<b class="nc">&nbsp;					Builder.this.log.pullingImage(reference, imageType));</b>
+<b class="nc">&nbsp;			Image image = Builder.this.docker.image().pull(reference, listener, this.authHeader);</b>
+<b class="nc">&nbsp;			Builder.this.log.pulledImage(image, imageType);</b>
+<b class="nc">&nbsp;			return image;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BuildpackResolverContext} implementation for the {@link Builder}.
+&nbsp;	 */
+&nbsp;	private class BuilderResolverContext implements BuildpackResolverContext {
+&nbsp;
+&nbsp;		private final ImageFetcher imageFetcher;
+&nbsp;
+&nbsp;		private final BuilderMetadata builderMetadata;
+&nbsp;
+&nbsp;		private final BuildpackLayersMetadata buildpackLayersMetadata;
+&nbsp;
+&nbsp;		BuilderResolverContext(ImageFetcher imageFetcher, BuilderMetadata builderMetadata,
+<b class="nc">&nbsp;				BuildpackLayersMetadata buildpackLayersMetadata) {</b>
+<b class="nc">&nbsp;			this.imageFetcher = imageFetcher;</b>
+<b class="nc">&nbsp;			this.builderMetadata = builderMetadata;</b>
+<b class="nc">&nbsp;			this.buildpackLayersMetadata = buildpackLayersMetadata;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public List&lt;BuildpackMetadata&gt; getBuildpackMetadata() {
+<b class="nc">&nbsp;			return this.builderMetadata.getBuildpacks();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public BuildpackLayersMetadata getBuildpackLayersMetadata() {
+<b class="nc">&nbsp;			return this.buildpackLayersMetadata;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Image fetchImage(ImageReference reference, ImageType imageType) throws IOException {
+<b class="nc">&nbsp;			return this.imageFetcher.fetchImage(imageType, reference);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void exportImageLayers(ImageReference reference, IOBiConsumer&lt;String, Path&gt; exports) throws IOException {
+<b class="nc">&nbsp;			Builder.this.docker.image().exportLayerFiles(reference, exports);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

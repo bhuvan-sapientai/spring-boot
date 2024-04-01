@@ -1,0 +1,218 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitInfoContributor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.info</a>
+</div>
+
+<h1>Coverage Summary for Class: GitInfoContributor (org.springframework.boot.actuate.info)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitInfoContributor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GitInfoContributor$GitInfoContributorRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.info;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Properties;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.BindingReflectionHintsRegistrar;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.boot.actuate.info.GitInfoContributor.GitInfoContributorRuntimeHints;
+&nbsp;import org.springframework.boot.info.GitProperties;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;import org.springframework.core.env.PropertiesPropertySource;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link InfoContributor} that exposes {@link GitProperties}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;@ImportRuntimeHints(GitInfoContributorRuntimeHints.class)
+&nbsp;public class GitInfoContributor extends InfoPropertiesInfoContributor&lt;GitProperties&gt; {
+&nbsp;
+&nbsp;	public GitInfoContributor(GitProperties properties) {
+<b class="nc">&nbsp;		this(properties, Mode.SIMPLE);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GitInfoContributor(GitProperties properties, Mode mode) {
+<b class="nc">&nbsp;		super(properties, mode);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void contribute(Info.Builder builder) {
+<b class="nc">&nbsp;		builder.withDetail(&quot;git&quot;, generateContent());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected PropertySource&lt;?&gt; toSimplePropertySource() {
+<b class="nc">&nbsp;		Properties props = new Properties();</b>
+<b class="nc">&nbsp;		copyIfSet(props, &quot;branch&quot;);</b>
+<b class="nc">&nbsp;		String commitId = getProperties().getShortCommitId();</b>
+<b class="nc">&nbsp;		if (commitId != null) {</b>
+<b class="nc">&nbsp;			props.put(&quot;commit.id&quot;, commitId);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		copyIfSet(props, &quot;commit.time&quot;);</b>
+<b class="nc">&nbsp;		return new PropertiesPropertySource(&quot;git&quot;, props);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Post-process the content to expose. By default, well known keys representing dates
+&nbsp;	 * are converted to {@link Instant} instances.
+&nbsp;	 * @param content the content to expose
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	protected void postProcessContent(Map&lt;String, Object&gt; content) {
+<b class="nc">&nbsp;		replaceValue(getNestedMap(content, &quot;commit&quot;), &quot;time&quot;, getProperties().getCommitTime());</b>
+<b class="nc">&nbsp;		replaceValue(getNestedMap(content, &quot;build&quot;), &quot;time&quot;, getProperties().getInstant(&quot;build.time&quot;));</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class GitInfoContributorRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final BindingReflectionHintsRegistrar bindingRegistrar = new BindingReflectionHintsRegistrar();</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			this.bindingRegistrar.registerReflectionHints(hints.reflection(), GitProperties.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

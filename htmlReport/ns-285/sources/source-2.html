@@ -1,0 +1,577 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BootBuildImage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.gradle.tasks.bundling</a>
+</div>
+
+<h1>Coverage Summary for Class: BootBuildImage (org.springframework.boot.gradle.tasks.bundling)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BootBuildImage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/104)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.gradle.tasks.bundling;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.gradle.api.Action;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.file.RegularFileProperty;
+&nbsp;import org.gradle.api.provider.ListProperty;
+&nbsp;import org.gradle.api.provider.MapProperty;
+&nbsp;import org.gradle.api.provider.Property;
+&nbsp;import org.gradle.api.tasks.Input;
+&nbsp;import org.gradle.api.tasks.InputFile;
+&nbsp;import org.gradle.api.tasks.Nested;
+&nbsp;import org.gradle.api.tasks.Optional;
+&nbsp;import org.gradle.api.tasks.PathSensitive;
+&nbsp;import org.gradle.api.tasks.PathSensitivity;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;import org.gradle.api.tasks.options.Option;
+&nbsp;import org.gradle.work.DisableCachingByDefault;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.build.BuildRequest;
+&nbsp;import org.springframework.boot.buildpack.platform.build.Builder;
+&nbsp;import org.springframework.boot.buildpack.platform.build.BuildpackReference;
+&nbsp;import org.springframework.boot.buildpack.platform.build.Creator;
+&nbsp;import org.springframework.boot.buildpack.platform.build.PullPolicy;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.transport.DockerEngineException;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.Binding;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageName;
+&nbsp;import org.springframework.boot.buildpack.platform.docker.type.ImageReference;
+&nbsp;import org.springframework.boot.buildpack.platform.io.ZipFileTarArchive;
+&nbsp;import org.springframework.boot.gradle.util.VersionExtractor;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Task} for bundling an application into an OCI image using a
+&nbsp; * &lt;a href=&quot;https://buildpacks.io&quot;&gt;buildpack&lt;/a&gt;.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Rafael Ceccone
+&nbsp; * @author Jeroen Meijer
+&nbsp; * @author Julian Liebig
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;@DisableCachingByDefault
+&nbsp;public abstract class BootBuildImage extends DefaultTask {
+&nbsp;
+&nbsp;	private final Property&lt;PullPolicy&gt; pullPolicy;
+&nbsp;
+&nbsp;	private final String projectName;
+&nbsp;
+&nbsp;	private final CacheSpec buildWorkspace;
+&nbsp;
+&nbsp;	private final CacheSpec buildCache;
+&nbsp;
+&nbsp;	private final CacheSpec launchCache;
+&nbsp;
+&nbsp;	private final DockerSpec docker;
+&nbsp;
+<b class="nc">&nbsp;	public BootBuildImage() {</b>
+<b class="nc">&nbsp;		this.projectName = getProject().getName();</b>
+<b class="nc">&nbsp;		Project project = getProject();</b>
+<b class="nc">&nbsp;		Property&lt;String&gt; projectVersion = project.getObjects()</b>
+<b class="nc">&nbsp;			.property(String.class)</b>
+<b class="nc">&nbsp;			.convention(project.provider(() -&gt; project.getVersion().toString()));</b>
+<b class="nc">&nbsp;		getImageName().convention(project.provider(() -&gt; {</b>
+<b class="nc">&nbsp;			ImageName imageName = ImageName.of(this.projectName);</b>
+<b class="nc">&nbsp;			if (&quot;unspecified&quot;.equals(projectVersion.get())) {</b>
+<b class="nc">&nbsp;				return ImageReference.of(imageName).toString();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return ImageReference.of(imageName, projectVersion.get()).toString();</b>
+&nbsp;		}));
+<b class="nc">&nbsp;		getCleanCache().convention(false);</b>
+<b class="nc">&nbsp;		getVerboseLogging().convention(false);</b>
+<b class="nc">&nbsp;		getPublish().convention(false);</b>
+<b class="nc">&nbsp;		this.buildWorkspace = getProject().getObjects().newInstance(CacheSpec.class);</b>
+<b class="nc">&nbsp;		this.buildCache = getProject().getObjects().newInstance(CacheSpec.class);</b>
+<b class="nc">&nbsp;		this.launchCache = getProject().getObjects().newInstance(CacheSpec.class);</b>
+<b class="nc">&nbsp;		this.docker = getProject().getObjects().newInstance(DockerSpec.class);</b>
+<b class="nc">&nbsp;		this.pullPolicy = getProject().getObjects().property(PullPolicy.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the property for the archive file from which the image will be built.
+&nbsp;	 * @return the archive file property
+&nbsp;	 */
+&nbsp;	@InputFile
+&nbsp;	@PathSensitive(PathSensitivity.RELATIVE)
+&nbsp;	public abstract RegularFileProperty getArchiveFile();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the name of the image that will be built. When {@code null}, the name will
+&nbsp;	 * be derived from the {@link Project Project&#39;s} {@link Project#getName() name} and
+&nbsp;	 * {@link Project#getVersion version}.
+&nbsp;	 * @return name of the image
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;imageName&quot;, description = &quot;The name of the image to generate&quot;)
+&nbsp;	public abstract Property&lt;String&gt; getImageName();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the builder that will be used to build the image. When {@code null}, the
+&nbsp;	 * default builder will be used.
+&nbsp;	 * @return the builder
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;builder&quot;, description = &quot;The name of the builder image to use&quot;)
+&nbsp;	public abstract Property&lt;String&gt; getBuilder();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the run image that will be included in the built image. When {@code null},
+&nbsp;	 * the run image bundled with the builder will be used.
+&nbsp;	 * @return the run image
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;runImage&quot;, description = &quot;The name of the run image to use&quot;)
+&nbsp;	public abstract Property&lt;String&gt; getRunImage();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the environment that will be used when building the image.
+&nbsp;	 * @return the environment
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	public abstract MapProperty&lt;String, String&gt; getEnvironment();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether caches should be cleaned before packaging.
+&nbsp;	 * @return whether caches should be cleaned
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Option(option = &quot;cleanCache&quot;, description = &quot;Clean caches before packaging&quot;)
+&nbsp;	public abstract Property&lt;Boolean&gt; getCleanCache();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether verbose logging should be enabled while building the image.
+&nbsp;	 * @return whether verbose logging should be enabled
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	public abstract Property&lt;Boolean&gt; getVerboseLogging();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns image pull policy that will be used when building the image.
+&nbsp;	 * @return whether images should be pulled
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;pullPolicy&quot;, description = &quot;The image pull policy&quot;)
+&nbsp;	public Property&lt;PullPolicy&gt; getPullPolicy() {
+<b class="nc">&nbsp;		return this.pullPolicy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets image pull policy that will be used when building the image.
+&nbsp;	 * @param pullPolicy the pull policy to use
+&nbsp;	 */
+&nbsp;	public void setPullPolicy(String pullPolicy) {
+<b class="nc">&nbsp;		getPullPolicy().set(PullPolicy.valueOf(pullPolicy));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether the built image should be pushed to a registry.
+&nbsp;	 * @return whether the built image should be pushed
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Option(option = &quot;publishImage&quot;, description = &quot;Publish the built image to a registry&quot;)
+&nbsp;	public abstract Property&lt;Boolean&gt; getPublish();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the buildpacks that will be used when building the image.
+&nbsp;	 * @return the buildpack references
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	public abstract ListProperty&lt;String&gt; getBuildpacks();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the volume bindings that will be mounted to the container when building the
+&nbsp;	 * image.
+&nbsp;	 * @return the bindings
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	public abstract ListProperty&lt;String&gt; getBindings();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the tags that will be created for the built image.
+&nbsp;	 * @return the tags
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	public abstract ListProperty&lt;String&gt; getTags();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the network the build container will connect to.
+&nbsp;	 * @return the network
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;network&quot;, description = &quot;Connect detect and build containers to network&quot;)
+&nbsp;	public abstract Property&lt;String&gt; getNetwork();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the build temporary workspace that will be used when building the image.
+&nbsp;	 * @return the cache
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	@Optional
+&nbsp;	public CacheSpec getBuildWorkspace() {
+<b class="nc">&nbsp;		return this.buildWorkspace;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Customizes the {@link CacheSpec} for the build temporary workspace using the given
+&nbsp;	 * {@code action}.
+&nbsp;	 * @param action the action
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public void buildWorkspace(Action&lt;CacheSpec&gt; action) {
+<b class="nc">&nbsp;		action.execute(this.buildWorkspace);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the build cache that will be used when building the image.
+&nbsp;	 * @return the cache
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	@Optional
+&nbsp;	public CacheSpec getBuildCache() {
+<b class="nc">&nbsp;		return this.buildCache;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Customizes the {@link CacheSpec} for the build cache using the given
+&nbsp;	 * {@code action}.
+&nbsp;	 * @param action the action
+&nbsp;	 */
+&nbsp;	public void buildCache(Action&lt;CacheSpec&gt; action) {
+<b class="nc">&nbsp;		action.execute(this.buildCache);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the launch cache that will be used when building the image.
+&nbsp;	 * @return the cache
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	@Optional
+&nbsp;	public CacheSpec getLaunchCache() {
+<b class="nc">&nbsp;		return this.launchCache;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Customizes the {@link CacheSpec} for the launch cache using the given
+&nbsp;	 * {@code action}.
+&nbsp;	 * @param action the action
+&nbsp;	 */
+&nbsp;	public void launchCache(Action&lt;CacheSpec&gt; action) {
+<b class="nc">&nbsp;		action.execute(this.launchCache);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the date that will be used as the {@code Created} date of the image. When
+&nbsp;	 * {@code null}, a fixed date that enables build reproducibility will be used.
+&nbsp;	 * @return the created date
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;createdDate&quot;, description = &quot;The date to use as the created date of the image&quot;)
+&nbsp;	public abstract Property&lt;String&gt; getCreatedDate();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the directory that contains application content in the image. When
+&nbsp;	 * {@code null}, a default location will be used.
+&nbsp;	 * @return the application directory
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;applicationDirectory&quot;, description = &quot;The directory containing application content in the image&quot;)
+&nbsp;	public abstract Property&lt;String&gt; getApplicationDirectory();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the security options that will be applied to the builder container.
+&nbsp;	 * @return the security options
+&nbsp;	 */
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;securityOptions&quot;, description = &quot;Security options that will be applied to the builder container&quot;)
+&nbsp;	public abstract ListProperty&lt;String&gt; getSecurityOptions();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the Docker configuration the builder will use.
+&nbsp;	 * @return docker configuration.
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	@Nested
+&nbsp;	public DockerSpec getDocker() {
+<b class="nc">&nbsp;		return this.docker;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configures the Docker connection using the given {@code action}.
+&nbsp;	 * @param action the action to apply
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public void docker(Action&lt;DockerSpec&gt; action) {
+<b class="nc">&nbsp;		action.execute(this.docker);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void buildImage() throws DockerEngineException, IOException {
+<b class="nc">&nbsp;		Builder builder = new Builder(this.docker.asDockerConfiguration());</b>
+<b class="nc">&nbsp;		BuildRequest request = createRequest();</b>
+<b class="nc">&nbsp;		builder.build(request);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	BuildRequest createRequest() {
+<b class="nc">&nbsp;		return customize(BuildRequest.of(getImageName().map(ImageReference::of).get(),</b>
+<b class="nc">&nbsp;				(owner) -&gt; new ZipFileTarArchive(getArchiveFile().get().getAsFile(), owner)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customize(BuildRequest request) {
+<b class="nc">&nbsp;		request = customizeBuilder(request);</b>
+<b class="nc">&nbsp;		request = customizeRunImage(request);</b>
+<b class="nc">&nbsp;		request = customizeEnvironment(request);</b>
+<b class="nc">&nbsp;		request = customizeCreator(request);</b>
+<b class="nc">&nbsp;		request = request.withCleanCache(getCleanCache().get());</b>
+<b class="nc">&nbsp;		request = request.withVerboseLogging(getVerboseLogging().get());</b>
+<b class="nc">&nbsp;		request = customizePullPolicy(request);</b>
+<b class="nc">&nbsp;		request = customizePublish(request);</b>
+<b class="nc">&nbsp;		request = customizeBuildpacks(request);</b>
+<b class="nc">&nbsp;		request = customizeBindings(request);</b>
+<b class="nc">&nbsp;		request = customizeTags(request);</b>
+<b class="nc">&nbsp;		request = customizeCaches(request);</b>
+<b class="nc">&nbsp;		request = request.withNetwork(getNetwork().getOrNull());</b>
+<b class="nc">&nbsp;		request = customizeCreatedDate(request);</b>
+<b class="nc">&nbsp;		request = customizeApplicationDirectory(request);</b>
+<b class="nc">&nbsp;		request = customizeSecurityOptions(request);</b>
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeBuilder(BuildRequest request) {
+<b class="nc">&nbsp;		String builder = getBuilder().getOrNull();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(builder)) {</b>
+<b class="nc">&nbsp;			return request.withBuilder(ImageReference.of(builder));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeRunImage(BuildRequest request) {
+<b class="nc">&nbsp;		String runImage = getRunImage().getOrNull();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(runImage)) {</b>
+<b class="nc">&nbsp;			return request.withRunImage(ImageReference.of(runImage));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeEnvironment(BuildRequest request) {
+<b class="nc">&nbsp;		Map&lt;String, String&gt; environment = getEnvironment().getOrNull();</b>
+<b class="nc">&nbsp;		if (environment != null &amp;&amp; !environment.isEmpty()) {</b>
+<b class="nc">&nbsp;			request = request.withEnv(environment);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeCreator(BuildRequest request) {
+<b class="nc">&nbsp;		String springBootVersion = VersionExtractor.forClass(BootBuildImage.class);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(springBootVersion)) {</b>
+<b class="nc">&nbsp;			return request.withCreator(Creator.withVersion(springBootVersion));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizePullPolicy(BuildRequest request) {
+<b class="nc">&nbsp;		PullPolicy pullPolicy = getPullPolicy().getOrNull();</b>
+<b class="nc">&nbsp;		if (pullPolicy != null) {</b>
+<b class="nc">&nbsp;			request = request.withPullPolicy(pullPolicy);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizePublish(BuildRequest request) {
+<b class="nc">&nbsp;		request = request.withPublish(getPublish().get());</b>
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeBuildpacks(BuildRequest request) {
+<b class="nc">&nbsp;		List&lt;String&gt; buildpacks = getBuildpacks().getOrNull();</b>
+<b class="nc">&nbsp;		if (buildpacks != null &amp;&amp; !buildpacks.isEmpty()) {</b>
+<b class="nc">&nbsp;			return request.withBuildpacks(buildpacks.stream().map(BuildpackReference::of).toList());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeBindings(BuildRequest request) {
+<b class="nc">&nbsp;		List&lt;String&gt; bindings = getBindings().getOrNull();</b>
+<b class="nc">&nbsp;		if (bindings != null &amp;&amp; !bindings.isEmpty()) {</b>
+<b class="nc">&nbsp;			return request.withBindings(bindings.stream().map(Binding::of).toList());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeTags(BuildRequest request) {
+<b class="nc">&nbsp;		List&lt;String&gt; tags = getTags().getOrNull();</b>
+<b class="nc">&nbsp;		if (tags != null &amp;&amp; !tags.isEmpty()) {</b>
+<b class="nc">&nbsp;			return request.withTags(tags.stream().map(ImageReference::of).toList());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeCaches(BuildRequest request) {
+<b class="nc">&nbsp;		if (this.buildWorkspace.asCache() != null) {</b>
+<b class="nc">&nbsp;			request = request.withBuildWorkspace((this.buildWorkspace.asCache()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.buildCache.asCache() != null) {</b>
+<b class="nc">&nbsp;			request = request.withBuildCache(this.buildCache.asCache());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.launchCache.asCache() != null) {</b>
+<b class="nc">&nbsp;			request = request.withLaunchCache(this.launchCache.asCache());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeCreatedDate(BuildRequest request) {
+<b class="nc">&nbsp;		String createdDate = getCreatedDate().getOrNull();</b>
+<b class="nc">&nbsp;		if (createdDate != null) {</b>
+<b class="nc">&nbsp;			return request.withCreatedDate(createdDate);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeApplicationDirectory(BuildRequest request) {
+<b class="nc">&nbsp;		String applicationDirectory = getApplicationDirectory().getOrNull();</b>
+<b class="nc">&nbsp;		if (applicationDirectory != null) {</b>
+<b class="nc">&nbsp;			return request.withApplicationDirectory(applicationDirectory);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BuildRequest customizeSecurityOptions(BuildRequest request) {
+<b class="nc">&nbsp;		List&lt;String&gt; securityOptions = getSecurityOptions().getOrNull();</b>
+<b class="nc">&nbsp;		if (securityOptions != null) {</b>
+<b class="nc">&nbsp;			return request.withSecurityOptions(securityOptions);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return request;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

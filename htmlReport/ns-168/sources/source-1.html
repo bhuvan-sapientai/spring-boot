@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractDeploymentTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.deployment</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractDeploymentTests (org.springframework.boot.deployment)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractDeploymentTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractDeploymentTests$DeployedApplication</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractDeploymentTests$WarDeploymentContainer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.deployment;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+&nbsp;import org.apache.hc.client5.http.impl.classic.HttpClients;
+&nbsp;import org.apache.hc.core5.util.TimeValue;
+&nbsp;import org.awaitility.Awaitility;
+&nbsp;import org.awaitility.core.ConditionTimeoutException;
+&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;import org.testcontainers.containers.GenericContainer;
+&nbsp;import org.testcontainers.images.builder.ImageFromDockerfile;
+&nbsp;import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
+&nbsp;
+&nbsp;import org.springframework.boot.test.web.client.TestRestTemplate;
+&nbsp;import org.springframework.boot.web.client.RestTemplateBuilder;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract class for deployment tests.
+&nbsp; */
+<b class="nc">&nbsp;abstract class AbstractDeploymentTests {</b>
+&nbsp;
+&nbsp;	protected static final int DEFAULT_PORT = 8080;
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void home() {
+<b class="nc">&nbsp;		getDeployedApplication().test((rest) -&gt; {</b>
+<b class="nc">&nbsp;			ResponseEntity&lt;String&gt; response = rest.getForEntity(&quot;/&quot;, String.class);</b>
+<b class="nc">&nbsp;			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);</b>
+<b class="nc">&nbsp;			assertThat(response.getBody()).isEqualTo(&quot;Hello World&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void health() {
+<b class="nc">&nbsp;		getDeployedApplication().test((rest) -&gt; {</b>
+<b class="nc">&nbsp;			ResponseEntity&lt;String&gt; response = rest.getForEntity(&quot;/actuator/health&quot;, String.class);</b>
+<b class="nc">&nbsp;			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);</b>
+<b class="nc">&nbsp;			assertThat(response.getBody()).isEqualTo(&quot;{\&quot;status\&quot;:\&quot;UP\&quot;}&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@Test
+&nbsp;	void conditionalOnWarShouldBeTrue() {
+<b class="nc">&nbsp;		getDeployedApplication().test((rest) -&gt; {</b>
+<b class="nc">&nbsp;			ResponseEntity&lt;String&gt; response = rest.getForEntity(&quot;/actuator/war&quot;, String.class);</b>
+<b class="nc">&nbsp;			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);</b>
+<b class="nc">&nbsp;			assertThat(response.getBody()).isEqualTo(&quot;{\&quot;hello\&quot;:\&quot;world\&quot;}&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private DeployedApplication getDeployedApplication() {
+<b class="nc">&nbsp;		return new DeployedApplication(getContainer(), getPort());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected int getPort() {
+<b class="nc">&nbsp;		return DEFAULT_PORT;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	abstract WarDeploymentContainer getContainer();
+&nbsp;
+&nbsp;	static final class DeployedApplication {
+&nbsp;
+&nbsp;		private final WarDeploymentContainer container;
+&nbsp;
+&nbsp;		private final int port;
+&nbsp;
+<b class="nc">&nbsp;		DeployedApplication(WarDeploymentContainer container, int port) {</b>
+<b class="nc">&nbsp;			this.container = container;</b>
+<b class="nc">&nbsp;			this.port = port;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void test(Consumer&lt;TestRestTemplate&gt; consumer) {
+<b class="nc">&nbsp;			TestRestTemplate rest = new TestRestTemplate(new RestTemplateBuilder()</b>
+<b class="nc">&nbsp;				.rootUri(&quot;http://&quot; + this.container.getHost() + &quot;:&quot; + this.container.getMappedPort(this.port)</b>
+&nbsp;						+ &quot;/spring-boot&quot;)
+<b class="nc">&nbsp;				.requestFactory(() -&gt; new HttpComponentsClientHttpRequestFactory(HttpClients.custom()</b>
+<b class="nc">&nbsp;					.setRetryStrategy(new DefaultHttpRequestRetryStrategy(10, TimeValue.of(1, TimeUnit.SECONDS)))</b>
+<b class="nc">&nbsp;					.build())));</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Awaitility.await().atMost(Duration.ofMinutes(10)).until(() -&gt; {</b>
+&nbsp;					try {
+<b class="nc">&nbsp;						consumer.accept(rest);</b>
+<b class="nc">&nbsp;						return true;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					catch (Throwable ex) {</b>
+<b class="nc">&nbsp;						return false;</b>
+&nbsp;					}
+&nbsp;				});
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ConditionTimeoutException ex) {</b>
+<b class="nc">&nbsp;				System.out.println(this.container.getLogs());</b>
+<b class="nc">&nbsp;				throw ex;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static final class WarDeploymentContainer extends GenericContainer&lt;WarDeploymentContainer&gt; {
+&nbsp;
+&nbsp;		WarDeploymentContainer(String baseImage, String deploymentLocation, int port) {
+<b class="nc">&nbsp;			this(baseImage, deploymentLocation, port, null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		WarDeploymentContainer(String baseImage, String deploymentLocation, int port,
+&nbsp;				Consumer&lt;DockerfileBuilder&gt; dockerfileCustomizer) {
+<b class="nc">&nbsp;			super(new ImageFromDockerfile().withFileFromFile(&quot;spring-boot.war&quot;, findWarToDeploy())</b>
+<b class="nc">&nbsp;				.withDockerfileFromBuilder((builder) -&gt; {</b>
+<b class="nc">&nbsp;					builder.from(baseImage).add(&quot;spring-boot.war&quot;, deploymentLocation + &quot;/spring-boot.war&quot;);</b>
+<b class="nc">&nbsp;					if (dockerfileCustomizer != null) {</b>
+<b class="nc">&nbsp;						dockerfileCustomizer.accept(builder);</b>
+&nbsp;					}
+&nbsp;				}));
+<b class="nc">&nbsp;			withExposedPorts(port).withStartupTimeout(Duration.ofMinutes(5)).withStartupAttempts(3);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static File findWarToDeploy() {
+<b class="nc">&nbsp;			File[] candidates = new File(&quot;build/libs&quot;).listFiles();</b>
+<b class="nc">&nbsp;			assertThat(candidates).hasSize(1);</b>
+<b class="nc">&nbsp;			return candidates[0];</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

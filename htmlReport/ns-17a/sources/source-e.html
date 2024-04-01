@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DockerEnv</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DockerEnv (org.springframework.boot.docker.compose.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DockerEnv</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DockerEnv$Entry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.core;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Parses and provides access to docker {@code env} data.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class DockerEnv {
+&nbsp;
+&nbsp;	private final Map&lt;String, String&gt; map;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link DockerEnv} instance.
+&nbsp;	 * @param env a list of env entries in the form {@code name=value} or {@code name}.
+&nbsp;	 */
+<b class="nc">&nbsp;	DockerEnv(List&lt;String&gt; env) {</b>
+<b class="nc">&nbsp;		this.map = parse(env);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, String&gt; parse(List&lt;String&gt; env) {
+<b class="nc">&nbsp;		if (CollectionUtils.isEmpty(env)) {</b>
+<b class="nc">&nbsp;			return Collections.emptyMap();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Map&lt;String, String&gt; result = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		env.stream().map(this::parseEntry).forEach((entry) -&gt; result.put(entry.key(), entry.value()));</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Entry parseEntry(String entry) {
+<b class="nc">&nbsp;		int index = entry.indexOf(&#39;=&#39;);</b>
+<b class="nc">&nbsp;		if (index != -1) {</b>
+<b class="nc">&nbsp;			String key = entry.substring(0, index);</b>
+<b class="nc">&nbsp;			String value = entry.substring(index + 1);</b>
+<b class="nc">&nbsp;			return new Entry(key, value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new Entry(entry, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the env as a {@link Map}.
+&nbsp;	 * @return the env as a map
+&nbsp;	 */
+&nbsp;	Map&lt;String, String&gt; asMap() {
+<b class="nc">&nbsp;		return this.map;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private record Entry(String key, String value) {</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

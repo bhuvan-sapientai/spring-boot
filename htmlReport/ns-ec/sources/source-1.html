@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JmxAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.jmx</a>
+</div>
+
+<h1>Coverage Summary for Class: JmxAutoConfiguration (org.springframework.boot.autoconfigure.jmx)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JmxAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.jmx;
+&nbsp;
+&nbsp;import javax.management.MBeanServer;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.EnableMBeanExport;
+&nbsp;import org.springframework.context.annotation.Primary;
+&nbsp;import org.springframework.jmx.export.MBeanExporter;
+&nbsp;import org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource;
+&nbsp;import org.springframework.jmx.export.annotation.AnnotationMBeanExporter;
+&nbsp;import org.springframework.jmx.export.naming.ObjectNamingStrategy;
+&nbsp;import org.springframework.jmx.support.MBeanServerFactoryBean;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} to enable/disable Spring&#39;s
+&nbsp; * {@link EnableMBeanExport @EnableMBeanExport} mechanism based on configuration
+&nbsp; * properties.
+&nbsp; * &lt;p&gt;
+&nbsp; * To enable auto export of annotation beans set {@code spring.jmx.enabled: true}.
+&nbsp; *
+&nbsp; * @author Christian Dupuis
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Artsiom Yudovin
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@EnableConfigurationProperties(JmxProperties.class)
+&nbsp;@ConditionalOnClass({ MBeanExporter.class })
+&nbsp;@ConditionalOnProperty(prefix = &quot;spring.jmx&quot;, name = &quot;enabled&quot;, havingValue = &quot;true&quot;)
+&nbsp;public class JmxAutoConfiguration {
+&nbsp;
+&nbsp;	private final JmxProperties properties;
+&nbsp;
+<b class="nc">&nbsp;	public JmxAutoConfiguration(JmxProperties properties) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@Primary
+&nbsp;	@ConditionalOnMissingBean(value = MBeanExporter.class, search = SearchStrategy.CURRENT)
+&nbsp;	public AnnotationMBeanExporter mbeanExporter(ObjectNamingStrategy namingStrategy, BeanFactory beanFactory) {
+<b class="nc">&nbsp;		AnnotationMBeanExporter exporter = new AnnotationMBeanExporter();</b>
+<b class="nc">&nbsp;		exporter.setRegistrationPolicy(this.properties.getRegistrationPolicy());</b>
+<b class="nc">&nbsp;		exporter.setNamingStrategy(namingStrategy);</b>
+<b class="nc">&nbsp;		String serverBean = this.properties.getServer();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(serverBean)) {</b>
+<b class="nc">&nbsp;			exporter.setServer(beanFactory.getBean(serverBean, MBeanServer.class));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		exporter.setEnsureUniqueRuntimeObjectNames(this.properties.isUniqueNames());</b>
+<b class="nc">&nbsp;		return exporter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(value = ObjectNamingStrategy.class, search = SearchStrategy.CURRENT)
+&nbsp;	public ParentAwareNamingStrategy objectNamingStrategy() {
+<b class="nc">&nbsp;		ParentAwareNamingStrategy namingStrategy = new ParentAwareNamingStrategy(new AnnotationJmxAttributeSource());</b>
+<b class="nc">&nbsp;		String defaultDomain = this.properties.getDefaultDomain();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(defaultDomain)) {</b>
+<b class="nc">&nbsp;			namingStrategy.setDefaultDomain(defaultDomain);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		namingStrategy.setEnsureUniqueRuntimeObjectNames(this.properties.isUniqueNames());</b>
+<b class="nc">&nbsp;		return namingStrategy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public MBeanServer mbeanServer() {
+<b class="nc">&nbsp;		MBeanServerFactoryBean factory = new MBeanServerFactoryBean();</b>
+<b class="nc">&nbsp;		factory.setLocateExistingServerIfPossible(true);</b>
+<b class="nc">&nbsp;		factory.afterPropertiesSet();</b>
+<b class="nc">&nbsp;		return factory.getObject();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

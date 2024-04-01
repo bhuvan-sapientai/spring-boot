@@ -1,0 +1,375 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UpgradeDependencies</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.bom.bomr</a>
+</div>
+
+<h1>Coverage Summary for Class: UpgradeDependencies (org.springframework.boot.build.bom.bomr)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UpgradeDependencies</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/110)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.bom.bomr;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Reader;
+&nbsp;import java.net.URI;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.BiPredicate;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javax.inject.Inject;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.InvalidUserDataException;
+&nbsp;import org.gradle.api.internal.tasks.userinput.UserInputHandler;
+&nbsp;import org.gradle.api.provider.ListProperty;
+&nbsp;import org.gradle.api.provider.Property;
+&nbsp;import org.gradle.api.tasks.Input;
+&nbsp;import org.gradle.api.tasks.Optional;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;import org.gradle.api.tasks.TaskExecutionException;
+&nbsp;import org.gradle.api.tasks.options.Option;
+&nbsp;
+&nbsp;import org.springframework.boot.build.bom.BomExtension;
+&nbsp;import org.springframework.boot.build.bom.Library;
+&nbsp;import org.springframework.boot.build.bom.bomr.github.GitHub;
+&nbsp;import org.springframework.boot.build.bom.bomr.github.GitHubRepository;
+&nbsp;import org.springframework.boot.build.bom.bomr.github.Issue;
+&nbsp;import org.springframework.boot.build.bom.bomr.github.Milestone;
+&nbsp;import org.springframework.boot.build.bom.bomr.version.DependencyVersion;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for tasks that upgrade dependencies in a bom.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+&nbsp;public abstract class UpgradeDependencies extends DefaultTask {
+&nbsp;
+&nbsp;	private final BomExtension bom;
+&nbsp;
+&nbsp;	private final boolean movingToSnapshots;
+&nbsp;
+&nbsp;	@Inject
+&nbsp;	public UpgradeDependencies(BomExtension bom) {
+<b class="nc">&nbsp;		this(bom, false);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	protected UpgradeDependencies(BomExtension bom, boolean movingToSnapshots) {</b>
+<b class="nc">&nbsp;		this.bom = bom;</b>
+<b class="nc">&nbsp;		getThreads().convention(2);</b>
+<b class="nc">&nbsp;		this.movingToSnapshots = movingToSnapshots;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Option(option = &quot;milestone&quot;, description = &quot;Milestone to which dependency upgrade issues should be assigned&quot;)
+&nbsp;	public abstract Property&lt;String&gt; getMilestone();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;threads&quot;, description = &quot;Number of Threads to use for update resolution&quot;)
+&nbsp;	public abstract Property&lt;Integer&gt; getThreads();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	@Optional
+&nbsp;	@Option(option = &quot;libraries&quot;, description = &quot;Regular expression that identifies the libraries to upgrade&quot;)
+&nbsp;	public abstract Property&lt;String&gt; getLibraries();
+&nbsp;
+&nbsp;	@Input
+&nbsp;	abstract ListProperty&lt;URI&gt; getRepositoryUris();
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void upgradeDependencies() {
+<b class="nc">&nbsp;		GitHubRepository repository = createGitHub().getRepository(this.bom.getUpgrade().getGitHub().getOrganization(),</b>
+<b class="nc">&nbsp;				this.bom.getUpgrade().getGitHub().getRepository());</b>
+<b class="nc">&nbsp;		List&lt;String&gt; issueLabels = verifyLabels(repository);</b>
+<b class="nc">&nbsp;		Milestone milestone = determineMilestone(repository);</b>
+<b class="nc">&nbsp;		List&lt;Upgrade&gt; upgrades = resolveUpgrades(milestone);</b>
+<b class="nc">&nbsp;		applyUpgrades(repository, issueLabels, milestone, upgrades);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyUpgrades(GitHubRepository repository, List&lt;String&gt; issueLabels, Milestone milestone,
+&nbsp;			List&lt;Upgrade&gt; upgrades) {
+<b class="nc">&nbsp;		Path buildFile = getProject().getBuildFile().toPath();</b>
+<b class="nc">&nbsp;		Path gradleProperties = new File(getProject().getRootProject().getProjectDir(), &quot;gradle.properties&quot;).toPath();</b>
+<b class="nc">&nbsp;		UpgradeApplicator upgradeApplicator = new UpgradeApplicator(buildFile, gradleProperties);</b>
+<b class="nc">&nbsp;		List&lt;Issue&gt; existingUpgradeIssues = repository.findIssues(issueLabels, milestone);</b>
+<b class="nc">&nbsp;		System.out.println(&quot;Applying upgrades...&quot;);</b>
+<b class="nc">&nbsp;		System.out.println(&quot;&quot;);</b>
+<b class="nc">&nbsp;		for (Upgrade upgrade : upgrades) {</b>
+<b class="nc">&nbsp;			System.out.println(upgrade.getLibrary().getName() + &quot; &quot; + upgrade.getVersion());</b>
+<b class="nc">&nbsp;			String title = issueTitle(upgrade);</b>
+<b class="nc">&nbsp;			Issue existingUpgradeIssue = findExistingUpgradeIssue(existingUpgradeIssues, upgrade);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Path modified = upgradeApplicator.apply(upgrade);</b>
+<b class="nc">&nbsp;				int issueNumber = getOrOpenUpgradeIssue(repository, issueLabels, milestone, title,</b>
+&nbsp;						existingUpgradeIssue);
+<b class="nc">&nbsp;				if (existingUpgradeIssue != null &amp;&amp; existingUpgradeIssue.getState() == Issue.State.CLOSED) {</b>
+<b class="nc">&nbsp;					existingUpgradeIssue.label(Arrays.asList(&quot;type: task&quot;, &quot;status: superseded&quot;));</b>
+&nbsp;				}
+<b class="nc">&nbsp;				System.out.println(&quot;   Issue: &quot; + issueNumber + &quot; - &quot; + title</b>
+<b class="nc">&nbsp;						+ getExistingUpgradeIssueMessageDetails(existingUpgradeIssue));</b>
+<b class="nc">&nbsp;				if (new ProcessBuilder().command(&quot;git&quot;, &quot;add&quot;, modified.toFile().getAbsolutePath())</b>
+<b class="nc">&nbsp;					.start()</b>
+<b class="nc">&nbsp;					.waitFor() != 0) {</b>
+<b class="nc">&nbsp;					throw new IllegalStateException(&quot;git add failed&quot;);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				String commitMessage = commitMessage(upgrade, issueNumber);</b>
+<b class="nc">&nbsp;				if (new ProcessBuilder().command(&quot;git&quot;, &quot;commit&quot;, &quot;-m&quot;, commitMessage).start().waitFor() != 0) {</b>
+<b class="nc">&nbsp;					throw new IllegalStateException(&quot;git commit failed&quot;);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				System.out.println(&quot;  Commit: &quot; + commitMessage.substring(0, commitMessage.indexOf(&#39;\n&#39;)));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new TaskExecutionException(this, ex);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int getOrOpenUpgradeIssue(GitHubRepository repository, List&lt;String&gt; issueLabels, Milestone milestone,
+&nbsp;			String title, Issue existingUpgradeIssue) {
+<b class="nc">&nbsp;		if (existingUpgradeIssue != null &amp;&amp; existingUpgradeIssue.getState() == Issue.State.OPEN) {</b>
+<b class="nc">&nbsp;			return existingUpgradeIssue.getNumber();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String body = (existingUpgradeIssue != null) ? &quot;Supersedes #&quot; + existingUpgradeIssue.getNumber() : &quot;&quot;;</b>
+<b class="nc">&nbsp;		return repository.openIssue(title, body, issueLabels, milestone);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getExistingUpgradeIssueMessageDetails(Issue existingUpgradeIssue) {
+<b class="nc">&nbsp;		if (existingUpgradeIssue == null) {</b>
+<b class="nc">&nbsp;			return &quot;&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (existingUpgradeIssue.getState() != Issue.State.CLOSED) {</b>
+<b class="nc">&nbsp;			return &quot; (completes existing upgrade)&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return &quot; (supersedes #&quot; + existingUpgradeIssue.getNumber() + &quot; &quot; + existingUpgradeIssue.getTitle() + &quot;)&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; verifyLabels(GitHubRepository repository) {
+<b class="nc">&nbsp;		Set&lt;String&gt; availableLabels = repository.getLabels();</b>
+<b class="nc">&nbsp;		List&lt;String&gt; issueLabels = this.bom.getUpgrade().getGitHub().getIssueLabels();</b>
+<b class="nc">&nbsp;		if (!availableLabels.containsAll(issueLabels)) {</b>
+<b class="nc">&nbsp;			List&lt;String&gt; unknownLabels = new ArrayList&lt;&gt;(issueLabels);</b>
+<b class="nc">&nbsp;			unknownLabels.removeAll(availableLabels);</b>
+<b class="nc">&nbsp;			String suffix = (unknownLabels.size() == 1) ? &quot;&quot; : &quot;s&quot;;</b>
+<b class="nc">&nbsp;			throw new InvalidUserDataException(</b>
+<b class="nc">&nbsp;					&quot;Unknown label&quot; + suffix + &quot;: &quot; + StringUtils.collectionToCommaDelimitedString(unknownLabels));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return issueLabels;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private GitHub createGitHub() {
+<b class="nc">&nbsp;		Properties bomrProperties = new Properties();</b>
+<b class="nc">&nbsp;		try (Reader reader = new FileReader(new File(System.getProperty(&quot;user.home&quot;), &quot;.bomr.properties&quot;))) {</b>
+<b class="nc">&nbsp;			bomrProperties.load(reader);</b>
+<b class="nc">&nbsp;			String username = bomrProperties.getProperty(&quot;bomr.github.username&quot;);</b>
+<b class="nc">&nbsp;			String password = bomrProperties.getProperty(&quot;bomr.github.password&quot;);</b>
+<b class="nc">&nbsp;			return GitHub.withCredentials(username, password);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new InvalidUserDataException(&quot;Failed to load .bomr.properties from user home&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Milestone determineMilestone(GitHubRepository repository) {
+<b class="nc">&nbsp;		List&lt;Milestone&gt; milestones = repository.getMilestones();</b>
+<b class="nc">&nbsp;		java.util.Optional&lt;Milestone&gt; matchingMilestone = milestones.stream()</b>
+<b class="nc">&nbsp;			.filter((milestone) -&gt; milestone.getName().equals(getMilestone().get()))</b>
+<b class="nc">&nbsp;			.findFirst();</b>
+<b class="nc">&nbsp;		if (matchingMilestone.isEmpty()) {</b>
+<b class="nc">&nbsp;			throw new InvalidUserDataException(&quot;Unknown milestone: &quot; + getMilestone().get());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return matchingMilestone.get();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Issue findExistingUpgradeIssue(List&lt;Issue&gt; existingUpgradeIssues, Upgrade upgrade) {
+<b class="nc">&nbsp;		String toMatch = &quot;Upgrade to &quot; + upgrade.getLibrary().getName();</b>
+<b class="nc">&nbsp;		for (Issue existingUpgradeIssue : existingUpgradeIssues) {</b>
+<b class="nc">&nbsp;			String title = existingUpgradeIssue.getTitle();</b>
+<b class="nc">&nbsp;			int lastSpaceIndex = title.lastIndexOf(&#39; &#39;);</b>
+<b class="nc">&nbsp;			if (lastSpaceIndex &gt; -1) {</b>
+<b class="nc">&nbsp;				title = title.substring(0, lastSpaceIndex);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (title.equals(toMatch)) {</b>
+<b class="nc">&nbsp;				return existingUpgradeIssue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;	private List&lt;Upgrade&gt; resolveUpgrades(Milestone milestone) {
+<b class="nc">&nbsp;		List&lt;Upgrade&gt; upgrades = new InteractiveUpgradeResolver(getServices().get(UserInputHandler.class),</b>
+<b class="nc">&nbsp;				new MultithreadedLibraryUpdateResolver(getThreads().get(),</b>
+<b class="nc">&nbsp;						new StandardLibraryUpdateResolver(new MavenMetadataVersionResolver(getRepositoryUris().get()),</b>
+<b class="nc">&nbsp;								determineUpdatePredicates(milestone))))</b>
+<b class="nc">&nbsp;			.resolveUpgrades(matchingLibraries(), this.bom.getLibraries());</b>
+<b class="nc">&nbsp;		return upgrades;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected List&lt;BiPredicate&lt;Library, DependencyVersion&gt;&gt; determineUpdatePredicates(Milestone milestone) {
+<b class="nc">&nbsp;		List&lt;BiPredicate&lt;Library, DependencyVersion&gt;&gt; updatePredicates = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		updatePredicates.add(this::compliesWithUpgradePolicy);</b>
+<b class="nc">&nbsp;		updatePredicates.add(this::isAnUpgrade);</b>
+<b class="nc">&nbsp;		updatePredicates.add(this::isNotProhibited);</b>
+<b class="nc">&nbsp;		return updatePredicates;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean compliesWithUpgradePolicy(Library library, DependencyVersion candidate) {
+<b class="nc">&nbsp;		return this.bom.getUpgrade().getPolicy().test(candidate, library.getVersion().getVersion());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isAnUpgrade(Library library, DependencyVersion candidate) {
+<b class="nc">&nbsp;		return library.getVersion().getVersion().isUpgrade(candidate, this.movingToSnapshots);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isNotProhibited(Library library, DependencyVersion candidate) {
+<b class="nc">&nbsp;		return library.getProhibitedVersions()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.noneMatch((prohibited) -&gt; prohibited.isProhibited(candidate.toString()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Library&gt; matchingLibraries() {
+<b class="nc">&nbsp;		List&lt;Library&gt; matchingLibraries = this.bom.getLibraries().stream().filter(this::eligible).toList();</b>
+<b class="nc">&nbsp;		if (matchingLibraries.isEmpty()) {</b>
+<b class="nc">&nbsp;			throw new InvalidUserDataException(&quot;No libraries to upgrade&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return matchingLibraries;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected boolean eligible(Library library) {
+<b class="nc">&nbsp;		String pattern = getLibraries().getOrNull();</b>
+<b class="nc">&nbsp;		if (pattern == null) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Predicate&lt;String&gt; libraryPredicate = Pattern.compile(pattern).asPredicate();</b>
+<b class="nc">&nbsp;		return libraryPredicate.test(library.getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected abstract String issueTitle(Upgrade upgrade);
+&nbsp;
+&nbsp;	protected abstract String commitMessage(Upgrade upgrade, int issueNumber);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

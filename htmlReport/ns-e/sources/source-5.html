@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReactiveCloudFoundrySecurityService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.cloudfoundry.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: ReactiveCloudFoundrySecurityService (org.springframework.boot.actuate.autoconfigure.cloudfoundry.reactive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReactiveCloudFoundrySecurityService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ReactiveCloudFoundrySecurityService$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.cloudfoundry.reactive;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import io.netty.handler.ssl.SslProvider;
+&nbsp;import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;import reactor.netty.http.Http11SslContextSpec;
+&nbsp;import reactor.netty.http.client.HttpClient;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.AccessLevel;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException.Reason;
+&nbsp;import org.springframework.core.ParameterizedTypeReference;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.HttpStatusCode;
+&nbsp;import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.web.reactive.function.client.WebClient;
+&nbsp;import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
+&nbsp;import org.springframework.web.reactive.function.client.WebClientResponseException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Reactive Cloud Foundry security service to handle REST calls to the cloud controller
+&nbsp; * and UAA.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class ReactiveCloudFoundrySecurityService {
+&nbsp;
+<b class="nc">&nbsp;	private static final ParameterizedTypeReference&lt;Map&lt;String, Object&gt;&gt; STRING_OBJECT_MAP = new ParameterizedTypeReference&lt;&gt;() {</b>
+&nbsp;	};
+&nbsp;
+&nbsp;	private final WebClient webClient;
+&nbsp;
+&nbsp;	private final String cloudControllerUrl;
+&nbsp;
+&nbsp;	ReactiveCloudFoundrySecurityService(WebClient.Builder webClientBuilder, String cloudControllerUrl,
+<b class="nc">&nbsp;			boolean skipSslValidation) {</b>
+<b class="nc">&nbsp;		Assert.notNull(webClientBuilder, &quot;WebClient must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(cloudControllerUrl, &quot;CloudControllerUrl must not be null&quot;);</b>
+<b class="nc">&nbsp;		if (skipSslValidation) {</b>
+<b class="nc">&nbsp;			webClientBuilder.clientConnector(buildTrustAllSslConnector());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.webClient = webClientBuilder.build();</b>
+<b class="nc">&nbsp;		this.cloudControllerUrl = cloudControllerUrl;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected ReactorClientHttpConnector buildTrustAllSslConnector() {
+<b class="nc">&nbsp;		HttpClient client = HttpClient.create().secure((spec) -&gt; spec.sslContext(createSslContextSpec()));</b>
+<b class="nc">&nbsp;		return new ReactorClientHttpConnector(client);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Http11SslContextSpec createSslContextSpec() {
+<b class="nc">&nbsp;		return Http11SslContextSpec.forClient()</b>
+<b class="nc">&nbsp;			.configure((builder) -&gt; builder.sslProvider(SslProvider.JDK)</b>
+<b class="nc">&nbsp;				.trustManager(InsecureTrustManagerFactory.INSTANCE));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a Mono of the access level that should be granted to the given token.
+&nbsp;	 * @param token the token
+&nbsp;	 * @param applicationId the cloud foundry application ID
+&nbsp;	 * @return a Mono of the access level that should be granted
+&nbsp;	 * @throws CloudFoundryAuthorizationException if the token is not authorized
+&nbsp;	 */
+&nbsp;	Mono&lt;AccessLevel&gt; getAccessLevel(String token, String applicationId) throws CloudFoundryAuthorizationException {
+<b class="nc">&nbsp;		String uri = getPermissionsUri(applicationId);</b>
+<b class="nc">&nbsp;		return this.webClient.get()</b>
+<b class="nc">&nbsp;			.uri(uri)</b>
+<b class="nc">&nbsp;			.header(&quot;Authorization&quot;, &quot;bearer &quot; + token)</b>
+<b class="nc">&nbsp;			.retrieve()</b>
+<b class="nc">&nbsp;			.bodyToMono(Map.class)</b>
+<b class="nc">&nbsp;			.map(this::getAccessLevel)</b>
+<b class="nc">&nbsp;			.onErrorMap(this::mapError);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Throwable mapError(Throwable throwable) {
+<b class="nc">&nbsp;		if (throwable instanceof WebClientResponseException webClientResponseException) {</b>
+<b class="nc">&nbsp;			HttpStatusCode statusCode = webClientResponseException.getStatusCode();</b>
+<b class="nc">&nbsp;			if (statusCode.equals(HttpStatus.FORBIDDEN)) {</b>
+<b class="nc">&nbsp;				return new CloudFoundryAuthorizationException(Reason.ACCESS_DENIED, &quot;Access denied&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (statusCode.is4xxClientError()) {</b>
+<b class="nc">&nbsp;				return new CloudFoundryAuthorizationException(Reason.INVALID_TOKEN, &quot;Invalid token&quot;, throwable);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return new CloudFoundryAuthorizationException(Reason.SERVICE_UNAVAILABLE, &quot;Cloud controller not reachable&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private AccessLevel getAccessLevel(Map&lt;?, ?&gt; body) {
+<b class="nc">&nbsp;		if (Boolean.TRUE.equals(body.get(&quot;read_sensitive_data&quot;))) {</b>
+<b class="nc">&nbsp;			return AccessLevel.FULL;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return AccessLevel.RESTRICTED;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getPermissionsUri(String applicationId) {
+<b class="nc">&nbsp;		return this.cloudControllerUrl + &quot;/v2/apps/&quot; + applicationId + &quot;/permissions&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a Mono of all token keys known by the UAA.
+&nbsp;	 * @return a Mono of token keys
+&nbsp;	 */
+&nbsp;	Mono&lt;Map&lt;String, String&gt;&gt; fetchTokenKeys() {
+<b class="nc">&nbsp;		return getUaaUrl().flatMap(this::fetchTokenKeys);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mono&lt;? extends Map&lt;String, String&gt;&gt; fetchTokenKeys(String url) {
+<b class="nc">&nbsp;		RequestHeadersSpec&lt;?&gt; uri = this.webClient.get().uri(url + &quot;/token_keys&quot;);</b>
+<b class="nc">&nbsp;		return uri.retrieve()</b>
+<b class="nc">&nbsp;			.bodyToMono(STRING_OBJECT_MAP)</b>
+<b class="nc">&nbsp;			.map(this::extractTokenKeys)</b>
+<b class="nc">&nbsp;			.onErrorMap(((ex) -&gt; new CloudFoundryAuthorizationException(Reason.SERVICE_UNAVAILABLE, ex.getMessage())));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, String&gt; extractTokenKeys(Map&lt;String, Object&gt; response) {
+<b class="nc">&nbsp;		Map&lt;String, String&gt; tokenKeys = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Object key : (List&lt;?&gt;) response.get(&quot;keys&quot;)) {</b>
+<b class="nc">&nbsp;			Map&lt;?, ?&gt; tokenKey = (Map&lt;?, ?&gt;) key;</b>
+<b class="nc">&nbsp;			tokenKeys.put((String) tokenKey.get(&quot;kid&quot;), (String) tokenKey.get(&quot;value&quot;));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return tokenKeys;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a Mono of URL of the UAA.
+&nbsp;	 * @return the UAA url Mono
+&nbsp;	 */
+&nbsp;	Mono&lt;String&gt; getUaaUrl() {
+<b class="nc">&nbsp;		return this.webClient.get()</b>
+<b class="nc">&nbsp;			.uri(this.cloudControllerUrl + &quot;/info&quot;)</b>
+<b class="nc">&nbsp;			.retrieve()</b>
+<b class="nc">&nbsp;			.bodyToMono(Map.class)</b>
+<b class="nc">&nbsp;			.map((response) -&gt; (String) response.get(&quot;token_endpoint&quot;))</b>
+<b class="nc">&nbsp;			.cache()</b>
+<b class="nc">&nbsp;			.onErrorMap((ex) -&gt; new CloudFoundryAuthorizationException(Reason.SERVICE_UNAVAILABLE,</b>
+&nbsp;					&quot;Unable to fetch token keys from UAA.&quot;));
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

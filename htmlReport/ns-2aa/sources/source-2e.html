@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringApplicationAdminClient</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringApplicationAdminClient (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringApplicationAdminClient</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;import javax.management.AttributeNotFoundException;
+&nbsp;import javax.management.InstanceNotFoundException;
+&nbsp;import javax.management.MBeanException;
+&nbsp;import javax.management.MBeanServerConnection;
+&nbsp;import javax.management.MalformedObjectNameException;
+&nbsp;import javax.management.ObjectName;
+&nbsp;import javax.management.ReflectionException;
+&nbsp;import javax.management.remote.JMXConnector;
+&nbsp;import javax.management.remote.JMXConnectorFactory;
+&nbsp;import javax.management.remote.JMXServiceURL;
+&nbsp;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;
+&nbsp;/**
+&nbsp; * A JMX client for the {@code SpringApplicationAdmin} MBean. Permits to obtain
+&nbsp; * information about a given Spring application.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;class SpringApplicationAdminClient {
+&nbsp;
+&nbsp;	// Note: see SpringApplicationAdminJmxAutoConfiguration
+&nbsp;	static final String DEFAULT_OBJECT_NAME = &quot;org.springframework.boot:type=Admin,name=SpringApplication&quot;;
+&nbsp;
+&nbsp;	private final MBeanServerConnection connection;
+&nbsp;
+&nbsp;	private final ObjectName objectName;
+&nbsp;
+<b class="nc">&nbsp;	SpringApplicationAdminClient(MBeanServerConnection connection, String jmxName) {</b>
+<b class="nc">&nbsp;		this.connection = connection;</b>
+<b class="nc">&nbsp;		this.objectName = toObjectName(jmxName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Check if the spring application managed by this instance is ready. Returns
+&nbsp;	 * {@code false} if the mbean is not yet deployed so this method should be repeatedly
+&nbsp;	 * called until a timeout is reached.
+&nbsp;	 * @return {@code true} if the application is ready to service requests
+&nbsp;	 * @throws MojoExecutionException if the JMX service could not be contacted
+&nbsp;	 */
+&nbsp;	boolean isReady() throws MojoExecutionException {
+&nbsp;		try {
+<b class="nc">&nbsp;			return (Boolean) this.connection.getAttribute(this.objectName, &quot;Ready&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (InstanceNotFoundException ex) {</b>
+<b class="nc">&nbsp;			return false; // Instance not available yet</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (AttributeNotFoundException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unexpected: attribute &#39;Ready&#39; not available&quot;, ex);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ReflectionException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Failed to retrieve Ready attribute&quot;, ex.getCause());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MBeanException | IOException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(ex.getMessage(), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Stop the application managed by this instance.
+&nbsp;	 * @throws MojoExecutionException if the JMX service could not be contacted
+&nbsp;	 * @throws IOException if an I/O error occurs
+&nbsp;	 * @throws InstanceNotFoundException if the lifecycle mbean cannot be found
+&nbsp;	 */
+&nbsp;	void stop() throws MojoExecutionException, IOException, InstanceNotFoundException {
+&nbsp;		try {
+<b class="nc">&nbsp;			this.connection.invoke(this.objectName, &quot;shutdown&quot;, null, null);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ReflectionException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Shutdown failed&quot;, ex.getCause());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MBeanException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Could not invoke shutdown operation&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ObjectName toObjectName(String name) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return new ObjectName(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedObjectNameException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Invalid jmx name &#39;&quot; + name + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a connector for an {@link javax.management.MBeanServer} exposed on the
+&nbsp;	 * current machine and the current port. Security should be disabled.
+&nbsp;	 * @param port the port on which the mbean server is exposed
+&nbsp;	 * @return a connection
+&nbsp;	 * @throws IOException if the connection to that server failed
+&nbsp;	 */
+&nbsp;	static JMXConnector connect(int port) throws IOException {
+<b class="nc">&nbsp;		String url = &quot;service:jmx:rmi:///jndi/rmi://127.0.0.1:&quot; + port + &quot;/jmxrmi&quot;;</b>
+<b class="nc">&nbsp;		JMXServiceURL serviceUrl = new JMXServiceURL(url);</b>
+<b class="nc">&nbsp;		return JMXConnectorFactory.connect(serviceUrl, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

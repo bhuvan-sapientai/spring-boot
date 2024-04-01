@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertiesMergingResourceTransformer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertiesMergingResourceTransformer (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertiesMergingResourceTransformer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.jar.JarEntry;
+&nbsp;import java.util.jar.JarOutputStream;
+&nbsp;
+&nbsp;import org.apache.maven.plugins.shade.relocation.Relocator;
+&nbsp;import org.apache.maven.plugins.shade.resource.ReproducibleResourceTransformer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension for the &lt;a href=&quot;https://maven.apache.org/plugins/maven-shade-plugin/&quot;&gt;Maven
+&nbsp; * shade plugin&lt;/a&gt; to allow properties files (e.g. {@literal META-INF/spring.factories})
+&nbsp; * to be merged without losing any information.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.0.0
+&nbsp; */
+<b class="nc">&nbsp;public class PropertiesMergingResourceTransformer implements ReproducibleResourceTransformer {</b>
+&nbsp;
+&nbsp;	// Set this in pom configuration with &lt;resource&gt;...&lt;/resource&gt;
+&nbsp;	private String resource;
+&nbsp;
+<b class="nc">&nbsp;	private final Properties data = new Properties();</b>
+&nbsp;
+&nbsp;	private long time;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the data the properties being merged.
+&nbsp;	 * @return the data
+&nbsp;	 */
+&nbsp;	public Properties getData() {
+<b class="nc">&nbsp;		return this.data;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean canTransformResource(String resource) {
+<b class="nc">&nbsp;		return this.resource != null &amp;&amp; this.resource.equalsIgnoreCase(resource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	@Deprecated(since = &quot;2.4.0&quot;, forRemoval = false)
+&nbsp;	public void processResource(String resource, InputStream inputStream, List&lt;Relocator&gt; relocators)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		processResource(resource, inputStream, relocators, 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void processResource(String resource, InputStream inputStream, List&lt;Relocator&gt; relocators, long time)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		Properties properties = new Properties();</b>
+<b class="nc">&nbsp;		properties.load(inputStream);</b>
+<b class="nc">&nbsp;		properties.forEach((name, value) -&gt; process((String) name, (String) value));</b>
+<b class="nc">&nbsp;		if (time &gt; this.time) {</b>
+<b class="nc">&nbsp;			this.time = time;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void process(String name, String value) {
+<b class="nc">&nbsp;		String existing = this.data.getProperty(name);</b>
+<b class="nc">&nbsp;		this.data.setProperty(name, (existing != null) ? existing + &quot;,&quot; + value : value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean hasTransformedResource() {
+<b class="nc">&nbsp;		return !this.data.isEmpty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void modifyOutputStream(JarOutputStream os) throws IOException {
+<b class="nc">&nbsp;		JarEntry jarEntry = new JarEntry(this.resource);</b>
+<b class="nc">&nbsp;		jarEntry.setTime(this.time);</b>
+<b class="nc">&nbsp;		os.putNextEntry(jarEntry);</b>
+<b class="nc">&nbsp;		this.data.store(os, &quot;Merged by PropertiesMergingResourceTransformer&quot;);</b>
+<b class="nc">&nbsp;		os.flush();</b>
+<b class="nc">&nbsp;		this.data.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getResource() {
+<b class="nc">&nbsp;		return this.resource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setResource(String resource) {
+<b class="nc">&nbsp;		this.resource = resource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

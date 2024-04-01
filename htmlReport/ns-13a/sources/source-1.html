@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DocumentTestSlices</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.test.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: DocumentTestSlices (org.springframework.boot.build.test.autoconfigure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DocumentTestSlices</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DocumentTestSlices$TestSlice</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.test.autoconfigure;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.FileWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.Reader;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.tasks.InputFiles;
+&nbsp;import org.gradle.api.tasks.OutputFile;
+&nbsp;import org.gradle.api.tasks.PathSensitive;
+&nbsp;import org.gradle.api.tasks.PathSensitivity;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Task} used to document test slices.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class DocumentTestSlices extends DefaultTask {</b>
+&nbsp;
+&nbsp;	private FileCollection testSlices;
+&nbsp;
+&nbsp;	private File outputFile;
+&nbsp;
+&nbsp;	@InputFiles
+&nbsp;	@PathSensitive(PathSensitivity.RELATIVE)
+&nbsp;	public FileCollection getTestSlices() {
+<b class="nc">&nbsp;		return this.testSlices;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setTestSlices(FileCollection testSlices) {
+<b class="nc">&nbsp;		this.testSlices = testSlices;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@OutputFile
+&nbsp;	public File getOutputFile() {
+<b class="nc">&nbsp;		return this.outputFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOutputFile(File outputFile) {
+<b class="nc">&nbsp;		this.outputFile = outputFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void documentTestSlices() throws IOException {
+<b class="nc">&nbsp;		Set&lt;TestSlice&gt; testSlices = readTestSlices();</b>
+<b class="nc">&nbsp;		writeTable(testSlices);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private Set&lt;TestSlice&gt; readTestSlices() throws IOException {
+<b class="nc">&nbsp;		Set&lt;TestSlice&gt; testSlices = new TreeSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (File metadataFile : this.testSlices) {</b>
+<b class="nc">&nbsp;			Properties metadata = new Properties();</b>
+<b class="nc">&nbsp;			try (Reader reader = new FileReader(metadataFile)) {</b>
+<b class="nc">&nbsp;				metadata.load(reader);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			for (String name : Collections.list((Enumeration&lt;String&gt;) metadata.propertyNames())) {</b>
+<b class="nc">&nbsp;				testSlices.add(new TestSlice(name,</b>
+<b class="nc">&nbsp;						new TreeSet&lt;&gt;(StringUtils.commaDelimitedListToSet(metadata.getProperty(name)))));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return testSlices;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeTable(Set&lt;TestSlice&gt; testSlices) throws IOException {
+<b class="nc">&nbsp;		this.outputFile.getParentFile().mkdirs();</b>
+<b class="nc">&nbsp;		try (PrintWriter writer = new PrintWriter(new FileWriter(this.outputFile))) {</b>
+<b class="nc">&nbsp;			writer.println(&quot;[cols=\&quot;d,a\&quot;]&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;|===&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;| Test slice | Imported auto-configuration&quot;);</b>
+<b class="nc">&nbsp;			for (TestSlice testSlice : testSlices) {</b>
+<b class="nc">&nbsp;				writer.println();</b>
+<b class="nc">&nbsp;				writer.printf(&quot;| `@%s`%n&quot;, testSlice.className);</b>
+<b class="nc">&nbsp;				writer.println(&quot;| &quot;);</b>
+<b class="nc">&nbsp;				for (String importedAutoConfiguration : testSlice.importedAutoConfigurations) {</b>
+<b class="nc">&nbsp;					writer.printf(&quot;`%s`%n&quot;, importedAutoConfiguration);</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			writer.println(&quot;|===&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class TestSlice implements Comparable&lt;TestSlice&gt; {
+&nbsp;
+&nbsp;		private final String className;
+&nbsp;
+&nbsp;		private final SortedSet&lt;String&gt; importedAutoConfigurations;
+&nbsp;
+<b class="nc">&nbsp;		private TestSlice(String className, SortedSet&lt;String&gt; importedAutoConfigurations) {</b>
+<b class="nc">&nbsp;			this.className = ClassUtils.getShortName(className);</b>
+<b class="nc">&nbsp;			this.importedAutoConfigurations = importedAutoConfigurations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int compareTo(TestSlice other) {
+<b class="nc">&nbsp;			return this.className.compareTo(other.className);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

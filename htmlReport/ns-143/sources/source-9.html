@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImageConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.type</a>
+</div>
+
+<h1>Coverage Summary for Class: ImageConfig (org.springframework.boot.buildpack.platform.docker.type)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImageConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ImageConfig$Update</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.type;
+&nbsp;
+&nbsp;import java.lang.invoke.MethodHandles;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.node.ObjectNode;
+&nbsp;
+&nbsp;import org.springframework.boot.buildpack.platform.json.MappedObject;
+&nbsp;
+&nbsp;/**
+&nbsp; * Image configuration information.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.3.0
+&nbsp; */
+<b class="nc">&nbsp;public class ImageConfig extends MappedObject {</b>
+&nbsp;
+&nbsp;	private final Map&lt;String, String&gt; labels;
+&nbsp;
+&nbsp;	private final Map&lt;String, String&gt; configEnv;
+&nbsp;
+&nbsp;	ImageConfig(JsonNode node) {
+<b class="nc">&nbsp;		super(node, MethodHandles.lookup());</b>
+<b class="nc">&nbsp;		this.labels = extractLabels();</b>
+<b class="nc">&nbsp;		this.configEnv = parseConfigEnv();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private Map&lt;String, String&gt; extractLabels() {
+<b class="nc">&nbsp;		Map&lt;String, String&gt; labels = valueAt(&quot;/Labels&quot;, Map.class);</b>
+<b class="nc">&nbsp;		if (labels == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptyMap();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return labels;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, String&gt; parseConfigEnv() {
+<b class="nc">&nbsp;		String[] entries = valueAt(&quot;/Env&quot;, String[].class);</b>
+<b class="nc">&nbsp;		if (entries == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptyMap();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Map&lt;String, String&gt; env = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String entry : entries) {</b>
+<b class="nc">&nbsp;			int i = entry.indexOf(&#39;=&#39;);</b>
+<b class="nc">&nbsp;			String name = (i != -1) ? entry.substring(0, i) : entry;</b>
+<b class="nc">&nbsp;			String value = (i != -1) ? entry.substring(i + 1) : null;</b>
+<b class="nc">&nbsp;			env.put(name, value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(env);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	JsonNode getNodeCopy() {
+<b class="nc">&nbsp;		return super.getNode().deepCopy();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the image labels. If the image has no labels, an empty {@code Map} is
+&nbsp;	 * returned.
+&nbsp;	 * @return the image labels, never {@code null}
+&nbsp;	 */
+&nbsp;	public Map&lt;String, String&gt; getLabels() {
+<b class="nc">&nbsp;		return this.labels;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the image environment variables. If the image has no environment variables,
+&nbsp;	 * an empty {@code Map} is returned.
+&nbsp;	 * @return the env, never {@code null}
+&nbsp;	 */
+&nbsp;	public Map&lt;String, String&gt; getEnv() {
+<b class="nc">&nbsp;		return this.configEnv;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an updated copy of this image config.
+&nbsp;	 * @param update consumer to apply updates
+&nbsp;	 * @return an updated image config
+&nbsp;	 */
+&nbsp;	public ImageConfig copy(Consumer&lt;Update&gt; update) {
+<b class="nc">&nbsp;		return new Update(this).run(update);</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Update class used to change data when creating a copy.
+&nbsp;	 */
+&nbsp;	public static final class Update {
+&nbsp;
+&nbsp;		private final ObjectNode copy;
+&nbsp;
+<b class="nc">&nbsp;		private Update(ImageConfig source) {</b>
+<b class="nc">&nbsp;			this.copy = source.getNode().deepCopy();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ImageConfig run(Consumer&lt;Update&gt; update) {
+<b class="nc">&nbsp;			update.accept(this);</b>
+<b class="nc">&nbsp;			return new ImageConfig(this.copy);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Update the image config with an additional label.
+&nbsp;		 * @param label the label name
+&nbsp;		 * @param value the label value
+&nbsp;		 */
+&nbsp;		public void withLabel(String label, String value) {
+<b class="nc">&nbsp;			JsonNode labels = this.copy.at(&quot;/Labels&quot;);</b>
+<b class="nc">&nbsp;			if (labels.isMissingNode()) {</b>
+<b class="nc">&nbsp;				labels = this.copy.putObject(&quot;Labels&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			((ObjectNode) labels).put(label, value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

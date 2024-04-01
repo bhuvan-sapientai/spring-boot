@@ -1,0 +1,229 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HotelServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">smoketest.data.jpa.service</a>
+</div>
+
+<h1>Coverage Summary for Class: HotelServiceImpl (smoketest.data.jpa.service)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HotelServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HotelServiceImpl$ReviewsSummaryImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package smoketest.data.jpa.service;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import smoketest.data.jpa.domain.City;
+&nbsp;import smoketest.data.jpa.domain.Hotel;
+&nbsp;import smoketest.data.jpa.domain.Rating;
+&nbsp;import smoketest.data.jpa.domain.RatingCount;
+&nbsp;import smoketest.data.jpa.domain.Review;
+&nbsp;import smoketest.data.jpa.domain.ReviewDetails;
+&nbsp;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;@Component(&quot;hotelService&quot;)
+&nbsp;@Transactional
+&nbsp;class HotelServiceImpl implements HotelService {
+&nbsp;
+&nbsp;	private final HotelRepository hotelRepository;
+&nbsp;
+&nbsp;	private final ReviewRepository reviewRepository;
+&nbsp;
+<b class="nc">&nbsp;	HotelServiceImpl(HotelRepository hotelRepository, ReviewRepository reviewRepository) {</b>
+<b class="nc">&nbsp;		this.hotelRepository = hotelRepository;</b>
+<b class="nc">&nbsp;		this.reviewRepository = reviewRepository;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Hotel getHotel(City city, String name) {
+<b class="nc">&nbsp;		Assert.notNull(city, &quot;City must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.hasLength(name, &quot;Name must not be empty&quot;);</b>
+<b class="nc">&nbsp;		return this.hotelRepository.findByCityAndName(city, name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Page&lt;Review&gt; getReviews(Hotel hotel, Pageable pageable) {
+<b class="nc">&nbsp;		Assert.notNull(hotel, &quot;Hotel must not be null&quot;);</b>
+<b class="nc">&nbsp;		return this.reviewRepository.findByHotel(hotel, pageable);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Review getReview(Hotel hotel, int reviewNumber) {
+<b class="nc">&nbsp;		Assert.notNull(hotel, &quot;Hotel must not be null&quot;);</b>
+<b class="nc">&nbsp;		return this.reviewRepository.findByHotelAndIndex(hotel, reviewNumber);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Review addReview(Hotel hotel, ReviewDetails details) {
+<b class="nc">&nbsp;		Review review = new Review(hotel, 1, details);</b>
+<b class="nc">&nbsp;		return this.reviewRepository.save(review);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ReviewsSummary getReviewSummary(Hotel hotel) {
+<b class="nc">&nbsp;		List&lt;RatingCount&gt; ratingCounts = this.hotelRepository.findRatingCounts(hotel);</b>
+<b class="nc">&nbsp;		return new ReviewsSummaryImpl(ratingCounts);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class ReviewsSummaryImpl implements ReviewsSummary {
+&nbsp;
+&nbsp;		private final Map&lt;Rating, Long&gt; ratingCount;
+&nbsp;
+<b class="nc">&nbsp;		ReviewsSummaryImpl(List&lt;RatingCount&gt; ratingCounts) {</b>
+<b class="nc">&nbsp;			this.ratingCount = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (RatingCount ratingCount : ratingCounts) {</b>
+<b class="nc">&nbsp;				this.ratingCount.put(ratingCount.getRating(), ratingCount.getCount());</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public long getNumberOfReviewsWithRating(Rating rating) {
+<b class="nc">&nbsp;			Long count = this.ratingCount.get(rating);</b>
+<b class="nc">&nbsp;			return (count != null) ? count : 0;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

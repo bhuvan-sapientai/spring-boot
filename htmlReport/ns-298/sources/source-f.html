@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MetaInfVersionsInfo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: MetaInfVersionsInfo (org.springframework.boot.loader.jar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MetaInfVersionsInfo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.jar;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.function.IntFunction;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.zip.ZipContent;
+&nbsp;
+&nbsp;/**
+&nbsp; * Info obtained from a {@link ZipContent} instance relating to the directories listed
+&nbsp; * under {@code META-INF/versions/}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;final class MetaInfVersionsInfo {
+&nbsp;
+<b class="nc">&nbsp;	static final MetaInfVersionsInfo NONE = new MetaInfVersionsInfo(Collections.emptySet());</b>
+&nbsp;
+&nbsp;	private static final String META_INF_VERSIONS = NestedJarFile.META_INF_VERSIONS;
+&nbsp;
+&nbsp;	private final int[] versions;
+&nbsp;
+&nbsp;	private final String[] directories;
+&nbsp;
+<b class="nc">&nbsp;	private MetaInfVersionsInfo(Set&lt;Integer&gt; versions) {</b>
+<b class="nc">&nbsp;		this.versions = versions.stream().mapToInt(Integer::intValue).toArray();</b>
+<b class="nc">&nbsp;		this.directories = versions.stream().map((version) -&gt; META_INF_VERSIONS + version + &quot;/&quot;).toArray(String[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the versions listed under {@code META-INF/versions/} in ascending order.
+&nbsp;	 * @return the versions
+&nbsp;	 */
+&nbsp;	int[] versions() {
+<b class="nc">&nbsp;		return this.versions;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the version directories in the same order as {@link #versions()}.
+&nbsp;	 * @return the version directories
+&nbsp;	 */
+&nbsp;	String[] directories() {
+<b class="nc">&nbsp;		return this.directories;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get {@link MetaInfVersionsInfo} for the given {@link ZipContent}.
+&nbsp;	 * @param zipContent the zip content
+&nbsp;	 * @return the {@link MetaInfVersionsInfo}.
+&nbsp;	 */
+&nbsp;	static MetaInfVersionsInfo get(ZipContent zipContent) {
+<b class="nc">&nbsp;		return get(zipContent.size(), zipContent::getEntry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get {@link MetaInfVersionsInfo} for the given details.
+&nbsp;	 * @param size the number of entries
+&nbsp;	 * @param entries a function to get an entry from an index
+&nbsp;	 * @return the {@link MetaInfVersionsInfo}.
+&nbsp;	 */
+&nbsp;	static MetaInfVersionsInfo get(int size, IntFunction&lt;ZipContent.Entry&gt; entries) {
+<b class="nc">&nbsp;		Set&lt;Integer&gt; versions = new TreeSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; size; i++) {</b>
+<b class="nc">&nbsp;			ZipContent.Entry contentEntry = entries.apply(i);</b>
+<b class="nc">&nbsp;			if (contentEntry.hasNameStartingWith(META_INF_VERSIONS) &amp;&amp; !contentEntry.isDirectory()) {</b>
+<b class="nc">&nbsp;				String name = contentEntry.getName();</b>
+<b class="nc">&nbsp;				int slash = name.indexOf(&#39;/&#39;, META_INF_VERSIONS.length());</b>
+<b class="nc">&nbsp;				String version = name.substring(META_INF_VERSIONS.length(), slash);</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					int versionNumber = Integer.parseInt(version);</b>
+<b class="nc">&nbsp;					if (versionNumber &gt;= NestedJarFile.BASE_VERSION) {</b>
+<b class="nc">&nbsp;						versions.add(versionNumber);</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				catch (NumberFormatException ex) {</b>
+&nbsp;					// Ignore
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return (!versions.isEmpty()) ? new MetaInfVersionsInfo(versions) : NONE;</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

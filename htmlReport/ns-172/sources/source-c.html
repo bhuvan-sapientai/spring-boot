@@ -1,0 +1,782 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Restarter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.restart</a>
+</div>
+
+<h1>Coverage Summary for Class: Restarter (org.springframework.boot.devtools.restart)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Restarter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/168)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Restarter$LeakSafeThread</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Restarter$LeakSafeThreadFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/190)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.restart;
+&nbsp;
+&nbsp;import java.beans.Introspector;
+&nbsp;import java.lang.Thread.UncaughtExceptionHandler;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.BlockingDeque;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import java.util.concurrent.LinkedBlockingDeque;
+&nbsp;import java.util.concurrent.ThreadFactory;
+&nbsp;import java.util.concurrent.locks.Lock;
+&nbsp;import java.util.concurrent.locks.ReentrantLock;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.CachedIntrospectionResults;
+&nbsp;import org.springframework.beans.factory.ObjectFactory;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.devtools.restart.FailureHandler.Outcome;
+&nbsp;import org.springframework.boot.devtools.restart.classloader.ClassLoaderFiles;
+&nbsp;import org.springframework.boot.devtools.restart.classloader.RestartClassLoader;
+&nbsp;import org.springframework.boot.logging.DeferredLog;
+&nbsp;import org.springframework.cglib.core.ClassNameReader;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.support.GenericApplicationContext;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.annotation.AnnotationUtils;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows a running application to be restarted with an updated classpath. The restarter
+&nbsp; * works by creating a new application ClassLoader that is split into two parts. The top
+&nbsp; * part contains static URLs that don&#39;t change (for example 3rd party libraries and Spring
+&nbsp; * Boot itself) and the bottom part contains URLs where classes and resources might be
+&nbsp; * updated.
+&nbsp; * &lt;p&gt;
+&nbsp; * The Restarter should be {@link #initialize(String[]) initialized} early to ensure that
+&nbsp; * classes are loaded multiple times. Mostly the {@link RestartApplicationListener} can be
+&nbsp; * relied upon to perform initialization, however, you may need to call
+&nbsp; * {@link #initialize(String[])} directly if your SpringApplication arguments are not
+&nbsp; * identical to your main method arguments.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, applications running in an IDE (i.e. those not packaged as &quot;uber jars&quot;)
+&nbsp; * will automatically detect URLs that can change. It&#39;s also possible to manually
+&nbsp; * configure URLs or class file updates for remote restart scenarios.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.3.0
+&nbsp; * @see RestartApplicationListener
+&nbsp; * @see #initialize(String[])
+&nbsp; * @see #getInstance()
+&nbsp; * @see #restart()
+&nbsp; */
+&nbsp;public class Restarter {
+&nbsp;
+<b class="nc">&nbsp;	private static final Object INSTANCE_MONITOR = new Object();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] NO_ARGS = {};</b>
+&nbsp;
+&nbsp;	private static Restarter instance;
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;URL&gt; urls = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final ClassLoaderFiles classLoaderFiles = new ClassLoaderFiles();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, Object&gt; attributes = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final BlockingDeque&lt;LeakSafeThread&gt; leakSafeThreads = new LinkedBlockingDeque&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Lock stopLock = new ReentrantLock();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Object monitor = new Object();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Log logger = new DeferredLog();</b>
+&nbsp;
+&nbsp;	private final boolean forceReferenceCleanup;
+&nbsp;
+<b class="nc">&nbsp;	private boolean enabled = true;</b>
+&nbsp;
+&nbsp;	private final URL[] initialUrls;
+&nbsp;
+&nbsp;	private final String mainClassName;
+&nbsp;
+&nbsp;	private final ClassLoader applicationClassLoader;
+&nbsp;
+&nbsp;	private final String[] args;
+&nbsp;
+&nbsp;	private final UncaughtExceptionHandler exceptionHandler;
+&nbsp;
+<b class="nc">&nbsp;	private boolean finished = false;</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;ConfigurableApplicationContext&gt; rootContexts = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Internal constructor to create a new {@link Restarter} instance.
+&nbsp;	 * @param thread the source thread
+&nbsp;	 * @param args the application arguments
+&nbsp;	 * @param forceReferenceCleanup if soft/weak reference cleanup should be forced
+&nbsp;	 * @param initializer the restart initializer
+&nbsp;	 * @see #initialize(String[])
+&nbsp;	 */
+<b class="nc">&nbsp;	protected Restarter(Thread thread, String[] args, boolean forceReferenceCleanup, RestartInitializer initializer) {</b>
+<b class="nc">&nbsp;		Assert.notNull(thread, &quot;Thread must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(args, &quot;Args must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(initializer, &quot;Initializer must not be null&quot;);</b>
+<b class="nc">&nbsp;		if (this.logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			this.logger.debug(&quot;Creating new Restarter for thread &quot; + thread);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		SilentExitExceptionHandler.setup(thread);</b>
+<b class="nc">&nbsp;		this.forceReferenceCleanup = forceReferenceCleanup;</b>
+<b class="nc">&nbsp;		this.initialUrls = initializer.getInitialUrls(thread);</b>
+<b class="nc">&nbsp;		this.mainClassName = getMainClassName(thread);</b>
+<b class="nc">&nbsp;		this.applicationClassLoader = thread.getContextClassLoader();</b>
+<b class="nc">&nbsp;		this.args = args;</b>
+<b class="nc">&nbsp;		this.exceptionHandler = thread.getUncaughtExceptionHandler();</b>
+<b class="nc">&nbsp;		this.leakSafeThreads.add(new LeakSafeThread());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getMainClassName(Thread thread) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return new MainMethod(thread).getDeclaringClassName();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void initialize(boolean restartOnInitialize) {
+<b class="nc">&nbsp;		preInitializeLeakyClasses();</b>
+<b class="nc">&nbsp;		if (this.initialUrls != null) {</b>
+<b class="nc">&nbsp;			this.urls.addAll(Arrays.asList(this.initialUrls));</b>
+<b class="nc">&nbsp;			if (restartOnInitialize) {</b>
+<b class="nc">&nbsp;				this.logger.debug(&quot;Immediately restarting application&quot;);</b>
+<b class="nc">&nbsp;				immediateRestart();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void immediateRestart() {
+&nbsp;		try {
+<b class="nc">&nbsp;			getLeakSafeThread().callAndWait(() -&gt; {</b>
+<b class="nc">&nbsp;				start(FailureHandler.NONE);</b>
+<b class="nc">&nbsp;				cleanupCaches();</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			});
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			this.logger.warn(&quot;Unable to initialize restarter&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		SilentExitExceptionHandler.exitCurrentThread();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * CGLIB has a private exception field which needs to initialized early to ensure that
+&nbsp;	 * the stacktrace doesn&#39;t retain a reference to the RestartClassLoader.
+&nbsp;	 */
+&nbsp;	private void preInitializeLeakyClasses() {
+&nbsp;		try {
+<b class="nc">&nbsp;			Class&lt;?&gt; readerClass = ClassNameReader.class;</b>
+<b class="nc">&nbsp;			Field field = readerClass.getDeclaredField(&quot;EARLY_EXIT&quot;);</b>
+<b class="nc">&nbsp;			field.setAccessible(true);</b>
+<b class="nc">&nbsp;			((Throwable) field.get(null)).fillInStackTrace();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			this.logger.warn(&quot;Unable to pre-initialize classes&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set if restart support is enabled.
+&nbsp;	 * @param enabled if restart support is enabled
+&nbsp;	 */
+&nbsp;	private void setEnabled(boolean enabled) {
+<b class="nc">&nbsp;		this.enabled = enabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add additional URLs to be includes in the next restart.
+&nbsp;	 * @param urls the urls to add
+&nbsp;	 */
+&nbsp;	public void addUrls(Collection&lt;URL&gt; urls) {
+<b class="nc">&nbsp;		Assert.notNull(urls, &quot;Urls must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.urls.addAll(urls);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add additional {@link ClassLoaderFiles} to be included in the next restart.
+&nbsp;	 * @param classLoaderFiles the files to add
+&nbsp;	 */
+&nbsp;	public void addClassLoaderFiles(ClassLoaderFiles classLoaderFiles) {
+<b class="nc">&nbsp;		Assert.notNull(classLoaderFiles, &quot;ClassLoaderFiles must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.classLoaderFiles.addAll(classLoaderFiles);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link ThreadFactory} that can be used to create leak safe threads.
+&nbsp;	 * @return a leak safe thread factory
+&nbsp;	 */
+&nbsp;	public ThreadFactory getThreadFactory() {
+<b class="nc">&nbsp;		return new LeakSafeThreadFactory();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Restart the running application.
+&nbsp;	 */
+&nbsp;	public void restart() {
+<b class="nc">&nbsp;		restart(FailureHandler.NONE);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Restart the running application.
+&nbsp;	 * @param failureHandler a failure handler to deal with application that doesn&#39;t start
+&nbsp;	 */
+&nbsp;	public void restart(FailureHandler failureHandler) {
+<b class="nc">&nbsp;		if (!this.enabled) {</b>
+<b class="nc">&nbsp;			this.logger.debug(&quot;Application restart is disabled&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		this.logger.debug(&quot;Restarting application&quot;);</b>
+<b class="nc">&nbsp;		getLeakSafeThread().call(() -&gt; {</b>
+<b class="nc">&nbsp;			Restarter.this.stop();</b>
+<b class="nc">&nbsp;			Restarter.this.start(failureHandler);</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Start the application.
+&nbsp;	 * @param failureHandler a failure handler for application that won&#39;t start
+&nbsp;	 * @throws Exception in case of errors
+&nbsp;	 */
+&nbsp;	protected void start(FailureHandler failureHandler) throws Exception {
+&nbsp;		do {
+<b class="nc">&nbsp;			Throwable error = doStart();</b>
+<b class="nc">&nbsp;			if (error == null) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			if (failureHandler.handle(error) == Outcome.ABORT) {</b>
+&nbsp;				return;
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		while (true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Throwable doStart() throws Exception {
+<b class="nc">&nbsp;		Assert.notNull(this.mainClassName, &quot;Unable to find the main class to restart&quot;);</b>
+<b class="nc">&nbsp;		URL[] urls = this.urls.toArray(new URL[0]);</b>
+<b class="nc">&nbsp;		ClassLoaderFiles updatedFiles = new ClassLoaderFiles(this.classLoaderFiles);</b>
+<b class="nc">&nbsp;		ClassLoader classLoader = new RestartClassLoader(this.applicationClassLoader, urls, updatedFiles);</b>
+<b class="nc">&nbsp;		if (this.logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			this.logger.debug(&quot;Starting application &quot; + this.mainClassName + &quot; with URLs &quot; + Arrays.asList(urls));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return relaunch(classLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Relaunch the application using the specified classloader.
+&nbsp;	 * @param classLoader the classloader to use
+&nbsp;	 * @return any exception that caused the launch to fail or {@code null}
+&nbsp;	 * @throws Exception in case of errors
+&nbsp;	 */
+&nbsp;	protected Throwable relaunch(ClassLoader classLoader) throws Exception {
+<b class="nc">&nbsp;		RestartLauncher launcher = new RestartLauncher(classLoader, this.mainClassName, this.args,</b>
+&nbsp;				this.exceptionHandler);
+<b class="nc">&nbsp;		launcher.start();</b>
+<b class="nc">&nbsp;		launcher.join();</b>
+<b class="nc">&nbsp;		return launcher.getError();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Stop the application.
+&nbsp;	 * @throws Exception in case of errors
+&nbsp;	 */
+&nbsp;	protected void stop() throws Exception {
+<b class="nc">&nbsp;		this.logger.debug(&quot;Stopping application&quot;);</b>
+<b class="nc">&nbsp;		this.stopLock.lock();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			for (ConfigurableApplicationContext context : this.rootContexts) {</b>
+<b class="nc">&nbsp;				context.close();</b>
+<b class="nc">&nbsp;				this.rootContexts.remove(context);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			cleanupCaches();</b>
+<b class="nc">&nbsp;			if (this.forceReferenceCleanup) {</b>
+<b class="nc">&nbsp;				forceReferenceCleanup();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;		finally {
+<b class="nc">&nbsp;			this.stopLock.unlock();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		System.gc();</b>
+<b class="nc">&nbsp;		System.runFinalization();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void cleanupCaches() {
+<b class="nc">&nbsp;		Introspector.flushCaches();</b>
+<b class="nc">&nbsp;		cleanupKnownCaches();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void cleanupKnownCaches() {
+&nbsp;		// Whilst not strictly necessary it helps to clean up soft reference caches
+&nbsp;		// early rather than waiting for memory limits to be reached
+<b class="nc">&nbsp;		ResolvableType.clearCache();</b>
+<b class="nc">&nbsp;		cleanCachedIntrospectionResultsCache();</b>
+<b class="nc">&nbsp;		ReflectionUtils.clearCache();</b>
+<b class="nc">&nbsp;		clearAnnotationUtilsCache();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void cleanCachedIntrospectionResultsCache() {
+<b class="nc">&nbsp;		clear(CachedIntrospectionResults.class, &quot;acceptedClassLoaders&quot;);</b>
+<b class="nc">&nbsp;		clear(CachedIntrospectionResults.class, &quot;strongClassCache&quot;);</b>
+<b class="nc">&nbsp;		clear(CachedIntrospectionResults.class, &quot;softClassCache&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void clearAnnotationUtilsCache() {
+&nbsp;		try {
+<b class="nc">&nbsp;			AnnotationUtils.clearCache();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			clear(AnnotationUtils.class, &quot;findAnnotationCache&quot;);</b>
+<b class="nc">&nbsp;			clear(AnnotationUtils.class, &quot;annotatedInterfaceCache&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void clear(Class&lt;?&gt; type, String fieldName) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Field field = type.getDeclaredField(fieldName);</b>
+<b class="nc">&nbsp;			field.setAccessible(true);</b>
+<b class="nc">&nbsp;			Object instance = field.get(null);</b>
+<b class="nc">&nbsp;			if (instance instanceof Set) {</b>
+<b class="nc">&nbsp;				((Set&lt;?&gt;) instance).clear();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (instance instanceof Map) {</b>
+<b class="nc">&nbsp;				((Map&lt;?, ?&gt;) instance).keySet().removeIf(this::isFromRestartClassLoader);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			if (this.logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;				this.logger.debug(&quot;Unable to clear field &quot; + type + &quot; &quot; + fieldName, ex);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isFromRestartClassLoader(Object object) {
+<b class="nc">&nbsp;		return (object instanceof Class &amp;&amp; ((Class&lt;?&gt;) object).getClassLoader() instanceof RestartClassLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Cleanup any soft/weak references by forcing an {@link OutOfMemoryError} error.
+&nbsp;	 */
+&nbsp;	private void forceReferenceCleanup() {
+&nbsp;		try {
+<b class="nc">&nbsp;			final List&lt;long[]&gt; memory = new LinkedList&lt;&gt;();</b>
+&nbsp;			while (true) {
+<b class="nc">&nbsp;				memory.add(new long[102400]);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (OutOfMemoryError ex) {</b>
+&nbsp;			// Expected
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Called to finish {@link Restarter} initialization when application logging is
+&nbsp;	 * available.
+&nbsp;	 */
+&nbsp;	void finish() {
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			if (!isFinished()) {</b>
+<b class="nc">&nbsp;				this.logger = DeferredLog.replay(this.logger, LogFactory.getLog(getClass()));</b>
+<b class="nc">&nbsp;				this.finished = true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isFinished() {
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			return this.finished;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void prepare(ConfigurableApplicationContext applicationContext) {
+<b class="nc">&nbsp;		if (!this.enabled || (applicationContext != null &amp;&amp; applicationContext.getParent() != null)) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		if (applicationContext instanceof GenericApplicationContext genericContext) {</b>
+<b class="nc">&nbsp;			prepare(genericContext);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.rootContexts.add(applicationContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void remove(ConfigurableApplicationContext applicationContext) {
+<b class="nc">&nbsp;		if (applicationContext != null) {</b>
+<b class="nc">&nbsp;			this.rootContexts.remove(applicationContext);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void prepare(GenericApplicationContext applicationContext) {
+<b class="nc">&nbsp;		ResourceLoader resourceLoader = new ClassLoaderFilesResourcePatternResolver(applicationContext,</b>
+&nbsp;				this.classLoaderFiles);
+<b class="nc">&nbsp;		applicationContext.setResourceLoader(resourceLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private LeakSafeThread getLeakSafeThread() {
+&nbsp;		try {
+<b class="nc">&nbsp;			return this.leakSafeThreads.takeFirst();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;			Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public Object getOrAddAttribute(String name, final ObjectFactory&lt;?&gt; objectFactory) {
+<b class="nc">&nbsp;		return this.attributes.computeIfAbsent(name, (ignore) -&gt; objectFactory.getObject());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Object removeAttribute(String name) {
+<b class="nc">&nbsp;		return this.attributes.remove(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the initial set of URLs as configured by the {@link RestartInitializer}.
+&nbsp;	 * @return the initial URLs or {@code null}
+&nbsp;	 */
+&nbsp;	public URL[] getInitialUrls() {
+<b class="nc">&nbsp;		return this.initialUrls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize and disable restart support.
+&nbsp;	 */
+&nbsp;	public static void disable() {
+<b class="nc">&nbsp;		initialize(NO_ARGS, false, RestartInitializer.NONE);</b>
+<b class="nc">&nbsp;		getInstance().setEnabled(false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize restart support. See
+&nbsp;	 * {@link #initialize(String[], boolean, RestartInitializer)} for details.
+&nbsp;	 * @param args main application arguments
+&nbsp;	 * @see #initialize(String[], boolean, RestartInitializer)
+&nbsp;	 */
+&nbsp;	public static void initialize(String[] args) {
+<b class="nc">&nbsp;		initialize(args, false, new DefaultRestartInitializer());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize restart support. See
+&nbsp;	 * {@link #initialize(String[], boolean, RestartInitializer)} for details.
+&nbsp;	 * @param args main application arguments
+&nbsp;	 * @param initializer the restart initializer
+&nbsp;	 * @see #initialize(String[], boolean, RestartInitializer)
+&nbsp;	 */
+&nbsp;	public static void initialize(String[] args, RestartInitializer initializer) {
+<b class="nc">&nbsp;		initialize(args, false, initializer, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize restart support. See
+&nbsp;	 * {@link #initialize(String[], boolean, RestartInitializer)} for details.
+&nbsp;	 * @param args main application arguments
+&nbsp;	 * @param forceReferenceCleanup if forcing of soft/weak reference should happen on
+&nbsp;	 * @see #initialize(String[], boolean, RestartInitializer)
+&nbsp;	 */
+&nbsp;	public static void initialize(String[] args, boolean forceReferenceCleanup) {
+<b class="nc">&nbsp;		initialize(args, forceReferenceCleanup, new DefaultRestartInitializer());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize restart support. See
+&nbsp;	 * {@link #initialize(String[], boolean, RestartInitializer, boolean)} for details.
+&nbsp;	 * @param args main application arguments
+&nbsp;	 * @param forceReferenceCleanup if forcing of soft/weak reference should happen on
+&nbsp;	 * @param initializer the restart initializer
+&nbsp;	 * @see #initialize(String[], boolean, RestartInitializer)
+&nbsp;	 */
+&nbsp;	public static void initialize(String[] args, boolean forceReferenceCleanup, RestartInitializer initializer) {
+<b class="nc">&nbsp;		initialize(args, forceReferenceCleanup, initializer, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize restart support for the current application. Called automatically by
+&nbsp;	 * {@link RestartApplicationListener} but can also be called directly if main
+&nbsp;	 * application arguments are not the same as those passed to the
+&nbsp;	 * {@link SpringApplication}.
+&nbsp;	 * @param args main application arguments
+&nbsp;	 * @param forceReferenceCleanup if forcing of soft/weak reference should happen on
+&nbsp;	 * each restart. This will slow down restarts and is intended primarily for testing
+&nbsp;	 * @param initializer the restart initializer
+&nbsp;	 * @param restartOnInitialize if the restarter should be restarted immediately when
+&nbsp;	 * the {@link RestartInitializer} returns non {@code null} results
+&nbsp;	 */
+&nbsp;	public static void initialize(String[] args, boolean forceReferenceCleanup, RestartInitializer initializer,
+&nbsp;			boolean restartOnInitialize) {
+<b class="nc">&nbsp;		Restarter localInstance = null;</b>
+<b class="nc">&nbsp;		synchronized (INSTANCE_MONITOR) {</b>
+<b class="nc">&nbsp;			if (instance == null) {</b>
+<b class="nc">&nbsp;				localInstance = new Restarter(Thread.currentThread(), args, forceReferenceCleanup, initializer);</b>
+<b class="nc">&nbsp;				instance = localInstance;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (localInstance != null) {</b>
+<b class="nc">&nbsp;			localInstance.initialize(restartOnInitialize);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the active {@link Restarter} instance. Cannot be called before
+&nbsp;	 * {@link #initialize(String[]) initialization}.
+&nbsp;	 * @return the restarter
+&nbsp;	 */
+&nbsp;	public static Restarter getInstance() {
+<b class="nc">&nbsp;		synchronized (INSTANCE_MONITOR) {</b>
+<b class="nc">&nbsp;			Assert.state(instance != null, &quot;Restarter has not been initialized&quot;);</b>
+<b class="nc">&nbsp;			return instance;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the restarter instance (useful for testing).
+&nbsp;	 * @param instance the instance to set
+&nbsp;	 */
+&nbsp;	static void setInstance(Restarter instance) {
+<b class="nc">&nbsp;		synchronized (INSTANCE_MONITOR) {</b>
+<b class="nc">&nbsp;			Restarter.instance = instance;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clear the instance. Primarily provided for tests and not usually used in
+&nbsp;	 * application code.
+&nbsp;	 */
+&nbsp;	public static void clearInstance() {
+<b class="nc">&nbsp;		synchronized (INSTANCE_MONITOR) {</b>
+<b class="nc">&nbsp;			instance = null;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Thread that is created early so not to retain the {@link RestartClassLoader}.
+&nbsp;	 */
+&nbsp;	private class LeakSafeThread extends Thread {
+&nbsp;
+&nbsp;		private Callable&lt;?&gt; callable;
+&nbsp;
+&nbsp;		private Object result;
+&nbsp;
+<b class="nc">&nbsp;		LeakSafeThread() {</b>
+<b class="nc">&nbsp;			setDaemon(false);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void call(Callable&lt;?&gt; callable) {
+<b class="nc">&nbsp;			this.callable = callable;</b>
+<b class="nc">&nbsp;			start();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		&lt;V&gt; V callAndWait(Callable&lt;V&gt; callable) {
+<b class="nc">&nbsp;			this.callable = callable;</b>
+<b class="nc">&nbsp;			start();</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				join();</b>
+<b class="nc">&nbsp;				return (V) this.result;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(ex);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void run() {
+&nbsp;			// We are safe to refresh the ActionThread (and indirectly call
+&nbsp;			// AccessController.getContext()) since our stack doesn&#39;t include the
+&nbsp;			// RestartClassLoader
+&nbsp;			try {
+<b class="nc">&nbsp;				Restarter.this.leakSafeThreads.put(new LeakSafeThread());</b>
+<b class="nc">&nbsp;				this.result = this.callable.call();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				ex.printStackTrace();</b>
+<b class="nc">&nbsp;				System.exit(1);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ThreadFactory} that creates a leak safe thread.
+&nbsp;	 */
+<b class="nc">&nbsp;	private final class LeakSafeThreadFactory implements ThreadFactory {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Thread newThread(Runnable runnable) {
+<b class="nc">&nbsp;			return getLeakSafeThread().callAndWait(() -&gt; {</b>
+<b class="nc">&nbsp;				Thread thread = new Thread(runnable);</b>
+<b class="nc">&nbsp;				thread.setContextClassLoader(Restarter.this.applicationClassLoader);</b>
+<b class="nc">&nbsp;				return thread;</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

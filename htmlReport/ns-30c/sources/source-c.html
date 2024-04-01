@@ -1,0 +1,571 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TomcatReactiveWebServerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.tomcat</a>
+</div>
+
+<h1>Coverage Summary for Class: TomcatReactiveWebServerFactory (org.springframework.boot.web.embedded.tomcat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TomcatReactiveWebServerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/130)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.tomcat;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.apache.catalina.Context;
+&nbsp;import org.apache.catalina.Engine;
+&nbsp;import org.apache.catalina.Executor;
+&nbsp;import org.apache.catalina.Host;
+&nbsp;import org.apache.catalina.LifecycleListener;
+&nbsp;import org.apache.catalina.Valve;
+&nbsp;import org.apache.catalina.connector.Connector;
+&nbsp;import org.apache.catalina.core.AprLifecycleListener;
+&nbsp;import org.apache.catalina.loader.WebappLoader;
+&nbsp;import org.apache.catalina.startup.Tomcat;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import org.apache.coyote.AbstractProtocol;
+&nbsp;import org.apache.coyote.ProtocolHandler;
+&nbsp;import org.apache.coyote.http2.Http2Protocol;
+&nbsp;import org.apache.tomcat.util.modeler.Registry;
+&nbsp;import org.apache.tomcat.util.scan.StandardJarScanFilter;
+&nbsp;
+&nbsp;import org.springframework.boot.util.LambdaSafe;
+&nbsp;import org.springframework.boot.web.reactive.server.AbstractReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.Ssl;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.http.server.reactive.HttpHandler;
+&nbsp;import org.springframework.http.server.reactive.TomcatHttpHandlerAdapter;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ReactiveWebServerFactory} that can be used to create a {@link TomcatWebServer}.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author HaiTao Zhang
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class TomcatReactiveWebServerFactory extends AbstractReactiveWebServerFactory
+&nbsp;		implements ConfigurableTomcatWebServerFactory {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(TomcatReactiveWebServerFactory.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The class name of default protocol used.
+&nbsp;	 */
+&nbsp;	public static final String DEFAULT_PROTOCOL = &quot;org.apache.coyote.http11.Http11NioProtocol&quot;;
+&nbsp;
+&nbsp;	private File baseDirectory;
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;Valve&gt; engineValves = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private List&lt;LifecycleListener&gt; contextLifecycleListeners = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;LifecycleListener&gt; serverLifecycleListeners = getDefaultServerLifecycleListeners();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;TomcatContextCustomizer&gt; tomcatContextCustomizers = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;TomcatConnectorCustomizer&gt; tomcatConnectorCustomizers = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;TomcatProtocolHandlerCustomizer&lt;?&gt;&gt; tomcatProtocolHandlerCustomizers = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;Connector&gt; additionalTomcatConnectors = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private String protocol = DEFAULT_PROTOCOL;</b>
+&nbsp;
+<b class="nc">&nbsp;	private Charset uriEncoding = DEFAULT_CHARSET;</b>
+&nbsp;
+&nbsp;	private int backgroundProcessorDelay;
+&nbsp;
+<b class="nc">&nbsp;	private boolean disableMBeanRegistry = true;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link TomcatReactiveWebServerFactory} instance.
+&nbsp;	 */
+<b class="nc">&nbsp;	public TomcatReactiveWebServerFactory() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link TomcatReactiveWebServerFactory} that listens for requests using
+&nbsp;	 * the specified port.
+&nbsp;	 * @param port the port to listen on
+&nbsp;	 */
+&nbsp;	public TomcatReactiveWebServerFactory(int port) {
+<b class="nc">&nbsp;		super(port);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;LifecycleListener&gt; getDefaultServerLifecycleListeners() {
+<b class="nc">&nbsp;		AprLifecycleListener aprLifecycleListener = new AprLifecycleListener();</b>
+<b class="nc">&nbsp;		return AprLifecycleListener.isAprAvailable() ? new ArrayList&lt;&gt;(Arrays.asList(aprLifecycleListener))</b>
+<b class="nc">&nbsp;				: new ArrayList&lt;&gt;();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public WebServer getWebServer(HttpHandler httpHandler) {
+<b class="nc">&nbsp;		if (this.disableMBeanRegistry) {</b>
+<b class="nc">&nbsp;			Registry.disableRegistry();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Tomcat tomcat = new Tomcat();</b>
+<b class="nc">&nbsp;		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir(&quot;tomcat&quot;);</b>
+<b class="nc">&nbsp;		tomcat.setBaseDir(baseDir.getAbsolutePath());</b>
+<b class="nc">&nbsp;		for (LifecycleListener listener : this.serverLifecycleListeners) {</b>
+<b class="nc">&nbsp;			tomcat.getServer().addLifecycleListener(listener);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		Connector connector = new Connector(this.protocol);</b>
+<b class="nc">&nbsp;		connector.setThrowOnFailure(true);</b>
+<b class="nc">&nbsp;		tomcat.getService().addConnector(connector);</b>
+<b class="nc">&nbsp;		customizeConnector(connector);</b>
+<b class="nc">&nbsp;		tomcat.setConnector(connector);</b>
+<b class="nc">&nbsp;		registerConnectorExecutor(tomcat, connector);</b>
+<b class="nc">&nbsp;		tomcat.getHost().setAutoDeploy(false);</b>
+<b class="nc">&nbsp;		configureEngine(tomcat.getEngine());</b>
+<b class="nc">&nbsp;		for (Connector additionalConnector : this.additionalTomcatConnectors) {</b>
+<b class="nc">&nbsp;			tomcat.getService().addConnector(additionalConnector);</b>
+<b class="nc">&nbsp;			registerConnectorExecutor(tomcat, additionalConnector);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		TomcatHttpHandlerAdapter servlet = new TomcatHttpHandlerAdapter(httpHandler);</b>
+<b class="nc">&nbsp;		prepareContext(tomcat.getHost(), servlet);</b>
+<b class="nc">&nbsp;		return getTomcatWebServer(tomcat);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerConnectorExecutor(Tomcat tomcat, Connector connector) {
+<b class="nc">&nbsp;		if (connector.getProtocolHandler().getExecutor() instanceof Executor executor) {</b>
+<b class="nc">&nbsp;			tomcat.getService().addExecutor(executor);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureEngine(Engine engine) {
+<b class="nc">&nbsp;		engine.setBackgroundProcessorDelay(this.backgroundProcessorDelay);</b>
+<b class="nc">&nbsp;		for (Valve valve : this.engineValves) {</b>
+<b class="nc">&nbsp;			engine.getPipeline().addValve(valve);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void prepareContext(Host host, TomcatHttpHandlerAdapter servlet) {
+<b class="nc">&nbsp;		File docBase = createTempDir(&quot;tomcat-docbase&quot;);</b>
+<b class="nc">&nbsp;		TomcatEmbeddedContext context = new TomcatEmbeddedContext();</b>
+<b class="nc">&nbsp;		context.setPath(&quot;&quot;);</b>
+<b class="nc">&nbsp;		context.setDocBase(docBase.getAbsolutePath());</b>
+<b class="nc">&nbsp;		context.addLifecycleListener(new Tomcat.FixContextListener());</b>
+<b class="nc">&nbsp;		ClassLoader parentClassLoader = ClassUtils.getDefaultClassLoader();</b>
+<b class="nc">&nbsp;		context.setParentClassLoader(parentClassLoader);</b>
+<b class="nc">&nbsp;		skipAllTldScanning(context);</b>
+<b class="nc">&nbsp;		WebappLoader loader = new WebappLoader();</b>
+<b class="nc">&nbsp;		loader.setLoaderInstance(new TomcatEmbeddedWebappClassLoader(parentClassLoader));</b>
+<b class="nc">&nbsp;		loader.setDelegate(true);</b>
+<b class="nc">&nbsp;		context.setLoader(loader);</b>
+<b class="nc">&nbsp;		Tomcat.addServlet(context, &quot;httpHandlerServlet&quot;, servlet).setAsyncSupported(true);</b>
+<b class="nc">&nbsp;		context.addServletMappingDecoded(&quot;/&quot;, &quot;httpHandlerServlet&quot;);</b>
+<b class="nc">&nbsp;		host.addChild(context);</b>
+<b class="nc">&nbsp;		configureContext(context);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void skipAllTldScanning(TomcatEmbeddedContext context) {
+<b class="nc">&nbsp;		StandardJarScanFilter filter = new StandardJarScanFilter();</b>
+<b class="nc">&nbsp;		filter.setTldSkip(&quot;*.jar&quot;);</b>
+<b class="nc">&nbsp;		context.getJarScanner().setJarScanFilter(filter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the Tomcat {@link Context}.
+&nbsp;	 * @param context the Tomcat context
+&nbsp;	 */
+&nbsp;	protected void configureContext(Context context) {
+<b class="nc">&nbsp;		this.contextLifecycleListeners.forEach(context::addLifecycleListener);</b>
+<b class="nc">&nbsp;		new DisableReferenceClearingContextCustomizer().customize(context);</b>
+<b class="nc">&nbsp;		this.tomcatContextCustomizers.forEach((customizer) -&gt; customizer.customize(context));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void customizeConnector(Connector connector) {
+<b class="nc">&nbsp;		int port = Math.max(getPort(), 0);</b>
+<b class="nc">&nbsp;		connector.setPort(port);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(getServerHeader())) {</b>
+<b class="nc">&nbsp;			connector.setProperty(&quot;server&quot;, getServerHeader());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (connector.getProtocolHandler() instanceof AbstractProtocol) {</b>
+<b class="nc">&nbsp;			customizeProtocol((AbstractProtocol&lt;?&gt;) connector.getProtocolHandler());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		invokeProtocolHandlerCustomizers(connector.getProtocolHandler());</b>
+<b class="nc">&nbsp;		if (getUriEncoding() != null) {</b>
+<b class="nc">&nbsp;			connector.setURIEncoding(getUriEncoding().name());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (getHttp2() != null &amp;&amp; getHttp2().isEnabled()) {</b>
+<b class="nc">&nbsp;			connector.addUpgradeProtocol(new Http2Protocol());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (Ssl.isEnabled(getSsl())) {</b>
+<b class="nc">&nbsp;			customizeSsl(connector);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		TomcatConnectorCustomizer compression = new CompressionConnectorCustomizer(getCompression());</b>
+<b class="nc">&nbsp;		compression.customize(connector);</b>
+<b class="nc">&nbsp;		for (TomcatConnectorCustomizer customizer : this.tomcatConnectorCustomizers) {</b>
+<b class="nc">&nbsp;			customizer.customize(connector);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private void invokeProtocolHandlerCustomizers(ProtocolHandler protocolHandler) {
+<b class="nc">&nbsp;		LambdaSafe</b>
+<b class="nc">&nbsp;			.callbacks(TomcatProtocolHandlerCustomizer.class, this.tomcatProtocolHandlerCustomizers, protocolHandler)</b>
+<b class="nc">&nbsp;			.invoke((customizer) -&gt; customizer.customize(protocolHandler));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeProtocol(AbstractProtocol&lt;?&gt; protocol) {
+<b class="nc">&nbsp;		if (getAddress() != null) {</b>
+<b class="nc">&nbsp;			protocol.setAddress(getAddress());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeSsl(Connector connector) {
+<b class="nc">&nbsp;		SslConnectorCustomizer customizer = new SslConnectorCustomizer(logger, connector, getSsl().getClientAuth());</b>
+<b class="nc">&nbsp;		customizer.customize(getSslBundle());</b>
+<b class="nc">&nbsp;		String sslBundleName = getSsl().getBundle();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(sslBundleName)) {</b>
+<b class="nc">&nbsp;			getSslBundles().addBundleUpdateHandler(sslBundleName, customizer::update);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBaseDirectory(File baseDirectory) {
+<b class="nc">&nbsp;		this.baseDirectory = baseDirectory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBackgroundProcessorDelay(int delay) {
+<b class="nc">&nbsp;		this.backgroundProcessorDelay = delay;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link TomcatContextCustomizer}s that should be applied to the Tomcat
+&nbsp;	 * {@link Context}. Calling this method will replace any existing customizers.
+&nbsp;	 * @param tomcatContextCustomizers the customizers to set
+&nbsp;	 */
+&nbsp;	public void setTomcatContextCustomizers(Collection&lt;? extends TomcatContextCustomizer&gt; tomcatContextCustomizers) {
+<b class="nc">&nbsp;		Assert.notNull(tomcatContextCustomizers, &quot;TomcatContextCustomizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.tomcatContextCustomizers = new LinkedHashSet&lt;&gt;(tomcatContextCustomizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link TomcatContextCustomizer}s that will be
+&nbsp;	 * applied to the Tomcat {@link Context}.
+&nbsp;	 * @return the listeners that will be applied
+&nbsp;	 */
+&nbsp;	public Collection&lt;TomcatContextCustomizer&gt; getTomcatContextCustomizers() {
+<b class="nc">&nbsp;		return this.tomcatContextCustomizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link TomcatContextCustomizer}s that should be added to the Tomcat
+&nbsp;	 * {@link Context}.
+&nbsp;	 * @param tomcatContextCustomizers the customizers to add
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void addContextCustomizers(TomcatContextCustomizer... tomcatContextCustomizers) {
+<b class="nc">&nbsp;		Assert.notNull(tomcatContextCustomizers, &quot;TomcatContextCustomizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.tomcatContextCustomizers.addAll(Arrays.asList(tomcatContextCustomizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link TomcatConnectorCustomizer}s that should be applied to the Tomcat
+&nbsp;	 * {@link Connector}. Calling this method will replace any existing customizers.
+&nbsp;	 * @param tomcatConnectorCustomizers the customizers to set
+&nbsp;	 */
+&nbsp;	public void setTomcatConnectorCustomizers(
+&nbsp;			Collection&lt;? extends TomcatConnectorCustomizer&gt; tomcatConnectorCustomizers) {
+<b class="nc">&nbsp;		Assert.notNull(tomcatConnectorCustomizers, &quot;TomcatConnectorCustomizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.tomcatConnectorCustomizers = new LinkedHashSet&lt;&gt;(tomcatConnectorCustomizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link TomcatConnectorCustomizer}s that should be added to the Tomcat
+&nbsp;	 * {@link Connector}.
+&nbsp;	 * @param tomcatConnectorCustomizers the customizers to add
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void addConnectorCustomizers(TomcatConnectorCustomizer... tomcatConnectorCustomizers) {
+<b class="nc">&nbsp;		Assert.notNull(tomcatConnectorCustomizers, &quot;TomcatConnectorCustomizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.tomcatConnectorCustomizers.addAll(Arrays.asList(tomcatConnectorCustomizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link TomcatConnectorCustomizer}s that will be
+&nbsp;	 * applied to the Tomcat {@link Connector}.
+&nbsp;	 * @return the customizers that will be applied
+&nbsp;	 */
+&nbsp;	public Collection&lt;TomcatConnectorCustomizer&gt; getTomcatConnectorCustomizers() {
+<b class="nc">&nbsp;		return this.tomcatConnectorCustomizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link TomcatProtocolHandlerCustomizer}s that should be applied to the Tomcat
+&nbsp;	 * {@link Connector}. Calling this method will replace any existing customizers.
+&nbsp;	 * @param tomcatProtocolHandlerCustomizers the customizers to set
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public void setTomcatProtocolHandlerCustomizers(
+&nbsp;			Collection&lt;? extends TomcatProtocolHandlerCustomizer&lt;?&gt;&gt; tomcatProtocolHandlerCustomizers) {
+<b class="nc">&nbsp;		Assert.notNull(tomcatProtocolHandlerCustomizers, &quot;TomcatProtocolHandlerCustomizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.tomcatProtocolHandlerCustomizers = new LinkedHashSet&lt;&gt;(tomcatProtocolHandlerCustomizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link TomcatProtocolHandlerCustomizer}s that should be added to the Tomcat
+&nbsp;	 * {@link Connector}.
+&nbsp;	 * @param tomcatProtocolHandlerCustomizers the customizers to add
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void addProtocolHandlerCustomizers(TomcatProtocolHandlerCustomizer&lt;?&gt;... tomcatProtocolHandlerCustomizers) {
+<b class="nc">&nbsp;		Assert.notNull(tomcatProtocolHandlerCustomizers, &quot;TomcatProtocolHandlerCustomizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.tomcatProtocolHandlerCustomizers.addAll(Arrays.asList(tomcatProtocolHandlerCustomizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link TomcatProtocolHandlerCustomizer}s that
+&nbsp;	 * will be applied to the Tomcat {@link Connector}.
+&nbsp;	 * @return the customizers that will be applied
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public Collection&lt;TomcatProtocolHandlerCustomizer&lt;?&gt;&gt; getTomcatProtocolHandlerCustomizers() {
+<b class="nc">&nbsp;		return this.tomcatProtocolHandlerCustomizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link Connector}s in addition to the default connector, e.g. for SSL or AJP.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * {@link #getTomcatConnectorCustomizers Connector customizers} are not applied to
+&nbsp;	 * connectors added this way.
+&nbsp;	 * @param connectors the connectors to add
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public void addAdditionalTomcatConnectors(Connector... connectors) {
+<b class="nc">&nbsp;		Assert.notNull(connectors, &quot;Connectors must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.additionalTomcatConnectors.addAll(Arrays.asList(connectors));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link Connector}s that will be added to the
+&nbsp;	 * Tomcat.
+&nbsp;	 * @return the additionalTomcatConnectors
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public List&lt;Connector&gt; getAdditionalTomcatConnectors() {
+<b class="nc">&nbsp;		return this.additionalTomcatConnectors;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addEngineValves(Valve... engineValves) {
+<b class="nc">&nbsp;		Assert.notNull(engineValves, &quot;Valves must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.engineValves.addAll(Arrays.asList(engineValves));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link Valve}s that will be applied to the
+&nbsp;	 * Tomcat {@link Engine}.
+&nbsp;	 * @return the engine valves that will be applied
+&nbsp;	 */
+&nbsp;	public List&lt;Valve&gt; getEngineValves() {
+<b class="nc">&nbsp;		return this.engineValves;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the character encoding to use for URL decoding. If not specified &#39;UTF-8&#39; will
+&nbsp;	 * be used.
+&nbsp;	 * @param uriEncoding the uri encoding to set
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void setUriEncoding(Charset uriEncoding) {
+<b class="nc">&nbsp;		this.uriEncoding = uriEncoding;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the character encoding to use for URL decoding.
+&nbsp;	 * @return the URI encoding
+&nbsp;	 */
+&nbsp;	public Charset getUriEncoding() {
+<b class="nc">&nbsp;		return this.uriEncoding;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link LifecycleListener}s that should be applied to the Tomcat
+&nbsp;	 * {@link Context}. Calling this method will replace any existing listeners.
+&nbsp;	 * @param contextLifecycleListeners the listeners to set
+&nbsp;	 */
+&nbsp;	public void setContextLifecycleListeners(Collection&lt;? extends LifecycleListener&gt; contextLifecycleListeners) {
+<b class="nc">&nbsp;		Assert.notNull(contextLifecycleListeners, &quot;ContextLifecycleListeners must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.contextLifecycleListeners = new ArrayList&lt;&gt;(contextLifecycleListeners);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link LifecycleListener}s that will be applied
+&nbsp;	 * to the Tomcat {@link Context}.
+&nbsp;	 * @return the context lifecycle listeners that will be applied
+&nbsp;	 */
+&nbsp;	public Collection&lt;LifecycleListener&gt; getContextLifecycleListeners() {
+<b class="nc">&nbsp;		return this.contextLifecycleListeners;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link LifecycleListener}s that should be added to the Tomcat {@link Context}.
+&nbsp;	 * @param contextLifecycleListeners the listeners to add
+&nbsp;	 */
+&nbsp;	public void addContextLifecycleListeners(LifecycleListener... contextLifecycleListeners) {
+<b class="nc">&nbsp;		Assert.notNull(contextLifecycleListeners, &quot;ContextLifecycleListeners must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.contextLifecycleListeners.addAll(Arrays.asList(contextLifecycleListeners));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method called to create the {@link TomcatWebServer}. Subclasses can
+&nbsp;	 * override this method to return a different {@link TomcatWebServer} or apply
+&nbsp;	 * additional processing to the Tomcat server.
+&nbsp;	 * @param tomcat the Tomcat server.
+&nbsp;	 * @return a new {@link TomcatWebServer} instance
+&nbsp;	 */
+&nbsp;	protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
+<b class="nc">&nbsp;		return new TomcatWebServer(tomcat, getPort() &gt;= 0, getShutdown());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The Tomcat protocol to use when create the {@link Connector}.
+&nbsp;	 * @param protocol the protocol
+&nbsp;	 * @see Connector#Connector(String)
+&nbsp;	 */
+&nbsp;	public void setProtocol(String protocol) {
+<b class="nc">&nbsp;		Assert.hasLength(protocol, &quot;Protocol must not be empty&quot;);</b>
+<b class="nc">&nbsp;		this.protocol = protocol;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set whether the factory should disable Tomcat&#39;s MBean registry prior to creating
+&nbsp;	 * the server.
+&nbsp;	 * @param disableMBeanRegistry whether to disable the MBean registry
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public void setDisableMBeanRegistry(boolean disableMBeanRegistry) {
+<b class="nc">&nbsp;		this.disableMBeanRegistry = disableMBeanRegistry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CouchbaseDataConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.data.couchbase</a>
+</div>
+
+<h1>Coverage Summary for Class: CouchbaseDataConfiguration (org.springframework.boot.autoconfigure.data.couchbase)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CouchbaseDataConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.data.couchbase;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.domain.EntityScanner;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.data.couchbase.config.BeanNames;
+&nbsp;import org.springframework.data.couchbase.core.convert.CouchbaseCustomConversions;
+&nbsp;import org.springframework.data.couchbase.core.convert.MappingCouchbaseConverter;
+&nbsp;import org.springframework.data.couchbase.core.convert.translation.JacksonTranslationService;
+&nbsp;import org.springframework.data.couchbase.core.convert.translation.TranslationService;
+&nbsp;import org.springframework.data.couchbase.core.mapping.CouchbaseMappingContext;
+&nbsp;import org.springframework.data.couchbase.core.mapping.Document;
+&nbsp;import org.springframework.data.mapping.model.FieldNamingStrategy;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration for Spring Data&#39;s couchbase support.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;@Configuration(proxyBeanMethods = false)
+<b class="nc">&nbsp;class CouchbaseDataConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	MappingCouchbaseConverter couchbaseMappingConverter(CouchbaseDataProperties properties,
+&nbsp;			CouchbaseMappingContext couchbaseMappingContext, CouchbaseCustomConversions couchbaseCustomConversions) {
+<b class="nc">&nbsp;		MappingCouchbaseConverter converter = new MappingCouchbaseConverter(couchbaseMappingContext,</b>
+<b class="nc">&nbsp;				properties.getTypeKey());</b>
+<b class="nc">&nbsp;		converter.setCustomConversions(couchbaseCustomConversions);</b>
+<b class="nc">&nbsp;		return converter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	TranslationService couchbaseTranslationService() {
+<b class="nc">&nbsp;		return new JacksonTranslationService();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean(name = BeanNames.COUCHBASE_MAPPING_CONTEXT)
+&nbsp;	@ConditionalOnMissingBean(name = BeanNames.COUCHBASE_MAPPING_CONTEXT)
+&nbsp;	CouchbaseMappingContext couchbaseMappingContext(CouchbaseDataProperties properties,
+&nbsp;			ApplicationContext applicationContext, CouchbaseCustomConversions couchbaseCustomConversions)
+&nbsp;			throws ClassNotFoundException {
+<b class="nc">&nbsp;		CouchbaseMappingContext mappingContext = new CouchbaseMappingContext();</b>
+<b class="nc">&nbsp;		mappingContext.setInitialEntitySet(new EntityScanner(applicationContext).scan(Document.class));</b>
+<b class="nc">&nbsp;		mappingContext.setSimpleTypeHolder(couchbaseCustomConversions.getSimpleTypeHolder());</b>
+<b class="nc">&nbsp;		Class&lt;?&gt; fieldNamingStrategy = properties.getFieldNamingStrategy();</b>
+<b class="nc">&nbsp;		if (fieldNamingStrategy != null) {</b>
+<b class="nc">&nbsp;			mappingContext</b>
+<b class="nc">&nbsp;				.setFieldNamingStrategy((FieldNamingStrategy) BeanUtils.instantiateClass(fieldNamingStrategy));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		mappingContext.setAutoIndexCreation(properties.isAutoIndex());</b>
+<b class="nc">&nbsp;		return mappingContext;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean(name = BeanNames.COUCHBASE_CUSTOM_CONVERSIONS)
+&nbsp;	@ConditionalOnMissingBean(name = BeanNames.COUCHBASE_CUSTOM_CONVERSIONS)
+&nbsp;	CouchbaseCustomConversions couchbaseCustomConversions() {
+<b class="nc">&nbsp;		return new CouchbaseCustomConversions(Collections.emptyList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

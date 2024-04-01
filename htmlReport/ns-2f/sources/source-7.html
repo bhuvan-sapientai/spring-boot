@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Log4J2MetricsAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.metrics</a>
+</div>
+
+<h1>Coverage Summary for Class: Log4J2MetricsAutoConfiguration (org.springframework.boot.actuate.autoconfigure.metrics)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Log4J2MetricsAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Log4J2MetricsAutoConfiguration$Log4JCoreLoggerContextCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.metrics;
+&nbsp;
+&nbsp;import io.micrometer.core.instrument.MeterRegistry;
+&nbsp;import io.micrometer.core.instrument.binder.logging.Log4j2Metrics;
+&nbsp;import org.apache.logging.log4j.LogManager;
+&nbsp;import org.apache.logging.log4j.spi.LoggerContext;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.Log4J2MetricsAutoConfiguration.Log4JCoreLoggerContextCondition;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;
+&nbsp;/**
+&nbsp; * Auto-configuration for Log4J2 metrics.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.1.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = { MetricsAutoConfiguration.class, CompositeMeterRegistryAutoConfiguration.class })
+&nbsp;@ConditionalOnClass(value = { Log4j2Metrics.class, LogManager.class },
+&nbsp;		name = &quot;org.apache.logging.log4j.core.LoggerContext&quot;)
+&nbsp;@ConditionalOnBean(MeterRegistry.class)
+&nbsp;@Conditional(Log4JCoreLoggerContextCondition.class)
+<b class="nc">&nbsp;public class Log4J2MetricsAutoConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public Log4j2Metrics log4j2Metrics() {
+<b class="nc">&nbsp;		return new Log4j2Metrics();</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class Log4JCoreLoggerContextCondition extends SpringBootCondition {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;			LoggerContext loggerContext = LogManager.getContext(false);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				if (Class.forName(&quot;org.apache.logging.log4j.core.LoggerContext&quot;).isInstance(loggerContext)) {</b>
+<b class="nc">&nbsp;					return ConditionOutcome</b>
+<b class="nc">&nbsp;						.match(&quot;LoggerContext was an instance of org.apache.logging.log4j.core.LoggerContext&quot;);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Throwable ex) {</b>
+&nbsp;				// Continue with no match
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return ConditionOutcome</b>
+<b class="nc">&nbsp;				.noMatch(&quot;Logger context was not an instance of org.apache.logging.log4j.core.LoggerContext&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

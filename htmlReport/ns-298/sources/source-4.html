@@ -1,0 +1,407 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CentralDirectoryEndRecord</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: CentralDirectoryEndRecord (org.springframework.boot.loader.jar)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CentralDirectoryEndRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CentralDirectoryEndRecord$Zip64End</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CentralDirectoryEndRecord$Zip64Locator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.jar;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.data.RandomAccessData;
+&nbsp;
+&nbsp;/**
+&nbsp; * A ZIP File &quot;End of central directory record&quot; (EOCD).
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Camille Vienot
+&nbsp; * @see &lt;a href=&quot;https://en.wikipedia.org/wiki/Zip_%28file_format%29&quot;&gt;Zip File Format&lt;/a&gt;
+&nbsp; */
+&nbsp;class CentralDirectoryEndRecord {
+&nbsp;
+&nbsp;	private static final int MINIMUM_SIZE = 22;
+&nbsp;
+&nbsp;	private static final int MAXIMUM_COMMENT_LENGTH = 0xFFFF;
+&nbsp;
+&nbsp;	private static final int MAXIMUM_SIZE = MINIMUM_SIZE + MAXIMUM_COMMENT_LENGTH;
+&nbsp;
+&nbsp;	private static final int SIGNATURE = 0x06054b50;
+&nbsp;
+&nbsp;	private static final int COMMENT_LENGTH_OFFSET = 20;
+&nbsp;
+&nbsp;	private static final int READ_BLOCK_SIZE = 256;
+&nbsp;
+&nbsp;	private final Zip64End zip64End;
+&nbsp;
+&nbsp;	private byte[] block;
+&nbsp;
+&nbsp;	private int offset;
+&nbsp;
+&nbsp;	private int size;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link CentralDirectoryEndRecord} instance from the specified
+&nbsp;	 * {@link RandomAccessData}, searching backwards from the end until a valid block is
+&nbsp;	 * located.
+&nbsp;	 * @param data the source data
+&nbsp;	 * @throws IOException in case of I/O errors
+&nbsp;	 */
+<b class="nc">&nbsp;	CentralDirectoryEndRecord(RandomAccessData data) throws IOException {</b>
+<b class="nc">&nbsp;		this.block = createBlockFromEndOfData(data, READ_BLOCK_SIZE);</b>
+<b class="nc">&nbsp;		this.size = MINIMUM_SIZE;</b>
+<b class="nc">&nbsp;		this.offset = this.block.length - this.size;</b>
+<b class="nc">&nbsp;		while (!isValid()) {</b>
+<b class="nc">&nbsp;			this.size++;</b>
+<b class="nc">&nbsp;			if (this.size &gt; this.block.length) {</b>
+<b class="nc">&nbsp;				if (this.size &gt;= MAXIMUM_SIZE || this.size &gt; data.getSize()) {</b>
+<b class="nc">&nbsp;					throw new IOException(</b>
+&nbsp;							&quot;Unable to find ZIP central directory records after reading &quot; + this.size + &quot; bytes&quot;);
+&nbsp;				}
+<b class="nc">&nbsp;				this.block = createBlockFromEndOfData(data, this.size + READ_BLOCK_SIZE);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.offset = this.block.length - this.size;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		long startOfCentralDirectoryEndRecord = data.getSize() - this.size;</b>
+<b class="nc">&nbsp;		Zip64Locator zip64Locator = Zip64Locator.find(data, startOfCentralDirectoryEndRecord);</b>
+<b class="nc">&nbsp;		this.zip64End = (zip64Locator != null) ? new Zip64End(data, zip64Locator) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private byte[] createBlockFromEndOfData(RandomAccessData data, int size) throws IOException {
+<b class="nc">&nbsp;		int length = (int) Math.min(data.getSize(), size);</b>
+<b class="nc">&nbsp;		return data.read(data.getSize() - length, length);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isValid() {
+<b class="nc">&nbsp;		if (this.block.length &lt; MINIMUM_SIZE || Bytes.littleEndianValue(this.block, this.offset + 0, 4) != SIGNATURE) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;		// Total size must be the structure size + comment
+<b class="nc">&nbsp;		long commentLength = Bytes.littleEndianValue(this.block, this.offset + COMMENT_LENGTH_OFFSET, 2);</b>
+<b class="nc">&nbsp;		return this.size == MINIMUM_SIZE + commentLength;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the location in the data that the archive actually starts. For most files
+&nbsp;	 * the archive data will start at 0, however, it is possible to have prefixed bytes
+&nbsp;	 * (often used for startup scripts) at the beginning of the data.
+&nbsp;	 * @param data the source data
+&nbsp;	 * @return the offset within the data where the archive begins
+&nbsp;	 */
+&nbsp;	long getStartOfArchive(RandomAccessData data) {
+<b class="nc">&nbsp;		long length = Bytes.littleEndianValue(this.block, this.offset + 12, 4);</b>
+<b class="nc">&nbsp;		long specifiedOffset = (this.zip64End != null) ? this.zip64End.centralDirectoryOffset</b>
+<b class="nc">&nbsp;				: Bytes.littleEndianValue(this.block, this.offset + 16, 4);</b>
+<b class="nc">&nbsp;		long zip64EndSize = (this.zip64End != null) ? this.zip64End.getSize() : 0L;</b>
+<b class="nc">&nbsp;		int zip64LocSize = (this.zip64End != null) ? Zip64Locator.ZIP64_LOCSIZE : 0;</b>
+<b class="nc">&nbsp;		long actualOffset = data.getSize() - this.size - length - zip64EndSize - zip64LocSize;</b>
+<b class="nc">&nbsp;		return actualOffset - specifiedOffset;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the bytes of the &quot;Central directory&quot; based on the offset indicated in this
+&nbsp;	 * record.
+&nbsp;	 * @param data the source data
+&nbsp;	 * @return the central directory data
+&nbsp;	 */
+&nbsp;	RandomAccessData getCentralDirectory(RandomAccessData data) {
+<b class="nc">&nbsp;		if (this.zip64End != null) {</b>
+<b class="nc">&nbsp;			return this.zip64End.getCentralDirectory(data);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		long offset = Bytes.littleEndianValue(this.block, this.offset + 16, 4);</b>
+<b class="nc">&nbsp;		long length = Bytes.littleEndianValue(this.block, this.offset + 12, 4);</b>
+<b class="nc">&nbsp;		return data.getSubsection(offset, length);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the number of ZIP entries in the file.
+&nbsp;	 * @return the number of records in the zip
+&nbsp;	 */
+&nbsp;	int getNumberOfRecords() {
+<b class="nc">&nbsp;		if (this.zip64End != null) {</b>
+<b class="nc">&nbsp;			return this.zip64End.getNumberOfRecords();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		long numberOfRecords = Bytes.littleEndianValue(this.block, this.offset + 10, 2);</b>
+<b class="nc">&nbsp;		return (int) numberOfRecords;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getComment() {
+<b class="nc">&nbsp;		int commentLength = (int) Bytes.littleEndianValue(this.block, this.offset + COMMENT_LENGTH_OFFSET, 2);</b>
+<b class="nc">&nbsp;		AsciiBytes comment = new AsciiBytes(this.block, this.offset + COMMENT_LENGTH_OFFSET + 2, commentLength);</b>
+<b class="nc">&nbsp;		return comment.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isZip64() {
+<b class="nc">&nbsp;		return this.zip64End != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A Zip64 end of central directory record.
+&nbsp;	 *
+&nbsp;	 * @see &lt;a href=&quot;https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT&quot;&gt;Chapter
+&nbsp;	 * 4.3.14 of Zip64 specification&lt;/a&gt;
+&nbsp;	 */
+&nbsp;	private static final class Zip64End {
+&nbsp;
+&nbsp;		private static final int ZIP64_ENDTOT = 32; // total number of entries
+&nbsp;
+&nbsp;		private static final int ZIP64_ENDSIZ = 40; // central directory size in bytes
+&nbsp;
+&nbsp;		private static final int ZIP64_ENDOFF = 48; // offset of first CEN header
+&nbsp;
+&nbsp;		private final Zip64Locator locator;
+&nbsp;
+&nbsp;		private final long centralDirectoryOffset;
+&nbsp;
+&nbsp;		private final long centralDirectoryLength;
+&nbsp;
+&nbsp;		private final int numberOfRecords;
+&nbsp;
+<b class="nc">&nbsp;		private Zip64End(RandomAccessData data, Zip64Locator locator) throws IOException {</b>
+<b class="nc">&nbsp;			this.locator = locator;</b>
+<b class="nc">&nbsp;			byte[] block = data.read(locator.getZip64EndOffset(), 56);</b>
+<b class="nc">&nbsp;			this.centralDirectoryOffset = Bytes.littleEndianValue(block, ZIP64_ENDOFF, 8);</b>
+<b class="nc">&nbsp;			this.centralDirectoryLength = Bytes.littleEndianValue(block, ZIP64_ENDSIZ, 8);</b>
+<b class="nc">&nbsp;			this.numberOfRecords = (int) Bytes.littleEndianValue(block, ZIP64_ENDTOT, 8);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the size of this zip 64 end of central directory record.
+&nbsp;		 * @return size of this zip 64 end of central directory record
+&nbsp;		 */
+&nbsp;		private long getSize() {
+<b class="nc">&nbsp;			return this.locator.getZip64EndSize();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the bytes of the &quot;Central directory&quot; based on the offset indicated in
+&nbsp;		 * this record.
+&nbsp;		 * @param data the source data
+&nbsp;		 * @return the central directory data
+&nbsp;		 */
+&nbsp;		private RandomAccessData getCentralDirectory(RandomAccessData data) {
+<b class="nc">&nbsp;			return data.getSubsection(this.centralDirectoryOffset, this.centralDirectoryLength);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the number of entries in the zip64 archive.
+&nbsp;		 * @return the number of records in the zip
+&nbsp;		 */
+&nbsp;		private int getNumberOfRecords() {
+<b class="nc">&nbsp;			return this.numberOfRecords;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A Zip64 end of central directory locator.
+&nbsp;	 *
+&nbsp;	 * @see &lt;a href=&quot;https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT&quot;&gt;Chapter
+&nbsp;	 * 4.3.15 of Zip64 specification&lt;/a&gt;
+&nbsp;	 */
+&nbsp;	private static final class Zip64Locator {
+&nbsp;
+&nbsp;		static final int SIGNATURE = 0x07064b50;
+&nbsp;
+&nbsp;		static final int ZIP64_LOCSIZE = 20; // locator size
+&nbsp;
+&nbsp;		static final int ZIP64_LOCOFF = 8; // offset of zip64 end
+&nbsp;
+&nbsp;		private final long zip64EndOffset;
+&nbsp;
+&nbsp;		private final long offset;
+&nbsp;
+<b class="nc">&nbsp;		private Zip64Locator(long offset, byte[] block) {</b>
+<b class="nc">&nbsp;			this.offset = offset;</b>
+<b class="nc">&nbsp;			this.zip64EndOffset = Bytes.littleEndianValue(block, ZIP64_LOCOFF, 8);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the size of the zip 64 end record located by this zip64 end locator.
+&nbsp;		 * @return size of the zip 64 end record located by this zip64 end locator
+&nbsp;		 */
+&nbsp;		private long getZip64EndSize() {
+<b class="nc">&nbsp;			return this.offset - this.zip64EndOffset;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the offset to locate {@link Zip64End}.
+&nbsp;		 * @return offset of the Zip64 end of central directory record
+&nbsp;		 */
+&nbsp;		private long getZip64EndOffset() {
+<b class="nc">&nbsp;			return this.zip64EndOffset;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Zip64Locator find(RandomAccessData data, long centralDirectoryEndOffset) throws IOException {
+<b class="nc">&nbsp;			long offset = centralDirectoryEndOffset - ZIP64_LOCSIZE;</b>
+<b class="nc">&nbsp;			if (offset &gt;= 0) {</b>
+<b class="nc">&nbsp;				byte[] block = data.read(offset, ZIP64_LOCSIZE);</b>
+<b class="nc">&nbsp;				if (Bytes.littleEndianValue(block, 0, 4) == SIGNATURE) {</b>
+<b class="nc">&nbsp;					return new Zip64Locator(offset, block);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

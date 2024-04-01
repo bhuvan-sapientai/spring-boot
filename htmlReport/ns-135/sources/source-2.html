@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MavenExec</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.mavenplugin</a>
+</div>
+
+<h1>Coverage Summary for Class: MavenExec (org.springframework.boot.build.mavenplugin)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MavenExec</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.mavenplugin;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.tasks.Internal;
+&nbsp;import org.gradle.api.tasks.JavaExec;
+&nbsp;import org.gradle.api.tasks.PathSensitivity;
+&nbsp;import org.gradle.api.tasks.TaskExecutionException;
+&nbsp;import org.gradle.process.internal.ExecException;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A custom {@link JavaExec} {@link Task task} for running Maven.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;public class MavenExec extends JavaExec {
+&nbsp;
+<b class="nc">&nbsp;	private final Logger log = LoggerFactory.getLogger(MavenExec.class);</b>
+&nbsp;
+&nbsp;	private File projectDir;
+&nbsp;
+<b class="nc">&nbsp;	public MavenExec() {</b>
+<b class="nc">&nbsp;		setClasspath(mavenConfiguration(getProject()));</b>
+<b class="nc">&nbsp;		args(&quot;--batch-mode&quot;);</b>
+<b class="nc">&nbsp;		getMainClass().set(&quot;org.apache.maven.cli.MavenCli&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setProjectDir(File projectDir) {
+<b class="nc">&nbsp;		this.projectDir = projectDir;</b>
+<b class="nc">&nbsp;		getInputs().file(new File(projectDir, &quot;pom.xml&quot;))</b>
+<b class="nc">&nbsp;			.withPathSensitivity(PathSensitivity.RELATIVE)</b>
+<b class="nc">&nbsp;			.withPropertyName(&quot;pom&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void exec() {
+<b class="nc">&nbsp;		workingDir(this.projectDir);</b>
+<b class="nc">&nbsp;		systemProperty(&quot;maven.multiModuleProjectDirectory&quot;, this.projectDir.getAbsolutePath());</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			Path logFile = Files.createTempFile(getName(), &quot;.log&quot;);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				args(&quot;--log-file&quot;, logFile.toFile().getAbsolutePath());</b>
+<b class="nc">&nbsp;				super.exec();</b>
+<b class="nc">&nbsp;				if (this.log.isInfoEnabled()) {</b>
+<b class="nc">&nbsp;					Files.readAllLines(logFile).forEach(this.log::info);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ExecException ex) {</b>
+<b class="nc">&nbsp;				System.out.println(&quot;Exec exception! Dumping log&quot;);</b>
+<b class="nc">&nbsp;				Files.readAllLines(logFile).forEach(System.out::println);</b>
+<b class="nc">&nbsp;				throw ex;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new TaskExecutionException(this, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Configuration mavenConfiguration(Project project) {
+<b class="nc">&nbsp;		Configuration existing = project.getConfigurations().findByName(&quot;maven&quot;);</b>
+<b class="nc">&nbsp;		if (existing != null) {</b>
+<b class="nc">&nbsp;			return existing;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return project.getConfigurations().create(&quot;maven&quot;, (maven) -&gt; {</b>
+<b class="nc">&nbsp;			maven.getDependencies().add(project.getDependencies().create(&quot;org.apache.maven:maven-embedder:3.6.3&quot;));</b>
+<b class="nc">&nbsp;			maven.getDependencies().add(project.getDependencies().create(&quot;org.apache.maven:maven-compat:3.6.3&quot;));</b>
+<b class="nc">&nbsp;			maven.getDependencies().add(project.getDependencies().create(&quot;org.slf4j:slf4j-simple:1.7.5&quot;));</b>
+<b class="nc">&nbsp;			maven.getDependencies()</b>
+<b class="nc">&nbsp;				.add(project.getDependencies()</b>
+<b class="nc">&nbsp;					.create(&quot;org.apache.maven.resolver:maven-resolver-connector-basic:1.4.1&quot;));</b>
+<b class="nc">&nbsp;			maven.getDependencies()</b>
+<b class="nc">&nbsp;				.add(project.getDependencies().create(&quot;org.apache.maven.resolver:maven-resolver-transport-http:1.4.1&quot;));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@Internal
+&nbsp;	public File getProjectDir() {
+<b class="nc">&nbsp;		return this.projectDir;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

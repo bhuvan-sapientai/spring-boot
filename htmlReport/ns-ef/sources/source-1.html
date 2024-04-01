@@ -1,0 +1,349 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConcurrentKafkaListenerContainerFactoryConfigurer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.kafka</a>
+</div>
+
+<h1>Coverage Summary for Class: ConcurrentKafkaListenerContainerFactoryConfigurer (org.springframework.boot.autoconfigure.kafka)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConcurrentKafkaListenerContainerFactoryConfigurer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.kafka;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Listener;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.core.task.SimpleAsyncTaskExecutor;
+&nbsp;import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+&nbsp;import org.springframework.kafka.core.ConsumerFactory;
+&nbsp;import org.springframework.kafka.core.KafkaTemplate;
+&nbsp;import org.springframework.kafka.listener.AfterRollbackProcessor;
+&nbsp;import org.springframework.kafka.listener.BatchInterceptor;
+&nbsp;import org.springframework.kafka.listener.CommonErrorHandler;
+&nbsp;import org.springframework.kafka.listener.ConsumerAwareRebalanceListener;
+&nbsp;import org.springframework.kafka.listener.ContainerProperties;
+&nbsp;import org.springframework.kafka.listener.MessageListenerContainer;
+&nbsp;import org.springframework.kafka.listener.RecordInterceptor;
+&nbsp;import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
+&nbsp;import org.springframework.kafka.support.converter.BatchMessageConverter;
+&nbsp;import org.springframework.kafka.support.converter.RecordMessageConverter;
+&nbsp;import org.springframework.kafka.transaction.KafkaAwareTransactionManager;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configure {@link ConcurrentKafkaListenerContainerFactory} with sensible defaults.
+&nbsp; *
+&nbsp; * @author Gary Russell
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Thomas Kåsene
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 1.5.0
+&nbsp; */
+<b class="nc">&nbsp;public class ConcurrentKafkaListenerContainerFactoryConfigurer {</b>
+&nbsp;
+&nbsp;	private KafkaProperties properties;
+&nbsp;
+&nbsp;	private BatchMessageConverter batchMessageConverter;
+&nbsp;
+&nbsp;	private RecordMessageConverter recordMessageConverter;
+&nbsp;
+&nbsp;	private RecordFilterStrategy&lt;Object, Object&gt; recordFilterStrategy;
+&nbsp;
+&nbsp;	private KafkaTemplate&lt;Object, Object&gt; replyTemplate;
+&nbsp;
+&nbsp;	private KafkaAwareTransactionManager&lt;Object, Object&gt; transactionManager;
+&nbsp;
+&nbsp;	private ConsumerAwareRebalanceListener rebalanceListener;
+&nbsp;
+&nbsp;	private CommonErrorHandler commonErrorHandler;
+&nbsp;
+&nbsp;	private AfterRollbackProcessor&lt;Object, Object&gt; afterRollbackProcessor;
+&nbsp;
+&nbsp;	private RecordInterceptor&lt;Object, Object&gt; recordInterceptor;
+&nbsp;
+&nbsp;	private BatchInterceptor&lt;Object, Object&gt; batchInterceptor;
+&nbsp;
+&nbsp;	private Function&lt;MessageListenerContainer, String&gt; threadNameSupplier;
+&nbsp;
+&nbsp;	private SimpleAsyncTaskExecutor listenerTaskExecutor;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link KafkaProperties} to use.
+&nbsp;	 * @param properties the properties
+&nbsp;	 */
+&nbsp;	void setKafkaProperties(KafkaProperties properties) {
+<b class="nc">&nbsp;		this.properties = properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link BatchMessageConverter} to use.
+&nbsp;	 * @param batchMessageConverter the message converter
+&nbsp;	 */
+&nbsp;	void setBatchMessageConverter(BatchMessageConverter batchMessageConverter) {
+<b class="nc">&nbsp;		this.batchMessageConverter = batchMessageConverter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link RecordMessageConverter} to use.
+&nbsp;	 * @param recordMessageConverter the message converter
+&nbsp;	 */
+&nbsp;	void setRecordMessageConverter(RecordMessageConverter recordMessageConverter) {
+<b class="nc">&nbsp;		this.recordMessageConverter = recordMessageConverter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link RecordFilterStrategy} to use to filter incoming records.
+&nbsp;	 * @param recordFilterStrategy the record filter strategy
+&nbsp;	 */
+&nbsp;	void setRecordFilterStrategy(RecordFilterStrategy&lt;Object, Object&gt; recordFilterStrategy) {
+<b class="nc">&nbsp;		this.recordFilterStrategy = recordFilterStrategy;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link KafkaTemplate} to use to send replies.
+&nbsp;	 * @param replyTemplate the reply template
+&nbsp;	 */
+&nbsp;	void setReplyTemplate(KafkaTemplate&lt;Object, Object&gt; replyTemplate) {
+<b class="nc">&nbsp;		this.replyTemplate = replyTemplate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link KafkaAwareTransactionManager} to use.
+&nbsp;	 * @param transactionManager the transaction manager
+&nbsp;	 */
+&nbsp;	void setTransactionManager(KafkaAwareTransactionManager&lt;Object, Object&gt; transactionManager) {
+<b class="nc">&nbsp;		this.transactionManager = transactionManager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link ConsumerAwareRebalanceListener} to use.
+&nbsp;	 * @param rebalanceListener the rebalance listener.
+&nbsp;	 * @since 2.2
+&nbsp;	 */
+&nbsp;	void setRebalanceListener(ConsumerAwareRebalanceListener rebalanceListener) {
+<b class="nc">&nbsp;		this.rebalanceListener = rebalanceListener;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link CommonErrorHandler} to use.
+&nbsp;	 * @param commonErrorHandler the error handler.
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	public void setCommonErrorHandler(CommonErrorHandler commonErrorHandler) {
+<b class="nc">&nbsp;		this.commonErrorHandler = commonErrorHandler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link AfterRollbackProcessor} to use.
+&nbsp;	 * @param afterRollbackProcessor the after rollback processor
+&nbsp;	 */
+&nbsp;	void setAfterRollbackProcessor(AfterRollbackProcessor&lt;Object, Object&gt; afterRollbackProcessor) {
+<b class="nc">&nbsp;		this.afterRollbackProcessor = afterRollbackProcessor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link RecordInterceptor} to use.
+&nbsp;	 * @param recordInterceptor the record interceptor.
+&nbsp;	 */
+&nbsp;	void setRecordInterceptor(RecordInterceptor&lt;Object, Object&gt; recordInterceptor) {
+<b class="nc">&nbsp;		this.recordInterceptor = recordInterceptor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link BatchInterceptor} to use.
+&nbsp;	 * @param batchInterceptor the batch interceptor.
+&nbsp;	 */
+&nbsp;	void setBatchInterceptor(BatchInterceptor&lt;Object, Object&gt; batchInterceptor) {
+<b class="nc">&nbsp;		this.batchInterceptor = batchInterceptor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the thread name supplier to use.
+&nbsp;	 * @param threadNameSupplier the thread name supplier to use
+&nbsp;	 */
+&nbsp;	void setThreadNameSupplier(Function&lt;MessageListenerContainer, String&gt; threadNameSupplier) {
+<b class="nc">&nbsp;		this.threadNameSupplier = threadNameSupplier;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the executor for threads that poll the consumer.
+&nbsp;	 * @param listenerTaskExecutor task executor
+&nbsp;	 */
+&nbsp;	void setListenerTaskExecutor(SimpleAsyncTaskExecutor listenerTaskExecutor) {
+<b class="nc">&nbsp;		this.listenerTaskExecutor = listenerTaskExecutor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the specified Kafka listener container factory. The factory can be
+&nbsp;	 * further tuned and default settings can be overridden.
+&nbsp;	 * @param listenerFactory the {@link ConcurrentKafkaListenerContainerFactory} instance
+&nbsp;	 * to configure
+&nbsp;	 * @param consumerFactory the {@link ConsumerFactory} to use
+&nbsp;	 */
+&nbsp;	public void configure(ConcurrentKafkaListenerContainerFactory&lt;Object, Object&gt; listenerFactory,
+&nbsp;			ConsumerFactory&lt;Object, Object&gt; consumerFactory) {
+<b class="nc">&nbsp;		listenerFactory.setConsumerFactory(consumerFactory);</b>
+<b class="nc">&nbsp;		configureListenerFactory(listenerFactory);</b>
+<b class="nc">&nbsp;		configureContainer(listenerFactory.getContainerProperties());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureListenerFactory(ConcurrentKafkaListenerContainerFactory&lt;Object, Object&gt; factory) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		Listener properties = this.properties.getListener();</b>
+<b class="nc">&nbsp;		map.from(properties::getConcurrency).to(factory::setConcurrency);</b>
+<b class="nc">&nbsp;		map.from(properties::isAutoStartup).to(factory::setAutoStartup);</b>
+<b class="nc">&nbsp;		map.from(this.batchMessageConverter).to(factory::setBatchMessageConverter);</b>
+<b class="nc">&nbsp;		map.from(this.recordMessageConverter).to(factory::setRecordMessageConverter);</b>
+<b class="nc">&nbsp;		map.from(this.recordFilterStrategy).to(factory::setRecordFilterStrategy);</b>
+<b class="nc">&nbsp;		map.from(this.replyTemplate).to(factory::setReplyTemplate);</b>
+<b class="nc">&nbsp;		if (properties.getType().equals(Listener.Type.BATCH)) {</b>
+<b class="nc">&nbsp;			factory.setBatchListener(true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		map.from(this.commonErrorHandler).to(factory::setCommonErrorHandler);</b>
+<b class="nc">&nbsp;		map.from(this.afterRollbackProcessor).to(factory::setAfterRollbackProcessor);</b>
+<b class="nc">&nbsp;		map.from(this.recordInterceptor).to(factory::setRecordInterceptor);</b>
+<b class="nc">&nbsp;		map.from(this.batchInterceptor).to(factory::setBatchInterceptor);</b>
+<b class="nc">&nbsp;		map.from(this.threadNameSupplier).to(factory::setThreadNameSupplier);</b>
+<b class="nc">&nbsp;		map.from(properties::getChangeConsumerThreadName).to(factory::setChangeConsumerThreadName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureContainer(ContainerProperties container) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		Listener properties = this.properties.getListener();</b>
+<b class="nc">&nbsp;		map.from(properties::getAckMode).to(container::setAckMode);</b>
+<b class="nc">&nbsp;		map.from(properties::getAsyncAcks).to(container::setAsyncAcks);</b>
+<b class="nc">&nbsp;		map.from(properties::getClientId).to(container::setClientId);</b>
+<b class="nc">&nbsp;		map.from(properties::getAckCount).to(container::setAckCount);</b>
+<b class="nc">&nbsp;		map.from(properties::getAckTime).as(Duration::toMillis).to(container::setAckTime);</b>
+<b class="nc">&nbsp;		map.from(properties::getPollTimeout).as(Duration::toMillis).to(container::setPollTimeout);</b>
+<b class="nc">&nbsp;		map.from(properties::getNoPollThreshold).to(container::setNoPollThreshold);</b>
+<b class="nc">&nbsp;		map.from(properties.getIdleBetweenPolls()).as(Duration::toMillis).to(container::setIdleBetweenPolls);</b>
+<b class="nc">&nbsp;		map.from(properties::getIdleEventInterval).as(Duration::toMillis).to(container::setIdleEventInterval);</b>
+<b class="nc">&nbsp;		map.from(properties::getIdlePartitionEventInterval)</b>
+<b class="nc">&nbsp;			.as(Duration::toMillis)</b>
+<b class="nc">&nbsp;			.to(container::setIdlePartitionEventInterval);</b>
+<b class="nc">&nbsp;		map.from(properties::getMonitorInterval)</b>
+<b class="nc">&nbsp;			.as(Duration::getSeconds)</b>
+<b class="nc">&nbsp;			.as(Number::intValue)</b>
+<b class="nc">&nbsp;			.to(container::setMonitorInterval);</b>
+<b class="nc">&nbsp;		map.from(properties::getLogContainerConfig).to(container::setLogContainerConfig);</b>
+<b class="nc">&nbsp;		map.from(properties::isMissingTopicsFatal).to(container::setMissingTopicsFatal);</b>
+<b class="nc">&nbsp;		map.from(properties::isImmediateStop).to(container::setStopImmediate);</b>
+<b class="nc">&nbsp;		map.from(properties::isObservationEnabled).to(container::setObservationEnabled);</b>
+<b class="nc">&nbsp;		map.from(this.transactionManager).to(container::setTransactionManager);</b>
+<b class="nc">&nbsp;		map.from(this.rebalanceListener).to(container::setConsumerRebalanceListener);</b>
+<b class="nc">&nbsp;		map.from(this.listenerTaskExecutor).to(container::setListenerTaskExecutor);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

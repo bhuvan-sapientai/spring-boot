@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JsonbTester</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.json</a>
+</div>
+
+<h1>Coverage Summary for Class: JsonbTester (org.springframework.boot.test.json)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JsonbTester</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JsonbTester$JsonbFieldInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.json;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Reader;
+&nbsp;
+&nbsp;import jakarta.json.bind.Jsonb;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectFactory;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * AssertJ based JSON tester backed by Jsonb. Usually instantiated via
+&nbsp; * {@link #initFields(Object, Jsonb)}, for example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * public class ExampleObjectJsonTests {
+&nbsp; *
+&nbsp; * 	private JsonbTester&amp;lt;ExampleObject&amp;gt; json;
+&nbsp; *
+&nbsp; * 	&amp;#064;Before
+&nbsp; * 	public void setup() {
+&nbsp; * 		Jsonb jsonb = JsonbBuilder.create();
+&nbsp; * 		JsonbTester.initFields(this, jsonb);
+&nbsp; * 	}
+&nbsp; *
+&nbsp; * 	&amp;#064;Test
+&nbsp; * 	public void testWriteJson() throws IOException {
+&nbsp; * 		ExampleObject object = // ...
+&nbsp; * 		assertThat(json.write(object)).isEqualToJson(&amp;quot;expected.json&amp;quot;);
+&nbsp; * 	}
+&nbsp; *
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * See {@link AbstractJsonMarshalTester} for more details.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type under test
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class JsonbTester&lt;T&gt; extends AbstractJsonMarshalTester&lt;T&gt; {
+&nbsp;
+&nbsp;	private final Jsonb jsonb;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new uninitialized {@link JsonbTester} instance.
+&nbsp;	 * @param jsonb the Jsonb instance
+&nbsp;	 */
+<b class="nc">&nbsp;	protected JsonbTester(Jsonb jsonb) {</b>
+<b class="nc">&nbsp;		Assert.notNull(jsonb, &quot;Jsonb must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.jsonb = jsonb;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JsonbTester} instance.
+&nbsp;	 * @param resourceLoadClass the source class used to load resources
+&nbsp;	 * @param type the type under test
+&nbsp;	 * @param jsonb the Jsonb instance
+&nbsp;	 * @see #initFields(Object, Jsonb)
+&nbsp;	 */
+&nbsp;	public JsonbTester(Class&lt;?&gt; resourceLoadClass, ResolvableType type, Jsonb jsonb) {
+<b class="nc">&nbsp;		super(resourceLoadClass, type);</b>
+<b class="nc">&nbsp;		Assert.notNull(jsonb, &quot;Jsonb must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.jsonb = jsonb;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String writeObject(T value, ResolvableType type) throws IOException {
+<b class="nc">&nbsp;		return this.jsonb.toJson(value, type.getType());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected T readObject(Reader reader, ResolvableType type) throws IOException {
+<b class="nc">&nbsp;		return this.jsonb.fromJson(reader, type.getType());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility method to initialize {@link JsonbTester} fields. See {@link JsonbTester
+&nbsp;	 * class-level documentation} for example usage.
+&nbsp;	 * @param testInstance the test instance
+&nbsp;	 * @param jsonb the Jsonb instance
+&nbsp;	 */
+&nbsp;	public static void initFields(Object testInstance, Jsonb jsonb) {
+<b class="nc">&nbsp;		new JsonbFieldInitializer().initFields(testInstance, jsonb);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility method to initialize {@link JsonbTester} fields. See {@link JsonbTester
+&nbsp;	 * class-level documentation} for example usage.
+&nbsp;	 * @param testInstance the test instance
+&nbsp;	 * @param jsonb an object factory to create the Jsonb instance
+&nbsp;	 */
+&nbsp;	public static void initFields(Object testInstance, ObjectFactory&lt;Jsonb&gt; jsonb) {
+<b class="nc">&nbsp;		new JsonbTester.JsonbFieldInitializer().initFields(testInstance, jsonb);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link FieldInitializer} for Jsonb.
+&nbsp;	 */
+&nbsp;	private static class JsonbFieldInitializer extends FieldInitializer&lt;Jsonb&gt; {
+&nbsp;
+&nbsp;		protected JsonbFieldInitializer() {
+<b class="nc">&nbsp;			super(JsonbTester.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected AbstractJsonMarshalTester&lt;Object&gt; createTester(Class&lt;?&gt; resourceLoadClass, ResolvableType type,
+&nbsp;				Jsonb marshaller) {
+<b class="nc">&nbsp;			return new JsonbTester&lt;&gt;(resourceLoadClass, type, marshaller);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

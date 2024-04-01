@@ -1,0 +1,278 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RunIntegrationTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: RunIntegrationTests (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RunIntegrationTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;
+&nbsp;import org.junit.jupiter.api.TestTemplate;
+&nbsp;import org.junit.jupiter.api.condition.DisabledOnOs;
+&nbsp;import org.junit.jupiter.api.condition.OS;
+&nbsp;import org.junit.jupiter.api.extension.ExtendWith;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;import static org.assertj.core.api.Assertions.contentOf;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests for the Maven plugin&#39;s run goal.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;@ExtendWith(MavenBuildExtension.class)
+<b class="nc">&nbsp;class RunIntegrationTests {</b>
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenTheRunGoalIsExecutedTheApplicationIsForkedWithOptimizedJvmArguments(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run&quot;).goals(&quot;spring-boot:run&quot;, &quot;-X&quot;).execute((project) -&gt; {</b>
+<b class="nc">&nbsp;			String jvmArguments = &quot;JVM argument: -XX:TieredStopAtLevel=1&quot;;</b>
+<b class="nc">&nbsp;			assertThat(buildLog(project)).contains(&quot;I haz been run&quot;).contains(jvmArguments);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenEnvironmentVariablesAreConfiguredTheyAreAvailableToTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-envargs&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenExclusionsAreConfiguredExcludedDependenciesDoNotAppearOnTheClasspath(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-exclude&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenSystemPropertiesAndJvmArgumentsAreConfiguredTheyAreAvailableToTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-jvm-system-props&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenJvmArgumentsAreConfiguredTheyAreAvailableToTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-jvmargs&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenCommandLineSpecifiesJvmArgumentsTheyAreAvailableToTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-jvmargs-commandline&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.systemProperty(&quot;spring-boot.run.jvmArguments&quot;, &quot;-Dfoo=value-from-cmd&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenPomAndCommandLineSpecifyJvmArgumentsThenPomOverrides(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-jvmargs&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.systemProperty(&quot;spring-boot.run.jvmArguments&quot;, &quot;-Dfoo=value-from-cmd&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenProfilesAreConfiguredTheyArePassedToTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-profiles&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;, &quot;-X&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run with profile(s) &#39;foo,bar&#39;&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenUseTestClasspathIsEnabledTheApplicationHasTestDependenciesOnItsClasspath(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-use-test-classpath&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAWorkingDirectoryIsConfiguredTheApplicationIsRunFromThatDirectory(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-working-directory&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).containsPattern(&quot;I haz been run from.*src.main.java&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	void whenDirectoriesAreConfiguredTheyAreAvailableToTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-directories&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAdditionalClasspathDirectoryIsConfiguredItsResourcesAreAvailableToTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-additional-classpath-directory&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenAdditionalClasspathFileIsConfiguredItsContentIsAvailableToTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-additional-classpath-jar&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;I haz been run&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	@DisabledOnOs(OS.WINDOWS)
+&nbsp;	void whenAToolchainIsConfiguredItIsUsedToRunTheApplication(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-toolchains&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;verify&quot;, &quot;-t&quot;, &quot;toolchains.xml&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project)).contains(&quot;The Maven Toolchains is awesome!&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenPomSpecifiesRunArgumentsContainingCommasTheyArePassedToTheApplicationCorrectly(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-arguments&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project))</b>
+<b class="nc">&nbsp;				.contains(&quot;I haz been run with profile(s) &#39;foo,bar&#39; and endpoint(s) &#39;prometheus,info&#39;&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenCommandLineSpecifiesRunArgumentsContainingCommasTheyArePassedToTheApplicationCorrectly(
+&nbsp;			MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-arguments-commandline&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.systemProperty(&quot;spring-boot.run.arguments&quot;,</b>
+&nbsp;					&quot;--management.endpoints.web.exposure.include=prometheus,info,health,metrics --spring.profiles.active=foo,bar&quot;)
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project))</b>
+<b class="nc">&nbsp;				.contains(&quot;I haz been run with profile(s) &#39;foo,bar&#39; and endpoint(s) &#39;prometheus,info,health,metrics&#39;&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenPomAndCommandLineSpecifyRunArgumentsThenPomOverrides(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;run-arguments&quot;)</b>
+<b class="nc">&nbsp;			.goals(&quot;spring-boot:run&quot;)</b>
+<b class="nc">&nbsp;			.systemProperty(&quot;spring-boot.run.arguments&quot;,</b>
+&nbsp;					&quot;--management.endpoints.web.exposure.include=one,two,three --spring.profiles.active=test&quot;)
+<b class="nc">&nbsp;			.execute((project) -&gt; assertThat(buildLog(project))</b>
+<b class="nc">&nbsp;				.contains(&quot;I haz been run with profile(s) &#39;foo,bar&#39; and endpoint(s) &#39;prometheus,info&#39;&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String buildLog(File project) {
+<b class="nc">&nbsp;		return contentOf(new File(project, &quot;target/build.log&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

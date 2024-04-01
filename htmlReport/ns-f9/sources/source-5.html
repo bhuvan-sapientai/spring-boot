@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HibernateProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.orm.jpa</a>
+</div>
+
+<h1>Coverage Summary for Class: HibernateProperties (org.springframework.boot.autoconfigure.orm.jpa)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HibernateProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HibernateProperties$Naming</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.orm.jpa;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
+&nbsp;import org.hibernate.cfg.AvailableSettings;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration properties for Hibernate.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Chris Bono
+&nbsp; * @since 2.1.0
+&nbsp; * @see JpaProperties
+&nbsp; */
+&nbsp;@ConfigurationProperties(&quot;spring.jpa.hibernate&quot;)
+<b class="nc">&nbsp;public class HibernateProperties {</b>
+&nbsp;
+&nbsp;	private static final String DISABLED_SCANNER_CLASS = &quot;org.hibernate.boot.archive.scan.internal.DisabledScanner&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private final Naming naming = new Naming();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * DDL mode. This is actually a shortcut for the &quot;hibernate.hbm2ddl.auto&quot; property.
+&nbsp;	 * Defaults to &quot;create-drop&quot; when using an embedded database and no schema manager was
+&nbsp;	 * detected. Otherwise, defaults to &quot;none&quot;.
+&nbsp;	 */
+&nbsp;	private String ddlAuto;
+&nbsp;
+&nbsp;	public String getDdlAuto() {
+<b class="nc">&nbsp;		return this.ddlAuto;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setDdlAuto(String ddlAuto) {
+<b class="nc">&nbsp;		this.ddlAuto = ddlAuto;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Naming getNaming() {
+<b class="nc">&nbsp;		return this.naming;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Determine the configuration properties for the initialization of the main Hibernate
+&nbsp;	 * EntityManagerFactory based on standard JPA properties and
+&nbsp;	 * {@link HibernateSettings}.
+&nbsp;	 * @param jpaProperties standard JPA properties
+&nbsp;	 * @param settings the settings to apply when determining the configuration properties
+&nbsp;	 * @return the Hibernate properties to use
+&nbsp;	 */
+&nbsp;	public Map&lt;String, Object&gt; determineHibernateProperties(Map&lt;String, String&gt; jpaProperties,
+&nbsp;			HibernateSettings settings) {
+<b class="nc">&nbsp;		Assert.notNull(jpaProperties, &quot;JpaProperties must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(settings, &quot;Settings must not be null&quot;);</b>
+<b class="nc">&nbsp;		return getAdditionalProperties(jpaProperties, settings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Object&gt; getAdditionalProperties(Map&lt;String, String&gt; existing, HibernateSettings settings) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; result = new HashMap&lt;&gt;(existing);</b>
+<b class="nc">&nbsp;		applyScanner(result);</b>
+<b class="nc">&nbsp;		getNaming().applyNamingStrategies(result);</b>
+<b class="nc">&nbsp;		String ddlAuto = determineDdlAuto(existing, settings::getDdlAuto);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(ddlAuto) &amp;&amp; !&quot;none&quot;.equals(ddlAuto)) {</b>
+<b class="nc">&nbsp;			result.put(AvailableSettings.HBM2DDL_AUTO, ddlAuto);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			result.remove(AvailableSettings.HBM2DDL_AUTO);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Collection&lt;HibernatePropertiesCustomizer&gt; customizers = settings.getHibernatePropertiesCustomizers();</b>
+<b class="nc">&nbsp;		if (!ObjectUtils.isEmpty(customizers)) {</b>
+<b class="nc">&nbsp;			customizers.forEach((customizer) -&gt; customizer.customize(result));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyScanner(Map&lt;String, Object&gt; result) {
+<b class="nc">&nbsp;		if (!result.containsKey(AvailableSettings.SCANNER) &amp;&amp; ClassUtils.isPresent(DISABLED_SCANNER_CLASS, null)) {</b>
+<b class="nc">&nbsp;			result.put(AvailableSettings.SCANNER, DISABLED_SCANNER_CLASS);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String determineDdlAuto(Map&lt;String, String&gt; existing, Supplier&lt;String&gt; defaultDdlAuto) {
+<b class="nc">&nbsp;		String ddlAuto = existing.get(AvailableSettings.HBM2DDL_AUTO);</b>
+<b class="nc">&nbsp;		if (ddlAuto != null) {</b>
+<b class="nc">&nbsp;			return ddlAuto;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.ddlAuto != null) {</b>
+<b class="nc">&nbsp;			return this.ddlAuto;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (existing.get(AvailableSettings.JAKARTA_HBM2DDL_DATABASE_ACTION) != null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return defaultDdlAuto.get();</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public static class Naming {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Fully qualified name of the implicit naming strategy.
+&nbsp;		 */
+&nbsp;		private String implicitStrategy;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Fully qualified name of the physical naming strategy.
+&nbsp;		 */
+&nbsp;		private String physicalStrategy;
+&nbsp;
+&nbsp;		public String getImplicitStrategy() {
+<b class="nc">&nbsp;			return this.implicitStrategy;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setImplicitStrategy(String implicitStrategy) {
+<b class="nc">&nbsp;			this.implicitStrategy = implicitStrategy;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getPhysicalStrategy() {
+<b class="nc">&nbsp;			return this.physicalStrategy;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setPhysicalStrategy(String physicalStrategy) {
+<b class="nc">&nbsp;			this.physicalStrategy = physicalStrategy;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void applyNamingStrategies(Map&lt;String, Object&gt; properties) {
+<b class="nc">&nbsp;			applyNamingStrategy(properties, AvailableSettings.IMPLICIT_NAMING_STRATEGY, this.implicitStrategy,</b>
+<b class="nc">&nbsp;					() -&gt; SpringImplicitNamingStrategy.class.getName());</b>
+<b class="nc">&nbsp;			applyNamingStrategy(properties, AvailableSettings.PHYSICAL_NAMING_STRATEGY, this.physicalStrategy,</b>
+<b class="nc">&nbsp;					() -&gt; CamelCaseToUnderscoresNamingStrategy.class.getName());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void applyNamingStrategy(Map&lt;String, Object&gt; properties, String key, Object strategy,
+&nbsp;				Supplier&lt;String&gt; defaultStrategy) {
+<b class="nc">&nbsp;			if (strategy != null) {</b>
+<b class="nc">&nbsp;				properties.put(key, strategy);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				properties.computeIfAbsent(key, (k) -&gt; defaultStrategy.get());</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

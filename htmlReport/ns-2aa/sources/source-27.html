@@ -1,0 +1,233 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProcessAotMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: ProcessAotMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProcessAotMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.apache.maven.plugins.annotations.LifecyclePhase;
+&nbsp;import org.apache.maven.plugins.annotations.Mojo;
+&nbsp;import org.apache.maven.plugins.annotations.Parameter;
+&nbsp;import org.apache.maven.plugins.annotations.ResolutionScope;
+&nbsp;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Invoke the AOT engine on the application.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;@Mojo(name = &quot;process-aot&quot;, defaultPhase = LifecyclePhase.PREPARE_PACKAGE, threadSafe = true,
+&nbsp;		requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
+&nbsp;		requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME)
+<b class="nc">&nbsp;public class ProcessAotMojo extends AbstractAotMojo {</b>
+&nbsp;
+&nbsp;	private static final String AOT_PROCESSOR_CLASS_NAME = &quot;org.springframework.boot.SpringApplicationAotProcessor&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the classes and resource files that should be packaged into
+&nbsp;	 * the archive.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.outputDirectory}&quot;, required = true)
+&nbsp;	private File classesDirectory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the generated sources.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.directory}/spring-aot/main/sources&quot;, required = true)
+&nbsp;	private File generatedSources;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the generated resources.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.directory}/spring-aot/main/resources&quot;, required = true)
+&nbsp;	private File generatedResources;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Directory containing the generated classes.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;${project.build.directory}/spring-aot/main/classes&quot;, required = true)
+&nbsp;	private File generatedClasses;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the main class to use as the source for the AOT process. If not specified
+&nbsp;	 * the first compiled class found that contains a &#39;main&#39; method will be used.
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.aot.main-class&quot;)
+&nbsp;	private String mainClass;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Application arguments that should be taken into account for AOT processing.
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private String[] arguments;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Spring profiles to take into account for AOT processing.
+&nbsp;	 */
+&nbsp;	@Parameter
+&nbsp;	private String[] profiles;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void executeAot() throws Exception {
+<b class="nc">&nbsp;		if (this.project.getPackaging().equals(&quot;pom&quot;)) {</b>
+<b class="nc">&nbsp;			getLog().debug(&quot;process-aot goal could not be applied to pom project.&quot;);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		String applicationClass = (this.mainClass != null) ? this.mainClass</b>
+<b class="nc">&nbsp;				: SpringBootApplicationClassFinder.findSingleClass(this.classesDirectory);</b>
+<b class="nc">&nbsp;		URL[] classPath = getClassPath();</b>
+<b class="nc">&nbsp;		generateAotAssets(classPath, AOT_PROCESSOR_CLASS_NAME, getAotArguments(applicationClass));</b>
+<b class="nc">&nbsp;		compileSourceFiles(classPath, this.generatedSources, this.classesDirectory);</b>
+<b class="nc">&nbsp;		copyAll(this.generatedResources.toPath(), this.classesDirectory.toPath());</b>
+<b class="nc">&nbsp;		copyAll(this.generatedClasses.toPath(), this.classesDirectory.toPath());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String[] getAotArguments(String applicationClass) {
+<b class="nc">&nbsp;		List&lt;String&gt; aotArguments = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		aotArguments.add(applicationClass);</b>
+<b class="nc">&nbsp;		aotArguments.add(this.generatedSources.toString());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.generatedResources.toString());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.generatedClasses.toString());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.project.getGroupId());</b>
+<b class="nc">&nbsp;		aotArguments.add(this.project.getArtifactId());</b>
+<b class="nc">&nbsp;		aotArguments.addAll(resolveArguments().getArgs());</b>
+<b class="nc">&nbsp;		return aotArguments.toArray(String[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private URL[] getClassPath() throws Exception {
+<b class="nc">&nbsp;		File[] directories = new File[] { this.classesDirectory, this.generatedClasses };</b>
+<b class="nc">&nbsp;		return getClassPath(directories, new ExcludeTestScopeArtifactFilter());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private RunArguments resolveArguments() {
+<b class="nc">&nbsp;		RunArguments runArguments = new RunArguments(this.arguments);</b>
+<b class="nc">&nbsp;		if (!ObjectUtils.isEmpty(this.profiles)) {</b>
+<b class="nc">&nbsp;			runArguments.getArgs().addFirst(&quot;--spring.profiles.active=&quot; + String.join(&quot;,&quot;, this.profiles));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return runArguments;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

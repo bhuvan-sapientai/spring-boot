@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OutputCaptureRule</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.system</a>
+</div>
+
+<h1>Coverage Summary for Class: OutputCaptureRule (org.springframework.boot.test.system)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OutputCaptureRule</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OutputCaptureRule$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.system;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.hamcrest.Matcher;
+&nbsp;import org.hamcrest.MatcherAssert;
+&nbsp;import org.junit.Rule;
+&nbsp;import org.junit.rules.TestRule;
+&nbsp;import org.junit.runner.Description;
+&nbsp;import org.junit.runners.model.Statement;
+&nbsp;
+&nbsp;import static org.hamcrest.Matchers.allOf;
+&nbsp;
+&nbsp;/**
+&nbsp; * JUnit {@code @Rule} to capture output from {@code System.out} and {@code System.err}.
+&nbsp; * &lt;p&gt;
+&nbsp; * To use add as a {@link Rule @Rule}:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * public class MyTest {
+&nbsp; *
+&nbsp; *     &amp;#064;Rule
+&nbsp; *     public OutputCaptureRule output = new OutputCaptureRule();
+&nbsp; *
+&nbsp; *     &amp;#064;Test
+&nbsp; *     public void test() {
+&nbsp; *         assertThat(output).contains(&quot;ok&quot;);
+&nbsp; *     }
+&nbsp; *
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.2.0
+&nbsp; */
+<b class="nc">&nbsp;public class OutputCaptureRule implements TestRule, CapturedOutput {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final OutputCapture delegate = new OutputCapture();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;Matcher&lt;? super String&gt;&gt; matchers = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Statement apply(Statement base, Description description) {
+<b class="nc">&nbsp;		return new Statement() {</b>
+&nbsp;			@Override
+&nbsp;			public void evaluate() throws Throwable {
+<b class="nc">&nbsp;				OutputCaptureRule.this.delegate.push();</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					base.evaluate();</b>
+&nbsp;				}
+&nbsp;				finally {
+<b class="nc">&nbsp;					try {</b>
+<b class="nc">&nbsp;						if (!OutputCaptureRule.this.matchers.isEmpty()) {</b>
+<b class="nc">&nbsp;							String output = OutputCaptureRule.this.delegate.toString();</b>
+<b class="nc">&nbsp;							MatcherAssert.assertThat(output, allOf(OutputCaptureRule.this.matchers));</b>
+&nbsp;						}
+&nbsp;					}
+&nbsp;					finally {
+<b class="nc">&nbsp;						OutputCaptureRule.this.delegate.pop();</b>
+<b class="nc">&nbsp;					}</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getAll() {
+<b class="nc">&nbsp;		return this.delegate.getAll();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getOut() {
+<b class="nc">&nbsp;		return this.delegate.getOut();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String getErr() {
+<b class="nc">&nbsp;		return this.delegate.getErr();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.delegate.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Verify that the output is matched by the supplied {@code matcher}. Verification is
+&nbsp;	 * performed after the test method has executed.
+&nbsp;	 * @param matcher the matcher
+&nbsp;	 */
+&nbsp;	public void expect(Matcher&lt;? super String&gt; matcher) {
+<b class="nc">&nbsp;		this.matchers.add(matcher);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

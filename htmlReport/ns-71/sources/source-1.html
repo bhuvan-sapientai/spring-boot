@@ -1,0 +1,359 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BeansEndpoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.beans</a>
+</div>
+
+<h1>Coverage Summary for Class: BeansEndpoint (org.springframework.boot.actuate.beans)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BeansEndpoint</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BeansEndpoint$BeanDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeansEndpoint$BeansDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BeansEndpoint$ContextBeansDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.beans;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationResponseBody;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Endpoint @Endpoint} to expose details of an application&#39;s beans, grouped by
+&nbsp; * application context.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@Endpoint(id = &quot;beans&quot;)
+&nbsp;public class BeansEndpoint {
+&nbsp;
+&nbsp;	private final ConfigurableApplicationContext context;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code BeansEndpoint} that will describe the beans in the given
+&nbsp;	 * {@code context} and all of its ancestors.
+&nbsp;	 * @param context the application context
+&nbsp;	 * @see ConfigurableApplicationContext#getParent()
+&nbsp;	 */
+<b class="nc">&nbsp;	public BeansEndpoint(ConfigurableApplicationContext context) {</b>
+<b class="nc">&nbsp;		this.context = context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ReadOperation
+&nbsp;	public BeansDescriptor beans() {
+<b class="nc">&nbsp;		Map&lt;String, ContextBeansDescriptor&gt; contexts = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		ConfigurableApplicationContext context = this.context;</b>
+<b class="nc">&nbsp;		while (context != null) {</b>
+<b class="nc">&nbsp;			contexts.put(context.getId(), ContextBeansDescriptor.describing(context));</b>
+<b class="nc">&nbsp;			context = getConfigurableParent(context);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new BeansDescriptor(contexts);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ConfigurableApplicationContext getConfigurableParent(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;		ApplicationContext parent = context.getParent();</b>
+<b class="nc">&nbsp;		if (parent instanceof ConfigurableApplicationContext configurableParent) {</b>
+<b class="nc">&nbsp;			return configurableParent;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of an application&#39;s beans.
+&nbsp;	 */
+&nbsp;	public static final class BeansDescriptor implements OperationResponseBody {
+&nbsp;
+&nbsp;		private final Map&lt;String, ContextBeansDescriptor&gt; contexts;
+&nbsp;
+<b class="nc">&nbsp;		private BeansDescriptor(Map&lt;String, ContextBeansDescriptor&gt; contexts) {</b>
+<b class="nc">&nbsp;			this.contexts = contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, ContextBeansDescriptor&gt; getContexts() {
+<b class="nc">&nbsp;			return this.contexts;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of an application context beans.
+&nbsp;	 */
+&nbsp;	public static final class ContextBeansDescriptor {
+&nbsp;
+&nbsp;		private final Map&lt;String, BeanDescriptor&gt; beans;
+&nbsp;
+&nbsp;		private final String parentId;
+&nbsp;
+<b class="nc">&nbsp;		private ContextBeansDescriptor(Map&lt;String, BeanDescriptor&gt; beans, String parentId) {</b>
+<b class="nc">&nbsp;			this.beans = beans;</b>
+<b class="nc">&nbsp;			this.parentId = parentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getParentId() {
+<b class="nc">&nbsp;			return this.parentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, BeanDescriptor&gt; getBeans() {
+<b class="nc">&nbsp;			return this.beans;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static ContextBeansDescriptor describing(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;			if (context == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			ConfigurableApplicationContext parent = getConfigurableParent(context);</b>
+<b class="nc">&nbsp;			return new ContextBeansDescriptor(describeBeans(context.getBeanFactory()),</b>
+<b class="nc">&nbsp;					(parent != null) ? parent.getId() : null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Map&lt;String, BeanDescriptor&gt; describeBeans(ConfigurableListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;			Map&lt;String, BeanDescriptor&gt; beans = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (String beanName : beanFactory.getBeanDefinitionNames()) {</b>
+<b class="nc">&nbsp;				BeanDefinition definition = beanFactory.getBeanDefinition(beanName);</b>
+<b class="nc">&nbsp;				if (isBeanEligible(beanName, definition, beanFactory)) {</b>
+<b class="nc">&nbsp;					beans.put(beanName, describeBean(beanName, definition, beanFactory));</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return beans;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static BeanDescriptor describeBean(String name, BeanDefinition definition,
+&nbsp;				ConfigurableListableBeanFactory factory) {
+<b class="nc">&nbsp;			return new BeanDescriptor(factory.getAliases(name), definition.getScope(), factory.getType(name),</b>
+<b class="nc">&nbsp;					definition.getResourceDescription(), factory.getDependenciesForBean(name));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isBeanEligible(String beanName, BeanDefinition bd, ConfigurableBeanFactory bf) {
+<b class="nc">&nbsp;			return (bd.getRole() != BeanDefinition.ROLE_INFRASTRUCTURE</b>
+<b class="nc">&nbsp;					&amp;&amp; (!bd.isLazyInit() || bf.containsSingleton(beanName)));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of a bean.
+&nbsp;	 */
+&nbsp;	public static final class BeanDescriptor {
+&nbsp;
+&nbsp;		private final String[] aliases;
+&nbsp;
+&nbsp;		private final String scope;
+&nbsp;
+&nbsp;		private final Class&lt;?&gt; type;
+&nbsp;
+&nbsp;		private final String resource;
+&nbsp;
+&nbsp;		private final String[] dependencies;
+&nbsp;
+<b class="nc">&nbsp;		private BeanDescriptor(String[] aliases, String scope, Class&lt;?&gt; type, String resource, String[] dependencies) {</b>
+<b class="nc">&nbsp;			this.aliases = aliases;</b>
+<b class="nc">&nbsp;			this.scope = (StringUtils.hasText(scope) ? scope : BeanDefinition.SCOPE_SINGLETON);</b>
+<b class="nc">&nbsp;			this.type = type;</b>
+<b class="nc">&nbsp;			this.resource = resource;</b>
+<b class="nc">&nbsp;			this.dependencies = dependencies;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String[] getAliases() {
+<b class="nc">&nbsp;			return this.aliases;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getScope() {
+<b class="nc">&nbsp;			return this.scope;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Class&lt;?&gt; getType() {
+<b class="nc">&nbsp;			return this.type;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getResource() {
+<b class="nc">&nbsp;			return this.resource;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String[] getDependencies() {
+<b class="nc">&nbsp;			return this.dependencies;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

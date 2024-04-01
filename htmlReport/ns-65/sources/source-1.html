@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PrometheusExemplarsAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.tracing.prometheus</a>
+</div>
+
+<h1>Coverage Summary for Class: PrometheusExemplarsAutoConfiguration (org.springframework.boot.actuate.autoconfigure.tracing.prometheus)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PrometheusExemplarsAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PrometheusExemplarsAutoConfiguration$LazyTracingSpanContextSupplier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.tracing.prometheus;
+&nbsp;
+&nbsp;import io.micrometer.tracing.Span;
+&nbsp;import io.micrometer.tracing.Tracer;
+&nbsp;import io.prometheus.client.exemplars.tracer.common.SpanContextSupplier;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.tracing.MicrometerTracingAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.util.function.SingletonSupplier;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for Prometheus Exemplars with
+&nbsp; * Micrometer Tracing.
+&nbsp; *
+&nbsp; * @author Jonatan Ivanov
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration(before = PrometheusMetricsExportAutoConfiguration.class,
+&nbsp;		after = MicrometerTracingAutoConfiguration.class)
+&nbsp;@ConditionalOnBean(Tracer.class)
+&nbsp;@ConditionalOnClass({ Tracer.class, SpanContextSupplier.class })
+<b class="nc">&nbsp;public class PrometheusExemplarsAutoConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	SpanContextSupplier spanContextSupplier(ObjectProvider&lt;Tracer&gt; tracerProvider) {
+<b class="nc">&nbsp;		return new LazyTracingSpanContextSupplier(tracerProvider);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Since the MeterRegistry can depend on the {@link Tracer} (Exemplars) and the
+&nbsp;	 * {@link Tracer} can depend on the MeterRegistry (recording metrics), this
+&nbsp;	 * {@link SpanContextSupplier} breaks the cycle by lazily loading the {@link Tracer}.
+&nbsp;	 */
+&nbsp;	static class LazyTracingSpanContextSupplier implements SpanContextSupplier {
+&nbsp;
+&nbsp;		private final SingletonSupplier&lt;Tracer&gt; tracer;
+&nbsp;
+<b class="nc">&nbsp;		LazyTracingSpanContextSupplier(ObjectProvider&lt;Tracer&gt; tracerProvider) {</b>
+<b class="nc">&nbsp;			this.tracer = SingletonSupplier.of(tracerProvider::getObject);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getTraceId() {
+<b class="nc">&nbsp;			Span currentSpan = currentSpan();</b>
+<b class="nc">&nbsp;			return (currentSpan != null) ? currentSpan.context().traceId() : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getSpanId() {
+<b class="nc">&nbsp;			Span currentSpan = currentSpan();</b>
+<b class="nc">&nbsp;			return (currentSpan != null) ? currentSpan.context().spanId() : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isSampled() {
+<b class="nc">&nbsp;			Span currentSpan = currentSpan();</b>
+<b class="nc">&nbsp;			if (currentSpan == null) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Boolean sampled = currentSpan.context().sampled();</b>
+<b class="nc">&nbsp;			return sampled != null &amp;&amp; sampled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Span currentSpan() {
+<b class="nc">&nbsp;			return this.tracer.obtain().currentSpan();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

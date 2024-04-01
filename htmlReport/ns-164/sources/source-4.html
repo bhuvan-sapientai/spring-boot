@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ValidationErrors</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind.validation</a>
+</div>
+
+<h1>Coverage Summary for Class: ValidationErrors (org.springframework.boot.context.properties.bind.validation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ValidationErrors</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (8/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.7%
+  </span>
+  <span class="absValue">
+    (23/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind.validation;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName.Form;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginProvider;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.validation.FieldError;
+&nbsp;import org.springframework.validation.ObjectError;
+&nbsp;
+&nbsp;/**
+&nbsp; * A collection of {@link ObjectError ObjectErrors} caused by bind validation failures.
+&nbsp; * Where possible, included {@link FieldError FieldErrors} will be OriginProvider.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class ValidationErrors implements Iterable&lt;ObjectError&gt; {
+&nbsp;
+&nbsp;	private final ConfigurationPropertyName name;
+&nbsp;
+&nbsp;	private final Set&lt;ConfigurationProperty&gt; boundProperties;
+&nbsp;
+&nbsp;	private final List&lt;ObjectError&gt; errors;
+&nbsp;
+&nbsp;	ValidationErrors(ConfigurationPropertyName name, Set&lt;ConfigurationProperty&gt; boundProperties,
+<b class="fc">&nbsp;			List&lt;ObjectError&gt; errors) {</b>
+<b class="fc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="fc">&nbsp;		Assert.notNull(boundProperties, &quot;BoundProperties must not be null&quot;);</b>
+<b class="fc">&nbsp;		Assert.notNull(errors, &quot;Errors must not be null&quot;);</b>
+<b class="fc">&nbsp;		this.name = name;</b>
+<b class="fc">&nbsp;		this.boundProperties = Collections.unmodifiableSet(boundProperties);</b>
+<b class="fc">&nbsp;		this.errors = convertErrors(name, boundProperties, errors);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;ObjectError&gt; convertErrors(ConfigurationPropertyName name, Set&lt;ConfigurationProperty&gt; boundProperties,
+&nbsp;			List&lt;ObjectError&gt; errors) {
+<b class="fc">&nbsp;		List&lt;ObjectError&gt; converted = new ArrayList&lt;&gt;(errors.size());</b>
+<b class="fc">&nbsp;		for (ObjectError error : errors) {</b>
+<b class="fc">&nbsp;			converted.add(convertError(name, boundProperties, error));</b>
+<b class="fc">&nbsp;		}</b>
+<b class="fc">&nbsp;		return Collections.unmodifiableList(converted);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ObjectError convertError(ConfigurationPropertyName name, Set&lt;ConfigurationProperty&gt; boundProperties,
+&nbsp;			ObjectError error) {
+<b class="fc">&nbsp;		if (error instanceof FieldError fieldError) {</b>
+<b class="fc">&nbsp;			return convertFieldError(name, boundProperties, fieldError);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return error;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private FieldError convertFieldError(ConfigurationPropertyName name, Set&lt;ConfigurationProperty&gt; boundProperties,
+&nbsp;			FieldError error) {
+<b class="fc">&nbsp;		if (error instanceof OriginProvider) {</b>
+<b class="nc">&nbsp;			return error;</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return OriginTrackedFieldError.of(error, findFieldErrorOrigin(name, boundProperties, error));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Origin findFieldErrorOrigin(ConfigurationPropertyName name, Set&lt;ConfigurationProperty&gt; boundProperties,
+&nbsp;			FieldError error) {
+<b class="fc">&nbsp;		for (ConfigurationProperty boundProperty : boundProperties) {</b>
+<b class="fc">&nbsp;			if (isForError(name, boundProperty.getName(), error)) {</b>
+<b class="fc">&nbsp;				return Origin.from(boundProperty);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isForError(ConfigurationPropertyName name, ConfigurationPropertyName boundPropertyName,
+&nbsp;			FieldError error) {
+<b class="fc">&nbsp;		return name.isParentOf(boundPropertyName)</b>
+<b class="fc">&nbsp;				&amp;&amp; boundPropertyName.getLastElement(Form.UNIFORM).equalsIgnoreCase(error.getField());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the name of the item that was being validated.
+&nbsp;	 * @return the name of the item
+&nbsp;	 */
+&nbsp;	public ConfigurationPropertyName getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the properties that were bound before validation failed.
+&nbsp;	 * @return the boundProperties
+&nbsp;	 */
+&nbsp;	public Set&lt;ConfigurationProperty&gt; getBoundProperties() {
+<b class="nc">&nbsp;		return this.boundProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean hasErrors() {
+<b class="fc">&nbsp;		return !this.errors.isEmpty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the list of all validation errors.
+&nbsp;	 * @return the errors
+&nbsp;	 */
+&nbsp;	public List&lt;ObjectError&gt; getAllErrors() {
+<b class="nc">&nbsp;		return this.errors;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;ObjectError&gt; iterator() {
+<b class="fc">&nbsp;		return this.errors.iterator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

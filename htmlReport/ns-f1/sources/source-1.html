@@ -1,0 +1,399 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EmbeddedLdapAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.ldap.embedded</a>
+</div>
+
+<h1>Coverage Summary for Class: EmbeddedLdapAutoConfiguration (org.springframework.boot.autoconfigure.ldap.embedded)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmbeddedLdapAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EmbeddedLdapAutoConfiguration$EmbeddedLdapAutoConfigurationRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedLdapAutoConfiguration$EmbeddedLdapCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedLdapAutoConfiguration$EmbeddedLdapContextConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.ldap.embedded;
+&nbsp;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import com.unboundid.ldap.listener.InMemoryDirectoryServer;
+&nbsp;import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
+&nbsp;import com.unboundid.ldap.listener.InMemoryListenerConfig;
+&nbsp;import com.unboundid.ldap.sdk.LDAPException;
+&nbsp;import com.unboundid.ldap.sdk.schema.Schema;
+&nbsp;import com.unboundid.ldif.LDIFReader;
+&nbsp;import jakarta.annotation.PreDestroy;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionMessage.Builder;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+&nbsp;import org.springframework.boot.autoconfigure.ldap.LdapAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.ldap.LdapProperties;
+&nbsp;import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapAutoConfiguration.EmbeddedLdapAutoConfigurationRuntimeHints;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.ConditionContext;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.DependsOn;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.MapPropertySource;
+&nbsp;import org.springframework.core.env.MutablePropertySources;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.type.AnnotatedTypeMetadata;
+&nbsp;import org.springframework.ldap.core.ContextSource;
+&nbsp;import org.springframework.ldap.core.support.LdapContextSource;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for Embedded LDAP.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Mathieu Ouellet
+&nbsp; * @author Raja Kolli
+&nbsp; * @since 1.5.0
+&nbsp; */
+&nbsp;@AutoConfiguration(before = LdapAutoConfiguration.class)
+&nbsp;@EnableConfigurationProperties({ LdapProperties.class, EmbeddedLdapProperties.class })
+&nbsp;@ConditionalOnClass(InMemoryDirectoryServer.class)
+&nbsp;@Conditional(EmbeddedLdapAutoConfiguration.EmbeddedLdapCondition.class)
+&nbsp;@ImportRuntimeHints(EmbeddedLdapAutoConfigurationRuntimeHints.class)
+&nbsp;public class EmbeddedLdapAutoConfiguration {
+&nbsp;
+&nbsp;	private static final String PROPERTY_SOURCE_NAME = &quot;ldap.ports&quot;;
+&nbsp;
+&nbsp;	private final EmbeddedLdapProperties embeddedProperties;
+&nbsp;
+&nbsp;	private InMemoryDirectoryServer server;
+&nbsp;
+<b class="nc">&nbsp;	public EmbeddedLdapAutoConfiguration(EmbeddedLdapProperties embeddedProperties) {</b>
+<b class="nc">&nbsp;		this.embeddedProperties = embeddedProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	public InMemoryDirectoryServer directoryServer(ApplicationContext applicationContext) throws LDAPException {
+<b class="nc">&nbsp;		String[] baseDn = StringUtils.toStringArray(this.embeddedProperties.getBaseDn());</b>
+<b class="nc">&nbsp;		InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig(baseDn);</b>
+<b class="nc">&nbsp;		if (this.embeddedProperties.getCredential().isAvailable()) {</b>
+<b class="nc">&nbsp;			config.addAdditionalBindCredentials(this.embeddedProperties.getCredential().getUsername(),</b>
+<b class="nc">&nbsp;					this.embeddedProperties.getCredential().getPassword());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		setSchema(config);</b>
+<b class="nc">&nbsp;		InMemoryListenerConfig listenerConfig = InMemoryListenerConfig.createLDAPConfig(&quot;LDAP&quot;,</b>
+<b class="nc">&nbsp;				this.embeddedProperties.getPort());</b>
+<b class="nc">&nbsp;		config.setListenerConfigs(listenerConfig);</b>
+<b class="nc">&nbsp;		this.server = new InMemoryDirectoryServer(config);</b>
+<b class="nc">&nbsp;		importLdif(applicationContext);</b>
+<b class="nc">&nbsp;		this.server.startListening();</b>
+<b class="nc">&nbsp;		setPortProperty(applicationContext, this.server.getListenPort());</b>
+<b class="nc">&nbsp;		return this.server;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setSchema(InMemoryDirectoryServerConfig config) {
+<b class="nc">&nbsp;		if (!this.embeddedProperties.getValidation().isEnabled()) {</b>
+<b class="nc">&nbsp;			config.setSchema(null);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		Resource schema = this.embeddedProperties.getValidation().getSchema();</b>
+<b class="nc">&nbsp;		if (schema != null) {</b>
+<b class="nc">&nbsp;			setSchema(config, schema);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setSchema(InMemoryDirectoryServerConfig config, Resource resource) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Schema defaultSchema = Schema.getDefaultStandardSchema();</b>
+<b class="nc">&nbsp;			Schema schema = Schema.getSchema(resource.getInputStream());</b>
+<b class="nc">&nbsp;			config.setSchema(Schema.mergeSchemas(defaultSchema, schema));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to load schema &quot; + resource.getDescription(), ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void importLdif(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		String location = this.embeddedProperties.getLdif();</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(location)) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				Resource resource = applicationContext.getResource(location);</b>
+<b class="nc">&nbsp;				if (resource.exists()) {</b>
+<b class="nc">&nbsp;					try (InputStream inputStream = resource.getInputStream()) {</b>
+<b class="nc">&nbsp;						this.server.importFromLDIF(true, new LDIFReader(inputStream));</b>
+<b class="nc">&nbsp;					}</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Unable to load LDIF &quot; + location, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void setPortProperty(ApplicationContext context, int port) {
+<b class="nc">&nbsp;		if (context instanceof ConfigurableApplicationContext configurableContext) {</b>
+<b class="nc">&nbsp;			MutablePropertySources sources = configurableContext.getEnvironment().getPropertySources();</b>
+<b class="nc">&nbsp;			getLdapPorts(sources).put(&quot;local.ldap.port&quot;, port);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (context.getParent() != null) {</b>
+<b class="nc">&nbsp;			setPortProperty(context.getParent(), port);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private Map&lt;String, Object&gt; getLdapPorts(MutablePropertySources sources) {
+<b class="nc">&nbsp;		PropertySource&lt;?&gt; propertySource = sources.get(PROPERTY_SOURCE_NAME);</b>
+<b class="nc">&nbsp;		if (propertySource == null) {</b>
+<b class="nc">&nbsp;			propertySource = new MapPropertySource(PROPERTY_SOURCE_NAME, new HashMap&lt;&gt;());</b>
+<b class="nc">&nbsp;			sources.addFirst(propertySource);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (Map&lt;String, Object&gt;) propertySource.getSource();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@PreDestroy
+&nbsp;	public void close() {
+<b class="nc">&nbsp;		if (this.server != null) {</b>
+<b class="nc">&nbsp;			this.server.shutDown(true);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link SpringBootCondition} to determine when to apply embedded LDAP
+&nbsp;	 * auto-configuration.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class EmbeddedLdapCondition extends SpringBootCondition {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final Bindable&lt;List&lt;String&gt;&gt; STRING_LIST = Bindable.listOf(String.class);</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+<b class="nc">&nbsp;			Builder message = ConditionMessage.forCondition(&quot;Embedded LDAP&quot;);</b>
+<b class="nc">&nbsp;			Environment environment = context.getEnvironment();</b>
+<b class="nc">&nbsp;			if (environment != null &amp;&amp; !Binder.get(environment)</b>
+<b class="nc">&nbsp;				.bind(&quot;spring.ldap.embedded.base-dn&quot;, STRING_LIST)</b>
+<b class="nc">&nbsp;				.orElseGet(Collections::emptyList)</b>
+<b class="nc">&nbsp;				.isEmpty()) {</b>
+<b class="nc">&nbsp;				return ConditionOutcome.match(message.because(&quot;Found base-dn property&quot;));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return ConditionOutcome.noMatch(message.because(&quot;No base-dn property found&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass(ContextSource.class)
+<b class="nc">&nbsp;	static class EmbeddedLdapContextConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@DependsOn(&quot;directoryServer&quot;)
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		LdapContextSource ldapContextSource(Environment environment, LdapProperties properties,
+&nbsp;				EmbeddedLdapProperties embeddedProperties) {
+<b class="nc">&nbsp;			LdapContextSource source = new LdapContextSource();</b>
+<b class="nc">&nbsp;			source.setBase(properties.getBase());</b>
+<b class="nc">&nbsp;			if (embeddedProperties.getCredential().isAvailable()) {</b>
+<b class="nc">&nbsp;				source.setUserDn(embeddedProperties.getCredential().getUsername());</b>
+<b class="nc">&nbsp;				source.setPassword(embeddedProperties.getCredential().getPassword());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			source.setUrls(properties.determineUrls(environment));</b>
+<b class="nc">&nbsp;			return source;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class EmbeddedLdapAutoConfigurationRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			hints.resources()</b>
+<b class="nc">&nbsp;				.registerPatternIfPresent(classLoader, &quot;schema.ldif&quot;, (hint) -&gt; hint.includes(&quot;schema.ldif&quot;));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

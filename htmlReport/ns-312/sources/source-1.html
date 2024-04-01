@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MustacheView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.reactive.result.view</a>
+</div>
+
+<h1>Coverage Summary for Class: MustacheView (org.springframework.boot.web.reactive.result.view)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MustacheView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.reactive.result.view;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.Writer;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import com.samskivert.mustache.Mustache.Compiler;
+&nbsp;import com.samskivert.mustache.Template;
+&nbsp;import reactor.core.publisher.Flux;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.buffer.DataBuffer;
+&nbsp;import org.springframework.core.io.buffer.DataBufferUtils;
+&nbsp;import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+&nbsp;import org.springframework.http.MediaType;
+&nbsp;import org.springframework.web.reactive.result.view.AbstractUrlBasedView;
+&nbsp;import org.springframework.web.reactive.result.view.View;
+&nbsp;import org.springframework.web.server.ServerWebExchange;
+&nbsp;
+&nbsp;/**
+&nbsp; * Spring WebFlux {@link View} using the Mustache template engine.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.0.0
+&nbsp; */
+<b class="nc">&nbsp;public class MustacheView extends AbstractUrlBasedView {</b>
+&nbsp;
+&nbsp;	private Compiler compiler;
+&nbsp;
+&nbsp;	private String charset;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the JMustache compiler to be used by this view. Typically this property is not
+&nbsp;	 * set directly. Instead a single {@link Compiler} is expected in the Spring
+&nbsp;	 * application context which is used to compile Mustache templates.
+&nbsp;	 * @param compiler the Mustache compiler
+&nbsp;	 */
+&nbsp;	public void setCompiler(Compiler compiler) {
+<b class="nc">&nbsp;		this.compiler = compiler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the charset used for reading Mustache template files.
+&nbsp;	 * @param charset the charset to use for reading template files
+&nbsp;	 */
+&nbsp;	public void setCharset(String charset) {
+<b class="nc">&nbsp;		this.charset = charset;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean checkResourceExists(Locale locale) throws Exception {
+<b class="nc">&nbsp;		return resolveResource() != null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Mono&lt;Void&gt; renderInternal(Map&lt;String, Object&gt; model, MediaType contentType, ServerWebExchange exchange) {
+<b class="nc">&nbsp;		Resource resource = resolveResource();</b>
+<b class="nc">&nbsp;		if (resource == null) {</b>
+<b class="nc">&nbsp;			return Mono</b>
+<b class="nc">&nbsp;				.error(new IllegalStateException(&quot;Could not find Mustache template with URL [&quot; + getUrl() + &quot;]&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		DataBuffer dataBuffer = exchange.getResponse()</b>
+<b class="nc">&nbsp;			.bufferFactory()</b>
+<b class="nc">&nbsp;			.allocateBuffer(DefaultDataBufferFactory.DEFAULT_INITIAL_CAPACITY);</b>
+<b class="nc">&nbsp;		try (Reader reader = getReader(resource)) {</b>
+<b class="nc">&nbsp;			Template template = this.compiler.compile(reader);</b>
+<b class="nc">&nbsp;			Charset charset = getCharset(contentType).orElseGet(this::getDefaultCharset);</b>
+<b class="nc">&nbsp;			try (Writer writer = new OutputStreamWriter(dataBuffer.asOutputStream(), charset)) {</b>
+<b class="nc">&nbsp;				template.execute(model, writer);</b>
+<b class="nc">&nbsp;				writer.flush();</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			DataBufferUtils.release(dataBuffer);</b>
+<b class="nc">&nbsp;			return Mono.error(ex);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return exchange.getResponse().writeWith(Flux.just(dataBuffer));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Resource resolveResource() {
+<b class="nc">&nbsp;		Resource resource = getApplicationContext().getResource(getUrl());</b>
+<b class="nc">&nbsp;		if (resource == null || !resource.exists()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return resource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Reader getReader(Resource resource) throws IOException {
+<b class="nc">&nbsp;		if (this.charset != null) {</b>
+<b class="nc">&nbsp;			return new InputStreamReader(resource.getInputStream(), this.charset);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new InputStreamReader(resource.getInputStream());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Optional&lt;Charset&gt; getCharset(MediaType mediaType) {
+<b class="nc">&nbsp;		return Optional.ofNullable((mediaType != null) ? mediaType.getCharset() : null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

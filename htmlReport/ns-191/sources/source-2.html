@@ -1,0 +1,199 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MyReactiveCloudFoundryConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docs.actuator.cloudfoundry.customcontextpath</a>
+</div>
+
+<h1>Coverage Summary for Class: MyReactiveCloudFoundryConfiguration (org.springframework.boot.docs.actuator.cloudfoundry.customcontextpath)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MyReactiveCloudFoundryConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MyReactiveCloudFoundryConfiguration$CloudFoundryHttpHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docs.actuator.cloudfoundry.customcontextpath;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import reactor.core.publisher.Mono;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.http.server.reactive.ContextPathCompositeHandler;
+&nbsp;import org.springframework.http.server.reactive.HttpHandler;
+<b class="nc">&nbsp;import org.springframework.http.server.reactive.ServerHttpRequest;</b>
+&nbsp;import org.springframework.http.server.reactive.ServerHttpResponse;
+&nbsp;import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
+&nbsp;
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@EnableConfigurationProperties(WebFluxProperties.class)
+<b class="nc">&nbsp;public class MyReactiveCloudFoundryConfiguration {</b>
+<b class="nc">&nbsp;</b>
+&nbsp;	@Bean
+&nbsp;	public HttpHandler httpHandler(ApplicationContext applicationContext, WebFluxProperties properties) {
+<b class="nc">&nbsp;		HttpHandler httpHandler = WebHttpHandlerBuilder.applicationContext(applicationContext).build();</b>
+<b class="nc">&nbsp;		return new CloudFoundryHttpHandler(properties.getBasePath(), httpHandler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class CloudFoundryHttpHandler implements HttpHandler {
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;		private final HttpHandler delegate;</b>
+<b class="nc">&nbsp;</b>
+<b class="nc">&nbsp;		private final ContextPathCompositeHandler contextPathDelegate;</b>
+<b class="nc">&nbsp;</b>
+&nbsp;		private CloudFoundryHttpHandler(String basePath, HttpHandler delegate) {
+&nbsp;			this.delegate = delegate;
+&nbsp;			this.contextPathDelegate = new ContextPathCompositeHandler(Map.of(basePath, delegate));
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Mono&lt;Void&gt; handle(ServerHttpRequest request, ServerHttpResponse response) {
+&nbsp;			// Remove underlying context path first (e.g. Servlet container)
+&nbsp;			String path = request.getPath().pathWithinApplication().value();
+&nbsp;			if (path.startsWith(&quot;/cloudfoundryapplication&quot;)) {
+&nbsp;				return this.delegate.handle(request, response);
+&nbsp;			}
+&nbsp;			else {
+&nbsp;				return this.contextPathDelegate.handle(request, response);
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

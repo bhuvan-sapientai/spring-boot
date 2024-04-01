@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServiceReadinessChecks</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: ServiceReadinessChecks (org.springframework.boot.docker.compose.lifecycle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServiceReadinessChecks</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.lifecycle;
+&nbsp;
+&nbsp;import java.time.Clock;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.docker.compose.core.RunningService;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility used to {@link #wait() wait} for {@link RunningService services} to be ready.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ServiceReadinessChecks {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ServiceReadinessChecks.class);</b>
+&nbsp;
+&nbsp;	private static final String DISABLE_LABEL = &quot;org.springframework.boot.readiness-check.disable&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Duration SLEEP_BETWEEN_READINESS_TRIES = Duration.ofSeconds(1);</b>
+&nbsp;
+&nbsp;	private final Clock clock;
+&nbsp;
+&nbsp;	private final Consumer&lt;Duration&gt; sleep;
+&nbsp;
+&nbsp;	private final DockerComposeProperties.Readiness properties;
+&nbsp;
+&nbsp;	private final TcpConnectServiceReadinessCheck check;
+&nbsp;
+&nbsp;	ServiceReadinessChecks(DockerComposeProperties.Readiness properties) {
+<b class="nc">&nbsp;		this(properties, Clock.systemUTC(), ServiceReadinessChecks::sleep,</b>
+<b class="nc">&nbsp;				new TcpConnectServiceReadinessCheck(properties.getTcp()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	ServiceReadinessChecks(DockerComposeProperties.Readiness properties, Clock clock, Consumer&lt;Duration&gt; sleep,
+<b class="nc">&nbsp;			TcpConnectServiceReadinessCheck check) {</b>
+<b class="nc">&nbsp;		this.clock = clock;</b>
+<b class="nc">&nbsp;		this.sleep = sleep;</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+<b class="nc">&nbsp;		this.check = check;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Wait for the given services to be ready.
+&nbsp;	 * @param runningServices the services to wait for
+&nbsp;	 */
+&nbsp;	void waitUntilReady(List&lt;RunningService&gt; runningServices) {
+<b class="nc">&nbsp;		Duration timeout = this.properties.getTimeout();</b>
+<b class="nc">&nbsp;		Instant start = this.clock.instant();</b>
+&nbsp;		while (true) {
+<b class="nc">&nbsp;			List&lt;ServiceNotReadyException&gt; exceptions = check(runningServices);</b>
+<b class="nc">&nbsp;			if (exceptions.isEmpty()) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			Duration elapsed = Duration.between(start, this.clock.instant());</b>
+<b class="nc">&nbsp;			if (elapsed.compareTo(timeout) &gt; 0) {</b>
+<b class="nc">&nbsp;				throw new ReadinessTimeoutException(timeout, exceptions);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.sleep.accept(SLEEP_BETWEEN_READINESS_TRIES);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;ServiceNotReadyException&gt; check(List&lt;RunningService&gt; runningServices) {
+<b class="nc">&nbsp;		List&lt;ServiceNotReadyException&gt; exceptions = null;</b>
+<b class="nc">&nbsp;		for (RunningService service : runningServices) {</b>
+<b class="nc">&nbsp;			if (isDisabled(service)) {</b>
+<b class="nc">&nbsp;				continue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			logger.trace(LogMessage.format(&quot;Checking readiness of service &#39;%s&#39;&quot;, service));</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				this.check.check(service);</b>
+<b class="nc">&nbsp;				logger.trace(LogMessage.format(&quot;Service &#39;%s&#39; is ready&quot;, service));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ServiceNotReadyException ex) {</b>
+<b class="nc">&nbsp;				logger.trace(LogMessage.format(&quot;Service &#39;%s&#39; is not ready&quot;, service), ex);</b>
+<b class="nc">&nbsp;				exceptions = (exceptions != null) ? exceptions : new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;				exceptions.add(ex);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return (exceptions != null) ? exceptions : Collections.emptyList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isDisabled(RunningService service) {
+<b class="nc">&nbsp;		return service.labels().containsKey(DISABLE_LABEL);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void sleep(Duration duration) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Thread.sleep(duration.toMillis());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;			Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

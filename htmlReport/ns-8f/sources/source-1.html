@@ -1,0 +1,310 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataSourceHealthIndicator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.jdbc</a>
+</div>
+
+<h1>Coverage Summary for Class: DataSourceHealthIndicator (org.springframework.boot.actuate.jdbc)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataSourceHealthIndicator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DataSourceHealthIndicator$SingleColumnRowMapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.jdbc;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.ResultSet;
+&nbsp;import java.sql.ResultSetMetaData;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.InitializingBean;
+&nbsp;import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+&nbsp;import org.springframework.boot.actuate.health.Health;
+&nbsp;import org.springframework.boot.actuate.health.HealthIndicator;
+&nbsp;import org.springframework.boot.actuate.health.Status;
+&nbsp;import org.springframework.dao.support.DataAccessUtils;
+&nbsp;import org.springframework.jdbc.IncorrectResultSetColumnCountException;
+&nbsp;import org.springframework.jdbc.core.ConnectionCallback;
+&nbsp;import org.springframework.jdbc.core.JdbcTemplate;
+&nbsp;import org.springframework.jdbc.core.RowMapper;
+&nbsp;import org.springframework.jdbc.support.JdbcUtils;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link HealthIndicator} that tests the status of a {@link DataSource} and optionally
+&nbsp; * runs a test query.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Christian Dupuis
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Arthur Kalimullin
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class DataSourceHealthIndicator extends AbstractHealthIndicator implements InitializingBean {
+&nbsp;
+&nbsp;	private DataSource dataSource;
+&nbsp;
+&nbsp;	private String query;
+&nbsp;
+&nbsp;	private JdbcTemplate jdbcTemplate;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link DataSourceHealthIndicator} instance.
+&nbsp;	 */
+&nbsp;	public DataSourceHealthIndicator() {
+<b class="nc">&nbsp;		this(null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link DataSourceHealthIndicator} using the specified
+&nbsp;	 * {@link DataSource}.
+&nbsp;	 * @param dataSource the data source
+&nbsp;	 */
+&nbsp;	public DataSourceHealthIndicator(DataSource dataSource) {
+<b class="nc">&nbsp;		this(dataSource, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link DataSourceHealthIndicator} using the specified
+&nbsp;	 * {@link DataSource} and validation query.
+&nbsp;	 * @param dataSource the data source
+&nbsp;	 * @param query the validation query to use (can be {@code null})
+&nbsp;	 */
+&nbsp;	public DataSourceHealthIndicator(DataSource dataSource, String query) {
+<b class="nc">&nbsp;		super(&quot;DataSource health check failed&quot;);</b>
+<b class="nc">&nbsp;		this.dataSource = dataSource;</b>
+<b class="nc">&nbsp;		this.query = query;</b>
+<b class="nc">&nbsp;		this.jdbcTemplate = (dataSource != null) ? new JdbcTemplate(dataSource) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterPropertiesSet() throws Exception {
+<b class="nc">&nbsp;		Assert.state(this.dataSource != null, &quot;DataSource for DataSourceHealthIndicator must be specified&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void doHealthCheck(Health.Builder builder) throws Exception {
+<b class="nc">&nbsp;		if (this.dataSource == null) {</b>
+<b class="nc">&nbsp;			builder.up().withDetail(&quot;database&quot;, &quot;unknown&quot;);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			doDataSourceHealthCheck(builder);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void doDataSourceHealthCheck(Health.Builder builder) {
+<b class="nc">&nbsp;		builder.up().withDetail(&quot;database&quot;, getProduct());</b>
+<b class="nc">&nbsp;		String validationQuery = this.query;</b>
+<b class="nc">&nbsp;		if (StringUtils.hasText(validationQuery)) {</b>
+<b class="nc">&nbsp;			builder.withDetail(&quot;validationQuery&quot;, validationQuery);</b>
+&nbsp;			// Avoid calling getObject as it breaks MySQL on Java 7 and later
+<b class="nc">&nbsp;			List&lt;Object&gt; results = this.jdbcTemplate.query(validationQuery, new SingleColumnRowMapper());</b>
+<b class="nc">&nbsp;			Object result = DataAccessUtils.requiredSingleResult(results);</b>
+<b class="nc">&nbsp;			builder.withDetail(&quot;result&quot;, result);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			builder.withDetail(&quot;validationQuery&quot;, &quot;isValid()&quot;);</b>
+<b class="nc">&nbsp;			boolean valid = isConnectionValid();</b>
+<b class="nc">&nbsp;			builder.status((valid) ? Status.UP : Status.DOWN);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getProduct() {
+<b class="nc">&nbsp;		return this.jdbcTemplate.execute((ConnectionCallback&lt;String&gt;) this::getProduct);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getProduct(Connection connection) throws SQLException {
+<b class="nc">&nbsp;		return connection.getMetaData().getDatabaseProductName();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Boolean isConnectionValid() {
+<b class="nc">&nbsp;		return this.jdbcTemplate.execute((ConnectionCallback&lt;Boolean&gt;) this::isConnectionValid);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Boolean isConnectionValid(Connection connection) throws SQLException {
+<b class="nc">&nbsp;		return connection.isValid(0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link DataSource} to use.
+&nbsp;	 * @param dataSource the data source
+&nbsp;	 */
+&nbsp;	public void setDataSource(DataSource dataSource) {
+<b class="nc">&nbsp;		this.dataSource = dataSource;</b>
+<b class="nc">&nbsp;		this.jdbcTemplate = new JdbcTemplate(dataSource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set a specific validation query to use to validate a connection. If none is set, a
+&nbsp;	 * validation based on {@link Connection#isValid(int)} is used.
+&nbsp;	 * @param query the validation query to use
+&nbsp;	 */
+&nbsp;	public void setQuery(String query) {
+<b class="nc">&nbsp;		this.query = query;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the validation query or {@code null}.
+&nbsp;	 * @return the query
+&nbsp;	 */
+&nbsp;	public String getQuery() {
+<b class="nc">&nbsp;		return this.query;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link RowMapper} that expects and returns results from a single column.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class SingleColumnRowMapper implements RowMapper&lt;Object&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+<b class="nc">&nbsp;			ResultSetMetaData metaData = rs.getMetaData();</b>
+<b class="nc">&nbsp;			int columns = metaData.getColumnCount();</b>
+<b class="nc">&nbsp;			if (columns != 1) {</b>
+<b class="nc">&nbsp;				throw new IncorrectResultSetColumnCountException(1, columns);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return JdbcUtils.getResultSetValue(rs, 1);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

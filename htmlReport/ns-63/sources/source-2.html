@@ -1,0 +1,370 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BravePropagationConfigurations</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.tracing</a>
+</div>
+
+<h1>Coverage Summary for Class: BravePropagationConfigurations (org.springframework.boot.actuate.autoconfigure.tracing)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BravePropagationConfigurations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BravePropagationConfigurations$NoPropagation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BravePropagationConfigurations$PropagationWithBaggage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BravePropagationConfigurations$PropagationWithBaggage$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BravePropagationConfigurations$PropagationWithoutBaggage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.tracing;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import brave.baggage.BaggageField;
+&nbsp;import brave.baggage.BaggagePropagation;
+&nbsp;import brave.baggage.BaggagePropagation.FactoryBuilder;
+&nbsp;import brave.baggage.BaggagePropagationConfig;
+&nbsp;import brave.baggage.BaggagePropagationCustomizer;
+&nbsp;import brave.baggage.CorrelationScopeConfig.SingleCorrelationField;
+&nbsp;import brave.baggage.CorrelationScopeCustomizer;
+&nbsp;import brave.baggage.CorrelationScopeDecorator;
+&nbsp;import brave.context.slf4j.MDCScopeDecorator;
+&nbsp;import brave.propagation.CurrentTraceContext.ScopeDecorator;
+&nbsp;import brave.propagation.Propagation;
+&nbsp;import brave.propagation.Propagation.Factory;
+&nbsp;import brave.propagation.Propagation.KeyFactory;
+&nbsp;import io.micrometer.tracing.brave.bridge.BraveBaggageManager;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.tracing.TracingProperties.Baggage.Correlation;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;
+&nbsp;/**
+&nbsp; * Brave propagation configurations. They are imported by {@link BraveAutoConfiguration}.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; */
+<b class="nc">&nbsp;class BravePropagationConfigurations {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Propagates traces but no baggage.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnProperty(value = &quot;management.tracing.baggage.enabled&quot;, havingValue = &quot;false&quot;)
+<b class="nc">&nbsp;	static class PropagationWithoutBaggage {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(Factory.class)
+&nbsp;		@ConditionalOnEnabledTracing
+&nbsp;		CompositePropagationFactory propagationFactory(TracingProperties properties) {
+<b class="nc">&nbsp;			return CompositePropagationFactory.create(properties.getPropagation());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Propagates traces and baggage.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnProperty(value = &quot;management.tracing.baggage.enabled&quot;, matchIfMissing = true)
+&nbsp;	@EnableConfigurationProperties(TracingProperties.class)
+&nbsp;	static class PropagationWithBaggage {
+&nbsp;
+&nbsp;		private final TracingProperties tracingProperties;
+&nbsp;
+<b class="nc">&nbsp;		PropagationWithBaggage(TracingProperties tracingProperties) {</b>
+<b class="nc">&nbsp;			this.tracingProperties = tracingProperties;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		BaggagePropagation.FactoryBuilder propagationFactoryBuilder(
+&nbsp;				ObjectProvider&lt;BaggagePropagationCustomizer&gt; baggagePropagationCustomizers) {
+&nbsp;			// There&#39;s a chicken-and-egg problem here: to create a builder, we need a
+&nbsp;			// factory. But the CompositePropagationFactory needs data from the builder.
+&nbsp;			// We create a throw-away builder with a throw-away factory, and then copy the
+&nbsp;			// config to the real builder.
+<b class="nc">&nbsp;			FactoryBuilder throwAwayBuilder = BaggagePropagation.newFactoryBuilder(createThrowAwayFactory());</b>
+<b class="nc">&nbsp;			baggagePropagationCustomizers.orderedStream()</b>
+<b class="nc">&nbsp;				.forEach((customizer) -&gt; customizer.customize(throwAwayBuilder));</b>
+<b class="nc">&nbsp;			CompositePropagationFactory propagationFactory = CompositePropagationFactory.create(</b>
+<b class="nc">&nbsp;					this.tracingProperties.getPropagation(),</b>
+<b class="nc">&nbsp;					new BraveBaggageManager(this.tracingProperties.getBaggage().getTagFields()),</b>
+<b class="nc">&nbsp;					LocalBaggageFields.extractFrom(throwAwayBuilder));</b>
+<b class="nc">&nbsp;			FactoryBuilder builder = BaggagePropagation.newFactoryBuilder(propagationFactory);</b>
+<b class="nc">&nbsp;			throwAwayBuilder.configs().forEach(builder::add);</b>
+<b class="nc">&nbsp;			return builder;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;		private Factory createThrowAwayFactory() {
+<b class="nc">&nbsp;			return new Factory() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public &lt;K&gt; Propagation&lt;K&gt; create(KeyFactory&lt;K&gt; keyFactory) {
+<b class="nc">&nbsp;					return null;</b>
+&nbsp;				}
+&nbsp;
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		BaggagePropagationCustomizer remoteFieldsBaggagePropagationCustomizer() {
+<b class="nc">&nbsp;			return (builder) -&gt; {</b>
+<b class="nc">&nbsp;				List&lt;String&gt; remoteFields = this.tracingProperties.getBaggage().getRemoteFields();</b>
+<b class="nc">&nbsp;				for (String fieldName : remoteFields) {</b>
+<b class="nc">&nbsp;					builder.add(BaggagePropagationConfig.SingleBaggageField.remote(BaggageField.create(fieldName)));</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				List&lt;String&gt; localFields = this.tracingProperties.getBaggage().getLocalFields();</b>
+<b class="nc">&nbsp;				for (String localFieldName : localFields) {</b>
+<b class="nc">&nbsp;					builder.add(BaggagePropagationConfig.SingleBaggageField.local(BaggageField.create(localFieldName)));</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		@ConditionalOnEnabledTracing
+&nbsp;		Factory propagationFactory(BaggagePropagation.FactoryBuilder factoryBuilder) {
+<b class="nc">&nbsp;			return factoryBuilder.build();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		CorrelationScopeDecorator.Builder mdcCorrelationScopeDecoratorBuilder(
+&nbsp;				ObjectProvider&lt;CorrelationScopeCustomizer&gt; correlationScopeCustomizers) {
+<b class="nc">&nbsp;			CorrelationScopeDecorator.Builder builder = MDCScopeDecorator.newBuilder();</b>
+<b class="nc">&nbsp;			correlationScopeCustomizers.orderedStream().forEach((customizer) -&gt; customizer.customize(builder));</b>
+<b class="nc">&nbsp;			return builder;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@Order(0)
+&nbsp;		@ConditionalOnProperty(prefix = &quot;management.tracing.baggage.correlation&quot;, name = &quot;enabled&quot;,
+&nbsp;				matchIfMissing = true)
+&nbsp;		CorrelationScopeCustomizer correlationFieldsCorrelationScopeCustomizer() {
+<b class="nc">&nbsp;			return (builder) -&gt; {</b>
+<b class="nc">&nbsp;				Correlation correlationProperties = this.tracingProperties.getBaggage().getCorrelation();</b>
+<b class="nc">&nbsp;				for (String field : correlationProperties.getFields()) {</b>
+<b class="nc">&nbsp;					BaggageField baggageField = BaggageField.create(field);</b>
+<b class="nc">&nbsp;					SingleCorrelationField correlationField = SingleCorrelationField.newBuilder(baggageField)</b>
+<b class="nc">&nbsp;						.flushOnUpdate()</b>
+<b class="nc">&nbsp;						.build();</b>
+<b class="nc">&nbsp;					builder.add(correlationField);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(CorrelationScopeDecorator.class)
+&nbsp;		ScopeDecorator correlationScopeDecorator(CorrelationScopeDecorator.Builder builder) {
+<b class="nc">&nbsp;			return builder.build();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Propagates neither traces nor baggage.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+<b class="nc">&nbsp;	static class NoPropagation {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(Factory.class)
+&nbsp;		CompositePropagationFactory noopPropagationFactory() {
+<b class="nc">&nbsp;			return CompositePropagationFactory.noop();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

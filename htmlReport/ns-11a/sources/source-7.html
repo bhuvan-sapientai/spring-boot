@@ -1,0 +1,452 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TomcatWebServerFactoryCustomizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.embedded</a>
+</div>
+
+<h1>Coverage Summary for Class: TomcatWebServerFactoryCustomizer (org.springframework.boot.autoconfigure.web.embedded)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TomcatWebServerFactoryCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/149)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.embedded;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.ObjIntConsumer;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.management.ObjectName;
+&nbsp;
+&nbsp;import org.apache.catalina.Lifecycle;
+&nbsp;import org.apache.catalina.core.StandardThreadExecutor;
+&nbsp;import org.apache.catalina.valves.AccessLogValve;
+&nbsp;import org.apache.catalina.valves.ErrorReportValve;
+&nbsp;import org.apache.catalina.valves.RemoteIpValve;
+&nbsp;import org.apache.coyote.AbstractProtocol;
+&nbsp;import org.apache.coyote.ProtocolHandler;
+&nbsp;import org.apache.coyote.UpgradeProtocol;
+&nbsp;import org.apache.coyote.http11.AbstractHttp11Protocol;
+&nbsp;import org.apache.coyote.http2.Http2Protocol;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.web.ErrorProperties;
+&nbsp;import org.springframework.boot.autoconfigure.web.ErrorProperties.IncludeAttribute;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat.Accesslog;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat.Remoteip;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat.Threads;
+&nbsp;import org.springframework.boot.cloud.CloudPlatform;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.web.embedded.tomcat.ConfigurableTomcatWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.util.unit.DataSize;
+&nbsp;
+&nbsp;/**
+&nbsp; * Customization for Tomcat-specific features common for both Servlet and Reactive
+&nbsp; * servers.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Yulin Qin
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Artsiom Yudovin
+&nbsp; * @author Chentao Qu
+&nbsp; * @author Andrew McGhie
+&nbsp; * @author Dirk Deyne
+&nbsp; * @author Rafiullah Hamedy
+&nbsp; * @author Victor Mandujano
+&nbsp; * @author Parviz Rozikov
+&nbsp; * @author Florian Storz
+&nbsp; * @author Michael Weidmann
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class TomcatWebServerFactoryCustomizer
+&nbsp;		implements WebServerFactoryCustomizer&lt;ConfigurableTomcatWebServerFactory&gt;, Ordered {
+&nbsp;
+&nbsp;	static final int ORDER = 0;
+&nbsp;
+&nbsp;	private final Environment environment;
+&nbsp;
+&nbsp;	private final ServerProperties serverProperties;
+&nbsp;
+<b class="nc">&nbsp;	public TomcatWebServerFactoryCustomizer(Environment environment, ServerProperties serverProperties) {</b>
+<b class="nc">&nbsp;		this.environment = environment;</b>
+<b class="nc">&nbsp;		this.serverProperties = serverProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return ORDER;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	@SuppressWarnings(&quot;removal&quot;)
+&nbsp;	public void customize(ConfigurableTomcatWebServerFactory factory) {
+<b class="nc">&nbsp;		ServerProperties.Tomcat properties = this.serverProperties.getTomcat();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(properties::getBasedir).to(factory::setBaseDirectory);</b>
+<b class="nc">&nbsp;		map.from(properties::getBackgroundProcessorDelay)</b>
+<b class="nc">&nbsp;			.as(Duration::getSeconds)</b>
+<b class="nc">&nbsp;			.as(Long::intValue)</b>
+<b class="nc">&nbsp;			.to(factory::setBackgroundProcessorDelay);</b>
+<b class="nc">&nbsp;		customizeRemoteIpValve(factory);</b>
+<b class="nc">&nbsp;		configureExecutor(factory, properties.getThreads());</b>
+<b class="nc">&nbsp;		map.from(this.serverProperties.getMaxHttpRequestHeaderSize())</b>
+<b class="nc">&nbsp;			.asInt(DataSize::toBytes)</b>
+<b class="nc">&nbsp;			.when(this::isPositive)</b>
+<b class="nc">&nbsp;			.to((maxHttpRequestHeaderSize) -&gt; customizeMaxHttpRequestHeaderSize(factory, maxHttpRequestHeaderSize));</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxHttpResponseHeaderSize)</b>
+<b class="nc">&nbsp;			.asInt(DataSize::toBytes)</b>
+<b class="nc">&nbsp;			.when(this::isPositive)</b>
+<b class="nc">&nbsp;			.to((maxHttpResponseHeaderSize) -&gt; customizeMaxHttpResponseHeaderSize(factory, maxHttpResponseHeaderSize));</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxSwallowSize)</b>
+<b class="nc">&nbsp;			.asInt(DataSize::toBytes)</b>
+<b class="nc">&nbsp;			.to((maxSwallowSize) -&gt; customizeMaxSwallowSize(factory, maxSwallowSize));</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxHttpFormPostSize)</b>
+<b class="nc">&nbsp;			.asInt(DataSize::toBytes)</b>
+<b class="nc">&nbsp;			.when((maxHttpFormPostSize) -&gt; maxHttpFormPostSize != 0)</b>
+<b class="nc">&nbsp;			.to((maxHttpFormPostSize) -&gt; customizeMaxHttpFormPostSize(factory, maxHttpFormPostSize));</b>
+<b class="nc">&nbsp;		map.from(properties::getAccesslog)</b>
+<b class="nc">&nbsp;			.when(ServerProperties.Tomcat.Accesslog::isEnabled)</b>
+<b class="nc">&nbsp;			.to((enabled) -&gt; customizeAccessLog(factory));</b>
+<b class="nc">&nbsp;		map.from(properties::getUriEncoding).to(factory::setUriEncoding);</b>
+<b class="nc">&nbsp;		map.from(properties::getConnectionTimeout)</b>
+<b class="nc">&nbsp;			.to((connectionTimeout) -&gt; customizeConnectionTimeout(factory, connectionTimeout));</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxConnections)</b>
+<b class="nc">&nbsp;			.when(this::isPositive)</b>
+<b class="nc">&nbsp;			.to((maxConnections) -&gt; customizeMaxConnections(factory, maxConnections));</b>
+<b class="nc">&nbsp;		map.from(properties::getAcceptCount)</b>
+<b class="nc">&nbsp;			.when(this::isPositive)</b>
+<b class="nc">&nbsp;			.to((acceptCount) -&gt; customizeAcceptCount(factory, acceptCount));</b>
+<b class="nc">&nbsp;		map.from(properties::getProcessorCache)</b>
+<b class="nc">&nbsp;			.to((processorCache) -&gt; customizeProcessorCache(factory, processorCache));</b>
+<b class="nc">&nbsp;		map.from(properties::getKeepAliveTimeout)</b>
+<b class="nc">&nbsp;			.to((keepAliveTimeout) -&gt; customizeKeepAliveTimeout(factory, keepAliveTimeout));</b>
+<b class="nc">&nbsp;		map.from(properties::getMaxKeepAliveRequests)</b>
+<b class="nc">&nbsp;			.to((maxKeepAliveRequests) -&gt; customizeMaxKeepAliveRequests(factory, maxKeepAliveRequests));</b>
+<b class="nc">&nbsp;		map.from(properties::getRelaxedPathChars)</b>
+<b class="nc">&nbsp;			.as(this::joinCharacters)</b>
+<b class="nc">&nbsp;			.whenHasText()</b>
+<b class="nc">&nbsp;			.to((relaxedChars) -&gt; customizeRelaxedPathChars(factory, relaxedChars));</b>
+<b class="nc">&nbsp;		map.from(properties::getRelaxedQueryChars)</b>
+<b class="nc">&nbsp;			.as(this::joinCharacters)</b>
+<b class="nc">&nbsp;			.whenHasText()</b>
+<b class="nc">&nbsp;			.to((relaxedChars) -&gt; customizeRelaxedQueryChars(factory, relaxedChars));</b>
+<b class="nc">&nbsp;		map.from(properties::isRejectIllegalHeader)</b>
+<b class="nc">&nbsp;			.to((rejectIllegalHeader) -&gt; customizeRejectIllegalHeader(factory, rejectIllegalHeader));</b>
+<b class="nc">&nbsp;		customizeStaticResources(factory);</b>
+<b class="nc">&nbsp;		customizeErrorReportValve(this.serverProperties.getError(), factory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureExecutor(ConfigurableTomcatWebServerFactory factory, Threads threadProperties) {
+<b class="nc">&nbsp;		factory.addProtocolHandlerCustomizers((handler) -&gt; {</b>
+<b class="nc">&nbsp;			StandardThreadExecutor executor = new StandardThreadExecutor();</b>
+<b class="nc">&nbsp;			executor.setMinSpareThreads(threadProperties.getMinSpare());</b>
+<b class="nc">&nbsp;			executor.setMaxThreads(threadProperties.getMax());</b>
+<b class="nc">&nbsp;			executor.setMaxQueueSize(threadProperties.getMaxQueueCapacity());</b>
+<b class="nc">&nbsp;			if (handler instanceof AbstractProtocol&lt;?&gt; protocol) {</b>
+<b class="nc">&nbsp;				executor.setNamePrefix(ObjectName.unquote(protocol.getName()) + &quot;-exec-&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			handler.setExecutor(executor);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isPositive(int value) {
+<b class="nc">&nbsp;		return value &gt; 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private void customizeAcceptCount(ConfigurableTomcatWebServerFactory factory, int acceptCount) {
+<b class="nc">&nbsp;		customizeHandler(factory, acceptCount, AbstractProtocol.class, AbstractProtocol::setAcceptCount);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private void customizeProcessorCache(ConfigurableTomcatWebServerFactory factory, int processorCache) {
+<b class="nc">&nbsp;		customizeHandler(factory, processorCache, AbstractProtocol.class, AbstractProtocol::setProcessorCache);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeKeepAliveTimeout(ConfigurableTomcatWebServerFactory factory, Duration keepAliveTimeout) {
+<b class="nc">&nbsp;		factory.addConnectorCustomizers((connector) -&gt; {</b>
+<b class="nc">&nbsp;			ProtocolHandler handler = connector.getProtocolHandler();</b>
+<b class="nc">&nbsp;			for (UpgradeProtocol upgradeProtocol : handler.findUpgradeProtocols()) {</b>
+<b class="nc">&nbsp;				if (upgradeProtocol instanceof Http2Protocol protocol) {</b>
+<b class="nc">&nbsp;					protocol.setKeepAliveTimeout(keepAliveTimeout.toMillis());</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			if (handler instanceof AbstractProtocol&lt;?&gt; protocol) {</b>
+<b class="nc">&nbsp;				protocol.setKeepAliveTimeout((int) keepAliveTimeout.toMillis());</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private void customizeMaxKeepAliveRequests(ConfigurableTomcatWebServerFactory factory, int maxKeepAliveRequests) {
+<b class="nc">&nbsp;		customizeHandler(factory, maxKeepAliveRequests, AbstractHttp11Protocol.class,</b>
+&nbsp;				AbstractHttp11Protocol::setMaxKeepAliveRequests);
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private void customizeMaxConnections(ConfigurableTomcatWebServerFactory factory, int maxConnections) {
+<b class="nc">&nbsp;		customizeHandler(factory, maxConnections, AbstractProtocol.class, AbstractProtocol::setMaxConnections);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private void customizeConnectionTimeout(ConfigurableTomcatWebServerFactory factory, Duration connectionTimeout) {
+<b class="nc">&nbsp;		customizeHandler(factory, (int) connectionTimeout.toMillis(), AbstractProtocol.class,</b>
+&nbsp;				AbstractProtocol::setConnectionTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeRelaxedPathChars(ConfigurableTomcatWebServerFactory factory, String relaxedChars) {
+<b class="nc">&nbsp;		factory.addConnectorCustomizers((connector) -&gt; connector.setProperty(&quot;relaxedPathChars&quot;, relaxedChars));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeRelaxedQueryChars(ConfigurableTomcatWebServerFactory factory, String relaxedChars) {
+<b class="nc">&nbsp;		factory.addConnectorCustomizers((connector) -&gt; connector.setProperty(&quot;relaxedQueryChars&quot;, relaxedChars));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;	private void customizeRejectIllegalHeader(ConfigurableTomcatWebServerFactory factory, boolean rejectIllegalHeader) {
+<b class="nc">&nbsp;		factory.addConnectorCustomizers((connector) -&gt; {</b>
+<b class="nc">&nbsp;			ProtocolHandler handler = connector.getProtocolHandler();</b>
+<b class="nc">&nbsp;			if (handler instanceof AbstractHttp11Protocol&lt;?&gt; protocol) {</b>
+<b class="nc">&nbsp;				protocol.setRejectIllegalHeader(rejectIllegalHeader);</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private String joinCharacters(List&lt;Character&gt; content) {
+<b class="nc">&nbsp;		return content.stream().map(String::valueOf).collect(Collectors.joining());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeRemoteIpValve(ConfigurableTomcatWebServerFactory factory) {
+<b class="nc">&nbsp;		Remoteip remoteIpProperties = this.serverProperties.getTomcat().getRemoteip();</b>
+<b class="nc">&nbsp;		String protocolHeader = remoteIpProperties.getProtocolHeader();</b>
+<b class="nc">&nbsp;		String remoteIpHeader = remoteIpProperties.getRemoteIpHeader();</b>
+&nbsp;		// For back compatibility the valve is also enabled if protocol-header is set
+<b class="nc">&nbsp;		if (StringUtils.hasText(protocolHeader) || StringUtils.hasText(remoteIpHeader)</b>
+<b class="nc">&nbsp;				|| getOrDeduceUseForwardHeaders()) {</b>
+<b class="nc">&nbsp;			RemoteIpValve valve = new RemoteIpValve();</b>
+<b class="nc">&nbsp;			valve.setProtocolHeader(StringUtils.hasLength(protocolHeader) ? protocolHeader : &quot;X-Forwarded-Proto&quot;);</b>
+<b class="nc">&nbsp;			if (StringUtils.hasLength(remoteIpHeader)) {</b>
+<b class="nc">&nbsp;				valve.setRemoteIpHeader(remoteIpHeader);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			valve.setTrustedProxies(remoteIpProperties.getTrustedProxies());</b>
+&nbsp;			// The internal proxies default to a list of &quot;safe&quot; internal IP addresses
+<b class="nc">&nbsp;			valve.setInternalProxies(remoteIpProperties.getInternalProxies());</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				valve.setHostHeader(remoteIpProperties.getHostHeader());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NoSuchMethodError ex) {</b>
+&nbsp;				// Avoid failure with war deployments to Tomcat 8.5 before 8.5.44 and
+&nbsp;				// Tomcat 9 before 9.0.23
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			valve.setPortHeader(remoteIpProperties.getPortHeader());</b>
+<b class="nc">&nbsp;			valve.setProtocolHeaderHttpsValue(remoteIpProperties.getProtocolHeaderHttpsValue());</b>
+&nbsp;			// ... so it&#39;s safe to add this valve by default.
+<b class="nc">&nbsp;			factory.addEngineValves(valve);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean getOrDeduceUseForwardHeaders() {
+<b class="nc">&nbsp;		if (this.serverProperties.getForwardHeadersStrategy() == null) {</b>
+<b class="nc">&nbsp;			CloudPlatform platform = CloudPlatform.getActive(this.environment);</b>
+<b class="nc">&nbsp;			return platform != null &amp;&amp; platform.isUsingForwardHeaders();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.serverProperties.getForwardHeadersStrategy() == ServerProperties.ForwardHeadersStrategy.NATIVE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private void customizeMaxHttpRequestHeaderSize(ConfigurableTomcatWebServerFactory factory,
+&nbsp;			int maxHttpRequestHeaderSize) {
+<b class="nc">&nbsp;		customizeHandler(factory, maxHttpRequestHeaderSize, AbstractHttp11Protocol.class,</b>
+&nbsp;				AbstractHttp11Protocol::setMaxHttpRequestHeaderSize);
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private void customizeMaxHttpResponseHeaderSize(ConfigurableTomcatWebServerFactory factory,
+&nbsp;			int maxHttpResponseHeaderSize) {
+<b class="nc">&nbsp;		customizeHandler(factory, maxHttpResponseHeaderSize, AbstractHttp11Protocol.class,</b>
+&nbsp;				AbstractHttp11Protocol::setMaxHttpResponseHeaderSize);
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private void customizeMaxSwallowSize(ConfigurableTomcatWebServerFactory factory, int maxSwallowSize) {
+<b class="nc">&nbsp;		customizeHandler(factory, maxSwallowSize, AbstractHttp11Protocol.class,</b>
+&nbsp;				AbstractHttp11Protocol::setMaxSwallowSize);
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T extends ProtocolHandler&gt; void customizeHandler(ConfigurableTomcatWebServerFactory factory, int value,
+&nbsp;			Class&lt;T&gt; type, ObjIntConsumer&lt;T&gt; consumer) {
+<b class="nc">&nbsp;		factory.addConnectorCustomizers((connector) -&gt; {</b>
+<b class="nc">&nbsp;			ProtocolHandler handler = connector.getProtocolHandler();</b>
+<b class="nc">&nbsp;			if (type.isAssignableFrom(handler.getClass())) {</b>
+<b class="nc">&nbsp;				consumer.accept(type.cast(handler), value);</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeMaxHttpFormPostSize(ConfigurableTomcatWebServerFactory factory, int maxHttpFormPostSize) {
+<b class="nc">&nbsp;		factory.addConnectorCustomizers((connector) -&gt; connector.setMaxPostSize(maxHttpFormPostSize));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeAccessLog(ConfigurableTomcatWebServerFactory factory) {
+<b class="nc">&nbsp;		ServerProperties.Tomcat tomcatProperties = this.serverProperties.getTomcat();</b>
+<b class="nc">&nbsp;		AccessLogValve valve = new AccessLogValve();</b>
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get();</b>
+<b class="nc">&nbsp;		Accesslog accessLogConfig = tomcatProperties.getAccesslog();</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getConditionIf()).to(valve::setConditionIf);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getConditionUnless()).to(valve::setConditionUnless);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getPattern()).to(valve::setPattern);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getDirectory()).to(valve::setDirectory);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getPrefix()).to(valve::setPrefix);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getSuffix()).to(valve::setSuffix);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getEncoding()).whenHasText().to(valve::setEncoding);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getLocale()).whenHasText().to(valve::setLocale);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.isCheckExists()).to(valve::setCheckExists);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.isRotate()).to(valve::setRotatable);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.isRenameOnRotate()).to(valve::setRenameOnRotate);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getMaxDays()).to(valve::setMaxDays);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.getFileDateFormat()).to(valve::setFileDateFormat);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.isIpv6Canonical()).to(valve::setIpv6Canonical);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.isRequestAttributesEnabled()).to(valve::setRequestAttributesEnabled);</b>
+<b class="nc">&nbsp;		map.from(accessLogConfig.isBuffered()).to(valve::setBuffered);</b>
+<b class="nc">&nbsp;		factory.addEngineValves(valve);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeStaticResources(ConfigurableTomcatWebServerFactory factory) {
+<b class="nc">&nbsp;		ServerProperties.Tomcat.Resource resource = this.serverProperties.getTomcat().getResource();</b>
+<b class="nc">&nbsp;		factory.addContextCustomizers((context) -&gt; context.addLifecycleListener((event) -&gt; {</b>
+<b class="nc">&nbsp;			if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {</b>
+<b class="nc">&nbsp;				context.getResources().setCachingAllowed(resource.isAllowCaching());</b>
+<b class="nc">&nbsp;				if (resource.getCacheTtl() != null) {</b>
+<b class="nc">&nbsp;					long ttl = resource.getCacheTtl().toMillis();</b>
+<b class="nc">&nbsp;					context.getResources().setCacheTtl(ttl);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}));
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeErrorReportValve(ErrorProperties error, ConfigurableTomcatWebServerFactory factory) {
+<b class="nc">&nbsp;		if (error.getIncludeStacktrace() == IncludeAttribute.NEVER) {</b>
+<b class="nc">&nbsp;			factory.addContextCustomizers((context) -&gt; {</b>
+<b class="nc">&nbsp;				ErrorReportValve valve = new ErrorReportValve();</b>
+<b class="nc">&nbsp;				valve.setShowServerInfo(false);</b>
+<b class="nc">&nbsp;				valve.setShowReport(false);</b>
+<b class="nc">&nbsp;				context.getParent().getPipeline().addValve(valve);</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

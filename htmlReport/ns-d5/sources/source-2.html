@@ -1,0 +1,363 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GraphQlAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.graphql</a>
+</div>
+
+<h1>Coverage Summary for Class: GraphQlAutoConfiguration (org.springframework.boot.autoconfigure.graphql)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GraphQlAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GraphQlAutoConfiguration$GraphQlDataAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GraphQlAutoConfiguration$GraphQlResourcesRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.graphql;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.Executor;
+&nbsp;
+&nbsp;import graphql.GraphQL;
+&nbsp;import graphql.execution.instrumentation.Instrumentation;
+&nbsp;import graphql.schema.idl.RuntimeWiring.Builder;
+&nbsp;import graphql.schema.visibility.NoIntrospectionGraphqlFieldVisibility;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.beans.factory.annotation.Qualifier;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.convert.ApplicationConversionService;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.ImportRuntimeHints;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.support.ResourcePatternResolver;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.data.domain.ScrollPosition;
+&nbsp;import org.springframework.graphql.ExecutionGraphQlService;
+&nbsp;import org.springframework.graphql.data.method.annotation.support.AnnotatedControllerConfigurer;
+&nbsp;import org.springframework.graphql.data.pagination.ConnectionFieldTypeVisitor;
+&nbsp;import org.springframework.graphql.data.pagination.CursorEncoder;
+&nbsp;import org.springframework.graphql.data.pagination.CursorStrategy;
+&nbsp;import org.springframework.graphql.data.pagination.EncodingCursorStrategy;
+&nbsp;import org.springframework.graphql.data.query.ScrollPositionCursorStrategy;
+&nbsp;import org.springframework.graphql.data.query.SliceConnectionAdapter;
+&nbsp;import org.springframework.graphql.data.query.WindowConnectionAdapter;
+&nbsp;import org.springframework.graphql.execution.BatchLoaderRegistry;
+&nbsp;import org.springframework.graphql.execution.ConnectionTypeDefinitionConfigurer;
+&nbsp;import org.springframework.graphql.execution.DataFetcherExceptionResolver;
+&nbsp;import org.springframework.graphql.execution.DefaultBatchLoaderRegistry;
+&nbsp;import org.springframework.graphql.execution.DefaultExecutionGraphQlService;
+&nbsp;import org.springframework.graphql.execution.GraphQlSource;
+&nbsp;import org.springframework.graphql.execution.RuntimeWiringConfigurer;
+&nbsp;import org.springframework.graphql.execution.SubscriptionExceptionResolver;
+&nbsp;import org.springframework.graphql.execution.TypeDefinitionConfigurer;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for creating a Spring GraphQL base
+&nbsp; * infrastructure.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.7.0
+&nbsp; */
+&nbsp;@AutoConfiguration
+&nbsp;@ConditionalOnClass({ GraphQL.class, GraphQlSource.class })
+&nbsp;@ConditionalOnGraphQlSchema
+&nbsp;@EnableConfigurationProperties(GraphQlProperties.class)
+&nbsp;@ImportRuntimeHints(GraphQlAutoConfiguration.GraphQlResourcesRuntimeHints.class)
+&nbsp;public class GraphQlAutoConfiguration {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(GraphQlAutoConfiguration.class);</b>
+&nbsp;
+&nbsp;	private final ListableBeanFactory beanFactory;
+&nbsp;
+<b class="nc">&nbsp;	public GraphQlAutoConfiguration(ListableBeanFactory beanFactory) {</b>
+<b class="nc">&nbsp;		this.beanFactory = beanFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public GraphQlSource graphQlSource(ResourcePatternResolver resourcePatternResolver, GraphQlProperties properties,
+&nbsp;			ObjectProvider&lt;DataFetcherExceptionResolver&gt; exceptionResolvers,
+&nbsp;			ObjectProvider&lt;SubscriptionExceptionResolver&gt; subscriptionExceptionResolvers,
+&nbsp;			ObjectProvider&lt;Instrumentation&gt; instrumentations, ObjectProvider&lt;RuntimeWiringConfigurer&gt; wiringConfigurers,
+&nbsp;			ObjectProvider&lt;GraphQlSourceBuilderCustomizer&gt; sourceCustomizers,
+&nbsp;			ObjectProvider&lt;TypeDefinitionConfigurer&gt; typeDefinitionConfigurers) {
+<b class="nc">&nbsp;		String[] schemaLocations = properties.getSchema().getLocations();</b>
+<b class="nc">&nbsp;		Resource[] schemaResources = resolveSchemaResources(resourcePatternResolver, schemaLocations,</b>
+<b class="nc">&nbsp;				properties.getSchema().getFileExtensions());</b>
+<b class="nc">&nbsp;		GraphQlSource.SchemaResourceBuilder builder = GraphQlSource.schemaResourceBuilder()</b>
+<b class="nc">&nbsp;			.schemaResources(schemaResources)</b>
+<b class="nc">&nbsp;			.exceptionResolvers(exceptionResolvers.orderedStream().toList())</b>
+<b class="nc">&nbsp;			.subscriptionExceptionResolvers(subscriptionExceptionResolvers.orderedStream().toList())</b>
+<b class="nc">&nbsp;			.instrumentation(instrumentations.orderedStream().toList());</b>
+<b class="nc">&nbsp;		if (properties.getSchema().getInspection().isEnabled()) {</b>
+<b class="nc">&nbsp;			builder.inspectSchemaMappings(logger::info);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!properties.getSchema().getIntrospection().isEnabled()) {</b>
+<b class="nc">&nbsp;			builder.configureRuntimeWiring(this::enableIntrospection);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		typeDefinitionConfigurers.forEach(builder::configureTypeDefinitions);</b>
+<b class="nc">&nbsp;		builder.configureTypeDefinitions(new ConnectionTypeDefinitionConfigurer());</b>
+<b class="nc">&nbsp;		wiringConfigurers.orderedStream().forEach(builder::configureRuntimeWiring);</b>
+<b class="nc">&nbsp;		sourceCustomizers.orderedStream().forEach((customizer) -&gt; customizer.customize(builder));</b>
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Builder enableIntrospection(Builder wiring) {
+<b class="nc">&nbsp;		return wiring.fieldVisibility(NoIntrospectionGraphqlFieldVisibility.NO_INTROSPECTION_FIELD_VISIBILITY);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Resource[] resolveSchemaResources(ResourcePatternResolver resolver, String[] locations,
+&nbsp;			String[] extensions) {
+<b class="nc">&nbsp;		List&lt;Resource&gt; resources = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String location : locations) {</b>
+<b class="nc">&nbsp;			for (String extension : extensions) {</b>
+<b class="nc">&nbsp;				resources.addAll(resolveSchemaResources(resolver, location + &quot;*&quot; + extension));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return resources.toArray(new Resource[0]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Resource&gt; resolveSchemaResources(ResourcePatternResolver resolver, String pattern) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return Arrays.asList(resolver.getResources(pattern));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			logger.debug(LogMessage.format(&quot;Could not resolve schema location: &#39;%s&#39;&quot;, pattern), ex);</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public BatchLoaderRegistry batchLoaderRegistry() {
+<b class="nc">&nbsp;		return new DefaultBatchLoaderRegistry();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public ExecutionGraphQlService executionGraphQlService(GraphQlSource graphQlSource,
+&nbsp;			BatchLoaderRegistry batchLoaderRegistry) {
+<b class="nc">&nbsp;		DefaultExecutionGraphQlService service = new DefaultExecutionGraphQlService(graphQlSource);</b>
+<b class="nc">&nbsp;		service.addDataLoaderRegistrar(batchLoaderRegistry);</b>
+<b class="nc">&nbsp;		return service;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public AnnotatedControllerConfigurer annotatedControllerConfigurer(
+&nbsp;			@Qualifier(TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME) ObjectProvider&lt;Executor&gt; executorProvider) {
+<b class="nc">&nbsp;		AnnotatedControllerConfigurer controllerConfigurer = new AnnotatedControllerConfigurer();</b>
+<b class="nc">&nbsp;		controllerConfigurer</b>
+<b class="nc">&nbsp;			.addFormatterRegistrar((registry) -&gt; ApplicationConversionService.addBeans(registry, this.beanFactory));</b>
+<b class="nc">&nbsp;		executorProvider.ifAvailable(controllerConfigurer::setExecutor);</b>
+<b class="nc">&nbsp;		return controllerConfigurer;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	DataFetcherExceptionResolver annotatedControllerConfigurerDataFetcherExceptionResolver(
+&nbsp;			AnnotatedControllerConfigurer annotatedControllerConfigurer) {
+<b class="nc">&nbsp;		return annotatedControllerConfigurer.getExceptionResolver();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ConditionalOnClass(ScrollPosition.class)
+&nbsp;	@Configuration(proxyBeanMethods = false)
+<b class="nc">&nbsp;	static class GraphQlDataAutoConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		EncodingCursorStrategy&lt;ScrollPosition&gt; cursorStrategy() {
+<b class="nc">&nbsp;			return CursorStrategy.withEncoder(new ScrollPositionCursorStrategy(), CursorEncoder.base64());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		GraphQlSourceBuilderCustomizer cursorStrategyCustomizer(CursorStrategy&lt;?&gt; cursorStrategy) {
+<b class="nc">&nbsp;			if (cursorStrategy.supports(ScrollPosition.class)) {</b>
+<b class="nc">&nbsp;				CursorStrategy&lt;ScrollPosition&gt; scrollCursorStrategy = (CursorStrategy&lt;ScrollPosition&gt;) cursorStrategy;</b>
+<b class="nc">&nbsp;				ConnectionFieldTypeVisitor connectionFieldTypeVisitor = ConnectionFieldTypeVisitor</b>
+<b class="nc">&nbsp;					.create(List.of(new WindowConnectionAdapter(scrollCursorStrategy),</b>
+&nbsp;							new SliceConnectionAdapter(scrollCursorStrategy)));
+<b class="nc">&nbsp;				return (builder) -&gt; builder.typeVisitors(List.of(connectionFieldTypeVisitor));</b>
+&nbsp;			}
+&nbsp;			return (builder) -&gt; {
+<b class="nc">&nbsp;			};</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class GraphQlResourcesRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			hints.resources().registerPattern(&quot;graphql/*.graphqls&quot;).registerPattern(&quot;graphql/*.gqls&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

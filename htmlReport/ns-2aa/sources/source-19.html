@@ -1,0 +1,479 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HelpMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: HelpMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HelpMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/149)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import org.apache.maven.plugin.AbstractMojo;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Display help information on spring-boot-maven-plugin.&lt;br&gt;
+&nbsp; * Call &lt;code&gt;mvn spring-boot:help -Ddetail=true -Dgoal=&amp;lt;goal-name&amp;gt;&lt;/code&gt; to
+&nbsp; * display parameter details.
+&nbsp; *
+&nbsp; * @author maven-plugin-tools
+&nbsp; * @goal help
+&nbsp; * @requiresProject false
+&nbsp; * @threadSafe
+&nbsp; */
+<b class="nc">&nbsp;public class HelpMojo extends AbstractMojo {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * If &lt;code&gt;true&lt;/code&gt;, display all settable properties for each goal.
+&nbsp;	 *
+&nbsp;	 * @parameter property=&quot;detail&quot; default-value=&quot;false&quot;
+&nbsp;	 */
+&nbsp;	private boolean detail;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the goal for which to show help. If unspecified, all goals will be
+&nbsp;	 * displayed.
+&nbsp;	 *
+&nbsp;	 * @parameter property=&quot;goal&quot;
+&nbsp;	 */
+&nbsp;	private java.lang.String goal;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The maximum length of a display line, should be positive.
+&nbsp;	 *
+&nbsp;	 * @parameter property=&quot;lineLength&quot; default-value=&quot;80&quot;
+&nbsp;	 */
+&nbsp;	private int lineLength;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The number of spaces per indentation level, should be positive.
+&nbsp;	 *
+&nbsp;	 * @parameter property=&quot;indentSize&quot; default-value=&quot;2&quot;
+&nbsp;	 */
+&nbsp;	private int indentSize;
+&nbsp;
+&nbsp;	// /META-INF/maven/&lt;groupId&gt;/&lt;artifactId&gt;/plugin-help.xml
+&nbsp;	private static final String PLUGIN_HELP_PATH = &quot;/META-INF/maven/org.springframework.boot/spring-boot-maven-plugin/plugin-help.xml&quot;;
+&nbsp;
+&nbsp;	private static final int DEFAULT_LINE_LENGTH = 80;
+&nbsp;
+&nbsp;	private Document build() throws MojoExecutionException {
+<b class="nc">&nbsp;		getLog().debug(&quot;load plugin-help.xml: &quot; + PLUGIN_HELP_PATH);</b>
+<b class="nc">&nbsp;		try (InputStream is = getClass().getResourceAsStream(PLUGIN_HELP_PATH)) {</b>
+<b class="nc">&nbsp;			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();</b>
+<b class="nc">&nbsp;			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();</b>
+<b class="nc">&nbsp;			return dBuilder.parse(is);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (IOException e) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(e.getMessage(), e);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ParserConfigurationException e) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(e.getMessage(), e);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (SAXException e) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(e.getMessage(), e);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void execute() throws MojoExecutionException {
+<b class="nc">&nbsp;		if (lineLength &lt;= 0) {</b>
+<b class="nc">&nbsp;			getLog().warn(&quot;The parameter &#39;lineLength&#39; should be positive, using &#39;80&#39; as default.&quot;);</b>
+<b class="nc">&nbsp;			lineLength = DEFAULT_LINE_LENGTH;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (indentSize &lt;= 0) {</b>
+<b class="nc">&nbsp;			getLog().warn(&quot;The parameter &#39;indentSize&#39; should be positive, using &#39;2&#39; as default.&quot;);</b>
+<b class="nc">&nbsp;			indentSize = 2;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		Document doc = build();</b>
+&nbsp;
+<b class="nc">&nbsp;		StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;		Node plugin = getSingleChild(doc, &quot;plugin&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;		String name = getValue(plugin, &quot;name&quot;);</b>
+<b class="nc">&nbsp;		String version = getValue(plugin, &quot;version&quot;);</b>
+<b class="nc">&nbsp;		String id = getValue(plugin, &quot;groupId&quot;) + &quot;:&quot; + getValue(plugin, &quot;artifactId&quot;) + &quot;:&quot; + version;</b>
+<b class="nc">&nbsp;		if (isNotEmpty(name) &amp;&amp; !name.contains(id)) {</b>
+<b class="nc">&nbsp;			append(sb, name + &quot; &quot; + version, 0);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			if (isNotEmpty(name)) {</b>
+<b class="nc">&nbsp;				append(sb, name, 0);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				append(sb, id, 0);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		append(sb, getValue(plugin, &quot;description&quot;), 1);</b>
+<b class="nc">&nbsp;		append(sb, &quot;&quot;, 0);</b>
+&nbsp;
+&nbsp;		// &lt;goalPrefix&gt;plugin&lt;/goalPrefix&gt;
+<b class="nc">&nbsp;		String goalPrefix = getValue(plugin, &quot;goalPrefix&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;		Node mojos1 = getSingleChild(plugin, &quot;mojos&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;		List&lt;Node&gt; mojos = findNamedChild(mojos1, &quot;mojo&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;		if (goal == null || goal.length() &lt;= 0) {</b>
+<b class="nc">&nbsp;			append(sb, &quot;This plugin has &quot; + mojos.size() + (mojos.size() &gt; 1 ? &quot; goals:&quot; : &quot; goal:&quot;), 0);</b>
+<b class="nc">&nbsp;			append(sb, &quot;&quot;, 0);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		for (Node mojo : mojos) {</b>
+<b class="nc">&nbsp;			writeGoal(sb, goalPrefix, (Element) mojo);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+<b class="nc">&nbsp;		if (getLog().isInfoEnabled()) {</b>
+<b class="nc">&nbsp;			getLog().info(sb.toString());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isNotEmpty(String string) {
+<b class="nc">&nbsp;		return string != null &amp;&amp; string.length() &gt; 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getValue(Node node, String elementName) throws MojoExecutionException {
+<b class="nc">&nbsp;		return getSingleChild(node, elementName).getTextContent();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Node getSingleChild(Node node, String elementName) throws MojoExecutionException {
+<b class="nc">&nbsp;		List&lt;Node&gt; namedChild = findNamedChild(node, elementName);</b>
+<b class="nc">&nbsp;		if (namedChild.isEmpty()) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Could not find &quot; + elementName + &quot; in plugin-help.xml&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (namedChild.size() &gt; 1) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Multiple &quot; + elementName + &quot; in plugin-help.xml&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return namedChild.get(0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;Node&gt; findNamedChild(Node node, String elementName) {
+<b class="nc">&nbsp;		List&lt;Node&gt; result = new ArrayList&lt;Node&gt;();</b>
+<b class="nc">&nbsp;		NodeList childNodes = node.getChildNodes();</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; childNodes.getLength(); i++) {</b>
+<b class="nc">&nbsp;			Node item = childNodes.item(i);</b>
+<b class="nc">&nbsp;			if (elementName.equals(item.getNodeName())) {</b>
+<b class="nc">&nbsp;				result.add(item);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Node findSingleChild(Node node, String elementName) throws MojoExecutionException {
+<b class="nc">&nbsp;		List&lt;Node&gt; elementsByTagName = findNamedChild(node, elementName);</b>
+<b class="nc">&nbsp;		if (elementsByTagName.isEmpty()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (elementsByTagName.size() &gt; 1) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Multiple &quot; + elementName + &quot;in plugin-help.xml&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return elementsByTagName.get(0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeGoal(StringBuilder sb, String goalPrefix, Element mojo) throws MojoExecutionException {
+<b class="nc">&nbsp;		String mojoGoal = getValue(mojo, &quot;goal&quot;);</b>
+<b class="nc">&nbsp;		Node configurationElement = findSingleChild(mojo, &quot;configuration&quot;);</b>
+<b class="nc">&nbsp;		Node description = findSingleChild(mojo, &quot;description&quot;);</b>
+<b class="nc">&nbsp;		if (goal == null || goal.length() &lt;= 0 || mojoGoal.equals(goal)) {</b>
+<b class="nc">&nbsp;			append(sb, goalPrefix + &quot;:&quot; + mojoGoal, 0);</b>
+<b class="nc">&nbsp;			Node deprecated = findSingleChild(mojo, &quot;deprecated&quot;);</b>
+<b class="nc">&nbsp;			if ((deprecated != null) &amp;&amp; isNotEmpty(deprecated.getTextContent())) {</b>
+<b class="nc">&nbsp;				append(sb, &quot;Deprecated. &quot; + deprecated.getTextContent(), 1);</b>
+<b class="nc">&nbsp;				if (detail &amp;&amp; description != null) {</b>
+<b class="nc">&nbsp;					append(sb, &quot;&quot;, 0);</b>
+<b class="nc">&nbsp;					append(sb, description.getTextContent(), 1);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			else if (description != null) {</b>
+<b class="nc">&nbsp;				append(sb, description.getTextContent(), 1);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			append(sb, &quot;&quot;, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;			if (detail) {</b>
+<b class="nc">&nbsp;				Node parametersNode = getSingleChild(mojo, &quot;parameters&quot;);</b>
+<b class="nc">&nbsp;				List&lt;Node&gt; parameters = findNamedChild(parametersNode, &quot;parameter&quot;);</b>
+<b class="nc">&nbsp;				append(sb, &quot;Available parameters:&quot;, 1);</b>
+<b class="nc">&nbsp;				append(sb, &quot;&quot;, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;				for (Node parameter : parameters) {</b>
+<b class="nc">&nbsp;					writeParameter(sb, parameter, configurationElement);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeParameter(StringBuilder sb, Node parameter, Node configurationElement)
+&nbsp;			throws MojoExecutionException {
+<b class="nc">&nbsp;		String parameterName = getValue(parameter, &quot;name&quot;);</b>
+<b class="nc">&nbsp;		String parameterDescription = getValue(parameter, &quot;description&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;		Element fieldConfigurationElement = null;</b>
+<b class="nc">&nbsp;		if (configurationElement != null) {</b>
+<b class="nc">&nbsp;			fieldConfigurationElement = (Element) findSingleChild(configurationElement, parameterName);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		String parameterDefaultValue = &quot;&quot;;</b>
+<b class="nc">&nbsp;		if (fieldConfigurationElement != null &amp;&amp; fieldConfigurationElement.hasAttribute(&quot;default-value&quot;)) {</b>
+<b class="nc">&nbsp;			parameterDefaultValue = &quot; (Default: &quot; + fieldConfigurationElement.getAttribute(&quot;default-value&quot;) + &quot;)&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		append(sb, parameterName + parameterDefaultValue, 2);</b>
+<b class="nc">&nbsp;		Node deprecated = findSingleChild(parameter, &quot;deprecated&quot;);</b>
+<b class="nc">&nbsp;		if ((deprecated != null) &amp;&amp; isNotEmpty(deprecated.getTextContent())) {</b>
+<b class="nc">&nbsp;			append(sb, &quot;Deprecated. &quot; + deprecated.getTextContent(), 3);</b>
+<b class="nc">&nbsp;			append(sb, &quot;&quot;, 0);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		append(sb, parameterDescription, 3);</b>
+<b class="nc">&nbsp;		if (&quot;true&quot;.equals(getValue(parameter, &quot;required&quot;))) {</b>
+<b class="nc">&nbsp;			append(sb, &quot;Required: Yes&quot;, 3);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if ((fieldConfigurationElement != null) &amp;&amp; isNotEmpty(fieldConfigurationElement.getTextContent())) {</b>
+<b class="nc">&nbsp;			String property = getPropertyFromExpression(fieldConfigurationElement.getTextContent());</b>
+<b class="nc">&nbsp;			append(sb, &quot;User property: &quot; + property, 3);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		append(sb, &quot;&quot;, 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Repeat a String &lt;code&gt;n&lt;/code&gt; times to form a new string.
+&nbsp;	 * &lt;/p&gt;
+&nbsp;	 * @param str String to repeat
+&nbsp;	 * @param repeat number of times to repeat str
+&nbsp;	 * @return String with repeated String
+&nbsp;	 * @throws NegativeArraySizeException if &lt;code&gt;repeat &amp;lt; 0&lt;/code&gt;
+&nbsp;	 * @throws NullPointerException if str is &lt;code&gt;null&lt;/code&gt;
+&nbsp;	 */
+&nbsp;	private static String repeat(String str, int repeat) {
+<b class="nc">&nbsp;		StringBuilder buffer = new StringBuilder(repeat * str.length());</b>
+&nbsp;
+<b class="nc">&nbsp;		for (int i = 0; i &lt; repeat; i++) {</b>
+<b class="nc">&nbsp;			buffer.append(str);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		return buffer.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Append a description to the buffer by respecting the indentSize and lineLength
+&nbsp;	 * parameters. &lt;b&gt;Note&lt;/b&gt;: The last character is always a new line.
+&nbsp;	 * @param sb The buffer to append the description, not &lt;code&gt;null&lt;/code&gt;.
+&nbsp;	 * @param description The description, not &lt;code&gt;null&lt;/code&gt;.
+&nbsp;	 * @param indent The base indentation level of each line, must not be negative.
+&nbsp;	 */
+&nbsp;	private void append(StringBuilder sb, String description, int indent) {
+<b class="nc">&nbsp;		for (String line : toLines(description, indent, indentSize, lineLength)) {</b>
+<b class="nc">&nbsp;			sb.append(line).append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Splits the specified text into lines of convenient display length.
+&nbsp;	 * @param text The text to split into lines, must not be &lt;code&gt;null&lt;/code&gt;.
+&nbsp;	 * @param indent The base indentation level of each line, must not be negative.
+&nbsp;	 * @param indentSize The size of each indentation, must not be negative.
+&nbsp;	 * @param lineLength The length of the line, must not be negative.
+&nbsp;	 * @return The sequence of display lines, never &lt;code&gt;null&lt;/code&gt;.
+&nbsp;	 * @throws NegativeArraySizeException if &lt;code&gt;indent &amp;lt; 0&lt;/code&gt;
+&nbsp;	 */
+&nbsp;	private static List&lt;String&gt; toLines(String text, int indent, int indentSize, int lineLength) {
+<b class="nc">&nbsp;		List&lt;String&gt; lines = new ArrayList&lt;String&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		String ind = repeat(&quot;\t&quot;, indent);</b>
+&nbsp;
+<b class="nc">&nbsp;		String[] plainLines = text.split(&quot;(\r\n)|(\r)|(\n)&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;		for (String plainLine : plainLines) {</b>
+<b class="nc">&nbsp;			toLines(lines, ind + plainLine, indentSize, lineLength);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		return lines;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Adds the specified line to the output sequence, performing line wrapping if
+&nbsp;	 * necessary.
+&nbsp;	 * @param lines The sequence of display lines, must not be &lt;code&gt;null&lt;/code&gt;.
+&nbsp;	 * @param line The line to add, must not be &lt;code&gt;null&lt;/code&gt;.
+&nbsp;	 * @param indentSize The size of each indentation, must not be negative.
+&nbsp;	 * @param lineLength The length of the line, must not be negative.
+&nbsp;	 */
+&nbsp;	private static void toLines(List&lt;String&gt; lines, String line, int indentSize, int lineLength) {
+<b class="nc">&nbsp;		int lineIndent = getIndentLevel(line);</b>
+<b class="nc">&nbsp;		StringBuilder buf = new StringBuilder(256);</b>
+&nbsp;
+<b class="nc">&nbsp;		String[] tokens = line.split(&quot; +&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;		for (String token : tokens) {</b>
+<b class="nc">&nbsp;			if (buf.length() &gt; 0) {</b>
+<b class="nc">&nbsp;				if (buf.length() + token.length() &gt;= lineLength) {</b>
+<b class="nc">&nbsp;					lines.add(buf.toString());</b>
+<b class="nc">&nbsp;					buf.setLength(0);</b>
+<b class="nc">&nbsp;					buf.append(repeat(&quot; &quot;, lineIndent * indentSize));</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					buf.append(&#39; &#39;);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;
+<b class="nc">&nbsp;			for (int j = 0; j &lt; token.length(); j++) {</b>
+<b class="nc">&nbsp;				char c = token.charAt(j);</b>
+<b class="nc">&nbsp;				if (c == &#39;\t&#39;) {</b>
+<b class="nc">&nbsp;					buf.append(repeat(&quot; &quot;, indentSize - buf.length() % indentSize));</b>
+&nbsp;				}
+<b class="nc">&nbsp;				else if (c == &#39;\u00A0&#39;) {</b>
+<b class="nc">&nbsp;					buf.append(&#39; &#39;);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					buf.append(c);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		lines.add(buf.toString());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Gets the indentation level of the specified line.
+&nbsp;	 * @param line The line whose indentation level should be retrieved, must not be
+&nbsp;	 * &lt;code&gt;null&lt;/code&gt;.
+&nbsp;	 * @return The indentation level of the line.
+&nbsp;	 */
+&nbsp;	private static int getIndentLevel(String line) {
+<b class="nc">&nbsp;		int level = 0;</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; line.length() &amp;&amp; line.charAt(i) == &#39;\t&#39;; i++) {</b>
+<b class="nc">&nbsp;			level++;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (int i = level + 1; i &lt;= level + 4 &amp;&amp; i &lt; line.length(); i++) {</b>
+<b class="nc">&nbsp;			if (line.charAt(i) == &#39;\t&#39;) {</b>
+<b class="nc">&nbsp;				level++;</b>
+<b class="nc">&nbsp;				break;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return level;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getPropertyFromExpression(String expression) {
+<b class="nc">&nbsp;		if (expression != null &amp;&amp; expression.startsWith(&quot;${&quot;) &amp;&amp; expression.endsWith(&quot;}&quot;)</b>
+<b class="nc">&nbsp;				&amp;&amp; !expression.substring(2).contains(&quot;${&quot;)) {</b>
+&nbsp;			// expression=&quot;${xxx}&quot; -&gt; property=&quot;xxx&quot;
+<b class="nc">&nbsp;			return expression.substring(2, expression.length() - 1);</b>
+&nbsp;		}
+&nbsp;		// no property can be extracted
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

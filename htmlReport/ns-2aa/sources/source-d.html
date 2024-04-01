@@ -1,0 +1,359 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BuildInfoIntegrationTests</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildInfoIntegrationTests (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildInfoIntegrationTests</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildInfoIntegrationTests$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildInfoIntegrationTests$BuildInfoAssert</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.assertj.core.api.AbstractMapAssert;
+&nbsp;import org.assertj.core.api.AssertProvider;
+&nbsp;import org.junit.jupiter.api.TestTemplate;
+&nbsp;import org.junit.jupiter.api.extension.ExtendWith;
+&nbsp;
+&nbsp;import org.springframework.boot.maven.MavenBuild.ProjectCallback;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;
+&nbsp;/**
+&nbsp; * Integration tests for the Maven plugin&#39;s build info support.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Vedran Pavic
+&nbsp; */
+&nbsp;@ExtendWith(MavenBuildExtension.class)
+<b class="nc">&nbsp;class BuildInfoIntegrationTests {</b>
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void buildInfoPropertiesAreGenerated(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-info&quot;)</b>
+<b class="nc">&nbsp;			.execute(buildInfo((buildInfo) -&gt; assertThat(buildInfo).hasBuildGroup(&quot;org.springframework.boot.maven.it&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildArtifact(&quot;build-info&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildName(&quot;Generate build info&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildVersion(&quot;0.0.1.BUILD-SNAPSHOT&quot;)</b>
+<b class="nc">&nbsp;				.containsBuildTime()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void generatedBuildInfoIncludesAdditionalProperties(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-info-additional-properties&quot;)</b>
+<b class="nc">&nbsp;			.execute(buildInfo((buildInfo) -&gt; assertThat(buildInfo).hasBuildGroup(&quot;org.springframework.boot.maven.it&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildArtifact(&quot;build-info-additional-properties&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildName(&quot;Generate build info with additional properties&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildVersion(&quot;0.0.1.BUILD-SNAPSHOT&quot;)</b>
+<b class="nc">&nbsp;				.containsBuildTime()</b>
+<b class="nc">&nbsp;				.containsEntry(&quot;build.foo&quot;, &quot;bar&quot;)</b>
+<b class="nc">&nbsp;				.containsEntry(&quot;build.encoding&quot;, &quot;UTF-8&quot;)</b>
+<b class="nc">&nbsp;				.containsEntry(&quot;build.java.source&quot;, &quot;1.8&quot;)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void generatedBuildInfoUsesCustomBuildTime(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-info-custom-build-time&quot;)</b>
+<b class="nc">&nbsp;			.execute(buildInfo((buildInfo) -&gt; assertThat(buildInfo).hasBuildGroup(&quot;org.springframework.boot.maven.it&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildArtifact(&quot;build-info-custom-build-time&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildName(&quot;Generate build info with custom build time&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildVersion(&quot;0.0.1.BUILD-SNAPSHOT&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildTime(&quot;2019-07-08T08:00:00Z&quot;)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void generatedBuildInfoReproducible(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-info-reproducible&quot;)</b>
+<b class="nc">&nbsp;			.execute(buildInfo((buildInfo) -&gt; assertThat(buildInfo).hasBuildGroup(&quot;org.springframework.boot.maven.it&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildArtifact(&quot;build-reproducible&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildName(&quot;Generate build info with build time from project.build.outputTimestamp&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildVersion(&quot;0.0.1.BUILD-SNAPSHOT&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildTime(&quot;2021-04-21T11:22:33Z&quot;)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void buildInfoPropertiesAreGeneratedToCustomOutputLocation(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-info-custom-file&quot;)</b>
+<b class="nc">&nbsp;			.execute(buildInfo(&quot;target/build.info&quot;,</b>
+<b class="nc">&nbsp;					(buildInfo) -&gt; assertThat(buildInfo).hasBuildGroup(&quot;org.springframework.boot.maven.it&quot;)</b>
+<b class="nc">&nbsp;						.hasBuildArtifact(&quot;build-info-custom-file&quot;)</b>
+<b class="nc">&nbsp;						.hasBuildName(&quot;Generate custom build info&quot;)</b>
+<b class="nc">&nbsp;						.hasBuildVersion(&quot;0.0.1.BUILD-SNAPSHOT&quot;)</b>
+<b class="nc">&nbsp;						.containsBuildTime()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenBuildTimeIsDisabledIfDoesNotAppearInGeneratedBuildInfo(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-info-disable-build-time&quot;)</b>
+<b class="nc">&nbsp;			.execute(buildInfo((buildInfo) -&gt; assertThat(buildInfo).hasBuildGroup(&quot;org.springframework.boot.maven.it&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildArtifact(&quot;build-info-disable-build-time&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildName(&quot;Generate build info with disabled build time&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildVersion(&quot;0.0.1.BUILD-SNAPSHOT&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContainBuildTime()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenBuildTimeIsExcludedIfDoesNotAppearInGeneratedBuildInfo(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-info-exclude-build-time&quot;)</b>
+<b class="nc">&nbsp;			.execute(buildInfo((buildInfo) -&gt; assertThat(buildInfo).hasBuildGroup(&quot;org.springframework.boot.maven.it&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildArtifact(&quot;build-info-exclude-build-time&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildName(&quot;Generate build info with excluded build time&quot;)</b>
+<b class="nc">&nbsp;				.hasBuildVersion(&quot;0.0.1.BUILD-SNAPSHOT&quot;)</b>
+<b class="nc">&nbsp;				.doesNotContainBuildTime()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TestTemplate
+&nbsp;	void whenBuildPropertiesAreExcludedTheyDoNotAppearInGeneratedBuildInfo(MavenBuild mavenBuild) {
+<b class="nc">&nbsp;		mavenBuild.project(&quot;build-info-exclude-build-properties&quot;)</b>
+<b class="nc">&nbsp;			.execute(buildInfo((buildInfo) -&gt; assertThat(buildInfo).doesNotContainBuildGroup()</b>
+<b class="nc">&nbsp;				.doesNotContainBuildArtifact()</b>
+<b class="nc">&nbsp;				.doesNotContainBuildName()</b>
+<b class="nc">&nbsp;				.doesNotContainBuildVersion()</b>
+<b class="nc">&nbsp;				.containsBuildTime()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ProjectCallback buildInfo(Consumer&lt;AssertProvider&lt;BuildInfoAssert&gt;&gt; buildInfo) {
+<b class="nc">&nbsp;		return buildInfo(&quot;target/classes/META-INF/build-info.properties&quot;, buildInfo);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ProjectCallback buildInfo(String location, Consumer&lt;AssertProvider&lt;BuildInfoAssert&gt;&gt; buildInfo) {
+<b class="nc">&nbsp;		return (project) -&gt; buildInfo.accept((buildInfo(project, location)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private AssertProvider&lt;BuildInfoAssert&gt; buildInfo(File project, String buildInfo) {
+<b class="nc">&nbsp;		return new AssertProvider&lt;&gt;() {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			@Deprecated(since = &quot;2.3.0&quot;, forRemoval = false)
+&nbsp;			public BuildInfoAssert assertThat() {
+<b class="nc">&nbsp;				return new BuildInfoAssert(new File(project, buildInfo));</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class BuildInfoAssert extends AbstractMapAssert&lt;BuildInfoAssert, Properties, Object, Object&gt; {
+&nbsp;
+&nbsp;		private BuildInfoAssert(File actual) {
+<b class="nc">&nbsp;			super(loadProperties(actual), BuildInfoAssert.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Properties loadProperties(File file) {
+<b class="nc">&nbsp;			try (FileReader reader = new FileReader(file)) {</b>
+<b class="nc">&nbsp;				Properties properties = new Properties();</b>
+<b class="nc">&nbsp;				properties.load(reader);</b>
+<b class="nc">&nbsp;				return properties;</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new RuntimeException(ex);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert hasBuildGroup(String expected) {
+<b class="nc">&nbsp;			return containsEntry(&quot;build.group&quot;, expected);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert doesNotContainBuildGroup() {
+<b class="nc">&nbsp;			return doesNotContainKey(&quot;build.group&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert hasBuildArtifact(String expected) {
+<b class="nc">&nbsp;			return containsEntry(&quot;build.artifact&quot;, expected);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert doesNotContainBuildArtifact() {
+<b class="nc">&nbsp;			return doesNotContainKey(&quot;build.artifact&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert hasBuildName(String expected) {
+<b class="nc">&nbsp;			return containsEntry(&quot;build.name&quot;, expected);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert doesNotContainBuildName() {
+<b class="nc">&nbsp;			return doesNotContainKey(&quot;build.name&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert hasBuildVersion(String expected) {
+<b class="nc">&nbsp;			return containsEntry(&quot;build.version&quot;, expected);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert doesNotContainBuildVersion() {
+<b class="nc">&nbsp;			return doesNotContainKey(&quot;build.version&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert containsBuildTime() {
+<b class="nc">&nbsp;			return containsKey(&quot;build.time&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert doesNotContainBuildTime() {
+<b class="nc">&nbsp;			return doesNotContainKey(&quot;build.time&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		BuildInfoAssert hasBuildTime(String expected) {
+<b class="nc">&nbsp;			return containsEntry(&quot;build.time&quot;, expected);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

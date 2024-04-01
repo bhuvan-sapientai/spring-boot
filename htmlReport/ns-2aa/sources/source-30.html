@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StartMojo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.maven</a>
+</div>
+
+<h1>Coverage Summary for Class: StartMojo (org.springframework.boot.maven)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StartMojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StartMojo$CreateJmxConnector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.maven;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.ConnectException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;
+&nbsp;import javax.management.MBeanServerConnection;
+&nbsp;import javax.management.ReflectionException;
+&nbsp;import javax.management.remote.JMXConnector;
+&nbsp;
+&nbsp;import org.apache.maven.plugin.MojoExecutionException;
+&nbsp;import org.apache.maven.plugin.MojoFailureException;
+&nbsp;import org.apache.maven.plugins.annotations.LifecyclePhase;
+&nbsp;import org.apache.maven.plugins.annotations.Mojo;
+&nbsp;import org.apache.maven.plugins.annotations.Parameter;
+&nbsp;import org.apache.maven.plugins.annotations.ResolutionScope;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.tools.RunProcess;
+&nbsp;
+&nbsp;/**
+&nbsp; * Start a spring application. Contrary to the {@code run} goal, this does not block and
+&nbsp; * allows other goals to operate on the application. This goal is typically used in
+&nbsp; * integration test scenario where the application is started before a test suite and
+&nbsp; * stopped after.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 1.3.0
+&nbsp; * @see StopMojo
+&nbsp; */
+&nbsp;@Mojo(name = &quot;start&quot;, requiresProject = true, defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST,
+&nbsp;		requiresDependencyResolution = ResolutionScope.TEST)
+<b class="nc">&nbsp;public class StartMojo extends AbstractRunMojo {</b>
+&nbsp;
+&nbsp;	private static final String ENABLE_MBEAN_PROPERTY = &quot;--spring.application.admin.enabled=true&quot;;
+&nbsp;
+&nbsp;	private static final String JMX_NAME_PROPERTY_PREFIX = &quot;--spring.application.admin.jmx-name=&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The JMX name of the automatically deployed MBean managing the lifecycle of the
+&nbsp;	 * spring application.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = SpringApplicationAdminClient.DEFAULT_OBJECT_NAME)
+&nbsp;	private String jmxName;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The port to use to expose the platform MBeanServer.
+&nbsp;	 */
+&nbsp;	@Parameter(defaultValue = &quot;9001&quot;)
+&nbsp;	private int jmxPort;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The number of milliseconds to wait between each attempt to check if the spring
+&nbsp;	 * application is ready.
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.start.wait&quot;, defaultValue = &quot;500&quot;)
+&nbsp;	private long wait;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The maximum number of attempts to check if the spring application is ready.
+&nbsp;	 * Combined with the &quot;wait&quot; argument, this gives a global timeout value (30 sec by
+&nbsp;	 * default)
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.start.maxAttempts&quot;, defaultValue = &quot;60&quot;)
+&nbsp;	private int maxAttempts;
+&nbsp;
+<b class="nc">&nbsp;	private final Object lock = new Object();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flag to include the test classpath when running.
+&nbsp;	 */
+&nbsp;	@Parameter(property = &quot;spring-boot.run.useTestClasspath&quot;, defaultValue = &quot;false&quot;)
+&nbsp;	private Boolean useTestClasspath;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void run(JavaProcessExecutor processExecutor, File workingDirectory, List&lt;String&gt; args,
+&nbsp;			Map&lt;String, String&gt; environmentVariables) throws MojoExecutionException, MojoFailureException {
+<b class="nc">&nbsp;		RunProcess runProcess = processExecutor.runAsync(workingDirectory, args, environmentVariables);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			waitForSpringApplication();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MojoExecutionException | MojoFailureException ex) {</b>
+<b class="nc">&nbsp;			runProcess.kill();</b>
+<b class="nc">&nbsp;			throw ex;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected RunArguments resolveApplicationArguments() {
+<b class="nc">&nbsp;		RunArguments applicationArguments = super.resolveApplicationArguments();</b>
+<b class="nc">&nbsp;		applicationArguments.getArgs().addLast(ENABLE_MBEAN_PROPERTY);</b>
+<b class="nc">&nbsp;		applicationArguments.getArgs().addLast(JMX_NAME_PROPERTY_PREFIX + this.jmxName);</b>
+<b class="nc">&nbsp;		return applicationArguments;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected RunArguments resolveJvmArguments() {
+<b class="nc">&nbsp;		RunArguments jvmArguments = super.resolveJvmArguments();</b>
+<b class="nc">&nbsp;		List&lt;String&gt; remoteJmxArguments = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		remoteJmxArguments.add(&quot;-Dcom.sun.management.jmxremote&quot;);</b>
+<b class="nc">&nbsp;		remoteJmxArguments.add(&quot;-Dcom.sun.management.jmxremote.port=&quot; + this.jmxPort);</b>
+<b class="nc">&nbsp;		remoteJmxArguments.add(&quot;-Dcom.sun.management.jmxremote.authenticate=false&quot;);</b>
+<b class="nc">&nbsp;		remoteJmxArguments.add(&quot;-Dcom.sun.management.jmxremote.ssl=false&quot;);</b>
+<b class="nc">&nbsp;		remoteJmxArguments.add(&quot;-Djava.rmi.server.hostname=127.0.0.1&quot;);</b>
+<b class="nc">&nbsp;		jvmArguments.getArgs().addAll(remoteJmxArguments);</b>
+<b class="nc">&nbsp;		return jvmArguments;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void waitForSpringApplication() throws MojoFailureException, MojoExecutionException {
+&nbsp;		try {
+<b class="nc">&nbsp;			getLog().debug(&quot;Connecting to local MBeanServer at port &quot; + this.jmxPort);</b>
+<b class="nc">&nbsp;			try (JMXConnector connector = execute(this.wait, this.maxAttempts, new CreateJmxConnector(this.jmxPort))) {</b>
+<b class="nc">&nbsp;				if (connector == null) {</b>
+<b class="nc">&nbsp;					throw new MojoExecutionException(&quot;JMX MBean server was not reachable before the configured &quot;</b>
+&nbsp;							+ &quot;timeout (&quot; + (this.wait * this.maxAttempts) + &quot;ms&quot;);
+&nbsp;				}
+<b class="nc">&nbsp;				getLog().debug(&quot;Connected to local MBeanServer at port &quot; + this.jmxPort);</b>
+<b class="nc">&nbsp;				MBeanServerConnection connection = connector.getMBeanServerConnection();</b>
+<b class="nc">&nbsp;				doWaitForSpringApplication(connection);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoFailureException(&quot;Could not contact Spring Boot application via JMX on port &quot; + this.jmxPort</b>
+&nbsp;					+ &quot;. Please make sure that no other process is using that port&quot;, ex);
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Failed to connect to MBean server at port &quot; + this.jmxPort, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void doWaitForSpringApplication(MBeanServerConnection connection)
+&nbsp;			throws MojoExecutionException, MojoFailureException {
+<b class="nc">&nbsp;		final SpringApplicationAdminClient client = new SpringApplicationAdminClient(connection, this.jmxName);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			execute(this.wait, this.maxAttempts, () -&gt; (client.isReady() ? true : null));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ReflectionException ex) {</b>
+<b class="nc">&nbsp;			throw new MojoExecutionException(&quot;Unable to retrieve &#39;ready&#39; attribute&quot;, ex.getCause());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new MojoFailureException(&quot;Could not invoke shutdown operation&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Execute a task, retrying it on failure.
+&nbsp;	 * @param &lt;T&gt; the result type
+&nbsp;	 * @param wait the wait time
+&nbsp;	 * @param maxAttempts the maximum number of attempts
+&nbsp;	 * @param callback the task to execute (possibly multiple times). The callback should
+&nbsp;	 * return {@code null} to indicate that another attempt should be made
+&nbsp;	 * @return the result
+&nbsp;	 * @throws Exception in case of execution errors
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; T execute(long wait, int maxAttempts, Callable&lt;T&gt; callback) throws Exception {
+<b class="nc">&nbsp;		getLog().debug(&quot;Waiting for spring application to start...&quot;);</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; maxAttempts; i++) {</b>
+<b class="nc">&nbsp;			T result = callback.call();</b>
+<b class="nc">&nbsp;			if (result != null) {</b>
+<b class="nc">&nbsp;				return result;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			String message = &quot;Spring application is not ready yet, waiting &quot; + wait + &quot;ms (attempt &quot; + (i + 1) + &quot;)&quot;;</b>
+<b class="nc">&nbsp;			getLog().debug(message);</b>
+<b class="nc">&nbsp;			synchronized (this.lock) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					this.lock.wait(wait);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;					Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;					throw new IllegalStateException(&quot;Interrupted while waiting for Spring Boot app to start.&quot;);</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new MojoExecutionException(</b>
+&nbsp;				&quot;Spring application did not start before the configured timeout (&quot; + (wait * maxAttempts) + &quot;ms&quot;);
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isUseTestClasspath() {
+<b class="nc">&nbsp;		return this.useTestClasspath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private class CreateJmxConnector implements Callable&lt;JMXConnector&gt; {
+&nbsp;
+&nbsp;		private final int port;
+&nbsp;
+<b class="nc">&nbsp;		CreateJmxConnector(int port) {</b>
+<b class="nc">&nbsp;			this.port = port;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public JMXConnector call() throws Exception {
+&nbsp;			try {
+<b class="nc">&nbsp;				return SpringApplicationAdminClient.connect(this.port);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				if (hasCauseWithType(ex, ConnectException.class)) {</b>
+<b class="nc">&nbsp;					String message = &quot;MBean server at port &quot; + this.port + &quot; is not up yet...&quot;;</b>
+<b class="nc">&nbsp;					getLog().debug(message);</b>
+<b class="nc">&nbsp;					return null;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean hasCauseWithType(Throwable t, Class&lt;? extends Exception&gt; type) {
+<b class="nc">&nbsp;			return type.isAssignableFrom(t.getClass()) || t.getCause() != null &amp;&amp; hasCauseWithType(t.getCause(), type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

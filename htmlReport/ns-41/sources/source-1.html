@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PrometheusMetricsExportAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus</a>
+</div>
+
+<h1>Coverage Summary for Class: PrometheusMetricsExportAutoConfiguration (org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PrometheusMetricsExportAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PrometheusMetricsExportAutoConfiguration$PrometheusPushGatewayConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PrometheusMetricsExportAutoConfiguration$PrometheusScrapeEndpointConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import io.micrometer.core.instrument.Clock;
+&nbsp;import io.micrometer.prometheus.PrometheusConfig;
+&nbsp;import io.micrometer.prometheus.PrometheusMeterRegistry;
+&nbsp;import io.prometheus.client.CollectorRegistry;
+&nbsp;import io.prometheus.client.exemplars.DefaultExemplarSampler;
+&nbsp;import io.prometheus.client.exemplars.ExemplarSampler;
+&nbsp;import io.prometheus.client.exemplars.tracer.common.SpanContextSupplier;
+&nbsp;import io.prometheus.client.exporter.BasicAuthHttpConnectionFactory;
+&nbsp;import io.prometheus.client.exporter.PushGateway;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.export.ConditionalOnEnabledMetricsExport;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration;
+&nbsp;import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusPushGatewayManager;
+&nbsp;import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusPushGatewayManager.ShutdownOperation;
+&nbsp;import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for exporting metrics to Prometheus.
+&nbsp; *
+&nbsp; * @author Jon Schneider
+&nbsp; * @author David J. M. Karlsen
+&nbsp; * @author Jonatan Ivanov
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@AutoConfiguration(
+&nbsp;		before = { CompositeMeterRegistryAutoConfiguration.class, SimpleMetricsExportAutoConfiguration.class },
+&nbsp;		after = MetricsAutoConfiguration.class)
+&nbsp;@ConditionalOnBean(Clock.class)
+&nbsp;@ConditionalOnClass(PrometheusMeterRegistry.class)
+&nbsp;@ConditionalOnEnabledMetricsExport(&quot;prometheus&quot;)
+&nbsp;@EnableConfigurationProperties(PrometheusProperties.class)
+<b class="nc">&nbsp;public class PrometheusMetricsExportAutoConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public PrometheusConfig prometheusConfig(PrometheusProperties prometheusProperties) {
+<b class="nc">&nbsp;		return new PrometheusPropertiesConfigAdapter(prometheusProperties);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public PrometheusMeterRegistry prometheusMeterRegistry(PrometheusConfig prometheusConfig,
+&nbsp;			CollectorRegistry collectorRegistry, Clock clock, ObjectProvider&lt;ExemplarSampler&gt; exemplarSamplerProvider) {
+<b class="nc">&nbsp;		return new PrometheusMeterRegistry(prometheusConfig, collectorRegistry, clock,</b>
+<b class="nc">&nbsp;				exemplarSamplerProvider.getIfAvailable());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public CollectorRegistry collectorRegistry() {
+<b class="nc">&nbsp;		return new CollectorRegistry(true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean(ExemplarSampler.class)
+&nbsp;	@ConditionalOnBean(SpanContextSupplier.class)
+&nbsp;	public DefaultExemplarSampler exemplarSampler(SpanContextSupplier spanContextSupplier) {
+<b class="nc">&nbsp;		return new DefaultExemplarSampler(spanContextSupplier);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnAvailableEndpoint(endpoint = PrometheusScrapeEndpoint.class)
+<b class="nc">&nbsp;	public static class PrometheusScrapeEndpointConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public PrometheusScrapeEndpoint prometheusEndpoint(CollectorRegistry collectorRegistry) {
+<b class="nc">&nbsp;			return new PrometheusScrapeEndpoint(collectorRegistry);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configuration for &lt;a href=&quot;https://github.com/prometheus/pushgateway&quot;&gt;Prometheus
+&nbsp;	 * Pushgateway&lt;/a&gt;.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnClass(PushGateway.class)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;management.prometheus.metrics.export.pushgateway&quot;, name = &quot;enabled&quot;)
+<b class="nc">&nbsp;	public static class PrometheusPushGatewayConfiguration {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The fallback job name. We use &#39;spring&#39; since there&#39;s a history of Prometheus
+&nbsp;		 * spring integration defaulting to that name from when Prometheus integration
+&nbsp;		 * didn&#39;t exist in Spring itself.
+&nbsp;		 */
+&nbsp;		private static final String FALLBACK_JOB = &quot;spring&quot;;
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public PrometheusPushGatewayManager prometheusPushGatewayManager(CollectorRegistry collectorRegistry,
+&nbsp;				PrometheusProperties prometheusProperties, Environment environment) throws MalformedURLException {
+<b class="nc">&nbsp;			PrometheusProperties.Pushgateway properties = prometheusProperties.getPushgateway();</b>
+<b class="nc">&nbsp;			Duration pushRate = properties.getPushRate();</b>
+<b class="nc">&nbsp;			String job = getJob(properties, environment);</b>
+<b class="nc">&nbsp;			Map&lt;String, String&gt; groupingKey = properties.getGroupingKey();</b>
+<b class="nc">&nbsp;			ShutdownOperation shutdownOperation = properties.getShutdownOperation();</b>
+<b class="nc">&nbsp;			PushGateway pushGateway = initializePushGateway(properties.getBaseUrl());</b>
+<b class="nc">&nbsp;			if (StringUtils.hasText(properties.getUsername())) {</b>
+<b class="nc">&nbsp;				pushGateway.setConnectionFactory(</b>
+<b class="nc">&nbsp;						new BasicAuthHttpConnectionFactory(properties.getUsername(), properties.getPassword()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new PrometheusPushGatewayManager(pushGateway, collectorRegistry, pushRate, job, groupingKey,</b>
+&nbsp;					shutdownOperation);
+&nbsp;		}
+&nbsp;
+&nbsp;		private PushGateway initializePushGateway(String url) throws MalformedURLException {
+<b class="nc">&nbsp;			return new PushGateway(new URL(url));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getJob(PrometheusProperties.Pushgateway properties, Environment environment) {
+<b class="nc">&nbsp;			String job = properties.getJob();</b>
+<b class="nc">&nbsp;			job = (job != null) ? job : environment.getProperty(&quot;spring.application.name&quot;);</b>
+<b class="nc">&nbsp;			return (job != null) ? job : FALLBACK_JOB;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,471 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Bindable</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: Bindable (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Bindable</td>
+<td class="coverageStat">
+  <span class="percent">
+    53.6%
+  </span>
+  <span class="absValue">
+    (15/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    47.9%
+  </span>
+  <span class="absValue">
+    (35/73)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Bindable$BindRestriction</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    56.7%
+  </span>
+  <span class="absValue">
+    (17/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    49.3%
+  </span>
+  <span class="absValue">
+    (37/75)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.Array;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.style.ToStringCreator;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Source that can be bound by a {@link Binder}.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the source type
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; * @see Bindable#of(Class)
+&nbsp; * @see Bindable#of(ResolvableType)
+&nbsp; */
+&nbsp;public final class Bindable&lt;T&gt; {
+&nbsp;
+<b class="fc">&nbsp;	private static final Annotation[] NO_ANNOTATIONS = {};</b>
+&nbsp;
+<b class="fc">&nbsp;	private static final EnumSet&lt;BindRestriction&gt; NO_BIND_RESTRICTIONS = EnumSet.noneOf(BindRestriction.class);</b>
+&nbsp;
+&nbsp;	private final ResolvableType type;
+&nbsp;
+&nbsp;	private final ResolvableType boxedType;
+&nbsp;
+&nbsp;	private final Supplier&lt;T&gt; value;
+&nbsp;
+&nbsp;	private final Annotation[] annotations;
+&nbsp;
+&nbsp;	private final EnumSet&lt;BindRestriction&gt; bindRestrictions;
+&nbsp;
+&nbsp;	private final BindMethod bindMethod;
+&nbsp;
+&nbsp;	private Bindable(ResolvableType type, ResolvableType boxedType, Supplier&lt;T&gt; value, Annotation[] annotations,
+<b class="fc">&nbsp;			EnumSet&lt;BindRestriction&gt; bindRestrictions, BindMethod bindMethod) {</b>
+<b class="fc">&nbsp;		this.type = type;</b>
+<b class="fc">&nbsp;		this.boxedType = boxedType;</b>
+<b class="fc">&nbsp;		this.value = value;</b>
+<b class="fc">&nbsp;		this.annotations = annotations;</b>
+<b class="fc">&nbsp;		this.bindRestrictions = bindRestrictions;</b>
+<b class="fc">&nbsp;		this.bindMethod = bindMethod;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the type of the item to bind.
+&nbsp;	 * @return the type being bound
+&nbsp;	 */
+&nbsp;	public ResolvableType getType() {
+<b class="fc">&nbsp;		return this.type;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the boxed type of the item to bind.
+&nbsp;	 * @return the boxed type for the item being bound
+&nbsp;	 */
+&nbsp;	public ResolvableType getBoxedType() {
+<b class="nc">&nbsp;		return this.boxedType;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a supplier that provides the object value or {@code null}.
+&nbsp;	 * @return the value or {@code null}
+&nbsp;	 */
+&nbsp;	public Supplier&lt;T&gt; getValue() {
+<b class="fc">&nbsp;		return this.value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return any associated annotations that could affect binding.
+&nbsp;	 * @return the associated annotations
+&nbsp;	 */
+&nbsp;	public Annotation[] getAnnotations() {
+<b class="fc">&nbsp;		return this.annotations;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a single associated annotations that could affect binding.
+&nbsp;	 * @param &lt;A&gt; the annotation type
+&nbsp;	 * @param type annotation type
+&nbsp;	 * @return the associated annotation or {@code null}
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public &lt;A extends Annotation&gt; A getAnnotation(Class&lt;A&gt; type) {
+<b class="nc">&nbsp;		for (Annotation annotation : this.annotations) {</b>
+<b class="nc">&nbsp;			if (type.isInstance(annotation)) {</b>
+<b class="nc">&nbsp;				return (A) annotation;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns {@code true} if the specified bind restriction has been added.
+&nbsp;	 * @param bindRestriction the bind restriction to check
+&nbsp;	 * @return if the bind restriction has been added
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public boolean hasBindRestriction(BindRestriction bindRestriction) {
+<b class="fc">&nbsp;		return this.bindRestrictions.contains(bindRestriction);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link BindMethod method} to be used to bind this bindable, or
+&nbsp;	 * {@code null} if no specific binding method is required.
+&nbsp;	 * @return the bind method or {@code null}
+&nbsp;	 * @since 3.0.8
+&nbsp;	 */
+&nbsp;	public BindMethod getBindMethod() {
+<b class="fc">&nbsp;		return this.bindMethod;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Bindable&lt;?&gt; other = (Bindable&lt;?&gt;) obj;</b>
+<b class="nc">&nbsp;		boolean result = true;</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; nullSafeEquals(this.type.resolve(), other.type.resolve());</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; nullSafeEquals(this.annotations, other.annotations);</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; nullSafeEquals(this.bindRestrictions, other.bindRestrictions);</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; nullSafeEquals(this.bindMethod, other.bindMethod);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return ObjectUtils.nullSafeHash(this.type, this.annotations, this.bindRestrictions, this.bindMethod);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		ToStringCreator creator = new ToStringCreator(this);</b>
+<b class="nc">&nbsp;		creator.append(&quot;type&quot;, this.type);</b>
+<b class="nc">&nbsp;		creator.append(&quot;value&quot;, (this.value != null) ? &quot;provided&quot; : &quot;none&quot;);</b>
+<b class="nc">&nbsp;		creator.append(&quot;annotations&quot;, this.annotations);</b>
+<b class="nc">&nbsp;		creator.append(&quot;bindMethod&quot;, this.bindMethod);</b>
+<b class="nc">&nbsp;		return creator.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean nullSafeEquals(Object o1, Object o2) {
+<b class="nc">&nbsp;		return ObjectUtils.nullSafeEquals(o1, o2);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an updated {@link Bindable} instance with the specified annotations.
+&nbsp;	 * @param annotations the annotations
+&nbsp;	 * @return an updated {@link Bindable}
+&nbsp;	 */
+&nbsp;	public Bindable&lt;T&gt; withAnnotations(Annotation... annotations) {
+<b class="nc">&nbsp;		return new Bindable&lt;&gt;(this.type, this.boxedType, this.value,</b>
+<b class="nc">&nbsp;				(annotations != null) ? annotations : NO_ANNOTATIONS, NO_BIND_RESTRICTIONS, this.bindMethod);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an updated {@link Bindable} instance with an existing value. Implies that
+&nbsp;	 * Java Bean binding will be used.
+&nbsp;	 * @param existingValue the existing value
+&nbsp;	 * @return an updated {@link Bindable}
+&nbsp;	 */
+&nbsp;	public Bindable&lt;T&gt; withExistingValue(T existingValue) {
+<b class="fc">&nbsp;		Assert.isTrue(</b>
+<b class="fc">&nbsp;				existingValue == null || this.type.isArray() || this.boxedType.resolve().isInstance(existingValue),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;ExistingValue must be an instance of &quot; + this.type);</b>
+<b class="fc">&nbsp;		Assert.state(this.bindMethod != BindMethod.VALUE_OBJECT,</b>
+<b class="nc">&nbsp;				() -&gt; &quot;An existing value cannot be provided when binding as a value object&quot;);</b>
+<b class="fc">&nbsp;		Supplier&lt;T&gt; value = (existingValue != null) ? () -&gt; existingValue : null;</b>
+<b class="fc">&nbsp;		return new Bindable&lt;&gt;(this.type, this.boxedType, value, this.annotations, this.bindRestrictions,</b>
+&nbsp;				BindMethod.JAVA_BEAN);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an updated {@link Bindable} instance with a value supplier.
+&nbsp;	 * @param suppliedValue the supplier for the value
+&nbsp;	 * @return an updated {@link Bindable}
+&nbsp;	 */
+&nbsp;	public Bindable&lt;T&gt; withSuppliedValue(Supplier&lt;T&gt; suppliedValue) {
+<b class="nc">&nbsp;		return new Bindable&lt;&gt;(this.type, this.boxedType, suppliedValue, this.annotations, this.bindRestrictions,</b>
+&nbsp;				this.bindMethod);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an updated {@link Bindable} instance with additional bind restrictions.
+&nbsp;	 * @param additionalRestrictions any additional restrictions to apply
+&nbsp;	 * @return an updated {@link Bindable}
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public Bindable&lt;T&gt; withBindRestrictions(BindRestriction... additionalRestrictions) {
+<b class="nc">&nbsp;		EnumSet&lt;BindRestriction&gt; bindRestrictions = EnumSet.copyOf(this.bindRestrictions);</b>
+<b class="nc">&nbsp;		bindRestrictions.addAll(Arrays.asList(additionalRestrictions));</b>
+<b class="nc">&nbsp;		return new Bindable&lt;&gt;(this.type, this.boxedType, this.value, this.annotations, bindRestrictions,</b>
+&nbsp;				this.bindMethod);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an updated {@link Bindable} instance with a specific bind method. To use
+&nbsp;	 * {@link BindMethod#VALUE_OBJECT value object binding}, the current instance must not
+&nbsp;	 * have an existing or supplied value.
+&nbsp;	 * @param bindMethod the method to use to bind the bindable
+&nbsp;	 * @return an updated {@link Bindable}
+&nbsp;	 * @since 3.0.8
+&nbsp;	 */
+&nbsp;	public Bindable&lt;T&gt; withBindMethod(BindMethod bindMethod) {
+<b class="nc">&nbsp;		Assert.state(bindMethod != BindMethod.VALUE_OBJECT || this.value == null,</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Value object binding cannot be used with an existing or supplied value&quot;);</b>
+<b class="nc">&nbsp;		return new Bindable&lt;&gt;(this.type, this.boxedType, this.value, this.annotations, this.bindRestrictions,</b>
+&nbsp;				bindMethod);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Bindable} of the type of the specified instance with an
+&nbsp;	 * existing value equal to the instance.
+&nbsp;	 * @param &lt;T&gt; the source type
+&nbsp;	 * @param instance the instance (must not be {@code null})
+&nbsp;	 * @return a {@link Bindable} instance
+&nbsp;	 * @see #of(ResolvableType)
+&nbsp;	 * @see #withExistingValue(Object)
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public static &lt;T&gt; Bindable&lt;T&gt; ofInstance(T instance) {
+<b class="fc">&nbsp;		Assert.notNull(instance, &quot;Instance must not be null&quot;);</b>
+<b class="fc">&nbsp;		Class&lt;T&gt; type = (Class&lt;T&gt;) instance.getClass();</b>
+<b class="fc">&nbsp;		return of(type).withExistingValue(instance);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Bindable} of the specified type.
+&nbsp;	 * @param &lt;T&gt; the source type
+&nbsp;	 * @param type the type (must not be {@code null})
+&nbsp;	 * @return a {@link Bindable} instance
+&nbsp;	 * @see #of(ResolvableType)
+&nbsp;	 */
+&nbsp;	public static &lt;T&gt; Bindable&lt;T&gt; of(Class&lt;T&gt; type) {
+<b class="fc">&nbsp;		Assert.notNull(type, &quot;Type must not be null&quot;);</b>
+<b class="fc">&nbsp;		return of(ResolvableType.forClass(type));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Bindable} {@link List} of the specified element type.
+&nbsp;	 * @param &lt;E&gt; the element type
+&nbsp;	 * @param elementType the list element type
+&nbsp;	 * @return a {@link Bindable} instance
+&nbsp;	 */
+&nbsp;	public static &lt;E&gt; Bindable&lt;List&lt;E&gt;&gt; listOf(Class&lt;E&gt; elementType) {
+<b class="fc">&nbsp;		return of(ResolvableType.forClassWithGenerics(List.class, elementType));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Bindable} {@link Set} of the specified element type.
+&nbsp;	 * @param &lt;E&gt; the element type
+&nbsp;	 * @param elementType the set element type
+&nbsp;	 * @return a {@link Bindable} instance
+&nbsp;	 */
+&nbsp;	public static &lt;E&gt; Bindable&lt;Set&lt;E&gt;&gt; setOf(Class&lt;E&gt; elementType) {
+<b class="fc">&nbsp;		return of(ResolvableType.forClassWithGenerics(Set.class, elementType));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Bindable} {@link Map} of the specified key and value type.
+&nbsp;	 * @param &lt;K&gt; the key type
+&nbsp;	 * @param &lt;V&gt; the value type
+&nbsp;	 * @param keyType the map key type
+&nbsp;	 * @param valueType the map value type
+&nbsp;	 * @return a {@link Bindable} instance
+&nbsp;	 */
+&nbsp;	public static &lt;K, V&gt; Bindable&lt;Map&lt;K, V&gt;&gt; mapOf(Class&lt;K&gt; keyType, Class&lt;V&gt; valueType) {
+<b class="fc">&nbsp;		return of(ResolvableType.forClassWithGenerics(Map.class, keyType, valueType));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link Bindable} of the specified type.
+&nbsp;	 * @param &lt;T&gt; the source type
+&nbsp;	 * @param type the type (must not be {@code null})
+&nbsp;	 * @return a {@link Bindable} instance
+&nbsp;	 * @see #of(Class)
+&nbsp;	 */
+&nbsp;	public static &lt;T&gt; Bindable&lt;T&gt; of(ResolvableType type) {
+<b class="fc">&nbsp;		Assert.notNull(type, &quot;Type must not be null&quot;);</b>
+<b class="fc">&nbsp;		ResolvableType boxedType = box(type);</b>
+<b class="fc">&nbsp;		return new Bindable&lt;&gt;(type, boxedType, null, NO_ANNOTATIONS, NO_BIND_RESTRICTIONS, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ResolvableType box(ResolvableType type) {
+<b class="fc">&nbsp;		Class&lt;?&gt; resolved = type.resolve();</b>
+<b class="fc">&nbsp;		if (resolved != null &amp;&amp; resolved.isPrimitive()) {</b>
+<b class="nc">&nbsp;			Object array = Array.newInstance(resolved, 1);</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; wrapperType = Array.get(array, 0).getClass();</b>
+<b class="nc">&nbsp;			return ResolvableType.forClass(wrapperType);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (resolved != null &amp;&amp; resolved.isArray()) {</b>
+<b class="fc">&nbsp;			return ResolvableType.forArrayComponent(box(type.getComponentType()));</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return type;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Restrictions that can be applied when binding values.
+&nbsp;	 *
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+<b class="fc">&nbsp;	public enum BindRestriction {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Do not bind direct {@link ConfigurationProperty} matches.
+&nbsp;		 */
+<b class="fc">&nbsp;		NO_DIRECT_PROPERTY</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

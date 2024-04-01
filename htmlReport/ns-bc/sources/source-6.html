@@ -1,0 +1,487 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CacheProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.cache</a>
+</div>
+
+<h1>Coverage Summary for Class: CacheProperties (org.springframework.boot.autoconfigure.cache)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CacheProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CacheProperties$Caffeine</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CacheProperties$Couchbase</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CacheProperties$Infinispan</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CacheProperties$JCache</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CacheProperties$Redis</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.cache;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration properties for the cache abstraction.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Ryon Day
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.cache&quot;)
+<b class="nc">&nbsp;public class CacheProperties {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Cache type. By default, auto-detected according to the environment.
+&nbsp;	 */
+&nbsp;	private CacheType type;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Comma-separated list of cache names to create if supported by the underlying cache
+&nbsp;	 * manager. Usually, this disables the ability to create additional caches on-the-fly.
+&nbsp;	 */
+<b class="nc">&nbsp;	private List&lt;String&gt; cacheNames = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Caffeine caffeine = new Caffeine();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Couchbase couchbase = new Couchbase();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Infinispan infinispan = new Infinispan();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final JCache jcache = new JCache();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Redis redis = new Redis();</b>
+&nbsp;
+&nbsp;	public CacheType getType() {
+<b class="nc">&nbsp;		return this.type;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setType(CacheType mode) {
+<b class="nc">&nbsp;		this.type = mode;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;String&gt; getCacheNames() {
+<b class="nc">&nbsp;		return this.cacheNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setCacheNames(List&lt;String&gt; cacheNames) {
+<b class="nc">&nbsp;		this.cacheNames = cacheNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Caffeine getCaffeine() {
+<b class="nc">&nbsp;		return this.caffeine;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Couchbase getCouchbase() {
+<b class="nc">&nbsp;		return this.couchbase;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Infinispan getInfinispan() {
+<b class="nc">&nbsp;		return this.infinispan;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public JCache getJcache() {
+<b class="nc">&nbsp;		return this.jcache;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Redis getRedis() {
+<b class="nc">&nbsp;		return this.redis;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolve the config location if set.
+&nbsp;	 * @param config the config resource
+&nbsp;	 * @return the location or {@code null} if it is not set
+&nbsp;	 * @throws IllegalArgumentException if the config attribute is set to an unknown
+&nbsp;	 * location
+&nbsp;	 */
+&nbsp;	public Resource resolveConfigLocation(Resource config) {
+<b class="nc">&nbsp;		if (config != null) {</b>
+<b class="nc">&nbsp;			Assert.isTrue(config.exists(),</b>
+<b class="nc">&nbsp;					() -&gt; &quot;Cache configuration does not exist &#39;&quot; + config.getDescription() + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Caffeine specific cache properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Caffeine {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The spec to use to create caches. See CaffeineSpec for more details on the spec
+&nbsp;		 * format.
+&nbsp;		 */
+&nbsp;		private String spec;
+&nbsp;
+&nbsp;		public String getSpec() {
+<b class="nc">&nbsp;			return this.spec;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setSpec(String spec) {
+<b class="nc">&nbsp;			this.spec = spec;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Couchbase specific cache properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Couchbase {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Entry expiration. By default the entries never expire. Note that this value is
+&nbsp;		 * ultimately converted to seconds.
+&nbsp;		 */
+&nbsp;		private Duration expiration;
+&nbsp;
+&nbsp;		public Duration getExpiration() {
+<b class="nc">&nbsp;			return this.expiration;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setExpiration(Duration expiration) {
+<b class="nc">&nbsp;			this.expiration = expiration;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Infinispan specific cache properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Infinispan {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The location of the configuration file to use to initialize Infinispan.
+&nbsp;		 */
+&nbsp;		private Resource config;
+&nbsp;
+&nbsp;		public Resource getConfig() {
+<b class="nc">&nbsp;			return this.config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setConfig(Resource config) {
+<b class="nc">&nbsp;			this.config = config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * JCache (JSR-107) specific cache properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class JCache {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The location of the configuration file to use to initialize the cache manager.
+&nbsp;		 * The configuration file is dependent of the underlying cache implementation.
+&nbsp;		 */
+&nbsp;		private Resource config;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Fully qualified name of the CachingProvider implementation to use to retrieve
+&nbsp;		 * the JSR-107 compliant cache manager. Needed only if more than one JSR-107
+&nbsp;		 * implementation is available on the classpath.
+&nbsp;		 */
+&nbsp;		private String provider;
+&nbsp;
+&nbsp;		public String getProvider() {
+<b class="nc">&nbsp;			return this.provider;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setProvider(String provider) {
+<b class="nc">&nbsp;			this.provider = provider;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Resource getConfig() {
+<b class="nc">&nbsp;			return this.config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setConfig(Resource config) {
+<b class="nc">&nbsp;			this.config = config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Redis-specific cache properties.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static class Redis {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Entry expiration. By default the entries never expire.
+&nbsp;		 */
+&nbsp;		private Duration timeToLive;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Allow caching null values.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean cacheNullValues = true;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Key prefix.
+&nbsp;		 */
+&nbsp;		private String keyPrefix;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether to use the key prefix when writing to Redis.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean useKeyPrefix = true;</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether to enable cache statistics.
+&nbsp;		 */
+&nbsp;		private boolean enableStatistics;
+&nbsp;
+&nbsp;		public Duration getTimeToLive() {
+<b class="nc">&nbsp;			return this.timeToLive;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setTimeToLive(Duration timeToLive) {
+<b class="nc">&nbsp;			this.timeToLive = timeToLive;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isCacheNullValues() {
+<b class="nc">&nbsp;			return this.cacheNullValues;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setCacheNullValues(boolean cacheNullValues) {
+<b class="nc">&nbsp;			this.cacheNullValues = cacheNullValues;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getKeyPrefix() {
+<b class="nc">&nbsp;			return this.keyPrefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setKeyPrefix(String keyPrefix) {
+<b class="nc">&nbsp;			this.keyPrefix = keyPrefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isUseKeyPrefix() {
+<b class="nc">&nbsp;			return this.useKeyPrefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setUseKeyPrefix(boolean useKeyPrefix) {
+<b class="nc">&nbsp;			this.useKeyPrefix = useKeyPrefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isEnableStatistics() {
+<b class="nc">&nbsp;			return this.enableStatistics;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setEnableStatistics(boolean enableStatistics) {
+<b class="nc">&nbsp;			this.enableStatistics = enableStatistics;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

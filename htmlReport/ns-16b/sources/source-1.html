@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ClassPathChangedEvent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.classpath</a>
+</div>
+
+<h1>Coverage Summary for Class: ClassPathChangedEvent (org.springframework.boot.devtools.classpath)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClassPathChangedEvent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.classpath;
+&nbsp;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.devtools.filewatch.ChangedFile;
+&nbsp;import org.springframework.boot.devtools.filewatch.ChangedFile.Type;
+&nbsp;import org.springframework.boot.devtools.filewatch.ChangedFiles;
+&nbsp;import org.springframework.context.ApplicationEvent;
+&nbsp;import org.springframework.core.style.ToStringCreator;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ApplicationEvent} containing details of a classpath change.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.3.0
+&nbsp; * @see ClassPathFileChangeListener
+&nbsp; */
+&nbsp;public class ClassPathChangedEvent extends ApplicationEvent {
+&nbsp;
+&nbsp;	private final Set&lt;ChangedFiles&gt; changeSet;
+&nbsp;
+&nbsp;	private final boolean restartRequired;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ClassPathChangedEvent}.
+&nbsp;	 * @param source the source of the event
+&nbsp;	 * @param changeSet the changed files
+&nbsp;	 * @param restartRequired if a restart is required due to the change
+&nbsp;	 */
+&nbsp;	public ClassPathChangedEvent(Object source, Set&lt;ChangedFiles&gt; changeSet, boolean restartRequired) {
+<b class="nc">&nbsp;		super(source);</b>
+<b class="nc">&nbsp;		Assert.notNull(changeSet, &quot;ChangeSet must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.changeSet = changeSet;</b>
+<b class="nc">&nbsp;		this.restartRequired = restartRequired;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return details of the files that changed.
+&nbsp;	 * @return the changed files
+&nbsp;	 */
+&nbsp;	public Set&lt;ChangedFiles&gt; getChangeSet() {
+<b class="nc">&nbsp;		return this.changeSet;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if an application restart is required due to the change.
+&nbsp;	 * @return if an application restart is required
+&nbsp;	 */
+&nbsp;	public boolean isRestartRequired() {
+<b class="nc">&nbsp;		return this.restartRequired;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return new ToStringCreator(this).append(&quot;changeSet&quot;, this.changeSet)</b>
+<b class="nc">&nbsp;			.append(&quot;restartRequired&quot;, this.restartRequired)</b>
+<b class="nc">&nbsp;			.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an overview of the changes that triggered this event.
+&nbsp;	 * @return an overview of the changes
+&nbsp;	 * @since 2.6.11
+&nbsp;	 */
+&nbsp;	public String overview() {
+<b class="nc">&nbsp;		int added = 0;</b>
+<b class="nc">&nbsp;		int deleted = 0;</b>
+<b class="nc">&nbsp;		int modified = 0;</b>
+<b class="nc">&nbsp;		for (ChangedFiles changedFiles : this.changeSet) {</b>
+<b class="nc">&nbsp;			for (ChangedFile changedFile : changedFiles) {</b>
+<b class="nc">&nbsp;				Type type = changedFile.getType();</b>
+<b class="nc">&nbsp;				if (type == Type.ADD) {</b>
+<b class="nc">&nbsp;					added++;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				else if (type == Type.DELETE) {</b>
+<b class="nc">&nbsp;					deleted++;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				else if (type == Type.MODIFY) {</b>
+<b class="nc">&nbsp;					modified++;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		int size = added + deleted + modified;</b>
+<b class="nc">&nbsp;		return String.format(&quot;%s (%s, %s, %s)&quot;, quantityOfUnit(size, &quot;class path change&quot;),</b>
+<b class="nc">&nbsp;				quantityOfUnit(added, &quot;addition&quot;), quantityOfUnit(deleted, &quot;deletion&quot;),</b>
+<b class="nc">&nbsp;				quantityOfUnit(modified, &quot;modification&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String quantityOfUnit(int quantity, String unit) {
+<b class="nc">&nbsp;		return quantity + &quot; &quot; + ((quantity != 1) ? unit + &quot;s&quot; : unit);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

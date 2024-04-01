@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DocumentRoot</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet.server</a>
+</div>
+
+<h1>Coverage Summary for Class: DocumentRoot (org.springframework.boot.web.servlet.server)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DocumentRoot</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet.server;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.net.JarURLConnection;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.security.CodeSource;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;
+&nbsp;/**
+&nbsp; * Manages a {@link ServletWebServerFactory} document root.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @see AbstractServletWebServerFactory
+&nbsp; */
+&nbsp;class DocumentRoot {
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] COMMON_DOC_ROOTS = { &quot;src/main/webapp&quot;, &quot;public&quot;, &quot;static&quot; };</b>
+&nbsp;
+&nbsp;	private final Log logger;
+&nbsp;
+&nbsp;	private File directory;
+&nbsp;
+<b class="nc">&nbsp;	DocumentRoot(Log logger) {</b>
+<b class="nc">&nbsp;		this.logger = logger;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	File getDirectory() {
+<b class="nc">&nbsp;		return this.directory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setDirectory(File directory) {
+<b class="nc">&nbsp;		this.directory = directory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the absolute document root when it points to a valid directory, logging a
+&nbsp;	 * warning and returning {@code null} otherwise.
+&nbsp;	 * @return the valid document root
+&nbsp;	 */
+&nbsp;	final File getValidDirectory() {
+<b class="nc">&nbsp;		File file = this.directory;</b>
+<b class="nc">&nbsp;		file = (file != null) ? file : getWarFileDocumentRoot();</b>
+<b class="nc">&nbsp;		file = (file != null) ? file : getExplodedWarFileDocumentRoot();</b>
+<b class="nc">&nbsp;		file = (file != null) ? file : getCommonDocumentRoot();</b>
+<b class="nc">&nbsp;		if (file == null &amp;&amp; this.logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			logNoDocumentRoots();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (this.logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			this.logger.debug(&quot;Document root: &quot; + file);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return file;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getWarFileDocumentRoot() {
+<b class="nc">&nbsp;		return getArchiveFileDocumentRoot(&quot;.war&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getArchiveFileDocumentRoot(String extension) {
+<b class="nc">&nbsp;		File file = getCodeSourceArchive();</b>
+<b class="nc">&nbsp;		if (this.logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			this.logger.debug(&quot;Code archive: &quot; + file);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (file != null &amp;&amp; file.exists() &amp;&amp; !file.isDirectory()</b>
+<b class="nc">&nbsp;				&amp;&amp; file.getName().toLowerCase(Locale.ENGLISH).endsWith(extension)) {</b>
+<b class="nc">&nbsp;			return file.getAbsoluteFile();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getExplodedWarFileDocumentRoot() {
+<b class="nc">&nbsp;		return getExplodedWarFileDocumentRoot(getCodeSourceArchive());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getCodeSourceArchive() {
+<b class="nc">&nbsp;		return getCodeSourceArchive(getClass().getProtectionDomain().getCodeSource());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	File getCodeSourceArchive(CodeSource codeSource) {
+&nbsp;		try {
+<b class="nc">&nbsp;			URL location = (codeSource != null) ? codeSource.getLocation() : null;</b>
+<b class="nc">&nbsp;			if (location == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;			String path;
+<b class="nc">&nbsp;			URLConnection connection = location.openConnection();</b>
+<b class="nc">&nbsp;			if (connection instanceof JarURLConnection jarURLConnection) {</b>
+<b class="nc">&nbsp;				path = jarURLConnection.getJarFile().getName();</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				path = location.toURI().getPath();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			int index = path.indexOf(&quot;!/&quot;);</b>
+<b class="nc">&nbsp;			if (index != -1) {</b>
+<b class="nc">&nbsp;				path = path.substring(0, index);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new File(path);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	final File getExplodedWarFileDocumentRoot(File codeSourceFile) {
+<b class="nc">&nbsp;		if (this.logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			this.logger.debug(&quot;Code archive: &quot; + codeSourceFile);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (codeSourceFile != null &amp;&amp; codeSourceFile.exists()) {</b>
+<b class="nc">&nbsp;			String path = codeSourceFile.getAbsolutePath();</b>
+<b class="nc">&nbsp;			int webInfPathIndex = path.indexOf(File.separatorChar + &quot;WEB-INF&quot; + File.separatorChar);</b>
+<b class="nc">&nbsp;			if (webInfPathIndex &gt;= 0) {</b>
+<b class="nc">&nbsp;				path = path.substring(0, webInfPathIndex);</b>
+<b class="nc">&nbsp;				return new File(path);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getCommonDocumentRoot() {
+<b class="nc">&nbsp;		for (String commonDocRoot : COMMON_DOC_ROOTS) {</b>
+<b class="nc">&nbsp;			File root = new File(commonDocRoot);</b>
+<b class="nc">&nbsp;			if (root.exists() &amp;&amp; root.isDirectory()) {</b>
+<b class="nc">&nbsp;				return root.getAbsoluteFile();</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logNoDocumentRoots() {
+<b class="nc">&nbsp;		this.logger.debug(&quot;None of the document roots &quot; + Arrays.asList(COMMON_DOC_ROOTS)</b>
+&nbsp;				+ &quot; point to a directory and will be ignored.&quot;);
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

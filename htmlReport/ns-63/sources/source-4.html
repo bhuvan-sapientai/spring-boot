@@ -1,0 +1,334 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CompositeTextMapPropagator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.tracing</a>
+</div>
+
+<h1>Coverage Summary for Class: CompositeTextMapPropagator (org.springframework.boot.actuate.autoconfigure.tracing)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CompositeTextMapPropagator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CompositeTextMapPropagator$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CompositeTextMapPropagator$TextMapPropagatorMapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.tracing;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import io.opentelemetry.api.baggage.propagation.W3CBaggagePropagator;
+&nbsp;import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+&nbsp;import io.opentelemetry.context.Context;
+&nbsp;import io.opentelemetry.context.propagation.TextMapGetter;
+&nbsp;import io.opentelemetry.context.propagation.TextMapPropagator;
+&nbsp;import io.opentelemetry.context.propagation.TextMapSetter;
+&nbsp;import io.opentelemetry.extension.trace.propagation.B3Propagator;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.tracing.TracingProperties.Propagation.PropagationType;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link TextMapPropagator} which supports multiple tracing formats. It is able to
+&nbsp; * configure different formats for injecting and for extracting.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;class CompositeTextMapPropagator implements TextMapPropagator {
+&nbsp;
+&nbsp;	private final Collection&lt;TextMapPropagator&gt; injectors;
+&nbsp;
+&nbsp;	private final Collection&lt;TextMapPropagator&gt; extractors;
+&nbsp;
+&nbsp;	private final TextMapPropagator baggagePropagator;
+&nbsp;
+&nbsp;	private final Set&lt;String&gt; fields;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@link CompositeTextMapPropagator}.
+&nbsp;	 * @param injectors the injectors
+&nbsp;	 * @param mutuallyExclusiveExtractors the mutually exclusive extractors. They are
+&nbsp;	 * applied in order, and as soon as an extractor extracts a context, the other
+&nbsp;	 * extractors after it are no longer invoked
+&nbsp;	 * @param baggagePropagator the baggage propagator to use, or {@code null}
+&nbsp;	 */
+&nbsp;	CompositeTextMapPropagator(Collection&lt;TextMapPropagator&gt; injectors,
+<b class="nc">&nbsp;			Collection&lt;TextMapPropagator&gt; mutuallyExclusiveExtractors, TextMapPropagator baggagePropagator) {</b>
+<b class="nc">&nbsp;		this.injectors = injectors;</b>
+<b class="nc">&nbsp;		this.extractors = mutuallyExclusiveExtractors;</b>
+<b class="nc">&nbsp;		this.baggagePropagator = baggagePropagator;</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; fields = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		fields(this.injectors).forEach(fields::add);</b>
+<b class="nc">&nbsp;		fields(this.extractors).forEach(fields::add);</b>
+<b class="nc">&nbsp;		if (baggagePropagator != null) {</b>
+<b class="nc">&nbsp;			fields.addAll(baggagePropagator.fields());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.fields = Collections.unmodifiableSet(fields);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Stream&lt;String&gt; fields(Collection&lt;TextMapPropagator&gt; propagators) {
+<b class="nc">&nbsp;		return propagators.stream().flatMap((propagator) -&gt; propagator.fields().stream());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Collection&lt;TextMapPropagator&gt; getInjectors() {
+<b class="nc">&nbsp;		return this.injectors;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Collection&lt;TextMapPropagator&gt; getExtractors() {
+<b class="nc">&nbsp;		return this.extractors;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Collection&lt;String&gt; fields() {
+<b class="nc">&nbsp;		return this.fields;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;C&gt; void inject(Context context, C carrier, TextMapSetter&lt;C&gt; setter) {
+<b class="nc">&nbsp;		if (context != null &amp;&amp; setter != null) {</b>
+<b class="nc">&nbsp;			this.injectors.forEach((injector) -&gt; injector.inject(context, carrier, setter));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;C&gt; Context extract(Context context, C carrier, TextMapGetter&lt;C&gt; getter) {
+<b class="nc">&nbsp;		if (context == null) {</b>
+<b class="nc">&nbsp;			return Context.root();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (getter == null) {</b>
+<b class="nc">&nbsp;			return context;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Context result = this.extractors.stream()</b>
+<b class="nc">&nbsp;			.map((extractor) -&gt; extractor.extract(context, carrier, getter))</b>
+<b class="nc">&nbsp;			.filter((extracted) -&gt; extracted != context)</b>
+<b class="nc">&nbsp;			.findFirst()</b>
+<b class="nc">&nbsp;			.orElse(context);</b>
+<b class="nc">&nbsp;		if (this.baggagePropagator != null) {</b>
+<b class="nc">&nbsp;			result = this.baggagePropagator.extract(result, carrier, getter);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@link CompositeTextMapPropagator}.
+&nbsp;	 * @param properties the tracing properties
+&nbsp;	 * @param baggagePropagator the baggage propagator to use, or {@code null}
+&nbsp;	 * @return the {@link CompositeTextMapPropagator}
+&nbsp;	 */
+&nbsp;	static TextMapPropagator create(TracingProperties.Propagation properties, TextMapPropagator baggagePropagator) {
+<b class="nc">&nbsp;		TextMapPropagatorMapper mapper = new TextMapPropagatorMapper(baggagePropagator != null);</b>
+<b class="nc">&nbsp;		List&lt;TextMapPropagator&gt; injectors = properties.getEffectiveProducedTypes()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map(mapper::map)</b>
+<b class="nc">&nbsp;			.collect(Collectors.toCollection(ArrayList::new));</b>
+<b class="nc">&nbsp;		if (baggagePropagator != null) {</b>
+<b class="nc">&nbsp;			injectors.add(baggagePropagator);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;TextMapPropagator&gt; extractors = properties.getEffectiveConsumedTypes().stream().map(mapper::map).toList();</b>
+<b class="nc">&nbsp;		return new CompositeTextMapPropagator(injectors, extractors, baggagePropagator);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Mapper used to create a {@link TextMapPropagator} from a {@link PropagationType}.
+&nbsp;	 */
+&nbsp;	private static class TextMapPropagatorMapper {
+&nbsp;
+&nbsp;		private final boolean baggage;
+&nbsp;
+<b class="nc">&nbsp;		TextMapPropagatorMapper(boolean baggage) {</b>
+<b class="nc">&nbsp;			this.baggage = baggage;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		TextMapPropagator map(PropagationType type) {
+<b class="nc">&nbsp;			return switch (type) {</b>
+<b class="nc">&nbsp;				case B3 -&gt; b3Single();</b>
+<b class="nc">&nbsp;				case B3_MULTI -&gt; b3Multi();</b>
+<b class="nc">&nbsp;				case W3C -&gt; w3c();</b>
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Creates a new B3 propagator using a single B3 header.
+&nbsp;		 * @return the B3 propagator
+&nbsp;		 */
+&nbsp;		private TextMapPropagator b3Single() {
+<b class="nc">&nbsp;			return B3Propagator.injectingSingleHeader();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Creates a new B3 propagator using multiple B3 headers.
+&nbsp;		 * @return the B3 propagator
+&nbsp;		 */
+&nbsp;		private TextMapPropagator b3Multi() {
+<b class="nc">&nbsp;			return B3Propagator.injectingMultiHeaders();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Creates a new W3C propagator.
+&nbsp;		 * @return the W3C propagator
+&nbsp;		 */
+&nbsp;		private TextMapPropagator w3c() {
+<b class="nc">&nbsp;			return (!this.baggage) ? W3CTraceContextPropagator.getInstance() : TextMapPropagator</b>
+<b class="nc">&nbsp;				.composite(W3CTraceContextPropagator.getInstance(), W3CBaggagePropagator.getInstance());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,330 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RestartClassLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.restart.classloader</a>
+</div>
+
+<h1>Coverage Summary for Class: RestartClassLoader (org.springframework.boot.devtools.restart.classloader)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RestartClassLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RestartClassLoader$CompoundEnumeration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.restart.classloader;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.security.ProtectionDomain;
+&nbsp;import java.util.Enumeration;
+&nbsp;
+&nbsp;import org.springframework.boot.devtools.restart.classloader.ClassLoaderFile.Kind;
+&nbsp;import org.springframework.core.SmartClassLoader;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Disposable {@link ClassLoader} used to support application restarting. Provides parent
+&nbsp; * last loading for the specified URLs.
+&nbsp; *
+&nbsp; * @author Andy Clement
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;public class RestartClassLoader extends URLClassLoader implements SmartClassLoader {
+&nbsp;
+&nbsp;	private final ClassLoaderFileRepository updatedFiles;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link RestartClassLoader} instance.
+&nbsp;	 * @param parent the parent classloader
+&nbsp;	 * @param urls the urls managed by the classloader
+&nbsp;	 */
+&nbsp;	public RestartClassLoader(ClassLoader parent, URL[] urls) {
+<b class="nc">&nbsp;		this(parent, urls, ClassLoaderFileRepository.NONE);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link RestartClassLoader} instance.
+&nbsp;	 * @param parent the parent classloader
+&nbsp;	 * @param updatedFiles any files that have been updated since the JARs referenced in
+&nbsp;	 * URLs were created.
+&nbsp;	 * @param urls the urls managed by the classloader
+&nbsp;	 */
+&nbsp;	public RestartClassLoader(ClassLoader parent, URL[] urls, ClassLoaderFileRepository updatedFiles) {
+<b class="nc">&nbsp;		super(urls, parent);</b>
+<b class="nc">&nbsp;		Assert.notNull(parent, &quot;Parent must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(updatedFiles, &quot;UpdatedFiles must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.updatedFiles = updatedFiles;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Enumeration&lt;URL&gt; getResources(String name) throws IOException {
+&nbsp;		// Use the parent since we&#39;re shadowing resource and we don&#39;t want duplicates
+<b class="nc">&nbsp;		Enumeration&lt;URL&gt; resources = getParent().getResources(name);</b>
+<b class="nc">&nbsp;		ClassLoaderFile file = this.updatedFiles.getFile(name);</b>
+<b class="nc">&nbsp;		if (file != null) {</b>
+&nbsp;			// Assume that we&#39;re replacing just the first item
+<b class="nc">&nbsp;			if (resources.hasMoreElements()) {</b>
+<b class="nc">&nbsp;				resources.nextElement();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (file.getKind() != Kind.DELETED) {</b>
+<b class="nc">&nbsp;				return new CompoundEnumeration&lt;&gt;(createFileUrl(name, file), resources);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return resources;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URL getResource(String name) {
+<b class="nc">&nbsp;		ClassLoaderFile file = this.updatedFiles.getFile(name);</b>
+<b class="nc">&nbsp;		if (file != null &amp;&amp; file.getKind() == Kind.DELETED) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		URL resource = findResource(name);</b>
+<b class="nc">&nbsp;		if (resource != null) {</b>
+<b class="nc">&nbsp;			return resource;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getParent().getResource(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URL findResource(String name) {
+<b class="nc">&nbsp;		final ClassLoaderFile file = this.updatedFiles.getFile(name);</b>
+<b class="nc">&nbsp;		if (file == null) {</b>
+<b class="nc">&nbsp;			return super.findResource(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (file.getKind() == Kind.DELETED) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return createFileUrl(name, file);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+<b class="nc">&nbsp;		String path = name.replace(&#39;.&#39;, &#39;/&#39;).concat(&quot;.class&quot;);</b>
+<b class="nc">&nbsp;		ClassLoaderFile file = this.updatedFiles.getFile(path);</b>
+<b class="nc">&nbsp;		if (file != null &amp;&amp; file.getKind() == Kind.DELETED) {</b>
+<b class="nc">&nbsp;			throw new ClassNotFoundException(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		synchronized (getClassLoadingLock(name)) {</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; loadedClass = findLoadedClass(name);</b>
+<b class="nc">&nbsp;			if (loadedClass == null) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					loadedClass = findClass(name);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (ClassNotFoundException ex) {</b>
+<b class="nc">&nbsp;					loadedClass = Class.forName(name, false, getParent());</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (resolve) {</b>
+<b class="nc">&nbsp;				resolveClass(loadedClass);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return loadedClass;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException {
+<b class="nc">&nbsp;		String path = name.replace(&#39;.&#39;, &#39;/&#39;).concat(&quot;.class&quot;);</b>
+<b class="nc">&nbsp;		final ClassLoaderFile file = this.updatedFiles.getFile(path);</b>
+<b class="nc">&nbsp;		if (file == null) {</b>
+<b class="nc">&nbsp;			return super.findClass(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (file.getKind() == Kind.DELETED) {</b>
+<b class="nc">&nbsp;			throw new ClassNotFoundException(name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		byte[] bytes = file.getContents();</b>
+<b class="nc">&nbsp;		return defineClass(name, bytes, 0, bytes.length);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;?&gt; publicDefineClass(String name, byte[] b, ProtectionDomain protectionDomain) {
+<b class="nc">&nbsp;		return defineClass(name, b, 0, b.length, protectionDomain);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ClassLoader getOriginalClassLoader() {
+<b class="nc">&nbsp;		return getParent();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private URL createFileUrl(String name, ClassLoaderFile file) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return new URL(&quot;reloaded&quot;, null, -1, &quot;/&quot; + name, new ClassLoaderFileURLStreamHandler(file));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedURLException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean isClassReloadable(Class&lt;?&gt; classType) {
+<b class="nc">&nbsp;		return (classType.getClassLoader() instanceof RestartClassLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Compound {@link Enumeration} that adds an additional item to the front.
+&nbsp;	 */
+&nbsp;	private static class CompoundEnumeration&lt;E&gt; implements Enumeration&lt;E&gt; {
+&nbsp;
+&nbsp;		private E firstElement;
+&nbsp;
+&nbsp;		private final Enumeration&lt;E&gt; enumeration;
+&nbsp;
+<b class="nc">&nbsp;		CompoundEnumeration(E firstElement, Enumeration&lt;E&gt; enumeration) {</b>
+<b class="nc">&nbsp;			this.firstElement = firstElement;</b>
+<b class="nc">&nbsp;			this.enumeration = enumeration;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean hasMoreElements() {
+<b class="nc">&nbsp;			return (this.firstElement != null || this.enumeration.hasMoreElements());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public E nextElement() {
+<b class="nc">&nbsp;			if (this.firstElement == null) {</b>
+<b class="nc">&nbsp;				return this.enumeration.nextElement();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			E element = this.firstElement;</b>
+<b class="nc">&nbsp;			this.firstElement = null;</b>
+<b class="nc">&nbsp;			return element;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

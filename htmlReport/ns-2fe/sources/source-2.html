@@ -1,0 +1,437 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GradleBuild</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testsupport.gradle.testkit</a>
+</div>
+
+<h1>Coverage Summary for Class: GradleBuild (org.springframework.boot.testsupport.gradle.testkit)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GradleBuild</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/131)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testsupport.gradle.testkit;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.FileWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonView;
+&nbsp;import com.fasterxml.jackson.core.Versioned;
+&nbsp;import com.fasterxml.jackson.databind.Module;
+&nbsp;import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+&nbsp;import com.sun.jna.Platform;
+&nbsp;import io.spring.gradle.dependencymanagement.DependencyManagementPlugin;
+&nbsp;import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension;
+&nbsp;import org.antlr.v4.runtime.Lexer;
+&nbsp;import org.apache.commons.compress.archivers.ArchiveEntry;
+&nbsp;import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+&nbsp;import org.apache.hc.core5.http.HttpRequest;
+&nbsp;import org.apache.hc.core5.http2.HttpVersionPolicy;
+&nbsp;import org.gradle.testkit.runner.BuildResult;
+&nbsp;import org.gradle.testkit.runner.GradleRunner;
+&nbsp;import org.gradle.util.GradleVersion;
+&nbsp;import org.jetbrains.kotlin.gradle.model.KotlinProject;
+&nbsp;import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin;
+&nbsp;import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformJvmPlugin;
+&nbsp;import org.jetbrains.kotlin.project.model.LanguageSettings;
+&nbsp;import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion;
+&nbsp;import org.tomlj.Toml;
+&nbsp;
+&nbsp;import org.springframework.asm.ClassVisitor;
+&nbsp;import org.springframework.boot.buildpack.platform.build.BuildRequest;
+&nbsp;import org.springframework.boot.loader.tools.LaunchScript;
+&nbsp;import org.springframework.util.FileCopyUtils;
+&nbsp;import org.springframework.util.FileSystemUtils;
+&nbsp;
+&nbsp;import static org.assertj.core.api.Assertions.assertThat;
+&nbsp;import static org.assertj.core.api.Assertions.fail;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@code GradleBuild} is used to run a Gradle build using {@link GradleRunner}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;public class GradleBuild {
+&nbsp;
+&nbsp;	private final Dsl dsl;
+&nbsp;
+&nbsp;	private File projectDir;
+&nbsp;
+&nbsp;	private String script;
+&nbsp;
+&nbsp;	private String settings;
+&nbsp;
+&nbsp;	private String gradleVersion;
+&nbsp;
+<b class="nc">&nbsp;	private String springBootVersion = &quot;TEST-SNAPSHOT&quot;;</b>
+&nbsp;
+&nbsp;	private GradleVersion expectDeprecationWarnings;
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;String&gt; expectedDeprecationMessages = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private boolean configurationCache = false;</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, String&gt; scriptProperties = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	public GradleBuild() {
+<b class="nc">&nbsp;		this(Dsl.GROOVY);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public GradleBuild(Dsl dsl) {</b>
+<b class="nc">&nbsp;		this.dsl = dsl;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Dsl getDsl() {
+<b class="nc">&nbsp;		return this.dsl;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void before() throws IOException {
+<b class="nc">&nbsp;		this.projectDir = Files.createTempDirectory(&quot;gradle-&quot;).toFile();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void after() {
+<b class="nc">&nbsp;		this.script = null;</b>
+<b class="nc">&nbsp;		FileSystemUtils.deleteRecursively(this.projectDir);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;File&gt; pluginClasspath() {
+<b class="nc">&nbsp;		return Arrays.asList(new File(&quot;bin/main&quot;), new File(&quot;build/classes/java/main&quot;),</b>
+<b class="nc">&nbsp;				new File(&quot;build/resources/main&quot;), new File(pathOfJarContaining(LaunchScript.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(ClassVisitor.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(DependencyManagementPlugin.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(&quot;org.jetbrains.kotlin.cli.common.PropertiesKt&quot;)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(KotlinPlatformJvmPlugin.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(KotlinProject.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(KotlinToolingVersion.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(&quot;org.jetbrains.kotlin.daemon.client.KotlinCompilerClient&quot;)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(KotlinCompilerPluginSupportPlugin.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(LanguageSettings.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(ArchiveEntry.class)), new File(pathOfJarContaining(BuildRequest.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(HttpClientConnectionManager.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(HttpRequest.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(HttpVersionPolicy.class)), new File(pathOfJarContaining(Module.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(Versioned.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(ParameterNamesModule.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(JsonView.class)), new File(pathOfJarContaining(Platform.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(Toml.class)), new File(pathOfJarContaining(Lexer.class)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(&quot;org.graalvm.buildtools.gradle.NativeImagePlugin&quot;)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(&quot;org.graalvm.reachability.GraalVMReachabilityMetadataRepository&quot;)),</b>
+<b class="nc">&nbsp;				new File(pathOfJarContaining(&quot;org.graalvm.buildtools.utils.SharedConstants&quot;)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String pathOfJarContaining(String className) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return pathOfJarContaining(Class.forName(className));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ClassNotFoundException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String pathOfJarContaining(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		return type.getProtectionDomain().getCodeSource().getLocation().getPath();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleBuild script(String script) {
+<b class="nc">&nbsp;		this.script = script.endsWith(this.dsl.getExtension()) ? script : script + this.dsl.getExtension();</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void settings(String settings) {
+<b class="nc">&nbsp;		this.settings = settings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleBuild expectDeprecationWarningsWithAtLeastVersion(String gradleVersion) {
+<b class="nc">&nbsp;		this.expectDeprecationWarnings = GradleVersion.version(gradleVersion);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleBuild expectDeprecationMessages(String... messages) {
+<b class="nc">&nbsp;		this.expectedDeprecationMessages.addAll(Arrays.asList(messages));</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleBuild configurationCache() {
+<b class="nc">&nbsp;		this.configurationCache = true;</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isConfigurationCache() {
+<b class="nc">&nbsp;		return this.configurationCache;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleBuild scriptProperty(String key, String value) {
+<b class="nc">&nbsp;		this.scriptProperties.put(key, value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleBuild scriptPropertyFrom(File propertiesFile, String key) {
+<b class="nc">&nbsp;		this.scriptProperties.put(key, getProperty(propertiesFile, key));</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean gradleVersionIsAtLeast(String version) {
+<b class="nc">&nbsp;		return GradleVersion.version(this.gradleVersion).compareTo(GradleVersion.version(version)) &gt;= 0;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public BuildResult build(String... arguments) {
+&nbsp;		try {
+<b class="nc">&nbsp;			BuildResult result = prepareRunner(arguments).build();</b>
+<b class="nc">&nbsp;			if (this.expectDeprecationWarnings == null || (this.gradleVersion != null</b>
+<b class="nc">&nbsp;					&amp;&amp; this.expectDeprecationWarnings.compareTo(GradleVersion.version(this.gradleVersion)) &gt; 0)) {</b>
+<b class="nc">&nbsp;				String buildOutput = result.getOutput();</b>
+<b class="nc">&nbsp;				if (this.expectedDeprecationMessages != null) {</b>
+<b class="nc">&nbsp;					for (String message : this.expectedDeprecationMessages) {</b>
+<b class="nc">&nbsp;						buildOutput = buildOutput.replaceAll(message, &quot;&quot;);</b>
+<b class="nc">&nbsp;					}</b>
+&nbsp;				}
+<b class="nc">&nbsp;				assertThat(buildOutput).doesNotContainIgnoringCase(&quot;deprecated&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public BuildResult buildAndFail(String... arguments) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return prepareRunner(arguments).buildAndFail();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleRunner prepareRunner(String... arguments) throws IOException {
+<b class="nc">&nbsp;		this.scriptProperties.put(&quot;bootVersion&quot;, getBootVersion());</b>
+<b class="nc">&nbsp;		this.scriptProperties.put(&quot;dependencyManagementPluginVersion&quot;, getDependencyManagementPluginVersion());</b>
+<b class="nc">&nbsp;		copyTransformedScript(this.script, new File(this.projectDir, &quot;build&quot; + this.dsl.getExtension()));</b>
+<b class="nc">&nbsp;		if (this.settings != null) {</b>
+<b class="nc">&nbsp;			copyTransformedScript(this.settings, new File(this.projectDir, &quot;settings.gradle&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		File repository = new File(&quot;src/test/resources/repository&quot;);</b>
+<b class="nc">&nbsp;		if (repository.exists()) {</b>
+<b class="nc">&nbsp;			FileSystemUtils.copyRecursively(repository, new File(this.projectDir, &quot;repository&quot;));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		GradleRunner gradleRunner = GradleRunner.create()</b>
+<b class="nc">&nbsp;			.withProjectDir(this.projectDir)</b>
+<b class="nc">&nbsp;			.withPluginClasspath(pluginClasspath());</b>
+<b class="nc">&nbsp;		if (!this.configurationCache) {</b>
+&nbsp;			// See https://github.com/gradle/gradle/issues/14125
+<b class="nc">&nbsp;			gradleRunner.withDebug(true);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.gradleVersion != null) {</b>
+<b class="nc">&nbsp;			gradleRunner.withGradleVersion(this.gradleVersion);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		gradleRunner.withTestKitDir(getTestKitDir());</b>
+<b class="nc">&nbsp;		List&lt;String&gt; allArguments = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		allArguments.add(&quot;-PbootVersion=&quot; + getBootVersion());</b>
+<b class="nc">&nbsp;		allArguments.add(&quot;--stacktrace&quot;);</b>
+<b class="nc">&nbsp;		allArguments.addAll(Arrays.asList(arguments));</b>
+<b class="nc">&nbsp;		allArguments.add(&quot;--warning-mode&quot;);</b>
+<b class="nc">&nbsp;		allArguments.add(&quot;all&quot;);</b>
+<b class="nc">&nbsp;		if (this.configurationCache) {</b>
+<b class="nc">&nbsp;			allArguments.add(&quot;--configuration-cache&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return gradleRunner.withArguments(allArguments);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void copyTransformedScript(String script, File destination) throws IOException {
+<b class="nc">&nbsp;		String scriptContent = FileCopyUtils.copyToString(new FileReader(script));</b>
+<b class="nc">&nbsp;		for (Entry&lt;String, String&gt; property : this.scriptProperties.entrySet()) {</b>
+<b class="nc">&nbsp;			scriptContent = scriptContent.replace(&quot;{&quot; + property.getKey() + &quot;}&quot;, property.getValue());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		FileCopyUtils.copy(scriptContent, new FileWriter(destination));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getTestKitDir() {
+<b class="nc">&nbsp;		File temp = new File(System.getProperty(&quot;java.io.tmpdir&quot;));</b>
+<b class="nc">&nbsp;		String username = System.getProperty(&quot;user.name&quot;);</b>
+<b class="nc">&nbsp;		String gradleVersion = (this.gradleVersion != null) ? this.gradleVersion : &quot;default&quot;;</b>
+<b class="nc">&nbsp;		return new File(temp, &quot;.gradle-test-kit-&quot; + username + &quot;-&quot; + getBootVersion() + &quot;-&quot; + gradleVersion);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public File getProjectDir() {
+<b class="nc">&nbsp;		return this.projectDir;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setProjectDir(File projectDir) {
+<b class="nc">&nbsp;		this.projectDir = projectDir;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleBuild gradleVersion(String version) {
+<b class="nc">&nbsp;		this.gradleVersion = version;</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getGradleVersion() {
+<b class="nc">&nbsp;		return this.gradleVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public GradleBuild bootVersion(String version) {
+<b class="nc">&nbsp;		this.springBootVersion = version;</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getBootVersion() {
+<b class="nc">&nbsp;		return this.springBootVersion;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getDependencyManagementPluginVersion() {
+&nbsp;		try {
+<b class="nc">&nbsp;			URL location = DependencyManagementExtension.class.getProtectionDomain().getCodeSource().getLocation();</b>
+<b class="nc">&nbsp;			try (JarFile jar = new JarFile(new File(location.toURI()))) {</b>
+<b class="nc">&nbsp;				return jar.getManifest().getMainAttributes().getValue(&quot;Implementation-Version&quot;);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Failed to find dependency management plugin version&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getProperty(File propertiesFile, String key) {
+&nbsp;		try {
+<b class="nc">&nbsp;			assertThat(propertiesFile)</b>
+<b class="nc">&nbsp;				.withFailMessage(&quot;Expecting properties file to exist at path &#39;%s&#39;&quot;, propertiesFile.getCanonicalFile())</b>
+<b class="nc">&nbsp;				.exists();</b>
+<b class="nc">&nbsp;			Properties properties = new Properties();</b>
+<b class="nc">&nbsp;			try (FileInputStream input = new FileInputStream(propertiesFile)) {</b>
+<b class="nc">&nbsp;				properties.load(input);</b>
+<b class="nc">&nbsp;				String value = properties.getProperty(key);</b>
+<b class="nc">&nbsp;				assertThat(value)</b>
+<b class="nc">&nbsp;					.withFailMessage(&quot;Expecting properties file &#39;%s&#39; to contain the key &#39;%s&#39;&quot;,</b>
+<b class="nc">&nbsp;							propertiesFile.getCanonicalFile(), key)</b>
+<b class="nc">&nbsp;					.isNotEmpty();</b>
+<b class="nc">&nbsp;				return value;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			fail(&quot;Error reading properties file &#39;&quot; + propertiesFile + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

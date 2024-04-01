@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NestedUrlConnectionResources</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.net.protocol.nested</a>
+</div>
+
+<h1>Coverage Summary for Class: NestedUrlConnectionResources (org.springframework.boot.loader.net.protocol.nested)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NestedUrlConnectionResources</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.net.protocol.nested;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.ref.Cleaner;
+&nbsp;import org.springframework.boot.loader.zip.CloseableDataBlock;
+&nbsp;import org.springframework.boot.loader.zip.ZipContent;
+&nbsp;
+&nbsp;/**
+&nbsp; * Resources created managed and cleaned by a {@link NestedUrlConnection} instance and
+&nbsp; * suitable for registration with a {@link Cleaner}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class NestedUrlConnectionResources implements Runnable {
+&nbsp;
+&nbsp;	private final NestedLocation location;
+&nbsp;
+&nbsp;	private volatile ZipContent zipContent;
+&nbsp;
+<b class="nc">&nbsp;	private volatile long size = -1;</b>
+&nbsp;
+&nbsp;	private volatile InputStream inputStream;
+&nbsp;
+<b class="nc">&nbsp;	NestedUrlConnectionResources(NestedLocation location) {</b>
+<b class="nc">&nbsp;		this.location = location;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	NestedLocation getLocation() {
+<b class="nc">&nbsp;		return this.location;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void connect() throws IOException {
+<b class="nc">&nbsp;		synchronized (this) {</b>
+<b class="nc">&nbsp;			if (this.zipContent == null) {</b>
+<b class="nc">&nbsp;				this.zipContent = ZipContent.open(this.location.path(), this.location.nestedEntryName());</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					connectData();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IOException | RuntimeException ex) {</b>
+<b class="nc">&nbsp;					this.zipContent.close();</b>
+<b class="nc">&nbsp;					this.zipContent = null;</b>
+<b class="nc">&nbsp;					throw ex;</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void connectData() throws IOException {
+<b class="nc">&nbsp;		CloseableDataBlock data = this.zipContent.openRawZipData();</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			this.size = data.size();</b>
+<b class="nc">&nbsp;			this.inputStream = data.asInputStream();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException | RuntimeException ex) {</b>
+<b class="nc">&nbsp;			data.close();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	InputStream getInputStream() throws IOException {
+<b class="nc">&nbsp;		synchronized (this) {</b>
+<b class="nc">&nbsp;			if (this.inputStream == null) {</b>
+<b class="nc">&nbsp;				throw new IOException(&quot;Nested location not found &quot; + this.location);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.inputStream;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	long getContentLength() {
+<b class="nc">&nbsp;		return this.size;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void run() {
+<b class="nc">&nbsp;		releaseAll();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void releaseAll() {
+<b class="nc">&nbsp;		synchronized (this) {</b>
+<b class="nc">&nbsp;			if (this.zipContent != null) {</b>
+<b class="nc">&nbsp;				IOException exceptionChain = null;</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					this.inputStream.close();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IOException ex) {</b>
+<b class="nc">&nbsp;					exceptionChain = addToExceptionChain(exceptionChain, ex);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					this.zipContent.close();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IOException ex) {</b>
+<b class="nc">&nbsp;					exceptionChain = addToExceptionChain(exceptionChain, ex);</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				this.size = -1;</b>
+<b class="nc">&nbsp;				if (exceptionChain != null) {</b>
+<b class="nc">&nbsp;					throw new UncheckedIOException(exceptionChain);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private IOException addToExceptionChain(IOException exceptionChain, IOException ex) {
+<b class="nc">&nbsp;		if (exceptionChain != null) {</b>
+<b class="nc">&nbsp;			exceptionChain.addSuppressed(ex);</b>
+<b class="nc">&nbsp;			return exceptionChain;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ex;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

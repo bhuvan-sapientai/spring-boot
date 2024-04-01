@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SimpleAsyncTaskSchedulerBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.task</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleAsyncTaskSchedulerBuilder (org.springframework.boot.task)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleAsyncTaskSchedulerBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.task;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builder that can be used to configure and create a {@link SimpleAsyncTaskScheduler}.
+&nbsp; * Provides convenience methods to set common {@link SimpleAsyncTaskScheduler} settings.
+&nbsp; * For advanced configuration, consider using {@link SimpleAsyncTaskSchedulerCustomizer}.
+&nbsp; * &lt;p&gt;
+&nbsp; * In a typical auto-configured Spring Boot application this builder is available as a
+&nbsp; * bean and can be injected whenever a {@link SimpleAsyncTaskScheduler} is needed.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 3.2.0
+&nbsp; */
+&nbsp;public class SimpleAsyncTaskSchedulerBuilder {
+&nbsp;
+&nbsp;	private final String threadNamePrefix;
+&nbsp;
+&nbsp;	private final Integer concurrencyLimit;
+&nbsp;
+&nbsp;	private final Boolean virtualThreads;
+&nbsp;
+&nbsp;	private final Set&lt;SimpleAsyncTaskSchedulerCustomizer&gt; customizers;
+&nbsp;
+&nbsp;	private final Duration taskTerminationTimeout;
+&nbsp;
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder() {
+<b class="nc">&nbsp;		this(null, null, null, null, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private SimpleAsyncTaskSchedulerBuilder(String threadNamePrefix, Integer concurrencyLimit, Boolean virtualThreads,
+<b class="nc">&nbsp;			Set&lt;SimpleAsyncTaskSchedulerCustomizer&gt; taskSchedulerCustomizers, Duration taskTerminationTimeout) {</b>
+<b class="nc">&nbsp;		this.threadNamePrefix = threadNamePrefix;</b>
+<b class="nc">&nbsp;		this.concurrencyLimit = concurrencyLimit;</b>
+<b class="nc">&nbsp;		this.virtualThreads = virtualThreads;</b>
+<b class="nc">&nbsp;		this.customizers = taskSchedulerCustomizers;</b>
+<b class="nc">&nbsp;		this.taskTerminationTimeout = taskTerminationTimeout;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the prefix to use for the names of newly created threads.
+&nbsp;	 * @param threadNamePrefix the thread name prefix to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder threadNamePrefix(String threadNamePrefix) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskSchedulerBuilder(threadNamePrefix, this.concurrencyLimit, this.virtualThreads,</b>
+&nbsp;				this.customizers, this.taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the concurrency limit.
+&nbsp;	 * @param concurrencyLimit the concurrency limit
+&nbsp;	 * @return a new builder instance
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder concurrencyLimit(Integer concurrencyLimit) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskSchedulerBuilder(this.threadNamePrefix, concurrencyLimit, this.virtualThreads,</b>
+&nbsp;				this.customizers, this.taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set whether to use virtual threads.
+&nbsp;	 * @param virtualThreads whether to use virtual threads
+&nbsp;	 * @return a new builder instance
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder virtualThreads(Boolean virtualThreads) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskSchedulerBuilder(this.threadNamePrefix, this.concurrencyLimit, virtualThreads,</b>
+&nbsp;				this.customizers, this.taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the task termination timeout.
+&nbsp;	 * @param taskTerminationTimeout the task termination timeout
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @since 3.2.1
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder taskTerminationTimeout(Duration taskTerminationTimeout) {
+<b class="nc">&nbsp;		return new SimpleAsyncTaskSchedulerBuilder(this.threadNamePrefix, this.concurrencyLimit, this.virtualThreads,</b>
+&nbsp;				this.customizers, taskTerminationTimeout);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link SimpleAsyncTaskSchedulerCustomizer customizers} that should be
+&nbsp;	 * applied to the {@link SimpleAsyncTaskScheduler}. Customizers are applied in the
+&nbsp;	 * order that they were added after builder configuration has been applied. Setting
+&nbsp;	 * this value will replace any previously configured customizers.
+&nbsp;	 * @param customizers the customizers to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #additionalCustomizers(SimpleAsyncTaskSchedulerCustomizer...)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder customizers(SimpleAsyncTaskSchedulerCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return customizers(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link SimpleAsyncTaskSchedulerCustomizer customizers} that should be
+&nbsp;	 * applied to the {@link SimpleAsyncTaskScheduler}. Customizers are applied in the
+&nbsp;	 * order that they were added after builder configuration has been applied. Setting
+&nbsp;	 * this value will replace any previously configured customizers.
+&nbsp;	 * @param customizers the customizers to set
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #additionalCustomizers(Iterable)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder customizers(
+&nbsp;			Iterable&lt;? extends SimpleAsyncTaskSchedulerCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new SimpleAsyncTaskSchedulerBuilder(this.threadNamePrefix, this.concurrencyLimit, this.virtualThreads,</b>
+<b class="nc">&nbsp;				append(null, customizers), this.taskTerminationTimeout);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link SimpleAsyncTaskSchedulerCustomizer customizers} that should be applied
+&nbsp;	 * to the {@link SimpleAsyncTaskScheduler}. Customizers are applied in the order that
+&nbsp;	 * they were added after builder configuration has been applied.
+&nbsp;	 * @param customizers the customizers to add
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #customizers(SimpleAsyncTaskSchedulerCustomizer...)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder additionalCustomizers(SimpleAsyncTaskSchedulerCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return additionalCustomizers(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link SimpleAsyncTaskSchedulerCustomizer customizers} that should be applied
+&nbsp;	 * to the {@link SimpleAsyncTaskScheduler}. Customizers are applied in the order that
+&nbsp;	 * they were added after builder configuration has been applied.
+&nbsp;	 * @param customizers the customizers to add
+&nbsp;	 * @return a new builder instance
+&nbsp;	 * @see #customizers(Iterable)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskSchedulerBuilder additionalCustomizers(
+&nbsp;			Iterable&lt;? extends SimpleAsyncTaskSchedulerCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		return new SimpleAsyncTaskSchedulerBuilder(this.threadNamePrefix, this.concurrencyLimit, this.virtualThreads,</b>
+<b class="nc">&nbsp;				append(this.customizers, customizers), this.taskTerminationTimeout);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Build a new {@link SimpleAsyncTaskScheduler} instance and configure it using this
+&nbsp;	 * builder.
+&nbsp;	 * @return a configured {@link SimpleAsyncTaskScheduler} instance.
+&nbsp;	 * @see #configure(SimpleAsyncTaskScheduler)
+&nbsp;	 */
+&nbsp;	public SimpleAsyncTaskScheduler build() {
+<b class="nc">&nbsp;		return configure(new SimpleAsyncTaskScheduler());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the provided {@link SimpleAsyncTaskScheduler} instance using this
+&nbsp;	 * builder.
+&nbsp;	 * @param &lt;T&gt; the type of task scheduler
+&nbsp;	 * @param taskScheduler the {@link SimpleAsyncTaskScheduler} to configure
+&nbsp;	 * @return the task scheduler instance
+&nbsp;	 * @see #build()
+&nbsp;	 */
+&nbsp;	public &lt;T extends SimpleAsyncTaskScheduler&gt; T configure(T taskScheduler) {
+<b class="nc">&nbsp;		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;		map.from(this.threadNamePrefix).to(taskScheduler::setThreadNamePrefix);</b>
+<b class="nc">&nbsp;		map.from(this.concurrencyLimit).to(taskScheduler::setConcurrencyLimit);</b>
+<b class="nc">&nbsp;		map.from(this.virtualThreads).to(taskScheduler::setVirtualThreads);</b>
+<b class="nc">&nbsp;		map.from(this.taskTerminationTimeout).as(Duration::toMillis).to(taskScheduler::setTaskTerminationTimeout);</b>
+<b class="nc">&nbsp;		if (!CollectionUtils.isEmpty(this.customizers)) {</b>
+<b class="nc">&nbsp;			this.customizers.forEach((customizer) -&gt; customizer.customize(taskScheduler));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return taskScheduler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; Set&lt;T&gt; append(Set&lt;T&gt; set, Iterable&lt;? extends T&gt; additions) {
+<b class="nc">&nbsp;		Set&lt;T&gt; result = new LinkedHashSet&lt;&gt;((set != null) ? set : Collections.emptySet());</b>
+<b class="nc">&nbsp;		additions.forEach(result::add);</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableSet(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

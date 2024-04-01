@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MappingsEndpoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.web.mappings</a>
+</div>
+
+<h1>Coverage Summary for Class: MappingsEndpoint (org.springframework.boot.actuate.web.mappings)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MappingsEndpoint</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MappingsEndpoint$ApplicationMappingsDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MappingsEndpoint$ContextMappingsDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.web.mappings;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationResponseBody;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Endpoint @Endpoint} to expose HTTP request mappings.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@Endpoint(id = &quot;mappings&quot;)
+&nbsp;public class MappingsEndpoint {
+&nbsp;
+&nbsp;	private final Collection&lt;MappingDescriptionProvider&gt; descriptionProviders;
+&nbsp;
+&nbsp;	private final ApplicationContext context;
+&nbsp;
+<b class="nc">&nbsp;	public MappingsEndpoint(Collection&lt;MappingDescriptionProvider&gt; descriptionProviders, ApplicationContext context) {</b>
+<b class="nc">&nbsp;		this.descriptionProviders = descriptionProviders;</b>
+<b class="nc">&nbsp;		this.context = context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@ReadOperation
+&nbsp;	public ApplicationMappingsDescriptor mappings() {
+<b class="nc">&nbsp;		ApplicationContext target = this.context;</b>
+<b class="nc">&nbsp;		Map&lt;String, ContextMappingsDescriptor&gt; contextMappings = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		while (target != null) {</b>
+<b class="nc">&nbsp;			contextMappings.put(target.getId(), mappingsForContext(target));</b>
+<b class="nc">&nbsp;			target = target.getParent();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ApplicationMappingsDescriptor(contextMappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ContextMappingsDescriptor mappingsForContext(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; mappings = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		this.descriptionProviders.forEach(</b>
+<b class="nc">&nbsp;				(provider) -&gt; mappings.put(provider.getMappingName(), provider.describeMappings(applicationContext)));</b>
+<b class="nc">&nbsp;		return new ContextMappingsDescriptor(mappings,</b>
+<b class="nc">&nbsp;				(applicationContext.getParent() != null) ? applicationContext.getId() : null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of an application&#39;s request mappings.
+&nbsp;	 */
+&nbsp;	public static final class ApplicationMappingsDescriptor implements OperationResponseBody {
+&nbsp;
+&nbsp;		private final Map&lt;String, ContextMappingsDescriptor&gt; contextMappings;
+&nbsp;
+<b class="nc">&nbsp;		private ApplicationMappingsDescriptor(Map&lt;String, ContextMappingsDescriptor&gt; contextMappings) {</b>
+<b class="nc">&nbsp;			this.contextMappings = contextMappings;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, ContextMappingsDescriptor&gt; getContexts() {
+<b class="nc">&nbsp;			return this.contextMappings;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Description of an application context&#39;s request mappings.
+&nbsp;	 */
+&nbsp;	public static final class ContextMappingsDescriptor {
+&nbsp;
+&nbsp;		private final Map&lt;String, Object&gt; mappings;
+&nbsp;
+&nbsp;		private final String parentId;
+&nbsp;
+<b class="nc">&nbsp;		private ContextMappingsDescriptor(Map&lt;String, Object&gt; mappings, String parentId) {</b>
+<b class="nc">&nbsp;			this.mappings = mappings;</b>
+<b class="nc">&nbsp;			this.parentId = parentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getParentId() {
+<b class="nc">&nbsp;			return this.parentId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Map&lt;String, Object&gt; getMappings() {
+<b class="nc">&nbsp;			return this.mappings;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

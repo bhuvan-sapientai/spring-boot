@@ -1,0 +1,296 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChangeableUrls</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.restart</a>
+</div>
+
+<h1>Coverage Summary for Class: ChangeableUrls (org.springframework.boot.devtools.restart)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChangeableUrls</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.restart;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.net.URLDecoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;
+&nbsp;import org.springframework.boot.devtools.logger.DevToolsLogFactory;
+&nbsp;import org.springframework.boot.devtools.settings.DevToolsSettings;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A filtered collection of URLs which can change after the application has started.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;final class ChangeableUrls implements Iterable&lt;URL&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = DevToolsLogFactory.getLog(ChangeableUrls.class);</b>
+&nbsp;
+&nbsp;	private final List&lt;URL&gt; urls;
+&nbsp;
+<b class="nc">&nbsp;	private ChangeableUrls(URL... urls) {</b>
+<b class="nc">&nbsp;		DevToolsSettings settings = DevToolsSettings.get();</b>
+<b class="nc">&nbsp;		List&lt;URL&gt; reloadableUrls = new ArrayList&lt;&gt;(urls.length);</b>
+<b class="nc">&nbsp;		for (URL url : urls) {</b>
+<b class="nc">&nbsp;			if ((settings.isRestartInclude(url) || isDirectoryUrl(url.toString())) &amp;&amp; !settings.isRestartExclude(url)) {</b>
+<b class="nc">&nbsp;				reloadableUrls.add(url);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			logger.debug(&quot;Matching URLs for reloading : &quot; + reloadableUrls);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.urls = Collections.unmodifiableList(reloadableUrls);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isDirectoryUrl(String urlString) {
+<b class="nc">&nbsp;		return urlString.startsWith(&quot;file:&quot;) &amp;&amp; urlString.endsWith(&quot;/&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;URL&gt; iterator() {
+<b class="nc">&nbsp;		return this.urls.iterator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	int size() {
+<b class="nc">&nbsp;		return this.urls.size();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	URL[] toArray() {
+<b class="nc">&nbsp;		return this.urls.toArray(new URL[0]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	List&lt;URL&gt; toList() {
+<b class="nc">&nbsp;		return Collections.unmodifiableList(this.urls);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.urls.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static ChangeableUrls fromClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		List&lt;URL&gt; urls = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (URL url : urlsFromClassLoader(classLoader)) {</b>
+<b class="nc">&nbsp;			urls.add(url);</b>
+<b class="nc">&nbsp;			urls.addAll(getUrlsFromClassPathOfJarManifestIfPossible(url));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return fromUrls(urls);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static URL[] urlsFromClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		if (classLoader instanceof URLClassLoader urlClassLoader) {</b>
+<b class="nc">&nbsp;			return urlClassLoader.getURLs();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Stream.of(ManagementFactory.getRuntimeMXBean().getClassPath().split(File.pathSeparator))</b>
+<b class="nc">&nbsp;			.map(ChangeableUrls::toURL)</b>
+<b class="nc">&nbsp;			.toArray(URL[]::new);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static URL toURL(String classPathEntry) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return new File(classPathEntry).toURI().toURL();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (MalformedURLException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;URL could not be created from &#39;&quot; + classPathEntry + &quot;&#39;&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;URL&gt; getUrlsFromClassPathOfJarManifestIfPossible(URL url) {
+&nbsp;		try {
+<b class="nc">&nbsp;			File file = new File(url.toURI());</b>
+<b class="nc">&nbsp;			if (file.isFile()) {</b>
+<b class="nc">&nbsp;				try (JarFile jarFile = new JarFile(file)) {</b>
+&nbsp;					try {
+<b class="nc">&nbsp;						return getUrlsFromManifestClassPathAttribute(url, jarFile);</b>
+&nbsp;					}
+<b class="nc">&nbsp;					catch (IOException ex) {</b>
+<b class="nc">&nbsp;						throw new IllegalStateException(</b>
+&nbsp;								&quot;Failed to read Class-Path attribute from manifest of jar &quot; + url, ex);
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+&nbsp;			// Assume it&#39;s not a jar and continue
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return Collections.emptyList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;URL&gt; getUrlsFromManifestClassPathAttribute(URL jarUrl, JarFile jarFile) throws IOException {
+<b class="nc">&nbsp;		Manifest manifest = jarFile.getManifest();</b>
+<b class="nc">&nbsp;		if (manifest == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String classPath = manifest.getMainAttributes().getValue(Attributes.Name.CLASS_PATH);</b>
+<b class="nc">&nbsp;		if (!StringUtils.hasText(classPath)) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String[] entries = StringUtils.delimitedListToStringArray(classPath, &quot; &quot;);</b>
+<b class="nc">&nbsp;		List&lt;URL&gt; urls = new ArrayList&lt;&gt;(entries.length);</b>
+<b class="nc">&nbsp;		List&lt;URL&gt; nonExistentEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String entry : entries) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				URL referenced = new URL(jarUrl, entry);</b>
+<b class="nc">&nbsp;				if (new File(referenced.getFile()).exists()) {</b>
+<b class="nc">&nbsp;					urls.add(referenced);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					referenced = new URL(jarUrl, URLDecoder.decode(entry, StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;					if (new File(referenced.getFile()).exists()) {</b>
+<b class="nc">&nbsp;						urls.add(referenced);</b>
+&nbsp;					}
+&nbsp;					else {
+<b class="nc">&nbsp;						nonExistentEntries.add(referenced);</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (MalformedURLException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Class-Path attribute contains malformed URL&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!nonExistentEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;			logger.info(LogMessage.of(() -&gt; &quot;The Class-Path manifest attribute in &quot; + jarFile.getName()</b>
+&nbsp;					+ &quot; referenced one or more files that do not exist: &quot;
+<b class="nc">&nbsp;					+ StringUtils.collectionToCommaDelimitedString(nonExistentEntries)));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return urls;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static ChangeableUrls fromUrls(Collection&lt;URL&gt; urls) {
+<b class="nc">&nbsp;		return fromUrls(new ArrayList&lt;&gt;(urls).toArray(new URL[urls.size()]));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static ChangeableUrls fromUrls(URL... urls) {
+<b class="nc">&nbsp;		return new ChangeableUrls(urls);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

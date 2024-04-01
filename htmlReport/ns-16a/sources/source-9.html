@@ -1,0 +1,265 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RemoteDevToolsAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.devtools.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: RemoteDevToolsAutoConfiguration (org.springframework.boot.devtools.autoconfigure)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoteDevToolsAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RemoteDevToolsAutoConfiguration$RemoteRestartConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.devtools.autoconfigure;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;
+&nbsp;import jakarta.servlet.Filter;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties;
+&nbsp;import org.springframework.boot.autoconfigure.web.ServerProperties.Servlet;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.boot.devtools.remote.server.AccessManager;
+&nbsp;import org.springframework.boot.devtools.remote.server.Dispatcher;
+&nbsp;import org.springframework.boot.devtools.remote.server.DispatcherFilter;
+&nbsp;import org.springframework.boot.devtools.remote.server.Handler;
+&nbsp;import org.springframework.boot.devtools.remote.server.HandlerMapper;
+&nbsp;import org.springframework.boot.devtools.remote.server.HttpHeaderAccessManager;
+&nbsp;import org.springframework.boot.devtools.remote.server.HttpStatusHandler;
+&nbsp;import org.springframework.boot.devtools.remote.server.UrlHandlerMapper;
+&nbsp;import org.springframework.boot.devtools.restart.server.DefaultSourceDirectoryUrlFilter;
+&nbsp;import org.springframework.boot.devtools.restart.server.HttpRestartServer;
+&nbsp;import org.springframework.boot.devtools.restart.server.HttpRestartServerHandler;
+&nbsp;import org.springframework.boot.devtools.restart.server.SourceDirectoryUrlFilter;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.http.server.ServerHttpRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for remote development support.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Rob Winch
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = SecurityAutoConfiguration.class)
+&nbsp;@Conditional(OnEnabledDevToolsCondition.class)
+&nbsp;@ConditionalOnProperty(prefix = &quot;spring.devtools.remote&quot;, name = &quot;secret&quot;)
+&nbsp;@ConditionalOnClass({ Filter.class, ServerHttpRequest.class })
+&nbsp;@Import(RemoteDevtoolsSecurityConfiguration.class)
+&nbsp;@EnableConfigurationProperties({ ServerProperties.class, DevToolsProperties.class })
+&nbsp;public class RemoteDevToolsAutoConfiguration {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(RemoteDevToolsAutoConfiguration.class);</b>
+&nbsp;
+&nbsp;	private final DevToolsProperties properties;
+&nbsp;
+<b class="nc">&nbsp;	public RemoteDevToolsAutoConfiguration(DevToolsProperties properties) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public AccessManager remoteDevToolsAccessManager() {
+<b class="nc">&nbsp;		RemoteDevToolsProperties remoteProperties = this.properties.getRemote();</b>
+<b class="nc">&nbsp;		return new HttpHeaderAccessManager(remoteProperties.getSecretHeaderName(), remoteProperties.getSecret());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	public HandlerMapper remoteDevToolsHealthCheckHandlerMapper(ServerProperties serverProperties) {
+<b class="nc">&nbsp;		Handler handler = new HttpStatusHandler();</b>
+<b class="nc">&nbsp;		Servlet servlet = serverProperties.getServlet();</b>
+<b class="nc">&nbsp;		String servletContextPath = (servlet.getContextPath() != null) ? servlet.getContextPath() : &quot;&quot;;</b>
+<b class="nc">&nbsp;		return new UrlHandlerMapper(servletContextPath + this.properties.getRemote().getContextPath(), handler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public DispatcherFilter remoteDevToolsDispatcherFilter(AccessManager accessManager,
+&nbsp;			Collection&lt;HandlerMapper&gt; mappers) {
+<b class="nc">&nbsp;		Dispatcher dispatcher = new Dispatcher(accessManager, mappers);</b>
+<b class="nc">&nbsp;		return new DispatcherFilter(dispatcher);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configuration for remote update and restarts.
+&nbsp;	 */
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnProperty(prefix = &quot;spring.devtools.remote.restart&quot;, name = &quot;enabled&quot;, matchIfMissing = true)
+<b class="nc">&nbsp;	static class RemoteRestartConfiguration {</b>
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		SourceDirectoryUrlFilter remoteRestartSourceDirectoryUrlFilter() {
+<b class="nc">&nbsp;			return new DefaultSourceDirectoryUrlFilter();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		HttpRestartServer remoteRestartHttpRestartServer(SourceDirectoryUrlFilter sourceDirectoryUrlFilter) {
+<b class="nc">&nbsp;			return new HttpRestartServer(sourceDirectoryUrlFilter);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean(name = &quot;remoteRestartHandlerMapper&quot;)
+&nbsp;		UrlHandlerMapper remoteRestartHandlerMapper(HttpRestartServer server, ServerProperties serverProperties,
+&nbsp;				DevToolsProperties properties) {
+<b class="nc">&nbsp;			Servlet servlet = serverProperties.getServlet();</b>
+<b class="nc">&nbsp;			RemoteDevToolsProperties remote = properties.getRemote();</b>
+<b class="nc">&nbsp;			String servletContextPath = (servlet.getContextPath() != null) ? servlet.getContextPath() : &quot;&quot;;</b>
+<b class="nc">&nbsp;			String url = servletContextPath + remote.getContextPath() + &quot;/restart&quot;;</b>
+<b class="nc">&nbsp;			logger.warn(LogMessage.format(&quot;Listening for remote restart updates on %s&quot;, url));</b>
+<b class="nc">&nbsp;			Handler handler = new HttpRestartServerHandler(server);</b>
+<b class="nc">&nbsp;			return new UrlHandlerMapper(url, handler);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

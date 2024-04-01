@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebApplicationType</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot</a>
+</div>
+
+<h1>Coverage Summary for Class: WebApplicationType (org.springframework.boot)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebApplicationType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebApplicationType$WebApplicationTypeRuntimeHints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot;
+&nbsp;
+&nbsp;import org.springframework.aot.hint.RuntimeHints;
+&nbsp;import org.springframework.aot.hint.RuntimeHintsRegistrar;
+&nbsp;import org.springframework.aot.hint.TypeReference;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * An enumeration of possible types of web application.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.0.0
+&nbsp; */
+<b class="nc">&nbsp;public enum WebApplicationType {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The application should not run as a web application and should not start an
+&nbsp;	 * embedded web server.
+&nbsp;	 */
+<b class="nc">&nbsp;	NONE,</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The application should run as a servlet-based web application and should start an
+&nbsp;	 * embedded servlet web server.
+&nbsp;	 */
+<b class="nc">&nbsp;	SERVLET,</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The application should run as a reactive web application and should start an
+&nbsp;	 * embedded reactive web server.
+&nbsp;	 */
+<b class="nc">&nbsp;	REACTIVE;</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] SERVLET_INDICATOR_CLASSES = { &quot;jakarta.servlet.Servlet&quot;,</b>
+&nbsp;			&quot;org.springframework.web.context.ConfigurableWebApplicationContext&quot; };
+&nbsp;
+&nbsp;	private static final String WEBMVC_INDICATOR_CLASS = &quot;org.springframework.web.servlet.DispatcherServlet&quot;;
+&nbsp;
+&nbsp;	private static final String WEBFLUX_INDICATOR_CLASS = &quot;org.springframework.web.reactive.DispatcherHandler&quot;;
+&nbsp;
+&nbsp;	private static final String JERSEY_INDICATOR_CLASS = &quot;org.glassfish.jersey.servlet.ServletContainer&quot;;
+&nbsp;
+&nbsp;	static WebApplicationType deduceFromClasspath() {
+<b class="nc">&nbsp;		if (ClassUtils.isPresent(WEBFLUX_INDICATOR_CLASS, null) &amp;&amp; !ClassUtils.isPresent(WEBMVC_INDICATOR_CLASS, null)</b>
+<b class="nc">&nbsp;				&amp;&amp; !ClassUtils.isPresent(JERSEY_INDICATOR_CLASS, null)) {</b>
+<b class="nc">&nbsp;			return WebApplicationType.REACTIVE;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (String className : SERVLET_INDICATOR_CLASSES) {</b>
+<b class="nc">&nbsp;			if (!ClassUtils.isPresent(className, null)) {</b>
+<b class="nc">&nbsp;				return WebApplicationType.NONE;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return WebApplicationType.SERVLET;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	static class WebApplicationTypeRuntimeHints implements RuntimeHintsRegistrar {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+<b class="nc">&nbsp;			for (String servletIndicatorClass : SERVLET_INDICATOR_CLASSES) {</b>
+<b class="nc">&nbsp;				registerTypeIfPresent(servletIndicatorClass, classLoader, hints);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			registerTypeIfPresent(JERSEY_INDICATOR_CLASS, classLoader, hints);</b>
+<b class="nc">&nbsp;			registerTypeIfPresent(WEBFLUX_INDICATOR_CLASS, classLoader, hints);</b>
+<b class="nc">&nbsp;			registerTypeIfPresent(WEBMVC_INDICATOR_CLASS, classLoader, hints);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void registerTypeIfPresent(String typeName, ClassLoader classLoader, RuntimeHints hints) {
+<b class="nc">&nbsp;			if (ClassUtils.isPresent(typeName, classLoader)) {</b>
+<b class="nc">&nbsp;				hints.reflection().registerType(TypeReference.of(typeName));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

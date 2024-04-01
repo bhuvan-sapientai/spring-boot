@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MavenPublishingConventions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build</a>
+</div>
+
+<h1>Coverage Summary for Class: MavenPublishingConventions (org.springframework.boot.build)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MavenPublishingConventions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build;
+&nbsp;
+&nbsp;import org.apache.maven.artifact.repository.MavenArtifactRepository;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.attributes.Usage;
+&nbsp;import org.gradle.api.component.AdhocComponentWithVariants;
+&nbsp;import org.gradle.api.component.ConfigurationVariantDetails;
+&nbsp;import org.gradle.api.plugins.JavaPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPluginExtension;
+&nbsp;import org.gradle.api.publish.PublishingExtension;
+&nbsp;import org.gradle.api.publish.VariantVersionMappingStrategy;
+&nbsp;import org.gradle.api.publish.maven.MavenPom;
+&nbsp;import org.gradle.api.publish.maven.MavenPomDeveloperSpec;
+&nbsp;import org.gradle.api.publish.maven.MavenPomIssueManagement;
+&nbsp;import org.gradle.api.publish.maven.MavenPomLicenseSpec;
+&nbsp;import org.gradle.api.publish.maven.MavenPomOrganization;
+&nbsp;import org.gradle.api.publish.maven.MavenPomScm;
+&nbsp;import org.gradle.api.publish.maven.MavenPublication;
+&nbsp;import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
+&nbsp;
+&nbsp;/**
+&nbsp; * Conventions that are applied in the presence of the {@link MavenPublishPlugin}. When
+&nbsp; * the plugin is applied:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;If the {@code deploymentRepository} property has been set, a
+&nbsp; * {@link MavenArtifactRepository Maven artifact repository} is configured to publish to
+&nbsp; * it.
+&nbsp; * &lt;li&gt;The poms of all {@link MavenPublication Maven publications} are customized to meet
+&nbsp; * Maven Central&#39;s requirements.
+&nbsp; * &lt;li&gt;If the {@link JavaPlugin Java plugin} has also been applied:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;Creation of Javadoc and source jars is enabled.
+&nbsp; * &lt;li&gt;Publication metadata (poms and Gradle module metadata) is configured to use
+&nbsp; * resolved versions.
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Christoph Dreis
+&nbsp; * @author Mike Smithson
+&nbsp; */
+<b class="nc">&nbsp;class MavenPublishingConventions {</b>
+&nbsp;
+&nbsp;	void apply(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().withType(MavenPublishPlugin.class).all((mavenPublish) -&gt; {</b>
+<b class="nc">&nbsp;			PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);</b>
+<b class="nc">&nbsp;			if (project.hasProperty(&quot;deploymentRepository&quot;)) {</b>
+<b class="nc">&nbsp;				publishing.getRepositories().maven((mavenRepository) -&gt; {</b>
+<b class="nc">&nbsp;					mavenRepository.setUrl(project.property(&quot;deploymentRepository&quot;));</b>
+<b class="nc">&nbsp;					mavenRepository.setName(&quot;deployment&quot;);</b>
+&nbsp;				});
+&nbsp;			}
+<b class="nc">&nbsp;			publishing.getPublications()</b>
+<b class="nc">&nbsp;				.withType(MavenPublication.class)</b>
+<b class="nc">&nbsp;				.all((mavenPublication) -&gt; customizeMavenPublication(mavenPublication, project));</b>
+<b class="nc">&nbsp;			project.getPlugins().withType(JavaPlugin.class).all((javaPlugin) -&gt; {</b>
+<b class="nc">&nbsp;				JavaPluginExtension extension = project.getExtensions().getByType(JavaPluginExtension.class);</b>
+<b class="nc">&nbsp;				extension.withJavadocJar();</b>
+<b class="nc">&nbsp;				extension.withSourcesJar();</b>
+&nbsp;			});
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeMavenPublication(MavenPublication publication, Project project) {
+<b class="nc">&nbsp;		customizePom(publication.getPom(), project);</b>
+<b class="nc">&nbsp;		project.getPlugins()</b>
+<b class="nc">&nbsp;			.withType(JavaPlugin.class)</b>
+<b class="nc">&nbsp;			.all((javaPlugin) -&gt; customizeJavaMavenPublication(publication, project));</b>
+<b class="nc">&nbsp;		suppressMavenOptionalFeatureWarnings(publication);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizePom(MavenPom pom, Project project) {
+<b class="nc">&nbsp;		pom.getUrl().set(&quot;https://spring.io/projects/spring-boot&quot;);</b>
+<b class="nc">&nbsp;		pom.getName().set(project.provider(project::getName));</b>
+<b class="nc">&nbsp;		pom.getDescription().set(project.provider(project::getDescription));</b>
+<b class="nc">&nbsp;		if (!isUserInherited(project)) {</b>
+<b class="nc">&nbsp;			pom.organization(this::customizeOrganization);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		pom.licenses(this::customizeLicences);</b>
+<b class="nc">&nbsp;		pom.developers(this::customizeDevelopers);</b>
+<b class="nc">&nbsp;		pom.scm((scm) -&gt; customizeScm(scm, project));</b>
+<b class="nc">&nbsp;		if (!isUserInherited(project)) {</b>
+<b class="nc">&nbsp;			pom.issueManagement(this::customizeIssueManagement);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeJavaMavenPublication(MavenPublication publication, Project project) {
+<b class="nc">&nbsp;		addMavenOptionalFeature(project);</b>
+<b class="nc">&nbsp;		publication.versionMapping((strategy) -&gt; strategy.usage(Usage.JAVA_API, (mappingStrategy) -&gt; mappingStrategy</b>
+<b class="nc">&nbsp;			.fromResolutionOf(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)));</b>
+<b class="nc">&nbsp;		publication.versionMapping(</b>
+<b class="nc">&nbsp;				(strategy) -&gt; strategy.usage(Usage.JAVA_RUNTIME, VariantVersionMappingStrategy::fromResolutionResult));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add a feature that allows maven plugins to declare optional dependencies that
+&nbsp;	 * appear in the POM. This is required to make m2e in Eclipse happy.
+&nbsp;	 * @param project the project to add the feature to
+&nbsp;	 */
+&nbsp;	private void addMavenOptionalFeature(Project project) {
+<b class="nc">&nbsp;		JavaPluginExtension extension = project.getExtensions().getByType(JavaPluginExtension.class);</b>
+<b class="nc">&nbsp;		extension.registerFeature(&quot;mavenOptional&quot;,</b>
+<b class="nc">&nbsp;				(feature) -&gt; feature.usingSourceSet(extension.getSourceSets().getByName(&quot;main&quot;)));</b>
+<b class="nc">&nbsp;		AdhocComponentWithVariants javaComponent = (AdhocComponentWithVariants) project.getComponents()</b>
+<b class="nc">&nbsp;			.findByName(&quot;java&quot;);</b>
+<b class="nc">&nbsp;		javaComponent.addVariantsFromConfiguration(</b>
+<b class="nc">&nbsp;				project.getConfigurations().findByName(&quot;mavenOptionalRuntimeElements&quot;),</b>
+&nbsp;				ConfigurationVariantDetails::mapToOptional);
+&nbsp;	}
+&nbsp;
+&nbsp;	private void suppressMavenOptionalFeatureWarnings(MavenPublication publication) {
+<b class="nc">&nbsp;		publication.suppressPomMetadataWarningsFor(&quot;mavenOptionalApiElements&quot;);</b>
+<b class="nc">&nbsp;		publication.suppressPomMetadataWarningsFor(&quot;mavenOptionalRuntimeElements&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeOrganization(MavenPomOrganization organization) {
+<b class="nc">&nbsp;		organization.getName().set(&quot;VMware, Inc.&quot;);</b>
+<b class="nc">&nbsp;		organization.getUrl().set(&quot;https://spring.io&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeLicences(MavenPomLicenseSpec licences) {
+<b class="nc">&nbsp;		licences.license((licence) -&gt; {</b>
+<b class="nc">&nbsp;			licence.getName().set(&quot;Apache License, Version 2.0&quot;);</b>
+<b class="nc">&nbsp;			licence.getUrl().set(&quot;https://www.apache.org/licenses/LICENSE-2.0&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeDevelopers(MavenPomDeveloperSpec developers) {
+<b class="nc">&nbsp;		developers.developer((developer) -&gt; {</b>
+<b class="nc">&nbsp;			developer.getName().set(&quot;Spring&quot;);</b>
+<b class="nc">&nbsp;			developer.getEmail().set(&quot;ask@spring.io&quot;);</b>
+<b class="nc">&nbsp;			developer.getOrganization().set(&quot;VMware, Inc.&quot;);</b>
+<b class="nc">&nbsp;			developer.getOrganizationUrl().set(&quot;https://www.spring.io&quot;);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeScm(MavenPomScm scm, Project project) {
+<b class="nc">&nbsp;		if (!isUserInherited(project)) {</b>
+<b class="nc">&nbsp;			scm.getConnection().set(&quot;scm:git:git://github.com/spring-projects/spring-boot.git&quot;);</b>
+<b class="nc">&nbsp;			scm.getDeveloperConnection().set(&quot;scm:git:ssh://git@github.com/spring-projects/spring-boot.git&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		scm.getUrl().set(&quot;https://github.com/spring-projects/spring-boot&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeIssueManagement(MavenPomIssueManagement issueManagement) {
+<b class="nc">&nbsp;		issueManagement.getSystem().set(&quot;GitHub&quot;);</b>
+<b class="nc">&nbsp;		issueManagement.getUrl().set(&quot;https://github.com/spring-projects/spring-boot/issues&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isUserInherited(Project project) {
+<b class="nc">&nbsp;		return &quot;spring-boot-starter-parent&quot;.equals(project.getName())</b>
+<b class="nc">&nbsp;				|| &quot;spring-boot-dependencies&quot;.equals(project.getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

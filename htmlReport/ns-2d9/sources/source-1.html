@@ -1,0 +1,732 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractApplicationContextRunner</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.context.runner</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractApplicationContextRunner (org.springframework.boot.test.context.runner)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractApplicationContextRunner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractApplicationContextRunner$BeanRegistration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractApplicationContextRunner$RunnerConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/139)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.context.runner;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.BeanNameGenerator;
+&nbsp;import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+&nbsp;import org.springframework.boot.context.annotation.Configurations;
+&nbsp;import org.springframework.boot.context.annotation.UserConfigurations;
+&nbsp;import org.springframework.boot.test.context.FilteredClassLoader;
+&nbsp;import org.springframework.boot.test.context.assertj.ApplicationContextAssert;
+&nbsp;import org.springframework.boot.test.context.assertj.ApplicationContextAssertProvider;
+&nbsp;import org.springframework.boot.test.util.TestPropertyValues;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContextInitializer;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.annotation.AnnotationConfigRegistry;
+&nbsp;import org.springframework.context.support.GenericApplicationContext;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.io.DefaultResourceLoader;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility design to run an {@link ApplicationContext} and provide AssertJ style
+&nbsp; * assertions. The test is best used as a field of a test class, describing the shared
+&nbsp; * configuration required for the test:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * public class MyContextTests {
+&nbsp; *     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+&nbsp; *             .withPropertyValues(&quot;spring.foo=bar&quot;)
+&nbsp; *             .withUserConfiguration(MyConfiguration.class);
+&nbsp; * }&lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The initialization above makes sure to register {@code MyConfiguration} for all tests
+&nbsp; * and set the {@code spring.foo} property to {@code bar} unless specified otherwise.
+&nbsp; * &lt;p&gt;
+&nbsp; * Based on the configuration above, a specific test can simulate what will happen when
+&nbsp; * the context runs, perhaps with overridden property values:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;Test
+&nbsp; * public someTest() {
+&nbsp; *     this.contextRunner.withPropertyValues(&quot;spring.foo=biz&quot;).run((context) -&amp;gt; {
+&nbsp; *         assertThat(context).containsSingleBean(MyBean.class);
+&nbsp; *         // other assertions
+&nbsp; *     });
+&nbsp; * }&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The test above has changed the {@code spring.foo} property to {@code biz} and is
+&nbsp; * asserting that the context contains a single {@code MyBean} bean. The
+&nbsp; * {@link #run(ContextConsumer) run} method takes a {@link ContextConsumer} that can apply
+&nbsp; * assertions to the context. Upon completion, the context is automatically closed.
+&nbsp; * &lt;p&gt;
+&nbsp; * If the application context fails to start the {@code #run(ContextConsumer)} method is
+&nbsp; * called with a &quot;failed&quot; application context. Calls to the context will throw an
+&nbsp; * {@link IllegalStateException} and assertions that expect a running context will fail.
+&nbsp; * The {@link ApplicationContextAssert#getFailure() getFailure()} assertion can be used if
+&nbsp; * further checks are required on the cause of the failure: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;Test
+&nbsp; * public someTest() {
+&nbsp; *     this.context.withPropertyValues(&quot;spring.foo=fails&quot;).run((loaded) -&amp;gt; {
+&nbsp; *         assertThat(loaded).getFailure().hasCauseInstanceOf(BadPropertyException.class);
+&nbsp; *         // other assertions
+&nbsp; *     });
+&nbsp; * }&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; *
+&nbsp; * @param &lt;SELF&gt; the &quot;self&quot; type for this runner
+&nbsp; * @param &lt;C&gt; the context type
+&nbsp; * @param &lt;A&gt; the application context assertion provider
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; * @see ApplicationContextRunner
+&nbsp; * @see WebApplicationContextRunner
+&nbsp; * @see ReactiveWebApplicationContextRunner
+&nbsp; * @see ApplicationContextAssert
+&nbsp; */
+&nbsp;public abstract class AbstractApplicationContextRunner&lt;SELF extends AbstractApplicationContextRunner&lt;SELF, C, A&gt;, C extends ConfigurableApplicationContext, A extends ApplicationContextAssertProvider&lt;C&gt;&gt; {
+&nbsp;
+&nbsp;	private final RunnerConfiguration&lt;C&gt; runnerConfiguration;
+&nbsp;
+&nbsp;	private final Function&lt;RunnerConfiguration&lt;C&gt;, SELF&gt; instanceFactory;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AbstractApplicationContextRunner} instance.
+&nbsp;	 * @param contextFactory the factory used to create the actual context
+&nbsp;	 * @param instanceFactory the factory used to create new instance of the runner
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	protected AbstractApplicationContextRunner(Supplier&lt;C&gt; contextFactory,
+<b class="nc">&nbsp;			Function&lt;RunnerConfiguration&lt;C&gt;, SELF&gt; instanceFactory) {</b>
+<b class="nc">&nbsp;		Assert.notNull(contextFactory, &quot;ContextFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(contextFactory, &quot;RunnerConfiguration must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.runnerConfiguration = new RunnerConfiguration&lt;&gt;(contextFactory);</b>
+<b class="nc">&nbsp;		this.instanceFactory = instanceFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AbstractApplicationContextRunner} instance.
+&nbsp;	 * @param configuration the configuration for the runner to use
+&nbsp;	 * @param instanceFactory the factory used to create new instance of the runner
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	protected AbstractApplicationContextRunner(RunnerConfiguration&lt;C&gt; configuration,
+<b class="nc">&nbsp;			Function&lt;RunnerConfiguration&lt;C&gt;, SELF&gt; instanceFactory) {</b>
+<b class="nc">&nbsp;		Assert.notNull(configuration, &quot;RunnerConfiguration must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(instanceFactory, &quot;instanceFactory must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.runnerConfiguration = configuration;</b>
+<b class="nc">&nbsp;		this.instanceFactory = instanceFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Specify if bean definition overriding, by registering a definition with the same
+&nbsp;	 * name as an existing definition, should be allowed.
+&nbsp;	 * @param allowBeanDefinitionOverriding if bean overriding is allowed
+&nbsp;	 * @return a new instance with the updated bean definition overriding policy
+&nbsp;	 * @since 2.3.0
+&nbsp;	 * @see DefaultListableBeanFactory#setAllowBeanDefinitionOverriding(boolean)
+&nbsp;	 */
+&nbsp;	public SELF withAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withAllowBeanDefinitionOverriding(allowBeanDefinitionOverriding));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Specify if circular references between beans should be allowed.
+&nbsp;	 * @param allowCircularReferences if circular references between beans are allowed
+&nbsp;	 * @return a new instance with the updated circular references policy
+&nbsp;	 * @since 2.6.0
+&nbsp;	 * @see AbstractAutowireCapableBeanFactory#setAllowCircularReferences(boolean)
+&nbsp;	 */
+&nbsp;	public SELF withAllowCircularReferences(boolean allowCircularReferences) {
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withAllowCircularReferences(allowCircularReferences));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add an {@link ApplicationContextInitializer} to be called when the context is
+&nbsp;	 * created.
+&nbsp;	 * @param initializer the initializer to add
+&nbsp;	 * @return a new instance with the updated initializers
+&nbsp;	 */
+&nbsp;	public SELF withInitializer(ApplicationContextInitializer&lt;? super C&gt; initializer) {
+<b class="nc">&nbsp;		Assert.notNull(initializer, &quot;Initializer must not be null&quot;);</b>
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withInitializer(initializer));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add the specified {@link Environment} property pairs. Key-value pairs can be
+&nbsp;	 * specified with colon (&quot;:&quot;) or equals (&quot;=&quot;) separators. Override matching keys that
+&nbsp;	 * might have been specified previously.
+&nbsp;	 * @param pairs the key-value pairs for properties that need to be added to the
+&nbsp;	 * environment
+&nbsp;	 * @return a new instance with the updated property values
+&nbsp;	 * @see TestPropertyValues
+&nbsp;	 * @see #withSystemProperties(String...)
+&nbsp;	 */
+&nbsp;	public SELF withPropertyValues(String... pairs) {
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withPropertyValues(pairs));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add the specified {@link System} property pairs. Key-value pairs can be specified
+&nbsp;	 * with colon (&quot;:&quot;) or equals (&quot;=&quot;) separators. System properties are added before the
+&nbsp;	 * context is {@link #run(ContextConsumer) run} and restored when the context is
+&nbsp;	 * closed.
+&nbsp;	 * @param pairs the key-value pairs for properties that need to be added to the system
+&nbsp;	 * @return a new instance with the updated system properties
+&nbsp;	 * @see TestPropertyValues
+&nbsp;	 * @see #withSystemProperties(String...)
+&nbsp;	 */
+&nbsp;	public SELF withSystemProperties(String... pairs) {
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withSystemProperties(pairs));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Customize the {@link ClassLoader} that the {@link ApplicationContext} should use
+&nbsp;	 * for resource loading and bean class loading.
+&nbsp;	 * @param classLoader the classloader to use (or {@code null} to use the default)
+&nbsp;	 * @return a new instance with the updated class loader
+&nbsp;	 * @see FilteredClassLoader
+&nbsp;	 */
+&nbsp;	public SELF withClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withClassLoader(classLoader));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the {@link ConfigurableApplicationContext#setParent(ApplicationContext)
+&nbsp;	 * parent} of the {@link ApplicationContext}.
+&nbsp;	 * @param parent the parent
+&nbsp;	 * @return a new instance with the updated parent
+&nbsp;	 */
+&nbsp;	public SELF withParent(ApplicationContext parent) {
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withParent(parent));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified user bean with the {@link ApplicationContext}. The bean name
+&nbsp;	 * is generated from the configured {@link BeanNameGenerator} on the underlying
+&nbsp;	 * context.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Such beans are registered after regular {@linkplain #withUserConfiguration(Class[])
+&nbsp;	 * user configurations} in the order of registration.
+&nbsp;	 * @param type the type of the bean
+&nbsp;	 * @param constructorArgs custom argument values to be fed into Spring&#39;s constructor
+&nbsp;	 * resolution algorithm, resolving either all arguments or just specific ones, with
+&nbsp;	 * the rest to be resolved through regular autowiring (may be {@code null} or empty)
+&nbsp;	 * @param &lt;T&gt; the type of the bean
+&nbsp;	 * @return a new instance with the updated bean
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; SELF withBean(Class&lt;T&gt; type, Object... constructorArgs) {
+<b class="nc">&nbsp;		return withBean(null, type, constructorArgs);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified user bean with the {@link ApplicationContext}.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Such beans are registered after regular {@linkplain #withUserConfiguration(Class[])
+&nbsp;	 * user configurations} in the order of registration.
+&nbsp;	 * @param name the bean name or {@code null} to use a generated name
+&nbsp;	 * @param type the type of the bean
+&nbsp;	 * @param constructorArgs custom argument values to be fed into Spring&#39;s constructor
+&nbsp;	 * resolution algorithm, resolving either all arguments or just specific ones, with
+&nbsp;	 * the rest to be resolved through regular autowiring (may be {@code null} or empty)
+&nbsp;	 * @param &lt;T&gt; the type of the bean
+&nbsp;	 * @return a new instance with the updated bean
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; SELF withBean(String name, Class&lt;T&gt; type, Object... constructorArgs) {
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withBean(name, type, constructorArgs));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified user bean with the {@link ApplicationContext}. The bean name
+&nbsp;	 * is generated from the configured {@link BeanNameGenerator} on the underlying
+&nbsp;	 * context.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Such beans are registered after regular {@linkplain #withUserConfiguration(Class[])
+&nbsp;	 * user configurations} in the order of registration.
+&nbsp;	 * @param type the type of the bean
+&nbsp;	 * @param supplier a supplier for the bean
+&nbsp;	 * @param customizers one or more callbacks for customizing the factory&#39;s
+&nbsp;	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
+&nbsp;	 * @param &lt;T&gt; the type of the bean
+&nbsp;	 * @return a new instance with the updated bean
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; SELF withBean(Class&lt;T&gt; type, Supplier&lt;T&gt; supplier, BeanDefinitionCustomizer... customizers) {
+<b class="nc">&nbsp;		return withBean(null, type, supplier, customizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified user bean with the {@link ApplicationContext}. The bean name
+&nbsp;	 * is generated from the configured {@link BeanNameGenerator} on the underlying
+&nbsp;	 * context.
+&nbsp;	 * &lt;p&gt;
+&nbsp;	 * Such beans are registered after regular {@linkplain #withUserConfiguration(Class[])
+&nbsp;	 * user configurations} in the order of registration.
+&nbsp;	 * @param name the bean name or {@code null} to use a generated name
+&nbsp;	 * @param type the type of the bean
+&nbsp;	 * @param supplier a supplier for the bean
+&nbsp;	 * @param customizers one or more callbacks for customizing the factory&#39;s
+&nbsp;	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
+&nbsp;	 * @param &lt;T&gt; the type of the bean
+&nbsp;	 * @return a new instance with the updated bean
+&nbsp;	 */
+&nbsp;	public &lt;T&gt; SELF withBean(String name, Class&lt;T&gt; type, Supplier&lt;T&gt; supplier,
+&nbsp;			BeanDefinitionCustomizer... customizers) {
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withBean(name, type, supplier, customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified user configuration classes with the
+&nbsp;	 * {@link ApplicationContext}.
+&nbsp;	 * @param configurationClasses the user configuration classes to add
+&nbsp;	 * @return a new instance with the updated configuration
+&nbsp;	 */
+&nbsp;	public SELF withUserConfiguration(Class&lt;?&gt;... configurationClasses) {
+<b class="nc">&nbsp;		return withConfiguration(UserConfigurations.of(configurationClasses));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Register the specified configuration classes with the {@link ApplicationContext}.
+&nbsp;	 * @param configurations the configurations to add
+&nbsp;	 * @return a new instance with the updated configuration
+&nbsp;	 */
+&nbsp;	public SELF withConfiguration(Configurations configurations) {
+<b class="nc">&nbsp;		Assert.notNull(configurations, &quot;Configurations must not be null&quot;);</b>
+<b class="nc">&nbsp;		return newInstance(this.runnerConfiguration.withConfiguration(configurations));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Apply customization to this runner.
+&nbsp;	 * @param customizer the customizer to call
+&nbsp;	 * @return a new instance with the customizations applied
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public SELF with(Function&lt;SELF, SELF&gt; customizer) {
+<b class="nc">&nbsp;		return customizer.apply((SELF) this);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private SELF newInstance(RunnerConfiguration&lt;C&gt; runnerConfiguration) {
+<b class="nc">&nbsp;		return this.instanceFactory.apply(runnerConfiguration);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create and refresh a new {@link ApplicationContext} based on the current state of
+&nbsp;	 * this loader. The context is consumed by the specified {@code consumer} and closed
+&nbsp;	 * upon completion.
+&nbsp;	 * @param consumer the consumer of the created {@link ApplicationContext}
+&nbsp;	 * @return this instance
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public SELF run(ContextConsumer&lt;? super A&gt; consumer) {
+<b class="nc">&nbsp;		withContextClassLoader(this.runnerConfiguration.classLoader, () -&gt; this.runnerConfiguration.systemProperties</b>
+<b class="nc">&nbsp;			.applyToSystemProperties(() -&gt; consumeAssertableContext(true, consumer)));</b>
+<b class="nc">&nbsp;		return (SELF) this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Prepare a new {@link ApplicationContext} based on the current state of this loader.
+&nbsp;	 * The context is consumed by the specified {@code consumer} and closed upon
+&nbsp;	 * completion. Unlike {@link #run(ContextConsumer)}, this method does not refresh the
+&nbsp;	 * consumed context.
+&nbsp;	 * @param consumer the consumer of the created {@link ApplicationContext}
+&nbsp;	 * @return this instance
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public SELF prepare(ContextConsumer&lt;? super A&gt; consumer) {
+<b class="nc">&nbsp;		withContextClassLoader(this.runnerConfiguration.classLoader, () -&gt; this.runnerConfiguration.systemProperties</b>
+<b class="nc">&nbsp;			.applyToSystemProperties(() -&gt; consumeAssertableContext(false, consumer)));</b>
+<b class="nc">&nbsp;		return (SELF) this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void consumeAssertableContext(boolean refresh, ContextConsumer&lt;? super A&gt; consumer) {
+<b class="nc">&nbsp;		try (A context = createAssertableContext(refresh)) {</b>
+<b class="nc">&nbsp;			accept(consumer, context);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void withContextClassLoader(ClassLoader classLoader, Runnable action) {
+<b class="nc">&nbsp;		if (classLoader == null) {</b>
+<b class="nc">&nbsp;			action.run();</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			Thread currentThread = Thread.currentThread();</b>
+<b class="nc">&nbsp;			ClassLoader previous = currentThread.getContextClassLoader();</b>
+<b class="nc">&nbsp;			currentThread.setContextClassLoader(classLoader);</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				action.run();</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				currentThread.setContextClassLoader(previous);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private A createAssertableContext(boolean refresh) {
+<b class="nc">&nbsp;		ResolvableType resolvableType = ResolvableType.forClass(AbstractApplicationContextRunner.class, getClass());</b>
+<b class="nc">&nbsp;		Class&lt;A&gt; assertType = (Class&lt;A&gt;) resolvableType.resolveGeneric(1);</b>
+<b class="nc">&nbsp;		Class&lt;C&gt; contextType = (Class&lt;C&gt;) resolvableType.resolveGeneric(2);</b>
+<b class="nc">&nbsp;		return ApplicationContextAssertProvider.get(assertType, contextType, () -&gt; createAndLoadContext(refresh));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private C createAndLoadContext(boolean refresh) {
+<b class="nc">&nbsp;		C context = this.runnerConfiguration.contextFactory.get();</b>
+<b class="nc">&nbsp;		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();</b>
+<b class="nc">&nbsp;		if (beanFactory instanceof AbstractAutowireCapableBeanFactory autowireCapableBeanFactory) {</b>
+<b class="nc">&nbsp;			autowireCapableBeanFactory.setAllowCircularReferences(this.runnerConfiguration.allowCircularReferences);</b>
+<b class="nc">&nbsp;			if (beanFactory instanceof DefaultListableBeanFactory listableBeanFactory) {</b>
+<b class="nc">&nbsp;				listableBeanFactory</b>
+<b class="nc">&nbsp;					.setAllowBeanDefinitionOverriding(this.runnerConfiguration.allowBeanDefinitionOverriding);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			configureContext(context, refresh);</b>
+<b class="nc">&nbsp;			return context;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			context.close();</b>
+<b class="nc">&nbsp;			throw ex;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureContext(C context, boolean refresh) {
+<b class="nc">&nbsp;		if (this.runnerConfiguration.parent != null) {</b>
+<b class="nc">&nbsp;			context.setParent(this.runnerConfiguration.parent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.runnerConfiguration.classLoader != null) {</b>
+<b class="nc">&nbsp;			Assert.isInstanceOf(DefaultResourceLoader.class, context);</b>
+<b class="nc">&nbsp;			((DefaultResourceLoader) context).setClassLoader(this.runnerConfiguration.classLoader);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.runnerConfiguration.environmentProperties.applyTo(context);</b>
+<b class="nc">&nbsp;		this.runnerConfiguration.beanRegistrations.forEach((registration) -&gt; registration.apply(context));</b>
+<b class="nc">&nbsp;		this.runnerConfiguration.initializers.forEach((initializer) -&gt; initializer.initialize(context));</b>
+<b class="nc">&nbsp;		Class&lt;?&gt;[] classes = Configurations.getClasses(this.runnerConfiguration.configurations);</b>
+<b class="nc">&nbsp;		if (classes.length &gt; 0) {</b>
+<b class="nc">&nbsp;			((AnnotationConfigRegistry) context).register(classes);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (refresh) {</b>
+<b class="nc">&nbsp;			context.refresh();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void accept(ContextConsumer&lt;? super A&gt; consumer, A context) {
+&nbsp;		try {
+<b class="nc">&nbsp;			consumer.accept(context);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			rethrow(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;E extends Throwable&gt; void rethrow(Throwable e) throws E {
+<b class="nc">&nbsp;		throw (E) e;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A Bean registration to be applied when the context loaded.
+&nbsp;	 *
+&nbsp;	 * @param &lt;T&gt; the bean type
+&nbsp;	 */
+&nbsp;	protected static final class BeanRegistration&lt;T&gt; {
+&nbsp;
+&nbsp;		Consumer&lt;GenericApplicationContext&gt; registrar;
+&nbsp;
+<b class="nc">&nbsp;		public BeanRegistration(String name, Class&lt;T&gt; type, Object... constructorArgs) {</b>
+<b class="nc">&nbsp;			this.registrar = (context) -&gt; context.registerBean(name, type, constructorArgs);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public BeanRegistration(String name, Class&lt;T&gt; type, Supplier&lt;T&gt; supplier,
+<b class="nc">&nbsp;				BeanDefinitionCustomizer... customizers) {</b>
+<b class="nc">&nbsp;			this.registrar = (context) -&gt; context.registerBean(name, type, supplier, customizers);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void apply(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;			Assert.isInstanceOf(GenericApplicationContext.class, context);</b>
+<b class="nc">&nbsp;			this.registrar.accept(((GenericApplicationContext) context));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	protected static final class RunnerConfiguration&lt;C extends ConfigurableApplicationContext&gt; {
+&nbsp;
+&nbsp;		private final Supplier&lt;C&gt; contextFactory;
+&nbsp;
+<b class="nc">&nbsp;		private boolean allowBeanDefinitionOverriding = false;</b>
+&nbsp;
+<b class="nc">&nbsp;		private boolean allowCircularReferences = false;</b>
+&nbsp;
+<b class="nc">&nbsp;		private List&lt;ApplicationContextInitializer&lt;? super C&gt;&gt; initializers = Collections.emptyList();</b>
+&nbsp;
+<b class="nc">&nbsp;		private TestPropertyValues environmentProperties = TestPropertyValues.empty();</b>
+&nbsp;
+<b class="nc">&nbsp;		private TestPropertyValues systemProperties = TestPropertyValues.empty();</b>
+&nbsp;
+&nbsp;		private ClassLoader classLoader;
+&nbsp;
+&nbsp;		private ApplicationContext parent;
+&nbsp;
+<b class="nc">&nbsp;		private List&lt;BeanRegistration&lt;?&gt;&gt; beanRegistrations = Collections.emptyList();</b>
+&nbsp;
+<b class="nc">&nbsp;		private List&lt;Configurations&gt; configurations = Collections.emptyList();</b>
+&nbsp;
+<b class="nc">&nbsp;		private RunnerConfiguration(Supplier&lt;C&gt; contextFactory) {</b>
+<b class="nc">&nbsp;			this.contextFactory = contextFactory;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		private RunnerConfiguration(RunnerConfiguration&lt;C&gt; source) {</b>
+<b class="nc">&nbsp;			this.contextFactory = source.contextFactory;</b>
+<b class="nc">&nbsp;			this.allowBeanDefinitionOverriding = source.allowBeanDefinitionOverriding;</b>
+<b class="nc">&nbsp;			this.allowCircularReferences = source.allowCircularReferences;</b>
+<b class="nc">&nbsp;			this.initializers = source.initializers;</b>
+<b class="nc">&nbsp;			this.environmentProperties = source.environmentProperties;</b>
+<b class="nc">&nbsp;			this.systemProperties = source.systemProperties;</b>
+<b class="nc">&nbsp;			this.classLoader = source.classLoader;</b>
+<b class="nc">&nbsp;			this.parent = source.parent;</b>
+<b class="nc">&nbsp;			this.beanRegistrations = source.beanRegistrations;</b>
+<b class="nc">&nbsp;			this.configurations = source.configurations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private RunnerConfiguration&lt;C&gt; withAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.allowBeanDefinitionOverriding = allowBeanDefinitionOverriding;</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private RunnerConfiguration&lt;C&gt; withAllowCircularReferences(boolean allowCircularReferences) {
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.allowCircularReferences = allowCircularReferences;</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private RunnerConfiguration&lt;C&gt; withInitializer(ApplicationContextInitializer&lt;? super C&gt; initializer) {
+<b class="nc">&nbsp;			Assert.notNull(initializer, &quot;Initializer must not be null&quot;);</b>
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.initializers = add(config.initializers, initializer);</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private RunnerConfiguration&lt;C&gt; withPropertyValues(String... pairs) {
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.environmentProperties = config.environmentProperties.and(pairs);</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private RunnerConfiguration&lt;C&gt; withSystemProperties(String... pairs) {
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.systemProperties = config.systemProperties.and(pairs);</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private RunnerConfiguration&lt;C&gt; withClassLoader(ClassLoader classLoader) {
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.classLoader = classLoader;</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private RunnerConfiguration&lt;C&gt; withParent(ApplicationContext parent) {
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.parent = parent;</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; RunnerConfiguration&lt;C&gt; withBean(String name, Class&lt;T&gt; type, Object... constructorArgs) {
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.beanRegistrations = add(config.beanRegistrations,</b>
+&nbsp;					new BeanRegistration&lt;&gt;(name, type, constructorArgs));
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; RunnerConfiguration&lt;C&gt; withBean(String name, Class&lt;T&gt; type, Supplier&lt;T&gt; supplier,
+&nbsp;				BeanDefinitionCustomizer... customizers) {
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.beanRegistrations = add(config.beanRegistrations,</b>
+&nbsp;					new BeanRegistration&lt;&gt;(name, type, supplier, customizers));
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private RunnerConfiguration&lt;C&gt; withConfiguration(Configurations configurations) {
+<b class="nc">&nbsp;			Assert.notNull(configurations, &quot;Configurations must not be null&quot;);</b>
+<b class="nc">&nbsp;			RunnerConfiguration&lt;C&gt; config = new RunnerConfiguration&lt;&gt;(this);</b>
+<b class="nc">&nbsp;			config.configurations = add(config.configurations, configurations);</b>
+<b class="nc">&nbsp;			return config;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static &lt;T&gt; List&lt;T&gt; add(List&lt;T&gt; list, T element) {
+<b class="nc">&nbsp;			List&lt;T&gt; result = new ArrayList&lt;&gt;(list);</b>
+<b class="nc">&nbsp;			result.add(element);</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

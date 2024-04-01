@@ -1,0 +1,171 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractFailureAnalyzer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.diagnostics</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractFailureAnalyzer (org.springframework.boot.diagnostics)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractFailureAnalyzer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.diagnostics;
+&nbsp;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base class for most {@code FailureAnalyzer} implementations.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type of exception to analyze
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; */
+<b class="fc">&nbsp;public abstract class AbstractFailureAnalyzer&lt;T extends Throwable&gt; implements FailureAnalyzer {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public FailureAnalysis analyze(Throwable failure) {
+<b class="nc">&nbsp;		T cause = findCause(failure, getCauseType());</b>
+<b class="nc">&nbsp;		return (cause != null) ? analyze(failure, cause) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns an analysis of the given {@code rootFailure}, or {@code null} if no
+&nbsp;	 * analysis was possible.
+&nbsp;	 * @param rootFailure the root failure passed to the analyzer
+&nbsp;	 * @param cause the actual found cause
+&nbsp;	 * @return the analysis or {@code null}
+&nbsp;	 */
+&nbsp;	protected abstract FailureAnalysis analyze(Throwable rootFailure, T cause);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the cause type being handled by the analyzer. By default the class generic
+&nbsp;	 * is used.
+&nbsp;	 * @return the cause type
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	protected Class&lt;? extends T&gt; getCauseType() {
+<b class="nc">&nbsp;		return (Class&lt;? extends T&gt;) ResolvableType.forClass(AbstractFailureAnalyzer.class, getClass()).resolveGeneric();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	protected final &lt;E extends Throwable&gt; E findCause(Throwable failure, Class&lt;E&gt; type) {
+<b class="fc">&nbsp;		while (failure != null) {</b>
+<b class="fc">&nbsp;			if (type.isInstance(failure)) {</b>
+<b class="fc">&nbsp;				return (E) failure;</b>
+&nbsp;			}
+<b class="fc">&nbsp;			failure = failure.getCause();</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

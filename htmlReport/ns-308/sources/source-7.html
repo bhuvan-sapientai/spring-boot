@@ -1,0 +1,216 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RootUriTemplateHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.client</a>
+</div>
+
+<h1>Coverage Summary for Class: RootUriTemplateHandler (org.springframework.boot.web.client)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RootUriTemplateHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.client;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;import org.springframework.web.util.DefaultUriBuilderFactory;
+&nbsp;import org.springframework.web.util.UriTemplateHandler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link UriTemplateHandler} to set the root for URI that starts with {@code &#39;/&#39;}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;public class RootUriTemplateHandler implements UriTemplateHandler {
+&nbsp;
+&nbsp;	private final String rootUri;
+&nbsp;
+&nbsp;	private final UriTemplateHandler handler;
+&nbsp;
+<b class="nc">&nbsp;	protected RootUriTemplateHandler(UriTemplateHandler handler) {</b>
+<b class="nc">&nbsp;		Assert.notNull(handler, &quot;Handler must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.rootUri = null;</b>
+<b class="nc">&nbsp;		this.handler = handler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link RootUriTemplateHandler} instance.
+&nbsp;	 * @param rootUri the root URI to be used to prefix relative URLs
+&nbsp;	 */
+&nbsp;	public RootUriTemplateHandler(String rootUri) {
+<b class="nc">&nbsp;		this(rootUri, new DefaultUriBuilderFactory());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link RootUriTemplateHandler} instance.
+&nbsp;	 * @param rootUri the root URI to be used to prefix relative URLs
+&nbsp;	 * @param handler the delegate handler
+&nbsp;	 */
+<b class="nc">&nbsp;	public RootUriTemplateHandler(String rootUri, UriTemplateHandler handler) {</b>
+<b class="nc">&nbsp;		Assert.notNull(rootUri, &quot;RootUri must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(handler, &quot;Handler must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.rootUri = rootUri;</b>
+<b class="nc">&nbsp;		this.handler = handler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URI expand(String uriTemplate, Map&lt;String, ?&gt; uriVariables) {
+<b class="nc">&nbsp;		return this.handler.expand(apply(uriTemplate), uriVariables);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URI expand(String uriTemplate, Object... uriVariables) {
+<b class="nc">&nbsp;		return this.handler.expand(apply(uriTemplate), uriVariables);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String apply(String uriTemplate) {
+<b class="nc">&nbsp;		if (StringUtils.startsWithIgnoreCase(uriTemplate, &quot;/&quot;)) {</b>
+<b class="nc">&nbsp;			return getRootUri() + uriTemplate;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return uriTemplate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getRootUri() {
+<b class="nc">&nbsp;		return this.rootUri;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Derives a new {@code RootUriTemplateHandler} from this one, wrapping its delegate
+&nbsp;	 * {@link UriTemplateHandler} by applying the given {@code wrapper}.
+&nbsp;	 * @param wrapper the wrapper to apply to the delegate URI template handler
+&nbsp;	 * @return the new handler
+&nbsp;	 * @since 2.3.10
+&nbsp;	 */
+&nbsp;	public RootUriTemplateHandler withHandlerWrapper(Function&lt;UriTemplateHandler, UriTemplateHandler&gt; wrapper) {
+<b class="nc">&nbsp;		return new RootUriTemplateHandler(getRootUri(), wrapper.apply(this.handler));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add a {@link RootUriTemplateHandler} instance to the given {@link RestTemplate}.
+&nbsp;	 * @param restTemplate the {@link RestTemplate} to add the handler to
+&nbsp;	 * @param rootUri the root URI
+&nbsp;	 * @return the added {@link RootUriTemplateHandler}.
+&nbsp;	 */
+&nbsp;	public static RootUriTemplateHandler addTo(RestTemplate restTemplate, String rootUri) {
+<b class="nc">&nbsp;		Assert.notNull(restTemplate, &quot;RestTemplate must not be null&quot;);</b>
+<b class="nc">&nbsp;		RootUriTemplateHandler handler = new RootUriTemplateHandler(rootUri, restTemplate.getUriTemplateHandler());</b>
+<b class="nc">&nbsp;		restTemplate.setUriTemplateHandler(handler);</b>
+<b class="nc">&nbsp;		return handler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

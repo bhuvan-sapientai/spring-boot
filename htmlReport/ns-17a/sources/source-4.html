@@ -1,0 +1,335 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DockerCli</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.docker.compose.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DockerCli (org.springframework.boot.docker.compose.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DockerCli</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DockerCli$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DockerCli$DockerCommands</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.docker.compose.core;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.docker.compose.core.DockerCliCommand.Type;
+&nbsp;import org.springframework.boot.logging.LogLevel;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;
+&nbsp;/**
+&nbsp; * Wrapper around {@code docker} and {@code docker-compose} command line tools.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class DockerCli {
+&nbsp;
+<b class="nc">&nbsp;	private static final Map&lt;File, DockerCommands&gt; dockerCommandsCache = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(DockerCli.class);</b>
+&nbsp;
+&nbsp;	private final ProcessRunner processRunner;
+&nbsp;
+&nbsp;	private final DockerCommands dockerCommands;
+&nbsp;
+&nbsp;	private final DockerComposeFile composeFile;
+&nbsp;
+&nbsp;	private final Set&lt;String&gt; activeProfiles;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link DockerCli} instance.
+&nbsp;	 * @param workingDirectory the working directory or {@code null}
+&nbsp;	 * @param composeFile the docker compose file to use
+&nbsp;	 * @param activeProfiles the docker compose profiles to activate
+&nbsp;	 */
+<b class="nc">&nbsp;	DockerCli(File workingDirectory, DockerComposeFile composeFile, Set&lt;String&gt; activeProfiles) {</b>
+<b class="nc">&nbsp;		this.processRunner = new ProcessRunner(workingDirectory);</b>
+<b class="nc">&nbsp;		this.dockerCommands = dockerCommandsCache.computeIfAbsent(workingDirectory,</b>
+<b class="nc">&nbsp;				(key) -&gt; new DockerCommands(this.processRunner));</b>
+<b class="nc">&nbsp;		this.composeFile = composeFile;</b>
+<b class="nc">&nbsp;		this.activeProfiles = (activeProfiles != null) ? activeProfiles : Collections.emptySet();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Run the given {@link DockerCli} command and return the response.
+&nbsp;	 * @param &lt;R&gt; the response type
+&nbsp;	 * @param dockerCommand the command to run
+&nbsp;	 * @return the response
+&nbsp;	 */
+&nbsp;	&lt;R&gt; R run(DockerCliCommand&lt;R&gt; dockerCommand) {
+<b class="nc">&nbsp;		List&lt;String&gt; command = createCommand(dockerCommand.getType());</b>
+<b class="nc">&nbsp;		command.addAll(dockerCommand.getCommand());</b>
+<b class="nc">&nbsp;		Consumer&lt;String&gt; outputConsumer = createOutputConsumer(dockerCommand.getLogLevel());</b>
+<b class="nc">&nbsp;		String json = this.processRunner.run(outputConsumer, command.toArray(new String[0]));</b>
+<b class="nc">&nbsp;		return dockerCommand.deserialize(json);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Consumer&lt;String&gt; createOutputConsumer(LogLevel logLevel) {
+<b class="nc">&nbsp;		if (logLevel == null || logLevel == LogLevel.OFF) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (line) -&gt; logLevel.log(logger, line);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; createCommand(Type type) {
+<b class="nc">&nbsp;		return switch (type) {</b>
+<b class="nc">&nbsp;			case DOCKER -&gt; new ArrayList&lt;&gt;(this.dockerCommands.get(type));</b>
+&nbsp;			case DOCKER_COMPOSE -&gt; {
+<b class="nc">&nbsp;				List&lt;String&gt; result = new ArrayList&lt;&gt;(this.dockerCommands.get(type));</b>
+<b class="nc">&nbsp;				if (this.composeFile != null) {</b>
+<b class="nc">&nbsp;					result.add(&quot;--file&quot;);</b>
+<b class="nc">&nbsp;					result.add(this.composeFile.toString());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				result.add(&quot;--ansi&quot;);</b>
+<b class="nc">&nbsp;				result.add(&quot;never&quot;);</b>
+<b class="nc">&nbsp;				for (String profile : this.activeProfiles) {</b>
+<b class="nc">&nbsp;					result.add(&quot;--profile&quot;);</b>
+<b class="nc">&nbsp;					result.add(profile);</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				yield result;</b>
+&nbsp;			}
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link DockerComposeFile} being used by this CLI instance.
+&nbsp;	 * @return the docker compose file
+&nbsp;	 */
+&nbsp;	DockerComposeFile getDockerComposeFile() {
+<b class="nc">&nbsp;		return this.composeFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Holds details of the actual CLI commands to invoke.
+&nbsp;	 */
+&nbsp;	private static class DockerCommands {
+&nbsp;
+&nbsp;		private final List&lt;String&gt; dockerCommand;
+&nbsp;
+&nbsp;		private final List&lt;String&gt; dockerComposeCommand;
+&nbsp;
+<b class="nc">&nbsp;		DockerCommands(ProcessRunner processRunner) {</b>
+<b class="nc">&nbsp;			this.dockerCommand = getDockerCommand(processRunner);</b>
+<b class="nc">&nbsp;			this.dockerComposeCommand = getDockerComposeCommand(processRunner);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private List&lt;String&gt; getDockerCommand(ProcessRunner processRunner) {
+&nbsp;			try {
+<b class="nc">&nbsp;				String version = processRunner.run(&quot;docker&quot;, &quot;version&quot;, &quot;--format&quot;, &quot;{{.Client.Version}}&quot;);</b>
+<b class="nc">&nbsp;				logger.trace(LogMessage.format(&quot;Using docker %s&quot;, version));</b>
+<b class="nc">&nbsp;				return List.of(&quot;docker&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ProcessStartException ex) {</b>
+<b class="nc">&nbsp;				throw new DockerProcessStartException(&quot;Unable to start docker process. Is docker correctly installed?&quot;,</b>
+&nbsp;						ex);
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ProcessExitException ex) {</b>
+<b class="nc">&nbsp;				if (ex.getStdErr().contains(&quot;docker daemon is not running&quot;)</b>
+<b class="nc">&nbsp;						|| ex.getStdErr().contains(&quot;Cannot connect to the Docker daemon&quot;)) {</b>
+<b class="nc">&nbsp;					throw new DockerNotRunningException(ex.getStdErr(), ex);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private List&lt;String&gt; getDockerComposeCommand(ProcessRunner processRunner) {
+&nbsp;			try {
+<b class="nc">&nbsp;				DockerCliComposeVersionResponse response = DockerJson.deserialize(</b>
+<b class="nc">&nbsp;						processRunner.run(&quot;docker&quot;, &quot;compose&quot;, &quot;version&quot;, &quot;--format&quot;, &quot;json&quot;),</b>
+&nbsp;						DockerCliComposeVersionResponse.class);
+<b class="nc">&nbsp;				logger.trace(LogMessage.format(&quot;Using docker compose %s&quot;, response.version()));</b>
+<b class="nc">&nbsp;				return List.of(&quot;docker&quot;, &quot;compose&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ProcessExitException ex) {</b>
+&nbsp;				// Ignore and try docker-compose
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				DockerCliComposeVersionResponse response = DockerJson.deserialize(</b>
+<b class="nc">&nbsp;						processRunner.run(&quot;docker-compose&quot;, &quot;version&quot;, &quot;--format&quot;, &quot;json&quot;),</b>
+&nbsp;						DockerCliComposeVersionResponse.class);
+<b class="nc">&nbsp;				logger.trace(LogMessage.format(&quot;Using docker-compose %s&quot;, response.version()));</b>
+<b class="nc">&nbsp;				return List.of(&quot;docker-compose&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ProcessStartException ex) {</b>
+<b class="nc">&nbsp;				throw new DockerProcessStartException(</b>
+&nbsp;						&quot;Unable to start &#39;docker-compose&#39; process or use &#39;docker compose&#39;. Is docker correctly installed?&quot;,
+&nbsp;						ex);
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		List&lt;String&gt; get(Type type) {
+<b class="nc">&nbsp;			return switch (type) {</b>
+<b class="nc">&nbsp;				case DOCKER -&gt; this.dockerCommand;</b>
+<b class="nc">&nbsp;				case DOCKER_COMPOSE -&gt; this.dockerComposeCommand;</b>
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

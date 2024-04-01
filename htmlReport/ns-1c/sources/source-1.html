@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultEndpointObjectNameFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.endpoint.jmx</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultEndpointObjectNameFactory (org.springframework.boot.actuate.autoconfigure.endpoint.jmx)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultEndpointObjectNameFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.endpoint.jmx;
+&nbsp;
+&nbsp;import javax.management.MBeanServer;
+&nbsp;import javax.management.MalformedObjectNameException;
+&nbsp;import javax.management.ObjectName;
+&nbsp;
+&nbsp;import org.springframework.boot.actuate.endpoint.jmx.EndpointObjectNameFactory;
+&nbsp;import org.springframework.boot.actuate.endpoint.jmx.ExposableJmxEndpoint;
+&nbsp;import org.springframework.boot.autoconfigure.jmx.JmxProperties;
+&nbsp;import org.springframework.jmx.support.ObjectNameManager;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link EndpointObjectNameFactory} that generates standard {@link ObjectName} for
+&nbsp; * Actuator&#39;s endpoints.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; */
+&nbsp;class DefaultEndpointObjectNameFactory implements EndpointObjectNameFactory {
+&nbsp;
+&nbsp;	private final JmxEndpointProperties properties;
+&nbsp;
+&nbsp;	private final JmxProperties jmxProperties;
+&nbsp;
+&nbsp;	private final MBeanServer mBeanServer;
+&nbsp;
+&nbsp;	private final String contextId;
+&nbsp;
+&nbsp;	DefaultEndpointObjectNameFactory(JmxEndpointProperties properties, JmxProperties jmxProperties,
+<b class="nc">&nbsp;			MBeanServer mBeanServer, String contextId) {</b>
+<b class="nc">&nbsp;		this.properties = properties;</b>
+<b class="nc">&nbsp;		this.jmxProperties = jmxProperties;</b>
+<b class="nc">&nbsp;		this.mBeanServer = mBeanServer;</b>
+<b class="nc">&nbsp;		this.contextId = contextId;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ObjectName getObjectName(ExposableJmxEndpoint endpoint) throws MalformedObjectNameException {
+<b class="nc">&nbsp;		StringBuilder builder = new StringBuilder(determineDomain());</b>
+<b class="nc">&nbsp;		builder.append(&quot;:type=Endpoint&quot;);</b>
+<b class="nc">&nbsp;		builder.append(&quot;,name=&quot;).append(StringUtils.capitalize(endpoint.getEndpointId().toString()));</b>
+<b class="nc">&nbsp;		String baseName = builder.toString();</b>
+<b class="nc">&nbsp;		if (this.mBeanServer != null &amp;&amp; hasMBean(baseName)) {</b>
+<b class="nc">&nbsp;			builder.append(&quot;,context=&quot;).append(this.contextId);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.jmxProperties.isUniqueNames()) {</b>
+<b class="nc">&nbsp;			String identity = ObjectUtils.getIdentityHexString(endpoint);</b>
+<b class="nc">&nbsp;			builder.append(&quot;,identity=&quot;).append(identity);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		builder.append(getStaticNames());</b>
+<b class="nc">&nbsp;		return ObjectNameManager.getInstance(builder.toString());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String determineDomain() {
+<b class="nc">&nbsp;		if (StringUtils.hasText(this.properties.getDomain())) {</b>
+<b class="nc">&nbsp;			return this.properties.getDomain();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasText(this.jmxProperties.getDefaultDomain())) {</b>
+<b class="nc">&nbsp;			return this.jmxProperties.getDefaultDomain();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return &quot;org.springframework.boot&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasMBean(String baseObjectName) throws MalformedObjectNameException {
+<b class="nc">&nbsp;		ObjectName query = new ObjectName(baseObjectName + &quot;,*&quot;);</b>
+<b class="nc">&nbsp;		return !this.mBeanServer.queryNames(query, null).isEmpty();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getStaticNames() {
+<b class="nc">&nbsp;		if (this.properties.getStaticNames().isEmpty()) {</b>
+<b class="nc">&nbsp;			return &quot;&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		StringBuilder builder = new StringBuilder();</b>
+<b class="nc">&nbsp;		this.properties.getStaticNames()</b>
+<b class="nc">&nbsp;			.forEach((name, value) -&gt; builder.append(&quot;,&quot;).append(name).append(&quot;=&quot;).append(value));</b>
+<b class="nc">&nbsp;		return builder.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

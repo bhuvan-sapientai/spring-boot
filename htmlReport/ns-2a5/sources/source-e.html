@@ -1,0 +1,229 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ZipLocalFileHeaderRecord</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.zip</a>
+</div>
+
+<h1>Coverage Summary for Class: ZipLocalFileHeaderRecord (org.springframework.boot.loader.zip)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ZipLocalFileHeaderRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.zip;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.ByteOrder;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.log.DebugLogger;
+&nbsp;
+&nbsp;/**
+&nbsp; * A ZIP File &quot;Local file header record&quot; (LFH).
+&nbsp; *
+&nbsp; * @param versionNeededToExtract the version needed to extract the zip
+&nbsp; * @param generalPurposeBitFlag the general purpose bit flag
+&nbsp; * @param compressionMethod the compression method used for this entry
+&nbsp; * @param lastModFileTime the last modified file time
+&nbsp; * @param lastModFileDate the last modified file date
+&nbsp; * @param crc32 the CRC32 checksum
+&nbsp; * @param compressedSize the size of the entry when compressed
+&nbsp; * @param uncompressedSize the size of the entry when uncompressed
+&nbsp; * @param fileNameLength the file name length
+&nbsp; * @param extraFieldLength the extra field length
+&nbsp; * @author Phillip Webb
+&nbsp; * @see &lt;a href=&quot;https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT&quot;&gt;Chapter
+&nbsp; * 4.3.7 of the Zip File Format Specification&lt;/a&gt;
+&nbsp; */
+<b class="nc">&nbsp;record ZipLocalFileHeaderRecord(short versionNeededToExtract, short generalPurposeBitFlag, short compressionMethod,</b>
+&nbsp;		short lastModFileTime, short lastModFileDate, int crc32, int compressedSize, int uncompressedSize,
+&nbsp;		short fileNameLength, short extraFieldLength) {
+&nbsp;
+<b class="nc">&nbsp;	private static final DebugLogger debug = DebugLogger.get(ZipLocalFileHeaderRecord.class);</b>
+&nbsp;
+&nbsp;	private static final int SIGNATURE = 0x04034b50;
+&nbsp;
+&nbsp;	private static final int MINIMUM_SIZE = 30;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the size of this record.
+&nbsp;	 * @return the record size
+&nbsp;	 */
+&nbsp;	long size() {
+<b class="nc">&nbsp;		return MINIMUM_SIZE + fileNameLength() + extraFieldLength();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link ZipLocalFileHeaderRecord} with a new
+&nbsp;	 * {@link #extraFieldLength()}.
+&nbsp;	 * @param extraFieldLength the new extra field length
+&nbsp;	 * @return a new {@link ZipLocalFileHeaderRecord} instance
+&nbsp;	 */
+&nbsp;	ZipLocalFileHeaderRecord withExtraFieldLength(short extraFieldLength) {
+<b class="nc">&nbsp;		return new ZipLocalFileHeaderRecord(this.versionNeededToExtract, this.generalPurposeBitFlag,</b>
+&nbsp;				this.compressionMethod, this.lastModFileTime, this.lastModFileDate, this.crc32, this.compressedSize,
+&nbsp;				this.uncompressedSize, this.fileNameLength, extraFieldLength);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link ZipLocalFileHeaderRecord} with a new {@link #fileNameLength()}.
+&nbsp;	 * @param fileNameLength the new file name length
+&nbsp;	 * @return a new {@link ZipLocalFileHeaderRecord} instance
+&nbsp;	 */
+&nbsp;	ZipLocalFileHeaderRecord withFileNameLength(short fileNameLength) {
+<b class="nc">&nbsp;		return new ZipLocalFileHeaderRecord(this.versionNeededToExtract, this.generalPurposeBitFlag,</b>
+&nbsp;				this.compressionMethod, this.lastModFileTime, this.lastModFileDate, this.crc32, this.compressedSize,
+&nbsp;				this.uncompressedSize, fileNameLength, this.extraFieldLength);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the contents of this record as a byte array suitable for writing to a zip.
+&nbsp;	 * @return the record as a byte array
+&nbsp;	 */
+&nbsp;	byte[] asByteArray() {
+<b class="nc">&nbsp;		ByteBuffer buffer = ByteBuffer.allocate(MINIMUM_SIZE);</b>
+<b class="nc">&nbsp;		buffer.order(ByteOrder.LITTLE_ENDIAN);</b>
+<b class="nc">&nbsp;		buffer.putInt(SIGNATURE);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.versionNeededToExtract);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.generalPurposeBitFlag);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.compressionMethod);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.lastModFileTime);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.lastModFileDate);</b>
+<b class="nc">&nbsp;		buffer.putInt(this.crc32);</b>
+<b class="nc">&nbsp;		buffer.putInt(this.compressedSize);</b>
+<b class="nc">&nbsp;		buffer.putInt(this.uncompressedSize);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.fileNameLength);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.extraFieldLength);</b>
+<b class="nc">&nbsp;		return buffer.array();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load the {@link ZipLocalFileHeaderRecord} from the given data block.
+&nbsp;	 * @param dataBlock the source data block
+&nbsp;	 * @param pos the position of the record
+&nbsp;	 * @return a new {@link ZipLocalFileHeaderRecord} instance
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+&nbsp;	static ZipLocalFileHeaderRecord load(DataBlock dataBlock, long pos) throws IOException {
+<b class="nc">&nbsp;		debug.log(&quot;Loading LocalFileHeaderRecord from position %s&quot;, pos);</b>
+<b class="nc">&nbsp;		ByteBuffer buffer = ByteBuffer.allocate(MINIMUM_SIZE);</b>
+<b class="nc">&nbsp;		buffer.order(ByteOrder.LITTLE_ENDIAN);</b>
+<b class="nc">&nbsp;		dataBlock.readFully(buffer, pos);</b>
+<b class="nc">&nbsp;		buffer.rewind();</b>
+<b class="nc">&nbsp;		if (buffer.getInt() != SIGNATURE) {</b>
+<b class="nc">&nbsp;			throw new IOException(&quot;Zip &#39;Local File Header Record&#39; not found at position &quot; + pos);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ZipLocalFileHeaderRecord(buffer.getShort(), buffer.getShort(), buffer.getShort(), buffer.getShort(),</b>
+<b class="nc">&nbsp;				buffer.getShort(), buffer.getInt(), buffer.getInt(), buffer.getInt(), buffer.getShort(),</b>
+<b class="nc">&nbsp;				buffer.getShort());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

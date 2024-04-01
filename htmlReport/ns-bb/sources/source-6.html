@@ -1,0 +1,355 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JobLauncherApplicationRunner</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.batch</a>
+</div>
+
+<h1>Coverage Summary for Class: JobLauncherApplicationRunner (org.springframework.boot.autoconfigure.batch)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JobLauncherApplicationRunner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.batch;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Properties;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.batch.core.BatchStatus;
+&nbsp;import org.springframework.batch.core.Job;
+&nbsp;import org.springframework.batch.core.JobExecution;
+&nbsp;import org.springframework.batch.core.JobExecutionException;
+&nbsp;import org.springframework.batch.core.JobParameter;
+&nbsp;import org.springframework.batch.core.JobParameters;
+&nbsp;import org.springframework.batch.core.JobParametersBuilder;
+&nbsp;import org.springframework.batch.core.JobParametersInvalidException;
+&nbsp;import org.springframework.batch.core.configuration.JobRegistry;
+&nbsp;import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+&nbsp;import org.springframework.batch.core.converter.JobParametersConverter;
+&nbsp;import org.springframework.batch.core.explore.JobExplorer;
+&nbsp;import org.springframework.batch.core.launch.JobLauncher;
+&nbsp;import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+&nbsp;import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+&nbsp;import org.springframework.batch.core.repository.JobRepository;
+&nbsp;import org.springframework.batch.core.repository.JobRestartException;
+&nbsp;import org.springframework.beans.factory.InitializingBean;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.boot.ApplicationArguments;
+&nbsp;import org.springframework.boot.ApplicationRunner;
+&nbsp;import org.springframework.context.ApplicationEventPublisher;
+&nbsp;import org.springframework.context.ApplicationEventPublisherAware;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ApplicationRunner} to {@link JobLauncher launch} Spring Batch jobs. If a single
+&nbsp; * job is found in the context, it will be executed by default. If multiple jobs are
+&nbsp; * found, launch a specific job by providing a jobName.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Jean-Pierre Bergamin
+&nbsp; * @author Mahmoud Ben Hassine
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Akshay Dubey
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class JobLauncherApplicationRunner
+&nbsp;		implements ApplicationRunner, InitializingBean, Ordered, ApplicationEventPublisherAware {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The default order for the command line runner.
+&nbsp;	 */
+&nbsp;	public static final int DEFAULT_ORDER = 0;
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(JobLauncherApplicationRunner.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private JobParametersConverter converter = new DefaultJobParametersConverter();</b>
+&nbsp;
+&nbsp;	private final JobLauncher jobLauncher;
+&nbsp;
+&nbsp;	private final JobExplorer jobExplorer;
+&nbsp;
+&nbsp;	private final JobRepository jobRepository;
+&nbsp;
+&nbsp;	private JobRegistry jobRegistry;
+&nbsp;
+&nbsp;	private String jobName;
+&nbsp;
+<b class="nc">&nbsp;	private Collection&lt;Job&gt; jobs = Collections.emptySet();</b>
+&nbsp;
+<b class="nc">&nbsp;	private int order = DEFAULT_ORDER;</b>
+&nbsp;
+&nbsp;	private ApplicationEventPublisher publisher;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JobLauncherApplicationRunner}.
+&nbsp;	 * @param jobLauncher to launch jobs
+&nbsp;	 * @param jobExplorer to check the job repository for previous executions
+&nbsp;	 * @param jobRepository to check if a job instance exists with the given parameters
+&nbsp;	 * when running a job
+&nbsp;	 */
+<b class="nc">&nbsp;	public JobLauncherApplicationRunner(JobLauncher jobLauncher, JobExplorer jobExplorer, JobRepository jobRepository) {</b>
+<b class="nc">&nbsp;		Assert.notNull(jobLauncher, &quot;JobLauncher must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(jobExplorer, &quot;JobExplorer must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(jobRepository, &quot;JobRepository must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.jobLauncher = jobLauncher;</b>
+<b class="nc">&nbsp;		this.jobExplorer = jobExplorer;</b>
+<b class="nc">&nbsp;		this.jobRepository = jobRepository;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterPropertiesSet() {
+<b class="nc">&nbsp;		Assert.isTrue(this.jobs.size() &lt;= 1 || StringUtils.hasText(this.jobName),</b>
+&nbsp;				&quot;Job name must be specified in case of multiple jobs&quot;);
+<b class="nc">&nbsp;		if (StringUtils.hasText(this.jobName)) {</b>
+<b class="nc">&nbsp;			Assert.isTrue(isLocalJob(this.jobName) || isRegisteredJob(this.jobName),</b>
+<b class="nc">&nbsp;					() -&gt; &quot;No job found with name &#39;&quot; + this.jobName + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Deprecated(since = &quot;3.0.10&quot;, forRemoval = true)
+&nbsp;	public void validate() {
+<b class="nc">&nbsp;		afterPropertiesSet();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOrder(int order) {
+<b class="nc">&nbsp;		this.order = order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return this.order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
+<b class="nc">&nbsp;		this.publisher = publisher;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Autowired(required = false)
+&nbsp;	public void setJobRegistry(JobRegistry jobRegistry) {
+<b class="nc">&nbsp;		this.jobRegistry = jobRegistry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setJobName(String jobName) {
+<b class="nc">&nbsp;		this.jobName = jobName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Autowired(required = false)
+&nbsp;	public void setJobParametersConverter(JobParametersConverter converter) {
+<b class="nc">&nbsp;		this.converter = converter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Autowired(required = false)
+&nbsp;	public void setJobs(Collection&lt;Job&gt; jobs) {
+<b class="nc">&nbsp;		this.jobs = jobs;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void run(ApplicationArguments args) throws Exception {
+<b class="nc">&nbsp;		String[] jobArguments = args.getNonOptionArgs().toArray(new String[0]);</b>
+<b class="nc">&nbsp;		run(jobArguments);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void run(String... args) throws JobExecutionException {
+<b class="nc">&nbsp;		logger.info(&quot;Running default command line with: &quot; + Arrays.asList(args));</b>
+<b class="nc">&nbsp;		launchJobFromProperties(StringUtils.splitArrayElementsIntoProperties(args, &quot;=&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void launchJobFromProperties(Properties properties) throws JobExecutionException {
+<b class="nc">&nbsp;		JobParameters jobParameters = this.converter.getJobParameters(properties);</b>
+<b class="nc">&nbsp;		executeLocalJobs(jobParameters);</b>
+<b class="nc">&nbsp;		executeRegisteredJobs(jobParameters);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isLocalJob(String jobName) {
+<b class="nc">&nbsp;		return this.jobs.stream().anyMatch((job) -&gt; job.getName().equals(jobName));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isRegisteredJob(String jobName) {
+<b class="nc">&nbsp;		return this.jobRegistry != null &amp;&amp; this.jobRegistry.getJobNames().contains(jobName);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void executeLocalJobs(JobParameters jobParameters) throws JobExecutionException {
+<b class="nc">&nbsp;		for (Job job : this.jobs) {</b>
+<b class="nc">&nbsp;			if (StringUtils.hasText(this.jobName)) {</b>
+<b class="nc">&nbsp;				if (!this.jobName.equals(job.getName())) {</b>
+<b class="nc">&nbsp;					logger.debug(LogMessage.format(&quot;Skipped job: %s&quot;, job.getName()));</b>
+<b class="nc">&nbsp;					continue;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			execute(job, jobParameters);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void executeRegisteredJobs(JobParameters jobParameters) throws JobExecutionException {
+<b class="nc">&nbsp;		if (this.jobRegistry != null &amp;&amp; StringUtils.hasText(this.jobName)) {</b>
+<b class="nc">&nbsp;			if (!isLocalJob(this.jobName)) {</b>
+<b class="nc">&nbsp;				Job job = this.jobRegistry.getJob(this.jobName);</b>
+<b class="nc">&nbsp;				execute(job, jobParameters);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void execute(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+&nbsp;			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+<b class="nc">&nbsp;		JobParameters parameters = getNextJobParameters(job, jobParameters);</b>
+<b class="nc">&nbsp;		JobExecution execution = this.jobLauncher.run(job, parameters);</b>
+<b class="nc">&nbsp;		if (this.publisher != null) {</b>
+<b class="nc">&nbsp;			this.publisher.publishEvent(new JobExecutionEvent(execution));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private JobParameters getNextJobParameters(Job job, JobParameters jobParameters) {
+<b class="nc">&nbsp;		if (this.jobRepository != null &amp;&amp; this.jobRepository.isJobInstanceExists(job.getName(), jobParameters)) {</b>
+<b class="nc">&nbsp;			return getNextJobParametersForExisting(job, jobParameters);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (job.getJobParametersIncrementer() == null) {</b>
+<b class="nc">&nbsp;			return jobParameters;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		JobParameters nextParameters = new JobParametersBuilder(jobParameters, this.jobExplorer)</b>
+<b class="nc">&nbsp;			.getNextJobParameters(job)</b>
+<b class="nc">&nbsp;			.toJobParameters();</b>
+<b class="nc">&nbsp;		return merge(nextParameters, jobParameters);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JobParameters getNextJobParametersForExisting(Job job, JobParameters jobParameters) {
+<b class="nc">&nbsp;		JobExecution lastExecution = this.jobRepository.getLastJobExecution(job.getName(), jobParameters);</b>
+<b class="nc">&nbsp;		if (isStoppedOrFailed(lastExecution) &amp;&amp; job.isRestartable()) {</b>
+<b class="nc">&nbsp;			JobParameters previousIdentifyingParameters = new JobParameters(</b>
+<b class="nc">&nbsp;					lastExecution.getJobParameters().getIdentifyingParameters());</b>
+<b class="nc">&nbsp;			return merge(previousIdentifyingParameters, jobParameters);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return jobParameters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isStoppedOrFailed(JobExecution execution) {
+<b class="nc">&nbsp;		BatchStatus status = (execution != null) ? execution.getStatus() : null;</b>
+<b class="nc">&nbsp;		return (status == BatchStatus.STOPPED || status == BatchStatus.FAILED);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JobParameters merge(JobParameters parameters, JobParameters additionals) {
+<b class="nc">&nbsp;		Map&lt;String, JobParameter&lt;?&gt;&gt; merged = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		merged.putAll(parameters.getParameters());</b>
+<b class="nc">&nbsp;		merged.putAll(additionals.getParameters());</b>
+<b class="nc">&nbsp;		return new JobParameters(merged);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

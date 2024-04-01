@@ -1,0 +1,493 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractServletWebServerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet.server</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractServletWebServerFactory (org.springframework.boot.web.servlet.server)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractServletWebServerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractServletWebServerFactory$SessionConfiguringInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet.server;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;import jakarta.servlet.SessionCookieConfig;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.web.server.AbstractConfigurableWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.Cookie;
+&nbsp;import org.springframework.boot.web.server.MimeMappings;
+&nbsp;import org.springframework.boot.web.servlet.ServletContextInitializer;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstract base class for {@link ConfigurableServletWebServerFactory} implementations.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Ivan Sopov
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public abstract class AbstractServletWebServerFactory extends AbstractConfigurableWebServerFactory
+&nbsp;		implements ConfigurableServletWebServerFactory {
+&nbsp;
+<b class="nc">&nbsp;	protected final Log logger = LogFactory.getLog(getClass());</b>
+&nbsp;
+<b class="nc">&nbsp;	private String contextPath = &quot;&quot;;</b>
+&nbsp;
+&nbsp;	private String displayName;
+&nbsp;
+<b class="nc">&nbsp;	private Session session = new Session();</b>
+&nbsp;
+<b class="nc">&nbsp;	private boolean registerDefaultServlet = false;</b>
+&nbsp;
+<b class="nc">&nbsp;	private MimeMappings mimeMappings = MimeMappings.lazyCopy(MimeMappings.DEFAULT);</b>
+&nbsp;
+<b class="nc">&nbsp;	private List&lt;ServletContextInitializer&gt; initializers = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Jsp jsp = new Jsp();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Map&lt;Locale, Charset&gt; localeCharsetMappings = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Map&lt;String, String&gt; initParameters = Collections.emptyMap();</b>
+&nbsp;
+<b class="nc">&nbsp;	private List&lt;CookieSameSiteSupplier&gt; cookieSameSiteSuppliers = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final DocumentRoot documentRoot = new DocumentRoot(this.logger);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final StaticResourceJars staticResourceJars = new StaticResourceJars();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;String&gt; webListenerClassNames = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AbstractServletWebServerFactory} instance.
+&nbsp;	 */
+<b class="nc">&nbsp;	public AbstractServletWebServerFactory() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AbstractServletWebServerFactory} instance with the specified
+&nbsp;	 * port.
+&nbsp;	 * @param port the port number for the web server
+&nbsp;	 */
+&nbsp;	public AbstractServletWebServerFactory(int port) {
+<b class="nc">&nbsp;		super(port);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AbstractServletWebServerFactory} instance with the specified
+&nbsp;	 * context path and port.
+&nbsp;	 * @param contextPath the context path for the web server
+&nbsp;	 * @param port the port number for the web server
+&nbsp;	 */
+&nbsp;	public AbstractServletWebServerFactory(String contextPath, int port) {
+<b class="nc">&nbsp;		super(port);</b>
+<b class="nc">&nbsp;		checkContextPath(contextPath);</b>
+<b class="nc">&nbsp;		this.contextPath = contextPath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the context path for the web server. The path will start with &quot;/&quot; and not
+&nbsp;	 * end with &quot;/&quot;. The root context is represented by an empty string.
+&nbsp;	 * @return the context path
+&nbsp;	 */
+&nbsp;	public String getContextPath() {
+<b class="nc">&nbsp;		return this.contextPath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setContextPath(String contextPath) {
+<b class="nc">&nbsp;		checkContextPath(contextPath);</b>
+<b class="nc">&nbsp;		this.contextPath = contextPath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkContextPath(String contextPath) {
+<b class="nc">&nbsp;		Assert.notNull(contextPath, &quot;ContextPath must not be null&quot;);</b>
+<b class="nc">&nbsp;		if (!contextPath.isEmpty()) {</b>
+<b class="nc">&nbsp;			if (&quot;/&quot;.equals(contextPath)) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(&quot;Root ContextPath must be specified using an empty string&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (!contextPath.startsWith(&quot;/&quot;) || contextPath.endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(&quot;ContextPath must start with &#39;/&#39; and not end with &#39;/&#39;&quot;);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getDisplayName() {
+<b class="nc">&nbsp;		return this.displayName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setDisplayName(String displayName) {
+<b class="nc">&nbsp;		this.displayName = displayName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flag to indicate that the default servlet should be registered.
+&nbsp;	 * @return true if the default servlet is to be registered
+&nbsp;	 */
+&nbsp;	public boolean isRegisterDefaultServlet() {
+<b class="nc">&nbsp;		return this.registerDefaultServlet;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setRegisterDefaultServlet(boolean registerDefaultServlet) {
+<b class="nc">&nbsp;		this.registerDefaultServlet = registerDefaultServlet;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the mime-type mappings.
+&nbsp;	 * @return the mimeMappings the mime-type mappings.
+&nbsp;	 */
+&nbsp;	public MimeMappings getMimeMappings() {
+<b class="nc">&nbsp;		return this.mimeMappings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setMimeMappings(MimeMappings mimeMappings) {
+<b class="nc">&nbsp;		Assert.notNull(mimeMappings, &quot;MimeMappings must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.mimeMappings = new MimeMappings(mimeMappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the document root which will be used by the web context to serve static
+&nbsp;	 * files.
+&nbsp;	 * @return the document root
+&nbsp;	 */
+&nbsp;	public File getDocumentRoot() {
+<b class="nc">&nbsp;		return this.documentRoot.getDirectory();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setDocumentRoot(File documentRoot) {
+<b class="nc">&nbsp;		this.documentRoot.setDirectory(documentRoot);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setInitializers(List&lt;? extends ServletContextInitializer&gt; initializers) {
+<b class="nc">&nbsp;		Assert.notNull(initializers, &quot;Initializers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.initializers = new ArrayList&lt;&gt;(initializers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addInitializers(ServletContextInitializer... initializers) {
+<b class="nc">&nbsp;		Assert.notNull(initializers, &quot;Initializers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.initializers.addAll(Arrays.asList(initializers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Jsp getJsp() {
+<b class="nc">&nbsp;		return this.jsp;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setJsp(Jsp jsp) {
+<b class="nc">&nbsp;		this.jsp = jsp;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Session getSession() {
+<b class="nc">&nbsp;		return this.session;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setSession(Session session) {
+<b class="nc">&nbsp;		this.session = session;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the Locale to Charset mappings.
+&nbsp;	 * @return the charset mappings
+&nbsp;	 */
+&nbsp;	public Map&lt;Locale, Charset&gt; getLocaleCharsetMappings() {
+<b class="nc">&nbsp;		return this.localeCharsetMappings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setLocaleCharsetMappings(Map&lt;Locale, Charset&gt; localeCharsetMappings) {
+<b class="nc">&nbsp;		Assert.notNull(localeCharsetMappings, &quot;localeCharsetMappings must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.localeCharsetMappings = localeCharsetMappings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setInitParameters(Map&lt;String, String&gt; initParameters) {
+<b class="nc">&nbsp;		this.initParameters = initParameters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Map&lt;String, String&gt; getInitParameters() {
+<b class="nc">&nbsp;		return this.initParameters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setCookieSameSiteSuppliers(List&lt;? extends CookieSameSiteSupplier&gt; cookieSameSiteSuppliers) {
+<b class="nc">&nbsp;		Assert.notNull(cookieSameSiteSuppliers, &quot;CookieSameSiteSuppliers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.cookieSameSiteSuppliers = new ArrayList&lt;&gt;(cookieSameSiteSuppliers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addCookieSameSiteSuppliers(CookieSameSiteSupplier... cookieSameSiteSuppliers) {
+<b class="nc">&nbsp;		Assert.notNull(cookieSameSiteSuppliers, &quot;CookieSameSiteSuppliers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.cookieSameSiteSuppliers.addAll(Arrays.asList(cookieSameSiteSuppliers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;CookieSameSiteSupplier&gt; getCookieSameSiteSuppliers() {
+<b class="nc">&nbsp;		return this.cookieSameSiteSuppliers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility method that can be used by subclasses wishing to combine the specified
+&nbsp;	 * {@link ServletContextInitializer} parameters with those defined in this instance.
+&nbsp;	 * @param initializers the initializers to merge
+&nbsp;	 * @return a complete set of merged initializers (with the specified parameters
+&nbsp;	 * appearing first)
+&nbsp;	 */
+&nbsp;	protected final ServletContextInitializer[] mergeInitializers(ServletContextInitializer... initializers) {
+<b class="nc">&nbsp;		List&lt;ServletContextInitializer&gt; mergedInitializers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		mergedInitializers.add((servletContext) -&gt; this.initParameters.forEach(servletContext::setInitParameter));</b>
+<b class="nc">&nbsp;		mergedInitializers.add(new SessionConfiguringInitializer(this.session));</b>
+<b class="nc">&nbsp;		mergedInitializers.addAll(Arrays.asList(initializers));</b>
+<b class="nc">&nbsp;		mergedInitializers.addAll(this.initializers);</b>
+<b class="nc">&nbsp;		return mergedInitializers.toArray(new ServletContextInitializer[0]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the JSP servlet should be registered with the web server.
+&nbsp;	 * @return {@code true} if the servlet should be registered, otherwise {@code false}
+&nbsp;	 */
+&nbsp;	protected boolean shouldRegisterJspServlet() {
+<b class="nc">&nbsp;		return this.jsp != null &amp;&amp; this.jsp.getRegistered()</b>
+<b class="nc">&nbsp;				&amp;&amp; ClassUtils.isPresent(this.jsp.getClassName(), getClass().getClassLoader());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the absolute document root when it points to a valid directory, logging a
+&nbsp;	 * warning and returning {@code null} otherwise.
+&nbsp;	 * @return the valid document root
+&nbsp;	 */
+&nbsp;	protected final File getValidDocumentRoot() {
+<b class="nc">&nbsp;		return this.documentRoot.getValidDirectory();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final List&lt;URL&gt; getUrlsOfJarsWithMetaInfResources() {
+<b class="nc">&nbsp;		return this.staticResourceJars.getUrls();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final File getValidSessionStoreDir() {
+<b class="nc">&nbsp;		return getValidSessionStoreDir(true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final File getValidSessionStoreDir(boolean mkdirs) {
+<b class="nc">&nbsp;		return this.session.getSessionStoreDirectory().getValidDirectory(mkdirs);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addWebListeners(String... webListenerClassNames) {
+<b class="nc">&nbsp;		this.webListenerClassNames.addAll(Arrays.asList(webListenerClassNames));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final Set&lt;String&gt; getWebListenerClassNames() {
+<b class="nc">&nbsp;		return this.webListenerClassNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ServletContextInitializer} to apply appropriate parts of the {@link Session}
+&nbsp;	 * configuration.
+&nbsp;	 */
+&nbsp;	private static class SessionConfiguringInitializer implements ServletContextInitializer {
+&nbsp;
+&nbsp;		private final Session session;
+&nbsp;
+<b class="nc">&nbsp;		SessionConfiguringInitializer(Session session) {</b>
+<b class="nc">&nbsp;			this.session = session;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void onStartup(ServletContext servletContext) throws ServletException {
+<b class="nc">&nbsp;			if (this.session.getTrackingModes() != null) {</b>
+<b class="nc">&nbsp;				servletContext.setSessionTrackingModes(unwrap(this.session.getTrackingModes()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			configureSessionCookie(servletContext.getSessionCookieConfig());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configureSessionCookie(SessionCookieConfig config) {
+<b class="nc">&nbsp;			Cookie cookie = this.session.getCookie();</b>
+<b class="nc">&nbsp;			PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;			map.from(cookie::getName).to(config::setName);</b>
+<b class="nc">&nbsp;			map.from(cookie::getDomain).to(config::setDomain);</b>
+<b class="nc">&nbsp;			map.from(cookie::getPath).to(config::setPath);</b>
+<b class="nc">&nbsp;			map.from(cookie::getHttpOnly).to(config::setHttpOnly);</b>
+<b class="nc">&nbsp;			map.from(cookie::getSecure).to(config::setSecure);</b>
+<b class="nc">&nbsp;			map.from(cookie::getMaxAge).asInt(Duration::getSeconds).to(config::setMaxAge);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Set&lt;jakarta.servlet.SessionTrackingMode&gt; unwrap(Set&lt;Session.SessionTrackingMode&gt; modes) {
+<b class="nc">&nbsp;			if (modes == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Set&lt;jakarta.servlet.SessionTrackingMode&gt; result = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (Session.SessionTrackingMode mode : modes) {</b>
+<b class="nc">&nbsp;				result.add(jakarta.servlet.SessionTrackingMode.valueOf(mode.name()));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

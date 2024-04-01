@@ -1,0 +1,196 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ArtemisEmbeddedConfigurationFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.jms.artemis</a>
+</div>
+
+<h1>Coverage Summary for Class: ArtemisEmbeddedConfigurationFactory (org.springframework.boot.autoconfigure.jms.artemis)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArtemisEmbeddedConfigurationFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.jms.artemis;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;
+&nbsp;import org.apache.activemq.artemis.api.core.QueueConfiguration;
+&nbsp;import org.apache.activemq.artemis.api.core.RoutingType;
+&nbsp;import org.apache.activemq.artemis.api.core.SimpleString;
+&nbsp;import org.apache.activemq.artemis.api.core.TransportConfiguration;
+&nbsp;import org.apache.activemq.artemis.core.config.Configuration;
+&nbsp;import org.apache.activemq.artemis.core.config.CoreAddressConfiguration;
+&nbsp;import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+&nbsp;import org.apache.activemq.artemis.core.remoting.impl.invm.InVMAcceptorFactory;
+&nbsp;import org.apache.activemq.artemis.core.server.JournalType;
+&nbsp;import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration used to create the embedded Artemis server.
+&nbsp; *
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ArtemisEmbeddedConfigurationFactory {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ArtemisEmbeddedConfigurationFactory.class);</b>
+&nbsp;
+&nbsp;	private final ArtemisProperties.Embedded properties;
+&nbsp;
+<b class="nc">&nbsp;	ArtemisEmbeddedConfigurationFactory(ArtemisProperties properties) {</b>
+<b class="nc">&nbsp;		this.properties = properties.getEmbedded();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Configuration createConfiguration() {
+<b class="nc">&nbsp;		ConfigurationImpl configuration = new ConfigurationImpl();</b>
+<b class="nc">&nbsp;		configuration.setSecurityEnabled(false);</b>
+<b class="nc">&nbsp;		configuration.setPersistenceEnabled(this.properties.isPersistent());</b>
+<b class="nc">&nbsp;		String dataDir = getDataDir();</b>
+<b class="nc">&nbsp;		configuration.setJournalDirectory(dataDir + &quot;/journal&quot;);</b>
+<b class="nc">&nbsp;		if (this.properties.isPersistent()) {</b>
+<b class="nc">&nbsp;			configuration.setJournalType(JournalType.NIO);</b>
+<b class="nc">&nbsp;			configuration.setLargeMessagesDirectory(dataDir + &quot;/largemessages&quot;);</b>
+<b class="nc">&nbsp;			configuration.setBindingsDirectory(dataDir + &quot;/bindings&quot;);</b>
+<b class="nc">&nbsp;			configuration.setPagingDirectory(dataDir + &quot;/paging&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		TransportConfiguration transportConfiguration = new TransportConfiguration(InVMAcceptorFactory.class.getName(),</b>
+<b class="nc">&nbsp;				this.properties.generateTransportParameters());</b>
+<b class="nc">&nbsp;		configuration.getAcceptorConfigurations().add(transportConfiguration);</b>
+<b class="nc">&nbsp;		if (this.properties.isDefaultClusterPassword() &amp;&amp; logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			logger.debug(&quot;Using default Artemis cluster password: &quot; + this.properties.getClusterPassword());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		configuration.setClusterPassword(this.properties.getClusterPassword());</b>
+<b class="nc">&nbsp;		configuration.addAddressConfiguration(createAddressConfiguration(&quot;DLQ&quot;));</b>
+<b class="nc">&nbsp;		configuration.addAddressConfiguration(createAddressConfiguration(&quot;ExpiryQueue&quot;));</b>
+<b class="nc">&nbsp;		configuration.addAddressSetting(&quot;#&quot;,</b>
+<b class="nc">&nbsp;				new AddressSettings().setDeadLetterAddress(SimpleString.toSimpleString(&quot;DLQ&quot;))</b>
+<b class="nc">&nbsp;					.setExpiryAddress(SimpleString.toSimpleString(&quot;ExpiryQueue&quot;)));</b>
+<b class="nc">&nbsp;		return configuration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private CoreAddressConfiguration createAddressConfiguration(String name) {
+<b class="nc">&nbsp;		return new CoreAddressConfiguration().setName(name)</b>
+<b class="nc">&nbsp;			.addRoutingType(RoutingType.ANYCAST)</b>
+<b class="nc">&nbsp;			.addQueueConfiguration(new QueueConfiguration(name).setRoutingType(RoutingType.ANYCAST).setAddress(name));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getDataDir() {
+<b class="nc">&nbsp;		if (this.properties.getDataDirectory() != null) {</b>
+<b class="nc">&nbsp;			return this.properties.getDataDirectory();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String tempDirectory = System.getProperty(&quot;java.io.tmpdir&quot;);</b>
+<b class="nc">&nbsp;		return new File(tempDirectory, &quot;artemis-data&quot;).getAbsolutePath();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

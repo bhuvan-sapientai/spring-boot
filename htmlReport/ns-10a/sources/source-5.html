@@ -1,0 +1,297 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Saml2RelyingPartyRegistrationConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.security.saml2</a>
+</div>
+
+<h1>Coverage Summary for Class: Saml2RelyingPartyRegistrationConfiguration (org.springframework.boot.autoconfigure.security.saml2)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Saml2RelyingPartyRegistrationConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/84)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.security.saml2;
+&nbsp;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.security.cert.CertificateFactory;
+&nbsp;import java.security.cert.X509Certificate;
+&nbsp;import java.security.interfaces.RSAPrivateKey;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties.AssertingParty;
+&nbsp;import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties.AssertingParty.Verification;
+&nbsp;import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties.Decryption;
+&nbsp;import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties.Registration;
+&nbsp;import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties.Registration.Signing;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.security.converter.RsaKeyConverters;
+&nbsp;import org.springframework.security.saml2.core.Saml2X509Credential;
+&nbsp;import org.springframework.security.saml2.core.Saml2X509Credential.Saml2X509CredentialType;
+&nbsp;import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
+&nbsp;import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
+&nbsp;import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration.AssertingPartyDetails;
+&nbsp;import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration.Builder;
+&nbsp;import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
+&nbsp;import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Configuration @Configuration} used to map {@link Saml2RelyingPartyProperties} to
+&nbsp; * relying party registrations in a {@link RelyingPartyRegistrationRepository}.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Lasse Lindqvist
+&nbsp; * @author Lasse Wulff
+&nbsp; */
+&nbsp;@Configuration(proxyBeanMethods = false)
+&nbsp;@Conditional(RegistrationConfiguredCondition.class)
+&nbsp;@ConditionalOnMissingBean(RelyingPartyRegistrationRepository.class)
+<b class="nc">&nbsp;class Saml2RelyingPartyRegistrationConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	RelyingPartyRegistrationRepository relyingPartyRegistrationRepository(Saml2RelyingPartyProperties properties) {
+<b class="nc">&nbsp;		List&lt;RelyingPartyRegistration&gt; registrations = properties.getRegistration()</b>
+<b class="nc">&nbsp;			.entrySet()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map(this::asRegistration)</b>
+<b class="nc">&nbsp;			.toList();</b>
+<b class="nc">&nbsp;		return new InMemoryRelyingPartyRegistrationRepository(registrations);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private RelyingPartyRegistration asRegistration(Map.Entry&lt;String, Registration&gt; entry) {
+<b class="nc">&nbsp;		return asRegistration(entry.getKey(), entry.getValue());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private RelyingPartyRegistration asRegistration(String id, Registration properties) {
+<b class="nc">&nbsp;		boolean usingMetadata = StringUtils.hasText(properties.getAssertingparty().getMetadataUri());</b>
+<b class="nc">&nbsp;		Builder builder = (!usingMetadata) ? RelyingPartyRegistration.withRegistrationId(id)</b>
+<b class="nc">&nbsp;				: createBuilderUsingMetadata(properties.getAssertingparty()).registrationId(id);</b>
+<b class="nc">&nbsp;		builder.assertionConsumerServiceLocation(properties.getAcs().getLocation());</b>
+<b class="nc">&nbsp;		builder.assertionConsumerServiceBinding(properties.getAcs().getBinding());</b>
+<b class="nc">&nbsp;		builder.assertingPartyDetails(mapAssertingParty(properties.getAssertingparty()));</b>
+<b class="nc">&nbsp;		builder.signingX509Credentials((credentials) -&gt; properties.getSigning()</b>
+<b class="nc">&nbsp;			.getCredentials()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map(this::asSigningCredential)</b>
+<b class="nc">&nbsp;			.forEach(credentials::add));</b>
+<b class="nc">&nbsp;		builder.decryptionX509Credentials((credentials) -&gt; properties.getDecryption()</b>
+<b class="nc">&nbsp;			.getCredentials()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map(this::asDecryptionCredential)</b>
+<b class="nc">&nbsp;			.forEach(credentials::add));</b>
+<b class="nc">&nbsp;		builder.assertingPartyDetails(</b>
+<b class="nc">&nbsp;				(details) -&gt; details.verificationX509Credentials((credentials) -&gt; properties.getAssertingparty()</b>
+<b class="nc">&nbsp;					.getVerification()</b>
+<b class="nc">&nbsp;					.getCredentials()</b>
+<b class="nc">&nbsp;					.stream()</b>
+<b class="nc">&nbsp;					.map(this::asVerificationCredential)</b>
+<b class="nc">&nbsp;					.forEach(credentials::add)));</b>
+<b class="nc">&nbsp;		builder.singleLogoutServiceLocation(properties.getSinglelogout().getUrl());</b>
+<b class="nc">&nbsp;		builder.singleLogoutServiceResponseLocation(properties.getSinglelogout().getResponseUrl());</b>
+<b class="nc">&nbsp;		builder.singleLogoutServiceBinding(properties.getSinglelogout().getBinding());</b>
+<b class="nc">&nbsp;		builder.entityId(properties.getEntityId());</b>
+<b class="nc">&nbsp;		builder.nameIdFormat(properties.getNameIdFormat());</b>
+<b class="nc">&nbsp;		RelyingPartyRegistration registration = builder.build();</b>
+<b class="nc">&nbsp;		boolean signRequest = registration.getAssertingPartyDetails().getWantAuthnRequestsSigned();</b>
+<b class="nc">&nbsp;		validateSigningCredentials(properties, signRequest);</b>
+<b class="nc">&nbsp;		return registration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private RelyingPartyRegistration.Builder createBuilderUsingMetadata(AssertingParty properties) {
+<b class="nc">&nbsp;		String requiredEntityId = properties.getEntityId();</b>
+<b class="nc">&nbsp;		Collection&lt;Builder&gt; candidates = RelyingPartyRegistrations</b>
+<b class="nc">&nbsp;			.collectionFromMetadataLocation(properties.getMetadataUri());</b>
+<b class="nc">&nbsp;		for (RelyingPartyRegistration.Builder candidate : candidates) {</b>
+<b class="nc">&nbsp;			if (requiredEntityId == null || requiredEntityId.equals(getEntityId(candidate))) {</b>
+<b class="nc">&nbsp;				return candidate;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;No relying party with Entity ID &#39;&quot; + requiredEntityId + &quot;&#39; found&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getEntityId(RelyingPartyRegistration.Builder candidate) {
+<b class="nc">&nbsp;		String[] result = new String[1];</b>
+<b class="nc">&nbsp;		candidate.assertingPartyDetails((builder) -&gt; result[0] = builder.build().getEntityId());</b>
+<b class="nc">&nbsp;		return result[0];</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Consumer&lt;AssertingPartyDetails.Builder&gt; mapAssertingParty(AssertingParty assertingParty) {
+<b class="nc">&nbsp;		return (details) -&gt; {</b>
+<b class="nc">&nbsp;			PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;			map.from(assertingParty::getEntityId).to(details::entityId);</b>
+<b class="nc">&nbsp;			map.from(assertingParty.getSinglesignon()::getBinding).to(details::singleSignOnServiceBinding);</b>
+<b class="nc">&nbsp;			map.from(assertingParty.getSinglesignon()::getUrl).to(details::singleSignOnServiceLocation);</b>
+<b class="nc">&nbsp;			map.from(assertingParty.getSinglesignon()::getSignRequest).to(details::wantAuthnRequestsSigned);</b>
+<b class="nc">&nbsp;			map.from(assertingParty.getSinglelogout()::getUrl).to(details::singleLogoutServiceLocation);</b>
+<b class="nc">&nbsp;			map.from(assertingParty.getSinglelogout()::getResponseUrl).to(details::singleLogoutServiceResponseLocation);</b>
+<b class="nc">&nbsp;			map.from(assertingParty.getSinglelogout()::getBinding).to(details::singleLogoutServiceBinding);</b>
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	private void validateSigningCredentials(Registration properties, boolean signRequest) {
+<b class="nc">&nbsp;		if (signRequest) {</b>
+<b class="nc">&nbsp;			Assert.state(!properties.getSigning().getCredentials().isEmpty(),</b>
+&nbsp;					&quot;Signing credentials must not be empty when authentication requests require signing.&quot;);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Saml2X509Credential asSigningCredential(Signing.Credential properties) {
+<b class="nc">&nbsp;		RSAPrivateKey privateKey = readPrivateKey(properties.getPrivateKeyLocation());</b>
+<b class="nc">&nbsp;		X509Certificate certificate = readCertificate(properties.getCertificateLocation());</b>
+<b class="nc">&nbsp;		return new Saml2X509Credential(privateKey, certificate, Saml2X509CredentialType.SIGNING);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Saml2X509Credential asDecryptionCredential(Decryption.Credential properties) {
+<b class="nc">&nbsp;		RSAPrivateKey privateKey = readPrivateKey(properties.getPrivateKeyLocation());</b>
+<b class="nc">&nbsp;		X509Certificate certificate = readCertificate(properties.getCertificateLocation());</b>
+<b class="nc">&nbsp;		return new Saml2X509Credential(privateKey, certificate, Saml2X509CredentialType.DECRYPTION);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Saml2X509Credential asVerificationCredential(Verification.Credential properties) {
+<b class="nc">&nbsp;		X509Certificate certificate = readCertificate(properties.getCertificateLocation());</b>
+<b class="nc">&nbsp;		return new Saml2X509Credential(certificate, Saml2X509Credential.Saml2X509CredentialType.ENCRYPTION,</b>
+&nbsp;				Saml2X509Credential.Saml2X509CredentialType.VERIFICATION);
+&nbsp;	}
+&nbsp;
+&nbsp;	private RSAPrivateKey readPrivateKey(Resource location) {
+<b class="nc">&nbsp;		Assert.state(location != null, &quot;No private key location specified&quot;);</b>
+<b class="nc">&nbsp;		Assert.state(location.exists(), () -&gt; &quot;Private key location &#39;&quot; + location + &quot;&#39; does not exist&quot;);</b>
+<b class="nc">&nbsp;		try (InputStream inputStream = location.getInputStream()) {</b>
+<b class="nc">&nbsp;			return RsaKeyConverters.pkcs8().convert(inputStream);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private X509Certificate readCertificate(Resource location) {
+<b class="nc">&nbsp;		Assert.state(location != null, &quot;No certificate location specified&quot;);</b>
+<b class="nc">&nbsp;		Assert.state(location.exists(), () -&gt; &quot;Certificate  location &#39;&quot; + location + &quot;&#39; does not exist&quot;);</b>
+<b class="nc">&nbsp;		try (InputStream inputStream = location.getInputStream()) {</b>
+<b class="nc">&nbsp;			return (X509Certificate) CertificateFactory.getInstance(&quot;X.509&quot;).generateCertificate(inputStream);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

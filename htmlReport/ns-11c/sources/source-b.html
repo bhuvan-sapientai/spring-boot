@@ -1,0 +1,308 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebFluxProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.web.reactive</a>
+</div>
+
+<h1>Coverage Summary for Class: WebFluxProperties (org.springframework.boot.autoconfigure.web.reactive)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebFluxProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebFluxProperties$Format</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WebFluxProperties$Problemdetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.web.reactive;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.ConfigurationProperties;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfigurationProperties Properties} for Spring WebFlux.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Vedran Pavic
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@ConfigurationProperties(prefix = &quot;spring.webflux&quot;)
+<b class="nc">&nbsp;public class WebFluxProperties {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Base path for all web handlers.
+&nbsp;	 */
+&nbsp;	private String basePath;
+&nbsp;
+<b class="nc">&nbsp;	private final Format format = new Format();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Problemdetails problemdetails = new Problemdetails();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Path pattern used for static resources.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String staticPathPattern = &quot;/**&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Path pattern used for WebJar assets.
+&nbsp;	 */
+<b class="nc">&nbsp;	private String webjarsPathPattern = &quot;/webjars/**&quot;;</b>
+&nbsp;
+&nbsp;	public String getBasePath() {
+<b class="nc">&nbsp;		return this.basePath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setBasePath(String basePath) {
+<b class="nc">&nbsp;		this.basePath = cleanBasePath(basePath);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String cleanBasePath(String basePath) {
+<b class="nc">&nbsp;		String candidate = null;</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(basePath)) {</b>
+<b class="nc">&nbsp;			candidate = basePath.strip();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasText(candidate)) {</b>
+<b class="nc">&nbsp;			if (!candidate.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;				candidate = &quot;/&quot; + candidate;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (candidate.endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;				candidate = candidate.substring(0, candidate.length() - 1);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return candidate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Format getFormat() {
+<b class="nc">&nbsp;		return this.format;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Problemdetails getProblemdetails() {
+<b class="nc">&nbsp;		return this.problemdetails;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getStaticPathPattern() {
+<b class="nc">&nbsp;		return this.staticPathPattern;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setStaticPathPattern(String staticPathPattern) {
+<b class="nc">&nbsp;		this.staticPathPattern = staticPathPattern;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getWebjarsPathPattern() {
+<b class="nc">&nbsp;		return this.webjarsPathPattern;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setWebjarsPathPattern(String webjarsPathPattern) {
+<b class="nc">&nbsp;		this.webjarsPathPattern = webjarsPathPattern;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public static class Format {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Date format to use, for example &#39;dd/MM/yyyy&#39;.
+&nbsp;		 */
+&nbsp;		private String date;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Time format to use, for example &#39;HH:mm:ss&#39;.
+&nbsp;		 */
+&nbsp;		private String time;
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Date-time format to use, for example &#39;yyyy-MM-dd HH:mm:ss&#39;.
+&nbsp;		 */
+&nbsp;		private String dateTime;
+&nbsp;
+&nbsp;		public String getDate() {
+<b class="nc">&nbsp;			return this.date;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setDate(String date) {
+<b class="nc">&nbsp;			this.date = date;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getTime() {
+<b class="nc">&nbsp;			return this.time;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setTime(String time) {
+<b class="nc">&nbsp;			this.time = time;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getDateTime() {
+<b class="nc">&nbsp;			return this.dateTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setDateTime(String dateTime) {
+<b class="nc">&nbsp;			this.dateTime = dateTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public static class Problemdetails {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Whether RFC 7807 Problem Details support should be enabled.
+&nbsp;		 */
+<b class="nc">&nbsp;		private boolean enabled = false;</b>
+&nbsp;
+&nbsp;		public boolean isEnabled() {
+<b class="nc">&nbsp;			return this.enabled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public void setEnabled(boolean enabled) {
+<b class="nc">&nbsp;			this.enabled = enabled;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

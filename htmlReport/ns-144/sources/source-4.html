@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InspectedContent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.io</a>
+</div>
+
+<h1>Coverage Summary for Class: InspectedContent (org.springframework.boot.buildpack.platform.io)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InspectedContent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InspectedContent$InspectingOutputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">InspectedContent$Inspector</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.io;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.FileCopyUtils;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Content} that is reads and inspects a source of data only once but allows it to
+&nbsp; * be consumed multiple times.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class InspectedContent implements Content {
+&nbsp;
+&nbsp;	static final int MEMORY_LIMIT = 4 * 1024 + 3;
+&nbsp;
+&nbsp;	private final int size;
+&nbsp;
+&nbsp;	private final Object content;
+&nbsp;
+<b class="nc">&nbsp;	InspectedContent(int size, Object content) {</b>
+<b class="nc">&nbsp;		this.size = size;</b>
+<b class="nc">&nbsp;		this.content = content;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int size() {
+<b class="nc">&nbsp;		return this.size;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void writeTo(OutputStream outputStream) throws IOException {
+<b class="nc">&nbsp;		if (this.content instanceof byte[] bytes) {</b>
+<b class="nc">&nbsp;			FileCopyUtils.copy(bytes, outputStream);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (this.content instanceof File file) {</b>
+<b class="nc">&nbsp;			InputStream inputStream = new FileInputStream(file);</b>
+<b class="nc">&nbsp;			FileCopyUtils.copy(inputStream, outputStream);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unknown content type&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create an {@link InspectedContent} instance from a source input
+&nbsp;	 * stream.
+&nbsp;	 * @param inputStream the content input stream
+&nbsp;	 * @param inspectors any inspectors to apply
+&nbsp;	 * @return a new inspected content instance
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public static InspectedContent of(InputStream inputStream, Inspector... inspectors) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(inputStream, &quot;InputStream must not be null&quot;);</b>
+<b class="nc">&nbsp;		return of((outputStream) -&gt; FileCopyUtils.copy(inputStream, outputStream), inspectors);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create an {@link InspectedContent} instance from source content.
+&nbsp;	 * @param content the content
+&nbsp;	 * @param inspectors any inspectors to apply
+&nbsp;	 * @return a new inspected content instance
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public static InspectedContent of(Content content, Inspector... inspectors) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(content, &quot;Content must not be null&quot;);</b>
+<b class="nc">&nbsp;		return of(content::writeTo, inspectors);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create an {@link InspectedContent} instance from a source write
+&nbsp;	 * method.
+&nbsp;	 * @param writer a consumer representing the write method
+&nbsp;	 * @param inspectors any inspectors to apply
+&nbsp;	 * @return a new inspected content instance
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	public static InspectedContent of(IOConsumer&lt;OutputStream&gt; writer, Inspector... inspectors) throws IOException {
+<b class="nc">&nbsp;		Assert.notNull(writer, &quot;Writer must not be null&quot;);</b>
+<b class="nc">&nbsp;		InspectingOutputStream outputStream = new InspectingOutputStream(inspectors);</b>
+<b class="nc">&nbsp;		try (outputStream) {</b>
+<b class="nc">&nbsp;			writer.accept(outputStream);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return new InspectedContent(outputStream.getSize(), outputStream.getContent());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Interface that can be used to inspect content as it is initially read.
+&nbsp;	 */
+&nbsp;	public interface Inspector {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Update inspected information based on the provided bytes.
+&nbsp;		 * @param input the array of bytes.
+&nbsp;		 * @param offset the offset to start from in the array of bytes.
+&nbsp;		 * @param len the number of bytes to use, starting at {@code offset}.
+&nbsp;		 * @throws IOException on IO error
+&nbsp;		 */
+&nbsp;		void update(byte[] input, int offset, int len) throws IOException;
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Internal {@link OutputStream} used to capture the content either as bytes, or to a
+&nbsp;	 * File if the content is too large.
+&nbsp;	 */
+&nbsp;	private static final class InspectingOutputStream extends OutputStream {
+&nbsp;
+&nbsp;		private final Inspector[] inspectors;
+&nbsp;
+&nbsp;		private int size;
+&nbsp;
+&nbsp;		private OutputStream delegate;
+&nbsp;
+&nbsp;		private File tempFile;
+&nbsp;
+<b class="nc">&nbsp;		private final byte[] singleByteBuffer = new byte[0];</b>
+&nbsp;
+<b class="nc">&nbsp;		private InspectingOutputStream(Inspector[] inspectors) {</b>
+<b class="nc">&nbsp;			this.inspectors = inspectors;</b>
+<b class="nc">&nbsp;			this.delegate = new ByteArrayOutputStream();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void write(int b) throws IOException {
+<b class="nc">&nbsp;			this.singleByteBuffer[0] = (byte) (b &amp; 0xFF);</b>
+<b class="nc">&nbsp;			write(this.singleByteBuffer);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void write(byte[] b, int off, int len) throws IOException {
+<b class="nc">&nbsp;			int size = len - off;</b>
+<b class="nc">&nbsp;			if (this.tempFile == null &amp;&amp; (this.size + size) &gt; MEMORY_LIMIT) {</b>
+<b class="nc">&nbsp;				convertToTempFile();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.delegate.write(b, off, len);</b>
+<b class="nc">&nbsp;			for (Inspector inspector : this.inspectors) {</b>
+<b class="nc">&nbsp;				inspector.update(b, off, len);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.size += size;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void convertToTempFile() throws IOException {
+<b class="nc">&nbsp;			this.tempFile = File.createTempFile(&quot;buildpack&quot;, &quot;.tmp&quot;);</b>
+<b class="nc">&nbsp;			byte[] bytes = ((ByteArrayOutputStream) this.delegate).toByteArray();</b>
+<b class="nc">&nbsp;			this.delegate = new FileOutputStream(this.tempFile);</b>
+<b class="nc">&nbsp;			StreamUtils.copy(bytes, this.delegate);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object getContent() {
+<b class="nc">&nbsp;			return (this.tempFile != null) ? this.tempFile : ((ByteArrayOutputStream) this.delegate).toByteArray();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private int getSize() {
+<b class="nc">&nbsp;			return this.size;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

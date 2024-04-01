@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TestcontainersPropertySource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testcontainers.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: TestcontainersPropertySource (org.springframework.boot.testcontainers.properties)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestcontainersPropertySource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TestcontainersPropertySource$EventPublisherRegistrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testcontainers.properties;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.CopyOnWriteArraySet;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.testcontainers.containers.Container;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.RootBeanDefinition;
+&nbsp;import org.springframework.context.ApplicationEventPublisher;
+&nbsp;import org.springframework.context.ApplicationEventPublisherAware;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.EnumerablePropertySource;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.test.context.DynamicPropertyRegistry;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnumerablePropertySource} backed by a map with values supplied from one or more
+&nbsp; * {@link Container testcontainers}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.1.0
+&nbsp; */
+&nbsp;public class TestcontainersPropertySource extends EnumerablePropertySource&lt;Map&lt;String, Supplier&lt;Object&gt;&gt;&gt; {
+&nbsp;
+&nbsp;	static final String NAME = &quot;testcontainersPropertySource&quot;;
+&nbsp;
+&nbsp;	private final DynamicPropertyRegistry registry;
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;ApplicationEventPublisher&gt; eventPublishers = new CopyOnWriteArraySet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	TestcontainersPropertySource() {
+<b class="nc">&nbsp;		this(Collections.synchronizedMap(new LinkedHashMap&lt;&gt;()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TestcontainersPropertySource(Map&lt;String, Supplier&lt;Object&gt;&gt; valueSuppliers) {
+<b class="nc">&nbsp;		super(NAME, Collections.unmodifiableMap(valueSuppliers));</b>
+<b class="nc">&nbsp;		this.registry = (name, valueSupplier) -&gt; {</b>
+<b class="nc">&nbsp;			Assert.hasText(name, &quot;&#39;name&#39; must not be null or blank&quot;);</b>
+<b class="nc">&nbsp;			Assert.notNull(valueSupplier, &quot;&#39;valueSupplier&#39; must not be null&quot;);</b>
+<b class="nc">&nbsp;			valueSuppliers.put(name, valueSupplier);</b>
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addEventPublisher(ApplicationEventPublisher eventPublisher) {
+<b class="nc">&nbsp;		this.eventPublishers.add(eventPublisher);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object getProperty(String name) {
+<b class="nc">&nbsp;		Supplier&lt;Object&gt; valueSupplier = this.source.get(name);</b>
+<b class="nc">&nbsp;		return (valueSupplier != null) ? getProperty(name, valueSupplier) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getProperty(String name, Supplier&lt;Object&gt; valueSupplier) {
+<b class="nc">&nbsp;		BeforeTestcontainersPropertySuppliedEvent event = new BeforeTestcontainersPropertySuppliedEvent(this, name);</b>
+<b class="nc">&nbsp;		this.eventPublishers.forEach((eventPublisher) -&gt; eventPublisher.publishEvent(event));</b>
+<b class="nc">&nbsp;		return valueSupplier.get();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean containsProperty(String name) {
+<b class="nc">&nbsp;		return this.source.containsKey(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String[] getPropertyNames() {
+<b class="nc">&nbsp;		return StringUtils.toStringArray(this.source.keySet());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public static DynamicPropertyRegistry attach(Environment environment) {
+<b class="nc">&nbsp;		return attach(environment, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static DynamicPropertyRegistry attach(ConfigurableApplicationContext applicationContext) {
+<b class="nc">&nbsp;		return attach(applicationContext.getEnvironment(), applicationContext, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public static DynamicPropertyRegistry attach(Environment environment, BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;		return attach(environment, null, registry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static DynamicPropertyRegistry attach(Environment environment, ApplicationEventPublisher eventPublisher,
+&nbsp;			BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;		Assert.state(environment instanceof ConfigurableEnvironment,</b>
+&nbsp;				&quot;TestcontainersPropertySource can only be attached to a ConfigurableEnvironment&quot;);
+<b class="nc">&nbsp;		TestcontainersPropertySource propertySource = getOrAdd((ConfigurableEnvironment) environment);</b>
+<b class="nc">&nbsp;		if (eventPublisher != null) {</b>
+<b class="nc">&nbsp;			propertySource.addEventPublisher(eventPublisher);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (registry != null &amp;&amp; !registry.containsBeanDefinition(EventPublisherRegistrar.NAME)) {</b>
+<b class="nc">&nbsp;			registry.registerBeanDefinition(EventPublisherRegistrar.NAME, new RootBeanDefinition(</b>
+<b class="nc">&nbsp;					EventPublisherRegistrar.class, () -&gt; new EventPublisherRegistrar(environment)));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return propertySource.registry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static TestcontainersPropertySource getOrAdd(ConfigurableEnvironment environment) {
+<b class="nc">&nbsp;		PropertySource&lt;?&gt; propertySource = environment.getPropertySources().get(NAME);</b>
+<b class="nc">&nbsp;		if (propertySource == null) {</b>
+<b class="nc">&nbsp;			environment.getPropertySources().addFirst(new TestcontainersPropertySource());</b>
+<b class="nc">&nbsp;			return getOrAdd(environment);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Assert.state(propertySource instanceof TestcontainersPropertySource,</b>
+&nbsp;				&quot;Incorrect TestcontainersPropertySource type registered&quot;);
+<b class="nc">&nbsp;		return ((TestcontainersPropertySource) propertySource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BeanFactoryPostProcessor} to register the {@link ApplicationEventPublisher}
+&nbsp;	 * to the {@link TestcontainersPropertySource}. This class is a
+&nbsp;	 * {@link BeanFactoryPostProcessor} so that it is initialized as early as possible.
+&nbsp;	 */
+&nbsp;	static class EventPublisherRegistrar implements BeanFactoryPostProcessor, ApplicationEventPublisherAware {
+&nbsp;
+<b class="nc">&nbsp;		static final String NAME = EventPublisherRegistrar.class.getName();</b>
+&nbsp;
+&nbsp;		private final Environment environment;
+&nbsp;
+&nbsp;		private ApplicationEventPublisher eventPublisher;
+&nbsp;
+<b class="nc">&nbsp;		EventPublisherRegistrar(Environment environment) {</b>
+<b class="nc">&nbsp;			this.environment = environment;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+<b class="nc">&nbsp;			this.eventPublisher = eventPublisher;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;			if (this.eventPublisher != null) {</b>
+<b class="nc">&nbsp;				TestcontainersPropertySource.getOrAdd((ConfigurableEnvironment) this.environment)</b>
+<b class="nc">&nbsp;					.addEventPublisher(this.eventPublisher);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

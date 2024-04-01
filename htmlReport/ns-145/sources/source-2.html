@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MappedObject</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.json</a>
+</div>
+
+<h1>Coverage Summary for Class: MappedObject (org.springframework.boot.buildpack.platform.json)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MappedObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MappedObject$ContentReader</td>
+  </tr>
+  <tr>
+    <td class="name">MappedObject$MappedInvocationHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.json;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.lang.invoke.MethodHandle;
+&nbsp;import java.lang.invoke.MethodHandles.Lookup;
+&nbsp;import java.lang.reflect.InvocationHandler;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Proxy;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for mapped JSON objects.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class MappedObject {
+&nbsp;
+&nbsp;	private final JsonNode node;
+&nbsp;
+&nbsp;	private final Lookup lookup;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link MappedObject} instance.
+&nbsp;	 * @param node the source node
+&nbsp;	 * @param lookup method handle lookup
+&nbsp;	 */
+<b class="nc">&nbsp;	protected MappedObject(JsonNode node, Lookup lookup) {</b>
+<b class="nc">&nbsp;		this.node = node;</b>
+<b class="nc">&nbsp;		this.lookup = lookup;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the source node of the mapped object.
+&nbsp;	 * @return the source node
+&nbsp;	 */
+&nbsp;	protected final JsonNode getNode() {
+<b class="nc">&nbsp;		return this.node;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get the value at the given JSON path expression as a specific type.
+&nbsp;	 * @param &lt;T&gt; the data type
+&nbsp;	 * @param expression the JSON path expression
+&nbsp;	 * @param type the desired type. May be a simple JSON type or an interface
+&nbsp;	 * @return the value
+&nbsp;	 */
+&nbsp;	protected &lt;T&gt; T valueAt(String expression, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;		return valueAt(this, this.node, this.lookup, expression, type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	protected static &lt;T extends MappedObject&gt; T getRoot(Object proxy) {
+<b class="nc">&nbsp;		MappedInvocationHandler handler = (MappedInvocationHandler) Proxy.getInvocationHandler(proxy);</b>
+<b class="nc">&nbsp;		return (T) handler.root;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected static &lt;T&gt; T valueAt(Object proxy, String expression, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;		MappedInvocationHandler handler = (MappedInvocationHandler) Proxy.getInvocationHandler(proxy);</b>
+<b class="nc">&nbsp;		return valueAt(handler.root, handler.node, handler.lookup, expression, type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private static &lt;T&gt; T valueAt(MappedObject root, JsonNode node, Lookup lookup, String expression, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;		JsonNode result = node.at(expression);</b>
+<b class="nc">&nbsp;		if (result.isMissingNode() &amp;&amp; expression.startsWith(&quot;/&quot;) &amp;&amp; expression.length() &gt; 1</b>
+<b class="nc">&nbsp;				&amp;&amp; Character.isLowerCase(expression.charAt(1))) {</b>
+<b class="nc">&nbsp;			StringBuilder alternative = new StringBuilder(expression);</b>
+<b class="nc">&nbsp;			alternative.setCharAt(1, Character.toUpperCase(alternative.charAt(1)));</b>
+<b class="nc">&nbsp;			result = node.at(alternative.toString());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type.isInterface() &amp;&amp; !type.getName().startsWith(&quot;java&quot;)) {</b>
+<b class="nc">&nbsp;			return (T) Proxy.newProxyInstance(MappedObject.class.getClassLoader(), new Class&lt;?&gt;[] { type },</b>
+&nbsp;					new MappedInvocationHandler(root, result, lookup));
+&nbsp;		}
+<b class="nc">&nbsp;		if (result.isMissingNode()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			return SharedObjectMapper.get().treeToValue(result, type);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link MappedObject} instance.
+&nbsp;	 * @param &lt;T&gt; the mapped object type
+&nbsp;	 * @param content the JSON content for the object
+&nbsp;	 * @param factory a factory to create the mapped object from a {@link JsonNode}
+&nbsp;	 * @return the mapped object
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	protected static &lt;T extends MappedObject&gt; T of(String content, Function&lt;JsonNode, T&gt; factory) throws IOException {
+<b class="nc">&nbsp;		return of(content, ObjectMapper::readTree, factory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link MappedObject} instance.
+&nbsp;	 * @param &lt;T&gt; the mapped object type
+&nbsp;	 * @param content the JSON content for the object
+&nbsp;	 * @param factory a factory to create the mapped object from a {@link JsonNode}
+&nbsp;	 * @return the mapped object
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	protected static &lt;T extends MappedObject&gt; T of(InputStream content, Function&lt;JsonNode, T&gt; factory)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		return of(content, ObjectMapper::readTree, factory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link MappedObject} instance.
+&nbsp;	 * @param &lt;T&gt; the mapped object type
+&nbsp;	 * @param &lt;C&gt; the content type
+&nbsp;	 * @param content the JSON content for the object
+&nbsp;	 * @param reader the content reader
+&nbsp;	 * @param factory a factory to create the mapped object from a {@link JsonNode}
+&nbsp;	 * @return the mapped object
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	protected static &lt;T extends MappedObject, C&gt; T of(C content, ContentReader&lt;C&gt; reader, Function&lt;JsonNode, T&gt; factory)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		ObjectMapper objectMapper = SharedObjectMapper.get();</b>
+<b class="nc">&nbsp;		JsonNode node = reader.read(objectMapper, content);</b>
+<b class="nc">&nbsp;		return factory.apply(node);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Strategy used to read JSON content.
+&nbsp;	 *
+&nbsp;	 * @param &lt;C&gt; the content type
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	protected interface ContentReader&lt;C&gt; {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Read JSON content as a {@link JsonNode}.
+&nbsp;		 * @param objectMapper the source object mapper
+&nbsp;		 * @param content the content to read
+&nbsp;		 * @return a {@link JsonNode}
+&nbsp;		 * @throws IOException on IO error
+&nbsp;		 */
+&nbsp;		JsonNode read(ObjectMapper objectMapper, C content) throws IOException;
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link InvocationHandler} used to support
+&nbsp;	 * {@link MappedObject#valueAt(String, Class) valueAt} with {@code interface} types.
+&nbsp;	 */
+&nbsp;	private static class MappedInvocationHandler implements InvocationHandler {
+&nbsp;
+&nbsp;		private static final String GET = &quot;get&quot;;
+&nbsp;
+&nbsp;		private static final String IS = &quot;is&quot;;
+&nbsp;
+&nbsp;		private final MappedObject root;
+&nbsp;
+&nbsp;		private final JsonNode node;
+&nbsp;
+&nbsp;		private final Lookup lookup;
+&nbsp;
+<b class="nc">&nbsp;		MappedInvocationHandler(MappedObject root, JsonNode node, Lookup lookup) {</b>
+<b class="nc">&nbsp;			this.root = root;</b>
+<b class="nc">&nbsp;			this.node = node;</b>
+<b class="nc">&nbsp;			this.lookup = lookup;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+<b class="nc">&nbsp;			Class&lt;?&gt; declaringClass = method.getDeclaringClass();</b>
+<b class="nc">&nbsp;			if (method.isDefault()) {</b>
+<b class="nc">&nbsp;				Lookup lookup = this.lookup.in(declaringClass);</b>
+<b class="nc">&nbsp;				MethodHandle methodHandle = lookup.unreflectSpecial(method, declaringClass).bindTo(proxy);</b>
+<b class="nc">&nbsp;				return methodHandle.invokeWithArguments();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (declaringClass == Object.class) {</b>
+<b class="nc">&nbsp;				method.invoke(proxy, args);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Assert.state(args == null || args.length == 0, () -&gt; &quot;Unsupported method &quot; + method);</b>
+<b class="nc">&nbsp;			String name = getName(method.getName());</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; type = method.getReturnType();</b>
+<b class="nc">&nbsp;			return valueForProperty(name, type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getName(String name) {
+<b class="nc">&nbsp;			StringBuilder result = new StringBuilder(name);</b>
+<b class="nc">&nbsp;			if (name.startsWith(GET)) {</b>
+<b class="nc">&nbsp;				result = new StringBuilder(name.substring(GET.length()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (name.startsWith(IS)) {</b>
+<b class="nc">&nbsp;				result = new StringBuilder(name.substring(IS.length()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Assert.state(result.length() &gt;= 0, &quot;Missing name&quot;);</b>
+<b class="nc">&nbsp;			result.setCharAt(0, Character.toLowerCase(result.charAt(0)));</b>
+<b class="nc">&nbsp;			return result.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object valueForProperty(String name, Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			return valueAt(this.root, this.node, this.lookup, &quot;/&quot; + name, type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

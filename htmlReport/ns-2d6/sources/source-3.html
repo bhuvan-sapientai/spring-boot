@@ -1,0 +1,395 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FilteredClassLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.context</a>
+</div>
+
+<h1>Coverage Summary for Class: FilteredClassLoader (org.springframework.boot.test.context)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FilteredClassLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FilteredClassLoader$ClassFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FilteredClassLoader$ClassPathResourceFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FilteredClassLoader$PackageFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.context;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.security.ProtectionDomain;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import org.springframework.core.SmartClassLoader;
+&nbsp;import org.springframework.core.io.ClassPathResource;
+&nbsp;
+&nbsp;/**
+&nbsp; * Test {@link URLClassLoader} that can filter the classes and resources it can load.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Roy Jacobs
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class FilteredClassLoader extends URLClassLoader implements SmartClassLoader {
+&nbsp;
+&nbsp;	private final Collection&lt;Predicate&lt;String&gt;&gt; classesFilters;
+&nbsp;
+&nbsp;	private final Collection&lt;Predicate&lt;String&gt;&gt; resourcesFilters;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link FilteredClassLoader} that hides the given classes.
+&nbsp;	 * @param hiddenClasses the classes to hide
+&nbsp;	 */
+&nbsp;	public FilteredClassLoader(Class&lt;?&gt;... hiddenClasses) {
+<b class="nc">&nbsp;		this(Collections.singleton(ClassFilter.of(hiddenClasses)), Collections.emptyList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link FilteredClassLoader} that hides classes from the given packages.
+&nbsp;	 * @param hiddenPackages the packages to hide
+&nbsp;	 */
+&nbsp;	public FilteredClassLoader(String... hiddenPackages) {
+<b class="nc">&nbsp;		this(Collections.singleton(PackageFilter.of(hiddenPackages)), Collections.emptyList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link FilteredClassLoader} that hides resources from the given
+&nbsp;	 * {@link ClassPathResource classpath resources}.
+&nbsp;	 * @param hiddenResources the resources to hide
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	public FilteredClassLoader(ClassPathResource... hiddenResources) {
+<b class="nc">&nbsp;		this(Collections.emptyList(), Collections.singleton(ClassPathResourceFilter.of(hiddenResources)));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link FilteredClassLoader} that filters based on the given predicate.
+&nbsp;	 * @param filters a set of filters to determine when a class name or resource should
+&nbsp;	 * be hidden. A {@link Predicate#test(Object) result} of {@code true} indicates a
+&nbsp;	 * filtered class or resource. The input of the predicate can either be the binary
+&nbsp;	 * name of a class or a resource name.
+&nbsp;	 */
+&nbsp;	@SafeVarargs
+&nbsp;	@SuppressWarnings(&quot;varargs&quot;)
+&nbsp;	public FilteredClassLoader(Predicate&lt;String&gt;... filters) {
+<b class="nc">&nbsp;		this(Arrays.asList(filters), Arrays.asList(filters));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private FilteredClassLoader(Collection&lt;Predicate&lt;String&gt;&gt; classesFilters,
+&nbsp;			Collection&lt;Predicate&lt;String&gt;&gt; resourcesFilters) {
+<b class="nc">&nbsp;		super(new URL[0], FilteredClassLoader.class.getClassLoader());</b>
+<b class="nc">&nbsp;		this.classesFilters = classesFilters;</b>
+<b class="nc">&nbsp;		this.resourcesFilters = resourcesFilters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+<b class="nc">&nbsp;		for (Predicate&lt;String&gt; filter : this.classesFilters) {</b>
+<b class="nc">&nbsp;			if (filter.test(name)) {</b>
+<b class="nc">&nbsp;				throw new ClassNotFoundException();</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return super.loadClass(name, resolve);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public URL getResource(String name) {
+<b class="nc">&nbsp;		for (Predicate&lt;String&gt; filter : this.resourcesFilters) {</b>
+<b class="nc">&nbsp;			if (filter.test(name)) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return super.getResource(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Enumeration&lt;URL&gt; getResources(String name) throws IOException {
+<b class="nc">&nbsp;		for (Predicate&lt;String&gt; filter : this.resourcesFilters) {</b>
+<b class="nc">&nbsp;			if (filter.test(name)) {</b>
+<b class="nc">&nbsp;				return Collections.emptyEnumeration();</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return super.getResources(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public InputStream getResourceAsStream(String name) {
+<b class="nc">&nbsp;		for (Predicate&lt;String&gt; filter : this.resourcesFilters) {</b>
+<b class="nc">&nbsp;			if (filter.test(name)) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return super.getResourceAsStream(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Class&lt;?&gt; publicDefineClass(String name, byte[] b, ProtectionDomain protectionDomain) {
+<b class="nc">&nbsp;		for (Predicate&lt;String&gt; filter : this.classesFilters) {</b>
+<b class="nc">&nbsp;			if (filter.test(name)) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(String.format(&quot;Defining class with name %s is not supported&quot;, name));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return defineClass(name, b, 0, b.length, protectionDomain);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Filter to restrict the classes that can be loaded.
+&nbsp;	 */
+&nbsp;	public static final class ClassFilter implements Predicate&lt;String&gt; {
+&nbsp;
+&nbsp;		private final Class&lt;?&gt;[] hiddenClasses;
+&nbsp;
+<b class="nc">&nbsp;		private ClassFilter(Class&lt;?&gt;[] hiddenClasses) {</b>
+<b class="nc">&nbsp;			this.hiddenClasses = hiddenClasses;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean test(String className) {
+<b class="nc">&nbsp;			for (Class&lt;?&gt; hiddenClass : this.hiddenClasses) {</b>
+<b class="nc">&nbsp;				if (className.equals(hiddenClass.getName())) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public static ClassFilter of(Class&lt;?&gt;... hiddenClasses) {
+<b class="nc">&nbsp;			return new ClassFilter(hiddenClasses);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Filter to restrict the packages that can be loaded.
+&nbsp;	 */
+&nbsp;	public static final class PackageFilter implements Predicate&lt;String&gt; {
+&nbsp;
+&nbsp;		private final String[] hiddenPackages;
+&nbsp;
+<b class="nc">&nbsp;		private PackageFilter(String[] hiddenPackages) {</b>
+<b class="nc">&nbsp;			this.hiddenPackages = hiddenPackages;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean test(String className) {
+<b class="nc">&nbsp;			for (String hiddenPackage : this.hiddenPackages) {</b>
+<b class="nc">&nbsp;				if (className.startsWith(hiddenPackage)) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public static PackageFilter of(String... hiddenPackages) {
+<b class="nc">&nbsp;			return new PackageFilter(hiddenPackages);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Filter to restrict the resources that can be loaded.
+&nbsp;	 *
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	public static final class ClassPathResourceFilter implements Predicate&lt;String&gt; {
+&nbsp;
+&nbsp;		private final ClassPathResource[] hiddenResources;
+&nbsp;
+<b class="nc">&nbsp;		private ClassPathResourceFilter(ClassPathResource[] hiddenResources) {</b>
+<b class="nc">&nbsp;			this.hiddenResources = hiddenResources;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean test(String resourceName) {
+<b class="nc">&nbsp;			for (ClassPathResource hiddenResource : this.hiddenResources) {</b>
+<b class="nc">&nbsp;				if (hiddenResource.getFilename() != null &amp;&amp; resourceName.equals(hiddenResource.getPath())) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public static ClassPathResourceFilter of(ClassPathResource... hiddenResources) {
+<b class="nc">&nbsp;			return new ClassPathResourceFilter(hiddenResources);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

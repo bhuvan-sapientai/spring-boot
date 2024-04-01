@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebMvcEndpointManagementContextConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.autoconfigure.endpoint.web.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: WebMvcEndpointManagementContextConfiguration (org.springframework.boot.actuate.autoconfigure.endpoint.web.servlet)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebMvcEndpointManagementContextConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebMvcEndpointManagementContextConfiguration$EndpointObjectMapperWebMvcConfigurer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.autoconfigure.endpoint.web.servlet;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.expose.EndpointExposure;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.server.ConditionalOnManagementPort;
+&nbsp;import org.springframework.boot.actuate.autoconfigure.web.server.ManagementPortType;
+&nbsp;import org.springframework.boot.actuate.endpoint.ExposableEndpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.OperationResponseBody;
+&nbsp;import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.jackson.EndpointObjectMapper;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointMapping;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.EndpointMediaTypes;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.ExposableWebEndpoint;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebEndpointsSupplier;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.WebServerNamespace;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpointsSupplier;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.annotation.ServletEndpointsSupplier;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.servlet.AdditionalHealthEndpointPathsWebMvcHandlerMapping;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.servlet.ControllerEndpointHandlerMapping;
+&nbsp;import org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpoint;
+&nbsp;import org.springframework.boot.actuate.health.HealthEndpointGroups;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+&nbsp;import org.springframework.boot.context.properties.EnableConfigurationProperties;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Role;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.http.MediaType;
+&nbsp;import org.springframework.http.converter.HttpMessageConverter;
+&nbsp;import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.web.servlet.DispatcherServlet;
+&nbsp;import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ManagementContextConfiguration @ManagementContextConfiguration} for Spring MVC
+&nbsp; * {@link Endpoint @Endpoint} concerns.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;@ManagementContextConfiguration(proxyBeanMethods = false)
+&nbsp;@ConditionalOnWebApplication(type = Type.SERVLET)
+&nbsp;@ConditionalOnClass(DispatcherServlet.class)
+&nbsp;@ConditionalOnBean({ DispatcherServlet.class, WebEndpointsSupplier.class })
+&nbsp;@EnableConfigurationProperties(CorsEndpointProperties.class)
+<b class="nc">&nbsp;public class WebMvcEndpointManagementContextConfiguration {</b>
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public WebMvcEndpointHandlerMapping webEndpointServletHandlerMapping(WebEndpointsSupplier webEndpointsSupplier,
+&nbsp;			ServletEndpointsSupplier servletEndpointsSupplier, ControllerEndpointsSupplier controllerEndpointsSupplier,
+&nbsp;			EndpointMediaTypes endpointMediaTypes, CorsEndpointProperties corsProperties,
+&nbsp;			WebEndpointProperties webEndpointProperties, Environment environment) {
+<b class="nc">&nbsp;		List&lt;ExposableEndpoint&lt;?&gt;&gt; allEndpoints = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		Collection&lt;ExposableWebEndpoint&gt; webEndpoints = webEndpointsSupplier.getEndpoints();</b>
+<b class="nc">&nbsp;		allEndpoints.addAll(webEndpoints);</b>
+<b class="nc">&nbsp;		allEndpoints.addAll(servletEndpointsSupplier.getEndpoints());</b>
+<b class="nc">&nbsp;		allEndpoints.addAll(controllerEndpointsSupplier.getEndpoints());</b>
+<b class="nc">&nbsp;		String basePath = webEndpointProperties.getBasePath();</b>
+<b class="nc">&nbsp;		EndpointMapping endpointMapping = new EndpointMapping(basePath);</b>
+<b class="nc">&nbsp;		boolean shouldRegisterLinksMapping = shouldRegisterLinksMapping(webEndpointProperties, environment, basePath);</b>
+<b class="nc">&nbsp;		return new WebMvcEndpointHandlerMapping(endpointMapping, webEndpoints, endpointMediaTypes,</b>
+<b class="nc">&nbsp;				corsProperties.toCorsConfiguration(), new EndpointLinksResolver(allEndpoints, basePath),</b>
+&nbsp;				shouldRegisterLinksMapping);
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean shouldRegisterLinksMapping(WebEndpointProperties webEndpointProperties, Environment environment,
+&nbsp;			String basePath) {
+<b class="nc">&nbsp;		return webEndpointProperties.getDiscovery().isEnabled() &amp;&amp; (StringUtils.hasText(basePath)</b>
+<b class="nc">&nbsp;				|| ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnManagementPort(ManagementPortType.DIFFERENT)
+&nbsp;	@ConditionalOnBean(HealthEndpoint.class)
+&nbsp;	@ConditionalOnAvailableEndpoint(endpoint = HealthEndpoint.class, exposure = EndpointExposure.WEB)
+&nbsp;	public AdditionalHealthEndpointPathsWebMvcHandlerMapping managementHealthEndpointWebMvcHandlerMapping(
+&nbsp;			WebEndpointsSupplier webEndpointsSupplier, HealthEndpointGroups groups) {
+<b class="nc">&nbsp;		Collection&lt;ExposableWebEndpoint&gt; webEndpoints = webEndpointsSupplier.getEndpoints();</b>
+<b class="nc">&nbsp;		ExposableWebEndpoint health = webEndpoints.stream()</b>
+<b class="nc">&nbsp;			.filter((endpoint) -&gt; endpoint.getEndpointId().equals(HealthEndpoint.ID))</b>
+<b class="nc">&nbsp;			.findFirst()</b>
+<b class="nc">&nbsp;			.orElseThrow(</b>
+<b class="nc">&nbsp;					() -&gt; new IllegalStateException(&quot;No endpoint with id &#39;%s&#39; found&quot;.formatted(HealthEndpoint.ID)));</b>
+<b class="nc">&nbsp;		return new AdditionalHealthEndpointPathsWebMvcHandlerMapping(health,</b>
+<b class="nc">&nbsp;				groups.getAllWithAdditionalPath(WebServerNamespace.MANAGEMENT));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public ControllerEndpointHandlerMapping controllerEndpointHandlerMapping(
+&nbsp;			ControllerEndpointsSupplier controllerEndpointsSupplier, CorsEndpointProperties corsProperties,
+&nbsp;			WebEndpointProperties webEndpointProperties) {
+<b class="nc">&nbsp;		EndpointMapping endpointMapping = new EndpointMapping(webEndpointProperties.getBasePath());</b>
+<b class="nc">&nbsp;		return new ControllerEndpointHandlerMapping(endpointMapping, controllerEndpointsSupplier.getEndpoints(),</b>
+<b class="nc">&nbsp;				corsProperties.toCorsConfiguration());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnBean(EndpointObjectMapper.class)
+&nbsp;	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+&nbsp;	static EndpointObjectMapperWebMvcConfigurer endpointObjectMapperWebMvcConfigurer(
+&nbsp;			EndpointObjectMapper endpointObjectMapper) {
+<b class="nc">&nbsp;		return new EndpointObjectMapperWebMvcConfigurer(endpointObjectMapper);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link WebMvcConfigurer} to apply {@link EndpointObjectMapper} for
+&nbsp;	 * {@link OperationResponseBody} to {@link MappingJackson2HttpMessageConverter}
+&nbsp;	 * instances.
+&nbsp;	 */
+&nbsp;	static class EndpointObjectMapperWebMvcConfigurer implements WebMvcConfigurer {
+&nbsp;
+<b class="nc">&nbsp;		private static final List&lt;MediaType&gt; MEDIA_TYPES = Collections</b>
+<b class="nc">&nbsp;			.unmodifiableList(Arrays.asList(MediaType.APPLICATION_JSON, new MediaType(&quot;application&quot;, &quot;*+json&quot;)));</b>
+&nbsp;
+&nbsp;		private final EndpointObjectMapper endpointObjectMapper;
+&nbsp;
+<b class="nc">&nbsp;		EndpointObjectMapperWebMvcConfigurer(EndpointObjectMapper endpointObjectMapper) {</b>
+<b class="nc">&nbsp;			this.endpointObjectMapper = endpointObjectMapper;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void configureMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) {
+<b class="nc">&nbsp;			for (HttpMessageConverter&lt;?&gt; converter : converters) {</b>
+<b class="nc">&nbsp;				if (converter instanceof MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {</b>
+<b class="nc">&nbsp;					configure(mappingJackson2HttpMessageConverter);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configure(MappingJackson2HttpMessageConverter converter) {
+<b class="nc">&nbsp;			converter.registerObjectMappersForType(OperationResponseBody.class, (associations) -&gt; {</b>
+<b class="nc">&nbsp;				ObjectMapper objectMapper = this.endpointObjectMapper.get();</b>
+<b class="nc">&nbsp;				MEDIA_TYPES.forEach((mimeType) -&gt; associations.put(mimeType, objectMapper));</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

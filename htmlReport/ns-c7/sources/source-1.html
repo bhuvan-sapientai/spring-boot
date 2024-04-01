@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JdbcRepositoriesAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.data.jdbc</a>
+</div>
+
+<h1>Coverage Summary for Class: JdbcRepositoriesAutoConfiguration (org.springframework.boot.autoconfigure.data.jdbc)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JdbcRepositoriesAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JdbcRepositoriesAutoConfiguration$JdbcRepositoriesConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JdbcRepositoriesAutoConfiguration$SpringBootJdbcConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.data.jdbc;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+&nbsp;import org.springframework.boot.autoconfigure.domain.EntityScanner;
+&nbsp;import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.context.annotation.Import;
+&nbsp;import org.springframework.context.annotation.Lazy;
+&nbsp;import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+&nbsp;import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
+&nbsp;import org.springframework.data.jdbc.core.convert.JdbcConverter;
+&nbsp;import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
+&nbsp;import org.springframework.data.jdbc.core.convert.RelationResolver;
+&nbsp;import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
+&nbsp;import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
+&nbsp;import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+&nbsp;import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension;
+&nbsp;import org.springframework.data.relational.RelationalManagedTypes;
+&nbsp;import org.springframework.data.relational.core.dialect.Dialect;
+&nbsp;import org.springframework.data.relational.core.mapping.NamingStrategy;
+&nbsp;import org.springframework.data.relational.core.mapping.Table;
+&nbsp;import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+&nbsp;import org.springframework.transaction.PlatformTransactionManager;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for Spring Data&#39;s JDBC Repositories.
+&nbsp; * &lt;p&gt;
+&nbsp; * Once in effect, the auto-configuration is the equivalent of enabling JDBC repositories
+&nbsp; * using the {@link EnableJdbcRepositories @EnableJdbcRepositories} annotation and
+&nbsp; * providing an {@link AbstractJdbcConfiguration} subclass.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Mark Paluch
+&nbsp; * @since 2.1.0
+&nbsp; * @see EnableJdbcRepositories
+&nbsp; */
+&nbsp;@AutoConfiguration(after = { JdbcTemplateAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class })
+&nbsp;@ConditionalOnBean({ NamedParameterJdbcOperations.class, PlatformTransactionManager.class })
+&nbsp;@ConditionalOnClass({ NamedParameterJdbcOperations.class, AbstractJdbcConfiguration.class })
+&nbsp;@ConditionalOnProperty(prefix = &quot;spring.data.jdbc.repositories&quot;, name = &quot;enabled&quot;, havingValue = &quot;true&quot;,
+&nbsp;		matchIfMissing = true)
+<b class="nc">&nbsp;public class JdbcRepositoriesAutoConfiguration {</b>
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnMissingBean(JdbcRepositoryConfigExtension.class)
+&nbsp;	@Import(JdbcRepositoriesRegistrar.class)
+<b class="nc">&nbsp;	static class JdbcRepositoriesConfiguration {</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	@Configuration(proxyBeanMethods = false)
+&nbsp;	@ConditionalOnMissingBean(AbstractJdbcConfiguration.class)
+&nbsp;	static class SpringBootJdbcConfiguration extends AbstractJdbcConfiguration {
+&nbsp;
+&nbsp;		private final ApplicationContext applicationContext;
+&nbsp;
+<b class="nc">&nbsp;		SpringBootJdbcConfiguration(ApplicationContext applicationContext) {</b>
+<b class="nc">&nbsp;			this.applicationContext = applicationContext;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected Set&lt;Class&lt;?&gt;&gt; getInitialEntitySet() throws ClassNotFoundException {
+<b class="nc">&nbsp;			return new EntityScanner(this.applicationContext).scan(Table.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public RelationalManagedTypes jdbcManagedTypes() throws ClassNotFoundException {
+<b class="nc">&nbsp;			return super.jdbcManagedTypes();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public JdbcMappingContext jdbcMappingContext(Optional&lt;NamingStrategy&gt; namingStrategy,
+&nbsp;				JdbcCustomConversions customConversions, RelationalManagedTypes jdbcManagedTypes) {
+<b class="nc">&nbsp;			return super.jdbcMappingContext(namingStrategy, customConversions, jdbcManagedTypes);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public JdbcConverter jdbcConverter(JdbcMappingContext mappingContext, NamedParameterJdbcOperations operations,
+&nbsp;				@Lazy RelationResolver relationResolver, JdbcCustomConversions conversions, Dialect dialect) {
+<b class="nc">&nbsp;			return super.jdbcConverter(mappingContext, operations, relationResolver, conversions, dialect);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public JdbcCustomConversions jdbcCustomConversions() {
+<b class="nc">&nbsp;			return super.jdbcCustomConversions();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public JdbcAggregateTemplate jdbcAggregateTemplate(ApplicationContext applicationContext,
+&nbsp;				JdbcMappingContext mappingContext, JdbcConverter converter, DataAccessStrategy dataAccessStrategy) {
+<b class="nc">&nbsp;			return super.jdbcAggregateTemplate(applicationContext, mappingContext, converter, dataAccessStrategy);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public DataAccessStrategy dataAccessStrategyBean(NamedParameterJdbcOperations operations,
+&nbsp;				JdbcConverter jdbcConverter, JdbcMappingContext context, Dialect dialect) {
+<b class="nc">&nbsp;			return super.dataAccessStrategyBean(operations, jdbcConverter, context, dialect);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		@Bean
+&nbsp;		@ConditionalOnMissingBean
+&nbsp;		public Dialect jdbcDialect(NamedParameterJdbcOperations operations) {
+<b class="nc">&nbsp;			return super.jdbcDialect(operations);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

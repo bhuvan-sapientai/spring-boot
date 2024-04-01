@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SslContextFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.buildpack.platform.docker.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: SslContextFactory (org.springframework.boot.buildpack.platform.docker.ssl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SslContextFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.buildpack.platform.docker.ssl;
+&nbsp;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.security.KeyStore;
+&nbsp;import java.security.KeyStoreException;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;
+&nbsp;import javax.net.ssl.KeyManagerFactory;
+&nbsp;import javax.net.ssl.SSLContext;
+&nbsp;import javax.net.ssl.TrustManagerFactory;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builds an {@link SSLContext} for use with an HTTP connection.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;public class SslContextFactory {
+&nbsp;
+<b class="nc">&nbsp;	private static final char[] NO_PASSWORD = {};</b>
+&nbsp;
+&nbsp;	private static final String KEY_STORE_ALIAS = &quot;spring-boot-docker&quot;;
+&nbsp;
+<b class="nc">&nbsp;	public SslContextFactory() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an {@link SSLContext} from files in the specified directory. The directory
+&nbsp;	 * must contain files with the names &#39;key.pem&#39;, &#39;cert.pem&#39;, and &#39;ca.pem&#39;.
+&nbsp;	 * @param directory the path to a directory containing certificate and key files
+&nbsp;	 * @return the {@code SSLContext}
+&nbsp;	 */
+&nbsp;	public SSLContext forDirectory(String directory) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Path keyPath = Paths.get(directory, &quot;key.pem&quot;);</b>
+<b class="nc">&nbsp;			Path certPath = Paths.get(directory, &quot;cert.pem&quot;);</b>
+<b class="nc">&nbsp;			Path caPath = Paths.get(directory, &quot;ca.pem&quot;);</b>
+<b class="nc">&nbsp;			Path caKeyPath = Paths.get(directory, &quot;ca-key.pem&quot;);</b>
+<b class="nc">&nbsp;			verifyCertificateFiles(keyPath, certPath, caPath);</b>
+<b class="nc">&nbsp;			KeyManagerFactory keyManagerFactory = getKeyManagerFactory(keyPath, certPath);</b>
+<b class="nc">&nbsp;			TrustManagerFactory trustManagerFactory = getTrustManagerFactory(caPath, caKeyPath);</b>
+<b class="nc">&nbsp;			SSLContext sslContext = SSLContext.getInstance(&quot;TLS&quot;);</b>
+<b class="nc">&nbsp;			sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);</b>
+<b class="nc">&nbsp;			return sslContext;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;			throw ex;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(ex.getMessage(), ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private KeyManagerFactory getKeyManagerFactory(Path keyPath, Path certPath) throws Exception {
+<b class="nc">&nbsp;		KeyStore store = KeyStoreFactory.create(certPath, keyPath, KEY_STORE_ALIAS);</b>
+<b class="nc">&nbsp;		KeyManagerFactory factory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());</b>
+<b class="nc">&nbsp;		factory.init(store, NO_PASSWORD);</b>
+<b class="nc">&nbsp;		return factory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private TrustManagerFactory getTrustManagerFactory(Path caPath, Path caKeyPath)
+&nbsp;			throws NoSuchAlgorithmException, KeyStoreException {
+<b class="nc">&nbsp;		KeyStore store = KeyStoreFactory.create(caPath, caKeyPath, KEY_STORE_ALIAS);</b>
+<b class="nc">&nbsp;		TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());</b>
+<b class="nc">&nbsp;		factory.init(store);</b>
+<b class="nc">&nbsp;		return factory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static void verifyCertificateFiles(Path... paths) {
+<b class="nc">&nbsp;		for (Path path : paths) {</b>
+<b class="nc">&nbsp;			Assert.state(Files.exists(path) &amp;&amp; Files.isRegularFile(path),</b>
+&nbsp;					&quot;Certificate path must contain the files &#39;ca.pem&#39;, &#39;cert.pem&#39;, and &#39;key.pem&#39; files&quot;);
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,320 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JacksonTester</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.test.json</a>
+</div>
+
+<h1>Coverage Summary for Class: JacksonTester (org.springframework.boot.test.json)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JacksonTester</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JacksonTester$JacksonFieldInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.test.json;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.Reader;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JavaType;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.ObjectReader;
+&nbsp;import com.fasterxml.jackson.databind.ObjectWriter;
+&nbsp;import com.jayway.jsonpath.Configuration;
+&nbsp;import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+&nbsp;import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectFactory;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * AssertJ based JSON tester backed by Jackson. Usually instantiated via
+&nbsp; * {@link #initFields(Object, ObjectMapper)}, for example: &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * public class ExampleObjectJsonTests {
+&nbsp; *
+&nbsp; *     private JacksonTester&amp;lt;ExampleObject&amp;gt; json;
+&nbsp; *
+&nbsp; *     &amp;#064;Before
+&nbsp; *     public void setup() {
+&nbsp; *         ObjectMapper objectMapper = new ObjectMapper();
+&nbsp; *         JacksonTester.initFields(this, objectMapper);
+&nbsp; *     }
+&nbsp; *
+&nbsp; *     &amp;#064;Test
+&nbsp; *     public void testWriteJson() throws IOException {
+&nbsp; *         ExampleObject object = //...
+&nbsp; *         assertThat(json.write(object)).isEqualToJson(&quot;expected.json&quot;);
+&nbsp; *     }
+&nbsp; *
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * See {@link AbstractJsonMarshalTester} for more details.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type under test
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Diego Berrueta
+&nbsp; * @since 1.4.0
+&nbsp; */
+&nbsp;public class JacksonTester&lt;T&gt; extends AbstractJsonMarshalTester&lt;T&gt; {
+&nbsp;
+&nbsp;	private final ObjectMapper objectMapper;
+&nbsp;
+&nbsp;	private Class&lt;?&gt; view;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JacksonTester} instance.
+&nbsp;	 * @param objectMapper the Jackson object mapper
+&nbsp;	 */
+<b class="nc">&nbsp;	protected JacksonTester(ObjectMapper objectMapper) {</b>
+<b class="nc">&nbsp;		Assert.notNull(objectMapper, &quot;ObjectMapper must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.objectMapper = objectMapper;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JacksonTester} instance.
+&nbsp;	 * @param resourceLoadClass the source class used to load resources
+&nbsp;	 * @param type the type under test
+&nbsp;	 * @param objectMapper the Jackson object mapper
+&nbsp;	 */
+&nbsp;	public JacksonTester(Class&lt;?&gt; resourceLoadClass, ResolvableType type, ObjectMapper objectMapper) {
+<b class="nc">&nbsp;		this(resourceLoadClass, type, objectMapper, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public JacksonTester(Class&lt;?&gt; resourceLoadClass, ResolvableType type, ObjectMapper objectMapper, Class&lt;?&gt; view) {
+<b class="nc">&nbsp;		super(resourceLoadClass, type);</b>
+<b class="nc">&nbsp;		Assert.notNull(objectMapper, &quot;ObjectMapper must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.objectMapper = objectMapper;</b>
+<b class="nc">&nbsp;		this.view = view;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected JsonContent&lt;T&gt; getJsonContent(String json) {
+<b class="nc">&nbsp;		Configuration configuration = Configuration.builder()</b>
+<b class="nc">&nbsp;			.jsonProvider(new JacksonJsonProvider(this.objectMapper))</b>
+<b class="nc">&nbsp;			.mappingProvider(new JacksonMappingProvider(this.objectMapper))</b>
+<b class="nc">&nbsp;			.build();</b>
+<b class="nc">&nbsp;		return new JsonContent&lt;&gt;(getResourceLoadClass(), getType(), json, configuration);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected T readObject(InputStream inputStream, ResolvableType type) throws IOException {
+<b class="nc">&nbsp;		return getObjectReader(type).readValue(inputStream);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected T readObject(Reader reader, ResolvableType type) throws IOException {
+<b class="nc">&nbsp;		return getObjectReader(type).readValue(reader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ObjectReader getObjectReader(ResolvableType type) {
+<b class="nc">&nbsp;		ObjectReader objectReader = this.objectMapper.readerFor(getType(type));</b>
+<b class="nc">&nbsp;		if (this.view != null) {</b>
+<b class="nc">&nbsp;			return objectReader.withView(this.view);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return objectReader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String writeObject(T value, ResolvableType type) throws IOException {
+<b class="nc">&nbsp;		return getObjectWriter(type).writeValueAsString(value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ObjectWriter getObjectWriter(ResolvableType type) {
+<b class="nc">&nbsp;		ObjectWriter objectWriter = this.objectMapper.writerFor(getType(type));</b>
+<b class="nc">&nbsp;		if (this.view != null) {</b>
+<b class="nc">&nbsp;			return objectWriter.withView(this.view);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return objectWriter;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JavaType getType(ResolvableType type) {
+<b class="nc">&nbsp;		return this.objectMapper.constructType(type.getType());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility method to initialize {@link JacksonTester} fields. See {@link JacksonTester
+&nbsp;	 * class-level documentation} for example usage.
+&nbsp;	 * @param testInstance the test instance
+&nbsp;	 * @param objectMapper the object mapper
+&nbsp;	 * @see #initFields(Object, ObjectMapper)
+&nbsp;	 */
+&nbsp;	public static void initFields(Object testInstance, ObjectMapper objectMapper) {
+<b class="nc">&nbsp;		new JacksonFieldInitializer().initFields(testInstance, objectMapper);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Utility method to initialize {@link JacksonTester} fields. See {@link JacksonTester
+&nbsp;	 * class-level documentation} for example usage.
+&nbsp;	 * @param testInstance the test instance
+&nbsp;	 * @param objectMapperFactory a factory to create the object mapper
+&nbsp;	 * @see #initFields(Object, ObjectMapper)
+&nbsp;	 */
+&nbsp;	public static void initFields(Object testInstance, ObjectFactory&lt;ObjectMapper&gt; objectMapperFactory) {
+<b class="nc">&nbsp;		new JacksonFieldInitializer().initFields(testInstance, objectMapperFactory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a new instance of {@link JacksonTester} with the view that should be used
+&nbsp;	 * for json serialization/deserialization.
+&nbsp;	 * @param view the view class
+&nbsp;	 * @return the new instance
+&nbsp;	 */
+&nbsp;	public JacksonTester&lt;T&gt; forView(Class&lt;?&gt; view) {
+<b class="nc">&nbsp;		return new JacksonTester&lt;&gt;(getResourceLoadClass(), getType(), this.objectMapper, view);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link FieldInitializer} for Jackson.
+&nbsp;	 */
+&nbsp;	private static class JacksonFieldInitializer extends FieldInitializer&lt;ObjectMapper&gt; {
+&nbsp;
+&nbsp;		protected JacksonFieldInitializer() {
+<b class="nc">&nbsp;			super(JacksonTester.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected AbstractJsonMarshalTester&lt;Object&gt; createTester(Class&lt;?&gt; resourceLoadClass, ResolvableType type,
+&nbsp;				ObjectMapper marshaller) {
+<b class="nc">&nbsp;			return new JacksonTester&lt;&gt;(resourceLoadClass, type, marshaller);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

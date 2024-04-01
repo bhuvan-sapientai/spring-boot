@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConditionalOnMissingBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.condition</a>
+</div>
+
+<h1>Coverage Summary for Class: ConditionalOnMissingBean (org.springframework.boot.autoconfigure.condition)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ConditionalOnMissingBean</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.condition;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.ElementType;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.RetentionPolicy;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.context.annotation.Conditional;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Conditional @Conditional} that only matches when no beans meeting the specified
+&nbsp; * requirements are already contained in the {@link BeanFactory}. None of the requirements
+&nbsp; * must be met for the condition to match and the requirements do not have to be met by
+&nbsp; * the same bean.
+&nbsp; * &lt;p&gt;
+&nbsp; * When placed on a {@code @Bean} method, the bean class defaults to the return type of
+&nbsp; * the factory method:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * &amp;#064;Configuration
+&nbsp; * public class MyAutoConfiguration {
+&nbsp; *
+&nbsp; *     &amp;#064;ConditionalOnMissingBean
+&nbsp; *     &amp;#064;Bean
+&nbsp; *     public MyService myService() {
+&nbsp; *         ...
+&nbsp; *     }
+&nbsp; *
+&nbsp; * }&lt;/pre&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * In the sample above the condition will match if no bean of type {@code MyService} is
+&nbsp; * already contained in the {@link BeanFactory}.
+&nbsp; * &lt;p&gt;
+&nbsp; * The condition can only match the bean definitions that have been processed by the
+&nbsp; * application context so far and, as such, it is strongly recommended to use this
+&nbsp; * condition on auto-configuration classes only. If a candidate bean may be created by
+&nbsp; * another auto-configuration, make sure that the one using this condition runs after.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;@Target({ ElementType.TYPE, ElementType.METHOD })
+&nbsp;@Retention(RetentionPolicy.RUNTIME)
+&nbsp;@Documented
+&nbsp;@Conditional(OnBeanCondition.class)
+&nbsp;public @interface ConditionalOnMissingBean {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The class types of beans that should be checked. The condition matches when no bean
+&nbsp;	 * of each class specified is contained in the {@link BeanFactory}.
+&nbsp;	 * @return the class types of beans to check
+&nbsp;	 */
+&nbsp;	Class&lt;?&gt;[] value() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The class type names of beans that should be checked. The condition matches when no
+&nbsp;	 * bean of each class specified is contained in the {@link BeanFactory}.
+&nbsp;	 * @return the class type names of beans to check
+&nbsp;	 */
+&nbsp;	String[] type() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The class types of beans that should be ignored when identifying matching beans.
+&nbsp;	 * @return the class types of beans to ignore
+&nbsp;	 * @since 1.2.5
+&nbsp;	 */
+&nbsp;	Class&lt;?&gt;[] ignored() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The class type names of beans that should be ignored when identifying matching
+&nbsp;	 * beans.
+&nbsp;	 * @return the class type names of beans to ignore
+&nbsp;	 * @since 1.2.5
+&nbsp;	 */
+&nbsp;	String[] ignoredType() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The annotation type decorating a bean that should be checked. The condition matches
+&nbsp;	 * when each annotation specified is missing from all beans in the
+&nbsp;	 * {@link BeanFactory}.
+&nbsp;	 * @return the class-level annotation types to check
+&nbsp;	 */
+&nbsp;	Class&lt;? extends Annotation&gt;[] annotation() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The names of beans to check. The condition matches when each bean name specified is
+&nbsp;	 * missing in the {@link BeanFactory}.
+&nbsp;	 * @return the names of beans to check
+&nbsp;	 */
+&nbsp;	String[] name() default {};
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Strategy to decide if the application context hierarchy (parent contexts) should be
+&nbsp;	 * considered.
+&nbsp;	 * @return the search strategy
+&nbsp;	 */
+&nbsp;	SearchStrategy search() default SearchStrategy.ALL;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Additional classes that may contain the specified bean types within their generic
+&nbsp;	 * parameters. For example, an annotation declaring {@code value=Name.class} and
+&nbsp;	 * {@code parameterizedContainer=NameRegistration.class} would detect both
+&nbsp;	 * {@code Name} and {@code NameRegistration&lt;Name&gt;}.
+&nbsp;	 * @return the container types
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	Class&lt;?&gt;[] parameterizedContainer() default {};
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

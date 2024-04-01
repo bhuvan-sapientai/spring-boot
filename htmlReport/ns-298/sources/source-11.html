@@ -1,0 +1,341 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NestedJarFileResources</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.jar</a>
+</div>
+
+<h1>Coverage Summary for Class: NestedJarFileResources (org.springframework.boot.loader.jar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NestedJarFileResources</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.jar;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.util.ArrayDeque;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Deque;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;import java.util.zip.Inflater;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.ref.Cleaner;
+&nbsp;import org.springframework.boot.loader.zip.ZipContent;
+&nbsp;import org.springframework.boot.loader.zip.ZipContent.Kind;
+&nbsp;
+&nbsp;/**
+&nbsp; * Resources created managed and cleaned by a {@link NestedJarFile} instance and suitable
+&nbsp; * for registration with a {@link Cleaner}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class NestedJarFileResources implements Runnable {
+&nbsp;
+&nbsp;	private static final int INFLATER_CACHE_LIMIT = 20;
+&nbsp;
+&nbsp;	private ZipContent zipContent;
+&nbsp;
+&nbsp;	private ZipContent zipContentForManifest;
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;InputStream&gt; inputStreams = Collections.newSetFromMap(new WeakHashMap&lt;&gt;());</b>
+&nbsp;
+<b class="nc">&nbsp;	private Deque&lt;Inflater&gt; inflaterCache = new ArrayDeque&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link NestedJarFileResources} instance.
+&nbsp;	 * @param file the source zip file
+&nbsp;	 * @param nestedEntryName the nested entry or {@code null}
+&nbsp;	 * @throws IOException on I/O error
+&nbsp;	 */
+<b class="nc">&nbsp;	NestedJarFileResources(File file, String nestedEntryName) throws IOException {</b>
+<b class="nc">&nbsp;		this.zipContent = ZipContent.open(file.toPath(), nestedEntryName);</b>
+<b class="nc">&nbsp;		this.zipContentForManifest = (this.zipContent.getKind() != Kind.NESTED_DIRECTORY) ? null</b>
+<b class="nc">&nbsp;				: ZipContent.open(file.toPath());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the underling {@link ZipContent}.
+&nbsp;	 * @return the zip content
+&nbsp;	 */
+&nbsp;	ZipContent zipContent() {
+<b class="nc">&nbsp;		return this.zipContent;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the underlying {@link ZipContent} that should be used to load manifest
+&nbsp;	 * content.
+&nbsp;	 * @return the zip content to use when loading the manifest
+&nbsp;	 */
+&nbsp;	ZipContent zipContentForManifest() {
+<b class="nc">&nbsp;		return (this.zipContentForManifest != null) ? this.zipContentForManifest : this.zipContent;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add a managed input stream resource.
+&nbsp;	 * @param inputStream the input stream
+&nbsp;	 */
+&nbsp;	void addInputStream(InputStream inputStream) {
+<b class="nc">&nbsp;		synchronized (this.inputStreams) {</b>
+<b class="nc">&nbsp;			this.inputStreams.add(inputStream);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Remove a managed input stream resource.
+&nbsp;	 * @param inputStream the input stream
+&nbsp;	 */
+&nbsp;	void removeInputStream(InputStream inputStream) {
+<b class="nc">&nbsp;		synchronized (this.inputStreams) {</b>
+<b class="nc">&nbsp;			this.inputStreams.remove(inputStream);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a {@link Runnable} action to cleanup the given inflater.
+&nbsp;	 * @param inflater the inflater to cleanup
+&nbsp;	 * @return the cleanup action
+&nbsp;	 */
+&nbsp;	Runnable createInflatorCleanupAction(Inflater inflater) {
+<b class="nc">&nbsp;		return () -&gt; endOrCacheInflater(inflater);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get previously used {@link Inflater} from the cache, or create a new one.
+&nbsp;	 * @return a usable {@link Inflater}
+&nbsp;	 */
+&nbsp;	Inflater getOrCreateInflater() {
+<b class="nc">&nbsp;		Deque&lt;Inflater&gt; inflaterCache = this.inflaterCache;</b>
+<b class="nc">&nbsp;		if (inflaterCache != null) {</b>
+<b class="nc">&nbsp;			synchronized (inflaterCache) {</b>
+<b class="nc">&nbsp;				Inflater inflater = this.inflaterCache.poll();</b>
+<b class="nc">&nbsp;				if (inflater != null) {</b>
+<b class="nc">&nbsp;					return inflater;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new Inflater(true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Either release the given {@link Inflater} by calling {@link Inflater#end()} or add
+&nbsp;	 * it to the cache for later reuse.
+&nbsp;	 * @param inflater the inflater to end or cache
+&nbsp;	 */
+&nbsp;	private void endOrCacheInflater(Inflater inflater) {
+<b class="nc">&nbsp;		Deque&lt;Inflater&gt; inflaterCache = this.inflaterCache;</b>
+<b class="nc">&nbsp;		if (inflaterCache != null) {</b>
+<b class="nc">&nbsp;			synchronized (inflaterCache) {</b>
+<b class="nc">&nbsp;				if (this.inflaterCache == inflaterCache &amp;&amp; inflaterCache.size() &lt; INFLATER_CACHE_LIMIT) {</b>
+<b class="nc">&nbsp;					inflater.reset();</b>
+<b class="nc">&nbsp;					this.inflaterCache.add(inflater);</b>
+<b class="nc">&nbsp;					return;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		inflater.end();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Called by the {@link Cleaner} to free resources.
+&nbsp;	 * @see java.lang.Runnable#run()
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public void run() {
+<b class="nc">&nbsp;		releaseAll();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void releaseAll() {
+<b class="nc">&nbsp;		IOException exceptionChain = null;</b>
+<b class="nc">&nbsp;		exceptionChain = releaseInflators(exceptionChain);</b>
+<b class="nc">&nbsp;		exceptionChain = releaseInputStreams(exceptionChain);</b>
+<b class="nc">&nbsp;		exceptionChain = releaseZipContent(exceptionChain);</b>
+<b class="nc">&nbsp;		exceptionChain = releaseZipContentForManifest(exceptionChain);</b>
+<b class="nc">&nbsp;		if (exceptionChain != null) {</b>
+<b class="nc">&nbsp;			throw new UncheckedIOException(exceptionChain);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private IOException releaseInflators(IOException exceptionChain) {
+<b class="nc">&nbsp;		Deque&lt;Inflater&gt; inflaterCache = this.inflaterCache;</b>
+<b class="nc">&nbsp;		if (inflaterCache != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				synchronized (inflaterCache) {</b>
+<b class="nc">&nbsp;					inflaterCache.forEach(Inflater::end);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				this.inflaterCache = null;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return exceptionChain;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private IOException releaseInputStreams(IOException exceptionChain) {
+<b class="nc">&nbsp;		synchronized (this.inputStreams) {</b>
+<b class="nc">&nbsp;			for (InputStream inputStream : List.copyOf(this.inputStreams)) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					inputStream.close();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IOException ex) {</b>
+<b class="nc">&nbsp;					exceptionChain = addToExceptionChain(exceptionChain, ex);</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			this.inputStreams.clear();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return exceptionChain;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private IOException releaseZipContent(IOException exceptionChain) {
+<b class="nc">&nbsp;		ZipContent zipContent = this.zipContent;</b>
+<b class="nc">&nbsp;		if (zipContent != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				zipContent.close();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				exceptionChain = addToExceptionChain(exceptionChain, ex);</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				this.zipContent = null;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return exceptionChain;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private IOException releaseZipContentForManifest(IOException exceptionChain) {
+<b class="nc">&nbsp;		ZipContent zipContentForManifest = this.zipContentForManifest;</b>
+<b class="nc">&nbsp;		if (zipContentForManifest != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				zipContentForManifest.close();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				exceptionChain = addToExceptionChain(exceptionChain, ex);</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				this.zipContentForManifest = null;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return exceptionChain;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private IOException addToExceptionChain(IOException exceptionChain, IOException ex) {
+<b class="nc">&nbsp;		if (exceptionChain != null) {</b>
+<b class="nc">&nbsp;			exceptionChain.addSuppressed(ex);</b>
+<b class="nc">&nbsp;			return exceptionChain;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ex;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

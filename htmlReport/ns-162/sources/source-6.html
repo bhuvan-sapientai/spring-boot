@@ -1,0 +1,410 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BindConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: BindConverter (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BindConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.5%
+  </span>
+  <span class="absValue">
+    (23/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BindConverter$ResolvableTypeDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BindConverter$TypeConverterConversionService</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BindConverter$TypeConverterConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    48.1%
+  </span>
+  <span class="absValue">
+    (13/27)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    58.8%
+  </span>
+  <span class="absValue">
+    (10/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.7%
+  </span>
+  <span class="absValue">
+    (39/74)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import java.beans.PropertyEditor;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.beans.PropertyEditorRegistry;
+&nbsp;import org.springframework.beans.SimpleTypeConverter;
+&nbsp;import org.springframework.beans.propertyeditors.CustomBooleanEditor;
+&nbsp;import org.springframework.beans.propertyeditors.CustomNumberEditor;
+&nbsp;import org.springframework.beans.propertyeditors.FileEditor;
+&nbsp;import org.springframework.boot.convert.ApplicationConversionService;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.convert.ConversionException;
+&nbsp;import org.springframework.core.convert.ConversionFailedException;
+&nbsp;import org.springframework.core.convert.ConversionService;
+&nbsp;import org.springframework.core.convert.ConverterNotFoundException;
+&nbsp;import org.springframework.core.convert.TypeDescriptor;
+&nbsp;import org.springframework.core.convert.converter.ConditionalGenericConverter;
+&nbsp;import org.springframework.core.convert.support.GenericConversionService;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility to handle any conversion needed during binding. This class is not thread-safe
+&nbsp; * and so a new instance is created for each top-level bind.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;final class BindConverter {
+&nbsp;
+&nbsp;	private static BindConverter sharedInstance;
+&nbsp;
+&nbsp;	private final List&lt;ConversionService&gt; delegates;
+&nbsp;
+&nbsp;	private BindConverter(List&lt;ConversionService&gt; conversionServices,
+<b class="fc">&nbsp;			Consumer&lt;PropertyEditorRegistry&gt; propertyEditorInitializer) {</b>
+<b class="fc">&nbsp;		List&lt;ConversionService&gt; delegates = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;		delegates.add(new TypeConverterConversionService(propertyEditorInitializer));</b>
+<b class="fc">&nbsp;		boolean hasApplication = false;</b>
+<b class="fc">&nbsp;		if (!CollectionUtils.isEmpty(conversionServices)) {</b>
+<b class="fc">&nbsp;			for (ConversionService conversionService : conversionServices) {</b>
+<b class="fc">&nbsp;				delegates.add(conversionService);</b>
+<b class="fc">&nbsp;				hasApplication = hasApplication || conversionService instanceof ApplicationConversionService;</b>
+<b class="fc">&nbsp;			}</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (!hasApplication) {</b>
+<b class="fc">&nbsp;			delegates.add(ApplicationConversionService.getSharedInstance());</b>
+&nbsp;		}
+<b class="fc">&nbsp;		this.delegates = Collections.unmodifiableList(delegates);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean canConvert(Object source, ResolvableType targetType, Annotation... targetAnnotations) {
+<b class="nc">&nbsp;		return canConvert(TypeDescriptor.forObject(source),</b>
+&nbsp;				new ResolvableTypeDescriptor(targetType, targetAnnotations));
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean canConvert(TypeDescriptor sourceType, TypeDescriptor targetType) {
+<b class="nc">&nbsp;		for (ConversionService service : this.delegates) {</b>
+<b class="nc">&nbsp;			if (service.canConvert(sourceType, targetType)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	&lt;T&gt; T convert(Object source, Bindable&lt;T&gt; target) {
+<b class="fc">&nbsp;		return convert(source, target.getType(), target.getAnnotations());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	&lt;T&gt; T convert(Object source, ResolvableType targetType, Annotation... targetAnnotations) {
+<b class="fc">&nbsp;		if (source == null) {</b>
+<b class="fc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (T) convert(source, TypeDescriptor.forObject(source),</b>
+&nbsp;				new ResolvableTypeDescriptor(targetType, targetAnnotations));
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+<b class="nc">&nbsp;		ConversionException failure = null;</b>
+<b class="nc">&nbsp;		for (ConversionService delegate : this.delegates) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				if (delegate.canConvert(sourceType, targetType)) {</b>
+<b class="nc">&nbsp;					return delegate.convert(source, sourceType, targetType);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ConversionException ex) {</b>
+<b class="nc">&nbsp;				if (failure == null &amp;&amp; ex instanceof ConversionFailedException) {</b>
+<b class="nc">&nbsp;					failure = ex;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		throw (failure != null) ? failure : new ConverterNotFoundException(sourceType, targetType);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static BindConverter get(List&lt;ConversionService&gt; conversionServices,
+&nbsp;			Consumer&lt;PropertyEditorRegistry&gt; propertyEditorInitializer) {
+<b class="fc">&nbsp;		boolean sharedApplicationConversionService = (conversionServices == null) || (conversionServices.size() == 1</b>
+<b class="fc">&nbsp;				&amp;&amp; conversionServices.get(0) == ApplicationConversionService.getSharedInstance());</b>
+<b class="fc">&nbsp;		if (propertyEditorInitializer == null &amp;&amp; sharedApplicationConversionService) {</b>
+<b class="fc">&nbsp;			return getSharedInstance();</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return new BindConverter(conversionServices, propertyEditorInitializer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static BindConverter getSharedInstance() {
+<b class="fc">&nbsp;		if (sharedInstance == null) {</b>
+<b class="fc">&nbsp;			sharedInstance = new BindConverter(null, null);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return sharedInstance;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A {@link TypeDescriptor} backed by a {@link ResolvableType}.
+&nbsp;	 */
+&nbsp;	private static class ResolvableTypeDescriptor extends TypeDescriptor {
+&nbsp;
+&nbsp;		ResolvableTypeDescriptor(ResolvableType resolvableType, Annotation[] annotations) {
+<b class="nc">&nbsp;			super(resolvableType, null, annotations);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A {@link ConversionService} implementation that delegates to a
+&nbsp;	 * {@link SimpleTypeConverter}. Allows {@link PropertyEditor} based conversion for
+&nbsp;	 * simple types, arrays and collections.
+&nbsp;	 */
+&nbsp;	private static class TypeConverterConversionService extends GenericConversionService {
+&nbsp;
+<b class="fc">&nbsp;		TypeConverterConversionService(Consumer&lt;PropertyEditorRegistry&gt; initializer) {</b>
+<b class="fc">&nbsp;			ApplicationConversionService.addDelimitedStringConverters(this);</b>
+<b class="fc">&nbsp;			addConverter(new TypeConverterConverter(initializer));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean canConvert(TypeDescriptor sourceType, TypeDescriptor targetType) {
+&nbsp;			// Prefer conversion service to handle things like String to char[].
+<b class="nc">&nbsp;			if (targetType.isArray() &amp;&amp; targetType.getElementTypeDescriptor().isPrimitive()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return super.canConvert(sourceType, targetType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ConditionalGenericConverter} that delegates to {@link SimpleTypeConverter}.
+&nbsp;	 */
+&nbsp;	private static class TypeConverterConverter implements ConditionalGenericConverter {
+&nbsp;
+&nbsp;		private static final Set&lt;Class&lt;?&gt;&gt; EXCLUDED_EDITORS;
+&nbsp;		static {
+<b class="fc">&nbsp;			Set&lt;Class&lt;?&gt;&gt; excluded = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;			excluded.add(CustomNumberEditor.class);</b>
+<b class="fc">&nbsp;			excluded.add(CustomBooleanEditor.class);</b>
+<b class="fc">&nbsp;			excluded.add(FileEditor.class);</b>
+<b class="fc">&nbsp;			EXCLUDED_EDITORS = Collections.unmodifiableSet(excluded);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private final Consumer&lt;PropertyEditorRegistry&gt; initializer;
+&nbsp;
+&nbsp;		// SimpleTypeConverter is not thread-safe to use for conversion but we can use it
+&nbsp;		// in a thread-safe way to check if conversion is possible.
+&nbsp;		private final SimpleTypeConverter matchesOnlyTypeConverter;
+&nbsp;
+<b class="fc">&nbsp;		TypeConverterConverter(Consumer&lt;PropertyEditorRegistry&gt; initializer) {</b>
+<b class="fc">&nbsp;			this.initializer = initializer;</b>
+<b class="fc">&nbsp;			this.matchesOnlyTypeConverter = createTypeConverter();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Set&lt;ConvertiblePair&gt; getConvertibleTypes() {
+<b class="fc">&nbsp;			return Set.of(new ConvertiblePair(String.class, Object.class),</b>
+&nbsp;					new ConvertiblePair(String.class, Resource[].class),
+&nbsp;					new ConvertiblePair(String.class, Collection.class));
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
+<b class="nc">&nbsp;			Class&lt;?&gt; type = targetType.getType();</b>
+<b class="nc">&nbsp;			if (type == null || type == Object.class || Map.class.isAssignableFrom(type)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (Collection.class.isAssignableFrom(type)) {</b>
+<b class="nc">&nbsp;				TypeDescriptor elementType = targetType.getElementTypeDescriptor();</b>
+<b class="nc">&nbsp;				if (elementType == null || (!Resource.class.isAssignableFrom(elementType.getType()))) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			PropertyEditor editor = this.matchesOnlyTypeConverter.getDefaultEditor(type);</b>
+<b class="nc">&nbsp;			if (editor == null) {</b>
+<b class="nc">&nbsp;				editor = this.matchesOnlyTypeConverter.findCustomEditor(type, null);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (editor == null &amp;&amp; String.class != type) {</b>
+<b class="nc">&nbsp;				editor = BeanUtils.findEditorByConvention(type);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return (editor != null &amp;&amp; !EXCLUDED_EDITORS.contains(editor.getClass()));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+<b class="nc">&nbsp;			return createTypeConverter().convertIfNecessary(source, targetType.getType(), targetType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private SimpleTypeConverter createTypeConverter() {
+<b class="fc">&nbsp;			SimpleTypeConverter typeConverter = new SimpleTypeConverter();</b>
+<b class="fc">&nbsp;			if (this.initializer != null) {</b>
+<b class="fc">&nbsp;				this.initializer.accept(typeConverter);</b>
+&nbsp;			}
+<b class="fc">&nbsp;			return typeConverter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IndexedElementsBinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: IndexedElementsBinder (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IndexedElementsBinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.7%
+  </span>
+  <span class="absValue">
+    (2/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">IndexedElementsBinder$IndexedCollectionSupplier</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    30%
+  </span>
+  <span class="absValue">
+    (3/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.8%
+  </span>
+  <span class="absValue">
+    (3/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder.Context;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName.Form;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.boot.context.properties.source.IterableConfigurationPropertySource;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.util.LinkedMultiValueMap;
+&nbsp;import org.springframework.util.MultiValueMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for {@link AggregateBinder AggregateBinders} that read a sequential run of
+&nbsp; * indexed items.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type being bound
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;abstract class IndexedElementsBinder&lt;T&gt; extends AggregateBinder&lt;T&gt; {
+&nbsp;
+&nbsp;	private static final String INDEX_ZERO = &quot;[0]&quot;;
+&nbsp;
+&nbsp;	IndexedElementsBinder(Context context) {
+<b class="fc">&nbsp;		super(context);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isAllowRecursiveBinding(ConfigurationPropertySource source) {
+<b class="nc">&nbsp;		return source == null || source instanceof IterableConfigurationPropertySource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bind indexed elements to the supplied collection.
+&nbsp;	 * @param name the name of the property to bind
+&nbsp;	 * @param target the target bindable
+&nbsp;	 * @param elementBinder the binder to use for elements
+&nbsp;	 * @param aggregateType the aggregate type, may be a collection or an array
+&nbsp;	 * @param elementType the element type
+&nbsp;	 * @param result the destination for results
+&nbsp;	 */
+&nbsp;	protected final void bindIndexed(ConfigurationPropertyName name, Bindable&lt;?&gt; target,
+&nbsp;			AggregateElementBinder elementBinder, ResolvableType aggregateType, ResolvableType elementType,
+&nbsp;			IndexedCollectionSupplier result) {
+<b class="fc">&nbsp;		for (ConfigurationPropertySource source : getContext().getSources()) {</b>
+<b class="nc">&nbsp;			bindIndexed(source, name, target, elementBinder, result, aggregateType, elementType);</b>
+<b class="nc">&nbsp;			if (result.wasSupplied() &amp;&amp; result.get() != null) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void bindIndexed(ConfigurationPropertySource source, ConfigurationPropertyName root, Bindable&lt;?&gt; target,
+&nbsp;			AggregateElementBinder elementBinder, IndexedCollectionSupplier collection, ResolvableType aggregateType,
+&nbsp;			ResolvableType elementType) {
+<b class="nc">&nbsp;		ConfigurationProperty property = source.getConfigurationProperty(root);</b>
+<b class="nc">&nbsp;		if (property != null) {</b>
+<b class="nc">&nbsp;			getContext().setConfigurationProperty(property);</b>
+<b class="nc">&nbsp;			bindValue(target, collection.get(), aggregateType, elementType, property.getValue());</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			bindIndexed(source, root, elementBinder, collection, elementType);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void bindValue(Bindable&lt;?&gt; target, Collection&lt;Object&gt; collection, ResolvableType aggregateType,
+&nbsp;			ResolvableType elementType, Object value) {
+<b class="nc">&nbsp;		if (value == null || (value instanceof CharSequence charSequence &amp;&amp; charSequence.isEmpty())) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		Object aggregate = convert(value, aggregateType, target.getAnnotations());</b>
+<b class="nc">&nbsp;		ResolvableType collectionType = ResolvableType.forClassWithGenerics(collection.getClass(), elementType);</b>
+<b class="nc">&nbsp;		Collection&lt;Object&gt; elements = convert(aggregate, collectionType);</b>
+<b class="nc">&nbsp;		collection.addAll(elements);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void bindIndexed(ConfigurationPropertySource source, ConfigurationPropertyName root,
+&nbsp;			AggregateElementBinder elementBinder, IndexedCollectionSupplier collection, ResolvableType elementType) {
+<b class="nc">&nbsp;		MultiValueMap&lt;String, ConfigurationPropertyName&gt; knownIndexedChildren = getKnownIndexedChildren(source, root);</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; Integer.MAX_VALUE; i++) {</b>
+<b class="nc">&nbsp;			ConfigurationPropertyName name = root.append((i != 0) ? &quot;[&quot; + i + &quot;]&quot; : INDEX_ZERO);</b>
+<b class="nc">&nbsp;			Object value = elementBinder.bind(name, Bindable.of(elementType), source);</b>
+<b class="nc">&nbsp;			if (value == null) {</b>
+<b class="nc">&nbsp;				break;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			knownIndexedChildren.remove(name.getLastElement(Form.UNIFORM));</b>
+<b class="nc">&nbsp;			collection.get().add(value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		assertNoUnboundChildren(source, knownIndexedChildren);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private MultiValueMap&lt;String, ConfigurationPropertyName&gt; getKnownIndexedChildren(ConfigurationPropertySource source,
+&nbsp;			ConfigurationPropertyName root) {
+<b class="nc">&nbsp;		MultiValueMap&lt;String, ConfigurationPropertyName&gt; children = new LinkedMultiValueMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (!(source instanceof IterableConfigurationPropertySource iterableSource)) {</b>
+<b class="nc">&nbsp;			return children;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (ConfigurationPropertyName name : iterableSource.filter(root::isAncestorOf)) {</b>
+<b class="nc">&nbsp;			ConfigurationPropertyName choppedName = name.chop(root.getNumberOfElements() + 1);</b>
+<b class="nc">&nbsp;			if (choppedName.isLastElementIndexed()) {</b>
+<b class="nc">&nbsp;				String key = choppedName.getLastElement(Form.UNIFORM);</b>
+<b class="nc">&nbsp;				children.add(key, name);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return children;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertNoUnboundChildren(ConfigurationPropertySource source,
+&nbsp;			MultiValueMap&lt;String, ConfigurationPropertyName&gt; children) {
+<b class="nc">&nbsp;		if (!children.isEmpty()) {</b>
+<b class="nc">&nbsp;			throw new UnboundConfigurationPropertiesException(children.values()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.flatMap(List::stream)</b>
+<b class="nc">&nbsp;				.map(source::getConfigurationProperty)</b>
+<b class="nc">&nbsp;				.collect(Collectors.toCollection(TreeSet::new)));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;C&gt; C convert(Object value, ResolvableType type, Annotation... annotations) {
+<b class="nc">&nbsp;		value = getContext().getPlaceholdersResolver().resolvePlaceholders(value);</b>
+<b class="nc">&nbsp;		return getContext().getConverter().convert(value, type, annotations);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link AggregateBinder.AggregateSupplier AggregateSupplier} for an indexed
+&nbsp;	 * collection.
+&nbsp;	 */
+&nbsp;	protected static class IndexedCollectionSupplier extends AggregateSupplier&lt;Collection&lt;Object&gt;&gt; {
+&nbsp;
+&nbsp;		public IndexedCollectionSupplier(Supplier&lt;Collection&lt;Object&gt;&gt; supplier) {
+<b class="fc">&nbsp;			super(supplier);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

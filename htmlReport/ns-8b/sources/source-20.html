@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SimpleStatusAggregator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.actuate.health</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleStatusAggregator (org.springframework.boot.actuate.health)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleStatusAggregator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SimpleStatusAggregator$StatusComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.actuate.health;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link StatusAggregator} backed by an ordered status list.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.2.0
+&nbsp; */
+&nbsp;public class SimpleStatusAggregator implements StatusAggregator {
+&nbsp;
+&nbsp;	private static final List&lt;String&gt; DEFAULT_ORDER;
+&nbsp;
+&nbsp;	static final StatusAggregator INSTANCE;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		List&lt;String&gt; defaultOrder = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		defaultOrder.add(Status.DOWN.getCode());</b>
+<b class="nc">&nbsp;		defaultOrder.add(Status.OUT_OF_SERVICE.getCode());</b>
+<b class="nc">&nbsp;		defaultOrder.add(Status.UP.getCode());</b>
+<b class="nc">&nbsp;		defaultOrder.add(Status.UNKNOWN.getCode());</b>
+<b class="nc">&nbsp;		DEFAULT_ORDER = Collections.unmodifiableList(getUniformCodes(defaultOrder.stream()));</b>
+<b class="nc">&nbsp;		INSTANCE = new SimpleStatusAggregator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final List&lt;String&gt; order;
+&nbsp;
+<b class="nc">&nbsp;	private final Comparator&lt;Status&gt; comparator = new StatusComparator();</b>
+&nbsp;
+<b class="nc">&nbsp;	public SimpleStatusAggregator() {</b>
+<b class="nc">&nbsp;		this.order = DEFAULT_ORDER;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public SimpleStatusAggregator(Status... order) {</b>
+<b class="nc">&nbsp;		this.order = ObjectUtils.isEmpty(order) ? DEFAULT_ORDER</b>
+<b class="nc">&nbsp;				: getUniformCodes(Arrays.stream(order).map(Status::getCode));</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public SimpleStatusAggregator(String... order) {</b>
+<b class="nc">&nbsp;		this.order = ObjectUtils.isEmpty(order) ? DEFAULT_ORDER : getUniformCodes(Arrays.stream(order));</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public SimpleStatusAggregator(List&lt;String&gt; order) {</b>
+<b class="nc">&nbsp;		this.order = CollectionUtils.isEmpty(order) ? DEFAULT_ORDER : getUniformCodes(order.stream());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Status getAggregateStatus(Set&lt;Status&gt; statuses) {
+<b class="nc">&nbsp;		return statuses.stream().filter(this::contains).min(this.comparator).orElse(Status.UNKNOWN);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean contains(Status status) {
+<b class="nc">&nbsp;		return this.order.contains(getUniformCode(status.getCode()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;String&gt; getUniformCodes(Stream&lt;String&gt; codes) {
+<b class="nc">&nbsp;		return codes.map(SimpleStatusAggregator::getUniformCode).toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String getUniformCode(String code) {
+<b class="nc">&nbsp;		if (code == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		StringBuilder builder = new StringBuilder();</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; code.length(); i++) {</b>
+<b class="nc">&nbsp;			char ch = code.charAt(i);</b>
+<b class="nc">&nbsp;			if (Character.isAlphabetic(ch) || Character.isDigit(ch)) {</b>
+<b class="nc">&nbsp;				builder.append(Character.toLowerCase(ch));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return builder.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Comparator} used to order {@link Status}.
+&nbsp;	 */
+<b class="nc">&nbsp;	private final class StatusComparator implements Comparator&lt;Status&gt; {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int compare(Status s1, Status s2) {
+<b class="nc">&nbsp;			List&lt;String&gt; order = SimpleStatusAggregator.this.order;</b>
+<b class="nc">&nbsp;			int i1 = order.indexOf(getUniformCode(s1.getCode()));</b>
+<b class="nc">&nbsp;			int i2 = order.indexOf(getUniformCode(s2.getCode()));</b>
+<b class="nc">&nbsp;			return (i1 &lt; i2) ? -1 : (i1 != i2) ? 1 : s1.getCode().compareTo(s2.getCode());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

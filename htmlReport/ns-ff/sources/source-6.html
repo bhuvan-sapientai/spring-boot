@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RSocketWebSocketNettyRouteProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.rsocket</a>
+</div>
+
+<h1>Coverage Summary for Class: RSocketWebSocketNettyRouteProvider (org.springframework.boot.autoconfigure.rsocket)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RSocketWebSocketNettyRouteProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.rsocket;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import io.rsocket.SocketAcceptor;
+&nbsp;import io.rsocket.core.RSocketServer;
+&nbsp;import io.rsocket.transport.ServerTransport;
+&nbsp;import io.rsocket.transport.netty.server.WebsocketRouteTransport;
+&nbsp;import reactor.netty.http.server.HttpServerRoutes;
+&nbsp;import reactor.netty.http.server.WebsocketServerSpec;
+&nbsp;import reactor.netty.http.server.WebsocketServerSpec.Builder;
+&nbsp;
+&nbsp;import org.springframework.boot.rsocket.server.RSocketServerCustomizer;
+&nbsp;import org.springframework.boot.web.embedded.netty.NettyRouteProvider;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link NettyRouteProvider} that configures an RSocket Websocket endpoint.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Leo Li
+&nbsp; */
+&nbsp;class RSocketWebSocketNettyRouteProvider implements NettyRouteProvider {
+&nbsp;
+&nbsp;	private final String mappingPath;
+&nbsp;
+&nbsp;	private final SocketAcceptor socketAcceptor;
+&nbsp;
+&nbsp;	private final List&lt;RSocketServerCustomizer&gt; customizers;
+&nbsp;
+&nbsp;	private final Consumer&lt;Builder&gt; serverSpecCustomizer;
+&nbsp;
+&nbsp;	RSocketWebSocketNettyRouteProvider(String mappingPath, SocketAcceptor socketAcceptor,
+<b class="nc">&nbsp;			Consumer&lt;Builder&gt; serverSpecCustomizer, Stream&lt;RSocketServerCustomizer&gt; customizers) {</b>
+<b class="nc">&nbsp;		this.mappingPath = mappingPath;</b>
+<b class="nc">&nbsp;		this.socketAcceptor = socketAcceptor;</b>
+<b class="nc">&nbsp;		this.serverSpecCustomizer = serverSpecCustomizer;</b>
+<b class="nc">&nbsp;		this.customizers = customizers.toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public HttpServerRoutes apply(HttpServerRoutes httpServerRoutes) {
+<b class="nc">&nbsp;		RSocketServer server = RSocketServer.create(this.socketAcceptor);</b>
+<b class="nc">&nbsp;		this.customizers.forEach((customizer) -&gt; customizer.customize(server));</b>
+<b class="nc">&nbsp;		ServerTransport.ConnectionAcceptor connectionAcceptor = server.asConnectionAcceptor();</b>
+<b class="nc">&nbsp;		return httpServerRoutes.ws(this.mappingPath, WebsocketRouteTransport.newHandler(connectionAcceptor),</b>
+<b class="nc">&nbsp;				createWebsocketServerSpec());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private WebsocketServerSpec createWebsocketServerSpec() {
+<b class="nc">&nbsp;		WebsocketServerSpec.Builder builder = WebsocketServerSpec.builder();</b>
+<b class="nc">&nbsp;		this.serverSpecCustomizer.accept(builder);</b>
+<b class="nc">&nbsp;		return builder.build();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

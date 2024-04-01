@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ZipEndOfCentralDirectoryRecord</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.loader.zip</a>
+</div>
+
+<h1>Coverage Summary for Class: ZipEndOfCentralDirectoryRecord (org.springframework.boot.loader.zip)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ZipEndOfCentralDirectoryRecord</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ZipEndOfCentralDirectoryRecord$Located</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.loader.zip;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.ByteOrder;
+&nbsp;
+&nbsp;import org.springframework.boot.loader.log.DebugLogger;
+&nbsp;
+&nbsp;/**
+&nbsp; * A ZIP File &quot;End of central directory record&quot; (EOCD).
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @param numberOfThisDisk the number of this disk (or 0xffff for Zip64)
+&nbsp; * @param diskWhereCentralDirectoryStarts the disk where central directory starts (or
+&nbsp; * 0xffff for Zip64)
+&nbsp; * @param numberOfCentralDirectoryEntriesOnThisDisk the number of central directory
+&nbsp; * entries on this disk (or 0xffff for Zip64)
+&nbsp; * @param totalNumberOfCentralDirectoryEntries the total number of central directory
+&nbsp; * entries (or 0xffff for Zip64)
+&nbsp; * @param sizeOfCentralDirectory the size of central directory (bytes) (or 0xffffffff for
+&nbsp; * Zip64)
+&nbsp; * @param offsetToStartOfCentralDirectory the offset of start of central directory,
+&nbsp; * relative to start of archive (or 0xffffffff for Zip64)
+&nbsp; * @param commentLength the length of the comment field
+&nbsp; * @see &lt;a href=&quot;https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT&quot;&gt;Chapter
+&nbsp; * 4.3.16 of the Zip File Format Specification&lt;/a&gt;
+&nbsp; */
+<b class="nc">&nbsp;record ZipEndOfCentralDirectoryRecord(short numberOfThisDisk, short diskWhereCentralDirectoryStarts,</b>
+&nbsp;		short numberOfCentralDirectoryEntriesOnThisDisk, short totalNumberOfCentralDirectoryEntries,
+&nbsp;		int sizeOfCentralDirectory, int offsetToStartOfCentralDirectory, short commentLength) {
+&nbsp;
+&nbsp;	ZipEndOfCentralDirectoryRecord(short totalNumberOfCentralDirectoryEntries, int sizeOfCentralDirectory,
+&nbsp;			int offsetToStartOfCentralDirectory) {
+<b class="nc">&nbsp;		this((short) 0, (short) 0, totalNumberOfCentralDirectoryEntries, totalNumberOfCentralDirectoryEntries,</b>
+&nbsp;				sizeOfCentralDirectory, offsetToStartOfCentralDirectory, (short) 0);
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final DebugLogger debug = DebugLogger.get(ZipEndOfCentralDirectoryRecord.class);</b>
+&nbsp;
+&nbsp;	private static final int SIGNATURE = 0x06054b50;
+&nbsp;
+&nbsp;	private static final int MAXIMUM_COMMENT_LENGTH = 0xFFFF;
+&nbsp;
+&nbsp;	private static final int MINIMUM_SIZE = 22;
+&nbsp;
+&nbsp;	private static final int MAXIMUM_SIZE = MINIMUM_SIZE + MAXIMUM_COMMENT_LENGTH;
+&nbsp;
+&nbsp;	static final int BUFFER_SIZE = 256;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The offset of the file comment relative to the record start position.
+&nbsp;	 */
+&nbsp;	static final int COMMENT_OFFSET = MINIMUM_SIZE;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the size of this record.
+&nbsp;	 * @return the record size
+&nbsp;	 */
+&nbsp;	long size() {
+<b class="nc">&nbsp;		return MINIMUM_SIZE + this.commentLength;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the contents of this record as a byte array suitable for writing to a zip.
+&nbsp;	 * @return the record as a byte array
+&nbsp;	 */
+&nbsp;	byte[] asByteArray() {
+<b class="nc">&nbsp;		ByteBuffer buffer = ByteBuffer.allocate(MINIMUM_SIZE);</b>
+<b class="nc">&nbsp;		buffer.order(ByteOrder.LITTLE_ENDIAN);</b>
+<b class="nc">&nbsp;		buffer.putInt(SIGNATURE);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.numberOfThisDisk);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.diskWhereCentralDirectoryStarts);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.numberOfCentralDirectoryEntriesOnThisDisk);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.totalNumberOfCentralDirectoryEntries);</b>
+<b class="nc">&nbsp;		buffer.putInt(this.sizeOfCentralDirectory);</b>
+<b class="nc">&nbsp;		buffer.putInt(this.offsetToStartOfCentralDirectory);</b>
+<b class="nc">&nbsp;		buffer.putShort(this.commentLength);</b>
+<b class="nc">&nbsp;		return buffer.array();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ZipEndOfCentralDirectoryRecord} instance from the specified
+&nbsp;	 * {@link DataBlock} by searching backwards from the end until a valid record is
+&nbsp;	 * located.
+&nbsp;	 * @param dataBlock the source data block
+&nbsp;	 * @return the {@link Located located} {@link ZipEndOfCentralDirectoryRecord}
+&nbsp;	 * @throws IOException if the {@link ZipEndOfCentralDirectoryRecord} cannot be read
+&nbsp;	 */
+&nbsp;	static Located load(DataBlock dataBlock) throws IOException {
+<b class="nc">&nbsp;		ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);</b>
+<b class="nc">&nbsp;		buffer.order(ByteOrder.LITTLE_ENDIAN);</b>
+<b class="nc">&nbsp;		long pos = locate(dataBlock, buffer);</b>
+<b class="nc">&nbsp;		return new Located(pos, new ZipEndOfCentralDirectoryRecord(buffer.getShort(), buffer.getShort(),</b>
+<b class="nc">&nbsp;				buffer.getShort(), buffer.getShort(), buffer.getInt(), buffer.getInt(), buffer.getShort()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static long locate(DataBlock dataBlock, ByteBuffer buffer) throws IOException {
+<b class="nc">&nbsp;		long endPos = dataBlock.size();</b>
+<b class="nc">&nbsp;		debug.log(&quot;Finding EndOfCentralDirectoryRecord starting at end position %s&quot;, endPos);</b>
+<b class="nc">&nbsp;		while (endPos &gt; 0) {</b>
+<b class="nc">&nbsp;			buffer.clear();</b>
+<b class="nc">&nbsp;			long totalRead = dataBlock.size() - endPos;</b>
+<b class="nc">&nbsp;			if (totalRead &gt; MAXIMUM_SIZE) {</b>
+<b class="nc">&nbsp;				throw new IOException(</b>
+&nbsp;						&quot;Zip &#39;End Of Central Directory Record&#39; not found after reading &quot; + totalRead + &quot; bytes&quot;);
+&nbsp;			}
+<b class="nc">&nbsp;			long startPos = endPos - buffer.limit();</b>
+<b class="nc">&nbsp;			if (startPos &lt; 0) {</b>
+<b class="nc">&nbsp;				buffer.limit((int) startPos + buffer.limit());</b>
+<b class="nc">&nbsp;				startPos = 0;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			debug.log(&quot;Finding EndOfCentralDirectoryRecord from %s with limit %s&quot;, startPos, buffer.limit());</b>
+<b class="nc">&nbsp;			dataBlock.readFully(buffer, startPos);</b>
+<b class="nc">&nbsp;			int offset = findInBuffer(buffer);</b>
+<b class="nc">&nbsp;			if (offset &gt;= 0) {</b>
+<b class="nc">&nbsp;				debug.log(&quot;Found EndOfCentralDirectoryRecord at %s + %s&quot;, startPos, offset);</b>
+<b class="nc">&nbsp;				return startPos + offset;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			endPos = endPos - BUFFER_SIZE + MINIMUM_SIZE;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		throw new IOException(&quot;Zip &#39;End Of Central Directory Record&#39; not found after reading entire data block&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static int findInBuffer(ByteBuffer buffer) {
+<b class="nc">&nbsp;		for (int pos = buffer.limit() - 4; pos &gt;= 0; pos--) {</b>
+<b class="nc">&nbsp;			buffer.position(pos);</b>
+<b class="nc">&nbsp;			if (buffer.getInt() == SIGNATURE) {</b>
+<b class="nc">&nbsp;				return pos;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return -1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A located {@link ZipEndOfCentralDirectoryRecord}.
+&nbsp;	 *
+&nbsp;	 * @param pos the position of the record
+&nbsp;	 * @param endOfCentralDirectoryRecord the located end of central directory record
+&nbsp;	 */
+<b class="nc">&nbsp;	record Located(long pos, ZipEndOfCentralDirectoryRecord endOfCentralDirectoryRecord) {</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>

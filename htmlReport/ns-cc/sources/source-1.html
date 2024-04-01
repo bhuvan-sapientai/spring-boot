@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > R2dbcDataAutoConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.autoconfigure.data.r2dbc</a>
+</div>
+
+<h1>Coverage Summary for Class: R2dbcDataAutoConfiguration (org.springframework.boot.autoconfigure.data.r2dbc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">R2dbcDataAutoConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.autoconfigure.data.r2dbc;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ObjectProvider;
+&nbsp;import org.springframework.boot.autoconfigure.AutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+&nbsp;import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
+&nbsp;import org.springframework.boot.autoconfigure.domain.EntityScanner;
+&nbsp;import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.data.convert.CustomConversions;
+&nbsp;import org.springframework.data.r2dbc.convert.MappingR2dbcConverter;
+&nbsp;import org.springframework.data.r2dbc.convert.R2dbcConverter;
+&nbsp;import org.springframework.data.r2dbc.convert.R2dbcCustomConversions;
+&nbsp;import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+&nbsp;import org.springframework.data.r2dbc.dialect.DialectResolver;
+&nbsp;import org.springframework.data.r2dbc.dialect.R2dbcDialect;
+&nbsp;import org.springframework.data.r2dbc.mapping.R2dbcMappingContext;
+&nbsp;import org.springframework.data.relational.RelationalManagedTypes;
+&nbsp;import org.springframework.data.relational.core.mapping.DefaultNamingStrategy;
+&nbsp;import org.springframework.data.relational.core.mapping.NamingStrategy;
+&nbsp;import org.springframework.data.relational.core.mapping.Table;
+&nbsp;import org.springframework.r2dbc.core.DatabaseClient;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link EnableAutoConfiguration Auto-configuration} for {@link DatabaseClient}.
+&nbsp; *
+&nbsp; * @author Mark Paluch
+&nbsp; * @author Oliver Drotbohm
+&nbsp; * @since 2.3.0
+&nbsp; */
+&nbsp;@AutoConfiguration(after = R2dbcAutoConfiguration.class)
+&nbsp;@ConditionalOnClass({ DatabaseClient.class, R2dbcEntityTemplate.class })
+&nbsp;@ConditionalOnSingleCandidate(DatabaseClient.class)
+&nbsp;public class R2dbcDataAutoConfiguration {
+&nbsp;
+&nbsp;	private final DatabaseClient databaseClient;
+&nbsp;
+&nbsp;	private final R2dbcDialect dialect;
+&nbsp;
+<b class="nc">&nbsp;	public R2dbcDataAutoConfiguration(DatabaseClient databaseClient) {</b>
+<b class="nc">&nbsp;		this.databaseClient = databaseClient;</b>
+<b class="nc">&nbsp;		this.dialect = DialectResolver.getDialect(this.databaseClient.getConnectionFactory());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public R2dbcEntityTemplate r2dbcEntityTemplate(R2dbcConverter r2dbcConverter) {
+<b class="nc">&nbsp;		return new R2dbcEntityTemplate(this.databaseClient, this.dialect, r2dbcConverter);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	static RelationalManagedTypes r2dbcManagedTypes(ApplicationContext applicationContext)
+&nbsp;			throws ClassNotFoundException {
+<b class="nc">&nbsp;		return RelationalManagedTypes.fromIterable(new EntityScanner(applicationContext).scan(Table.class));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public R2dbcMappingContext r2dbcMappingContext(ObjectProvider&lt;NamingStrategy&gt; namingStrategy,
+&nbsp;			R2dbcCustomConversions r2dbcCustomConversions, RelationalManagedTypes r2dbcManagedTypes) {
+<b class="nc">&nbsp;		R2dbcMappingContext relationalMappingContext = new R2dbcMappingContext(</b>
+<b class="nc">&nbsp;				namingStrategy.getIfAvailable(() -&gt; DefaultNamingStrategy.INSTANCE));</b>
+<b class="nc">&nbsp;		relationalMappingContext.setSimpleTypeHolder(r2dbcCustomConversions.getSimpleTypeHolder());</b>
+<b class="nc">&nbsp;		relationalMappingContext.setManagedTypes(r2dbcManagedTypes);</b>
+<b class="nc">&nbsp;		return relationalMappingContext;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public MappingR2dbcConverter r2dbcConverter(R2dbcMappingContext mappingContext,
+&nbsp;			R2dbcCustomConversions r2dbcCustomConversions) {
+<b class="nc">&nbsp;		return new MappingR2dbcConverter(mappingContext, r2dbcCustomConversions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Bean
+&nbsp;	@ConditionalOnMissingBean
+&nbsp;	public R2dbcCustomConversions r2dbcCustomConversions() {
+<b class="nc">&nbsp;		List&lt;Object&gt; converters = new ArrayList&lt;&gt;(this.dialect.getConverters());</b>
+<b class="nc">&nbsp;		converters.addAll(R2dbcCustomConversions.STORE_CONVERTERS);</b>
+<b class="nc">&nbsp;		return new R2dbcCustomConversions(</b>
+<b class="nc">&nbsp;				CustomConversions.StoreConversions.of(this.dialect.getSimpleTypeHolder(), converters),</b>
+<b class="nc">&nbsp;				Collections.emptyList());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-01 11:12</div>
+</div>
+</body>
+</html>
