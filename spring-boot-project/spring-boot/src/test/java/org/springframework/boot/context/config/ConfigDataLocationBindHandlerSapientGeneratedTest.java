@@ -33,7 +33,7 @@ class ConfigDataLocationBindHandlerSapientGeneratedTest {
 
 	private final BindContext bindContextMock = mock(BindContext.class);
 
-	private final Bindable<?> bindableMock = mock(Bindable.class);
+	private final Bindable bindableMock = mock(Bindable.class);
 
 	private final ConfigDataLocation configDataLocationMock = mock(ConfigDataLocation.class);
 
@@ -47,7 +47,7 @@ class ConfigDataLocationBindHandlerSapientGeneratedTest {
 
 	private final ConfigDataLocation resultMock = mock(ConfigDataLocation.class);
 
-	//Sapient generated method id: ${6eedb967-f586-3173-b97a-0d19567e5214}
+	//Sapient generated method id: ${6eedb967-f586-3173-b97a-0d19567e5214}, hash: 4E83FE8A41B47346622EC4F51132B13B
 	@Test()
 	void onSuccessWhenResultGetOriginIsNotNull() {
 		/* Branches:
@@ -64,11 +64,11 @@ class ConfigDataLocationBindHandlerSapientGeneratedTest {
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(resultMock));
-			verify(resultMock).getOrigin();
+			verify(resultMock, atLeast(1)).getOrigin();
 		});
 	}
 
-	//Sapient generated method id: ${c1747cdb-cfa5-3814-9b27-1c2705e19c83}
+	//Sapient generated method id: ${c1747cdb-cfa5-3814-9b27-1c2705e19c83}, hash: C6230FB69B2EF78430B0501F5A7C414C
 	@Test()
 	void onSuccessWhenResultGetOriginIsNull() {
 		/* Branches:
@@ -95,7 +95,7 @@ class ConfigDataLocationBindHandlerSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${479edc22-1303-388d-815e-7e24e9773547}
+	//Sapient generated method id: ${479edc22-1303-388d-815e-7e24e9773547}, hash: 1EE28FEEAB63494388B8F04BFCF3421D
 	@Test()
 	void onSuccessWhenElementNotInstanceOfConfigDataLocation() {
 		/* Branches:
@@ -116,7 +116,7 @@ class ConfigDataLocationBindHandlerSapientGeneratedTest {
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${28dab3de-a044-3f7b-ae11-f48f4b19735f}
+	//Sapient generated method id: ${28dab3de-a044-3f7b-ae11-f48f4b19735f}, hash: 11685A7A6CD411512AD7829F442AC862
 	@Test()
 	void onSuccessWhenResultInstanceOfConfigDataLocationArray() {
 		/* Branches:
@@ -135,7 +135,7 @@ class ConfigDataLocationBindHandlerSapientGeneratedTest {
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${976e011e-2dfb-32a6-aad0-08e064c5bcb1}
+	//Sapient generated method id: ${976e011e-2dfb-32a6-aad0-08e064c5bcb1}, hash: A665A7E82B13EF6B38A07D61CA1BEE1E
 	@Test()
 	void onSuccessWhenResultNotInstanceOfConfigDataLocationArray() {
 		/* Branches:
@@ -154,7 +154,7 @@ class ConfigDataLocationBindHandlerSapientGeneratedTest {
 		assertAll("result", () -> assertThat(result, equalTo(object)));
 	}
 
-	//Sapient generated method id: ${f33e4889-ecfa-3a4c-b9fc-4faa32df4ab3}
+	//Sapient generated method id: ${f33e4889-ecfa-3a4c-b9fc-4faa32df4ab3}, hash: 41EC1C977806EE6AEE5E4119B0B14BD9
 	@Test()
 	void onSuccessWhenElementInstanceOfConfigDataLocationAndResultGetOriginIsNotNull() {
 		/* Branches:
@@ -175,11 +175,11 @@ class ConfigDataLocationBindHandlerSapientGeneratedTest {
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(notNullValue()));
-			verify(resultMock).getOrigin();
+			verify(resultMock, atLeast(1)).getOrigin();
 		});
 	}
 
-	//Sapient generated method id: ${62f5beb5-b5bd-34dd-a481-891b92eaa275}
+	//Sapient generated method id: ${62f5beb5-b5bd-34dd-a481-891b92eaa275}, hash: 30D09A85E1669F544AD8DC756F055655
 	@Test()
 	void onSuccessWhenElementInstanceOfConfigDataLocationAndResultGetOriginIsNull() {
 		/* Branches:
