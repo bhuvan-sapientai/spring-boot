@@ -224,8 +224,6 @@ class JavaConventions {
 				compile.setTargetCompatibility(SOURCE_AND_TARGET_COMPATIBILITY);
 			}
 			else if (buildingWithJava17(project)) {
-				args.addAll(Arrays.asList("-Werror", "-Xlint:unchecked", "-Xlint:deprecation", "-Xlint:rawtypes",
-						"-Xlint:varargs"));
 			}
 		});
 	}

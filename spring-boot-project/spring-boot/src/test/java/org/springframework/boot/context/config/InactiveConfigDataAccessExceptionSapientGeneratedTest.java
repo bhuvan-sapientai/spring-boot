@@ -25,7 +25,7 @@ class InactiveConfigDataAccessExceptionSapientGeneratedTest {
 
 	private final ConfigDataEnvironmentContributor contributorMock = mock(ConfigDataEnvironmentContributor.class);
 
-	//Sapient generated method id: ${a01f0178-a50a-33c2-887d-886bec5903b0}
+	//Sapient generated method id: ${a01f0178-a50a-33c2-887d-886bec5903b0}, hash: 45968527DF1502A8998514AED8ED6F52
 	@Test()
 	void throwIfPropertyFoundWhenSourceIsNullAndPropertyIsNull() {
 		/* Branches:
@@ -42,7 +42,7 @@ class InactiveConfigDataAccessExceptionSapientGeneratedTest {
 		assertAll("result", () -> verify(contributorMock).getConfigurationPropertySource());
 	}
 
-	//Sapient generated method id: ${f751bede-fa12-3072-9148-50b80904ccd0}
+	//Sapient generated method id: ${f751bede-fa12-3072-9148-50b80904ccd0}, hash: 22D987A1864DF5CEAE9EAE9F577FA885
 	@Test()
 	void throwIfPropertyFoundWhenOriginIsNotNullThrowsInactiveConfigDataAccessException() {
 		/* Branches:
