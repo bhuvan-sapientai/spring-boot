@@ -1,0 +1,341 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DocumentConfigurationProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.context.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: DocumentConfigurationProperties (org.springframework.boot.build.context.properties)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DocumentConfigurationProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/114)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.context.properties;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.tasks.InputFiles;
+&nbsp;import org.gradle.api.tasks.OutputDirectory;
+&nbsp;import org.gradle.api.tasks.PathSensitive;
+&nbsp;import org.gradle.api.tasks.PathSensitivity;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;
+&nbsp;import org.springframework.boot.build.context.properties.Snippet.Config;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Task} used to document auto-configuration classes.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; */
+<b class="nc">&nbsp;public class DocumentConfigurationProperties extends DefaultTask {</b>
+&nbsp;
+&nbsp;	private FileCollection configurationPropertyMetadata;
+&nbsp;
+&nbsp;	private File outputDir;
+&nbsp;
+&nbsp;	@InputFiles
+&nbsp;	@PathSensitive(PathSensitivity.RELATIVE)
+&nbsp;	public FileCollection getConfigurationPropertyMetadata() {
+<b class="nc">&nbsp;		return this.configurationPropertyMetadata;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setConfigurationPropertyMetadata(FileCollection configurationPropertyMetadata) {
+<b class="nc">&nbsp;		this.configurationPropertyMetadata = configurationPropertyMetadata;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@OutputDirectory
+&nbsp;	public File getOutputDir() {
+<b class="nc">&nbsp;		return this.outputDir;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOutputDir(File outputDir) {
+<b class="nc">&nbsp;		this.outputDir = outputDir;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void documentConfigurationProperties() throws IOException {
+<b class="nc">&nbsp;		Snippets snippets = new Snippets(this.configurationPropertyMetadata);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.core&quot;, &quot;Core Properties&quot;, this::corePrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.cache&quot;, &quot;Cache Properties&quot;, this::cachePrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.mail&quot;, &quot;Mail Properties&quot;, this::mailPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.json&quot;, &quot;JSON Properties&quot;, this::jsonPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.data&quot;, &quot;Data Properties&quot;, this::dataPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.transaction&quot;, &quot;Transaction Properties&quot;, this::transactionPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.data-migration&quot;, &quot;Data Migration Properties&quot;, this::dataMigrationPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.integration&quot;, &quot;Integration Properties&quot;, this::integrationPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.web&quot;, &quot;Web Properties&quot;, this::webPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.templating&quot;, &quot;Templating Properties&quot;, this::templatePrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.server&quot;, &quot;Server Properties&quot;, this::serverPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.security&quot;, &quot;Security Properties&quot;, this::securityPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.rsocket&quot;, &quot;RSocket Properties&quot;, this::rsocketPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.actuator&quot;, &quot;Actuator Properties&quot;, this::actuatorPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.devtools&quot;, &quot;Devtools Properties&quot;, this::devtoolsPrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.docker-compose&quot;, &quot;Docker Compose Properties&quot;, this::dockerComposePrefixes);</b>
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.testcontainers&quot;, &quot;Testcontainers Properties&quot;,</b>
+&nbsp;				this::testcontainersPrefixes);
+<b class="nc">&nbsp;		snippets.add(&quot;application-properties.testing&quot;, &quot;Testing Properties&quot;, this::testingPrefixes);</b>
+<b class="nc">&nbsp;		snippets.writeTo(this.outputDir.toPath());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void corePrefixes(Config config) {
+<b class="nc">&nbsp;		config.accept(&quot;debug&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;trace&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;logging&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.aop&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.application&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.autoconfigure&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.banner&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.beaninfo&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.codec&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.config&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.info&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.jmx&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.lifecycle&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.main&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.messages&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.pid&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.profiles&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.quartz&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.reactor&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.ssl&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.task&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.threads&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.mandatory-file-encoding&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;info&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.output.ansi.enabled&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void cachePrefixes(Config config) {
+<b class="nc">&nbsp;		config.accept(&quot;spring.cache&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void mailPrefixes(Config config) {
+<b class="nc">&nbsp;		config.accept(&quot;spring.mail&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.sendgrid&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void jsonPrefixes(Config config) {
+<b class="nc">&nbsp;		config.accept(&quot;spring.jackson&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.gson&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void dataPrefixes(Config config) {
+<b class="nc">&nbsp;		config.accept(&quot;spring.couchbase&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.cassandra&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.elasticsearch&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.h2&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.influx&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.ldap&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.mongodb&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.neo4j&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.dao&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.data&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.datasource&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.jooq&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.jdbc&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.jpa&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.r2dbc&quot;);</b>
+<b class="nc">&nbsp;		config.accept(&quot;spring.datasource.oracleucp&quot;,</b>
+&nbsp;				&quot;Oracle UCP specific settings bound to an instance of Oracle UCP&#39;s PoolDataSource&quot;);
+<b class="nc">&nbsp;		config.accept(&quot;spring.datasource.dbcp2&quot;,</b>
+&nbsp;				&quot;Commons DBCP2 specific settings bound to an instance of DBCP2&#39;s BasicDataSource&quot;);
+<b class="nc">&nbsp;		config.accept(&quot;spring.datasource.tomcat&quot;,</b>
+&nbsp;				&quot;Tomcat datasource specific settings bound to an instance of Tomcat JDBC&#39;s DataSource&quot;);
+<b class="nc">&nbsp;		config.accept(&quot;spring.datasource.hikari&quot;,</b>
+&nbsp;				&quot;Hikari specific settings bound to an instance of Hikari&#39;s HikariDataSource&quot;);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private void transactionPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.jta&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.transaction&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void dataMigrationPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.flyway&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.liquibase&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.sql.init&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void integrationPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.activemq&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.artemis&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.batch&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.integration&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.jms&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.kafka&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.pulsar&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.rabbitmq&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.hazelcast&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.webservices&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void webPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.graphql&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.hateoas&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.http&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.jersey&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.mvc&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.netty&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.resources&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.servlet&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.session&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.web&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.webflux&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void templatePrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.freemarker&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.groovy&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.mustache&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.thymeleaf&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.groovy.template.configuration&quot;, &quot;See GroovyMarkupConfigurer&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void serverPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;server&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void securityPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.security&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void rsocketPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.rsocket&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void actuatorPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;management&quot;);</b>
+<b class="nc">&nbsp;		prefix.accept(&quot;micrometer&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void dockerComposePrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.docker.compose&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void devtoolsPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.devtools&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void testingPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.test.&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void testcontainersPrefixes(Config prefix) {
+<b class="nc">&nbsp;		prefix.accept(&quot;spring.testcontainers.&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

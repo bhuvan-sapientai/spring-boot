@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigDataEnvironmentContributorPlaceholdersResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.config</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigDataEnvironmentContributorPlaceholdersResolver (org.springframework.boot.context.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigDataEnvironmentContributorPlaceholdersResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.config;
+&nbsp;
+&nbsp;import org.springframework.boot.context.config.ConfigDataEnvironmentContributor.Kind;
+&nbsp;import org.springframework.boot.context.properties.bind.PlaceholdersResolver;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginLookup;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.util.PropertyPlaceholderHelper;
+&nbsp;import org.springframework.util.SystemPropertyUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link PlaceholdersResolver} backed by one or more
+&nbsp; * {@link ConfigDataEnvironmentContributor} instances.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class ConfigDataEnvironmentContributorPlaceholdersResolver implements PlaceholdersResolver {
+&nbsp;
+&nbsp;	private final Iterable&lt;ConfigDataEnvironmentContributor&gt; contributors;
+&nbsp;
+&nbsp;	private final ConfigDataActivationContext activationContext;
+&nbsp;
+&nbsp;	private final boolean failOnResolveFromInactiveContributor;
+&nbsp;
+&nbsp;	private final PropertyPlaceholderHelper helper;
+&nbsp;
+&nbsp;	private final ConfigDataEnvironmentContributor activeContributor;
+&nbsp;
+&nbsp;	ConfigDataEnvironmentContributorPlaceholdersResolver(Iterable&lt;ConfigDataEnvironmentContributor&gt; contributors,
+&nbsp;			ConfigDataActivationContext activationContext, ConfigDataEnvironmentContributor activeContributor,
+<b class="nc">&nbsp;			boolean failOnResolveFromInactiveContributor) {</b>
+<b class="nc">&nbsp;		this.contributors = contributors;</b>
+<b class="nc">&nbsp;		this.activationContext = activationContext;</b>
+<b class="nc">&nbsp;		this.activeContributor = activeContributor;</b>
+<b class="nc">&nbsp;		this.failOnResolveFromInactiveContributor = failOnResolveFromInactiveContributor;</b>
+<b class="nc">&nbsp;		this.helper = new PropertyPlaceholderHelper(SystemPropertyUtils.PLACEHOLDER_PREFIX,</b>
+&nbsp;				SystemPropertyUtils.PLACEHOLDER_SUFFIX, SystemPropertyUtils.VALUE_SEPARATOR, true);
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object resolvePlaceholders(Object value) {
+<b class="nc">&nbsp;		if (value instanceof String string) {</b>
+<b class="nc">&nbsp;			return this.helper.replacePlaceholders(string, this::resolvePlaceholder);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String resolvePlaceholder(String placeholder) {
+<b class="nc">&nbsp;		Object result = null;</b>
+<b class="nc">&nbsp;		for (ConfigDataEnvironmentContributor contributor : this.contributors) {</b>
+<b class="nc">&nbsp;			PropertySource&lt;?&gt; propertySource = contributor.getPropertySource();</b>
+<b class="nc">&nbsp;			Object value = (propertySource != null) ? propertySource.getProperty(placeholder) : null;</b>
+<b class="nc">&nbsp;			if (value != null &amp;&amp; !isActive(contributor)) {</b>
+<b class="nc">&nbsp;				if (this.failOnResolveFromInactiveContributor) {</b>
+<b class="nc">&nbsp;					ConfigDataResource resource = contributor.getResource();</b>
+<b class="nc">&nbsp;					Origin origin = OriginLookup.getOrigin(propertySource, placeholder);</b>
+<b class="nc">&nbsp;					throw new InactiveConfigDataAccessException(propertySource, resource, placeholder, origin);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				value = null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			result = (result != null) ? result : value;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return (result != null) ? String.valueOf(result) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isActive(ConfigDataEnvironmentContributor contributor) {
+<b class="nc">&nbsp;		if (contributor == this.activeContributor) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (contributor.getKind() != Kind.UNBOUND_IMPORT) {</b>
+<b class="nc">&nbsp;			return contributor.isActive(this.activationContext);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return contributor.withBoundProperties(this.contributors, this.activationContext)</b>
+<b class="nc">&nbsp;			.isActive(this.activationContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

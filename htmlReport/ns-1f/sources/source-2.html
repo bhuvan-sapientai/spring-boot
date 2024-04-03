@@ -1,0 +1,367 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JavaCompilerFieldValuesParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor.fieldvalues.javac</a>
+</div>
+
+<h1>Coverage Summary for Class: JavaCompilerFieldValuesParser (org.springframework.boot.configurationprocessor.fieldvalues.javac)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JavaCompilerFieldValuesParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JavaCompilerFieldValuesParser$FieldCollector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/102)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/110)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor.fieldvalues.javac;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.annotation.processing.ProcessingEnvironment;
+&nbsp;import javax.lang.model.element.Modifier;
+&nbsp;import javax.lang.model.element.TypeElement;
+&nbsp;
+&nbsp;import org.springframework.boot.configurationprocessor.fieldvalues.FieldValuesParser;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link FieldValuesParser} implementation for the standard Java compiler.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 1.2.0
+&nbsp; */
+&nbsp;public class JavaCompilerFieldValuesParser implements FieldValuesParser {
+&nbsp;
+&nbsp;	private final Trees trees;
+&nbsp;
+<b class="nc">&nbsp;	public JavaCompilerFieldValuesParser(ProcessingEnvironment env) throws Exception {</b>
+<b class="nc">&nbsp;		this.trees = Trees.instance(env);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Map&lt;String, Object&gt; getFieldValues(TypeElement element) throws Exception {
+<b class="nc">&nbsp;		Tree tree = this.trees.getTree(element);</b>
+<b class="nc">&nbsp;		if (tree != null) {</b>
+<b class="nc">&nbsp;			FieldCollector fieldCollector = new FieldCollector();</b>
+<b class="nc">&nbsp;			tree.accept(fieldCollector);</b>
+<b class="nc">&nbsp;			return fieldCollector.getFieldValues();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.emptyMap();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link TreeVisitor} to collect fields.
+&nbsp;	 */
+<b class="nc">&nbsp;	private static final class FieldCollector implements TreeVisitor {</b>
+&nbsp;
+&nbsp;		private static final Map&lt;String, Class&lt;?&gt;&gt; WRAPPER_TYPES;
+&nbsp;
+&nbsp;		static {
+<b class="nc">&nbsp;			Map&lt;String, Class&lt;?&gt;&gt; types = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			types.put(&quot;boolean&quot;, Boolean.class);</b>
+<b class="nc">&nbsp;			types.put(Boolean.class.getName(), Boolean.class);</b>
+<b class="nc">&nbsp;			types.put(&quot;byte&quot;, Byte.class);</b>
+<b class="nc">&nbsp;			types.put(Byte.class.getName(), Byte.class);</b>
+<b class="nc">&nbsp;			types.put(&quot;short&quot;, Short.class);</b>
+<b class="nc">&nbsp;			types.put(Short.class.getName(), Short.class);</b>
+<b class="nc">&nbsp;			types.put(&quot;int&quot;, Integer.class);</b>
+<b class="nc">&nbsp;			types.put(Integer.class.getName(), Integer.class);</b>
+<b class="nc">&nbsp;			types.put(&quot;long&quot;, Long.class);</b>
+<b class="nc">&nbsp;			types.put(Long.class.getName(), Long.class);</b>
+<b class="nc">&nbsp;			WRAPPER_TYPES = Collections.unmodifiableMap(types);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static final Map&lt;Class&lt;?&gt;, Object&gt; DEFAULT_TYPE_VALUES;
+&nbsp;
+&nbsp;		static {
+<b class="nc">&nbsp;			Map&lt;Class&lt;?&gt;, Object&gt; values = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			values.put(Boolean.class, false);</b>
+<b class="nc">&nbsp;			values.put(Byte.class, (byte) 0);</b>
+<b class="nc">&nbsp;			values.put(Short.class, (short) 0);</b>
+<b class="nc">&nbsp;			values.put(Integer.class, 0);</b>
+<b class="nc">&nbsp;			values.put(Long.class, (long) 0);</b>
+<b class="nc">&nbsp;			DEFAULT_TYPE_VALUES = Collections.unmodifiableMap(values);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static final Map&lt;String, Object&gt; WELL_KNOWN_STATIC_FINALS;
+&nbsp;
+&nbsp;		static {
+<b class="nc">&nbsp;			Map&lt;String, Object&gt; values = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			values.put(&quot;Boolean.TRUE&quot;, true);</b>
+<b class="nc">&nbsp;			values.put(&quot;Boolean.FALSE&quot;, false);</b>
+<b class="nc">&nbsp;			values.put(&quot;StandardCharsets.ISO_8859_1&quot;, &quot;ISO-8859-1&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;StandardCharsets.UTF_8&quot;, &quot;UTF-8&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;StandardCharsets.UTF_16&quot;, &quot;UTF-16&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;StandardCharsets.US_ASCII&quot;, &quot;US-ASCII&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Duration.ZERO&quot;, 0);</b>
+<b class="nc">&nbsp;			values.put(&quot;Period.ZERO&quot;, 0);</b>
+<b class="nc">&nbsp;			WELL_KNOWN_STATIC_FINALS = Collections.unmodifiableMap(values);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static final String DURATION_OF = &quot;Duration.of&quot;;
+&nbsp;
+&nbsp;		private static final Map&lt;String, String&gt; DURATION_SUFFIX;
+&nbsp;
+&nbsp;		static {
+<b class="nc">&nbsp;			Map&lt;String, String&gt; values = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			values.put(&quot;Nanos&quot;, &quot;ns&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Millis&quot;, &quot;ms&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Seconds&quot;, &quot;s&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Minutes&quot;, &quot;m&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Hours&quot;, &quot;h&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Days&quot;, &quot;d&quot;);</b>
+<b class="nc">&nbsp;			DURATION_SUFFIX = Collections.unmodifiableMap(values);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static final String PERIOD_OF = &quot;Period.of&quot;;
+&nbsp;
+&nbsp;		private static final Map&lt;String, String&gt; PERIOD_SUFFIX;
+&nbsp;
+&nbsp;		static {
+<b class="nc">&nbsp;			Map&lt;String, String&gt; values = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			values.put(&quot;Days&quot;, &quot;d&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Weeks&quot;, &quot;w&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Months&quot;, &quot;m&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Years&quot;, &quot;y&quot;);</b>
+<b class="nc">&nbsp;			PERIOD_SUFFIX = Collections.unmodifiableMap(values);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static final String DATA_SIZE_OF = &quot;DataSize.of&quot;;
+&nbsp;
+&nbsp;		private static final Map&lt;String, String&gt; DATA_SIZE_SUFFIX;
+&nbsp;
+&nbsp;		static {
+<b class="nc">&nbsp;			Map&lt;String, String&gt; values = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			values.put(&quot;Bytes&quot;, &quot;B&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Kilobytes&quot;, &quot;KB&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Megabytes&quot;, &quot;MB&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Gigabytes&quot;, &quot;GB&quot;);</b>
+<b class="nc">&nbsp;			values.put(&quot;Terabytes&quot;, &quot;TB&quot;);</b>
+<b class="nc">&nbsp;			DATA_SIZE_SUFFIX = Collections.unmodifiableMap(values);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, Object&gt; fieldValues = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, Object&gt; staticFinals = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void visitVariable(VariableTree variable) throws Exception {
+<b class="nc">&nbsp;			Set&lt;Modifier&gt; flags = variable.getModifierFlags();</b>
+<b class="nc">&nbsp;			if (flags.contains(Modifier.STATIC) &amp;&amp; flags.contains(Modifier.FINAL)) {</b>
+<b class="nc">&nbsp;				this.staticFinals.put(variable.getName(), getValue(variable));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (!flags.contains(Modifier.FINAL)) {</b>
+<b class="nc">&nbsp;				this.fieldValues.put(variable.getName(), getValue(variable));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object getValue(VariableTree variable) throws Exception {
+<b class="nc">&nbsp;			ExpressionTree initializer = variable.getInitializer();</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; wrapperType = WRAPPER_TYPES.get(variable.getType());</b>
+<b class="nc">&nbsp;			Object defaultValue = DEFAULT_TYPE_VALUES.get(wrapperType);</b>
+<b class="nc">&nbsp;			if (initializer != null) {</b>
+<b class="nc">&nbsp;				return getValue(initializer, defaultValue);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return defaultValue;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object getValue(ExpressionTree expression, Object defaultValue) throws Exception {
+<b class="nc">&nbsp;			Object literalValue = expression.getLiteralValue();</b>
+<b class="nc">&nbsp;			if (literalValue != null) {</b>
+<b class="nc">&nbsp;				return literalValue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Object factoryValue = expression.getFactoryValue();</b>
+<b class="nc">&nbsp;			if (factoryValue != null) {</b>
+<b class="nc">&nbsp;				return getFactoryValue(expression, factoryValue);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			List&lt;? extends ExpressionTree&gt; arrayValues = expression.getArrayExpression();</b>
+<b class="nc">&nbsp;			if (arrayValues != null) {</b>
+<b class="nc">&nbsp;				Object[] result = new Object[arrayValues.size()];</b>
+<b class="nc">&nbsp;				for (int i = 0; i &lt; arrayValues.size(); i++) {</b>
+<b class="nc">&nbsp;					Object value = getValue(arrayValues.get(i), null);</b>
+<b class="nc">&nbsp;					if (value == null) { // One of the elements could not be resolved</b>
+<b class="nc">&nbsp;						return defaultValue;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					result[i] = value;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return result;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (expression.getKind().equals(&quot;IDENTIFIER&quot;)) {</b>
+<b class="nc">&nbsp;				return this.staticFinals.get(expression.toString());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (expression.getKind().equals(&quot;MEMBER_SELECT&quot;)) {</b>
+<b class="nc">&nbsp;				return WELL_KNOWN_STATIC_FINALS.get(expression.toString());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return defaultValue;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object getFactoryValue(ExpressionTree expression, Object factoryValue) {
+<b class="nc">&nbsp;			Object durationValue = getFactoryValue(expression, factoryValue, DURATION_OF, DURATION_SUFFIX);</b>
+<b class="nc">&nbsp;			if (durationValue != null) {</b>
+<b class="nc">&nbsp;				return durationValue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Object dataSizeValue = getFactoryValue(expression, factoryValue, DATA_SIZE_OF, DATA_SIZE_SUFFIX);</b>
+<b class="nc">&nbsp;			if (dataSizeValue != null) {</b>
+<b class="nc">&nbsp;				return dataSizeValue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Object periodValue = getFactoryValue(expression, factoryValue, PERIOD_OF, PERIOD_SUFFIX);</b>
+<b class="nc">&nbsp;			if (periodValue != null) {</b>
+<b class="nc">&nbsp;				return periodValue;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return factoryValue;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Object getFactoryValue(ExpressionTree expression, Object factoryValue, String prefix,
+&nbsp;				Map&lt;String, String&gt; suffixMapping) {
+<b class="nc">&nbsp;			Object instance = expression.getInstance();</b>
+<b class="nc">&nbsp;			if (instance != null &amp;&amp; instance.toString().startsWith(prefix)) {</b>
+<b class="nc">&nbsp;				String type = instance.toString();</b>
+<b class="nc">&nbsp;				type = type.substring(prefix.length(), type.indexOf(&#39;(&#39;));</b>
+<b class="nc">&nbsp;				String suffix = suffixMapping.get(type);</b>
+<b class="nc">&nbsp;				return (suffix != null) ? factoryValue + suffix : null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Map&lt;String, Object&gt; getFieldValues() {
+<b class="nc">&nbsp;			return this.fieldValues;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

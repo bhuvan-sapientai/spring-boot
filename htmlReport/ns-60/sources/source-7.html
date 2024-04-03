@@ -1,0 +1,265 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NestedJarResourceSet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.tomcat</a>
+</div>
+
+<h1>Coverage Summary for Class: NestedJarResourceSet (org.springframework.boot.web.embedded.tomcat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NestedJarResourceSet</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.tomcat;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.JarURLConnection;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.Attributes.Name;
+&nbsp;import java.util.jar.JarEntry;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;
+&nbsp;import org.apache.catalina.LifecycleException;
+&nbsp;import org.apache.catalina.WebResource;
+&nbsp;import org.apache.catalina.WebResourceRoot;
+&nbsp;import org.apache.catalina.WebResourceSet;
+&nbsp;import org.apache.catalina.webresources.AbstractSingleArchiveResourceSet;
+&nbsp;import org.apache.catalina.webresources.JarResource;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ResourceUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link WebResourceSet} for a resource in a nested JAR.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class NestedJarResourceSet extends AbstractSingleArchiveResourceSet {
+&nbsp;
+<b class="nc">&nbsp;	private static final Name MULTI_RELEASE = new Name(&quot;Multi-Release&quot;);</b>
+&nbsp;
+&nbsp;	private final URL url;
+&nbsp;
+<b class="nc">&nbsp;	private JarFile archive = null;</b>
+&nbsp;
+<b class="nc">&nbsp;	private long archiveUseCount = 0;</b>
+&nbsp;
+&nbsp;	private boolean useCaches;
+&nbsp;
+&nbsp;	private volatile Boolean multiRelease;
+&nbsp;
+&nbsp;	NestedJarResourceSet(URL url, WebResourceRoot root, String webAppMount, String internalPath)
+<b class="nc">&nbsp;			throws IllegalArgumentException {</b>
+<b class="nc">&nbsp;		this.url = url;</b>
+<b class="nc">&nbsp;		setRoot(root);</b>
+<b class="nc">&nbsp;		setWebAppMount(webAppMount);</b>
+<b class="nc">&nbsp;		setInternalPath(internalPath);</b>
+<b class="nc">&nbsp;		setStaticOnly(true);</b>
+<b class="nc">&nbsp;		if (getRoot().getState().isAvailable()) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				start();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (LifecycleException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected WebResource createArchiveResource(JarEntry jarEntry, String webAppPath, Manifest manifest) {
+<b class="nc">&nbsp;		return new JarResource(this, webAppPath, getBaseUrlString(), jarEntry);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void initInternal() throws LifecycleException {
+&nbsp;		try {
+<b class="nc">&nbsp;			JarURLConnection connection = connect();</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				setManifest(connection.getManifest());</b>
+<b class="nc">&nbsp;				setBaseUrl(connection.getJarFileURL());</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				if (!connection.getUseCaches()) {</b>
+<b class="nc">&nbsp;					connection.getJarFile().close();</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected JarFile openJarFile() throws IOException {
+<b class="nc">&nbsp;		synchronized (this.archiveLock) {</b>
+<b class="nc">&nbsp;			if (this.archive == null) {</b>
+<b class="nc">&nbsp;				JarURLConnection connection = connect();</b>
+<b class="nc">&nbsp;				this.useCaches = connection.getUseCaches();</b>
+<b class="nc">&nbsp;				this.archive = connection.getJarFile();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.archiveUseCount++;</b>
+<b class="nc">&nbsp;			return this.archive;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void closeJarFile() {
+<b class="nc">&nbsp;		synchronized (this.archiveLock) {</b>
+<b class="nc">&nbsp;			this.archiveUseCount--;</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isMultiRelease() {
+<b class="nc">&nbsp;		if (this.multiRelease == null) {</b>
+<b class="nc">&nbsp;			synchronized (this.archiveLock) {</b>
+<b class="nc">&nbsp;				if (this.multiRelease == null) {</b>
+&nbsp;					// JarFile.isMultiRelease() is final so we must go to the manifest
+<b class="nc">&nbsp;					Manifest manifest = getManifest();</b>
+<b class="nc">&nbsp;					Attributes attributes = (manifest != null) ? manifest.getMainAttributes() : null;</b>
+<b class="nc">&nbsp;					this.multiRelease = (attributes != null) &amp;&amp; attributes.containsKey(MULTI_RELEASE);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.multiRelease.booleanValue();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void gc() {
+<b class="nc">&nbsp;		synchronized (this.archiveLock) {</b>
+<b class="nc">&nbsp;			if (this.archive != null &amp;&amp; this.archiveUseCount == 0) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					if (!this.useCaches) {</b>
+<b class="nc">&nbsp;						this.archive.close();</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IOException ex) {</b>
+&nbsp;					// Ignore
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;				this.archive = null;</b>
+<b class="nc">&nbsp;				this.archiveEntries = null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private JarURLConnection connect() throws IOException {
+<b class="nc">&nbsp;		URLConnection connection = this.url.openConnection();</b>
+<b class="nc">&nbsp;		ResourceUtils.useCachesIfNecessary(connection);</b>
+<b class="nc">&nbsp;		Assert.state(connection instanceof JarURLConnection,</b>
+<b class="nc">&nbsp;				() -&gt; &quot;URL &#39;%s&#39; did not return a JAR connection&quot;.formatted(this.url));</b>
+<b class="nc">&nbsp;		connection.connect();</b>
+<b class="nc">&nbsp;		return (JarURLConnection) connection;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

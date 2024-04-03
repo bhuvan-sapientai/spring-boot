@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SystemEnvironmentPropertySourceEnvironmentPostProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.env</a>
+</div>
+
+<h1>Coverage Summary for Class: SystemEnvironmentPropertySourceEnvironmentPostProcessor (org.springframework.boot.env)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SystemEnvironmentPropertySourceEnvironmentPostProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SystemEnvironmentPropertySourceEnvironmentPostProcessor$OriginAwareSystemEnvironmentPropertySource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.env;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginLookup;
+&nbsp;import org.springframework.boot.origin.SystemEnvironmentOrigin;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.core.env.StandardEnvironment;
+&nbsp;import org.springframework.core.env.SystemEnvironmentPropertySource;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link EnvironmentPostProcessor} that replaces the systemEnvironment
+&nbsp; * {@link SystemEnvironmentPropertySource} with an
+&nbsp; * {@link OriginAwareSystemEnvironmentPropertySource} that can track the
+&nbsp; * {@link SystemEnvironmentOrigin} for every system environment property.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; */
+<b class="nc">&nbsp;public class SystemEnvironmentPropertySourceEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The default order for the processor.
+&nbsp;	 */
+&nbsp;	public static final int DEFAULT_ORDER = SpringApplicationJsonEnvironmentPostProcessor.DEFAULT_ORDER - 1;
+&nbsp;
+<b class="nc">&nbsp;	private int order = DEFAULT_ORDER;</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+<b class="nc">&nbsp;		String sourceName = StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME;</b>
+<b class="nc">&nbsp;		PropertySource&lt;?&gt; propertySource = environment.getPropertySources().get(sourceName);</b>
+<b class="nc">&nbsp;		if (propertySource != null) {</b>
+<b class="nc">&nbsp;			replacePropertySource(environment, sourceName, propertySource, application.getEnvironmentPrefix());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private void replacePropertySource(ConfigurableEnvironment environment, String sourceName,
+&nbsp;			PropertySource&lt;?&gt; propertySource, String environmentPrefix) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; originalSource = (Map&lt;String, Object&gt;) propertySource.getSource();</b>
+<b class="nc">&nbsp;		SystemEnvironmentPropertySource source = new OriginAwareSystemEnvironmentPropertySource(sourceName,</b>
+&nbsp;				originalSource, environmentPrefix);
+<b class="nc">&nbsp;		environment.getPropertySources().replace(sourceName, source);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return this.order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOrder(int order) {
+<b class="nc">&nbsp;		this.order = order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link SystemEnvironmentPropertySource} that also tracks {@link Origin}.
+&nbsp;	 */
+&nbsp;	protected static class OriginAwareSystemEnvironmentPropertySource extends SystemEnvironmentPropertySource
+&nbsp;			implements OriginLookup&lt;String&gt; {
+&nbsp;
+&nbsp;		private final String prefix;
+&nbsp;
+&nbsp;		OriginAwareSystemEnvironmentPropertySource(String name, Map&lt;String, Object&gt; source, String environmentPrefix) {
+<b class="nc">&nbsp;			super(name, source);</b>
+<b class="nc">&nbsp;			this.prefix = determinePrefix(environmentPrefix);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String determinePrefix(String environmentPrefix) {
+<b class="nc">&nbsp;			if (!StringUtils.hasText(environmentPrefix)) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (environmentPrefix.endsWith(&quot;.&quot;) || environmentPrefix.endsWith(&quot;_&quot;) || environmentPrefix.endsWith(&quot;-&quot;)) {</b>
+<b class="nc">&nbsp;				return environmentPrefix.substring(0, environmentPrefix.length() - 1);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return environmentPrefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean containsProperty(String name) {
+<b class="nc">&nbsp;			return super.containsProperty(name);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Object getProperty(String name) {
+<b class="nc">&nbsp;			return super.getProperty(name);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Origin getOrigin(String key) {
+<b class="nc">&nbsp;			String property = resolvePropertyName(key);</b>
+<b class="nc">&nbsp;			if (super.containsProperty(property)) {</b>
+<b class="nc">&nbsp;				return new SystemEnvironmentOrigin(property);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getPrefix() {
+<b class="nc">&nbsp;			return this.prefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

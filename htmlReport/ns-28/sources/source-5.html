@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationPropertiesBeanRegistrar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationPropertiesBeanRegistrar (org.springframework.boot.context.properties)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationPropertiesBeanRegistrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.HierarchicalBeanFactory;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.RootBeanDefinition;
+&nbsp;import org.springframework.boot.context.properties.bind.BindMethod;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Delegate used by {@link EnableConfigurationPropertiesRegistrar} and
+&nbsp; * {@link ConfigurationPropertiesScanRegistrar} to register a bean definition for a
+&nbsp; * {@link ConfigurationProperties @ConfigurationProperties} class.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;final class ConfigurationPropertiesBeanRegistrar {
+&nbsp;
+&nbsp;	private final BeanDefinitionRegistry registry;
+&nbsp;
+&nbsp;	private final BeanFactory beanFactory;
+&nbsp;
+<b class="nc">&nbsp;	ConfigurationPropertiesBeanRegistrar(BeanDefinitionRegistry registry) {</b>
+<b class="nc">&nbsp;		this.registry = registry;</b>
+<b class="nc">&nbsp;		this.beanFactory = (BeanFactory) this.registry;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void register(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		MergedAnnotation&lt;ConfigurationProperties&gt; annotation = MergedAnnotations</b>
+<b class="nc">&nbsp;			.from(type, SearchStrategy.TYPE_HIERARCHY)</b>
+<b class="nc">&nbsp;			.get(ConfigurationProperties.class);</b>
+<b class="nc">&nbsp;		register(type, annotation);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void register(Class&lt;?&gt; type, MergedAnnotation&lt;ConfigurationProperties&gt; annotation) {
+<b class="nc">&nbsp;		String name = getName(type, annotation);</b>
+<b class="nc">&nbsp;		if (!containsBeanDefinition(name)) {</b>
+<b class="nc">&nbsp;			registerBeanDefinition(name, type, annotation);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getName(Class&lt;?&gt; type, MergedAnnotation&lt;ConfigurationProperties&gt; annotation) {
+<b class="nc">&nbsp;		String prefix = annotation.isPresent() ? annotation.getString(&quot;prefix&quot;) : &quot;&quot;;</b>
+<b class="nc">&nbsp;		return (StringUtils.hasText(prefix) ? prefix + &quot;-&quot; + type.getName() : type.getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean containsBeanDefinition(String name) {
+<b class="nc">&nbsp;		return containsBeanDefinition(this.beanFactory, name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean containsBeanDefinition(BeanFactory beanFactory, String name) {
+<b class="nc">&nbsp;		if (beanFactory instanceof ListableBeanFactory listableBeanFactory</b>
+<b class="nc">&nbsp;				&amp;&amp; listableBeanFactory.containsBeanDefinition(name)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (beanFactory instanceof HierarchicalBeanFactory hierarchicalBeanFactory) {</b>
+<b class="nc">&nbsp;			return containsBeanDefinition(hierarchicalBeanFactory.getParentBeanFactory(), name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerBeanDefinition(String beanName, Class&lt;?&gt; type,
+&nbsp;			MergedAnnotation&lt;ConfigurationProperties&gt; annotation) {
+<b class="nc">&nbsp;		Assert.state(annotation.isPresent(), () -&gt; &quot;No &quot; + ConfigurationProperties.class.getSimpleName()</b>
+<b class="nc">&nbsp;				+ &quot; annotation found on  &#39;&quot; + type.getName() + &quot;&#39;.&quot;);</b>
+<b class="nc">&nbsp;		this.registry.registerBeanDefinition(beanName, createBeanDefinition(beanName, type));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BeanDefinition createBeanDefinition(String beanName, Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		BindMethod bindMethod = ConfigurationPropertiesBean.deduceBindMethod(type);</b>
+<b class="nc">&nbsp;		RootBeanDefinition definition = new RootBeanDefinition(type);</b>
+<b class="nc">&nbsp;		BindMethodAttribute.set(definition, bindMethod);</b>
+<b class="nc">&nbsp;		if (bindMethod == BindMethod.VALUE_OBJECT) {</b>
+<b class="nc">&nbsp;			definition.setInstanceSupplier(() -&gt; ConstructorBound.from(this.beanFactory, beanName, type));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return definition;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

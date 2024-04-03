@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JsonObjectDeserializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.jackson</a>
+</div>
+
+<h1>Coverage Summary for Class: JsonObjectDeserializer (org.springframework.boot.jackson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JsonObjectDeserializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.jackson;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.math.BigInteger;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.JsonParser;
+&nbsp;import com.fasterxml.jackson.core.ObjectCodec;
+&nbsp;import com.fasterxml.jackson.core.TreeNode;
+&nbsp;import com.fasterxml.jackson.databind.DeserializationContext;
+&nbsp;import com.fasterxml.jackson.databind.JsonDeserializer;
+&nbsp;import com.fasterxml.jackson.databind.JsonMappingException;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.node.NullNode;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Helper base class for {@link JsonDeserializer} implementations that deserialize
+&nbsp; * objects.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the supported object type
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; * @see JsonObjectSerializer
+&nbsp; */
+<b class="nc">&nbsp;public abstract class JsonObjectDeserializer&lt;T&gt; extends com.fasterxml.jackson.databind.JsonDeserializer&lt;T&gt; {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public final T deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+&nbsp;		try {
+<b class="nc">&nbsp;			ObjectCodec codec = jp.getCodec();</b>
+<b class="nc">&nbsp;			JsonNode tree = codec.readTree(jp);</b>
+<b class="nc">&nbsp;			return deserializeObject(jp, ctxt, codec, tree);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			if (ex instanceof IOException ioException) {</b>
+<b class="nc">&nbsp;				throw ioException;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new JsonMappingException(jp, &quot;Object deserialize error&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Deserialize JSON content into the value type this serializer handles.
+&nbsp;	 * @param jsonParser the source parser used for reading JSON content
+&nbsp;	 * @param context context that can be used to access information about this
+&nbsp;	 * deserialization activity
+&nbsp;	 * @param codec the {@link ObjectCodec} associated with the parser
+&nbsp;	 * @param tree deserialized JSON content as tree expressed using set of
+&nbsp;	 * {@link TreeNode} instances
+&nbsp;	 * @return the deserialized object
+&nbsp;	 * @throws IOException on error
+&nbsp;	 * @see #deserialize(JsonParser, DeserializationContext)
+&nbsp;	 */
+&nbsp;	protected abstract T deserializeObject(JsonParser jsonParser, DeserializationContext context, ObjectCodec codec,
+&nbsp;			JsonNode tree) throws IOException;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Helper method to extract a value from the given {@code jsonNode} or return
+&nbsp;	 * {@code null} when the node itself is {@code null}.
+&nbsp;	 * @param jsonNode the source node (may be {@code null})
+&nbsp;	 * @param type the data type. May be {@link String}, {@link Boolean}, {@link Long},
+&nbsp;	 * {@link Integer}, {@link Short}, {@link Double}, {@link Float}, {@link BigDecimal}
+&nbsp;	 * or {@link BigInteger}.
+&nbsp;	 * @param &lt;D&gt; the data type requested
+&nbsp;	 * @return the node value or {@code null}
+&nbsp;	 */
+&nbsp;	@SuppressWarnings({ &quot;unchecked&quot; })
+&nbsp;	protected final &lt;D&gt; D nullSafeValue(JsonNode jsonNode, Class&lt;D&gt; type) {
+<b class="nc">&nbsp;		Assert.notNull(type, &quot;Type must not be null&quot;);</b>
+<b class="nc">&nbsp;		if (jsonNode == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == String.class) {</b>
+<b class="nc">&nbsp;			return (D) jsonNode.textValue();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == Boolean.class) {</b>
+<b class="nc">&nbsp;			return (D) Boolean.valueOf(jsonNode.booleanValue());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == Long.class) {</b>
+<b class="nc">&nbsp;			return (D) Long.valueOf(jsonNode.longValue());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == Integer.class) {</b>
+<b class="nc">&nbsp;			return (D) Integer.valueOf(jsonNode.intValue());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == Short.class) {</b>
+<b class="nc">&nbsp;			return (D) Short.valueOf(jsonNode.shortValue());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == Double.class) {</b>
+<b class="nc">&nbsp;			return (D) Double.valueOf(jsonNode.doubleValue());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == Float.class) {</b>
+<b class="nc">&nbsp;			return (D) Float.valueOf(jsonNode.floatValue());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == BigDecimal.class) {</b>
+<b class="nc">&nbsp;			return (D) jsonNode.decimalValue();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (type == BigInteger.class) {</b>
+<b class="nc">&nbsp;			return (D) jsonNode.bigIntegerValue();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalArgumentException(&quot;Unsupported value type &quot; + type.getName());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Helper method to return a {@link JsonNode} from the tree.
+&nbsp;	 * @param tree the source tree
+&nbsp;	 * @param fieldName the field name to extract
+&nbsp;	 * @return the {@link JsonNode}
+&nbsp;	 */
+&nbsp;	protected final JsonNode getRequiredNode(JsonNode tree, String fieldName) {
+<b class="nc">&nbsp;		Assert.notNull(tree, &quot;Tree must not be null&quot;);</b>
+<b class="nc">&nbsp;		JsonNode node = tree.get(fieldName);</b>
+<b class="nc">&nbsp;		Assert.state(node != null &amp;&amp; !(node instanceof NullNode), () -&gt; &quot;Missing JSON field &#39;&quot; + fieldName + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;		return node;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

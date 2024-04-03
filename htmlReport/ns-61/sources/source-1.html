@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AccessLogHttpHandlerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.undertow</a>
+</div>
+
+<h1>Coverage Summary for Class: AccessLogHttpHandlerFactory (org.springframework.boot.web.embedded.undertow)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AccessLogHttpHandlerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AccessLogHttpHandlerFactory$ClosableAccessLogHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.undertow;
+&nbsp;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import io.undertow.Undertow;
+&nbsp;import io.undertow.server.HttpHandler;
+&nbsp;import io.undertow.server.handlers.accesslog.AccessLogHandler;
+&nbsp;import io.undertow.server.handlers.accesslog.DefaultAccessLogReceiver;
+&nbsp;import org.xnio.OptionMap;
+&nbsp;import org.xnio.Options;
+&nbsp;import org.xnio.Xnio;
+&nbsp;import org.xnio.XnioWorker;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link HttpHandlerFactory} for an {@link AccessLogHandler}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;class AccessLogHttpHandlerFactory implements HttpHandlerFactory {
+&nbsp;
+&nbsp;	private final File directory;
+&nbsp;
+&nbsp;	private final String pattern;
+&nbsp;
+&nbsp;	private final String prefix;
+&nbsp;
+&nbsp;	private final String suffix;
+&nbsp;
+&nbsp;	private final boolean rotate;
+&nbsp;
+<b class="nc">&nbsp;	AccessLogHttpHandlerFactory(File directory, String pattern, String prefix, String suffix, boolean rotate) {</b>
+<b class="nc">&nbsp;		this.directory = directory;</b>
+<b class="nc">&nbsp;		this.pattern = pattern;</b>
+<b class="nc">&nbsp;		this.prefix = prefix;</b>
+<b class="nc">&nbsp;		this.suffix = suffix;</b>
+<b class="nc">&nbsp;		this.rotate = rotate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public HttpHandler getHandler(HttpHandler next) {
+&nbsp;		try {
+<b class="nc">&nbsp;			createAccessLogDirectoryIfNecessary();</b>
+<b class="nc">&nbsp;			XnioWorker worker = createWorker();</b>
+<b class="nc">&nbsp;			String baseName = (this.prefix != null) ? this.prefix : &quot;access_log.&quot;;</b>
+<b class="nc">&nbsp;			String formatString = (this.pattern != null) ? this.pattern : &quot;common&quot;;</b>
+<b class="nc">&nbsp;			return new ClosableAccessLogHandler(next, worker,</b>
+&nbsp;					new DefaultAccessLogReceiver(worker, this.directory, baseName, this.suffix, this.rotate),
+&nbsp;					formatString);
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Failed to create AccessLogHandler&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createAccessLogDirectoryIfNecessary() {
+<b class="nc">&nbsp;		Assert.state(this.directory != null, &quot;Access log directory is not set&quot;);</b>
+<b class="nc">&nbsp;		if (!this.directory.isDirectory() &amp;&amp; !this.directory.mkdirs()) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Failed to create access log directory &#39;&quot; + this.directory + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private XnioWorker createWorker() throws IOException {
+<b class="nc">&nbsp;		Xnio xnio = Xnio.getInstance(Undertow.class.getClassLoader());</b>
+<b class="nc">&nbsp;		return xnio.createWorker(OptionMap.builder().set(Options.THREAD_DAEMON, true).getMap());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Closeable} variant of {@link AccessLogHandler}.
+&nbsp;	 */
+&nbsp;	private static class ClosableAccessLogHandler extends AccessLogHandler implements Closeable {
+&nbsp;
+&nbsp;		private final DefaultAccessLogReceiver accessLogReceiver;
+&nbsp;
+&nbsp;		private final XnioWorker worker;
+&nbsp;
+&nbsp;		ClosableAccessLogHandler(HttpHandler next, XnioWorker worker, DefaultAccessLogReceiver accessLogReceiver,
+&nbsp;				String formatString) {
+<b class="nc">&nbsp;			super(next, accessLogReceiver, formatString, Undertow.class.getClassLoader());</b>
+<b class="nc">&nbsp;			this.worker = worker;</b>
+<b class="nc">&nbsp;			this.accessLogReceiver = accessLogReceiver;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+&nbsp;			try {
+<b class="nc">&nbsp;				this.accessLogReceiver.close();</b>
+<b class="nc">&nbsp;				this.worker.shutdown();</b>
+<b class="nc">&nbsp;				this.worker.awaitTermination(30, TimeUnit.SECONDS);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IOException ex) {</b>
+<b class="nc">&nbsp;				throw new RuntimeException(ex);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;				Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

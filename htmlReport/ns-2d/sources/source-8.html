@@ -1,0 +1,429 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DurationStyle</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.convert</a>
+</div>
+
+<h1>Coverage Summary for Class: DurationStyle (org.springframework.boot.convert)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DurationStyle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DurationStyle$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DurationStyle$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DurationStyle$Unit</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.convert;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Duration format styles.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Valentine Wu
+&nbsp; * @since 2.0.0
+&nbsp; */
+<b class="nc">&nbsp;public enum DurationStyle {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Simple formatting, for example &#39;1s&#39;.
+&nbsp;	 */
+<b class="nc">&nbsp;	SIMPLE(&quot;^([+-]?\\d+)([a-zA-Z]{0,2})$&quot;) {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Duration parse(String value, ChronoUnit unit) {
+&nbsp;			try {
+<b class="nc">&nbsp;				Matcher matcher = matcher(value);</b>
+<b class="nc">&nbsp;				Assert.state(matcher.matches(), &quot;Does not match simple duration pattern&quot;);</b>
+<b class="nc">&nbsp;				String suffix = matcher.group(2);</b>
+<b class="nc">&nbsp;				return (StringUtils.hasLength(suffix) ? Unit.fromSuffix(suffix) : Unit.fromChronoUnit(unit))</b>
+<b class="nc">&nbsp;					.parse(matcher.group(1));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(&quot;&#39;&quot; + value + &quot;&#39; is not a valid simple duration&quot;, ex);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String print(Duration value, ChronoUnit unit) {
+<b class="nc">&nbsp;			return Unit.fromChronoUnit(unit).print(value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	},
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * ISO-8601 formatting.
+&nbsp;	 */
+<b class="nc">&nbsp;	ISO8601(&quot;^[+-]?[pP].*$&quot;) {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Duration parse(String value, ChronoUnit unit) {
+&nbsp;			try {
+<b class="nc">&nbsp;				return Duration.parse(value);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(&quot;&#39;&quot; + value + &quot;&#39; is not a valid ISO-8601 duration&quot;, ex);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String print(Duration value, ChronoUnit unit) {
+<b class="nc">&nbsp;			return value.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	};
+&nbsp;
+&nbsp;	private final Pattern pattern;
+&nbsp;
+<b class="nc">&nbsp;	DurationStyle(String pattern) {</b>
+<b class="nc">&nbsp;		this.pattern = Pattern.compile(pattern);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final boolean matches(String value) {
+<b class="nc">&nbsp;		return this.pattern.matcher(value).matches();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final Matcher matcher(String value) {
+<b class="nc">&nbsp;		return this.pattern.matcher(value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Parse the given value to a duration.
+&nbsp;	 * @param value the value to parse
+&nbsp;	 * @return a duration
+&nbsp;	 */
+&nbsp;	public Duration parse(String value) {
+<b class="nc">&nbsp;		return parse(value, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Parse the given value to a duration.
+&nbsp;	 * @param value the value to parse
+&nbsp;	 * @param unit the duration unit to use if the value doesn&#39;t specify one ({@code null}
+&nbsp;	 * will default to ms)
+&nbsp;	 * @return a duration
+&nbsp;	 */
+&nbsp;	public abstract Duration parse(String value, ChronoUnit unit);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Print the specified duration.
+&nbsp;	 * @param value the value to print
+&nbsp;	 * @return the printed result
+&nbsp;	 */
+&nbsp;	public String print(Duration value) {
+<b class="nc">&nbsp;		return print(value, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Print the specified duration using the given unit.
+&nbsp;	 * @param value the value to print
+&nbsp;	 * @param unit the value to use for printing
+&nbsp;	 * @return the printed result
+&nbsp;	 */
+&nbsp;	public abstract String print(Duration value, ChronoUnit unit);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Detect the style then parse the value to return a duration.
+&nbsp;	 * @param value the value to parse
+&nbsp;	 * @return the parsed duration
+&nbsp;	 * @throws IllegalArgumentException if the value is not a known style or cannot be
+&nbsp;	 * parsed
+&nbsp;	 */
+&nbsp;	public static Duration detectAndParse(String value) {
+<b class="nc">&nbsp;		return detectAndParse(value, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Detect the style then parse the value to return a duration.
+&nbsp;	 * @param value the value to parse
+&nbsp;	 * @param unit the duration unit to use if the value doesn&#39;t specify one ({@code null}
+&nbsp;	 * will default to ms)
+&nbsp;	 * @return the parsed duration
+&nbsp;	 * @throws IllegalArgumentException if the value is not a known style or cannot be
+&nbsp;	 * parsed
+&nbsp;	 */
+&nbsp;	public static Duration detectAndParse(String value, ChronoUnit unit) {
+<b class="nc">&nbsp;		return detect(value).parse(value, unit);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Detect the style from the given source value.
+&nbsp;	 * @param value the source value
+&nbsp;	 * @return the duration style
+&nbsp;	 * @throws IllegalArgumentException if the value is not a known style
+&nbsp;	 */
+&nbsp;	public static DurationStyle detect(String value) {
+<b class="nc">&nbsp;		Assert.notNull(value, &quot;Value must not be null&quot;);</b>
+<b class="nc">&nbsp;		for (DurationStyle candidate : values()) {</b>
+<b class="nc">&nbsp;			if (candidate.matches(value)) {</b>
+<b class="nc">&nbsp;				return candidate;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalArgumentException(&quot;&#39;&quot; + value + &quot;&#39; is not a valid duration&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Units that we support.
+&nbsp;	 */
+<b class="nc">&nbsp;	enum Unit {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Nanoseconds.
+&nbsp;		 */
+<b class="nc">&nbsp;		NANOS(ChronoUnit.NANOS, &quot;ns&quot;, Duration::toNanos),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Microseconds.
+&nbsp;		 */
+<b class="nc">&nbsp;		MICROS(ChronoUnit.MICROS, &quot;us&quot;, (duration) -&gt; duration.toNanos() / 1000L),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Milliseconds.
+&nbsp;		 */
+<b class="nc">&nbsp;		MILLIS(ChronoUnit.MILLIS, &quot;ms&quot;, Duration::toMillis),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Seconds.
+&nbsp;		 */
+<b class="nc">&nbsp;		SECONDS(ChronoUnit.SECONDS, &quot;s&quot;, Duration::getSeconds),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Minutes.
+&nbsp;		 */
+<b class="nc">&nbsp;		MINUTES(ChronoUnit.MINUTES, &quot;m&quot;, Duration::toMinutes),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Hours.
+&nbsp;		 */
+<b class="nc">&nbsp;		HOURS(ChronoUnit.HOURS, &quot;h&quot;, Duration::toHours),</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Days.
+&nbsp;		 */
+<b class="nc">&nbsp;		DAYS(ChronoUnit.DAYS, &quot;d&quot;, Duration::toDays);</b>
+&nbsp;
+&nbsp;		private final ChronoUnit chronoUnit;
+&nbsp;
+&nbsp;		private final String suffix;
+&nbsp;
+&nbsp;		private final Function&lt;Duration, Long&gt; longValue;
+&nbsp;
+<b class="nc">&nbsp;		Unit(ChronoUnit chronoUnit, String suffix, Function&lt;Duration, Long&gt; toUnit) {</b>
+<b class="nc">&nbsp;			this.chronoUnit = chronoUnit;</b>
+<b class="nc">&nbsp;			this.suffix = suffix;</b>
+<b class="nc">&nbsp;			this.longValue = toUnit;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Duration parse(String value) {
+<b class="nc">&nbsp;			return Duration.of(Long.parseLong(value), this.chronoUnit);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String print(Duration value) {
+<b class="nc">&nbsp;			return longValue(value) + this.suffix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public long longValue(Duration value) {
+<b class="nc">&nbsp;			return this.longValue.apply(value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public static Unit fromChronoUnit(ChronoUnit chronoUnit) {
+<b class="nc">&nbsp;			if (chronoUnit == null) {</b>
+<b class="nc">&nbsp;				return Unit.MILLIS;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (Unit candidate : values()) {</b>
+<b class="nc">&nbsp;				if (candidate.chronoUnit == chronoUnit) {</b>
+<b class="nc">&nbsp;					return candidate;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Unknown unit &quot; + chronoUnit);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public static Unit fromSuffix(String suffix) {
+<b class="nc">&nbsp;			for (Unit candidate : values()) {</b>
+<b class="nc">&nbsp;				if (candidate.suffix.equalsIgnoreCase(suffix)) {</b>
+<b class="nc">&nbsp;					return candidate;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Unknown unit &#39;&quot; + suffix + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,319 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServletRegistrationBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: ServletRegistrationBean (org.springframework.boot.web.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServletRegistrationBean</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import jakarta.servlet.MultipartConfigElement;
+&nbsp;import jakarta.servlet.Servlet;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;import jakarta.servlet.ServletRegistration;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link ServletContextInitializer} to register {@link Servlet}s in a Servlet 3.0+
+&nbsp; * container. Similar to the {@link ServletContext#addServlet(String, Servlet)
+&nbsp; * registration} features provided by {@link ServletContext} but with a Spring Bean
+&nbsp; * friendly design.
+&nbsp; * &lt;p&gt;
+&nbsp; * The {@link #setServlet(Servlet) servlet} must be specified before calling
+&nbsp; * {@link #onStartup}. URL mapping can be configured used {@link #setUrlMappings} or
+&nbsp; * omitted when mapping to &#39;/*&#39; (unless
+&nbsp; * {@link #ServletRegistrationBean(Servlet, boolean, String...) alwaysMapUrl} is set to
+&nbsp; * {@code false}). The servlet name will be deduced if not specified.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the type of the {@link Servlet} to register
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; * @see ServletContextInitializer
+&nbsp; * @see ServletContext#addServlet(String, Servlet)
+&nbsp; */
+&nbsp;public class ServletRegistrationBean&lt;T extends Servlet&gt; extends DynamicRegistrationBean&lt;ServletRegistration.Dynamic&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] DEFAULT_MAPPINGS = { &quot;/*&quot; };</b>
+&nbsp;
+&nbsp;	private T servlet;
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;String&gt; urlMappings = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private boolean alwaysMapUrl = true;</b>
+&nbsp;
+<b class="nc">&nbsp;	private int loadOnStartup = -1;</b>
+&nbsp;
+&nbsp;	private MultipartConfigElement multipartConfig;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ServletRegistrationBean} instance.
+&nbsp;	 */
+<b class="nc">&nbsp;	public ServletRegistrationBean() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ServletRegistrationBean} instance with the specified
+&nbsp;	 * {@link Servlet} and URL mappings.
+&nbsp;	 * @param servlet the servlet being mapped
+&nbsp;	 * @param urlMappings the URLs being mapped
+&nbsp;	 */
+&nbsp;	public ServletRegistrationBean(T servlet, String... urlMappings) {
+<b class="nc">&nbsp;		this(servlet, true, urlMappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ServletRegistrationBean} instance with the specified
+&nbsp;	 * {@link Servlet} and URL mappings.
+&nbsp;	 * @param servlet the servlet being mapped
+&nbsp;	 * @param alwaysMapUrl if omitted URL mappings should be replaced with &#39;/*&#39;
+&nbsp;	 * @param urlMappings the URLs being mapped
+&nbsp;	 */
+<b class="nc">&nbsp;	public ServletRegistrationBean(T servlet, boolean alwaysMapUrl, String... urlMappings) {</b>
+<b class="nc">&nbsp;		Assert.notNull(servlet, &quot;Servlet must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(urlMappings, &quot;UrlMappings must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.servlet = servlet;</b>
+<b class="nc">&nbsp;		this.alwaysMapUrl = alwaysMapUrl;</b>
+<b class="nc">&nbsp;		this.urlMappings.addAll(Arrays.asList(urlMappings));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the servlet to be registered.
+&nbsp;	 * @param servlet the servlet
+&nbsp;	 */
+&nbsp;	public void setServlet(T servlet) {
+<b class="nc">&nbsp;		Assert.notNull(servlet, &quot;Servlet must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.servlet = servlet;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the servlet being registered.
+&nbsp;	 * @return the servlet
+&nbsp;	 */
+&nbsp;	public T getServlet() {
+<b class="nc">&nbsp;		return this.servlet;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the URL mappings for the servlet. If not specified the mapping will default to
+&nbsp;	 * &#39;/&#39;. This will replace any previously specified mappings.
+&nbsp;	 * @param urlMappings the mappings to set
+&nbsp;	 * @see #addUrlMappings(String...)
+&nbsp;	 */
+&nbsp;	public void setUrlMappings(Collection&lt;String&gt; urlMappings) {
+<b class="nc">&nbsp;		Assert.notNull(urlMappings, &quot;UrlMappings must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.urlMappings = new LinkedHashSet&lt;&gt;(urlMappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a mutable collection of the URL mappings, as defined in the Servlet
+&nbsp;	 * specification, for the servlet.
+&nbsp;	 * @return the urlMappings
+&nbsp;	 */
+&nbsp;	public Collection&lt;String&gt; getUrlMappings() {
+<b class="nc">&nbsp;		return this.urlMappings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add URL mappings, as defined in the Servlet specification, for the servlet.
+&nbsp;	 * @param urlMappings the mappings to add
+&nbsp;	 * @see #setUrlMappings(Collection)
+&nbsp;	 */
+&nbsp;	public void addUrlMappings(String... urlMappings) {
+<b class="nc">&nbsp;		Assert.notNull(urlMappings, &quot;UrlMappings must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.urlMappings.addAll(Arrays.asList(urlMappings));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the {@code loadOnStartup} priority. See
+&nbsp;	 * {@link ServletRegistration.Dynamic#setLoadOnStartup} for details.
+&nbsp;	 * @param loadOnStartup if load on startup is enabled
+&nbsp;	 */
+&nbsp;	public void setLoadOnStartup(int loadOnStartup) {
+<b class="nc">&nbsp;		this.loadOnStartup = loadOnStartup;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link MultipartConfigElement multi-part configuration}.
+&nbsp;	 * @param multipartConfig the multipart configuration to set or {@code null}
+&nbsp;	 */
+&nbsp;	public void setMultipartConfig(MultipartConfigElement multipartConfig) {
+<b class="nc">&nbsp;		this.multipartConfig = multipartConfig;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the {@link MultipartConfigElement multi-part configuration} to be applied
+&nbsp;	 * or {@code null}.
+&nbsp;	 * @return the multipart config
+&nbsp;	 */
+&nbsp;	public MultipartConfigElement getMultipartConfig() {
+<b class="nc">&nbsp;		return this.multipartConfig;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String getDescription() {
+<b class="nc">&nbsp;		Assert.notNull(this.servlet, &quot;Servlet must not be null&quot;);</b>
+<b class="nc">&nbsp;		return &quot;servlet &quot; + getServletName();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected ServletRegistration.Dynamic addRegistration(String description, ServletContext servletContext) {
+<b class="nc">&nbsp;		String name = getServletName();</b>
+<b class="nc">&nbsp;		return servletContext.addServlet(name, this.servlet);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure registration settings. Subclasses can override this method to perform
+&nbsp;	 * additional configuration if required.
+&nbsp;	 * @param registration the registration
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	protected void configure(ServletRegistration.Dynamic registration) {
+<b class="nc">&nbsp;		super.configure(registration);</b>
+<b class="nc">&nbsp;		String[] urlMapping = StringUtils.toStringArray(this.urlMappings);</b>
+<b class="nc">&nbsp;		if (urlMapping.length == 0 &amp;&amp; this.alwaysMapUrl) {</b>
+<b class="nc">&nbsp;			urlMapping = DEFAULT_MAPPINGS;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!ObjectUtils.isEmpty(urlMapping)) {</b>
+<b class="nc">&nbsp;			registration.addMapping(urlMapping);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		registration.setLoadOnStartup(this.loadOnStartup);</b>
+<b class="nc">&nbsp;		if (this.multipartConfig != null) {</b>
+<b class="nc">&nbsp;			registration.setMultipartConfig(this.multipartConfig);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the servlet name that will be registered.
+&nbsp;	 * @return the servlet name
+&nbsp;	 */
+&nbsp;	public String getServletName() {
+<b class="nc">&nbsp;		return getOrDeduceName(this.servlet);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return getServletName() + &quot; urls=&quot; + getUrlMappings();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

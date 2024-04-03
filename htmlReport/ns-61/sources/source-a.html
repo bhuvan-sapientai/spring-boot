@@ -1,0 +1,856 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UndertowServletWebServerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.undertow</a>
+</div>
+
+<h1>Coverage Summary for Class: UndertowServletWebServerFactory (org.springframework.boot.web.embedded.undertow)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UndertowServletWebServerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/149)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UndertowServletWebServerFactory$Initializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowServletWebServerFactory$LoaderHidingResourceManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowServletWebServerFactory$MetaInfResourcesResourceManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UndertowServletWebServerFactory$SuppliedSameSiteCookieHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/208)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.undertow;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLEncoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EventListener;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import io.undertow.Undertow.Builder;
+&nbsp;import io.undertow.server.HttpHandler;
+&nbsp;import io.undertow.server.HttpServerExchange;
+&nbsp;import io.undertow.server.handlers.Cookie;
+&nbsp;import io.undertow.server.handlers.resource.FileResourceManager;
+&nbsp;import io.undertow.server.handlers.resource.Resource;
+&nbsp;import io.undertow.server.handlers.resource.ResourceChangeListener;
+&nbsp;import io.undertow.server.handlers.resource.ResourceManager;
+&nbsp;import io.undertow.server.handlers.resource.URLResource;
+&nbsp;import io.undertow.server.session.SessionManager;
+&nbsp;import io.undertow.servlet.Servlets;
+&nbsp;import io.undertow.servlet.api.Deployment;
+&nbsp;import io.undertow.servlet.api.DeploymentInfo;
+&nbsp;import io.undertow.servlet.api.DeploymentManager;
+&nbsp;import io.undertow.servlet.api.ListenerInfo;
+&nbsp;import io.undertow.servlet.api.MimeMapping;
+&nbsp;import io.undertow.servlet.api.ServletContainerInitializerInfo;
+&nbsp;import io.undertow.servlet.api.ServletStackTraces;
+&nbsp;import io.undertow.servlet.core.DeploymentImpl;
+&nbsp;import io.undertow.servlet.handlers.DefaultServlet;
+&nbsp;import io.undertow.servlet.util.ImmediateInstanceFactory;
+&nbsp;import jakarta.servlet.ServletContainerInitializer;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.PropertyMapper;
+&nbsp;import org.springframework.boot.web.server.Cookie.SameSite;
+&nbsp;import org.springframework.boot.web.server.ErrorPage;
+&nbsp;import org.springframework.boot.web.server.MimeMappings.Mapping;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.boot.web.servlet.ServletContextInitializer;
+&nbsp;import org.springframework.boot.web.servlet.server.AbstractServletWebServerFactory;
+&nbsp;import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
+&nbsp;import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+&nbsp;import org.springframework.context.ResourceLoaderAware;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ServletWebServerFactory} that can be used to create
+&nbsp; * {@link UndertowServletWebServer}s.
+&nbsp; * &lt;p&gt;
+&nbsp; * Unless explicitly configured otherwise, the factory will create servers that listen for
+&nbsp; * HTTP requests on port 8080.
+&nbsp; *
+&nbsp; * @author Ivan Sopov
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Marcos Barbero
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @since 2.0.0
+&nbsp; * @see UndertowServletWebServer
+&nbsp; */
+&nbsp;public class UndertowServletWebServerFactory extends AbstractServletWebServerFactory
+&nbsp;		implements ConfigurableUndertowWebServerFactory, ResourceLoaderAware {
+&nbsp;
+<b class="nc">&nbsp;	private static final Pattern ENCODED_SLASH = Pattern.compile(&quot;%2F&quot;, Pattern.LITERAL);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Set&lt;Class&lt;?&gt;&gt; NO_CLASSES = Collections.emptySet();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final UndertowWebServerFactoryDelegate delegate = new UndertowWebServerFactoryDelegate();</b>
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;UndertowDeploymentInfoCustomizer&gt; deploymentInfoCustomizers = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private ResourceLoader resourceLoader;
+&nbsp;
+<b class="nc">&nbsp;	private boolean eagerFilterInit = true;</b>
+&nbsp;
+<b class="nc">&nbsp;	private boolean preservePathOnForward = false;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link UndertowServletWebServerFactory} instance.
+&nbsp;	 */
+<b class="nc">&nbsp;	public UndertowServletWebServerFactory() {</b>
+<b class="nc">&nbsp;		getJsp().setRegistered(false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link UndertowServletWebServerFactory} that listens for requests
+&nbsp;	 * using the specified port.
+&nbsp;	 * @param port the port to listen on
+&nbsp;	 */
+&nbsp;	public UndertowServletWebServerFactory(int port) {
+<b class="nc">&nbsp;		super(port);</b>
+<b class="nc">&nbsp;		getJsp().setRegistered(false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link UndertowServletWebServerFactory} with the specified context
+&nbsp;	 * path and port.
+&nbsp;	 * @param contextPath the root context path
+&nbsp;	 * @param port the port to listen on
+&nbsp;	 */
+&nbsp;	public UndertowServletWebServerFactory(String contextPath, int port) {
+<b class="nc">&nbsp;		super(contextPath, port);</b>
+<b class="nc">&nbsp;		getJsp().setRegistered(false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBuilderCustomizers(Collection&lt;? extends UndertowBuilderCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		this.delegate.setBuilderCustomizers(customizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addBuilderCustomizers(UndertowBuilderCustomizer... customizers) {
+<b class="nc">&nbsp;		this.delegate.addBuilderCustomizers(customizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link UndertowBuilderCustomizer}s that will be
+&nbsp;	 * applied to the Undertow {@link Builder}.
+&nbsp;	 * @return the customizers that will be applied
+&nbsp;	 */
+&nbsp;	public Collection&lt;UndertowBuilderCustomizer&gt; getBuilderCustomizers() {
+<b class="nc">&nbsp;		return this.delegate.getBuilderCustomizers();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setBufferSize(Integer bufferSize) {
+<b class="nc">&nbsp;		this.delegate.setBufferSize(bufferSize);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setIoThreads(Integer ioThreads) {
+<b class="nc">&nbsp;		this.delegate.setIoThreads(ioThreads);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setWorkerThreads(Integer workerThreads) {
+<b class="nc">&nbsp;		this.delegate.setWorkerThreads(workerThreads);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setUseDirectBuffers(Boolean directBuffers) {
+<b class="nc">&nbsp;		this.delegate.setUseDirectBuffers(directBuffers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAccessLogDirectory(File accessLogDirectory) {
+<b class="nc">&nbsp;		this.delegate.setAccessLogDirectory(accessLogDirectory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAccessLogPattern(String accessLogPattern) {
+<b class="nc">&nbsp;		this.delegate.setAccessLogPattern(accessLogPattern);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAccessLogPrefix(String accessLogPrefix) {
+<b class="nc">&nbsp;		this.delegate.setAccessLogPrefix(accessLogPrefix);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public String getAccessLogPrefix() {
+<b class="nc">&nbsp;		return this.delegate.getAccessLogPrefix();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAccessLogSuffix(String accessLogSuffix) {
+<b class="nc">&nbsp;		this.delegate.setAccessLogSuffix(accessLogSuffix);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAccessLogEnabled(boolean accessLogEnabled) {
+<b class="nc">&nbsp;		this.delegate.setAccessLogEnabled(accessLogEnabled);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public boolean isAccessLogEnabled() {
+<b class="nc">&nbsp;		return this.delegate.isAccessLogEnabled();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAccessLogRotate(boolean accessLogRotate) {
+<b class="nc">&nbsp;		this.delegate.setAccessLogRotate(accessLogRotate);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setUseForwardHeaders(boolean useForwardHeaders) {
+<b class="nc">&nbsp;		this.delegate.setUseForwardHeaders(useForwardHeaders);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final boolean isUseForwardHeaders() {
+<b class="nc">&nbsp;		return this.delegate.isUseForwardHeaders();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set {@link UndertowDeploymentInfoCustomizer}s that should be applied to the
+&nbsp;	 * Undertow {@link DeploymentInfo}. Calling this method will replace any existing
+&nbsp;	 * customizers.
+&nbsp;	 * @param customizers the customizers to set
+&nbsp;	 */
+&nbsp;	public void setDeploymentInfoCustomizers(Collection&lt;? extends UndertowDeploymentInfoCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.deploymentInfoCustomizers = new LinkedHashSet&lt;&gt;(customizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link UndertowDeploymentInfoCustomizer}s that should be used to customize the
+&nbsp;	 * Undertow {@link DeploymentInfo}.
+&nbsp;	 * @param customizers the customizers to add
+&nbsp;	 */
+&nbsp;	public void addDeploymentInfoCustomizers(UndertowDeploymentInfoCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;UndertowDeploymentInfoCustomizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.deploymentInfoCustomizers.addAll(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of the {@link UndertowDeploymentInfoCustomizer}s that
+&nbsp;	 * will be applied to the Undertow {@link DeploymentInfo}.
+&nbsp;	 * @return the customizers that will be applied
+&nbsp;	 */
+&nbsp;	public Collection&lt;UndertowDeploymentInfoCustomizer&gt; getDeploymentInfoCustomizers() {
+<b class="nc">&nbsp;		return this.deploymentInfoCustomizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setResourceLoader(ResourceLoader resourceLoader) {
+<b class="nc">&nbsp;		this.resourceLoader = resourceLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if filters should be eagerly initialized.
+&nbsp;	 * @return {@code true} if filters are eagerly initialized, otherwise {@code false}.
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public boolean isEagerFilterInit() {
+<b class="nc">&nbsp;		return this.eagerFilterInit;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set whether filters should be eagerly initialized.
+&nbsp;	 * @param eagerFilterInit {@code true} if filters are eagerly initialized, otherwise
+&nbsp;	 * {@code false}.
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public void setEagerFilterInit(boolean eagerFilterInit) {
+<b class="nc">&nbsp;		this.eagerFilterInit = eagerFilterInit;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return whether the request path should be preserved on forward.
+&nbsp;	 * @return {@code true} if the path should be preserved when a request is forwarded,
+&nbsp;	 * otherwise {@code false}.
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public boolean isPreservePathOnForward() {
+<b class="nc">&nbsp;		return this.preservePathOnForward;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set whether the request path should be preserved on forward.
+&nbsp;	 * @param preservePathOnForward {@code true} if the path should be preserved when a
+&nbsp;	 * request is forwarded, otherwise {@code false}.
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public void setPreservePathOnForward(boolean preservePathOnForward) {
+<b class="nc">&nbsp;		this.preservePathOnForward = preservePathOnForward;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public WebServer getWebServer(ServletContextInitializer... initializers) {
+<b class="nc">&nbsp;		Builder builder = this.delegate.createBuilder(this, this::getSslBundle);</b>
+<b class="nc">&nbsp;		DeploymentManager manager = createManager(initializers);</b>
+<b class="nc">&nbsp;		return getUndertowWebServer(builder, manager, getPort());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private DeploymentManager createManager(ServletContextInitializer... initializers) {
+<b class="nc">&nbsp;		DeploymentInfo deployment = Servlets.deployment();</b>
+<b class="nc">&nbsp;		registerServletContainerInitializerToDriveServletContextInitializers(deployment, initializers);</b>
+<b class="nc">&nbsp;		deployment.setClassLoader(getServletClassLoader());</b>
+<b class="nc">&nbsp;		deployment.setContextPath(getContextPath());</b>
+<b class="nc">&nbsp;		deployment.setDisplayName(getDisplayName());</b>
+<b class="nc">&nbsp;		deployment.setDeploymentName(&quot;spring-boot&quot;);</b>
+<b class="nc">&nbsp;		if (isRegisterDefaultServlet()) {</b>
+<b class="nc">&nbsp;			deployment.addServlet(Servlets.servlet(&quot;default&quot;, DefaultServlet.class));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		configureErrorPages(deployment);</b>
+<b class="nc">&nbsp;		deployment.setServletStackTraces(ServletStackTraces.NONE);</b>
+<b class="nc">&nbsp;		deployment.setResourceManager(getDocumentRootResourceManager());</b>
+<b class="nc">&nbsp;		deployment.setTempDir(createTempDir(&quot;undertow&quot;));</b>
+<b class="nc">&nbsp;		deployment.setEagerFilterInit(this.eagerFilterInit);</b>
+<b class="nc">&nbsp;		deployment.setPreservePathOnForward(this.preservePathOnForward);</b>
+<b class="nc">&nbsp;		configureMimeMappings(deployment);</b>
+<b class="nc">&nbsp;		configureWebListeners(deployment);</b>
+<b class="nc">&nbsp;		for (UndertowDeploymentInfoCustomizer customizer : this.deploymentInfoCustomizers) {</b>
+<b class="nc">&nbsp;			customizer.customize(deployment);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (getSession().isPersistent()) {</b>
+<b class="nc">&nbsp;			File dir = getValidSessionStoreDir();</b>
+<b class="nc">&nbsp;			deployment.setSessionPersistenceManager(new FileSessionPersistence(dir));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		addLocaleMappings(deployment);</b>
+<b class="nc">&nbsp;		DeploymentManager manager = Servlets.newContainer().addDeployment(deployment);</b>
+<b class="nc">&nbsp;		manager.deploy();</b>
+<b class="nc">&nbsp;		if (manager.getDeployment() instanceof DeploymentImpl managerDeployment) {</b>
+<b class="nc">&nbsp;			removeSuperfluousMimeMappings(managerDeployment, deployment);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		SessionManager sessionManager = manager.getDeployment().getSessionManager();</b>
+<b class="nc">&nbsp;		Duration timeoutDuration = getSession().getTimeout();</b>
+<b class="nc">&nbsp;		int sessionTimeout = (isZeroOrLess(timeoutDuration) ? -1 : (int) timeoutDuration.getSeconds());</b>
+<b class="nc">&nbsp;		sessionManager.setDefaultSessionTimeout(sessionTimeout);</b>
+<b class="nc">&nbsp;		return manager;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureWebListeners(DeploymentInfo deployment) {
+<b class="nc">&nbsp;		for (String className : getWebListenerClassNames()) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				deployment.addListener(new ListenerInfo(loadWebListenerClass(className)));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ClassNotFoundException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Failed to load web listener class &#39;&quot; + className + &quot;&#39;&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private Class&lt;? extends EventListener&gt; loadWebListenerClass(String className) throws ClassNotFoundException {
+<b class="nc">&nbsp;		return (Class&lt;? extends EventListener&gt;) getServletClassLoader().loadClass(className);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isZeroOrLess(Duration timeoutDuration) {
+<b class="nc">&nbsp;		return timeoutDuration == null || timeoutDuration.isZero() || timeoutDuration.isNegative();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addLocaleMappings(DeploymentInfo deployment) {
+<b class="nc">&nbsp;		getLocaleCharsetMappings()</b>
+<b class="nc">&nbsp;			.forEach((locale, charset) -&gt; deployment.addLocaleCharsetMapping(locale.toString(), charset.toString()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerServletContainerInitializerToDriveServletContextInitializers(DeploymentInfo deployment,
+&nbsp;			ServletContextInitializer... initializers) {
+<b class="nc">&nbsp;		ServletContextInitializer[] mergedInitializers = mergeInitializers(initializers);</b>
+<b class="nc">&nbsp;		Initializer initializer = new Initializer(mergedInitializers);</b>
+<b class="nc">&nbsp;		deployment.addServletContainerInitializer(new ServletContainerInitializerInfo(Initializer.class,</b>
+&nbsp;				new ImmediateInstanceFactory&lt;ServletContainerInitializer&gt;(initializer), NO_CLASSES));
+&nbsp;	}
+&nbsp;
+&nbsp;	private ClassLoader getServletClassLoader() {
+<b class="nc">&nbsp;		if (this.resourceLoader != null) {</b>
+<b class="nc">&nbsp;			return this.resourceLoader.getClassLoader();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return getClass().getClassLoader();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ResourceManager getDocumentRootResourceManager() {
+<b class="nc">&nbsp;		File root = getValidDocumentRoot();</b>
+<b class="nc">&nbsp;		File docBase = getCanonicalDocumentRoot(root);</b>
+<b class="nc">&nbsp;		List&lt;URL&gt; metaInfResourceUrls = getUrlsOfJarsWithMetaInfResources();</b>
+<b class="nc">&nbsp;		List&lt;URL&gt; resourceJarUrls = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		List&lt;ResourceManager&gt; managers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		ResourceManager rootManager = (docBase.isDirectory() ? new FileResourceManager(docBase, 0)</b>
+<b class="nc">&nbsp;				: new JarResourceManager(docBase));</b>
+<b class="nc">&nbsp;		if (root != null) {</b>
+<b class="nc">&nbsp;			rootManager = new LoaderHidingResourceManager(rootManager);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		managers.add(rootManager);</b>
+<b class="nc">&nbsp;		for (URL url : metaInfResourceUrls) {</b>
+<b class="nc">&nbsp;			if (&quot;file&quot;.equals(url.getProtocol())) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					File file = new File(url.toURI());</b>
+<b class="nc">&nbsp;					if (file.isFile()) {</b>
+<b class="nc">&nbsp;						resourceJarUrls.add(new URL(&quot;jar:&quot; + url + &quot;!/&quot;));</b>
+&nbsp;					}
+&nbsp;					else {
+<b class="nc">&nbsp;						managers.add(new FileResourceManager(new File(file, &quot;META-INF/resources&quot;), 0));</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				catch (Exception ex) {</b>
+<b class="nc">&nbsp;					throw new RuntimeException(ex);</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				resourceJarUrls.add(url);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		managers.add(new MetaInfResourcesResourceManager(resourceJarUrls));</b>
+<b class="nc">&nbsp;		return new CompositeResourceManager(managers.toArray(new ResourceManager[0]));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getCanonicalDocumentRoot(File docBase) {
+&nbsp;		try {
+<b class="nc">&nbsp;			File root = (docBase != null) ? docBase : createTempDir(&quot;undertow-docbase&quot;);</b>
+<b class="nc">&nbsp;			return root.getCanonicalFile();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Cannot get canonical document root&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureErrorPages(DeploymentInfo deployment) {
+<b class="nc">&nbsp;		for (ErrorPage errorPage : getErrorPages()) {</b>
+<b class="nc">&nbsp;			deployment.addErrorPage(getUndertowErrorPage(errorPage));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private io.undertow.servlet.api.ErrorPage getUndertowErrorPage(ErrorPage errorPage) {
+<b class="nc">&nbsp;		if (errorPage.getStatus() != null) {</b>
+<b class="nc">&nbsp;			return new io.undertow.servlet.api.ErrorPage(errorPage.getPath(), errorPage.getStatusCode());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (errorPage.getException() != null) {</b>
+<b class="nc">&nbsp;			return new io.undertow.servlet.api.ErrorPage(errorPage.getPath(), errorPage.getException());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new io.undertow.servlet.api.ErrorPage(errorPage.getPath());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureMimeMappings(DeploymentInfo deployment) {
+<b class="nc">&nbsp;		for (Mapping mimeMapping : getMimeMappings()) {</b>
+<b class="nc">&nbsp;			deployment.addMimeMapping(new MimeMapping(mimeMapping.getExtension(), mimeMapping.getMimeType()));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void removeSuperfluousMimeMappings(DeploymentImpl deployment, DeploymentInfo deploymentInfo) {
+&nbsp;		// DeploymentManagerImpl will always add MimeMappings.DEFAULT_MIME_MAPPINGS
+&nbsp;		// but we only want ours
+<b class="nc">&nbsp;		Map&lt;String, String&gt; mappings = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (MimeMapping mapping : deploymentInfo.getMimeMappings()) {</b>
+<b class="nc">&nbsp;			mappings.put(mapping.getExtension().toLowerCase(Locale.ENGLISH), mapping.getMimeType());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		deployment.setMimeExtensionMappings(mappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method called to create the {@link UndertowServletWebServer}. Subclasses
+&nbsp;	 * can override this method to return a different {@link UndertowServletWebServer} or
+&nbsp;	 * apply additional processing to the {@link Builder} and {@link DeploymentManager}
+&nbsp;	 * used to bootstrap Undertow
+&nbsp;	 * @param builder the builder
+&nbsp;	 * @param manager the deployment manager
+&nbsp;	 * @param port the port that Undertow should listen on
+&nbsp;	 * @return a new {@link UndertowServletWebServer} instance
+&nbsp;	 */
+&nbsp;	protected UndertowServletWebServer getUndertowWebServer(Builder builder, DeploymentManager manager, int port) {
+<b class="nc">&nbsp;		List&lt;HttpHandlerFactory&gt; initialHandlerFactories = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		initialHandlerFactories.add(new DeploymentManagerHttpHandlerFactory(manager));</b>
+<b class="nc">&nbsp;		HttpHandlerFactory cooHandlerFactory = getCookieHandlerFactory(manager.getDeployment());</b>
+<b class="nc">&nbsp;		if (cooHandlerFactory != null) {</b>
+<b class="nc">&nbsp;			initialHandlerFactories.add(cooHandlerFactory);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;HttpHandlerFactory&gt; httpHandlerFactories = this.delegate.createHttpHandlerFactories(this,</b>
+<b class="nc">&nbsp;				initialHandlerFactories.toArray(new HttpHandlerFactory[0]));</b>
+<b class="nc">&nbsp;		return new UndertowServletWebServer(builder, httpHandlerFactories, getContextPath(), port &gt;= 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private HttpHandlerFactory getCookieHandlerFactory(Deployment deployment) {
+<b class="nc">&nbsp;		SameSite sessionSameSite = getSession().getCookie().getSameSite();</b>
+<b class="nc">&nbsp;		List&lt;CookieSameSiteSupplier&gt; suppliers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		if (sessionSameSite != null) {</b>
+<b class="nc">&nbsp;			String sessionCookieName = deployment.getServletContext().getSessionCookieConfig().getName();</b>
+<b class="nc">&nbsp;			suppliers.add(CookieSameSiteSupplier.of(sessionSameSite).whenHasName(sessionCookieName));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!CollectionUtils.isEmpty(getCookieSameSiteSuppliers())) {</b>
+<b class="nc">&nbsp;			suppliers.addAll(getCookieSameSiteSuppliers());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (!suppliers.isEmpty()) ? (next) -&gt; new SuppliedSameSiteCookieHandler(next, suppliers) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ServletContainerInitializer} to initialize {@link ServletContextInitializer
+&nbsp;	 * ServletContextInitializers}.
+&nbsp;	 */
+&nbsp;	private static class Initializer implements ServletContainerInitializer {
+&nbsp;
+&nbsp;		private final ServletContextInitializer[] initializers;
+&nbsp;
+<b class="nc">&nbsp;		Initializer(ServletContextInitializer[] initializers) {</b>
+<b class="nc">&nbsp;			this.initializers = initializers;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void onStartup(Set&lt;Class&lt;?&gt;&gt; classes, ServletContext servletContext) throws ServletException {
+<b class="nc">&nbsp;			for (ServletContextInitializer initializer : this.initializers) {</b>
+<b class="nc">&nbsp;				initializer.onStartup(servletContext);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ResourceManager} that exposes resource in {@code META-INF/resources}
+&nbsp;	 * directory of nested (in {@code BOOT-INF/lib} or {@code WEB-INF/lib}) jars.
+&nbsp;	 */
+&nbsp;	private static final class MetaInfResourcesResourceManager implements ResourceManager {
+&nbsp;
+&nbsp;		private final List&lt;URL&gt; metaInfResourceJarUrls;
+&nbsp;
+<b class="nc">&nbsp;		private MetaInfResourcesResourceManager(List&lt;URL&gt; metaInfResourceJarUrls) {</b>
+<b class="nc">&nbsp;			this.metaInfResourceJarUrls = metaInfResourceJarUrls;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Resource getResource(String path) {
+<b class="nc">&nbsp;			for (URL url : this.metaInfResourceJarUrls) {</b>
+<b class="nc">&nbsp;				URLResource resource = getMetaInfResource(url, path);</b>
+<b class="nc">&nbsp;				if (resource != null) {</b>
+<b class="nc">&nbsp;					return resource;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isResourceChangeListenerSupported() {
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerResourceChangeListener(ResourceChangeListener listener) {
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void removeResourceChangeListener(ResourceChangeListener listener) {
+&nbsp;
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		private URLResource getMetaInfResource(URL resourceJar, String path) {
+&nbsp;			try {
+<b class="nc">&nbsp;				String urlPath = URLEncoder.encode(ENCODED_SLASH.matcher(path).replaceAll(&quot;/&quot;), StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;				URL resourceUrl = new URL(resourceJar + &quot;META-INF/resources&quot; + urlPath);</b>
+<b class="nc">&nbsp;				URLResource resource = new URLResource(resourceUrl, path);</b>
+<b class="nc">&nbsp;				if (resource.getContentLength() &lt; 0) {</b>
+<b class="nc">&nbsp;					return null;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return resource;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ResourceManager} to hide Spring Boot loader classes.
+&nbsp;	 */
+&nbsp;	private static final class LoaderHidingResourceManager implements ResourceManager {
+&nbsp;
+&nbsp;		private final ResourceManager delegate;
+&nbsp;
+<b class="nc">&nbsp;		private LoaderHidingResourceManager(ResourceManager delegate) {</b>
+<b class="nc">&nbsp;			this.delegate = delegate;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Resource getResource(String path) throws IOException {
+<b class="nc">&nbsp;			if (path.startsWith(&quot;/org/springframework/boot&quot;)) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.delegate.getResource(path);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isResourceChangeListenerSupported() {
+<b class="nc">&nbsp;			return this.delegate.isResourceChangeListenerSupported();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void registerResourceChangeListener(ResourceChangeListener listener) {
+<b class="nc">&nbsp;			this.delegate.registerResourceChangeListener(listener);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void removeResourceChangeListener(ResourceChangeListener listener) {
+<b class="nc">&nbsp;			this.delegate.removeResourceChangeListener(listener);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+<b class="nc">&nbsp;			this.delegate.close();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link HttpHandler} to apply {@link CookieSameSiteSupplier supplied}
+&nbsp;	 * {@link SameSite} cookie values.
+&nbsp;	 */
+&nbsp;	private static class SuppliedSameSiteCookieHandler implements HttpHandler {
+&nbsp;
+&nbsp;		private final HttpHandler next;
+&nbsp;
+&nbsp;		private final List&lt;CookieSameSiteSupplier&gt; suppliers;
+&nbsp;
+<b class="nc">&nbsp;		SuppliedSameSiteCookieHandler(HttpHandler next, List&lt;CookieSameSiteSupplier&gt; suppliers) {</b>
+<b class="nc">&nbsp;			this.next = next;</b>
+<b class="nc">&nbsp;			this.suppliers = suppliers;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void handleRequest(HttpServerExchange exchange) throws Exception {
+<b class="nc">&nbsp;			exchange.addResponseCommitListener(this::beforeCommit);</b>
+<b class="nc">&nbsp;			this.next.handleRequest(exchange);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void beforeCommit(HttpServerExchange exchange) {
+<b class="nc">&nbsp;			for (Cookie cookie : exchange.responseCookies()) {</b>
+<b class="nc">&nbsp;				SameSite sameSite = getSameSite(asServletCookie(cookie));</b>
+<b class="nc">&nbsp;				if (sameSite != null) {</b>
+<b class="nc">&nbsp;					cookie.setSameSiteMode(sameSite.attributeValue());</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;removal&quot;)
+&nbsp;		private jakarta.servlet.http.Cookie asServletCookie(Cookie cookie) {
+<b class="nc">&nbsp;			PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();</b>
+<b class="nc">&nbsp;			jakarta.servlet.http.Cookie result = new jakarta.servlet.http.Cookie(cookie.getName(), cookie.getValue());</b>
+<b class="nc">&nbsp;			map.from(cookie::getComment).to(result::setComment);</b>
+<b class="nc">&nbsp;			map.from(cookie::getDomain).to(result::setDomain);</b>
+<b class="nc">&nbsp;			map.from(cookie::getMaxAge).to(result::setMaxAge);</b>
+<b class="nc">&nbsp;			map.from(cookie::getPath).to(result::setPath);</b>
+<b class="nc">&nbsp;			result.setSecure(cookie.isSecure());</b>
+<b class="nc">&nbsp;			result.setVersion(cookie.getVersion());</b>
+<b class="nc">&nbsp;			result.setHttpOnly(cookie.isHttpOnly());</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private SameSite getSameSite(jakarta.servlet.http.Cookie cookie) {
+<b class="nc">&nbsp;			for (CookieSameSiteSupplier supplier : this.suppliers) {</b>
+<b class="nc">&nbsp;				SameSite sameSite = supplier.getSameSite(cookie);</b>
+<b class="nc">&nbsp;				if (sameSite != null) {</b>
+<b class="nc">&nbsp;					return sameSite;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurableServletWebServerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.servlet.server</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurableServletWebServerFactory (org.springframework.boot.web.servlet.server)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ConfigurableServletWebServerFactory</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.servlet.server;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;
+&nbsp;import org.springframework.boot.web.server.ConfigurableWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.Cookie.SameSite;
+&nbsp;import org.springframework.boot.web.server.MimeMappings;
+&nbsp;import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+&nbsp;import org.springframework.boot.web.servlet.ServletContextInitializer;
+&nbsp;import org.springframework.boot.web.servlet.WebListenerRegistry;
+&nbsp;
+&nbsp;/**
+&nbsp; * A configurable {@link ServletWebServerFactory}.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Eddú Meléndez
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.0.0
+&nbsp; * @see ServletWebServerFactory
+&nbsp; * @see WebServerFactoryCustomizer
+&nbsp; */
+&nbsp;public interface ConfigurableServletWebServerFactory
+&nbsp;		extends ConfigurableWebServerFactory, ServletWebServerFactory, WebListenerRegistry {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the context path for the web server. The context should start with a &quot;/&quot;
+&nbsp;	 * character but not end with a &quot;/&quot; character. The default context path can be
+&nbsp;	 * specified using an empty string.
+&nbsp;	 * @param contextPath the contextPath to set
+&nbsp;	 */
+&nbsp;	void setContextPath(String contextPath);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the display name of the application deployed in the web server.
+&nbsp;	 * @param displayName the displayName to set
+&nbsp;	 * @since 1.3.0
+&nbsp;	 */
+&nbsp;	void setDisplayName(String displayName);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the configuration that will be applied to the container&#39;s HTTP session
+&nbsp;	 * support.
+&nbsp;	 * @param session the session configuration
+&nbsp;	 */
+&nbsp;	void setSession(Session session);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set if the DefaultServlet should be registered. Defaults to {@code false} since
+&nbsp;	 * 2.4.
+&nbsp;	 * @param registerDefaultServlet if the default servlet should be registered
+&nbsp;	 */
+&nbsp;	void setRegisterDefaultServlet(boolean registerDefaultServlet);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the mime-type mappings.
+&nbsp;	 * @param mimeMappings the mime type mappings (defaults to
+&nbsp;	 * {@link MimeMappings#DEFAULT})
+&nbsp;	 */
+&nbsp;	void setMimeMappings(MimeMappings mimeMappings);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the document root directory which will be used by the web context to serve
+&nbsp;	 * static files.
+&nbsp;	 * @param documentRoot the document root or {@code null} if not required
+&nbsp;	 */
+&nbsp;	void setDocumentRoot(File documentRoot);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets {@link ServletContextInitializer} that should be applied in addition to
+&nbsp;	 * {@link ServletWebServerFactory#getWebServer(ServletContextInitializer...)}
+&nbsp;	 * parameters. This method will replace any previously set or added initializers.
+&nbsp;	 * @param initializers the initializers to set
+&nbsp;	 * @see #addInitializers
+&nbsp;	 */
+&nbsp;	void setInitializers(List&lt;? extends ServletContextInitializer&gt; initializers);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link ServletContextInitializer}s to those that should be applied in addition
+&nbsp;	 * to {@link ServletWebServerFactory#getWebServer(ServletContextInitializer...)}
+&nbsp;	 * parameters.
+&nbsp;	 * @param initializers the initializers to add
+&nbsp;	 * @see #setInitializers
+&nbsp;	 */
+&nbsp;	void addInitializers(ServletContextInitializer... initializers);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the configuration that will be applied to the server&#39;s JSP servlet.
+&nbsp;	 * @param jsp the JSP servlet configuration
+&nbsp;	 */
+&nbsp;	void setJsp(Jsp jsp);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the Locale to Charset mappings.
+&nbsp;	 * @param localeCharsetMappings the Locale to Charset mappings
+&nbsp;	 */
+&nbsp;	void setLocaleCharsetMappings(Map&lt;Locale, Charset&gt; localeCharsetMappings);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the init parameters that are applied to the container&#39;s
+&nbsp;	 * {@link ServletContext}.
+&nbsp;	 * @param initParameters the init parameters
+&nbsp;	 */
+&nbsp;	void setInitParameters(Map&lt;String, String&gt; initParameters);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets {@link CookieSameSiteSupplier CookieSameSiteSuppliers} that should be used to
+&nbsp;	 * obtain the {@link SameSite} attribute of any added cookie. This method will replace
+&nbsp;	 * any previously set or added suppliers.
+&nbsp;	 * @param cookieSameSiteSuppliers the suppliers to add
+&nbsp;	 * @see #addCookieSameSiteSuppliers
+&nbsp;	 */
+&nbsp;	void setCookieSameSiteSuppliers(List&lt;? extends CookieSameSiteSupplier&gt; cookieSameSiteSuppliers);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add {@link CookieSameSiteSupplier CookieSameSiteSuppliers} to those that should be
+&nbsp;	 * used to obtain the {@link SameSite} attribute of any added cookie.
+&nbsp;	 * @param cookieSameSiteSuppliers the suppliers to add
+&nbsp;	 * @see #setCookieSameSiteSuppliers
+&nbsp;	 */
+&nbsp;	void addCookieSameSiteSuppliers(CookieSameSiteSupplier... cookieSameSiteSuppliers);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

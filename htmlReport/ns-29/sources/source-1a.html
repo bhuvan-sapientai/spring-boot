@@ -1,0 +1,604 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ValueObjectBinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: ValueObjectBinder (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ValueObjectBinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ValueObjectBinder$ConstructorParameter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ValueObjectBinder$DefaultValueObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ValueObjectBinder$Discoverer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ValueObjectBinder$KotlinValueObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ValueObjectBinder$ValueObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/142)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.Array;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.lang.reflect.Parameter;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import kotlin.reflect.KFunction;
+&nbsp;import kotlin.reflect.KParameter;
+&nbsp;import kotlin.reflect.jvm.ReflectJvmMapping;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder.Context;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.core.CollectionFactory;
+&nbsp;import org.springframework.core.DefaultParameterNameDiscoverer;
+&nbsp;import org.springframework.core.KotlinDetector;
+&nbsp;import org.springframework.core.MethodParameter;
+&nbsp;import org.springframework.core.ParameterNameDiscoverer;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.annotation.MergedAnnotation;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.convert.ConversionException;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link DataObjectBinder} for immutable value objects.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;class ValueObjectBinder implements DataObjectBinder {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ValueObjectBinder.class);</b>
+&nbsp;
+&nbsp;	private final BindConstructorProvider constructorProvider;
+&nbsp;
+<b class="nc">&nbsp;	ValueObjectBinder(BindConstructorProvider constructorProvider) {</b>
+<b class="nc">&nbsp;		this.constructorProvider = constructorProvider;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;T&gt; T bind(ConfigurationPropertyName name, Bindable&lt;T&gt; target, Binder.Context context,
+&nbsp;			DataObjectPropertyBinder propertyBinder) {
+<b class="nc">&nbsp;		ValueObject&lt;T&gt; valueObject = ValueObject.get(target, this.constructorProvider, context, Discoverer.LENIENT);</b>
+<b class="nc">&nbsp;		if (valueObject == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		context.pushConstructorBoundTypes(target.getType().resolve());</b>
+<b class="nc">&nbsp;		List&lt;ConstructorParameter&gt; parameters = valueObject.getConstructorParameters();</b>
+<b class="nc">&nbsp;		List&lt;Object&gt; args = new ArrayList&lt;&gt;(parameters.size());</b>
+<b class="nc">&nbsp;		boolean bound = false;</b>
+<b class="nc">&nbsp;		for (ConstructorParameter parameter : parameters) {</b>
+<b class="nc">&nbsp;			Object arg = parameter.bind(propertyBinder);</b>
+<b class="nc">&nbsp;			bound = bound || arg != null;</b>
+<b class="nc">&nbsp;			arg = (arg != null) ? arg : getDefaultValue(context, parameter);</b>
+<b class="nc">&nbsp;			args.add(arg);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		context.clearConfigurationProperty();</b>
+<b class="nc">&nbsp;		context.popConstructorBoundTypes();</b>
+<b class="nc">&nbsp;		return bound ? valueObject.instantiate(args) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;T&gt; T create(Bindable&lt;T&gt; target, Binder.Context context) {
+<b class="nc">&nbsp;		ValueObject&lt;T&gt; valueObject = ValueObject.get(target, this.constructorProvider, context, Discoverer.LENIENT);</b>
+<b class="nc">&nbsp;		if (valueObject == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;ConstructorParameter&gt; parameters = valueObject.getConstructorParameters();</b>
+<b class="nc">&nbsp;		List&lt;Object&gt; args = new ArrayList&lt;&gt;(parameters.size());</b>
+<b class="nc">&nbsp;		for (ConstructorParameter parameter : parameters) {</b>
+<b class="nc">&nbsp;			args.add(getDefaultValue(context, parameter));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return valueObject.instantiate(args);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;T&gt; void onUnableToCreateInstance(Bindable&lt;T&gt; target, Context context, RuntimeException exception) {
+&nbsp;		try {
+<b class="nc">&nbsp;			ValueObject.get(target, this.constructorProvider, context, Discoverer.STRICT);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			exception.addSuppressed(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T getDefaultValue(Binder.Context context, ConstructorParameter parameter) {
+<b class="nc">&nbsp;		ResolvableType type = parameter.getType();</b>
+<b class="nc">&nbsp;		Annotation[] annotations = parameter.getAnnotations();</b>
+<b class="nc">&nbsp;		for (Annotation annotation : annotations) {</b>
+<b class="nc">&nbsp;			if (annotation instanceof DefaultValue defaultValueAnnotation) {</b>
+<b class="nc">&nbsp;				String[] defaultValue = defaultValueAnnotation.value();</b>
+<b class="nc">&nbsp;				if (defaultValue.length == 0) {</b>
+<b class="nc">&nbsp;					return getNewDefaultValueInstanceIfPossible(context, type);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return convertDefaultValue(context.getConverter(), defaultValue, type, annotations);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; T convertDefaultValue(BindConverter converter, String[] defaultValue, ResolvableType type,
+&nbsp;			Annotation[] annotations) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return converter.convert(defaultValue, type, annotations);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ConversionException ex) {</b>
+&nbsp;			// Try again in case ArrayToObjectConverter is not in play
+<b class="nc">&nbsp;			if (defaultValue.length == 1) {</b>
+<b class="nc">&nbsp;				return converter.convert(defaultValue[0], type, annotations);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw ex;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;T&gt; T getNewDefaultValueInstanceIfPossible(Binder.Context context, ResolvableType type) {
+<b class="nc">&nbsp;		Class&lt;T&gt; resolved = (Class&lt;T&gt;) type.resolve();</b>
+<b class="nc">&nbsp;		Assert.state(resolved == null || isEmptyDefaultValueAllowed(resolved),</b>
+<b class="nc">&nbsp;				() -&gt; &quot;Parameter of type &quot; + type + &quot; must have a non-empty default value.&quot;);</b>
+<b class="nc">&nbsp;		if (resolved != null) {</b>
+<b class="nc">&nbsp;			if (Optional.class == resolved) {</b>
+<b class="nc">&nbsp;				return (T) Optional.empty();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (Collection.class.isAssignableFrom(resolved)) {</b>
+<b class="nc">&nbsp;				return (T) CollectionFactory.createCollection(resolved, 0);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (Map.class.isAssignableFrom(resolved)) {</b>
+<b class="nc">&nbsp;				return (T) CollectionFactory.createMap(resolved, 0);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (resolved.isArray()) {</b>
+<b class="nc">&nbsp;				return (T) Array.newInstance(resolved.getComponentType(), 0);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		T instance = create(Bindable.of(type), context);</b>
+<b class="nc">&nbsp;		if (instance != null) {</b>
+<b class="nc">&nbsp;			return instance;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (resolved != null) ? BeanUtils.instantiateClass(resolved) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isEmptyDefaultValueAllowed(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		return (Optional.class == type || isAggregate(type))</b>
+<b class="nc">&nbsp;				|| !(type.isPrimitive() || type.isEnum() || type.getName().startsWith(&quot;java.lang&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isAggregate(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		return type.isArray() || Map.class.isAssignableFrom(type) || Collection.class.isAssignableFrom(type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The value object being bound.
+&nbsp;	 *
+&nbsp;	 * @param &lt;T&gt; the value object type
+&nbsp;	 */
+&nbsp;	private abstract static class ValueObject&lt;T&gt; {
+&nbsp;
+&nbsp;		private final Constructor&lt;T&gt; constructor;
+&nbsp;
+<b class="nc">&nbsp;		protected ValueObject(Constructor&lt;T&gt; constructor) {</b>
+<b class="nc">&nbsp;			this.constructor = constructor;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		T instantiate(List&lt;Object&gt; args) {
+<b class="nc">&nbsp;			return BeanUtils.instantiateClass(this.constructor, args.toArray());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		abstract List&lt;ConstructorParameter&gt; getConstructorParameters();
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		static &lt;T&gt; ValueObject&lt;T&gt; get(Bindable&lt;T&gt; bindable, BindConstructorProvider constructorProvider,
+&nbsp;				Binder.Context context, ParameterNameDiscoverer parameterNameDiscoverer) {
+<b class="nc">&nbsp;			Class&lt;T&gt; type = (Class&lt;T&gt;) bindable.getType().resolve();</b>
+<b class="nc">&nbsp;			if (type == null || type.isEnum() || Modifier.isAbstract(type.getModifiers())) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Constructor&lt;?&gt; bindConstructor = constructorProvider.getBindConstructor(bindable,</b>
+<b class="nc">&nbsp;					context.isNestedConstructorBinding());</b>
+<b class="nc">&nbsp;			if (bindConstructor == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (KotlinDetector.isKotlinType(type)) {</b>
+<b class="nc">&nbsp;				return KotlinValueObject.get((Constructor&lt;T&gt;) bindConstructor, bindable.getType(),</b>
+&nbsp;						parameterNameDiscoverer);
+&nbsp;			}
+<b class="nc">&nbsp;			return DefaultValueObject.get(bindConstructor, bindable.getType(), parameterNameDiscoverer);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A {@link ValueObject} implementation that is aware of Kotlin specific constructs.
+&nbsp;	 */
+&nbsp;	private static final class KotlinValueObject&lt;T&gt; extends ValueObject&lt;T&gt; {
+&nbsp;
+<b class="nc">&nbsp;		private static final Annotation[] ANNOTATION_ARRAY = new Annotation[0];</b>
+&nbsp;
+&nbsp;		private final List&lt;ConstructorParameter&gt; constructorParameters;
+&nbsp;
+&nbsp;		private KotlinValueObject(Constructor&lt;T&gt; primaryConstructor, KFunction&lt;T&gt; kotlinConstructor,
+&nbsp;				ResolvableType type) {
+<b class="nc">&nbsp;			super(primaryConstructor);</b>
+<b class="nc">&nbsp;			this.constructorParameters = parseConstructorParameters(kotlinConstructor, type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private List&lt;ConstructorParameter&gt; parseConstructorParameters(KFunction&lt;T&gt; kotlinConstructor,
+&nbsp;				ResolvableType type) {
+<b class="nc">&nbsp;			List&lt;KParameter&gt; parameters = kotlinConstructor.getParameters();</b>
+<b class="nc">&nbsp;			List&lt;ConstructorParameter&gt; result = new ArrayList&lt;&gt;(parameters.size());</b>
+<b class="nc">&nbsp;			for (KParameter parameter : parameters) {</b>
+<b class="nc">&nbsp;				String name = getParameterName(parameter);</b>
+<b class="nc">&nbsp;				ResolvableType parameterType = ResolvableType</b>
+<b class="nc">&nbsp;					.forType(ReflectJvmMapping.getJavaType(parameter.getType()), type);</b>
+<b class="nc">&nbsp;				Annotation[] annotations = parameter.getAnnotations().toArray(ANNOTATION_ARRAY);</b>
+<b class="nc">&nbsp;				result.add(new ConstructorParameter(name, parameterType, annotations));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return Collections.unmodifiableList(result);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getParameterName(KParameter parameter) {
+<b class="nc">&nbsp;			return MergedAnnotations.from(parameter, parameter.getAnnotations().toArray(ANNOTATION_ARRAY))</b>
+<b class="nc">&nbsp;				.get(Name.class)</b>
+<b class="nc">&nbsp;				.getValue(MergedAnnotation.VALUE, String.class)</b>
+<b class="nc">&nbsp;				.orElseGet(parameter::getName);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		List&lt;ConstructorParameter&gt; getConstructorParameters() {
+<b class="nc">&nbsp;			return this.constructorParameters;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static &lt;T&gt; ValueObject&lt;T&gt; get(Constructor&lt;T&gt; bindConstructor, ResolvableType type,
+&nbsp;				ParameterNameDiscoverer parameterNameDiscoverer) {
+<b class="nc">&nbsp;			KFunction&lt;T&gt; kotlinConstructor = ReflectJvmMapping.getKotlinFunction(bindConstructor);</b>
+<b class="nc">&nbsp;			if (kotlinConstructor != null) {</b>
+<b class="nc">&nbsp;				return new KotlinValueObject&lt;&gt;(bindConstructor, kotlinConstructor, type);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return DefaultValueObject.get(bindConstructor, type, parameterNameDiscoverer);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A default {@link ValueObject} implementation that uses only standard Java
+&nbsp;	 * reflection calls.
+&nbsp;	 */
+&nbsp;	private static final class DefaultValueObject&lt;T&gt; extends ValueObject&lt;T&gt; {
+&nbsp;
+&nbsp;		private final List&lt;ConstructorParameter&gt; constructorParameters;
+&nbsp;
+&nbsp;		private DefaultValueObject(Constructor&lt;T&gt; constructor, List&lt;ConstructorParameter&gt; constructorParameters) {
+<b class="nc">&nbsp;			super(constructor);</b>
+<b class="nc">&nbsp;			this.constructorParameters = constructorParameters;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		List&lt;ConstructorParameter&gt; getConstructorParameters() {
+<b class="nc">&nbsp;			return this.constructorParameters;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		static &lt;T&gt; ValueObject&lt;T&gt; get(Constructor&lt;?&gt; bindConstructor, ResolvableType type,
+&nbsp;				ParameterNameDiscoverer parameterNameDiscoverer) {
+<b class="nc">&nbsp;			String[] names = parameterNameDiscoverer.getParameterNames(bindConstructor);</b>
+<b class="nc">&nbsp;			if (names == null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			List&lt;ConstructorParameter&gt; constructorParameters = parseConstructorParameters(bindConstructor, type, names);</b>
+<b class="nc">&nbsp;			return new DefaultValueObject&lt;&gt;((Constructor&lt;T&gt;) bindConstructor, constructorParameters);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static List&lt;ConstructorParameter&gt; parseConstructorParameters(Constructor&lt;?&gt; constructor,
+&nbsp;				ResolvableType type, String[] names) {
+<b class="nc">&nbsp;			Parameter[] parameters = constructor.getParameters();</b>
+<b class="nc">&nbsp;			List&lt;ConstructorParameter&gt; result = new ArrayList&lt;&gt;(parameters.length);</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; parameters.length; i++) {</b>
+<b class="nc">&nbsp;				String name = MergedAnnotations.from(parameters[i])</b>
+<b class="nc">&nbsp;					.get(Name.class)</b>
+<b class="nc">&nbsp;					.getValue(MergedAnnotation.VALUE, String.class)</b>
+<b class="nc">&nbsp;					.orElse(names[i]);</b>
+<b class="nc">&nbsp;				ResolvableType parameterType = ResolvableType.forMethodParameter(new MethodParameter(constructor, i),</b>
+&nbsp;						type);
+<b class="nc">&nbsp;				Annotation[] annotations = parameters[i].getDeclaredAnnotations();</b>
+<b class="nc">&nbsp;				result.add(new ConstructorParameter(name, parameterType, annotations));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return Collections.unmodifiableList(result);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A constructor parameter being bound.
+&nbsp;	 */
+&nbsp;	private static class ConstructorParameter {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final ResolvableType type;
+&nbsp;
+&nbsp;		private final Annotation[] annotations;
+&nbsp;
+<b class="nc">&nbsp;		ConstructorParameter(String name, ResolvableType type, Annotation[] annotations) {</b>
+<b class="nc">&nbsp;			this.name = DataObjectPropertyName.toDashedForm(name);</b>
+<b class="nc">&nbsp;			this.type = type;</b>
+<b class="nc">&nbsp;			this.annotations = annotations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Object bind(DataObjectPropertyBinder propertyBinder) {
+<b class="nc">&nbsp;			return propertyBinder.bindProperty(this.name, Bindable.of(this.type).withAnnotations(this.annotations));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Annotation[] getAnnotations() {
+<b class="nc">&nbsp;			return this.annotations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ResolvableType getType() {
+<b class="nc">&nbsp;			return this.type;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ParameterNameDiscoverer} used for value data object binding.
+&nbsp;	 */
+&nbsp;	static final class Discoverer implements ParameterNameDiscoverer {
+&nbsp;
+<b class="nc">&nbsp;		private static final ParameterNameDiscoverer DEFAULT_DELEGATE = new DefaultParameterNameDiscoverer();</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final ParameterNameDiscoverer LENIENT = new Discoverer(DEFAULT_DELEGATE, (message) -&gt; {</b>
+<b class="nc">&nbsp;		});</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final ParameterNameDiscoverer STRICT = new Discoverer(DEFAULT_DELEGATE, (message) -&gt; {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(message.toString());</b>
+&nbsp;		});
+&nbsp;
+&nbsp;		private final ParameterNameDiscoverer delegate;
+&nbsp;
+&nbsp;		private final Consumer&lt;LogMessage&gt; noParameterNamesHandler;
+&nbsp;
+<b class="nc">&nbsp;		private Discoverer(ParameterNameDiscoverer delegate, Consumer&lt;LogMessage&gt; noParameterNamesHandler) {</b>
+<b class="nc">&nbsp;			this.delegate = delegate;</b>
+<b class="nc">&nbsp;			this.noParameterNamesHandler = noParameterNamesHandler;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String[] getParameterNames(Method method) {
+<b class="nc">&nbsp;			throw new UnsupportedOperationException();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String[] getParameterNames(Constructor&lt;?&gt; constructor) {
+<b class="nc">&nbsp;			String[] names = this.delegate.getParameterNames(constructor);</b>
+<b class="nc">&nbsp;			if (names != null) {</b>
+<b class="nc">&nbsp;				return names;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			LogMessage message = LogMessage.format(</b>
+&nbsp;					&quot;Unable to use value object binding with constructor [%s] as parameter names cannot be discovered. &quot;
+&nbsp;							+ &quot;Ensure that the compiler uses the &#39;-parameters&#39; flag&quot;,
+&nbsp;					constructor);
+<b class="nc">&nbsp;			this.noParameterNamesHandler.accept(message);</b>
+<b class="nc">&nbsp;			logger.debug(message);</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

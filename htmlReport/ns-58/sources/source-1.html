@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConcurrentReferenceCachingMetadataReaderFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.type.classreading</a>
+</div>
+
+<h1>Coverage Summary for Class: ConcurrentReferenceCachingMetadataReaderFactory (org.springframework.boot.type.classreading)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConcurrentReferenceCachingMetadataReaderFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.type.classreading;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+&nbsp;import org.springframework.core.type.classreading.MetadataReader;
+&nbsp;import org.springframework.core.type.classreading.MetadataReaderFactory;
+&nbsp;import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
+&nbsp;import org.springframework.util.ConcurrentReferenceHashMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * Caching implementation of the {@link MetadataReaderFactory} interface backed by a
+&nbsp; * {@link ConcurrentReferenceHashMap}, caching {@link MetadataReader} per Spring
+&nbsp; * {@link Resource} handle (i.e. per &quot;.class&quot; file).
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.4.0
+&nbsp; * @see CachingMetadataReaderFactory
+&nbsp; */
+&nbsp;public class ConcurrentReferenceCachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;Resource, MetadataReader&gt; cache = new ConcurrentReferenceHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConcurrentReferenceCachingMetadataReaderFactory} instance for
+&nbsp;	 * the default class loader.
+&nbsp;	 */
+<b class="nc">&nbsp;	public ConcurrentReferenceCachingMetadataReaderFactory() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConcurrentReferenceCachingMetadataReaderFactory} instance for
+&nbsp;	 * the given resource loader.
+&nbsp;	 * @param resourceLoader the Spring ResourceLoader to use (also determines the
+&nbsp;	 * ClassLoader to use)
+&nbsp;	 */
+&nbsp;	public ConcurrentReferenceCachingMetadataReaderFactory(ResourceLoader resourceLoader) {
+<b class="nc">&nbsp;		super(resourceLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConcurrentReferenceCachingMetadataReaderFactory} instance for
+&nbsp;	 * the given class loader.
+&nbsp;	 * @param classLoader the ClassLoader to use
+&nbsp;	 */
+&nbsp;	public ConcurrentReferenceCachingMetadataReaderFactory(ClassLoader classLoader) {
+<b class="nc">&nbsp;		super(classLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public MetadataReader getMetadataReader(Resource resource) throws IOException {
+<b class="nc">&nbsp;		MetadataReader metadataReader = this.cache.get(resource);</b>
+<b class="nc">&nbsp;		if (metadataReader == null) {</b>
+<b class="nc">&nbsp;			metadataReader = createMetadataReader(resource);</b>
+<b class="nc">&nbsp;			this.cache.put(resource, metadataReader);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return metadataReader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create the meta-data reader.
+&nbsp;	 * @param resource the source resource.
+&nbsp;	 * @return the meta-data reader
+&nbsp;	 * @throws IOException on error
+&nbsp;	 */
+&nbsp;	protected MetadataReader createMetadataReader(Resource resource) throws IOException {
+<b class="nc">&nbsp;		return super.getMetadataReader(resource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Clear the entire MetadataReader cache, removing all cached class metadata.
+&nbsp;	 */
+&nbsp;	public void clearCache() {
+<b class="nc">&nbsp;		this.cache.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

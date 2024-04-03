@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PemSslStoreDetails</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.ssl.pem</a>
+</div>
+
+<h1>Coverage Summary for Class: PemSslStoreDetails (org.springframework.boot.ssl.pem)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PemSslStoreDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.ssl.pem;
+&nbsp;
+&nbsp;import java.security.KeyStore;
+&nbsp;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Details for an individual trust or key store in a {@link PemSslStoreBundle}.
+&nbsp; *
+&nbsp; * @param type the key store type, for example {@code JKS} or {@code PKCS11}. A
+&nbsp; * {@code null} value will use {@link KeyStore#getDefaultType()}).
+&nbsp; * @param alias the alias used when setting entries in the {@link KeyStore}
+&nbsp; * @param password the password used
+&nbsp; * {@link KeyStore#setKeyEntry(String, java.security.Key, char[], java.security.cert.Certificate[])
+&nbsp; * setting key entries} in the {@link KeyStore}
+&nbsp; * @param certificates the certificates content (either the PEM content itself or or a
+&nbsp; * reference to the resource to load). When a {@link #privateKey() private key} is present
+&nbsp; * this value is treated as a certificate chain, otherwise it is treated a list of
+&nbsp; * certificates that should all be registered.
+&nbsp; * @param privateKey the private key content (either the PEM content itself or a reference
+&nbsp; * to the resource to load)
+&nbsp; * @param privateKeyPassword a password used to decrypt an encrypted private key
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.1.0
+&nbsp; * @see PemSslStore#load(PemSslStoreDetails)
+&nbsp; */
+<b class="nc">&nbsp;public record PemSslStoreDetails(String type, String alias, String password, String certificates, String privateKey,</b>
+&nbsp;		String privateKeyPassword) {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link PemSslStoreDetails} instance.
+&nbsp;	 * @param type the key store type, for example {@code JKS} or {@code PKCS11}. A
+&nbsp;	 * {@code null} value will use {@link KeyStore#getDefaultType()}).
+&nbsp;	 * @param alias the alias used when setting entries in the {@link KeyStore}
+&nbsp;	 * @param password the password used
+&nbsp;	 * {@link KeyStore#setKeyEntry(String, java.security.Key, char[], java.security.cert.Certificate[])
+&nbsp;	 * setting key entries} in the {@link KeyStore}
+&nbsp;	 * @param certificates the certificate content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load)
+&nbsp;	 * @param privateKey the private key content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load)
+&nbsp;	 * @param privateKeyPassword a password used to decrypt an encrypted private key
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+<b class="nc">&nbsp;	public PemSslStoreDetails {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link PemSslStoreDetails} instance.
+&nbsp;	 * @param type the key store type, for example {@code JKS} or {@code PKCS11}. A
+&nbsp;	 * {@code null} value will use {@link KeyStore#getDefaultType()}).
+&nbsp;	 * @param certificate the certificate content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load)
+&nbsp;	 * @param privateKey the private key content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load)
+&nbsp;	 * @param privateKeyPassword a password used to decrypt an encrypted private key
+&nbsp;	 */
+&nbsp;	public PemSslStoreDetails(String type, String certificate, String privateKey, String privateKeyPassword) {
+<b class="nc">&nbsp;		this(type, null, null, certificate, privateKey, privateKeyPassword);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link PemSslStoreDetails} instance.
+&nbsp;	 * @param type the key store type, for example {@code JKS} or {@code PKCS11}. A
+&nbsp;	 * {@code null} value will use {@link KeyStore#getDefaultType()}).
+&nbsp;	 * @param certificate the certificate content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load)
+&nbsp;	 * @param privateKey the private key content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load)
+&nbsp;	 */
+&nbsp;	public PemSslStoreDetails(String type, String certificate, String privateKey) {
+<b class="nc">&nbsp;		this(type, certificate, privateKey, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the certificate content.
+&nbsp;	 * @return the certificate content
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of {@link #certificates()}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public String certificate() {
+<b class="nc">&nbsp;		return certificates();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PemSslStoreDetails} instance with a new alias.
+&nbsp;	 * @param alias the new alias
+&nbsp;	 * @return a new {@link PemSslStoreDetails} instance
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public PemSslStoreDetails withAlias(String alias) {
+<b class="nc">&nbsp;		return new PemSslStoreDetails(this.type, alias, this.password, this.certificates, this.privateKey,</b>
+&nbsp;				this.privateKeyPassword);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PemSslStoreDetails} instance with a new password.
+&nbsp;	 * @param password the new password
+&nbsp;	 * @return a new {@link PemSslStoreDetails} instance
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public PemSslStoreDetails withPassword(String password) {
+<b class="nc">&nbsp;		return new PemSslStoreDetails(this.type, this.alias, password, this.certificates, this.privateKey,</b>
+&nbsp;				this.privateKeyPassword);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PemSslStoreDetails} instance with a new private key.
+&nbsp;	 * @param privateKey the new private key
+&nbsp;	 * @return a new {@link PemSslStoreDetails} instance
+&nbsp;	 */
+&nbsp;	public PemSslStoreDetails withPrivateKey(String privateKey) {
+<b class="nc">&nbsp;		return new PemSslStoreDetails(this.type, this.alias, this.password, this.certificates, privateKey,</b>
+&nbsp;				this.privateKeyPassword);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PemSslStoreDetails} instance with a new private key password.
+&nbsp;	 * @param privateKeyPassword the new private key password
+&nbsp;	 * @return a new {@link PemSslStoreDetails} instance
+&nbsp;	 */
+&nbsp;	public PemSslStoreDetails withPrivateKeyPassword(String privateKeyPassword) {
+<b class="nc">&nbsp;		return new PemSslStoreDetails(this.type, this.alias, this.password, this.certificates, this.privateKey,</b>
+&nbsp;				privateKeyPassword);
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isEmpty() {
+<b class="nc">&nbsp;		return isEmpty(this.type) &amp;&amp; isEmpty(this.certificates) &amp;&amp; isEmpty(this.privateKey);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isEmpty(String value) {
+<b class="nc">&nbsp;		return !StringUtils.hasText(value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link PemSslStoreDetails} instance for the given
+&nbsp;	 * certificate. &lt;b&gt;Note:&lt;/b&gt; This method doesn&#39;t actually check if the provided value
+&nbsp;	 * only contains a single certificate. It is functionally equivalent to
+&nbsp;	 * {@link #forCertificates(String)}.
+&nbsp;	 * @param certificate the certificate content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load)
+&nbsp;	 * @return a new {@link PemSslStoreDetails} instance.
+&nbsp;	 */
+&nbsp;	public static PemSslStoreDetails forCertificate(String certificate) {
+<b class="nc">&nbsp;		return forCertificates(certificate);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link PemSslStoreDetails} instance for the given
+&nbsp;	 * certificates.
+&nbsp;	 * @param certificates the certificates content (either the PEM content itself or a
+&nbsp;	 * reference to the resource to load)
+&nbsp;	 * @return a new {@link PemSslStoreDetails} instance.
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public static PemSslStoreDetails forCertificates(String certificates) {
+<b class="nc">&nbsp;		return new PemSslStoreDetails(null, certificates, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

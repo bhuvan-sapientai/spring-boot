@@ -1,0 +1,492 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationMetadataAnnotationProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationMetadataAnnotationProcessor (org.springframework.boot.configurationprocessor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationMetadataAnnotationProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/143)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor;
+&nbsp;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayDeque;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Deque;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.annotation.processing.AbstractProcessor;
+&nbsp;import javax.annotation.processing.ProcessingEnvironment;
+&nbsp;import javax.annotation.processing.Processor;
+&nbsp;import javax.annotation.processing.RoundEnvironment;
+&nbsp;import javax.annotation.processing.SupportedAnnotationTypes;
+&nbsp;import javax.lang.model.SourceVersion;
+&nbsp;import javax.lang.model.element.AnnotationMirror;
+&nbsp;import javax.lang.model.element.Element;
+&nbsp;import javax.lang.model.element.ExecutableElement;
+&nbsp;import javax.lang.model.element.Modifier;
+&nbsp;import javax.lang.model.element.TypeElement;
+&nbsp;import javax.lang.model.element.VariableElement;
+&nbsp;import javax.lang.model.type.TypeKind;
+&nbsp;import javax.lang.model.util.ElementFilter;
+&nbsp;import javax.tools.Diagnostic.Kind;
+&nbsp;
+&nbsp;import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
+&nbsp;import org.springframework.boot.configurationprocessor.metadata.InvalidConfigurationMetadataException;
+&nbsp;import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
+&nbsp;
+&nbsp;/**
+&nbsp; * Annotation {@link Processor} that writes meta-data file for
+&nbsp; * {@code @ConfigurationProperties}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Kris De Volder
+&nbsp; * @author Jonas Keßler
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 1.2.0
+&nbsp; */
+&nbsp;@SupportedAnnotationTypes({ ConfigurationMetadataAnnotationProcessor.AUTO_CONFIGURATION_ANNOTATION,
+&nbsp;		ConfigurationMetadataAnnotationProcessor.CONFIGURATION_PROPERTIES_ANNOTATION,
+&nbsp;		ConfigurationMetadataAnnotationProcessor.CONTROLLER_ENDPOINT_ANNOTATION,
+&nbsp;		ConfigurationMetadataAnnotationProcessor.ENDPOINT_ANNOTATION,
+&nbsp;		ConfigurationMetadataAnnotationProcessor.JMX_ENDPOINT_ANNOTATION,
+&nbsp;		ConfigurationMetadataAnnotationProcessor.REST_CONTROLLER_ENDPOINT_ANNOTATION,
+&nbsp;		ConfigurationMetadataAnnotationProcessor.SERVLET_ENDPOINT_ANNOTATION,
+&nbsp;		ConfigurationMetadataAnnotationProcessor.WEB_ENDPOINT_ANNOTATION,
+&nbsp;		&quot;org.springframework.context.annotation.Configuration&quot; })
+<b class="nc">&nbsp;public class ConfigurationMetadataAnnotationProcessor extends AbstractProcessor {</b>
+&nbsp;
+&nbsp;	static final String ADDITIONAL_METADATA_LOCATIONS_OPTION = &quot;org.springframework.boot.configurationprocessor.additionalMetadataLocations&quot;;
+&nbsp;
+&nbsp;	static final String CONFIGURATION_PROPERTIES_ANNOTATION = &quot;org.springframework.boot.context.properties.ConfigurationProperties&quot;;
+&nbsp;
+&nbsp;	static final String NESTED_CONFIGURATION_PROPERTY_ANNOTATION = &quot;org.springframework.boot.context.properties.NestedConfigurationProperty&quot;;
+&nbsp;
+&nbsp;	static final String DEPRECATED_CONFIGURATION_PROPERTY_ANNOTATION = &quot;org.springframework.boot.context.properties.DeprecatedConfigurationProperty&quot;;
+&nbsp;
+&nbsp;	static final String CONSTRUCTOR_BINDING_ANNOTATION = &quot;org.springframework.boot.context.properties.bind.ConstructorBinding&quot;;
+&nbsp;
+&nbsp;	static final String AUTOWIRED_ANNOTATION = &quot;org.springframework.beans.factory.annotation.Autowired&quot;;
+&nbsp;
+&nbsp;	static final String DEFAULT_VALUE_ANNOTATION = &quot;org.springframework.boot.context.properties.bind.DefaultValue&quot;;
+&nbsp;
+&nbsp;	static final String CONTROLLER_ENDPOINT_ANNOTATION = &quot;org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpoint&quot;;
+&nbsp;
+&nbsp;	static final String ENDPOINT_ANNOTATION = &quot;org.springframework.boot.actuate.endpoint.annotation.Endpoint&quot;;
+&nbsp;
+&nbsp;	static final String JMX_ENDPOINT_ANNOTATION = &quot;org.springframework.boot.actuate.endpoint.jmx.annotation.JmxEndpoint&quot;;
+&nbsp;
+&nbsp;	static final String REST_CONTROLLER_ENDPOINT_ANNOTATION = &quot;org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint&quot;;
+&nbsp;
+&nbsp;	static final String SERVLET_ENDPOINT_ANNOTATION = &quot;org.springframework.boot.actuate.endpoint.web.annotation.ServletEndpoint&quot;;
+&nbsp;
+&nbsp;	static final String WEB_ENDPOINT_ANNOTATION = &quot;org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint&quot;;
+&nbsp;
+&nbsp;	static final String READ_OPERATION_ANNOTATION = &quot;org.springframework.boot.actuate.endpoint.annotation.ReadOperation&quot;;
+&nbsp;
+&nbsp;	static final String NAME_ANNOTATION = &quot;org.springframework.boot.context.properties.bind.Name&quot;;
+&nbsp;
+&nbsp;	static final String AUTO_CONFIGURATION_ANNOTATION = &quot;org.springframework.boot.autoconfigure.AutoConfiguration&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final Set&lt;String&gt; SUPPORTED_OPTIONS = Collections.singleton(ADDITIONAL_METADATA_LOCATIONS_OPTION);</b>
+&nbsp;
+&nbsp;	private MetadataStore metadataStore;
+&nbsp;
+&nbsp;	private MetadataCollector metadataCollector;
+&nbsp;
+&nbsp;	private MetadataGenerationEnvironment metadataEnv;
+&nbsp;
+&nbsp;	protected String configurationPropertiesAnnotation() {
+<b class="nc">&nbsp;		return CONFIGURATION_PROPERTIES_ANNOTATION;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String nestedConfigurationPropertyAnnotation() {
+<b class="nc">&nbsp;		return NESTED_CONFIGURATION_PROPERTY_ANNOTATION;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String deprecatedConfigurationPropertyAnnotation() {
+<b class="nc">&nbsp;		return DEPRECATED_CONFIGURATION_PROPERTY_ANNOTATION;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String constructorBindingAnnotation() {
+<b class="nc">&nbsp;		return CONSTRUCTOR_BINDING_ANNOTATION;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String autowiredAnnotation() {
+<b class="nc">&nbsp;		return AUTOWIRED_ANNOTATION;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String defaultValueAnnotation() {
+<b class="nc">&nbsp;		return DEFAULT_VALUE_ANNOTATION;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Set&lt;String&gt; endpointAnnotations() {
+<b class="nc">&nbsp;		return new HashSet&lt;&gt;(Arrays.asList(CONTROLLER_ENDPOINT_ANNOTATION, ENDPOINT_ANNOTATION, JMX_ENDPOINT_ANNOTATION,</b>
+&nbsp;				REST_CONTROLLER_ENDPOINT_ANNOTATION, SERVLET_ENDPOINT_ANNOTATION, WEB_ENDPOINT_ANNOTATION));
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String readOperationAnnotation() {
+<b class="nc">&nbsp;		return READ_OPERATION_ANNOTATION;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String nameAnnotation() {
+<b class="nc">&nbsp;		return NAME_ANNOTATION;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public SourceVersion getSupportedSourceVersion() {
+<b class="nc">&nbsp;		return SourceVersion.latestSupported();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Set&lt;String&gt; getSupportedOptions() {
+<b class="nc">&nbsp;		return SUPPORTED_OPTIONS;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public synchronized void init(ProcessingEnvironment env) {
+<b class="nc">&nbsp;		super.init(env);</b>
+<b class="nc">&nbsp;		this.metadataStore = new MetadataStore(env);</b>
+<b class="nc">&nbsp;		this.metadataCollector = new MetadataCollector(env, this.metadataStore.readMetadata());</b>
+<b class="nc">&nbsp;		this.metadataEnv = new MetadataGenerationEnvironment(env, configurationPropertiesAnnotation(),</b>
+<b class="nc">&nbsp;				nestedConfigurationPropertyAnnotation(), deprecatedConfigurationPropertyAnnotation(),</b>
+<b class="nc">&nbsp;				constructorBindingAnnotation(), autowiredAnnotation(), defaultValueAnnotation(), endpointAnnotations(),</b>
+<b class="nc">&nbsp;				readOperationAnnotation(), nameAnnotation());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean process(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv) {
+<b class="nc">&nbsp;		this.metadataCollector.processing(roundEnv);</b>
+<b class="nc">&nbsp;		TypeElement annotationType = this.metadataEnv.getConfigurationPropertiesAnnotationElement();</b>
+<b class="nc">&nbsp;		if (annotationType != null) { // Is @ConfigurationProperties available</b>
+<b class="nc">&nbsp;			for (Element element : roundEnv.getElementsAnnotatedWith(annotationType)) {</b>
+<b class="nc">&nbsp;				processElement(element);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Set&lt;TypeElement&gt; endpointTypes = this.metadataEnv.getEndpointAnnotationElements();</b>
+<b class="nc">&nbsp;		if (!endpointTypes.isEmpty()) { // Are endpoint annotations available</b>
+<b class="nc">&nbsp;			for (TypeElement endpointType : endpointTypes) {</b>
+<b class="nc">&nbsp;				getElementsAnnotatedOrMetaAnnotatedWith(roundEnv, endpointType).forEach(this::processEndpoint);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (roundEnv.processingOver()) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				writeMetadata();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Failed to write metadata&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;Element, List&lt;Element&gt;&gt; getElementsAnnotatedOrMetaAnnotatedWith(RoundEnvironment roundEnv,
+&nbsp;			TypeElement annotation) {
+<b class="nc">&nbsp;		Map&lt;Element, List&lt;Element&gt;&gt; result = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Element element : roundEnv.getRootElements()) {</b>
+<b class="nc">&nbsp;			List&lt;Element&gt; annotations = this.metadataEnv.getElementsAnnotatedOrMetaAnnotatedWith(element, annotation);</b>
+<b class="nc">&nbsp;			if (!annotations.isEmpty()) {</b>
+<b class="nc">&nbsp;				result.put(element, annotations);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processElement(Element element) {
+&nbsp;		try {
+<b class="nc">&nbsp;			AnnotationMirror annotation = this.metadataEnv.getConfigurationPropertiesAnnotation(element);</b>
+<b class="nc">&nbsp;			if (annotation != null) {</b>
+<b class="nc">&nbsp;				String prefix = getPrefix(annotation);</b>
+<b class="nc">&nbsp;				if (element instanceof TypeElement typeElement) {</b>
+<b class="nc">&nbsp;					processAnnotatedTypeElement(prefix, typeElement, new ArrayDeque&lt;&gt;());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				else if (element instanceof ExecutableElement executableElement) {</b>
+<b class="nc">&nbsp;					processExecutableElement(prefix, executableElement, new ArrayDeque&lt;&gt;());</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Error processing configuration meta-data on &quot; + element, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processAnnotatedTypeElement(String prefix, TypeElement element, Deque&lt;TypeElement&gt; seen) {
+<b class="nc">&nbsp;		String type = this.metadataEnv.getTypeUtils().getQualifiedName(element);</b>
+<b class="nc">&nbsp;		this.metadataCollector.add(ItemMetadata.newGroup(prefix, type, type, null));</b>
+<b class="nc">&nbsp;		processTypeElement(prefix, element, null, seen);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processExecutableElement(String prefix, ExecutableElement element, Deque&lt;TypeElement&gt; seen) {
+<b class="nc">&nbsp;		if ((!element.getModifiers().contains(Modifier.PRIVATE))</b>
+<b class="nc">&nbsp;				&amp;&amp; (TypeKind.VOID != element.getReturnType().getKind())) {</b>
+<b class="nc">&nbsp;			Element returns = this.processingEnv.getTypeUtils().asElement(element.getReturnType());</b>
+<b class="nc">&nbsp;			if (returns instanceof TypeElement typeElement) {</b>
+<b class="nc">&nbsp;				ItemMetadata group = ItemMetadata.newGroup(prefix,</b>
+<b class="nc">&nbsp;						this.metadataEnv.getTypeUtils().getQualifiedName(returns),</b>
+<b class="nc">&nbsp;						this.metadataEnv.getTypeUtils().getQualifiedName(element.getEnclosingElement()),</b>
+<b class="nc">&nbsp;						element.toString());</b>
+<b class="nc">&nbsp;				if (this.metadataCollector.hasSimilarGroup(group)) {</b>
+<b class="nc">&nbsp;					this.processingEnv.getMessager()</b>
+<b class="nc">&nbsp;						.printMessage(Kind.ERROR,</b>
+&nbsp;								&quot;Duplicate @ConfigurationProperties definition for prefix &#39;&quot; + prefix + &quot;&#39;&quot;, element);
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					this.metadataCollector.add(group);</b>
+<b class="nc">&nbsp;					processTypeElement(prefix, typeElement, element, seen);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processTypeElement(String prefix, TypeElement element, ExecutableElement source,
+&nbsp;			Deque&lt;TypeElement&gt; seen) {
+<b class="nc">&nbsp;		if (!seen.contains(element)) {</b>
+<b class="nc">&nbsp;			seen.push(element);</b>
+<b class="nc">&nbsp;			new PropertyDescriptorResolver(this.metadataEnv).resolve(element, source).forEach((descriptor) -&gt; {</b>
+<b class="nc">&nbsp;				this.metadataCollector.add(descriptor.resolveItemMetadata(prefix, this.metadataEnv));</b>
+<b class="nc">&nbsp;				if (descriptor.isNested(this.metadataEnv)) {</b>
+<b class="nc">&nbsp;					TypeElement nestedTypeElement = (TypeElement) this.metadataEnv.getTypeUtils()</b>
+<b class="nc">&nbsp;						.asElement(descriptor.getType());</b>
+<b class="nc">&nbsp;					String nestedPrefix = ConfigurationMetadata.nestedPrefix(prefix, descriptor.getName());</b>
+<b class="nc">&nbsp;					processTypeElement(nestedPrefix, nestedTypeElement, source, seen);</b>
+&nbsp;				}
+&nbsp;			});
+<b class="nc">&nbsp;			seen.pop();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processEndpoint(Element element, List&lt;Element&gt; annotations) {
+&nbsp;		try {
+<b class="nc">&nbsp;			String annotationName = this.metadataEnv.getTypeUtils().getQualifiedName(annotations.get(0));</b>
+<b class="nc">&nbsp;			AnnotationMirror annotation = this.metadataEnv.getAnnotation(element, annotationName);</b>
+<b class="nc">&nbsp;			if (element instanceof TypeElement typeElement) {</b>
+<b class="nc">&nbsp;				processEndpoint(annotation, typeElement);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Error processing configuration meta-data on &quot; + element, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processEndpoint(AnnotationMirror annotation, TypeElement element) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; elementValues = this.metadataEnv.getAnnotationElementValues(annotation);</b>
+<b class="nc">&nbsp;		String endpointId = (String) elementValues.get(&quot;id&quot;);</b>
+<b class="nc">&nbsp;		if (endpointId == null || endpointId.isEmpty()) {</b>
+&nbsp;			return; // Can&#39;t process that endpoint
+&nbsp;		}
+<b class="nc">&nbsp;		String endpointKey = ItemMetadata.newItemMetadataPrefix(&quot;management.endpoint.&quot;, endpointId);</b>
+<b class="nc">&nbsp;		boolean enabledByDefault = (boolean) elementValues.getOrDefault(&quot;enableByDefault&quot;, true);</b>
+<b class="nc">&nbsp;		String type = this.metadataEnv.getTypeUtils().getQualifiedName(element);</b>
+<b class="nc">&nbsp;		this.metadataCollector.addIfAbsent(ItemMetadata.newGroup(endpointKey, type, type, null));</b>
+<b class="nc">&nbsp;		this.metadataCollector.add(</b>
+<b class="nc">&nbsp;				ItemMetadata.newProperty(endpointKey, &quot;enabled&quot;, Boolean.class.getName(), type, null,</b>
+<b class="nc">&nbsp;						&quot;Whether to enable the %s endpoint.&quot;.formatted(endpointId), enabledByDefault, null),</b>
+<b class="nc">&nbsp;				(existing) -&gt; checkEnabledValueMatchesExisting(existing, enabledByDefault, type));</b>
+<b class="nc">&nbsp;		if (hasMainReadOperation(element)) {</b>
+<b class="nc">&nbsp;			this.metadataCollector.addIfAbsent(ItemMetadata.newProperty(endpointKey, &quot;cache.time-to-live&quot;,</b>
+<b class="nc">&nbsp;					Duration.class.getName(), type, null, &quot;Maximum time that a response can be cached.&quot;, &quot;0ms&quot;, null));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkEnabledValueMatchesExisting(ItemMetadata existing, boolean enabledByDefault, String sourceType) {
+<b class="nc">&nbsp;		boolean existingDefaultValue = (boolean) existing.getDefaultValue();</b>
+<b class="nc">&nbsp;		if (enabledByDefault != existingDefaultValue) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(</b>
+&nbsp;					&quot;Existing property &#39;%s&#39; from type %s has a conflicting value. Existing value: %b, new value from type %s: %b&quot;
+<b class="nc">&nbsp;						.formatted(existing.getName(), existing.getSourceType(), existingDefaultValue, sourceType,</b>
+<b class="nc">&nbsp;								enabledByDefault));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasMainReadOperation(TypeElement element) {
+<b class="nc">&nbsp;		for (ExecutableElement method : ElementFilter.methodsIn(element.getEnclosedElements())) {</b>
+<b class="nc">&nbsp;			if (this.metadataEnv.getReadOperationAnnotation(method) != null</b>
+<b class="nc">&nbsp;					&amp;&amp; (TypeKind.VOID != method.getReturnType().getKind()) &amp;&amp; hasNoOrOptionalParameters(method)) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasNoOrOptionalParameters(ExecutableElement method) {
+<b class="nc">&nbsp;		for (VariableElement parameter : method.getParameters()) {</b>
+<b class="nc">&nbsp;			if (!this.metadataEnv.hasNullableAnnotation(parameter)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getPrefix(AnnotationMirror annotation) {
+<b class="nc">&nbsp;		String prefix = this.metadataEnv.getAnnotationElementStringValue(annotation, &quot;prefix&quot;);</b>
+<b class="nc">&nbsp;		if (prefix != null) {</b>
+<b class="nc">&nbsp;			return prefix;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.metadataEnv.getAnnotationElementStringValue(annotation, &quot;value&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected ConfigurationMetadata writeMetadata() throws Exception {
+<b class="nc">&nbsp;		ConfigurationMetadata metadata = this.metadataCollector.getMetadata();</b>
+<b class="nc">&nbsp;		metadata = mergeAdditionalMetadata(metadata);</b>
+<b class="nc">&nbsp;		if (!metadata.getItems().isEmpty()) {</b>
+<b class="nc">&nbsp;			this.metadataStore.writeMetadata(metadata);</b>
+<b class="nc">&nbsp;			return metadata;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurationMetadata mergeAdditionalMetadata(ConfigurationMetadata metadata) {
+&nbsp;		try {
+<b class="nc">&nbsp;			ConfigurationMetadata merged = new ConfigurationMetadata(metadata);</b>
+<b class="nc">&nbsp;			merged.merge(this.metadataStore.readAdditionalMetadata());</b>
+<b class="nc">&nbsp;			return merged;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (FileNotFoundException ex) {</b>
+&nbsp;			// No additional metadata
+&nbsp;		}
+<b class="nc">&nbsp;		catch (InvalidConfigurationMetadataException ex) {</b>
+<b class="nc">&nbsp;			log(ex.getKind(), ex.getMessage());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			logWarning(&quot;Unable to merge additional metadata&quot;);</b>
+<b class="nc">&nbsp;			logWarning(getStackTrace(ex));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return metadata;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getStackTrace(Exception ex) {
+<b class="nc">&nbsp;		StringWriter writer = new StringWriter();</b>
+<b class="nc">&nbsp;		ex.printStackTrace(new PrintWriter(writer, true));</b>
+<b class="nc">&nbsp;		return writer.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void logWarning(String msg) {
+<b class="nc">&nbsp;		log(Kind.WARNING, msg);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void log(Kind kind, String msg) {
+<b class="nc">&nbsp;		this.processingEnv.getMessager().printMessage(kind, msg);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

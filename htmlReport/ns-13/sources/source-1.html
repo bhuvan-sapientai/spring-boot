@@ -1,0 +1,355 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DocumentPluginGoals</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.mavenplugin</a>
+</div>
+
+<h1>Coverage Summary for Class: DocumentPluginGoals (org.springframework.boot.build.mavenplugin)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DocumentPluginGoals</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/123)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.mavenplugin;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.tasks.Input;
+&nbsp;import org.gradle.api.tasks.InputFile;
+&nbsp;import org.gradle.api.tasks.OutputDirectory;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;
+&nbsp;import org.springframework.boot.build.mavenplugin.PluginXmlParser.Mojo;
+&nbsp;import org.springframework.boot.build.mavenplugin.PluginXmlParser.Parameter;
+&nbsp;import org.springframework.boot.build.mavenplugin.PluginXmlParser.Plugin;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Task} to document the plugin&#39;s goals.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class DocumentPluginGoals extends DefaultTask {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final PluginXmlParser parser = new PluginXmlParser();</b>
+&nbsp;
+&nbsp;	private File pluginXml;
+&nbsp;
+&nbsp;	private File outputDir;
+&nbsp;
+&nbsp;	private Map&lt;String, String&gt; goalSections;
+&nbsp;
+&nbsp;	@OutputDirectory
+&nbsp;	public File getOutputDir() {
+<b class="nc">&nbsp;		return this.outputDir;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOutputDir(File outputDir) {
+<b class="nc">&nbsp;		this.outputDir = outputDir;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Input
+&nbsp;	public Map&lt;String, String&gt; getGoalSections() {
+<b class="nc">&nbsp;		return this.goalSections;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setGoalSections(Map&lt;String, String&gt; goalSections) {
+<b class="nc">&nbsp;		this.goalSections = goalSections;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@InputFile
+&nbsp;	public File getPluginXml() {
+<b class="nc">&nbsp;		return this.pluginXml;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setPluginXml(File pluginXml) {
+<b class="nc">&nbsp;		this.pluginXml = pluginXml;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	public void documentPluginGoals() throws IOException {
+<b class="nc">&nbsp;		Plugin plugin = this.parser.parse(this.pluginXml);</b>
+<b class="nc">&nbsp;		writeOverview(plugin);</b>
+<b class="nc">&nbsp;		for (Mojo mojo : plugin.getMojos()) {</b>
+<b class="nc">&nbsp;			documentMojo(plugin, mojo);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeOverview(Plugin plugin) throws IOException {
+<b class="nc">&nbsp;		try (PrintWriter writer = new PrintWriter(new FileWriter(new File(this.outputDir, &quot;overview.adoc&quot;)))) {</b>
+<b class="nc">&nbsp;			writer.println(&quot;[cols=\&quot;1,3\&quot;]&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;|===&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;| Goal | Description&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			for (Mojo mojo : plugin.getMojos()) {</b>
+<b class="nc">&nbsp;				writer.printf(&quot;| &lt;&lt;%s,%s:%s&gt;&gt;%n&quot;, goalSectionId(mojo), plugin.getGoalPrefix(), mojo.getGoal());</b>
+<b class="nc">&nbsp;				writer.printf(&quot;| %s%n&quot;, mojo.getDescription());</b>
+<b class="nc">&nbsp;				writer.println();</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			writer.println(&quot;|===&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void documentMojo(Plugin plugin, Mojo mojo) throws IOException {
+<b class="nc">&nbsp;		try (PrintWriter writer = new PrintWriter(new FileWriter(new File(this.outputDir, mojo.getGoal() + &quot;.adoc&quot;)))) {</b>
+<b class="nc">&nbsp;			String sectionId = goalSectionId(mojo);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.printf(&quot;[[%s]]%n&quot;, sectionId);</b>
+<b class="nc">&nbsp;			writer.printf(&quot;= `%s:%s`%n&quot;, plugin.getGoalPrefix(), mojo.getGoal());</b>
+<b class="nc">&nbsp;			writer.printf(&quot;`%s:%s:%s`%n&quot;, plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion());</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(mojo.getDescription());</b>
+<b class="nc">&nbsp;			List&lt;Parameter&gt; parameters = mojo.getParameters().stream().filter(Parameter::isEditable).toList();</b>
+<b class="nc">&nbsp;			List&lt;Parameter&gt; requiredParameters = parameters.stream().filter(Parameter::isRequired).toList();</b>
+<b class="nc">&nbsp;			String detailsSectionId = sectionId + &quot;.parameter-details&quot;;</b>
+<b class="nc">&nbsp;			if (!requiredParameters.isEmpty()) {</b>
+<b class="nc">&nbsp;				writer.println();</b>
+<b class="nc">&nbsp;				writer.println();</b>
+<b class="nc">&nbsp;				writer.printf(&quot;[[%s.required-parameters]]%n&quot;, sectionId);</b>
+<b class="nc">&nbsp;				writer.println(&quot;== Required parameters&quot;);</b>
+<b class="nc">&nbsp;				writeParametersTable(writer, detailsSectionId, requiredParameters);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			List&lt;Parameter&gt; optionalParameters = parameters.stream()</b>
+<b class="nc">&nbsp;				.filter((parameter) -&gt; !parameter.isRequired())</b>
+<b class="nc">&nbsp;				.toList();</b>
+<b class="nc">&nbsp;			if (!optionalParameters.isEmpty()) {</b>
+<b class="nc">&nbsp;				writer.println();</b>
+<b class="nc">&nbsp;				writer.println();</b>
+<b class="nc">&nbsp;				writer.printf(&quot;[[%s.optional-parameters]]%n&quot;, sectionId);</b>
+<b class="nc">&nbsp;				writer.println(&quot;== Optional parameters&quot;);</b>
+<b class="nc">&nbsp;				writeParametersTable(writer, detailsSectionId, optionalParameters);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.printf(&quot;[[%s]]%n&quot;, detailsSectionId);</b>
+<b class="nc">&nbsp;			writer.println(&quot;== Parameter details&quot;);</b>
+<b class="nc">&nbsp;			writeParameterDetails(writer, parameters, detailsSectionId);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String goalSectionId(Mojo mojo) {
+<b class="nc">&nbsp;		String goalSection = this.goalSections.get(mojo.getGoal());</b>
+<b class="nc">&nbsp;		if (goalSection == null) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Goal &#39;&quot; + mojo.getGoal() + &quot;&#39; has not be assigned to a section&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String sectionId = goalSection + &quot;.&quot; + mojo.getGoal() + &quot;-goal&quot;;</b>
+<b class="nc">&nbsp;		return sectionId;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeParametersTable(PrintWriter writer, String detailsSectionId, List&lt;Parameter&gt; parameters) {
+<b class="nc">&nbsp;		writer.println(&quot;[cols=\&quot;3,2,3\&quot;]&quot;);</b>
+<b class="nc">&nbsp;		writer.println(&quot;|===&quot;);</b>
+<b class="nc">&nbsp;		writer.println(&quot;| Name | Type | Default&quot;);</b>
+<b class="nc">&nbsp;		writer.println();</b>
+<b class="nc">&nbsp;		for (Parameter parameter : parameters) {</b>
+<b class="nc">&nbsp;			String name = parameter.getName();</b>
+<b class="nc">&nbsp;			writer.printf(&quot;| &lt;&lt;%s.%s,%s&gt;&gt;%n&quot;, detailsSectionId, parameterId(name), name);</b>
+<b class="nc">&nbsp;			writer.printf(&quot;| `%s`%n&quot;, typeNameToJavadocLink(shortTypeName(parameter.getType()), parameter.getType()));</b>
+<b class="nc">&nbsp;			String defaultValue = parameter.getDefaultValue();</b>
+<b class="nc">&nbsp;			if (defaultValue != null) {</b>
+<b class="nc">&nbsp;				writer.printf(&quot;| `%s`%n&quot;, defaultValue);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				writer.println(&quot;|&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		writer.println(&quot;|===&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeParameterDetails(PrintWriter writer, List&lt;Parameter&gt; parameters, String sectionId) {
+<b class="nc">&nbsp;		for (Parameter parameter : parameters) {</b>
+<b class="nc">&nbsp;			String name = parameter.getName();</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.printf(&quot;[[%s.%s]]%n&quot;, sectionId, parameterId(name));</b>
+<b class="nc">&nbsp;			writer.printf(&quot;=== `%s`%n&quot;, name);</b>
+<b class="nc">&nbsp;			writer.println(parameter.getDescription());</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writer.println(&quot;[cols=\&quot;10h,90\&quot;]&quot;);</b>
+<b class="nc">&nbsp;			writer.println(&quot;|===&quot;);</b>
+<b class="nc">&nbsp;			writer.println();</b>
+<b class="nc">&nbsp;			writeDetail(writer, &quot;Name&quot;, name);</b>
+<b class="nc">&nbsp;			writeDetail(writer, &quot;Type&quot;, typeNameToJavadocLink(parameter.getType()));</b>
+<b class="nc">&nbsp;			writeOptionalDetail(writer, &quot;Default value&quot;, parameter.getDefaultValue());</b>
+<b class="nc">&nbsp;			writeOptionalDetail(writer, &quot;User property&quot;, parameter.getUserProperty());</b>
+<b class="nc">&nbsp;			writeOptionalDetail(writer, &quot;Since&quot;, parameter.getSince());</b>
+<b class="nc">&nbsp;			writer.println(&quot;|===&quot;);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String parameterId(String name) {
+<b class="nc">&nbsp;		StringBuilder id = new StringBuilder(name.length() + 4);</b>
+<b class="nc">&nbsp;		for (char c : name.toCharArray()) {</b>
+<b class="nc">&nbsp;			if (Character.isLowerCase(c)) {</b>
+<b class="nc">&nbsp;				id.append(c);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				id.append(&quot;-&quot;);</b>
+<b class="nc">&nbsp;				id.append(Character.toLowerCase(c));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return id.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeDetail(PrintWriter writer, String name, String value) {
+<b class="nc">&nbsp;		writer.printf(&quot;| %s%n&quot;, name);</b>
+<b class="nc">&nbsp;		writer.printf(&quot;| `%s`%n&quot;, value);</b>
+<b class="nc">&nbsp;		writer.println();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void writeOptionalDetail(PrintWriter writer, String name, String value) {
+<b class="nc">&nbsp;		writer.printf(&quot;| %s%n&quot;, name);</b>
+<b class="nc">&nbsp;		if (value != null) {</b>
+<b class="nc">&nbsp;			writer.printf(&quot;| `%s`%n&quot;, value);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			writer.println(&quot;|&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		writer.println();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String shortTypeName(String name) {
+<b class="nc">&nbsp;		if (name.lastIndexOf(&#39;.&#39;) &gt;= 0) {</b>
+<b class="nc">&nbsp;			name = name.substring(name.lastIndexOf(&#39;.&#39;) + 1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (name.lastIndexOf(&#39;$&#39;) &gt;= 0) {</b>
+<b class="nc">&nbsp;			name = name.substring(name.lastIndexOf(&#39;$&#39;) + 1);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String typeNameToJavadocLink(String name) {
+<b class="nc">&nbsp;		return typeNameToJavadocLink(name, name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String typeNameToJavadocLink(String shortName, String name) {
+<b class="nc">&nbsp;		if (name.startsWith(&quot;org.springframework.boot.maven&quot;)) {</b>
+<b class="nc">&nbsp;			return &quot;{spring-boot-docs}/maven-plugin/api/&quot; + typeNameToJavadocPath(name) + &quot;.html[&quot; + shortName + &quot;]&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (name.startsWith(&quot;org.springframework.boot&quot;)) {</b>
+<b class="nc">&nbsp;			return &quot;{spring-boot-docs}/api/&quot; + typeNameToJavadocPath(name) + &quot;.html[&quot; + shortName + &quot;]&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return shortName;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String typeNameToJavadocPath(String name) {
+<b class="nc">&nbsp;		return name.replace(&quot;.&quot;, &quot;/&quot;).replace(&quot;$&quot;, &quot;.&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationPropertiesBeanFactoryInitializationAotProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationPropertiesBeanFactoryInitializationAotProcessor (org.springframework.boot.context.properties)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationPropertiesBeanFactoryInitializationAotProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConfigurationPropertiesBeanFactoryInitializationAotProcessor$ConfigurationPropertiesReflectionHintsContribution</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.aot.generate.GenerationContext;
+&nbsp;import org.springframework.beans.factory.aot.BeanFactoryInitializationAotContribution;
+&nbsp;import org.springframework.beans.factory.aot.BeanFactoryInitializationAotProcessor;
+&nbsp;import org.springframework.beans.factory.aot.BeanFactoryInitializationCode;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.boot.context.properties.bind.BindMethod;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.BindableRuntimeHintsRegistrar;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link BeanFactoryInitializationAotProcessor} that contributes runtime hints for
+&nbsp; * configuration properties-annotated beans.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Christoph Strobl
+&nbsp; * @author Sebastien Deleuze
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;class ConfigurationPropertiesBeanFactoryInitializationAotProcessor implements BeanFactoryInitializationAotProcessor {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConfigurationPropertiesReflectionHintsContribution processAheadOfTime(
+&nbsp;			ConfigurableListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;		String[] beanNames = beanFactory.getBeanNamesForAnnotation(ConfigurationProperties.class);</b>
+<b class="nc">&nbsp;		List&lt;Bindable&lt;?&gt;&gt; bindables = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String beanName : beanNames) {</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; beanType = beanFactory.getType(beanName, false);</b>
+<b class="nc">&nbsp;			if (beanType != null) {</b>
+<b class="nc">&nbsp;				BindMethod bindMethod = beanFactory.containsBeanDefinition(beanName)</b>
+<b class="nc">&nbsp;						? (BindMethod) beanFactory.getBeanDefinition(beanName).getAttribute(BindMethod.class.getName())</b>
+<b class="nc">&nbsp;						: null;</b>
+<b class="nc">&nbsp;				bindables.add(Bindable.of(ClassUtils.getUserClass(beanType))</b>
+<b class="nc">&nbsp;					.withBindMethod((bindMethod != null) ? bindMethod : BindMethod.JAVA_BEAN));</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return (!bindables.isEmpty()) ? new ConfigurationPropertiesReflectionHintsContribution(bindables) : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static final class ConfigurationPropertiesReflectionHintsContribution
+&nbsp;			implements BeanFactoryInitializationAotContribution {
+&nbsp;
+&nbsp;		private final List&lt;Bindable&lt;?&gt;&gt; bindables;
+&nbsp;
+<b class="nc">&nbsp;		private ConfigurationPropertiesReflectionHintsContribution(List&lt;Bindable&lt;?&gt;&gt; bindables) {</b>
+<b class="nc">&nbsp;			this.bindables = bindables;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void applyTo(GenerationContext generationContext,
+&nbsp;				BeanFactoryInitializationCode beanFactoryInitializationCode) {
+<b class="nc">&nbsp;			BindableRuntimeHintsRegistrar.forBindables(this.bindables)</b>
+<b class="nc">&nbsp;				.registerHints(generationContext.getRuntimeHints());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Iterable&lt;Bindable&lt;?&gt;&gt; getBindables() {
+<b class="nc">&nbsp;			return this.bindables;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

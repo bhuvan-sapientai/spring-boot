@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImportCandidates</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.annotation</a>
+</div>
+
+<h1>Coverage Summary for Class: ImportCandidates (org.springframework.boot.context.annotation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImportCandidates</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.annotation;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.core.io.UrlResource;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains {@code @Configuration} import candidates, usually auto-configurations.
+&nbsp; *
+&nbsp; * The {@link #load(Class, ClassLoader)} method can be used to discover the import
+&nbsp; * candidates.
+&nbsp; *
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Scott Frederick
+&nbsp; * @since 2.7.0
+&nbsp; */
+&nbsp;public final class ImportCandidates implements Iterable&lt;String&gt; {
+&nbsp;
+&nbsp;	private static final String LOCATION = &quot;META-INF/spring/%s.imports&quot;;
+&nbsp;
+&nbsp;	private static final String COMMENT_START = &quot;#&quot;;
+&nbsp;
+&nbsp;	private final List&lt;String&gt; candidates;
+&nbsp;
+<b class="nc">&nbsp;	private ImportCandidates(List&lt;String&gt; candidates) {</b>
+<b class="nc">&nbsp;		Assert.notNull(candidates, &quot;&#39;candidates&#39; must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.candidates = Collections.unmodifiableList(candidates);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;String&gt; iterator() {
+<b class="nc">&nbsp;		return this.candidates.iterator();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the list of loaded import candidates.
+&nbsp;	 * @return the list of import candidates
+&nbsp;	 */
+&nbsp;	public List&lt;String&gt; getCandidates() {
+<b class="nc">&nbsp;		return this.candidates;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Loads the names of import candidates from the classpath.
+&nbsp;	 *
+&nbsp;	 * The names of the import candidates are stored in files named
+&nbsp;	 * {@code META-INF/spring/full-qualified-annotation-name.imports} on the classpath.
+&nbsp;	 * Every line contains the full qualified name of the candidate class. Comments are
+&nbsp;	 * supported using the # character.
+&nbsp;	 * @param annotation annotation to load
+&nbsp;	 * @param classLoader class loader to use for loading
+&nbsp;	 * @return list of names of annotated classes
+&nbsp;	 */
+&nbsp;	public static ImportCandidates load(Class&lt;?&gt; annotation, ClassLoader classLoader) {
+<b class="nc">&nbsp;		Assert.notNull(annotation, &quot;&#39;annotation&#39; must not be null&quot;);</b>
+<b class="nc">&nbsp;		ClassLoader classLoaderToUse = decideClassloader(classLoader);</b>
+<b class="nc">&nbsp;		String location = String.format(LOCATION, annotation.getName());</b>
+<b class="nc">&nbsp;		Enumeration&lt;URL&gt; urls = findUrlsInClasspath(classLoaderToUse, location);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; importCandidates = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		while (urls.hasMoreElements()) {</b>
+<b class="nc">&nbsp;			URL url = urls.nextElement();</b>
+<b class="nc">&nbsp;			importCandidates.addAll(readCandidateConfigurations(url));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return new ImportCandidates(importCandidates);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ClassLoader decideClassloader(ClassLoader classLoader) {
+<b class="nc">&nbsp;		if (classLoader == null) {</b>
+<b class="nc">&nbsp;			return ImportCandidates.class.getClassLoader();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static Enumeration&lt;URL&gt; findUrlsInClasspath(ClassLoader classLoader, String location) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return classLoader.getResources(location);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Failed to load configurations from location [&quot; + location + &quot;]&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static List&lt;String&gt; readCandidateConfigurations(URL url) {
+<b class="nc">&nbsp;		try (BufferedReader reader = new BufferedReader(</b>
+<b class="nc">&nbsp;				new InputStreamReader(new UrlResource(url).getInputStream(), StandardCharsets.UTF_8))) {</b>
+<b class="nc">&nbsp;			List&lt;String&gt; candidates = new ArrayList&lt;&gt;();</b>
+&nbsp;			String line;
+<b class="nc">&nbsp;			while ((line = reader.readLine()) != null) {</b>
+<b class="nc">&nbsp;				line = stripComment(line);</b>
+<b class="nc">&nbsp;				line = line.trim();</b>
+<b class="nc">&nbsp;				if (line.isEmpty()) {</b>
+<b class="nc">&nbsp;					continue;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				candidates.add(line);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return candidates;</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		catch (IOException ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Unable to load configurations from location [&quot; + url + &quot;]&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private static String stripComment(String line) {
+<b class="nc">&nbsp;		int commentStart = line.indexOf(COMMENT_START);</b>
+<b class="nc">&nbsp;		if (commentStart == -1) {</b>
+<b class="nc">&nbsp;			return line;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return line.substring(0, commentStart);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

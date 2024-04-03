@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IntegrationTestPlugin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.test</a>
+</div>
+
+<h1>Coverage Summary for Class: IntegrationTestPlugin (org.springframework.boot.build.test)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IntegrationTestPlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.test;
+&nbsp;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.plugins.JavaPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPluginExtension;
+&nbsp;import org.gradle.api.tasks.SourceSet;
+&nbsp;import org.gradle.api.tasks.SourceSetContainer;
+&nbsp;import org.gradle.api.tasks.testing.Test;
+&nbsp;import org.gradle.language.base.plugins.LifecycleBasePlugin;
+&nbsp;import org.gradle.plugins.ide.eclipse.EclipsePlugin;
+&nbsp;import org.gradle.plugins.ide.eclipse.model.EclipseModel;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Plugin} to configure integration testing support in a {@link Project}.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class IntegrationTestPlugin implements Plugin&lt;Project&gt; {</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the {@code intTest} task.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static String INT_TEST_TASK_NAME = &quot;intTest&quot;;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Name of the {@code intTest} source set.
+&nbsp;	 */
+<b class="nc">&nbsp;	public static String INT_TEST_SOURCE_SET_NAME = &quot;intTest&quot;;</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void apply(Project project) {
+<b class="nc">&nbsp;		project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -&gt; configureIntegrationTesting(project));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureIntegrationTesting(Project project) {
+<b class="nc">&nbsp;		SourceSet intTestSourceSet = createSourceSet(project);</b>
+<b class="nc">&nbsp;		Test intTest = createTestTask(project, intTestSourceSet);</b>
+<b class="nc">&nbsp;		project.getTasks().getByName(LifecycleBasePlugin.CHECK_TASK_NAME).dependsOn(intTest);</b>
+<b class="nc">&nbsp;		project.getPlugins().withType(EclipsePlugin.class, (eclipsePlugin) -&gt; {</b>
+<b class="nc">&nbsp;			EclipseModel eclipse = project.getExtensions().getByType(EclipseModel.class);</b>
+<b class="nc">&nbsp;			eclipse.classpath((classpath) -&gt; classpath.getPlusConfigurations()</b>
+<b class="nc">&nbsp;				.add(project.getConfigurations().getByName(intTestSourceSet.getRuntimeClasspathConfigurationName())));</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private SourceSet createSourceSet(Project project) {
+<b class="nc">&nbsp;		SourceSetContainer sourceSets = project.getExtensions().getByType(JavaPluginExtension.class).getSourceSets();</b>
+<b class="nc">&nbsp;		SourceSet intTestSourceSet = sourceSets.create(INT_TEST_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;		SourceSet main = sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);</b>
+<b class="nc">&nbsp;		intTestSourceSet.setCompileClasspath(intTestSourceSet.getCompileClasspath().plus(main.getOutput()));</b>
+<b class="nc">&nbsp;		intTestSourceSet.setRuntimeClasspath(intTestSourceSet.getRuntimeClasspath().plus(main.getOutput()));</b>
+<b class="nc">&nbsp;		return intTestSourceSet;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Test createTestTask(Project project, SourceSet intTestSourceSet) {
+<b class="nc">&nbsp;		Test intTest = project.getTasks().create(INT_TEST_TASK_NAME, Test.class);</b>
+<b class="nc">&nbsp;		intTest.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);</b>
+<b class="nc">&nbsp;		intTest.setDescription(&quot;Runs integration tests.&quot;);</b>
+<b class="nc">&nbsp;		intTest.setTestClassesDirs(intTestSourceSet.getOutput().getClassesDirs());</b>
+<b class="nc">&nbsp;		intTest.setClasspath(intTestSourceSet.getRuntimeClasspath());</b>
+<b class="nc">&nbsp;		intTest.shouldRunAfter(JavaPlugin.TEST_TASK_NAME);</b>
+<b class="nc">&nbsp;		return intTest;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

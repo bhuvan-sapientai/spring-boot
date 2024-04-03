@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoConfigurationMetadata</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.autoconfigure</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoConfigurationMetadata (org.springframework.boot.build.autoconfigure)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoConfigurationMetadata</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.autoconfigure;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.FileWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.tasks.OutputFile;
+&nbsp;import org.gradle.api.tasks.PathSensitivity;
+&nbsp;import org.gradle.api.tasks.SourceSet;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;
+&nbsp;import org.springframework.asm.ClassReader;
+&nbsp;import org.springframework.asm.Opcodes;
+&nbsp;import org.springframework.core.CollectionFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Task} for generating metadata describing a project&#39;s auto-configuration
+&nbsp; * classes.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;public class AutoConfigurationMetadata extends DefaultTask {
+&nbsp;
+&nbsp;	private static final String COMMENT_START = &quot;#&quot;;
+&nbsp;
+&nbsp;	private SourceSet sourceSet;
+&nbsp;
+&nbsp;	private File outputFile;
+&nbsp;
+<b class="nc">&nbsp;	public AutoConfigurationMetadata() {</b>
+<b class="nc">&nbsp;		getInputs()</b>
+<b class="nc">&nbsp;			.file((Callable&lt;File&gt;) () -&gt; new File(this.sourceSet.getOutput().getResourcesDir(),</b>
+&nbsp;					&quot;META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports&quot;))
+<b class="nc">&nbsp;			.withPathSensitivity(PathSensitivity.RELATIVE)</b>
+<b class="nc">&nbsp;			.withPropertyName(&quot;org.springframework.boot.autoconfigure.AutoConfiguration&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;		dependsOn((Callable&lt;String&gt;) () -&gt; this.sourceSet.getProcessResourcesTaskName());</b>
+<b class="nc">&nbsp;		getProject().getConfigurations()</b>
+<b class="nc">&nbsp;			.maybeCreate(AutoConfigurationPlugin.AUTO_CONFIGURATION_METADATA_CONFIGURATION_NAME);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setSourceSet(SourceSet sourceSet) {
+<b class="nc">&nbsp;		this.sourceSet = sourceSet;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@OutputFile
+&nbsp;	public File getOutputFile() {
+<b class="nc">&nbsp;		return this.outputFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOutputFile(File outputFile) {
+<b class="nc">&nbsp;		this.outputFile = outputFile;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void documentAutoConfiguration() throws IOException {
+<b class="nc">&nbsp;		Properties autoConfiguration = readAutoConfiguration();</b>
+<b class="nc">&nbsp;		getOutputFile().getParentFile().mkdirs();</b>
+<b class="nc">&nbsp;		try (FileWriter writer = new FileWriter(getOutputFile())) {</b>
+<b class="nc">&nbsp;			autoConfiguration.store(writer, null);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Properties readAutoConfiguration() throws IOException {
+<b class="nc">&nbsp;		Properties autoConfiguration = CollectionFactory.createSortedProperties(true);</b>
+<b class="nc">&nbsp;		List&lt;String&gt; classNames = readAutoConfigurationsFile();</b>
+<b class="nc">&nbsp;		Set&lt;String&gt; publicClassNames = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String className : classNames) {</b>
+<b class="nc">&nbsp;			File classFile = findClassFile(className);</b>
+<b class="nc">&nbsp;			if (classFile == null) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(&quot;Auto-configuration class &#39;&quot; + className + &quot;&#39; not found.&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			try (InputStream in = new FileInputStream(classFile)) {</b>
+<b class="nc">&nbsp;				int access = new ClassReader(in).getAccess();</b>
+<b class="nc">&nbsp;				if ((access &amp; Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC) {</b>
+<b class="nc">&nbsp;					publicClassNames.add(className);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		autoConfiguration.setProperty(&quot;autoConfigurationClassNames&quot;, String.join(&quot;,&quot;, publicClassNames));</b>
+<b class="nc">&nbsp;		autoConfiguration.setProperty(&quot;module&quot;, getProject().getName());</b>
+<b class="nc">&nbsp;		return autoConfiguration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Reads auto-configurations from
+&nbsp;	 * META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports.
+&nbsp;	 * @return auto-configurations
+&nbsp;	 */
+&nbsp;	private List&lt;String&gt; readAutoConfigurationsFile() throws IOException {
+<b class="nc">&nbsp;		File file = new File(this.sourceSet.getOutput().getResourcesDir(),</b>
+&nbsp;				&quot;META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports&quot;);
+<b class="nc">&nbsp;		if (!file.exists()) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {</b>
+<b class="nc">&nbsp;			return reader.lines().map(this::stripComment).filter((line) -&gt; !line.isEmpty()).toList();</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String stripComment(String line) {
+<b class="nc">&nbsp;		int commentStart = line.indexOf(COMMENT_START);</b>
+<b class="nc">&nbsp;		if (commentStart == -1) {</b>
+<b class="nc">&nbsp;			return line.trim();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return line.substring(0, commentStart).trim();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File findClassFile(String className) {
+<b class="nc">&nbsp;		String classFileName = className.replace(&quot;.&quot;, &quot;/&quot;) + &quot;.class&quot;;</b>
+<b class="nc">&nbsp;		for (File classesDir : this.sourceSet.getOutput().getClassesDirs()) {</b>
+<b class="nc">&nbsp;			File classFile = new File(classesDir, classFileName);</b>
+<b class="nc">&nbsp;			if (classFile.isFile()) {</b>
+<b class="nc">&nbsp;				return classFile;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

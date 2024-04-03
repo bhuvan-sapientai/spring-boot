@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringProfileIfNestedWithinSecondPhaseElementSanityChecker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.logging.logback</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringProfileIfNestedWithinSecondPhaseElementSanityChecker (org.springframework.boot.logging.logback)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringProfileIfNestedWithinSecondPhaseElementSanityChecker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.logging.logback;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import ch.qos.logback.classic.joran.sanity.IfNestedWithinSecondPhaseElementSC;
+&nbsp;import ch.qos.logback.classic.model.LoggerModel;
+&nbsp;import ch.qos.logback.classic.model.RootLoggerModel;
+&nbsp;import ch.qos.logback.core.joran.sanity.Pair;
+&nbsp;import ch.qos.logback.core.joran.sanity.SanityChecker;
+&nbsp;import ch.qos.logback.core.model.AppenderModel;
+&nbsp;import ch.qos.logback.core.model.Model;
+&nbsp;import ch.qos.logback.core.spi.ContextAwareBase;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link SanityChecker} to ensure that {@code springProfile} elements are not nested
+&nbsp; * within second-phase elements.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @see IfNestedWithinSecondPhaseElementSC
+&nbsp; */
+<b class="nc">&nbsp;class SpringProfileIfNestedWithinSecondPhaseElementSanityChecker extends ContextAwareBase implements SanityChecker {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final List&lt;Class&lt;? extends Model&gt;&gt; SECOND_PHASE_TYPES = List.of(AppenderModel.class,</b>
+&nbsp;			LoggerModel.class, RootLoggerModel.class);
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void check(Model model) {
+<b class="nc">&nbsp;		if (model == null) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;Model&gt; models = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		SECOND_PHASE_TYPES.forEach((type) -&gt; deepFindAllModelsOfType(type, models, model));</b>
+<b class="nc">&nbsp;		List&lt;Pair&lt;Model, Model&gt;&gt; nestedPairs = deepFindNestedSubModelsOfType(SpringProfileModel.class, models);</b>
+<b class="nc">&nbsp;		if (!nestedPairs.isEmpty()) {</b>
+<b class="nc">&nbsp;			addWarn(&quot;&lt;springProfile&gt; elements cannot be nested within an &lt;appender&gt;, &lt;logger&gt; or &lt;root&gt; element&quot;);</b>
+<b class="nc">&nbsp;			nestedPairs.forEach((nested) -&gt; {</b>
+<b class="nc">&nbsp;				Model first = nested.first;</b>
+<b class="nc">&nbsp;				Model second = nested.second;</b>
+<b class="nc">&nbsp;				addWarn(&quot;Element &lt;%s&gt; at line %s contains a nested &lt;%s&gt; element at line %s&quot;.formatted(first.getTag(),</b>
+<b class="nc">&nbsp;						first.getLineNumber(), second.getTag(), second.getLineNumber()));</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

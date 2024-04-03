@@ -1,0 +1,333 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationMetadata</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor.metadata</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationMetadata (org.springframework.boot.configurationprocessor.metadata)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationMetadata</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor.metadata;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configuration meta-data.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.2.0
+&nbsp; * @see ItemMetadata
+&nbsp; */
+&nbsp;public class ConfigurationMetadata {
+&nbsp;
+&nbsp;	private static final Set&lt;Character&gt; SEPARATORS;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		List&lt;Character&gt; chars = Arrays.asList(&#39;-&#39;, &#39;_&#39;);</b>
+<b class="nc">&nbsp;		SEPARATORS = Collections.unmodifiableSet(new HashSet&lt;&gt;(chars));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final Map&lt;String, List&lt;ItemMetadata&gt;&gt; items;
+&nbsp;
+&nbsp;	private final Map&lt;String, List&lt;ItemHint&gt;&gt; hints;
+&nbsp;
+<b class="nc">&nbsp;	public ConfigurationMetadata() {</b>
+<b class="nc">&nbsp;		this.items = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		this.hints = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public ConfigurationMetadata(ConfigurationMetadata metadata) {</b>
+<b class="nc">&nbsp;		this.items = new LinkedHashMap&lt;&gt;(metadata.items);</b>
+<b class="nc">&nbsp;		this.hints = new LinkedHashMap&lt;&gt;(metadata.hints);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add item meta-data.
+&nbsp;	 * @param itemMetadata the meta-data to add
+&nbsp;	 */
+&nbsp;	public void add(ItemMetadata itemMetadata) {
+<b class="nc">&nbsp;		add(this.items, itemMetadata.getName(), itemMetadata, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add item meta-data if it&#39;s not already present.
+&nbsp;	 * @param itemMetadata the meta-data to add
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public void addIfMissing(ItemMetadata itemMetadata) {
+<b class="nc">&nbsp;		add(this.items, itemMetadata.getName(), itemMetadata, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add item hint.
+&nbsp;	 * @param itemHint the item hint to add
+&nbsp;	 */
+&nbsp;	public void add(ItemHint itemHint) {
+<b class="nc">&nbsp;		add(this.hints, itemHint.getName(), itemHint, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Merge the content from another {@link ConfigurationMetadata}.
+&nbsp;	 * @param metadata the {@link ConfigurationMetadata} instance to merge
+&nbsp;	 */
+&nbsp;	public void merge(ConfigurationMetadata metadata) {
+<b class="nc">&nbsp;		for (ItemMetadata additionalItem : metadata.getItems()) {</b>
+<b class="nc">&nbsp;			mergeItemMetadata(additionalItem);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		for (ItemHint itemHint : metadata.getHints()) {</b>
+<b class="nc">&nbsp;			add(itemHint);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return item meta-data.
+&nbsp;	 * @return the items
+&nbsp;	 */
+&nbsp;	public List&lt;ItemMetadata&gt; getItems() {
+<b class="nc">&nbsp;		return flattenValues(this.items);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return hint meta-data.
+&nbsp;	 * @return the hints
+&nbsp;	 */
+&nbsp;	public List&lt;ItemHint&gt; getHints() {
+<b class="nc">&nbsp;		return flattenValues(this.hints);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void mergeItemMetadata(ItemMetadata metadata) {
+<b class="nc">&nbsp;		ItemMetadata matching = findMatchingItemMetadata(metadata);</b>
+<b class="nc">&nbsp;		if (matching != null) {</b>
+<b class="nc">&nbsp;			if (metadata.getDescription() != null) {</b>
+<b class="nc">&nbsp;				matching.setDescription(metadata.getDescription());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (metadata.getDefaultValue() != null) {</b>
+<b class="nc">&nbsp;				matching.setDefaultValue(metadata.getDefaultValue());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			ItemDeprecation deprecation = metadata.getDeprecation();</b>
+<b class="nc">&nbsp;			ItemDeprecation matchingDeprecation = matching.getDeprecation();</b>
+<b class="nc">&nbsp;			if (deprecation != null) {</b>
+<b class="nc">&nbsp;				if (matchingDeprecation == null) {</b>
+<b class="nc">&nbsp;					matching.setDeprecation(deprecation);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					if (deprecation.getReason() != null) {</b>
+<b class="nc">&nbsp;						matchingDeprecation.setReason(deprecation.getReason());</b>
+&nbsp;					}
+<b class="nc">&nbsp;					if (deprecation.getReplacement() != null) {</b>
+<b class="nc">&nbsp;						matchingDeprecation.setReplacement(deprecation.getReplacement());</b>
+&nbsp;					}
+<b class="nc">&nbsp;					if (deprecation.getLevel() != null) {</b>
+<b class="nc">&nbsp;						matchingDeprecation.setLevel(deprecation.getLevel());</b>
+&nbsp;					}
+<b class="nc">&nbsp;					if (deprecation.getSince() != null) {</b>
+<b class="nc">&nbsp;						matchingDeprecation.setSince(deprecation.getSince());</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			add(this.items, metadata.getName(), metadata, false);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;K, V&gt; void add(Map&lt;K, List&lt;V&gt;&gt; map, K key, V value, boolean ifMissing) {
+<b class="nc">&nbsp;		List&lt;V&gt; values = map.computeIfAbsent(key, (k) -&gt; new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;		if (!ifMissing || values.isEmpty()) {</b>
+<b class="nc">&nbsp;			values.add(value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private ItemMetadata findMatchingItemMetadata(ItemMetadata metadata) {
+<b class="nc">&nbsp;		List&lt;ItemMetadata&gt; candidates = this.items.get(metadata.getName());</b>
+<b class="nc">&nbsp;		if (candidates == null || candidates.isEmpty()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		candidates = new ArrayList&lt;&gt;(candidates);</b>
+<b class="nc">&nbsp;		candidates.removeIf((itemMetadata) -&gt; !itemMetadata.hasSameType(metadata));</b>
+<b class="nc">&nbsp;		if (candidates.size() &gt; 1 &amp;&amp; metadata.getType() != null) {</b>
+<b class="nc">&nbsp;			candidates.removeIf((itemMetadata) -&gt; !metadata.getType().equals(itemMetadata.getType()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (candidates.size() == 1) {</b>
+<b class="nc">&nbsp;			return candidates.get(0);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (ItemMetadata candidate : candidates) {</b>
+<b class="nc">&nbsp;			if (nullSafeEquals(candidate.getSourceType(), metadata.getSourceType())) {</b>
+<b class="nc">&nbsp;				return candidate;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean nullSafeEquals(Object o1, Object o2) {
+<b class="nc">&nbsp;		if (o1 == o2) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return o1 != null &amp;&amp; o1.equals(o2);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public static String nestedPrefix(String prefix, String name) {
+<b class="nc">&nbsp;		String nestedPrefix = (prefix != null) ? prefix : &quot;&quot;;</b>
+<b class="nc">&nbsp;		String dashedName = toDashedCase(name);</b>
+<b class="nc">&nbsp;		nestedPrefix += nestedPrefix.isEmpty() ? dashedName : &quot;.&quot; + dashedName;</b>
+<b class="nc">&nbsp;		return nestedPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static String toDashedCase(String name) {
+<b class="nc">&nbsp;		StringBuilder dashed = new StringBuilder();</b>
+<b class="nc">&nbsp;		Character previous = null;</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; name.length(); i++) {</b>
+<b class="nc">&nbsp;			char current = name.charAt(i);</b>
+<b class="nc">&nbsp;			if (SEPARATORS.contains(current)) {</b>
+<b class="nc">&nbsp;				dashed.append(&quot;-&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (Character.isUpperCase(current) &amp;&amp; previous != null &amp;&amp; !SEPARATORS.contains(previous)) {</b>
+<b class="nc">&nbsp;				dashed.append(&quot;-&quot;).append(current);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				dashed.append(current);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			previous = current;</b>
+&nbsp;
+&nbsp;		}
+<b class="nc">&nbsp;		return dashed.toString().toLowerCase(Locale.ENGLISH);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static &lt;T extends Comparable&lt;T&gt;&gt; List&lt;T&gt; flattenValues(Map&lt;?, List&lt;T&gt;&gt; map) {
+<b class="nc">&nbsp;		List&lt;T&gt; content = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (List&lt;T&gt; values : map.values()) {</b>
+<b class="nc">&nbsp;			content.addAll(values);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		Collections.sort(content);</b>
+<b class="nc">&nbsp;		return content;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		StringBuilder result = new StringBuilder();</b>
+<b class="nc">&nbsp;		result.append(String.format(&quot;items: %n&quot;));</b>
+<b class="nc">&nbsp;		this.items.values().forEach((itemMetadata) -&gt; result.append(&quot;\t&quot;).append(String.format(&quot;%s%n&quot;, itemMetadata)));</b>
+<b class="nc">&nbsp;		return result.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

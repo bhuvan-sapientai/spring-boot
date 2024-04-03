@@ -1,0 +1,431 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BomPlugin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.bom</a>
+</div>
+
+<h1>Coverage Summary for Class: BomPlugin (org.springframework.boot.build.bom)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BomPlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BomPlugin$PublishingCustomizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/136)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/162)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.bom;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import groovy.namespace.QName;
+&nbsp;import groovy.util.Node;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.plugins.JavaPlatformExtension;
+&nbsp;import org.gradle.api.plugins.JavaPlatformPlugin;
+&nbsp;import org.gradle.api.plugins.PluginContainer;
+&nbsp;import org.gradle.api.publish.PublishingExtension;
+&nbsp;import org.gradle.api.publish.maven.MavenPom;
+&nbsp;import org.gradle.api.publish.maven.MavenPublication;
+&nbsp;
+&nbsp;import org.springframework.boot.build.DeployedPlugin;
+&nbsp;import org.springframework.boot.build.MavenRepositoryPlugin;
+&nbsp;import org.springframework.boot.build.bom.Library.Group;
+&nbsp;import org.springframework.boot.build.bom.Library.Module;
+&nbsp;import org.springframework.boot.build.bom.bomr.MoveToSnapshots;
+&nbsp;import org.springframework.boot.build.bom.bomr.UpgradeBom;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Plugin} for defining a bom. Dependencies are added as constraints in the
+&nbsp; * {@code api} configuration. Imported boms are added as enforced platforms in the
+&nbsp; * {@code api} configuration.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class BomPlugin implements Plugin&lt;Project&gt; {</b>
+&nbsp;
+&nbsp;	static final String API_ENFORCED_CONFIGURATION_NAME = &quot;apiEnforced&quot;;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void apply(Project project) {
+<b class="nc">&nbsp;		PluginContainer plugins = project.getPlugins();</b>
+<b class="nc">&nbsp;		plugins.apply(DeployedPlugin.class);</b>
+<b class="nc">&nbsp;		plugins.apply(MavenRepositoryPlugin.class);</b>
+<b class="nc">&nbsp;		plugins.apply(JavaPlatformPlugin.class);</b>
+<b class="nc">&nbsp;		JavaPlatformExtension javaPlatform = project.getExtensions().getByType(JavaPlatformExtension.class);</b>
+<b class="nc">&nbsp;		javaPlatform.allowDependencies();</b>
+<b class="nc">&nbsp;		createApiEnforcedConfiguration(project);</b>
+<b class="nc">&nbsp;		BomExtension bom = project.getExtensions()</b>
+<b class="nc">&nbsp;			.create(&quot;bom&quot;, BomExtension.class, project.getDependencies(), project);</b>
+<b class="nc">&nbsp;		CheckBom checkBom = project.getTasks().create(&quot;bomrCheck&quot;, CheckBom.class, bom);</b>
+<b class="nc">&nbsp;		project.getTasks().named(&quot;check&quot;).configure((check) -&gt; check.dependsOn(checkBom));</b>
+<b class="nc">&nbsp;		project.getTasks().create(&quot;bomrUpgrade&quot;, UpgradeBom.class, bom);</b>
+<b class="nc">&nbsp;		project.getTasks().create(&quot;moveToSnapshots&quot;, MoveToSnapshots.class, bom);</b>
+<b class="nc">&nbsp;		new PublishingCustomizer(project, bom).customize();</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createApiEnforcedConfiguration(Project project) {
+<b class="nc">&nbsp;		Configuration apiEnforced = project.getConfigurations()</b>
+<b class="nc">&nbsp;			.create(API_ENFORCED_CONFIGURATION_NAME, (configuration) -&gt; {</b>
+<b class="nc">&nbsp;				configuration.setCanBeConsumed(false);</b>
+<b class="nc">&nbsp;				configuration.setCanBeResolved(false);</b>
+<b class="nc">&nbsp;				configuration.setVisible(false);</b>
+&nbsp;			});
+<b class="nc">&nbsp;		project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(JavaPlatformPlugin.ENFORCED_API_ELEMENTS_CONFIGURATION_NAME)</b>
+<b class="nc">&nbsp;			.extendsFrom(apiEnforced);</b>
+<b class="nc">&nbsp;		project.getConfigurations()</b>
+<b class="nc">&nbsp;			.getByName(JavaPlatformPlugin.ENFORCED_RUNTIME_ELEMENTS_CONFIGURATION_NAME)</b>
+<b class="nc">&nbsp;			.extendsFrom(apiEnforced);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class PublishingCustomizer {
+&nbsp;
+&nbsp;		private final Project project;
+&nbsp;
+&nbsp;		private final BomExtension bom;
+&nbsp;
+<b class="nc">&nbsp;		private PublishingCustomizer(Project project, BomExtension bom) {</b>
+<b class="nc">&nbsp;			this.project = project;</b>
+<b class="nc">&nbsp;			this.bom = bom;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void customize() {
+<b class="nc">&nbsp;			PublishingExtension publishing = this.project.getExtensions().getByType(PublishingExtension.class);</b>
+<b class="nc">&nbsp;			publishing.getPublications().withType(MavenPublication.class).all(this::configurePublication);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void configurePublication(MavenPublication publication) {
+<b class="nc">&nbsp;			publication.pom(this::customizePom);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		private void customizePom(MavenPom pom) {
+<b class="nc">&nbsp;			pom.withXml((xml) -&gt; {</b>
+<b class="nc">&nbsp;				Node projectNode = xml.asNode();</b>
+<b class="nc">&nbsp;				Node properties = new Node(null, &quot;properties&quot;);</b>
+<b class="nc">&nbsp;				this.bom.getProperties().forEach(properties::appendNode);</b>
+<b class="nc">&nbsp;				Node dependencyManagement = findChild(projectNode, &quot;dependencyManagement&quot;);</b>
+<b class="nc">&nbsp;				if (dependencyManagement != null) {</b>
+<b class="nc">&nbsp;					addPropertiesBeforeDependencyManagement(projectNode, properties);</b>
+<b class="nc">&nbsp;					addClassifiedManagedDependencies(dependencyManagement);</b>
+<b class="nc">&nbsp;					replaceVersionsWithVersionPropertyReferences(dependencyManagement);</b>
+<b class="nc">&nbsp;					addExclusionsToManagedDependencies(dependencyManagement);</b>
+<b class="nc">&nbsp;					addTypesToManagedDependencies(dependencyManagement);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					projectNode.children().add(properties);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				addPluginManagement(projectNode);</b>
+&nbsp;			});
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		private void addPropertiesBeforeDependencyManagement(Node projectNode, Node properties) {
+<b class="nc">&nbsp;			for (int i = 0; i &lt; projectNode.children().size(); i++) {</b>
+<b class="nc">&nbsp;				if (isNodeWithName(projectNode.children().get(i), &quot;dependencyManagement&quot;)) {</b>
+<b class="nc">&nbsp;					projectNode.children().add(i, properties);</b>
+<b class="nc">&nbsp;					break;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void replaceVersionsWithVersionPropertyReferences(Node dependencyManagement) {
+<b class="nc">&nbsp;			Node dependencies = findChild(dependencyManagement, &quot;dependencies&quot;);</b>
+<b class="nc">&nbsp;			if (dependencies != null) {</b>
+<b class="nc">&nbsp;				for (Node dependency : findChildren(dependencies, &quot;dependency&quot;)) {</b>
+<b class="nc">&nbsp;					String groupId = findChild(dependency, &quot;groupId&quot;).text();</b>
+<b class="nc">&nbsp;					String artifactId = findChild(dependency, &quot;artifactId&quot;).text();</b>
+<b class="nc">&nbsp;					Node classifierNode = findChild(dependency, &quot;classifier&quot;);</b>
+<b class="nc">&nbsp;					String classifier = (classifierNode != null) ? classifierNode.text() : &quot;&quot;;</b>
+<b class="nc">&nbsp;					String versionProperty = this.bom.getArtifactVersionProperty(groupId, artifactId, classifier);</b>
+<b class="nc">&nbsp;					if (versionProperty != null) {</b>
+<b class="nc">&nbsp;						findChild(dependency, &quot;version&quot;).setValue(&quot;${&quot; + versionProperty + &quot;}&quot;);</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addExclusionsToManagedDependencies(Node dependencyManagement) {
+<b class="nc">&nbsp;			Node dependencies = findChild(dependencyManagement, &quot;dependencies&quot;);</b>
+<b class="nc">&nbsp;			if (dependencies != null) {</b>
+<b class="nc">&nbsp;				for (Node dependency : findChildren(dependencies, &quot;dependency&quot;)) {</b>
+<b class="nc">&nbsp;					String groupId = findChild(dependency, &quot;groupId&quot;).text();</b>
+<b class="nc">&nbsp;					String artifactId = findChild(dependency, &quot;artifactId&quot;).text();</b>
+<b class="nc">&nbsp;					this.bom.getLibraries()</b>
+<b class="nc">&nbsp;						.stream()</b>
+<b class="nc">&nbsp;						.flatMap((library) -&gt; library.getGroups().stream())</b>
+<b class="nc">&nbsp;						.filter((group) -&gt; group.getId().equals(groupId))</b>
+<b class="nc">&nbsp;						.flatMap((group) -&gt; group.getModules().stream())</b>
+<b class="nc">&nbsp;						.filter((module) -&gt; module.getName().equals(artifactId))</b>
+<b class="nc">&nbsp;						.flatMap((module) -&gt; module.getExclusions().stream())</b>
+<b class="nc">&nbsp;						.forEach((exclusion) -&gt; {</b>
+<b class="nc">&nbsp;							Node exclusions = findOrCreateNode(dependency, &quot;exclusions&quot;);</b>
+<b class="nc">&nbsp;							Node node = new Node(exclusions, &quot;exclusion&quot;);</b>
+<b class="nc">&nbsp;							node.appendNode(&quot;groupId&quot;, exclusion.getGroupId());</b>
+<b class="nc">&nbsp;							node.appendNode(&quot;artifactId&quot;, exclusion.getArtifactId());</b>
+&nbsp;						});
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addTypesToManagedDependencies(Node dependencyManagement) {
+<b class="nc">&nbsp;			Node dependencies = findChild(dependencyManagement, &quot;dependencies&quot;);</b>
+<b class="nc">&nbsp;			if (dependencies != null) {</b>
+<b class="nc">&nbsp;				for (Node dependency : findChildren(dependencies, &quot;dependency&quot;)) {</b>
+<b class="nc">&nbsp;					String groupId = findChild(dependency, &quot;groupId&quot;).text();</b>
+<b class="nc">&nbsp;					String artifactId = findChild(dependency, &quot;artifactId&quot;).text();</b>
+<b class="nc">&nbsp;					Set&lt;String&gt; types = this.bom.getLibraries()</b>
+<b class="nc">&nbsp;						.stream()</b>
+<b class="nc">&nbsp;						.flatMap((library) -&gt; library.getGroups().stream())</b>
+<b class="nc">&nbsp;						.filter((group) -&gt; group.getId().equals(groupId))</b>
+<b class="nc">&nbsp;						.flatMap((group) -&gt; group.getModules().stream())</b>
+<b class="nc">&nbsp;						.filter((module) -&gt; module.getName().equals(artifactId))</b>
+<b class="nc">&nbsp;						.map(Module::getType)</b>
+<b class="nc">&nbsp;						.filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;						.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;					if (types.size() &gt; 1) {</b>
+<b class="nc">&nbsp;						throw new IllegalStateException(</b>
+&nbsp;								&quot;Multiple types for &quot; + groupId + &quot;:&quot; + artifactId + &quot;: &quot; + types);
+&nbsp;					}
+<b class="nc">&nbsp;					if (types.size() == 1) {</b>
+<b class="nc">&nbsp;						String type = types.iterator().next();</b>
+<b class="nc">&nbsp;						dependency.appendNode(&quot;type&quot;, type);</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		private void addClassifiedManagedDependencies(Node dependencyManagement) {
+<b class="nc">&nbsp;			Node dependencies = findChild(dependencyManagement, &quot;dependencies&quot;);</b>
+<b class="nc">&nbsp;			if (dependencies != null) {</b>
+<b class="nc">&nbsp;				for (Node dependency : findChildren(dependencies, &quot;dependency&quot;)) {</b>
+<b class="nc">&nbsp;					String groupId = findChild(dependency, &quot;groupId&quot;).text();</b>
+<b class="nc">&nbsp;					String artifactId = findChild(dependency, &quot;artifactId&quot;).text();</b>
+<b class="nc">&nbsp;					String version = findChild(dependency, &quot;version&quot;).text();</b>
+<b class="nc">&nbsp;					Set&lt;String&gt; classifiers = this.bom.getLibraries()</b>
+<b class="nc">&nbsp;						.stream()</b>
+<b class="nc">&nbsp;						.flatMap((library) -&gt; library.getGroups().stream())</b>
+<b class="nc">&nbsp;						.filter((group) -&gt; group.getId().equals(groupId))</b>
+<b class="nc">&nbsp;						.flatMap((group) -&gt; group.getModules().stream())</b>
+<b class="nc">&nbsp;						.filter((module) -&gt; module.getName().equals(artifactId))</b>
+<b class="nc">&nbsp;						.map(Module::getClassifier)</b>
+<b class="nc">&nbsp;						.filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;						.collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;					Node target = dependency;</b>
+<b class="nc">&nbsp;					for (String classifier : classifiers) {</b>
+<b class="nc">&nbsp;						if (!classifier.isEmpty()) {</b>
+<b class="nc">&nbsp;							if (target == null) {</b>
+<b class="nc">&nbsp;								target = new Node(null, &quot;dependency&quot;);</b>
+<b class="nc">&nbsp;								target.appendNode(&quot;groupId&quot;, groupId);</b>
+<b class="nc">&nbsp;								target.appendNode(&quot;artifactId&quot;, artifactId);</b>
+<b class="nc">&nbsp;								target.appendNode(&quot;version&quot;, version);</b>
+<b class="nc">&nbsp;								int index = dependency.parent().children().indexOf(dependency);</b>
+<b class="nc">&nbsp;								dependency.parent().children().add(index + 1, target);</b>
+&nbsp;							}
+<b class="nc">&nbsp;							target.appendNode(&quot;classifier&quot;, classifier);</b>
+&nbsp;						}
+<b class="nc">&nbsp;						target = null;</b>
+<b class="nc">&nbsp;					}</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addPluginManagement(Node projectNode) {
+<b class="nc">&nbsp;			for (Library library : this.bom.getLibraries()) {</b>
+<b class="nc">&nbsp;				for (Group group : library.getGroups()) {</b>
+<b class="nc">&nbsp;					Node plugins = findOrCreateNode(projectNode, &quot;build&quot;, &quot;pluginManagement&quot;, &quot;plugins&quot;);</b>
+<b class="nc">&nbsp;					for (String pluginName : group.getPlugins()) {</b>
+<b class="nc">&nbsp;						Node plugin = new Node(plugins, &quot;plugin&quot;);</b>
+<b class="nc">&nbsp;						plugin.appendNode(&quot;groupId&quot;, group.getId());</b>
+<b class="nc">&nbsp;						plugin.appendNode(&quot;artifactId&quot;, pluginName);</b>
+<b class="nc">&nbsp;						String versionProperty = library.getVersionProperty();</b>
+<b class="nc">&nbsp;						String value = (versionProperty != null) ? &quot;${&quot; + versionProperty + &quot;}&quot;</b>
+<b class="nc">&nbsp;								: library.getVersion().getVersion().toString();</b>
+<b class="nc">&nbsp;						plugin.appendNode(&quot;version&quot;, value);</b>
+<b class="nc">&nbsp;					}</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Node findOrCreateNode(Node parent, String... path) {
+<b class="nc">&nbsp;			Node current = parent;</b>
+<b class="nc">&nbsp;			for (String nodeName : path) {</b>
+<b class="nc">&nbsp;				Node child = findChild(current, nodeName);</b>
+<b class="nc">&nbsp;				if (child == null) {</b>
+<b class="nc">&nbsp;					child = new Node(current, nodeName);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				current = child;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return current;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Node findChild(Node parent, String name) {
+<b class="nc">&nbsp;			for (Object child : parent.children()) {</b>
+<b class="nc">&nbsp;				if (child instanceof Node node) {</b>
+<b class="nc">&nbsp;					if ((node.name() instanceof QName qname) &amp;&amp; name.equals(qname.getLocalPart())) {</b>
+<b class="nc">&nbsp;						return node;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					if (name.equals(node.name())) {</b>
+<b class="nc">&nbsp;						return node;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;		private List&lt;Node&gt; findChildren(Node parent, String name) {
+<b class="nc">&nbsp;			return parent.children().stream().filter((child) -&gt; isNodeWithName(child, name)).toList();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isNodeWithName(Object candidate, String name) {
+<b class="nc">&nbsp;			if (candidate instanceof Node node) {</b>
+<b class="nc">&nbsp;				if ((node.name() instanceof QName qname) &amp;&amp; name.equals(qname.getLocalPart())) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return name.equals(node.name());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

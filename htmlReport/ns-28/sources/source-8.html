@@ -1,0 +1,459 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationPropertiesBinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationPropertiesBinder (org.springframework.boot.context.properties)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationPropertiesBinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConfigurationPropertiesBinder$ConfigurationPropertiesBinderFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationPropertiesBinder$ConfigurationPropertiesBindHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationPropertiesBinder$SelfValidatingConstructorBoundBindableValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.PropertyEditorRegistry;
+&nbsp;import org.springframework.beans.factory.BeanFactory;
+&nbsp;import org.springframework.beans.factory.FactoryBean;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.boot.context.properties.bind.AbstractBindHandler;
+&nbsp;import org.springframework.boot.context.properties.bind.BindContext;
+&nbsp;import org.springframework.boot.context.properties.bind.BindHandler;
+&nbsp;import org.springframework.boot.context.properties.bind.BindResult;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable.BindRestriction;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.boot.context.properties.bind.BoundPropertiesTrackingBindHandler;
+&nbsp;import org.springframework.boot.context.properties.bind.PropertySourcesPlaceholdersResolver;
+&nbsp;import org.springframework.boot.context.properties.bind.handler.IgnoreErrorsBindHandler;
+&nbsp;import org.springframework.boot.context.properties.bind.handler.IgnoreTopLevelConverterNotFoundBindHandler;
+&nbsp;import org.springframework.boot.context.properties.bind.handler.NoUnboundElementsBindHandler;
+&nbsp;import org.springframework.boot.context.properties.bind.validation.ValidationBindHandler;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
+&nbsp;import org.springframework.boot.context.properties.source.UnboundElementsSourceFilter;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContextAware;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.convert.ConversionService;
+&nbsp;import org.springframework.core.env.PropertySources;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.validation.Errors;
+&nbsp;import org.springframework.validation.Validator;
+&nbsp;import org.springframework.validation.annotation.Validated;
+&nbsp;
+&nbsp;/**
+&nbsp; * Internal class used by the {@link ConfigurationPropertiesBindingPostProcessor} to
+&nbsp; * handle the actual {@link ConfigurationProperties @ConfigurationProperties} binding.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ConfigurationPropertiesBinder {
+&nbsp;
+&nbsp;	private static final String BEAN_NAME = &quot;org.springframework.boot.context.internalConfigurationPropertiesBinder&quot;;
+&nbsp;
+&nbsp;	private static final String VALIDATOR_BEAN_NAME = EnableConfigurationProperties.VALIDATOR_BEAN_NAME;
+&nbsp;
+&nbsp;	private final ApplicationContext applicationContext;
+&nbsp;
+&nbsp;	private final PropertySources propertySources;
+&nbsp;
+&nbsp;	private final Validator configurationPropertiesValidator;
+&nbsp;
+&nbsp;	private final boolean jsr303Present;
+&nbsp;
+&nbsp;	private volatile Validator jsr303Validator;
+&nbsp;
+&nbsp;	private volatile Binder binder;
+&nbsp;
+<b class="nc">&nbsp;	ConfigurationPropertiesBinder(ApplicationContext applicationContext) {</b>
+<b class="nc">&nbsp;		this.applicationContext = applicationContext;</b>
+<b class="nc">&nbsp;		this.propertySources = new PropertySourcesDeducer(applicationContext).getPropertySources();</b>
+<b class="nc">&nbsp;		this.configurationPropertiesValidator = getConfigurationPropertiesValidator(applicationContext);</b>
+<b class="nc">&nbsp;		this.jsr303Present = ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContext);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	BindResult&lt;?&gt; bind(ConfigurationPropertiesBean propertiesBean) {
+<b class="nc">&nbsp;		Bindable&lt;?&gt; target = propertiesBean.asBindTarget();</b>
+<b class="nc">&nbsp;		ConfigurationProperties annotation = propertiesBean.getAnnotation();</b>
+<b class="nc">&nbsp;		BindHandler bindHandler = getBindHandler(target, annotation);</b>
+<b class="nc">&nbsp;		return getBinder().bind(annotation.prefix(), target, bindHandler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Object bindOrCreate(ConfigurationPropertiesBean propertiesBean) {
+<b class="nc">&nbsp;		Bindable&lt;?&gt; target = propertiesBean.asBindTarget();</b>
+<b class="nc">&nbsp;		ConfigurationProperties annotation = propertiesBean.getAnnotation();</b>
+<b class="nc">&nbsp;		BindHandler bindHandler = getBindHandler(target, annotation);</b>
+<b class="nc">&nbsp;		return getBinder().bindOrCreate(annotation.prefix(), target, bindHandler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Validator getConfigurationPropertiesValidator(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		if (applicationContext.containsBean(VALIDATOR_BEAN_NAME)) {</b>
+<b class="nc">&nbsp;			return applicationContext.getBean(VALIDATOR_BEAN_NAME, Validator.class);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private &lt;T&gt; BindHandler getBindHandler(Bindable&lt;T&gt; target, ConfigurationProperties annotation) {
+<b class="nc">&nbsp;		List&lt;Validator&gt; validators = getValidators(target);</b>
+<b class="nc">&nbsp;		BindHandler handler = getHandler();</b>
+<b class="nc">&nbsp;		handler = new ConfigurationPropertiesBindHandler(handler);</b>
+<b class="nc">&nbsp;		if (annotation.ignoreInvalidFields()) {</b>
+<b class="nc">&nbsp;			handler = new IgnoreErrorsBindHandler(handler);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!annotation.ignoreUnknownFields()) {</b>
+<b class="nc">&nbsp;			UnboundElementsSourceFilter filter = new UnboundElementsSourceFilter();</b>
+<b class="nc">&nbsp;			handler = new NoUnboundElementsBindHandler(handler, filter);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!validators.isEmpty()) {</b>
+<b class="nc">&nbsp;			handler = new ValidationBindHandler(handler, validators.toArray(new Validator[0]));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (ConfigurationPropertiesBindHandlerAdvisor advisor : getBindHandlerAdvisors()) {</b>
+<b class="nc">&nbsp;			handler = advisor.apply(handler);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return handler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private IgnoreTopLevelConverterNotFoundBindHandler getHandler() {
+<b class="nc">&nbsp;		BoundConfigurationProperties bound = BoundConfigurationProperties.get(this.applicationContext);</b>
+<b class="nc">&nbsp;		return (bound != null)</b>
+<b class="nc">&nbsp;				? new IgnoreTopLevelConverterNotFoundBindHandler(new BoundPropertiesTrackingBindHandler(bound::add))</b>
+<b class="nc">&nbsp;				: new IgnoreTopLevelConverterNotFoundBindHandler();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Validator&gt; getValidators(Bindable&lt;?&gt; target) {
+<b class="nc">&nbsp;		List&lt;Validator&gt; validators = new ArrayList&lt;&gt;(3);</b>
+<b class="nc">&nbsp;		if (this.configurationPropertiesValidator != null) {</b>
+<b class="nc">&nbsp;			validators.add(this.configurationPropertiesValidator);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.jsr303Present &amp;&amp; target.getAnnotation(Validated.class) != null) {</b>
+<b class="nc">&nbsp;			validators.add(getJsr303Validator());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Validator selfValidator = getSelfValidator(target);</b>
+<b class="nc">&nbsp;		if (selfValidator != null) {</b>
+<b class="nc">&nbsp;			validators.add(selfValidator);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return validators;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Validator getSelfValidator(Bindable&lt;?&gt; target) {
+<b class="nc">&nbsp;		if (target.getValue() != null) {</b>
+<b class="nc">&nbsp;			Object value = target.getValue().get();</b>
+<b class="nc">&nbsp;			return (value instanceof Validator validator) ? validator : null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Class&lt;?&gt; type = target.getType().resolve();</b>
+<b class="nc">&nbsp;		if (Validator.class.isAssignableFrom(type)) {</b>
+<b class="nc">&nbsp;			return new SelfValidatingConstructorBoundBindableValidator(type);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Validator getJsr303Validator() {
+<b class="nc">&nbsp;		if (this.jsr303Validator == null) {</b>
+<b class="nc">&nbsp;			this.jsr303Validator = new ConfigurationPropertiesJsr303Validator(this.applicationContext);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.jsr303Validator;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;ConfigurationPropertiesBindHandlerAdvisor&gt; getBindHandlerAdvisors() {
+<b class="nc">&nbsp;		return this.applicationContext.getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class)</b>
+<b class="nc">&nbsp;			.orderedStream()</b>
+<b class="nc">&nbsp;			.toList();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Binder getBinder() {
+<b class="nc">&nbsp;		if (this.binder == null) {</b>
+<b class="nc">&nbsp;			this.binder = new Binder(getConfigurationPropertySources(), getPropertySourcesPlaceholdersResolver(),</b>
+<b class="nc">&nbsp;					getConversionServices(), getPropertyEditorInitializer(), null, null);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.binder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Iterable&lt;ConfigurationPropertySource&gt; getConfigurationPropertySources() {
+<b class="nc">&nbsp;		return ConfigurationPropertySources.from(this.propertySources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private PropertySourcesPlaceholdersResolver getPropertySourcesPlaceholdersResolver() {
+<b class="nc">&nbsp;		return new PropertySourcesPlaceholdersResolver(this.propertySources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;ConversionService&gt; getConversionServices() {
+<b class="nc">&nbsp;		return new ConversionServiceDeducer(this.applicationContext).getConversionServices();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Consumer&lt;PropertyEditorRegistry&gt; getPropertyEditorInitializer() {
+<b class="nc">&nbsp;		if (this.applicationContext instanceof ConfigurableApplicationContext configurableContext) {</b>
+<b class="nc">&nbsp;			return configurableContext.getBeanFactory()::copyRegisteredEditorsTo;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static void register(BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;		if (!registry.containsBeanDefinition(BEAN_NAME)) {</b>
+<b class="nc">&nbsp;			BeanDefinition definition = BeanDefinitionBuilder</b>
+<b class="nc">&nbsp;				.rootBeanDefinition(ConfigurationPropertiesBinderFactory.class)</b>
+<b class="nc">&nbsp;				.getBeanDefinition();</b>
+<b class="nc">&nbsp;			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);</b>
+<b class="nc">&nbsp;			registry.registerBeanDefinition(ConfigurationPropertiesBinder.BEAN_NAME, definition);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	static ConfigurationPropertiesBinder get(BeanFactory beanFactory) {
+<b class="nc">&nbsp;		return beanFactory.getBean(BEAN_NAME, ConfigurationPropertiesBinder.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BindHandler} to deal with
+&nbsp;	 * {@link ConfigurationProperties @ConfigurationProperties} concerns.
+&nbsp;	 */
+&nbsp;	private static class ConfigurationPropertiesBindHandler extends AbstractBindHandler {
+&nbsp;
+&nbsp;		ConfigurationPropertiesBindHandler(BindHandler handler) {
+<b class="nc">&nbsp;			super(handler);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public &lt;T&gt; Bindable&lt;T&gt; onStart(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindContext context) {
+<b class="nc">&nbsp;			return isConfigurationProperties(target.getType().resolve())</b>
+<b class="nc">&nbsp;					? target.withBindRestrictions(BindRestriction.NO_DIRECT_PROPERTY) : target;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isConfigurationProperties(Class&lt;?&gt; target) {
+<b class="nc">&nbsp;			return target != null &amp;&amp; MergedAnnotations.from(target).isPresent(ConfigurationProperties.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link FactoryBean} to create the {@link ConfigurationPropertiesBinder}.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class ConfigurationPropertiesBinderFactory</b>
+&nbsp;			implements FactoryBean&lt;ConfigurationPropertiesBinder&gt;, ApplicationContextAware {
+&nbsp;
+&nbsp;		private ConfigurationPropertiesBinder binder;
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+<b class="nc">&nbsp;			this.binder = (this.binder != null) ? this.binder : new ConfigurationPropertiesBinder(applicationContext);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Class&lt;?&gt; getObjectType() {
+<b class="nc">&nbsp;			return ConfigurationPropertiesBinder.class;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConfigurationPropertiesBinder getObject() throws Exception {
+<b class="nc">&nbsp;			Assert.state(this.binder != null, &quot;Binder was not created due to missing setApplicationContext call&quot;);</b>
+<b class="nc">&nbsp;			return this.binder;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A {@code Validator} for a constructor-bound {@code Bindable} where the type being
+&nbsp;	 * bound is itself a {@code Validator} implementation.
+&nbsp;	 */
+&nbsp;	static class SelfValidatingConstructorBoundBindableValidator implements Validator {
+&nbsp;
+&nbsp;		private final Class&lt;?&gt; type;
+&nbsp;
+<b class="nc">&nbsp;		SelfValidatingConstructorBoundBindableValidator(Class&lt;?&gt; type) {</b>
+<b class="nc">&nbsp;			this.type = type;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean supports(Class&lt;?&gt; candidate) {
+<b class="nc">&nbsp;			return candidate.isAssignableFrom(this.type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void validate(Object target, Errors errors) {
+<b class="nc">&nbsp;			((Validator) target).validate(target, errors);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

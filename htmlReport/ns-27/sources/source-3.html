@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StartupTimeline</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.metrics.buffering</a>
+</div>
+
+<h1>Coverage Summary for Class: StartupTimeline (org.springframework.boot.context.metrics.buffering)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StartupTimeline</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StartupTimeline$TimelineEvent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2002-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.metrics.buffering;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.core.metrics.StartupStep;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represent the timeline of {@link StartupStep steps} recorded by
+&nbsp; * {@link BufferingApplicationStartup}. Each {@link TimelineEvent} has a start and end
+&nbsp; * time as well as a duration measured with nanosecond precision.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @since 2.4.0
+&nbsp; */
+&nbsp;public class StartupTimeline {
+&nbsp;
+&nbsp;	private final Instant startTime;
+&nbsp;
+&nbsp;	private final List&lt;TimelineEvent&gt; events;
+&nbsp;
+<b class="nc">&nbsp;	StartupTimeline(Instant startTime, List&lt;TimelineEvent&gt; events) {</b>
+<b class="nc">&nbsp;		this.startTime = startTime;</b>
+<b class="nc">&nbsp;		this.events = Collections.unmodifiableList(events);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the start time of this timeline.
+&nbsp;	 * @return the start time
+&nbsp;	 */
+&nbsp;	public Instant getStartTime() {
+<b class="nc">&nbsp;		return this.startTime;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the recorded events.
+&nbsp;	 * @return the events
+&nbsp;	 */
+&nbsp;	public List&lt;TimelineEvent&gt; getEvents() {
+<b class="nc">&nbsp;		return this.events;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Event on the current {@link StartupTimeline}. Each event has a start/end time, a
+&nbsp;	 * precise duration and the complete {@link StartupStep} information associated with
+&nbsp;	 * it.
+&nbsp;	 */
+&nbsp;	public static class TimelineEvent {
+&nbsp;
+&nbsp;		private final BufferedStartupStep step;
+&nbsp;
+&nbsp;		private final Instant endTime;
+&nbsp;
+&nbsp;		private final Duration duration;
+&nbsp;
+<b class="nc">&nbsp;		TimelineEvent(BufferedStartupStep step, Instant endTime) {</b>
+<b class="nc">&nbsp;			this.step = step;</b>
+<b class="nc">&nbsp;			this.endTime = endTime;</b>
+<b class="nc">&nbsp;			this.duration = Duration.between(step.getStartTime(), endTime);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the start time of this event.
+&nbsp;		 * @return the start time
+&nbsp;		 */
+&nbsp;		public Instant getStartTime() {
+<b class="nc">&nbsp;			return this.step.getStartTime();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the end time of this event.
+&nbsp;		 * @return the end time
+&nbsp;		 */
+&nbsp;		public Instant getEndTime() {
+<b class="nc">&nbsp;			return this.endTime;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the duration of this event, i.e. the processing time of the associated
+&nbsp;		 * {@link StartupStep} with nanoseconds precision.
+&nbsp;		 * @return the event duration
+&nbsp;		 */
+&nbsp;		public Duration getDuration() {
+<b class="nc">&nbsp;			return this.duration;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the {@link StartupStep} information for this event.
+&nbsp;		 * @return the step information.
+&nbsp;		 */
+&nbsp;		public StartupStep getStartupStep() {
+<b class="nc">&nbsp;			return this.step;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

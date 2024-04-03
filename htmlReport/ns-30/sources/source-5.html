@@ -1,0 +1,496 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OriginTrackedPropertiesLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.env</a>
+</div>
+
+<h1>Coverage Summary for Class: OriginTrackedPropertiesLoader (org.springframework.boot.env)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OriginTrackedPropertiesLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/71)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OriginTrackedPropertiesLoader$CharacterReader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OriginTrackedPropertiesLoader$Document</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/130)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.env;
+&nbsp;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.LineNumberReader;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.BooleanSupplier;
+&nbsp;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginTrackedValue;
+&nbsp;import org.springframework.boot.origin.TextResourceOrigin;
+&nbsp;import org.springframework.boot.origin.TextResourceOrigin.Location;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class to load {@code .properties} files into a map of {@code String} -&amp;gt;
+&nbsp; * {@link OriginTrackedValue}. Also supports expansion of {@code name[]=a,b,c} list style
+&nbsp; * values.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Thiago Hirata
+&nbsp; * @author Guirong Hu
+&nbsp; */
+&nbsp;class OriginTrackedPropertiesLoader {
+&nbsp;
+&nbsp;	private final Resource resource;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link OriginTrackedPropertiesLoader} instance.
+&nbsp;	 * @param resource the resource of the {@code .properties} data
+&nbsp;	 */
+<b class="nc">&nbsp;	OriginTrackedPropertiesLoader(Resource resource) {</b>
+<b class="nc">&nbsp;		Assert.notNull(resource, &quot;Resource must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.resource = resource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load {@code .properties} data and return a list of documents.
+&nbsp;	 * @return the loaded properties
+&nbsp;	 * @throws IOException on read error
+&nbsp;	 */
+&nbsp;	List&lt;Document&gt; load() throws IOException {
+<b class="nc">&nbsp;		return load(true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load {@code .properties} data and return a map of {@code String} -&gt;
+&nbsp;	 * {@link OriginTrackedValue}.
+&nbsp;	 * @param expandLists if list {@code name[]=a,b,c} shortcuts should be expanded
+&nbsp;	 * @return the loaded properties
+&nbsp;	 * @throws IOException on read error
+&nbsp;	 */
+&nbsp;	List&lt;Document&gt; load(boolean expandLists) throws IOException {
+<b class="nc">&nbsp;		List&lt;Document&gt; documents = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		Document document = new Document();</b>
+<b class="nc">&nbsp;		StringBuilder buffer = new StringBuilder();</b>
+<b class="nc">&nbsp;		try (CharacterReader reader = new CharacterReader(this.resource)) {</b>
+<b class="nc">&nbsp;			while (reader.read()) {</b>
+<b class="nc">&nbsp;				if (reader.isCommentPrefixCharacter()) {</b>
+<b class="nc">&nbsp;					char commentPrefixCharacter = reader.getCharacter();</b>
+<b class="nc">&nbsp;					if (isNewDocument(reader)) {</b>
+<b class="nc">&nbsp;						if (!document.isEmpty()) {</b>
+<b class="nc">&nbsp;							documents.add(document);</b>
+&nbsp;						}
+<b class="nc">&nbsp;						document = new Document();</b>
+&nbsp;					}
+&nbsp;					else {
+<b class="nc">&nbsp;						if (document.isEmpty() &amp;&amp; !documents.isEmpty()) {</b>
+<b class="nc">&nbsp;							document = documents.remove(documents.size() - 1);</b>
+&nbsp;						}
+<b class="nc">&nbsp;						reader.setLastLineCommentPrefixCharacter(commentPrefixCharacter);</b>
+<b class="nc">&nbsp;						reader.skipComment();</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;				else {
+<b class="nc">&nbsp;					reader.setLastLineCommentPrefixCharacter(-1);</b>
+<b class="nc">&nbsp;					loadKeyAndValue(expandLists, document, reader, buffer);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (!document.isEmpty() &amp;&amp; !documents.contains(document)) {</b>
+<b class="nc">&nbsp;			documents.add(document);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return documents;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void loadKeyAndValue(boolean expandLists, Document document, CharacterReader reader, StringBuilder buffer)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		String key = loadKey(buffer, reader).trim();</b>
+<b class="nc">&nbsp;		if (expandLists &amp;&amp; key.endsWith(&quot;[]&quot;)) {</b>
+<b class="nc">&nbsp;			key = key.substring(0, key.length() - 2);</b>
+<b class="nc">&nbsp;			int index = 0;</b>
+&nbsp;			do {
+<b class="nc">&nbsp;				OriginTrackedValue value = loadValue(buffer, reader, true);</b>
+<b class="nc">&nbsp;				document.put(key + &quot;[&quot; + (index++) + &quot;]&quot;, value);</b>
+<b class="nc">&nbsp;				if (!reader.isEndOfLine()) {</b>
+<b class="nc">&nbsp;					reader.read();</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			while (!reader.isEndOfLine());</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;		else {
+<b class="nc">&nbsp;			OriginTrackedValue value = loadValue(buffer, reader, false);</b>
+<b class="nc">&nbsp;			document.put(key, value);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String loadKey(StringBuilder buffer, CharacterReader reader) throws IOException {
+<b class="nc">&nbsp;		buffer.setLength(0);</b>
+<b class="nc">&nbsp;		boolean previousWhitespace = false;</b>
+<b class="nc">&nbsp;		while (!reader.isEndOfLine()) {</b>
+<b class="nc">&nbsp;			if (reader.isPropertyDelimiter()) {</b>
+<b class="nc">&nbsp;				reader.read();</b>
+<b class="nc">&nbsp;				return buffer.toString();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (!reader.isWhiteSpace() &amp;&amp; previousWhitespace) {</b>
+<b class="nc">&nbsp;				return buffer.toString();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			previousWhitespace = reader.isWhiteSpace();</b>
+<b class="nc">&nbsp;			buffer.append(reader.getCharacter());</b>
+<b class="nc">&nbsp;			reader.read();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return buffer.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private OriginTrackedValue loadValue(StringBuilder buffer, CharacterReader reader, boolean splitLists)
+&nbsp;			throws IOException {
+<b class="nc">&nbsp;		buffer.setLength(0);</b>
+<b class="nc">&nbsp;		while (reader.isWhiteSpace() &amp;&amp; !reader.isEndOfLine()) {</b>
+<b class="nc">&nbsp;			reader.read();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Location location = reader.getLocation();</b>
+<b class="nc">&nbsp;		while (!reader.isEndOfLine() &amp;&amp; !(splitLists &amp;&amp; reader.isListDelimiter())) {</b>
+<b class="nc">&nbsp;			buffer.append(reader.getCharacter());</b>
+<b class="nc">&nbsp;			reader.read();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Origin origin = new TextResourceOrigin(this.resource, location);</b>
+<b class="nc">&nbsp;		return OriginTrackedValue.of(buffer.toString(), origin);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isNewDocument(CharacterReader reader) throws IOException {
+<b class="nc">&nbsp;		if (reader.isSameLastLineCommentPrefix()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		boolean result = reader.getLocation().getColumn() == 0;</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; readAndExpect(reader, reader::isHyphenCharacter);</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; readAndExpect(reader, reader::isHyphenCharacter);</b>
+<b class="nc">&nbsp;		result = result &amp;&amp; readAndExpect(reader, reader::isHyphenCharacter);</b>
+<b class="nc">&nbsp;		if (!reader.isEndOfLine()) {</b>
+<b class="nc">&nbsp;			reader.read();</b>
+<b class="nc">&nbsp;			reader.skipWhitespace();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result &amp;&amp; reader.isEndOfLine();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean readAndExpect(CharacterReader reader, BooleanSupplier check) throws IOException {
+<b class="nc">&nbsp;		reader.read();</b>
+<b class="nc">&nbsp;		return check.getAsBoolean();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Reads characters from the source resource, taking care of skipping comments,
+&nbsp;	 * handling multi-line values and tracking {@code &#39;\&#39;} escapes.
+&nbsp;	 */
+&nbsp;	private static class CharacterReader implements Closeable {
+&nbsp;
+<b class="nc">&nbsp;		private static final String[] ESCAPES = { &quot;trnf&quot;, &quot;\t\r\n\f&quot; };</b>
+&nbsp;
+&nbsp;		private final LineNumberReader reader;
+&nbsp;
+<b class="nc">&nbsp;		private int columnNumber = -1;</b>
+&nbsp;
+&nbsp;		private boolean escaped;
+&nbsp;
+&nbsp;		private int character;
+&nbsp;
+&nbsp;		private int lastLineCommentPrefixCharacter;
+&nbsp;
+<b class="nc">&nbsp;		CharacterReader(Resource resource) throws IOException {</b>
+<b class="nc">&nbsp;			this.reader = new LineNumberReader(</b>
+<b class="nc">&nbsp;					new InputStreamReader(resource.getInputStream(), StandardCharsets.ISO_8859_1));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void close() throws IOException {
+<b class="nc">&nbsp;			this.reader.close();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean read() throws IOException {
+<b class="nc">&nbsp;			this.escaped = false;</b>
+<b class="nc">&nbsp;			this.character = this.reader.read();</b>
+<b class="nc">&nbsp;			this.columnNumber++;</b>
+<b class="nc">&nbsp;			if (this.columnNumber == 0) {</b>
+<b class="nc">&nbsp;				skipWhitespace();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.character == &#39;\\&#39;) {</b>
+<b class="nc">&nbsp;				this.escaped = true;</b>
+<b class="nc">&nbsp;				readEscaped();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (this.character == &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;				this.columnNumber = -1;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return !isEndOfFile();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void skipWhitespace() throws IOException {
+<b class="nc">&nbsp;			while (isWhiteSpace()) {</b>
+<b class="nc">&nbsp;				this.character = this.reader.read();</b>
+<b class="nc">&nbsp;				this.columnNumber++;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void setLastLineCommentPrefixCharacter(int lastLineCommentPrefixCharacter) {
+<b class="nc">&nbsp;			this.lastLineCommentPrefixCharacter = lastLineCommentPrefixCharacter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void skipComment() throws IOException {
+<b class="nc">&nbsp;			while (this.character != &#39;\n&#39; &amp;&amp; this.character != -1) {</b>
+<b class="nc">&nbsp;				this.character = this.reader.read();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.columnNumber = -1;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void readEscaped() throws IOException {
+<b class="nc">&nbsp;			this.character = this.reader.read();</b>
+<b class="nc">&nbsp;			int escapeIndex = ESCAPES[0].indexOf(this.character);</b>
+<b class="nc">&nbsp;			if (escapeIndex != -1) {</b>
+<b class="nc">&nbsp;				this.character = ESCAPES[1].charAt(escapeIndex);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (this.character == &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;				this.columnNumber = -1;</b>
+<b class="nc">&nbsp;				read();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			else if (this.character == &#39;u&#39;) {</b>
+<b class="nc">&nbsp;				readUnicode();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void readUnicode() throws IOException {
+<b class="nc">&nbsp;			this.character = 0;</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; 4; i++) {</b>
+<b class="nc">&nbsp;				int digit = this.reader.read();</b>
+<b class="nc">&nbsp;				if (digit &gt;= &#39;0&#39; &amp;&amp; digit &lt;= &#39;9&#39;) {</b>
+<b class="nc">&nbsp;					this.character = (this.character &lt;&lt; 4) + digit - &#39;0&#39;;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				else if (digit &gt;= &#39;a&#39; &amp;&amp; digit &lt;= &#39;f&#39;) {</b>
+<b class="nc">&nbsp;					this.character = (this.character &lt;&lt; 4) + digit - &#39;a&#39; + 10;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				else if (digit &gt;= &#39;A&#39; &amp;&amp; digit &lt;= &#39;F&#39;) {</b>
+<b class="nc">&nbsp;					this.character = (this.character &lt;&lt; 4) + digit - &#39;A&#39; + 10;</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					throw new IllegalStateException(&quot;Malformed \\uxxxx encoding.&quot;);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isWhiteSpace() {
+<b class="nc">&nbsp;			return !this.escaped &amp;&amp; (this.character == &#39; &#39; || this.character == &#39;\t&#39; || this.character == &#39;\f&#39;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isEndOfFile() {
+<b class="nc">&nbsp;			return this.character == -1;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isEndOfLine() {
+<b class="nc">&nbsp;			return this.character == -1 || (!this.escaped &amp;&amp; this.character == &#39;\n&#39;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isListDelimiter() {
+<b class="nc">&nbsp;			return !this.escaped &amp;&amp; this.character == &#39;,&#39;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isPropertyDelimiter() {
+<b class="nc">&nbsp;			return !this.escaped &amp;&amp; (this.character == &#39;=&#39; || this.character == &#39;:&#39;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		char getCharacter() {
+<b class="nc">&nbsp;			return (char) this.character;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Location getLocation() {
+<b class="nc">&nbsp;			return new Location(this.reader.getLineNumber(), this.columnNumber);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isSameLastLineCommentPrefix() {
+<b class="nc">&nbsp;			return this.lastLineCommentPrefixCharacter == this.character;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isCommentPrefixCharacter() {
+<b class="nc">&nbsp;			return this.character == &#39;#&#39; || this.character == &#39;!&#39;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isHyphenCharacter() {
+<b class="nc">&nbsp;			return this.character == &#39;-&#39;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A single document within the properties file.
+&nbsp;	 */
+<b class="nc">&nbsp;	static class Document {</b>
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, OriginTrackedValue&gt; values = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		void put(String key, OriginTrackedValue value) {
+<b class="nc">&nbsp;			if (!key.isEmpty()) {</b>
+<b class="nc">&nbsp;				this.values.put(key, value);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isEmpty() {
+<b class="nc">&nbsp;			return this.values.isEmpty();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Map&lt;String, OriginTrackedValue&gt; asMap() {
+<b class="nc">&nbsp;			return this.values;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

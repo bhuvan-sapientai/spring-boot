@@ -1,0 +1,501 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PluginXmlParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.mavenplugin</a>
+</div>
+
+<h1>Coverage Summary for Class: PluginXmlParser (org.springframework.boot.build.mavenplugin)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PluginXmlParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PluginXmlParser$IterableNodeList</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PluginXmlParser$IterableNodeList$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PluginXmlParser$Mojo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PluginXmlParser$Parameter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PluginXmlParser$Plugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/93)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.mavenplugin;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.xpath.XPath;
+&nbsp;import javax.xml.xpath.XPathConstants;
+&nbsp;import javax.xml.xpath.XPathExpressionException;
+&nbsp;import javax.xml.xpath.XPathFactory;
+&nbsp;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;
+&nbsp;/**
+&nbsp; * A parser for a Maven plugin&#39;s {@code plugin.xml} file.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Mike Smithson
+&nbsp; */
+&nbsp;class PluginXmlParser {
+&nbsp;
+&nbsp;	private final XPath xpath;
+&nbsp;
+<b class="nc">&nbsp;	PluginXmlParser() {</b>
+<b class="nc">&nbsp;		this.xpath = XPathFactory.newInstance().newXPath();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Plugin parse(File pluginXml) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Node root = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pluginXml);</b>
+<b class="nc">&nbsp;			List&lt;Mojo&gt; mojos = parseMojos(root);</b>
+<b class="nc">&nbsp;			return new Plugin(textAt(&quot;//plugin/groupId&quot;, root), textAt(&quot;//plugin/artifactId&quot;, root),</b>
+<b class="nc">&nbsp;					textAt(&quot;//plugin/version&quot;, root), textAt(&quot;//plugin/goalPrefix&quot;, root), mojos);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String textAt(String path, Node source) throws XPathExpressionException {
+<b class="nc">&nbsp;		String text = this.xpath.evaluate(path + &quot;/text()&quot;, source);</b>
+<b class="nc">&nbsp;		return text.isEmpty() ? null : text;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Mojo&gt; parseMojos(Node plugin) throws XPathExpressionException {
+<b class="nc">&nbsp;		List&lt;Mojo&gt; mojos = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Node mojoNode : nodesAt(&quot;//plugin/mojos/mojo&quot;, plugin)) {</b>
+<b class="nc">&nbsp;			mojos.add(new Mojo(textAt(&quot;goal&quot;, mojoNode), format(textAt(&quot;description&quot;, mojoNode)),</b>
+<b class="nc">&nbsp;					parseParameters(mojoNode)));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return mojos;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Iterable&lt;Node&gt; nodesAt(String path, Node source) throws XPathExpressionException {
+<b class="nc">&nbsp;		return IterableNodeList.of((NodeList) this.xpath.evaluate(path, source, XPathConstants.NODESET));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Parameter&gt; parseParameters(Node mojoNode) throws XPathExpressionException {
+<b class="nc">&nbsp;		Map&lt;String, String&gt; defaultValues = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		Map&lt;String, String&gt; userProperties = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Node parameterConfigurationNode : nodesAt(&quot;configuration/*&quot;, mojoNode)) {</b>
+<b class="nc">&nbsp;			String userProperty = parameterConfigurationNode.getTextContent();</b>
+<b class="nc">&nbsp;			if (userProperty != null &amp;&amp; !userProperty.isEmpty()) {</b>
+<b class="nc">&nbsp;				userProperties.put(parameterConfigurationNode.getNodeName(),</b>
+<b class="nc">&nbsp;						userProperty.replace(&quot;${&quot;, &quot;`&quot;).replace(&quot;}&quot;, &quot;`&quot;));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Node defaultValueAttribute = parameterConfigurationNode.getAttributes().getNamedItem(&quot;default-value&quot;);</b>
+<b class="nc">&nbsp;			if (defaultValueAttribute != null &amp;&amp; !defaultValueAttribute.getTextContent().isEmpty()) {</b>
+<b class="nc">&nbsp;				defaultValues.put(parameterConfigurationNode.getNodeName(), defaultValueAttribute.getTextContent());</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		List&lt;Parameter&gt; parameters = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Node parameterNode : nodesAt(&quot;parameters/parameter&quot;, mojoNode)) {</b>
+<b class="nc">&nbsp;			parameters.add(parseParameter(parameterNode, defaultValues, userProperties));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return parameters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Parameter parseParameter(Node parameterNode, Map&lt;String, String&gt; defaultValues,
+&nbsp;			Map&lt;String, String&gt; userProperties) throws XPathExpressionException {
+<b class="nc">&nbsp;		String description = textAt(&quot;description&quot;, parameterNode);</b>
+<b class="nc">&nbsp;		return new Parameter(textAt(&quot;name&quot;, parameterNode), textAt(&quot;type&quot;, parameterNode),</b>
+<b class="nc">&nbsp;				booleanAt(&quot;required&quot;, parameterNode), booleanAt(&quot;editable&quot;, parameterNode),</b>
+<b class="nc">&nbsp;				(description != null) ? format(description) : &quot;&quot;, defaultValues.get(textAt(&quot;name&quot;, parameterNode)),</b>
+<b class="nc">&nbsp;				userProperties.get(textAt(&quot;name&quot;, parameterNode)), textAt(&quot;since&quot;, parameterNode));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean booleanAt(String path, Node node) throws XPathExpressionException {
+<b class="nc">&nbsp;		return Boolean.parseBoolean(textAt(path, node));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String format(String input) {
+<b class="nc">&nbsp;		return input.replace(&quot;&lt;code&gt;&quot;, &quot;`&quot;)</b>
+<b class="nc">&nbsp;			.replace(&quot;&lt;/code&gt;&quot;, &quot;`&quot;)</b>
+<b class="nc">&nbsp;			.replace(&quot;&amp;lt;&quot;, &quot;&lt;&quot;)</b>
+<b class="nc">&nbsp;			.replace(&quot;&amp;gt;&quot;, &quot;&gt;&quot;)</b>
+<b class="nc">&nbsp;			.replace(&quot;&lt;br&gt;&quot;, &quot; &quot;)</b>
+<b class="nc">&nbsp;			.replace(&quot;\n&quot;, &quot; &quot;)</b>
+<b class="nc">&nbsp;			.replace(&quot;&amp;quot;&quot;, &quot;\&quot;&quot;)</b>
+<b class="nc">&nbsp;			.replaceAll(&quot;\\{@code (.*?)}&quot;, &quot;`$1`&quot;)</b>
+<b class="nc">&nbsp;			.replaceAll(&quot;\\{@link (.*?)}&quot;, &quot;`$1`&quot;)</b>
+<b class="nc">&nbsp;			.replaceAll(&quot;\\{@literal (.*?)}&quot;, &quot;`$1`&quot;)</b>
+<b class="nc">&nbsp;			.replaceAll(&quot;&lt;a href=.\&quot;(.*?)\&quot;.&gt;(.*?)&lt;/a&gt;&quot;, &quot;$1[$2]&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class IterableNodeList implements Iterable&lt;Node&gt; {
+&nbsp;
+&nbsp;		private final NodeList nodeList;
+&nbsp;
+<b class="nc">&nbsp;		private IterableNodeList(NodeList nodeList) {</b>
+<b class="nc">&nbsp;			this.nodeList = nodeList;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Iterable&lt;Node&gt; of(NodeList nodeList) {
+<b class="nc">&nbsp;			return new IterableNodeList(nodeList);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Iterator&lt;Node&gt; iterator() {
+&nbsp;
+<b class="nc">&nbsp;			return new Iterator&lt;&gt;() {</b>
+&nbsp;
+<b class="nc">&nbsp;				private int index = 0;</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public boolean hasNext() {
+<b class="nc">&nbsp;					return this.index &lt; IterableNodeList.this.nodeList.getLength();</b>
+&nbsp;				}
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public Node next() {
+<b class="nc">&nbsp;					return IterableNodeList.this.nodeList.item(this.index++);</b>
+&nbsp;				}
+&nbsp;
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static final class Plugin {
+&nbsp;
+&nbsp;		private final String groupId;
+&nbsp;
+&nbsp;		private final String artifactId;
+&nbsp;
+&nbsp;		private final String version;
+&nbsp;
+&nbsp;		private final String goalPrefix;
+&nbsp;
+&nbsp;		private final List&lt;Mojo&gt; mojos;
+&nbsp;
+<b class="nc">&nbsp;		private Plugin(String groupId, String artifactId, String version, String goalPrefix, List&lt;Mojo&gt; mojos) {</b>
+<b class="nc">&nbsp;			this.groupId = groupId;</b>
+<b class="nc">&nbsp;			this.artifactId = artifactId;</b>
+<b class="nc">&nbsp;			this.version = version;</b>
+<b class="nc">&nbsp;			this.goalPrefix = goalPrefix;</b>
+<b class="nc">&nbsp;			this.mojos = mojos;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getGroupId() {
+<b class="nc">&nbsp;			return this.groupId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getArtifactId() {
+<b class="nc">&nbsp;			return this.artifactId;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getVersion() {
+<b class="nc">&nbsp;			return this.version;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getGoalPrefix() {
+<b class="nc">&nbsp;			return this.goalPrefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		List&lt;Mojo&gt; getMojos() {
+<b class="nc">&nbsp;			return this.mojos;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static final class Mojo {
+&nbsp;
+&nbsp;		private final String goal;
+&nbsp;
+&nbsp;		private final String description;
+&nbsp;
+&nbsp;		private final List&lt;Parameter&gt; parameters;
+&nbsp;
+<b class="nc">&nbsp;		private Mojo(String goal, String description, List&lt;Parameter&gt; parameters) {</b>
+<b class="nc">&nbsp;			this.goal = goal;</b>
+<b class="nc">&nbsp;			this.description = description;</b>
+<b class="nc">&nbsp;			this.parameters = parameters;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getGoal() {
+<b class="nc">&nbsp;			return this.goal;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getDescription() {
+<b class="nc">&nbsp;			return this.description;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		List&lt;Parameter&gt; getParameters() {
+<b class="nc">&nbsp;			return this.parameters;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	static final class Parameter {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final String type;
+&nbsp;
+&nbsp;		private final boolean required;
+&nbsp;
+&nbsp;		private final boolean editable;
+&nbsp;
+&nbsp;		private final String description;
+&nbsp;
+&nbsp;		private final String defaultValue;
+&nbsp;
+&nbsp;		private final String userProperty;
+&nbsp;
+&nbsp;		private final String since;
+&nbsp;
+&nbsp;		private Parameter(String name, String type, boolean required, boolean editable, String description,
+<b class="nc">&nbsp;				String defaultValue, String userProperty, String since) {</b>
+<b class="nc">&nbsp;			this.name = name;</b>
+<b class="nc">&nbsp;			this.type = type;</b>
+<b class="nc">&nbsp;			this.required = required;</b>
+<b class="nc">&nbsp;			this.editable = editable;</b>
+<b class="nc">&nbsp;			this.description = description;</b>
+<b class="nc">&nbsp;			this.defaultValue = defaultValue;</b>
+<b class="nc">&nbsp;			this.userProperty = userProperty;</b>
+<b class="nc">&nbsp;			this.since = since;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getName() {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getType() {
+<b class="nc">&nbsp;			return this.type;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isRequired() {
+<b class="nc">&nbsp;			return this.required;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isEditable() {
+<b class="nc">&nbsp;			return this.editable;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getDescription() {
+<b class="nc">&nbsp;			return this.description;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getDefaultValue() {
+<b class="nc">&nbsp;			return this.defaultValue;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getUserProperty() {
+<b class="nc">&nbsp;			return this.userProperty;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getSince() {
+<b class="nc">&nbsp;			return this.since;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

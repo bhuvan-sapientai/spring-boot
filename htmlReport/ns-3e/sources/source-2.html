@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Origin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.origin</a>
+</div>
+
+<h1>Coverage Summary for Class: Origin (org.springframework.boot.origin)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Origin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Origin$MockitoMock$REz9Lmfv</td>
+  </tr>
+  <tr>
+    <td class="name">Origin$MockitoMock$REz9Lmfv$auxiliary$EhTF81xw</td>
+  </tr>
+  <tr>
+    <td class="name">Origin$MockitoMock$REz9Lmfv$auxiliary$h8jejCAF</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.origin;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Interface that uniquely represents the origin of an item. For example, an item loaded
+&nbsp; * from a {@link File} may have an origin made up of the file name along with line/column
+&nbsp; * numbers.
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementations must provide sensible {@code hashCode()}, {@code equals(...)} and
+&nbsp; * {@code #toString()} implementations.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; * @see OriginProvider
+&nbsp; * @see TextResourceOrigin
+&nbsp; */
+&nbsp;public interface Origin {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the parent origin for this instance if there is one. The parent origin
+&nbsp;	 * provides the origin of the item that created this one.
+&nbsp;	 * @return the parent origin or {@code null}
+&nbsp;	 * @since 2.4.0
+&nbsp;	 * @see Origin#parentsFrom(Object)
+&nbsp;	 */
+&nbsp;	default Origin getParent() {
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find the {@link Origin} that an object originated from. Checks if the source object
+&nbsp;	 * is an {@link Origin} or {@link OriginProvider} and also searches exception stacks.
+&nbsp;	 * @param source the source object or {@code null}
+&nbsp;	 * @return an optional {@link Origin}
+&nbsp;	 */
+&nbsp;	static Origin from(Object source) {
+<b class="nc">&nbsp;		if (source instanceof Origin origin) {</b>
+<b class="nc">&nbsp;			return origin;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Origin origin = null;</b>
+<b class="nc">&nbsp;		if (source instanceof OriginProvider originProvider) {</b>
+<b class="nc">&nbsp;			origin = originProvider.getOrigin();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (origin == null &amp;&amp; source instanceof Throwable throwable) {</b>
+<b class="nc">&nbsp;			return from(throwable.getCause());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return origin;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Find the parents of the {@link Origin} that an object originated from. Checks if
+&nbsp;	 * the source object is an {@link Origin} or {@link OriginProvider} and also searches
+&nbsp;	 * exception stacks. Provides a list of all parents up to root {@link Origin},
+&nbsp;	 * starting with the most immediate parent.
+&nbsp;	 * @param source the source object or {@code null}
+&nbsp;	 * @return a list of parents or an empty list if the source is {@code null}, has no
+&nbsp;	 * origin, or no parent
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	static List&lt;Origin&gt; parentsFrom(Object source) {
+<b class="nc">&nbsp;		Origin origin = from(source);</b>
+<b class="nc">&nbsp;		if (origin == null) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Set&lt;Origin&gt; parents = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		origin = origin.getParent();</b>
+<b class="nc">&nbsp;		while (origin != null &amp;&amp; !parents.contains(origin)) {</b>
+<b class="nc">&nbsp;			parents.add(origin);</b>
+<b class="nc">&nbsp;			origin = origin.getParent();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.unmodifiableList(new ArrayList&lt;&gt;(parents));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

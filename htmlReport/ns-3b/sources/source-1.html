@@ -1,0 +1,324 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JavaLoggingSystem</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.logging.java</a>
+</div>
+
+<h1>Coverage Summary for Class: JavaLoggingSystem (org.springframework.boot.logging.java)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JavaLoggingSystem</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JavaLoggingSystem$Factory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.logging.java;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.LogManager;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;import org.springframework.boot.logging.AbstractLoggingSystem;
+&nbsp;import org.springframework.boot.logging.LogFile;
+&nbsp;import org.springframework.boot.logging.LogLevel;
+&nbsp;import org.springframework.boot.logging.LoggerConfiguration;
+&nbsp;import org.springframework.boot.logging.LoggingInitializationContext;
+&nbsp;import org.springframework.boot.logging.LoggingSystem;
+&nbsp;import org.springframework.boot.logging.LoggingSystemFactory;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.annotation.Order;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.FileCopyUtils;
+&nbsp;import org.springframework.util.ResourceUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link LoggingSystem} for {@link Logger java.util.logging}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Ben Hale
+&nbsp; * @since 1.0.0
+&nbsp; */
+&nbsp;public class JavaLoggingSystem extends AbstractLoggingSystem {
+&nbsp;
+<b class="nc">&nbsp;	private static final LogLevels&lt;Level&gt; LEVELS = new LogLevels&lt;&gt;();</b>
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		LEVELS.map(LogLevel.TRACE, Level.FINEST);</b>
+<b class="nc">&nbsp;		LEVELS.map(LogLevel.DEBUG, Level.FINE);</b>
+<b class="nc">&nbsp;		LEVELS.map(LogLevel.INFO, Level.INFO);</b>
+<b class="nc">&nbsp;		LEVELS.map(LogLevel.WARN, Level.WARNING);</b>
+<b class="nc">&nbsp;		LEVELS.map(LogLevel.ERROR, Level.SEVERE);</b>
+<b class="nc">&nbsp;		LEVELS.map(LogLevel.FATAL, Level.SEVERE);</b>
+<b class="nc">&nbsp;		LEVELS.map(LogLevel.OFF, Level.OFF);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;Logger&gt; configuredLoggers = Collections.synchronizedSet(new HashSet&lt;&gt;());</b>
+&nbsp;
+&nbsp;	public JavaLoggingSystem(ClassLoader classLoader) {
+<b class="nc">&nbsp;		super(classLoader);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected String[] getStandardConfigLocations() {
+<b class="nc">&nbsp;		return new String[] { &quot;logging.properties&quot; };</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void beforeInitialize() {
+<b class="nc">&nbsp;		super.beforeInitialize();</b>
+<b class="nc">&nbsp;		Logger.getLogger(&quot;&quot;).setLevel(Level.SEVERE);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void loadDefaults(LoggingInitializationContext initializationContext, LogFile logFile) {
+<b class="nc">&nbsp;		if (logFile != null) {</b>
+<b class="nc">&nbsp;			loadConfiguration(getPackagedConfigFile(&quot;logging-file.properties&quot;), logFile);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			loadConfiguration(getPackagedConfigFile(&quot;logging.properties&quot;), null);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected void loadConfiguration(LoggingInitializationContext initializationContext, String location,
+&nbsp;			LogFile logFile) {
+<b class="nc">&nbsp;		loadConfiguration(location, logFile);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void loadConfiguration(String location, LogFile logFile) {
+<b class="nc">&nbsp;		Assert.notNull(location, &quot;Location must not be null&quot;);</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			String configuration = FileCopyUtils</b>
+<b class="nc">&nbsp;				.copyToString(new InputStreamReader(ResourceUtils.getURL(location).openStream()));</b>
+<b class="nc">&nbsp;			if (logFile != null) {</b>
+<b class="nc">&nbsp;				configuration = configuration.replace(&quot;${LOG_FILE}&quot;, StringUtils.cleanPath(logFile.toString()));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			LogManager.getLogManager().readConfiguration(new ByteArrayInputStream(configuration.getBytes()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Could not initialize Java logging from &quot; + location, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Set&lt;LogLevel&gt; getSupportedLogLevels() {
+<b class="nc">&nbsp;		return LEVELS.getSupported();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setLogLevel(String loggerName, LogLevel level) {
+<b class="nc">&nbsp;		if (loggerName == null || ROOT_LOGGER_NAME.equals(loggerName)) {</b>
+<b class="nc">&nbsp;			loggerName = &quot;&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Logger logger = Logger.getLogger(loggerName);</b>
+<b class="nc">&nbsp;		if (logger != null) {</b>
+<b class="nc">&nbsp;			this.configuredLoggers.add(logger);</b>
+<b class="nc">&nbsp;			logger.setLevel(LEVELS.convertSystemToNative(level));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public List&lt;LoggerConfiguration&gt; getLoggerConfigurations() {
+<b class="nc">&nbsp;		List&lt;LoggerConfiguration&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		Enumeration&lt;String&gt; names = LogManager.getLogManager().getLoggerNames();</b>
+<b class="nc">&nbsp;		while (names.hasMoreElements()) {</b>
+<b class="nc">&nbsp;			result.add(getLoggerConfiguration(names.nextElement()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		result.sort(CONFIGURATION_COMPARATOR);</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableList(result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public LoggerConfiguration getLoggerConfiguration(String loggerName) {
+<b class="nc">&nbsp;		Logger logger = Logger.getLogger(loggerName);</b>
+<b class="nc">&nbsp;		if (logger == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		LogLevel level = LEVELS.convertNativeToSystem(logger.getLevel());</b>
+<b class="nc">&nbsp;		LogLevel effectiveLevel = LEVELS.convertNativeToSystem(getEffectiveLevel(logger));</b>
+<b class="nc">&nbsp;		String name = (StringUtils.hasLength(logger.getName()) ? logger.getName() : ROOT_LOGGER_NAME);</b>
+<b class="nc">&nbsp;		return new LoggerConfiguration(name, level, effectiveLevel);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Level getEffectiveLevel(Logger root) {
+<b class="nc">&nbsp;		Logger logger = root;</b>
+<b class="nc">&nbsp;		while (logger.getLevel() == null) {</b>
+<b class="nc">&nbsp;			logger = logger.getParent();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return logger.getLevel();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Runnable getShutdownHandler() {
+<b class="nc">&nbsp;		return () -&gt; LogManager.getLogManager().reset();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void cleanUp() {
+<b class="nc">&nbsp;		this.configuredLoggers.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link LoggingSystemFactory} that returns {@link JavaLoggingSystem} if possible.
+&nbsp;	 */
+&nbsp;	@Order(Ordered.LOWEST_PRECEDENCE)
+<b class="nc">&nbsp;	public static class Factory implements LoggingSystemFactory {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final boolean PRESENT = ClassUtils.isPresent(&quot;java.util.logging.LogManager&quot;,</b>
+<b class="nc">&nbsp;				Factory.class.getClassLoader());</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public LoggingSystem getLoggingSystem(ClassLoader classLoader) {
+<b class="nc">&nbsp;			if (PRESENT) {</b>
+<b class="nc">&nbsp;				return new JavaLoggingSystem(classLoader);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

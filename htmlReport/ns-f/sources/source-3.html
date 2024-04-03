@@ -1,0 +1,344 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExtractVersionConstraints</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.constraints</a>
+</div>
+
+<h1>Coverage Summary for Class: ExtractVersionConstraints (org.springframework.boot.build.constraints)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExtractVersionConstraints</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExtractVersionConstraints$ConstrainedVersion</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExtractVersionConstraints$VersionProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.constraints;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.artifacts.ComponentMetadataDetails;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.artifacts.DependencyConstraint;
+&nbsp;import org.gradle.api.artifacts.DependencyConstraintMetadata;
+&nbsp;import org.gradle.api.artifacts.dsl.DependencyHandler;
+&nbsp;import org.gradle.api.tasks.Internal;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;import org.gradle.platform.base.Platform;
+&nbsp;
+&nbsp;import org.springframework.boot.build.bom.BomExtension;
+&nbsp;import org.springframework.boot.build.bom.Library;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Task} to extract constraints from a {@link Platform}. The platform&#39;s own
+&nbsp; * constraints and those in any boms upon which it depends are extracted.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;public class ExtractVersionConstraints extends DefaultTask {
+&nbsp;
+&nbsp;	private final Configuration configuration;
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, String&gt; versionConstraints = new TreeMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;ConstrainedVersion&gt; constrainedVersions = new TreeSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;VersionProperty&gt; versionProperties = new TreeSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;String&gt; projectPaths = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	public ExtractVersionConstraints() {</b>
+<b class="nc">&nbsp;		DependencyHandler dependencies = getProject().getDependencies();</b>
+<b class="nc">&nbsp;		this.configuration = getProject().getConfigurations().create(getName());</b>
+<b class="nc">&nbsp;		dependencies.getComponents().all(this::processMetadataDetails);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void enforcedPlatform(String projectPath) {
+<b class="nc">&nbsp;		this.configuration.getDependencies()</b>
+<b class="nc">&nbsp;			.add(getProject().getDependencies()</b>
+<b class="nc">&nbsp;				.enforcedPlatform(</b>
+<b class="nc">&nbsp;						getProject().getDependencies().project(Collections.singletonMap(&quot;path&quot;, projectPath))));</b>
+<b class="nc">&nbsp;		this.projectPaths.add(projectPath);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Internal
+&nbsp;	public Map&lt;String, String&gt; getVersionConstraints() {
+<b class="nc">&nbsp;		return Collections.unmodifiableMap(this.versionConstraints);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Internal
+&nbsp;	public Set&lt;ConstrainedVersion&gt; getConstrainedVersions() {
+<b class="nc">&nbsp;		return this.constrainedVersions;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Internal
+&nbsp;	public Set&lt;VersionProperty&gt; getVersionProperties() {
+<b class="nc">&nbsp;		return this.versionProperties;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	void extractVersionConstraints() {
+<b class="nc">&nbsp;		this.configuration.resolve();</b>
+<b class="nc">&nbsp;		for (String projectPath : this.projectPaths) {</b>
+<b class="nc">&nbsp;			extractVersionProperties(projectPath);</b>
+<b class="nc">&nbsp;			for (DependencyConstraint constraint : getProject().project(projectPath)</b>
+<b class="nc">&nbsp;				.getConfigurations()</b>
+<b class="nc">&nbsp;				.getByName(&quot;apiElements&quot;)</b>
+<b class="nc">&nbsp;				.getAllDependencyConstraints()) {</b>
+<b class="nc">&nbsp;				this.versionConstraints.put(constraint.getGroup() + &quot;:&quot; + constraint.getName(),</b>
+<b class="nc">&nbsp;						constraint.getVersionConstraint().toString());</b>
+<b class="nc">&nbsp;				this.constrainedVersions.add(new ConstrainedVersion(constraint.getGroup(), constraint.getName(),</b>
+<b class="nc">&nbsp;						constraint.getVersionConstraint().toString()));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void extractVersionProperties(String projectPath) {
+<b class="nc">&nbsp;		Object bom = getProject().project(projectPath).getExtensions().getByName(&quot;bom&quot;);</b>
+<b class="nc">&nbsp;		BomExtension bomExtension = (BomExtension) bom;</b>
+<b class="nc">&nbsp;		for (Library lib : bomExtension.getLibraries()) {</b>
+<b class="nc">&nbsp;			String versionProperty = lib.getVersionProperty();</b>
+<b class="nc">&nbsp;			if (versionProperty != null) {</b>
+<b class="nc">&nbsp;				this.versionProperties.add(new VersionProperty(lib.getName(), versionProperty));</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void processMetadataDetails(ComponentMetadataDetails details) {
+<b class="nc">&nbsp;		details.allVariants((variantMetadata) -&gt; variantMetadata.withDependencyConstraints((dependencyConstraints) -&gt; {</b>
+<b class="nc">&nbsp;			for (DependencyConstraintMetadata constraint : dependencyConstraints) {</b>
+<b class="nc">&nbsp;				this.versionConstraints.put(constraint.getGroup() + &quot;:&quot; + constraint.getName(),</b>
+<b class="nc">&nbsp;						constraint.getVersionConstraint().toString());</b>
+<b class="nc">&nbsp;				this.constrainedVersions.add(new ConstrainedVersion(constraint.getGroup(), constraint.getName(),</b>
+<b class="nc">&nbsp;						constraint.getVersionConstraint().toString()));</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}));
+&nbsp;	}
+&nbsp;
+&nbsp;	public static final class ConstrainedVersion implements Comparable&lt;ConstrainedVersion&gt;, Serializable {
+&nbsp;
+&nbsp;		private final String group;
+&nbsp;
+&nbsp;		private final String artifact;
+&nbsp;
+&nbsp;		private final String version;
+&nbsp;
+<b class="nc">&nbsp;		private ConstrainedVersion(String group, String artifact, String version) {</b>
+<b class="nc">&nbsp;			this.group = group;</b>
+<b class="nc">&nbsp;			this.artifact = artifact;</b>
+<b class="nc">&nbsp;			this.version = version;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getGroup() {
+<b class="nc">&nbsp;			return this.group;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getArtifact() {
+<b class="nc">&nbsp;			return this.artifact;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getVersion() {
+<b class="nc">&nbsp;			return this.version;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int compareTo(ConstrainedVersion other) {
+<b class="nc">&nbsp;			int groupComparison = this.group.compareTo(other.group);</b>
+<b class="nc">&nbsp;			if (groupComparison != 0) {</b>
+<b class="nc">&nbsp;				return groupComparison;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.artifact.compareTo(other.artifact);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	public static final class VersionProperty implements Comparable&lt;VersionProperty&gt;, Serializable {
+&nbsp;
+&nbsp;		private final String libraryName;
+&nbsp;
+&nbsp;		private final String versionProperty;
+&nbsp;
+<b class="nc">&nbsp;		public VersionProperty(String libraryName, String versionProperty) {</b>
+<b class="nc">&nbsp;			this.libraryName = libraryName;</b>
+<b class="nc">&nbsp;			this.versionProperty = versionProperty;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getLibraryName() {
+<b class="nc">&nbsp;			return this.libraryName;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getVersionProperty() {
+<b class="nc">&nbsp;			return this.versionProperty;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int compareTo(VersionProperty other) {
+<b class="nc">&nbsp;			int groupComparison = this.libraryName.compareToIgnoreCase(other.libraryName);</b>
+<b class="nc">&nbsp;			if (groupComparison != 0) {</b>
+<b class="nc">&nbsp;				return groupComparison;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.versionProperty.compareTo(other.versionProperty);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

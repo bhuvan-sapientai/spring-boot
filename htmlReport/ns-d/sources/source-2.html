@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CheckClasspathForProhibitedDependencies</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.classpath</a>
+</div>
+
+<h1>Coverage Summary for Class: CheckClasspathForProhibitedDependencies (org.springframework.boot.build.classpath)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CheckClasspathForProhibitedDependencies</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.classpath;
+&nbsp;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.GradleException;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.artifacts.ModuleVersionIdentifier;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.tasks.Classpath;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Task} for checking the classpath for prohibited dependencies.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;public class CheckClasspathForProhibitedDependencies extends DefaultTask {
+&nbsp;
+&nbsp;	private Configuration classpath;
+&nbsp;
+<b class="nc">&nbsp;	public CheckClasspathForProhibitedDependencies() {</b>
+<b class="nc">&nbsp;		getOutputs().upToDateWhen((task) -&gt; true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setClasspath(Configuration classpath) {
+<b class="nc">&nbsp;		this.classpath = classpath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Classpath
+&nbsp;	public FileCollection getClasspath() {
+<b class="nc">&nbsp;		return this.classpath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	public void checkForProhibitedDependencies() {
+<b class="nc">&nbsp;		TreeSet&lt;String&gt; prohibited = this.classpath.getResolvedConfiguration()</b>
+<b class="nc">&nbsp;			.getResolvedArtifacts()</b>
+<b class="nc">&nbsp;			.stream()</b>
+<b class="nc">&nbsp;			.map((artifact) -&gt; artifact.getModuleVersion().getId())</b>
+<b class="nc">&nbsp;			.filter(this::prohibited)</b>
+<b class="nc">&nbsp;			.map((id) -&gt; id.getGroup() + &quot;:&quot; + id.getName())</b>
+<b class="nc">&nbsp;			.collect(Collectors.toCollection(TreeSet::new));</b>
+<b class="nc">&nbsp;		if (!prohibited.isEmpty()) {</b>
+<b class="nc">&nbsp;			StringBuilder message = new StringBuilder(String.format(&quot;Found prohibited dependencies:%n&quot;));</b>
+<b class="nc">&nbsp;			for (String dependency : prohibited) {</b>
+<b class="nc">&nbsp;				message.append(String.format(&quot;    %s%n&quot;, dependency));</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			throw new GradleException(message.toString());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean prohibited(ModuleVersionIdentifier id) {
+<b class="nc">&nbsp;		String group = id.getGroup();</b>
+<b class="nc">&nbsp;		if (group.equals(&quot;javax.batch&quot;)) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.equals(&quot;javax.cache&quot;)) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.equals(&quot;javax.money&quot;)) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.equals(&quot;org.codehaus.groovy&quot;)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.equals(&quot;org.eclipse.jetty.toolchain&quot;)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.startsWith(&quot;javax&quot;)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.equals(&quot;commons-logging&quot;)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.equals(&quot;org.slf4j&quot;) &amp;&amp; id.getName().equals(&quot;jcl-over-slf4j&quot;)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.startsWith(&quot;org.jboss.spec&quot;)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (group.equals(&quot;org.apache.geronimo.specs&quot;)) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return group.equals(&quot;com.sun.activation&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

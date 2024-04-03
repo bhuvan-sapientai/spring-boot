@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DependencyVersion</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.bom.bomr.version</a>
+</div>
+
+<h1>Coverage Summary for Class: DependencyVersion (org.springframework.boot.build.bom.bomr.version)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DependencyVersion</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.bom.bomr.version;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;/**
+&nbsp; * Version of a dependency.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;public interface DependencyVersion extends Comparable&lt;DependencyVersion&gt; {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether this version has the same major and minor versions as the
+&nbsp;	 * {@code other} version.
+&nbsp;	 * @param other the version to test
+&nbsp;	 * @return {@code true} if this version has the same major and minor, otherwise
+&nbsp;	 * {@code false}
+&nbsp;	 */
+&nbsp;	boolean isSameMinor(DependencyVersion other);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether this version has the same major version as the {@code other}
+&nbsp;	 * version.
+&nbsp;	 * @param other the version to test
+&nbsp;	 * @return {@code true} if this version has the same major, otherwise {@code false}
+&nbsp;	 */
+&nbsp;	boolean isSameMajor(DependencyVersion other);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the given {@code candidate} is an upgrade of this version.
+&nbsp;	 * @param candidate the version to consider
+&nbsp;	 * @param movingToSnapshots whether the upgrade is to be considered as part of moving
+&nbsp;	 * to snapshots
+&nbsp;	 * @return {@code true} if the candidate is an upgrade, otherwise false
+&nbsp;	 */
+&nbsp;	boolean isUpgrade(DependencyVersion candidate, boolean movingToSnapshots);
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether this version is a snapshot for the given {@code candidate}.
+&nbsp;	 * @param candidate the version to consider
+&nbsp;	 * @return {@code true} if this version is a snapshot for the candidate, otherwise
+&nbsp;	 * false
+&nbsp;	 */
+&nbsp;	boolean isSnapshotFor(DependencyVersion candidate);
+&nbsp;
+&nbsp;	static DependencyVersion parse(String version) {
+<b class="nc">&nbsp;		List&lt;Function&lt;String, DependencyVersion&gt;&gt; parsers = Arrays.asList(CalendarVersionDependencyVersion::parse,</b>
+&nbsp;				ArtifactVersionDependencyVersion::parse, ReleaseTrainDependencyVersion::parse,
+&nbsp;				MultipleComponentsDependencyVersion::parse, CombinedPatchAndQualifierDependencyVersion::parse,
+&nbsp;				LeadingZeroesDependencyVersion::parse, UnstructuredDependencyVersion::parse);
+<b class="nc">&nbsp;		for (Function&lt;String, DependencyVersion&gt; parser : parsers) {</b>
+<b class="nc">&nbsp;			DependencyVersion result = parser.apply(version);</b>
+<b class="nc">&nbsp;			if (result != null) {</b>
+<b class="nc">&nbsp;				return result;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		throw new IllegalArgumentException(&quot;Version &#39;&quot; + version + &quot;&#39; could not be parsed&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

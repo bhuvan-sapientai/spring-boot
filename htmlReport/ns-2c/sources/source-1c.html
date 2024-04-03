@@ -1,0 +1,502 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringIterableConfigurationPropertySource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.source</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringIterableConfigurationPropertySource (org.springframework.boot.context.properties.source)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringIterableConfigurationPropertySource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpringIterableConfigurationPropertySource$ConfigurationPropertyNamesIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SpringIterableConfigurationPropertySource$Mappings</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/129)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.source;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.ConcurrentModificationException;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.BiPredicate;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginLookup;
+&nbsp;import org.springframework.boot.origin.PropertySourceOrigin;
+&nbsp;import org.springframework.core.env.EnumerablePropertySource;
+&nbsp;import org.springframework.core.env.MapPropertySource;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.core.env.StandardEnvironment;
+&nbsp;import org.springframework.core.env.SystemEnvironmentPropertySource;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfigurationPropertySource} backed by an {@link EnumerablePropertySource}.
+&nbsp; * Extends {@link SpringConfigurationPropertySource} with full &quot;relaxed&quot; mapping support.
+&nbsp; * In order to use this adapter the underlying {@link PropertySource} must be fully
+&nbsp; * enumerable. A security restricted {@link SystemEnvironmentPropertySource} cannot be
+&nbsp; * adapted.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @see PropertyMapper
+&nbsp; */
+&nbsp;class SpringIterableConfigurationPropertySource extends SpringConfigurationPropertySource
+&nbsp;		implements IterableConfigurationPropertySource, CachingConfigurationPropertySource {
+&nbsp;
+&nbsp;	private final BiPredicate&lt;ConfigurationPropertyName, ConfigurationPropertyName&gt; ancestorOfCheck;
+&nbsp;
+&nbsp;	private final SoftReferenceConfigurationPropertyCache&lt;Mappings&gt; cache;
+&nbsp;
+&nbsp;	private volatile ConfigurationPropertyName[] configurationPropertyNames;
+&nbsp;
+&nbsp;	SpringIterableConfigurationPropertySource(EnumerablePropertySource&lt;?&gt; propertySource, PropertyMapper... mappers) {
+<b class="nc">&nbsp;		super(propertySource, mappers);</b>
+<b class="nc">&nbsp;		assertEnumerablePropertySource();</b>
+<b class="nc">&nbsp;		this.ancestorOfCheck = getAncestorOfCheck(mappers);</b>
+<b class="nc">&nbsp;		this.cache = new SoftReferenceConfigurationPropertyCache&lt;&gt;(isImmutablePropertySource());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BiPredicate&lt;ConfigurationPropertyName, ConfigurationPropertyName&gt; getAncestorOfCheck(
+&nbsp;			PropertyMapper[] mappers) {
+<b class="nc">&nbsp;		BiPredicate&lt;ConfigurationPropertyName, ConfigurationPropertyName&gt; ancestorOfCheck = mappers[0]</b>
+<b class="nc">&nbsp;			.getAncestorOfCheck();</b>
+<b class="nc">&nbsp;		for (int i = 1; i &lt; mappers.length; i++) {</b>
+<b class="nc">&nbsp;			ancestorOfCheck = ancestorOfCheck.or(mappers[i].getAncestorOfCheck());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ancestorOfCheck;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void assertEnumerablePropertySource() {
+<b class="nc">&nbsp;		if (getPropertySource() instanceof MapPropertySource mapSource) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				mapSource.getSource().size();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (UnsupportedOperationException ex) {</b>
+<b class="nc">&nbsp;				throw new IllegalArgumentException(&quot;PropertySource must be fully enumerable&quot;);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConfigurationPropertyCaching getCaching() {
+<b class="nc">&nbsp;		return this.cache;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConfigurationProperty getConfigurationProperty(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		if (name == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ConfigurationProperty configurationProperty = super.getConfigurationProperty(name);</b>
+<b class="nc">&nbsp;		if (configurationProperty != null) {</b>
+<b class="nc">&nbsp;			return configurationProperty;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (String candidate : getMappings().getMapped(name)) {</b>
+<b class="nc">&nbsp;			Object value = getPropertySource().getProperty(candidate);</b>
+<b class="nc">&nbsp;			if (value != null) {</b>
+<b class="nc">&nbsp;				Origin origin = PropertySourceOrigin.get(getPropertySource(), candidate);</b>
+<b class="nc">&nbsp;				return ConfigurationProperty.of(this, name, value, origin);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Stream&lt;ConfigurationPropertyName&gt; stream() {
+<b class="nc">&nbsp;		ConfigurationPropertyName[] names = getConfigurationPropertyNames();</b>
+<b class="nc">&nbsp;		return Arrays.stream(names).filter(Objects::nonNull);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Iterator&lt;ConfigurationPropertyName&gt; iterator() {
+<b class="nc">&nbsp;		return new ConfigurationPropertyNamesIterator(getConfigurationPropertyNames());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConfigurationPropertyState containsDescendantOf(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		ConfigurationPropertyState result = super.containsDescendantOf(name);</b>
+<b class="nc">&nbsp;		if (result != ConfigurationPropertyState.UNKNOWN) {</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.ancestorOfCheck == PropertyMapper.DEFAULT_ANCESTOR_OF_CHECK) {</b>
+<b class="nc">&nbsp;			return getMappings().containsDescendantOf(name, this.ancestorOfCheck);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ConfigurationPropertyName[] candidates = getConfigurationPropertyNames();</b>
+<b class="nc">&nbsp;		for (ConfigurationPropertyName candidate : candidates) {</b>
+<b class="nc">&nbsp;			if (candidate != null &amp;&amp; this.ancestorOfCheck.test(name, candidate)) {</b>
+<b class="nc">&nbsp;				return ConfigurationPropertyState.PRESENT;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return ConfigurationPropertyState.ABSENT;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurationPropertyName[] getConfigurationPropertyNames() {
+<b class="nc">&nbsp;		if (!isImmutablePropertySource()) {</b>
+<b class="nc">&nbsp;			return getMappings().getConfigurationPropertyNames(getPropertySource().getPropertyNames());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ConfigurationPropertyName[] configurationPropertyNames = this.configurationPropertyNames;</b>
+<b class="nc">&nbsp;		if (configurationPropertyNames == null) {</b>
+<b class="nc">&nbsp;			configurationPropertyNames = getMappings()</b>
+<b class="nc">&nbsp;				.getConfigurationPropertyNames(getPropertySource().getPropertyNames());</b>
+<b class="nc">&nbsp;			this.configurationPropertyNames = configurationPropertyNames;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return configurationPropertyNames;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mappings getMappings() {
+<b class="nc">&nbsp;		return this.cache.get(this::createMappings, this::updateMappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mappings createMappings() {
+<b class="nc">&nbsp;		return new Mappings(getMappers(), isImmutablePropertySource(),</b>
+&nbsp;				this.ancestorOfCheck == PropertyMapper.DEFAULT_ANCESTOR_OF_CHECK);
+&nbsp;	}
+&nbsp;
+&nbsp;	private Mappings updateMappings(Mappings mappings) {
+<b class="nc">&nbsp;		mappings.updateMappings(getPropertySource()::getPropertyNames);</b>
+<b class="nc">&nbsp;		return mappings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isImmutablePropertySource() {
+<b class="nc">&nbsp;		EnumerablePropertySource&lt;?&gt; source = getPropertySource();</b>
+<b class="nc">&nbsp;		if (source instanceof OriginLookup) {</b>
+<b class="nc">&nbsp;			return ((OriginLookup&lt;?&gt;) source).isImmutable();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME.equals(source.getName())) {</b>
+<b class="nc">&nbsp;			return source.getSource() == System.getenv();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected EnumerablePropertySource&lt;?&gt; getPropertySource() {
+<b class="nc">&nbsp;		return (EnumerablePropertySource&lt;?&gt;) super.getPropertySource();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class Mappings {
+&nbsp;
+<b class="nc">&nbsp;		private static final ConfigurationPropertyName[] EMPTY_NAMES_ARRAY = {};</b>
+&nbsp;
+&nbsp;		private final PropertyMapper[] mappers;
+&nbsp;
+&nbsp;		private final boolean immutable;
+&nbsp;
+&nbsp;		private final boolean trackDescendants;
+&nbsp;
+&nbsp;		private volatile Map&lt;ConfigurationPropertyName, Set&lt;String&gt;&gt; mappings;
+&nbsp;
+&nbsp;		private volatile Map&lt;String, ConfigurationPropertyName&gt; reverseMappings;
+&nbsp;
+&nbsp;		private volatile Map&lt;ConfigurationPropertyName, Set&lt;ConfigurationPropertyName&gt;&gt; descendants;
+&nbsp;
+&nbsp;		private volatile ConfigurationPropertyName[] configurationPropertyNames;
+&nbsp;
+&nbsp;		private volatile String[] lastUpdated;
+&nbsp;
+<b class="nc">&nbsp;		Mappings(PropertyMapper[] mappers, boolean immutable, boolean trackDescendants) {</b>
+<b class="nc">&nbsp;			this.mappers = mappers;</b>
+<b class="nc">&nbsp;			this.immutable = immutable;</b>
+<b class="nc">&nbsp;			this.trackDescendants = trackDescendants;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void updateMappings(Supplier&lt;String[]&gt; propertyNames) {
+<b class="nc">&nbsp;			if (this.mappings == null || !this.immutable) {</b>
+<b class="nc">&nbsp;				int count = 0;</b>
+&nbsp;				while (true) {
+&nbsp;					try {
+<b class="nc">&nbsp;						updateMappings(propertyNames.get());</b>
+&nbsp;						return;
+&nbsp;					}
+<b class="nc">&nbsp;					catch (ConcurrentModificationException ex) {</b>
+<b class="nc">&nbsp;						if (count++ &gt; 10) {</b>
+<b class="nc">&nbsp;							throw ex;</b>
+&nbsp;						}
+<b class="nc">&nbsp;					}</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void updateMappings(String[] propertyNames) {
+<b class="nc">&nbsp;			String[] lastUpdated = this.lastUpdated;</b>
+<b class="nc">&nbsp;			if (lastUpdated != null &amp;&amp; Arrays.equals(lastUpdated, propertyNames)) {</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			int size = propertyNames.length;</b>
+<b class="nc">&nbsp;			Map&lt;ConfigurationPropertyName, Set&lt;String&gt;&gt; mappings = cloneOrCreate(this.mappings, size);</b>
+<b class="nc">&nbsp;			Map&lt;String, ConfigurationPropertyName&gt; reverseMappings = cloneOrCreate(this.reverseMappings, size);</b>
+<b class="nc">&nbsp;			Map&lt;ConfigurationPropertyName, Set&lt;ConfigurationPropertyName&gt;&gt; descendants = cloneOrCreate(this.descendants,</b>
+&nbsp;					size);
+<b class="nc">&nbsp;			for (PropertyMapper propertyMapper : this.mappers) {</b>
+<b class="nc">&nbsp;				for (String propertyName : propertyNames) {</b>
+<b class="nc">&nbsp;					if (!reverseMappings.containsKey(propertyName)) {</b>
+<b class="nc">&nbsp;						ConfigurationPropertyName configurationPropertyName = propertyMapper.map(propertyName);</b>
+<b class="nc">&nbsp;						if (configurationPropertyName != null &amp;&amp; !configurationPropertyName.isEmpty()) {</b>
+<b class="nc">&nbsp;							add(mappings, configurationPropertyName, propertyName);</b>
+<b class="nc">&nbsp;							reverseMappings.put(propertyName, configurationPropertyName);</b>
+<b class="nc">&nbsp;							if (this.trackDescendants) {</b>
+<b class="nc">&nbsp;								addParents(descendants, configurationPropertyName);</b>
+&nbsp;							}
+&nbsp;						}
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			this.mappings = mappings;</b>
+<b class="nc">&nbsp;			this.reverseMappings = reverseMappings;</b>
+<b class="nc">&nbsp;			this.descendants = descendants;</b>
+<b class="nc">&nbsp;			this.lastUpdated = this.immutable ? null : propertyNames;</b>
+<b class="nc">&nbsp;			this.configurationPropertyNames = this.immutable</b>
+<b class="nc">&nbsp;					? reverseMappings.values().toArray(new ConfigurationPropertyName[0]) : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;K, V&gt; Map&lt;K, V&gt; cloneOrCreate(Map&lt;K, V&gt; source, int size) {
+<b class="nc">&nbsp;			return (source != null) ? new LinkedHashMap&lt;&gt;(source) : new LinkedHashMap&lt;&gt;(size);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addParents(Map&lt;ConfigurationPropertyName, Set&lt;ConfigurationPropertyName&gt;&gt; descendants,
+&nbsp;				ConfigurationPropertyName name) {
+<b class="nc">&nbsp;			ConfigurationPropertyName parent = name;</b>
+<b class="nc">&nbsp;			while (!parent.isEmpty()) {</b>
+<b class="nc">&nbsp;				add(descendants, parent, name);</b>
+<b class="nc">&nbsp;				parent = parent.getParent();</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;K, T&gt; void add(Map&lt;K, Set&lt;T&gt;&gt; map, K key, T value) {
+<b class="nc">&nbsp;			map.computeIfAbsent(key, (k) -&gt; new HashSet&lt;&gt;()).add(value);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Set&lt;String&gt; getMapped(ConfigurationPropertyName configurationPropertyName) {
+<b class="nc">&nbsp;			return this.mappings.getOrDefault(configurationPropertyName, Collections.emptySet());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ConfigurationPropertyName[] getConfigurationPropertyNames(String[] propertyNames) {
+<b class="nc">&nbsp;			ConfigurationPropertyName[] names = this.configurationPropertyNames;</b>
+<b class="nc">&nbsp;			if (names != null) {</b>
+<b class="nc">&nbsp;				return names;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Map&lt;String, ConfigurationPropertyName&gt; reverseMappings = this.reverseMappings;</b>
+<b class="nc">&nbsp;			if (reverseMappings == null || reverseMappings.isEmpty()) {</b>
+<b class="nc">&nbsp;				return EMPTY_NAMES_ARRAY;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			names = new ConfigurationPropertyName[propertyNames.length];</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; propertyNames.length; i++) {</b>
+<b class="nc">&nbsp;				names[i] = reverseMappings.get(propertyNames[i]);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return names;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ConfigurationPropertyState containsDescendantOf(ConfigurationPropertyName name,
+&nbsp;				BiPredicate&lt;ConfigurationPropertyName, ConfigurationPropertyName&gt; ancestorOfCheck) {
+<b class="nc">&nbsp;			if (name.isEmpty() &amp;&amp; !this.descendants.isEmpty()) {</b>
+<b class="nc">&nbsp;				return ConfigurationPropertyState.PRESENT;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Set&lt;ConfigurationPropertyName&gt; candidates = this.descendants.getOrDefault(name, Collections.emptySet());</b>
+<b class="nc">&nbsp;			for (ConfigurationPropertyName candidate : candidates) {</b>
+<b class="nc">&nbsp;				if (ancestorOfCheck.test(name, candidate)) {</b>
+<b class="nc">&nbsp;					return ConfigurationPropertyState.PRESENT;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return ConfigurationPropertyState.ABSENT;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * ConfigurationPropertyNames iterator backed by an array.
+&nbsp;	 */
+&nbsp;	private static class ConfigurationPropertyNamesIterator implements Iterator&lt;ConfigurationPropertyName&gt; {
+&nbsp;
+&nbsp;		private final ConfigurationPropertyName[] names;
+&nbsp;
+<b class="nc">&nbsp;		private int index = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;		ConfigurationPropertyNamesIterator(ConfigurationPropertyName[] names) {</b>
+<b class="nc">&nbsp;			this.names = names;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean hasNext() {
+<b class="nc">&nbsp;			skipNulls();</b>
+<b class="nc">&nbsp;			return this.index &lt; this.names.length;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public ConfigurationPropertyName next() {
+<b class="nc">&nbsp;			skipNulls();</b>
+<b class="nc">&nbsp;			if (this.index &gt;= this.names.length) {</b>
+<b class="nc">&nbsp;				throw new NoSuchElementException();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return this.names[this.index++];</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void skipNulls() {
+<b class="nc">&nbsp;			while (this.index &lt; this.names.length) {</b>
+<b class="nc">&nbsp;				if (this.names[this.index] != null) {</b>
+&nbsp;					return;
+&nbsp;				}
+<b class="nc">&nbsp;				this.index++;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

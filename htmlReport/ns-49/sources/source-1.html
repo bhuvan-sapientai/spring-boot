@@ -1,0 +1,384 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractScriptDatabaseInitializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.sql.init</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractScriptDatabaseInitializer (org.springframework.boot.sql.init)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractScriptDatabaseInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractScriptDatabaseInitializer$ScriptLocationResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractScriptDatabaseInitializer$Scripts</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.sql.init;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.InitializingBean;
+&nbsp;import org.springframework.context.ResourceLoaderAware;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.core.io.support.ResourcePatternResolver;
+&nbsp;import org.springframework.core.io.support.ResourcePatternUtils;
+&nbsp;import org.springframework.util.CollectionUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for an {@link InitializingBean} that performs SQL database initialization
+&nbsp; * using schema (DDL) and data (DML) scripts.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.5.0
+&nbsp; */
+&nbsp;public abstract class AbstractScriptDatabaseInitializer implements ResourceLoaderAware, InitializingBean {
+&nbsp;
+&nbsp;	private static final String OPTIONAL_LOCATION_PREFIX = &quot;optional:&quot;;
+&nbsp;
+&nbsp;	private final DatabaseInitializationSettings settings;
+&nbsp;
+&nbsp;	private volatile ResourceLoader resourceLoader;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@link AbstractScriptDatabaseInitializer} that will initialize the
+&nbsp;	 * database using the given settings.
+&nbsp;	 * @param settings initialization settings
+&nbsp;	 */
+<b class="nc">&nbsp;	protected AbstractScriptDatabaseInitializer(DatabaseInitializationSettings settings) {</b>
+<b class="nc">&nbsp;		this.settings = settings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setResourceLoader(ResourceLoader resourceLoader) {
+<b class="nc">&nbsp;		this.resourceLoader = resourceLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterPropertiesSet() throws Exception {
+<b class="nc">&nbsp;		initializeDatabase();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initializes the database by applying schema and data scripts.
+&nbsp;	 * @return {@code true} if one or more scripts were applied to the database, otherwise
+&nbsp;	 * {@code false}
+&nbsp;	 */
+&nbsp;	public boolean initializeDatabase() {
+<b class="nc">&nbsp;		ScriptLocationResolver locationResolver = new ScriptLocationResolver(this.resourceLoader);</b>
+<b class="nc">&nbsp;		boolean initialized = applySchemaScripts(locationResolver);</b>
+<b class="nc">&nbsp;		return applyDataScripts(locationResolver) || initialized;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isEnabled() {
+<b class="nc">&nbsp;		if (this.settings.getMode() == DatabaseInitializationMode.NEVER) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.settings.getMode() == DatabaseInitializationMode.ALWAYS || isEmbeddedDatabase();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns whether the database that is to be initialized is embedded.
+&nbsp;	 * @return {@code true} if the database is embedded, otherwise {@code false}
+&nbsp;	 * @since 2.5.1
+&nbsp;	 */
+&nbsp;	protected boolean isEmbeddedDatabase() {
+<b class="nc">&nbsp;		throw new IllegalStateException(</b>
+<b class="nc">&nbsp;				&quot;Database initialization mode is &#39;&quot; + this.settings.getMode() + &quot;&#39; and database type is unknown&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean applySchemaScripts(ScriptLocationResolver locationResolver) {
+<b class="nc">&nbsp;		return applyScripts(this.settings.getSchemaLocations(), &quot;schema&quot;, locationResolver);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean applyDataScripts(ScriptLocationResolver locationResolver) {
+<b class="nc">&nbsp;		return applyScripts(this.settings.getDataLocations(), &quot;data&quot;, locationResolver);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean applyScripts(List&lt;String&gt; locations, String type, ScriptLocationResolver locationResolver) {
+<b class="nc">&nbsp;		List&lt;Resource&gt; scripts = getScripts(locations, type, locationResolver);</b>
+<b class="nc">&nbsp;		if (!scripts.isEmpty() &amp;&amp; isEnabled()) {</b>
+<b class="nc">&nbsp;			runScripts(scripts);</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Resource&gt; getScripts(List&lt;String&gt; locations, String type, ScriptLocationResolver locationResolver) {
+<b class="nc">&nbsp;		if (CollectionUtils.isEmpty(locations)) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;Resource&gt; resources = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String location : locations) {</b>
+<b class="nc">&nbsp;			boolean optional = location.startsWith(OPTIONAL_LOCATION_PREFIX);</b>
+<b class="nc">&nbsp;			if (optional) {</b>
+<b class="nc">&nbsp;				location = location.substring(OPTIONAL_LOCATION_PREFIX.length());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (Resource resource : doGetResources(location, locationResolver)) {</b>
+<b class="nc">&nbsp;				if (resource.isReadable()) {</b>
+<b class="nc">&nbsp;					resources.add(resource);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				else if (!optional) {</b>
+<b class="nc">&nbsp;					throw new IllegalStateException(&quot;No &quot; + type + &quot; scripts found at location &#39;&quot; + location + &quot;&#39;&quot;);</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return resources;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;Resource&gt; doGetResources(String location, ScriptLocationResolver locationResolver) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return locationResolver.resolve(location);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Unable to load resources from &quot; + location, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void runScripts(List&lt;Resource&gt; resources) {
+<b class="nc">&nbsp;		runScripts(new Scripts(resources).continueOnError(this.settings.isContinueOnError())</b>
+<b class="nc">&nbsp;			.separator(this.settings.getSeparator())</b>
+<b class="nc">&nbsp;			.encoding(this.settings.getEncoding()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize the database by running the given {@code scripts}.
+&nbsp;	 * @param scripts the scripts to run
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	protected abstract void runScripts(Scripts scripts);
+&nbsp;
+&nbsp;	private static class ScriptLocationResolver {
+&nbsp;
+&nbsp;		private final ResourcePatternResolver resourcePatternResolver;
+&nbsp;
+<b class="nc">&nbsp;		ScriptLocationResolver(ResourceLoader resourceLoader) {</b>
+<b class="nc">&nbsp;			this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private List&lt;Resource&gt; resolve(String location) throws IOException {
+<b class="nc">&nbsp;			List&lt;Resource&gt; resources = new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;					Arrays.asList(this.resourcePatternResolver.getResources(location)));</b>
+<b class="nc">&nbsp;			resources.sort((r1, r2) -&gt; {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					return r1.getURL().toString().compareTo(r2.getURL().toString());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IOException ex) {</b>
+<b class="nc">&nbsp;					return 0;</b>
+&nbsp;				}
+&nbsp;			});
+<b class="nc">&nbsp;			return resources;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Scripts to be used to initialize the database.
+&nbsp;	 *
+&nbsp;	 * @since 3.0.0
+&nbsp;	 */
+&nbsp;	public static class Scripts implements Iterable&lt;Resource&gt; {
+&nbsp;
+&nbsp;		private final List&lt;Resource&gt; resources;
+&nbsp;
+<b class="nc">&nbsp;		private boolean continueOnError = false;</b>
+&nbsp;
+<b class="nc">&nbsp;		private String separator = &quot;;&quot;;</b>
+&nbsp;
+&nbsp;		private Charset encoding;
+&nbsp;
+<b class="nc">&nbsp;		public Scripts(List&lt;Resource&gt; resources) {</b>
+<b class="nc">&nbsp;			this.resources = resources;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Iterator&lt;Resource&gt; iterator() {
+<b class="nc">&nbsp;			return this.resources.iterator();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Scripts continueOnError(boolean continueOnError) {
+<b class="nc">&nbsp;			this.continueOnError = continueOnError;</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public boolean isContinueOnError() {
+<b class="nc">&nbsp;			return this.continueOnError;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Scripts separator(String separator) {
+<b class="nc">&nbsp;			this.separator = separator;</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public String getSeparator() {
+<b class="nc">&nbsp;			return this.separator;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Scripts encoding(Charset encoding) {
+<b class="nc">&nbsp;			this.encoding = encoding;</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Charset getEncoding() {
+<b class="nc">&nbsp;			return this.encoding;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

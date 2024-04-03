@@ -1,0 +1,618 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoggingApplicationListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: LoggingApplicationListener (org.springframework.boot.context.logging)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoggingApplicationListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/141)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoggingApplicationListener$Lifecycle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/147)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.logging;
+&nbsp;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationFailedEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationPreparedEvent;
+&nbsp;import org.springframework.boot.context.event.ApplicationStartingEvent;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.logging.LogFile;
+&nbsp;import org.springframework.boot.logging.LogLevel;
+&nbsp;import org.springframework.boot.logging.LoggerGroup;
+&nbsp;import org.springframework.boot.logging.LoggerGroups;
+&nbsp;import org.springframework.boot.logging.LoggingInitializationContext;
+&nbsp;import org.springframework.boot.logging.LoggingSystem;
+&nbsp;import org.springframework.boot.logging.LoggingSystemProperties;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationEvent;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.SmartLifecycle;
+&nbsp;import org.springframework.context.event.ContextClosedEvent;
+&nbsp;import org.springframework.context.event.GenericApplicationListener;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.LinkedMultiValueMap;
+&nbsp;import org.springframework.util.MultiValueMap;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link ApplicationListener} that configures the {@link LoggingSystem}. If the
+&nbsp; * environment contains a {@code logging.config} property it will be used to bootstrap the
+&nbsp; * logging system, otherwise a default configuration is used. Regardless, logging levels
+&nbsp; * will be customized if the environment contains {@code logging.level.*} entries and
+&nbsp; * logging groups can be defined with {@code logging.group}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Debug and trace logging for Spring, Tomcat, Jetty and Hibernate will be enabled when
+&nbsp; * the environment contains {@code debug} or {@code trace} properties that aren&#39;t set to
+&nbsp; * {@code &quot;false&quot;} (i.e. if you start your application using
+&nbsp; * {@literal java -jar myapp.jar [--debug | --trace]}). If you prefer to ignore these
+&nbsp; * properties you can set {@link #setParseArgs(boolean) parseArgs} to {@code false}.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, log output is only written to the console. If a log file is required, the
+&nbsp; * {@code logging.file.path} and {@code logging.file.name} properties can be used.
+&nbsp; * &lt;p&gt;
+&nbsp; * Some system properties may be set as side effects, and these can be useful if the
+&nbsp; * logging configuration supports placeholders (i.e. log4j or logback):
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;{@code LOG_FILE} is set to the value of path of the log file that should be written
+&nbsp; * (if any).&lt;/li&gt;
+&nbsp; * &lt;li&gt;{@code PID} is set to the value of the current process ID if it can be determined.
+&nbsp; * &lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author HaiTao Zhang
+&nbsp; * @since 2.0.0
+&nbsp; * @see LoggingSystem#get(ClassLoader)
+&nbsp; */
+<b class="nc">&nbsp;public class LoggingApplicationListener implements GenericApplicationListener {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final ConfigurationPropertyName LOGGING_LEVEL = ConfigurationPropertyName.of(&quot;logging.level&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final ConfigurationPropertyName LOGGING_GROUP = ConfigurationPropertyName.of(&quot;logging.group&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Bindable&lt;Map&lt;String, LogLevel&gt;&gt; STRING_LOGLEVEL_MAP = Bindable.mapOf(String.class,</b>
+&nbsp;			LogLevel.class);
+&nbsp;
+<b class="nc">&nbsp;	private static final Bindable&lt;Map&lt;String, List&lt;String&gt;&gt;&gt; STRING_STRINGS_MAP = Bindable</b>
+<b class="nc">&nbsp;		.of(ResolvableType.forClassWithGenerics(MultiValueMap.class, String.class, String.class).asMap());</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The default order for the LoggingApplicationListener.
+&nbsp;	 */
+&nbsp;	public static final int DEFAULT_ORDER = Ordered.HIGHEST_PRECEDENCE + 20;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the Spring property that contains a reference to the logging
+&nbsp;	 * configuration to load.
+&nbsp;	 */
+&nbsp;	public static final String CONFIG_PROPERTY = &quot;logging.config&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the Spring property that controls the registration of a shutdown hook
+&nbsp;	 * to shut down the logging system when the JVM exits.
+&nbsp;	 * @see LoggingSystem#getShutdownHandler
+&nbsp;	 */
+&nbsp;	public static final String REGISTER_SHUTDOWN_HOOK_PROPERTY = &quot;logging.register-shutdown-hook&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@link LoggingSystem} bean.
+&nbsp;	 */
+&nbsp;	public static final String LOGGING_SYSTEM_BEAN_NAME = &quot;springBootLoggingSystem&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@link LogFile} bean.
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public static final String LOG_FILE_BEAN_NAME = &quot;springBootLogFile&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@link LoggerGroups} bean.
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public static final String LOGGER_GROUPS_BEAN_NAME = &quot;springBootLoggerGroups&quot;;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The name of the {@link Lifecycle} bean used to handle cleanup.
+&nbsp;	 */
+&nbsp;	private static final String LOGGING_LIFECYCLE_BEAN_NAME = &quot;springBootLoggingLifecycle&quot;;
+&nbsp;
+&nbsp;	private static final Map&lt;String, List&lt;String&gt;&gt; DEFAULT_GROUP_LOGGERS;
+&nbsp;	static {
+<b class="nc">&nbsp;		MultiValueMap&lt;String, String&gt; loggers = new LinkedMultiValueMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		loggers.add(&quot;web&quot;, &quot;org.springframework.core.codec&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(&quot;web&quot;, &quot;org.springframework.http&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(&quot;web&quot;, &quot;org.springframework.web&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(&quot;web&quot;, &quot;org.springframework.boot.actuate.endpoint.web&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(&quot;web&quot;, &quot;org.springframework.boot.web.servlet.ServletContextInitializerBeans&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(&quot;sql&quot;, &quot;org.springframework.jdbc.core&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(&quot;sql&quot;, &quot;org.hibernate.SQL&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(&quot;sql&quot;, &quot;org.jooq.tools.LoggerListener&quot;);</b>
+<b class="nc">&nbsp;		DEFAULT_GROUP_LOGGERS = Collections.unmodifiableMap(loggers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final Map&lt;LogLevel, List&lt;String&gt;&gt; SPRING_BOOT_LOGGING_LOGGERS;
+&nbsp;	static {
+<b class="nc">&nbsp;		MultiValueMap&lt;LogLevel, String&gt; loggers = new LinkedMultiValueMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		loggers.add(LogLevel.DEBUG, &quot;sql&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(LogLevel.DEBUG, &quot;web&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(LogLevel.DEBUG, &quot;org.springframework.boot&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(LogLevel.TRACE, &quot;org.springframework&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(LogLevel.TRACE, &quot;org.apache.tomcat&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(LogLevel.TRACE, &quot;org.apache.catalina&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(LogLevel.TRACE, &quot;org.eclipse.jetty&quot;);</b>
+<b class="nc">&nbsp;		loggers.add(LogLevel.TRACE, &quot;org.hibernate.tool.hbm2ddl&quot;);</b>
+<b class="nc">&nbsp;		SPRING_BOOT_LOGGING_LOGGERS = Collections.unmodifiableMap(loggers);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final Class&lt;?&gt;[] EVENT_TYPES = { ApplicationStartingEvent.class,</b>
+&nbsp;			ApplicationEnvironmentPreparedEvent.class, ApplicationPreparedEvent.class, ContextClosedEvent.class,
+&nbsp;			ApplicationFailedEvent.class };
+&nbsp;
+<b class="nc">&nbsp;	private static final Class&lt;?&gt;[] SOURCE_TYPES = { SpringApplication.class, ApplicationContext.class };</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final AtomicBoolean shutdownHookRegistered = new AtomicBoolean();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Log logger = LogFactory.getLog(getClass());</b>
+&nbsp;
+&nbsp;	private LoggingSystem loggingSystem;
+&nbsp;
+&nbsp;	private LogFile logFile;
+&nbsp;
+&nbsp;	private LoggerGroups loggerGroups;
+&nbsp;
+<b class="nc">&nbsp;	private int order = DEFAULT_ORDER;</b>
+&nbsp;
+<b class="nc">&nbsp;	private boolean parseArgs = true;</b>
+&nbsp;
+<b class="nc">&nbsp;	private LogLevel springBootLogging = null;</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean supportsEventType(ResolvableType resolvableType) {
+<b class="nc">&nbsp;		return isAssignableFrom(resolvableType.getRawClass(), EVENT_TYPES);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean supportsSourceType(Class&lt;?&gt; sourceType) {
+<b class="nc">&nbsp;		return isAssignableFrom(sourceType, SOURCE_TYPES);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isAssignableFrom(Class&lt;?&gt; type, Class&lt;?&gt;... supportedTypes) {
+<b class="nc">&nbsp;		if (type != null) {</b>
+<b class="nc">&nbsp;			for (Class&lt;?&gt; supportedType : supportedTypes) {</b>
+<b class="nc">&nbsp;				if (supportedType.isAssignableFrom(type)) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onApplicationEvent(ApplicationEvent event) {
+<b class="nc">&nbsp;		if (event instanceof ApplicationStartingEvent startingEvent) {</b>
+<b class="nc">&nbsp;			onApplicationStartingEvent(startingEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (event instanceof ApplicationEnvironmentPreparedEvent environmentPreparedEvent) {</b>
+<b class="nc">&nbsp;			onApplicationEnvironmentPreparedEvent(environmentPreparedEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (event instanceof ApplicationPreparedEvent preparedEvent) {</b>
+<b class="nc">&nbsp;			onApplicationPreparedEvent(preparedEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (event instanceof ContextClosedEvent) {</b>
+<b class="nc">&nbsp;			onContextClosedEvent((ContextClosedEvent) event);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (event instanceof ApplicationFailedEvent) {</b>
+<b class="nc">&nbsp;			onApplicationFailedEvent();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationStartingEvent(ApplicationStartingEvent event) {
+<b class="nc">&nbsp;		this.loggingSystem = LoggingSystem.get(event.getSpringApplication().getClassLoader());</b>
+<b class="nc">&nbsp;		this.loggingSystem.beforeInitialize();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
+<b class="nc">&nbsp;		SpringApplication springApplication = event.getSpringApplication();</b>
+<b class="nc">&nbsp;		if (this.loggingSystem == null) {</b>
+<b class="nc">&nbsp;			this.loggingSystem = LoggingSystem.get(springApplication.getClassLoader());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		initialize(event.getEnvironment(), springApplication.getClassLoader());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationPreparedEvent(ApplicationPreparedEvent event) {
+<b class="nc">&nbsp;		ConfigurableApplicationContext applicationContext = event.getApplicationContext();</b>
+<b class="nc">&nbsp;		ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();</b>
+<b class="nc">&nbsp;		if (!beanFactory.containsBean(LOGGING_SYSTEM_BEAN_NAME)) {</b>
+<b class="nc">&nbsp;			beanFactory.registerSingleton(LOGGING_SYSTEM_BEAN_NAME, this.loggingSystem);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.logFile != null &amp;&amp; !beanFactory.containsBean(LOG_FILE_BEAN_NAME)) {</b>
+<b class="nc">&nbsp;			beanFactory.registerSingleton(LOG_FILE_BEAN_NAME, this.logFile);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.loggerGroups != null &amp;&amp; !beanFactory.containsBean(LOGGER_GROUPS_BEAN_NAME)) {</b>
+<b class="nc">&nbsp;			beanFactory.registerSingleton(LOGGER_GROUPS_BEAN_NAME, this.loggerGroups);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!beanFactory.containsBean(LOGGING_LIFECYCLE_BEAN_NAME) &amp;&amp; applicationContext.getParent() == null) {</b>
+<b class="nc">&nbsp;			beanFactory.registerSingleton(LOGGING_LIFECYCLE_BEAN_NAME, new Lifecycle());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onContextClosedEvent(ContextClosedEvent event) {
+<b class="nc">&nbsp;		ApplicationContext applicationContext = event.getApplicationContext();</b>
+<b class="nc">&nbsp;		if (applicationContext.getParent() != null || applicationContext.containsBean(LOGGING_LIFECYCLE_BEAN_NAME)) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		cleanupLoggingSystem();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void cleanupLoggingSystem() {
+<b class="nc">&nbsp;		if (this.loggingSystem != null) {</b>
+<b class="nc">&nbsp;			this.loggingSystem.cleanUp();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void onApplicationFailedEvent() {
+<b class="nc">&nbsp;		cleanupLoggingSystem();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize the logging system according to preferences expressed through the
+&nbsp;	 * {@link Environment} and the classpath.
+&nbsp;	 * @param environment the environment
+&nbsp;	 * @param classLoader the classloader
+&nbsp;	 */
+&nbsp;	protected void initialize(ConfigurableEnvironment environment, ClassLoader classLoader) {
+<b class="nc">&nbsp;		getLoggingSystemProperties(environment).apply();</b>
+<b class="nc">&nbsp;		this.logFile = LogFile.get(environment);</b>
+<b class="nc">&nbsp;		if (this.logFile != null) {</b>
+<b class="nc">&nbsp;			this.logFile.applyToSystemProperties();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.loggerGroups = new LoggerGroups(DEFAULT_GROUP_LOGGERS);</b>
+<b class="nc">&nbsp;		initializeEarlyLoggingLevel(environment);</b>
+<b class="nc">&nbsp;		initializeSystem(environment, this.loggingSystem, this.logFile);</b>
+<b class="nc">&nbsp;		initializeFinalLoggingLevels(environment, this.loggingSystem);</b>
+<b class="nc">&nbsp;		registerShutdownHookIfNecessary(environment, this.loggingSystem);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private LoggingSystemProperties getLoggingSystemProperties(ConfigurableEnvironment environment) {
+<b class="nc">&nbsp;		return (this.loggingSystem != null) ? this.loggingSystem.getSystemProperties(environment)</b>
+<b class="nc">&nbsp;				: new LoggingSystemProperties(environment);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void initializeEarlyLoggingLevel(ConfigurableEnvironment environment) {
+<b class="nc">&nbsp;		if (this.parseArgs &amp;&amp; this.springBootLogging == null) {</b>
+<b class="nc">&nbsp;			if (isSet(environment, &quot;debug&quot;)) {</b>
+<b class="nc">&nbsp;				this.springBootLogging = LogLevel.DEBUG;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (isSet(environment, &quot;trace&quot;)) {</b>
+<b class="nc">&nbsp;				this.springBootLogging = LogLevel.TRACE;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isSet(ConfigurableEnvironment environment, String property) {
+<b class="nc">&nbsp;		String value = environment.getProperty(property);</b>
+<b class="nc">&nbsp;		return (value != null &amp;&amp; !value.equals(&quot;false&quot;));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void initializeSystem(ConfigurableEnvironment environment, LoggingSystem system, LogFile logFile) {
+<b class="nc">&nbsp;		String logConfig = environment.getProperty(CONFIG_PROPERTY);</b>
+<b class="nc">&nbsp;		if (StringUtils.hasLength(logConfig)) {</b>
+<b class="nc">&nbsp;			logConfig = logConfig.strip();</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			LoggingInitializationContext initializationContext = new LoggingInitializationContext(environment);</b>
+<b class="nc">&nbsp;			if (ignoreLogConfig(logConfig)) {</b>
+<b class="nc">&nbsp;				system.initialize(initializationContext, null, logFile);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				system.initialize(initializationContext, logConfig, logFile);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			Throwable exceptionToReport = ex;</b>
+<b class="nc">&nbsp;			while (exceptionToReport != null &amp;&amp; !(exceptionToReport instanceof FileNotFoundException)) {</b>
+<b class="nc">&nbsp;				exceptionToReport = exceptionToReport.getCause();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			exceptionToReport = (exceptionToReport != null) ? exceptionToReport : ex;</b>
+&nbsp;			// NOTE: We can&#39;t use the logger here to report the problem
+<b class="nc">&nbsp;			System.err.println(&quot;Logging system failed to initialize using configuration from &#39;&quot; + logConfig + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;			exceptionToReport.printStackTrace(System.err);</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean ignoreLogConfig(String logConfig) {
+<b class="nc">&nbsp;		return !StringUtils.hasLength(logConfig) || logConfig.startsWith(&quot;-D&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void initializeFinalLoggingLevels(ConfigurableEnvironment environment, LoggingSystem system) {
+<b class="nc">&nbsp;		bindLoggerGroups(environment);</b>
+<b class="nc">&nbsp;		if (this.springBootLogging != null) {</b>
+<b class="nc">&nbsp;			initializeSpringBootLogging(system, this.springBootLogging);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		setLogLevels(system, environment);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void bindLoggerGroups(ConfigurableEnvironment environment) {
+<b class="nc">&nbsp;		if (this.loggerGroups != null) {</b>
+<b class="nc">&nbsp;			Binder binder = Binder.get(environment);</b>
+<b class="nc">&nbsp;			binder.bind(LOGGING_GROUP, STRING_STRINGS_MAP).ifBound(this.loggerGroups::putAll);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initialize loggers based on the {@link #setSpringBootLogging(LogLevel)
+&nbsp;	 * springBootLogging} setting. By default this implementation will pick an appropriate
+&nbsp;	 * set of loggers to configure based on the level.
+&nbsp;	 * @param system the logging system
+&nbsp;	 * @param springBootLogging the spring boot logging level requested
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	protected void initializeSpringBootLogging(LoggingSystem system, LogLevel springBootLogging) {
+<b class="nc">&nbsp;		BiConsumer&lt;String, LogLevel&gt; configurer = getLogLevelConfigurer(system);</b>
+<b class="nc">&nbsp;		SPRING_BOOT_LOGGING_LOGGERS.getOrDefault(springBootLogging, Collections.emptyList())</b>
+<b class="nc">&nbsp;			.forEach((name) -&gt; configureLogLevel(name, springBootLogging, configurer));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set logging levels based on relevant {@link Environment} properties.
+&nbsp;	 * @param system the logging system
+&nbsp;	 * @param environment the environment
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	protected void setLogLevels(LoggingSystem system, ConfigurableEnvironment environment) {
+<b class="nc">&nbsp;		BiConsumer&lt;String, LogLevel&gt; customizer = getLogLevelConfigurer(system);</b>
+<b class="nc">&nbsp;		Binder binder = Binder.get(environment);</b>
+<b class="nc">&nbsp;		Map&lt;String, LogLevel&gt; levels = binder.bind(LOGGING_LEVEL, STRING_LOGLEVEL_MAP).orElseGet(Collections::emptyMap);</b>
+<b class="nc">&nbsp;		levels.forEach((name, level) -&gt; configureLogLevel(name, level, customizer));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureLogLevel(String name, LogLevel level, BiConsumer&lt;String, LogLevel&gt; configurer) {
+<b class="nc">&nbsp;		if (this.loggerGroups != null) {</b>
+<b class="nc">&nbsp;			LoggerGroup group = this.loggerGroups.get(name);</b>
+<b class="nc">&nbsp;			if (group != null &amp;&amp; group.hasMembers()) {</b>
+<b class="nc">&nbsp;				group.configureLogLevel(level, configurer);</b>
+&nbsp;				return;
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		configurer.accept(name, level);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private BiConsumer&lt;String, LogLevel&gt; getLogLevelConfigurer(LoggingSystem system) {
+<b class="nc">&nbsp;		return (name, level) -&gt; {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				name = name.equalsIgnoreCase(LoggingSystem.ROOT_LOGGER_NAME) ? null : name;</b>
+<b class="nc">&nbsp;				system.setLogLevel(name, level);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;				this.logger.error(LogMessage.format(&quot;Cannot set level &#39;%s&#39; for &#39;%s&#39;&quot;, level, name));</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;	private void registerShutdownHookIfNecessary(Environment environment, LoggingSystem loggingSystem) {
+<b class="nc">&nbsp;		if (environment.getProperty(REGISTER_SHUTDOWN_HOOK_PROPERTY, Boolean.class, true)) {</b>
+<b class="nc">&nbsp;			Runnable shutdownHandler = loggingSystem.getShutdownHandler();</b>
+<b class="nc">&nbsp;			if (shutdownHandler != null &amp;&amp; shutdownHookRegistered.compareAndSet(false, true)) {</b>
+<b class="nc">&nbsp;				registerShutdownHook(shutdownHandler);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	void registerShutdownHook(Runnable shutdownHandler) {
+<b class="nc">&nbsp;		SpringApplication.getShutdownHandlers().add(shutdownHandler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setOrder(int order) {
+<b class="nc">&nbsp;		this.order = order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return this.order;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets a custom logging level to be used for Spring Boot and related libraries.
+&nbsp;	 * @param springBootLogging the logging level
+&nbsp;	 */
+&nbsp;	public void setSpringBootLogging(LogLevel springBootLogging) {
+<b class="nc">&nbsp;		this.springBootLogging = springBootLogging;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets if initialization arguments should be parsed for {@literal debug} and
+&nbsp;	 * {@literal trace} properties (usually defined from {@literal --debug} or
+&nbsp;	 * {@literal --trace} command line args). Defaults to {@code true}.
+&nbsp;	 * @param parseArgs if arguments should be parsed
+&nbsp;	 */
+&nbsp;	public void setParseArgs(boolean parseArgs) {
+<b class="nc">&nbsp;		this.parseArgs = parseArgs;</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private final class Lifecycle implements SmartLifecycle {</b>
+&nbsp;
+&nbsp;		private volatile boolean running;
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void start() {
+<b class="nc">&nbsp;			this.running = true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void stop() {
+<b class="nc">&nbsp;			this.running = false;</b>
+<b class="nc">&nbsp;			cleanupLoggingSystem();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isRunning() {
+<b class="nc">&nbsp;			return this.running;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getPhase() {
+&nbsp;			// Shutdown late and always after WebServerStartStopLifecycle
+<b class="nc">&nbsp;			return Integer.MIN_VALUE + 1;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PlatformPlaceholderDatabaseDriverResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.jdbc.init</a>
+</div>
+
+<h1>Coverage Summary for Class: PlatformPlaceholderDatabaseDriverResolver (org.springframework.boot.jdbc.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PlatformPlaceholderDatabaseDriverResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.jdbc.init;
+&nbsp;
+&nbsp;import java.sql.DatabaseMetaData;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.springframework.boot.jdbc.DatabaseDriver;
+&nbsp;import org.springframework.jdbc.support.JdbcUtils;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility class that can resolve placeholder text with the actual {@link DatabaseDriver}
+&nbsp; * platform.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, the name of the platform is the {@link DatabaseDriver#getId ID of the
+&nbsp; * driver}. This mapping can be customized by
+&nbsp; * {@link #withDriverPlatform(DatabaseDriver, String)} registering custom
+&nbsp; * {@code DatabaseDriver} to platform mappings.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.6.0
+&nbsp; */
+&nbsp;public class PlatformPlaceholderDatabaseDriverResolver {
+&nbsp;
+&nbsp;	private final String placeholder;
+&nbsp;
+&nbsp;	private final Map&lt;DatabaseDriver, String&gt; driverMappings;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new resolver that will use the default {@code &quot;@@platform@@&quot;}
+&nbsp;	 * placeholder.
+&nbsp;	 */
+&nbsp;	public PlatformPlaceholderDatabaseDriverResolver() {
+<b class="nc">&nbsp;		this(&quot;@@platform@@&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new resolver that will use the given {@code placeholder}.
+&nbsp;	 * @param placeholder the placeholder to use
+&nbsp;	 */
+&nbsp;	public PlatformPlaceholderDatabaseDriverResolver(String placeholder) {
+<b class="nc">&nbsp;		this(placeholder, Collections.emptyMap());</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private PlatformPlaceholderDatabaseDriverResolver(String placeholder, Map&lt;DatabaseDriver, String&gt; driverMappings) {</b>
+<b class="nc">&nbsp;		this.placeholder = placeholder;</b>
+<b class="nc">&nbsp;		this.driverMappings = driverMappings;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@link PlatformPlaceholderDatabaseDriverResolver} that will map the
+&nbsp;	 * given {@code driver} to the given {@code platform}.
+&nbsp;	 * @param driver the driver
+&nbsp;	 * @param platform the platform
+&nbsp;	 * @return the new resolver
+&nbsp;	 */
+&nbsp;	public PlatformPlaceholderDatabaseDriverResolver withDriverPlatform(DatabaseDriver driver, String platform) {
+<b class="nc">&nbsp;		Map&lt;DatabaseDriver, String&gt; driverMappings = new LinkedHashMap&lt;&gt;(this.driverMappings);</b>
+<b class="nc">&nbsp;		driverMappings.put(driver, platform);</b>
+<b class="nc">&nbsp;		return new PlatformPlaceholderDatabaseDriverResolver(this.placeholder, driverMappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolves the placeholders in the given {@code values}, replacing them with the
+&nbsp;	 * platform derived from the {@link DatabaseDriver} of the given {@code dataSource}.
+&nbsp;	 * @param dataSource the DataSource from which the {@link DatabaseDriver} is derived
+&nbsp;	 * @param values the values in which placeholders are resolved
+&nbsp;	 * @return the values with their placeholders resolved
+&nbsp;	 */
+&nbsp;	public List&lt;String&gt; resolveAll(DataSource dataSource, String... values) {
+<b class="nc">&nbsp;		Assert.notNull(dataSource, &quot;DataSource must not be null&quot;);</b>
+<b class="nc">&nbsp;		return resolveAll(() -&gt; determinePlatform(dataSource), values);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Resolves the placeholders in the given {@code values}, replacing them with the
+&nbsp;	 * given platform.
+&nbsp;	 * @param platform the platform to use
+&nbsp;	 * @param values the values in which placeholders are resolved
+&nbsp;	 * @return the values with their placeholders resolved
+&nbsp;	 * @since 2.6.2
+&nbsp;	 */
+&nbsp;	public List&lt;String&gt; resolveAll(String platform, String... values) {
+<b class="nc">&nbsp;		Assert.notNull(platform, &quot;Platform must not be null&quot;);</b>
+<b class="nc">&nbsp;		return resolveAll(() -&gt; platform, values);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;String&gt; resolveAll(Supplier&lt;String&gt; platformProvider, String... values) {
+<b class="nc">&nbsp;		if (ObjectUtils.isEmpty(values)) {</b>
+<b class="nc">&nbsp;			return Collections.emptyList();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		List&lt;String&gt; resolved = new ArrayList&lt;&gt;(values.length);</b>
+<b class="nc">&nbsp;		String platform = null;</b>
+<b class="nc">&nbsp;		for (String value : values) {</b>
+<b class="nc">&nbsp;			if (StringUtils.hasLength(value)) {</b>
+<b class="nc">&nbsp;				if (value.contains(this.placeholder)) {</b>
+<b class="nc">&nbsp;					platform = (platform != null) ? platform : platformProvider.get();</b>
+<b class="nc">&nbsp;					value = value.replace(this.placeholder, platform);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			resolved.add(value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return Collections.unmodifiableList(resolved);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String determinePlatform(DataSource dataSource) {
+<b class="nc">&nbsp;		DatabaseDriver databaseDriver = getDatabaseDriver(dataSource);</b>
+<b class="nc">&nbsp;		Assert.state(databaseDriver != DatabaseDriver.UNKNOWN, &quot;Unable to detect database type&quot;);</b>
+<b class="nc">&nbsp;		return this.driverMappings.getOrDefault(databaseDriver, databaseDriver.getId());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	DatabaseDriver getDatabaseDriver(DataSource dataSource) {
+&nbsp;		try {
+<b class="nc">&nbsp;			String productName = JdbcUtils.commonDatabaseName(</b>
+<b class="nc">&nbsp;					JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductName));</b>
+<b class="nc">&nbsp;			return DatabaseDriver.fromProductName(productName);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(&quot;Failed to determine DatabaseDriver&quot;, ex);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

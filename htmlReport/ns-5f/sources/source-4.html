@@ -1,0 +1,394 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NettyWebServer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.netty</a>
+</div>
+
+<h1>Coverage Summary for Class: NettyWebServer (org.springframework.boot.web.embedded.netty)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NettyWebServer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NettyWebServer$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/79)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.netty;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import io.netty.channel.group.DefaultChannelGroup;
+&nbsp;import io.netty.channel.unix.Errors.NativeIoException;
+&nbsp;import io.netty.util.concurrent.DefaultEventExecutor;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import org.reactivestreams.Publisher;
+&nbsp;import reactor.netty.ChannelBindException;
+&nbsp;import reactor.netty.DisposableServer;
+&nbsp;import reactor.netty.http.server.HttpServer;
+&nbsp;import reactor.netty.http.server.HttpServerRequest;
+&nbsp;import reactor.netty.http.server.HttpServerResponse;
+&nbsp;import reactor.netty.http.server.HttpServerRoutes;
+&nbsp;import reactor.netty.resources.LoopResources;
+&nbsp;
+&nbsp;import org.springframework.boot.web.server.GracefulShutdownCallback;
+&nbsp;import org.springframework.boot.web.server.GracefulShutdownResult;
+&nbsp;import org.springframework.boot.web.server.PortInUseException;
+&nbsp;import org.springframework.boot.web.server.Shutdown;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.boot.web.server.WebServerException;
+&nbsp;import org.springframework.http.client.ReactorResourceFactory;
+&nbsp;import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link WebServer} that can be used to control a Reactor Netty web server. Usually this
+&nbsp; * class should be created using the {@link NettyReactiveWebServerFactory} and not
+&nbsp; * directly.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class NettyWebServer implements WebServer {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Permission denied error code from {@code errno.h}.
+&nbsp;	 */
+&nbsp;	private static final int ERROR_NO_EACCES = -13;
+&nbsp;
+<b class="nc">&nbsp;	private static final Predicate&lt;HttpServerRequest&gt; ALWAYS = (request) -&gt; true;</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(NettyWebServer.class);</b>
+&nbsp;
+&nbsp;	private final HttpServer httpServer;
+&nbsp;
+&nbsp;	private final BiFunction&lt;? super HttpServerRequest, ? super HttpServerResponse, ? extends Publisher&lt;Void&gt;&gt; handler;
+&nbsp;
+&nbsp;	private final Duration lifecycleTimeout;
+&nbsp;
+&nbsp;	private final GracefulShutdown gracefulShutdown;
+&nbsp;
+&nbsp;	private final ReactorResourceFactory resourceFactory;
+&nbsp;
+<b class="nc">&nbsp;	private List&lt;NettyRouteProvider&gt; routeProviders = Collections.emptyList();</b>
+&nbsp;
+&nbsp;	private volatile DisposableServer disposableServer;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code NettyWebServer} instance.
+&nbsp;	 * @param httpServer the HTTP server
+&nbsp;	 * @param handlerAdapter the handler adapter
+&nbsp;	 * @param lifecycleTimeout the lifecycle timeout, may be {@code null}
+&nbsp;	 * @param shutdown the shutdown, may be {@code null}
+&nbsp;	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of
+&nbsp;	 * {@link #NettyWebServer(HttpServer, ReactorHttpHandlerAdapter, Duration, Shutdown, ReactorResourceFactory)}
+&nbsp;	 */
+&nbsp;	@Deprecated(since = &quot;3.2.0&quot;, forRemoval = true)
+&nbsp;	public NettyWebServer(HttpServer httpServer, ReactorHttpHandlerAdapter handlerAdapter, Duration lifecycleTimeout,
+&nbsp;			Shutdown shutdown) {
+<b class="nc">&nbsp;		this(httpServer, handlerAdapter, lifecycleTimeout, shutdown, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code NettyWebServer} instance.
+&nbsp;	 * @param httpServer the HTTP server
+&nbsp;	 * @param handlerAdapter the handler adapter
+&nbsp;	 * @param lifecycleTimeout the lifecycle timeout, may be {@code null}
+&nbsp;	 * @param shutdown the shutdown, may be {@code null}
+&nbsp;	 * @param resourceFactory the factory for the server&#39;s {@link LoopResources loop
+&nbsp;	 * resources}, may be {@code null}
+&nbsp;	 * @since 3.2.0
+&nbsp;	 */
+&nbsp;	public NettyWebServer(HttpServer httpServer, ReactorHttpHandlerAdapter handlerAdapter, Duration lifecycleTimeout,
+<b class="nc">&nbsp;			Shutdown shutdown, ReactorResourceFactory resourceFactory) {</b>
+<b class="nc">&nbsp;		Assert.notNull(httpServer, &quot;HttpServer must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(handlerAdapter, &quot;HandlerAdapter must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.lifecycleTimeout = lifecycleTimeout;</b>
+<b class="nc">&nbsp;		this.handler = handlerAdapter;</b>
+<b class="nc">&nbsp;		this.httpServer = httpServer.channelGroup(new DefaultChannelGroup(new DefaultEventExecutor()));</b>
+<b class="nc">&nbsp;		this.gracefulShutdown = (shutdown == Shutdown.GRACEFUL) ? new GracefulShutdown(() -&gt; this.disposableServer)</b>
+<b class="nc">&nbsp;				: null;</b>
+<b class="nc">&nbsp;		this.resourceFactory = resourceFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void setRouteProviders(List&lt;NettyRouteProvider&gt; routeProviders) {
+<b class="nc">&nbsp;		this.routeProviders = routeProviders;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void start() throws WebServerException {
+<b class="nc">&nbsp;		if (this.disposableServer == null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				this.disposableServer = startHttpServer();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				PortInUseException.ifCausedBy(ex, ChannelBindException.class, (bindException) -&gt; {</b>
+<b class="nc">&nbsp;					if (bindException.localPort() &gt; 0 &amp;&amp; !isPermissionDenied(bindException.getCause())) {</b>
+<b class="nc">&nbsp;						throw new PortInUseException(bindException.localPort(), ex);</b>
+&nbsp;					}
+&nbsp;				});
+<b class="nc">&nbsp;				throw new WebServerException(&quot;Unable to start Netty&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			if (this.disposableServer != null) {</b>
+<b class="nc">&nbsp;				logger.info(getStartedOnMessage(this.disposableServer));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			startDaemonAwaitThread(this.disposableServer);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getStartedOnMessage(DisposableServer server) {
+<b class="nc">&nbsp;		StringBuilder message = new StringBuilder();</b>
+<b class="nc">&nbsp;		tryAppend(message, &quot;port %s&quot;, () -&gt; server.port()</b>
+<b class="nc">&nbsp;				+ ((this.httpServer.configuration().sslProvider() != null) ? &quot; (https)&quot; : &quot; (http)&quot;));</b>
+<b class="nc">&nbsp;		tryAppend(message, &quot;path %s&quot;, server::path);</b>
+<b class="nc">&nbsp;		return (!message.isEmpty()) ? &quot;Netty started on &quot; + message : &quot;Netty started&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String getStartedLogMessage() {
+<b class="nc">&nbsp;		return getStartedOnMessage(this.disposableServer);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void tryAppend(StringBuilder message, String format, Supplier&lt;Object&gt; supplier) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Object value = supplier.get();</b>
+<b class="nc">&nbsp;			message.append((!message.isEmpty()) ? &quot; &quot; : &quot;&quot;);</b>
+<b class="nc">&nbsp;			message.append(String.format(format, value));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (UnsupportedOperationException ex) {</b>
+&nbsp;			// Ignore
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	DisposableServer startHttpServer() {
+<b class="nc">&nbsp;		HttpServer server = this.httpServer;</b>
+<b class="nc">&nbsp;		if (this.routeProviders.isEmpty()) {</b>
+<b class="nc">&nbsp;			server = server.handle(this.handler);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			server = server.route(this::applyRouteProviders);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.resourceFactory != null) {</b>
+<b class="nc">&nbsp;			LoopResources resources = this.resourceFactory.getLoopResources();</b>
+<b class="nc">&nbsp;			Assert.notNull(resources, &quot;No LoopResources: is ReactorResourceFactory not initialized yet?&quot;);</b>
+<b class="nc">&nbsp;			server = server.runOn(resources);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.lifecycleTimeout != null) {</b>
+<b class="nc">&nbsp;			return server.bindNow(this.lifecycleTimeout);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return server.bindNow();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isPermissionDenied(Throwable bindExceptionCause) {
+&nbsp;		try {
+<b class="nc">&nbsp;			if (bindExceptionCause instanceof NativeIoException nativeException) {</b>
+<b class="nc">&nbsp;				return nativeException.expectedErr() == ERROR_NO_EACCES;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ignore) {</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void shutDownGracefully(GracefulShutdownCallback callback) {
+<b class="nc">&nbsp;		if (this.gracefulShutdown == null) {</b>
+<b class="nc">&nbsp;			callback.shutdownComplete(GracefulShutdownResult.IMMEDIATE);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		this.gracefulShutdown.shutDownGracefully(callback);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void applyRouteProviders(HttpServerRoutes routes) {
+<b class="nc">&nbsp;		for (NettyRouteProvider provider : this.routeProviders) {</b>
+<b class="nc">&nbsp;			routes = provider.apply(routes);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		routes.route(ALWAYS, this.handler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void startDaemonAwaitThread(DisposableServer disposableServer) {
+<b class="nc">&nbsp;		Thread awaitThread = new Thread(&quot;server&quot;) {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void run() {
+<b class="nc">&nbsp;				disposableServer.onDispose().block();</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+<b class="nc">&nbsp;		awaitThread.setContextClassLoader(getClass().getClassLoader());</b>
+<b class="nc">&nbsp;		awaitThread.setDaemon(false);</b>
+<b class="nc">&nbsp;		awaitThread.start();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void stop() throws WebServerException {
+<b class="nc">&nbsp;		if (this.disposableServer != null) {</b>
+<b class="nc">&nbsp;			if (this.gracefulShutdown != null) {</b>
+<b class="nc">&nbsp;				this.gracefulShutdown.abort();</b>
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				if (this.lifecycleTimeout != null) {</b>
+<b class="nc">&nbsp;					this.disposableServer.disposeNow(this.lifecycleTimeout);</b>
+&nbsp;				}
+&nbsp;				else {
+<b class="nc">&nbsp;					this.disposableServer.disposeNow();</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (IllegalStateException ex) {</b>
+&nbsp;				// Continue
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			this.disposableServer = null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getPort() {
+<b class="nc">&nbsp;		if (this.disposableServer != null) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				return this.disposableServer.port();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (UnsupportedOperationException ex) {</b>
+<b class="nc">&nbsp;				return -1;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return -1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

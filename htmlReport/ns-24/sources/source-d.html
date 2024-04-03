@@ -1,0 +1,222 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigDataLoaders</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.config</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigDataLoaders (org.springframework.boot.context.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigDataLoaders</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.config;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;
+&nbsp;import org.springframework.boot.BootstrapContext;
+&nbsp;import org.springframework.boot.BootstrapRegistry;
+&nbsp;import org.springframework.boot.ConfigurableBootstrapContext;
+&nbsp;import org.springframework.boot.logging.DeferredLogFactory;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.io.support.SpringFactoriesLoader;
+&nbsp;import org.springframework.core.io.support.SpringFactoriesLoader.ArgumentResolver;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * A collection of {@link ConfigDataLoader} instances loaded through
+&nbsp; * {@code spring.factories}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class ConfigDataLoaders {
+&nbsp;
+&nbsp;	private final Log logger;
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private final List&lt;ConfigDataLoader&gt; loaders;
+&nbsp;
+&nbsp;	private final List&lt;Class&lt;?&gt;&gt; resourceTypes;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConfigDataLoaders} instance.
+&nbsp;	 * @param logFactory the deferred log factory
+&nbsp;	 * @param bootstrapContext the bootstrap context
+&nbsp;	 * @param springFactoriesLoader the loader to use
+&nbsp;	 */
+&nbsp;	ConfigDataLoaders(DeferredLogFactory logFactory, ConfigurableBootstrapContext bootstrapContext,
+<b class="nc">&nbsp;			SpringFactoriesLoader springFactoriesLoader) {</b>
+<b class="nc">&nbsp;		this.logger = logFactory.getLog(getClass());</b>
+<b class="nc">&nbsp;		ArgumentResolver argumentResolver = ArgumentResolver.of(DeferredLogFactory.class, logFactory);</b>
+<b class="nc">&nbsp;		argumentResolver = argumentResolver.and(ConfigurableBootstrapContext.class, bootstrapContext);</b>
+<b class="nc">&nbsp;		argumentResolver = argumentResolver.and(BootstrapContext.class, bootstrapContext);</b>
+<b class="nc">&nbsp;		argumentResolver = argumentResolver.and(BootstrapRegistry.class, bootstrapContext);</b>
+<b class="nc">&nbsp;		argumentResolver = argumentResolver.andSupplied(Log.class, () -&gt; {</b>
+<b class="nc">&nbsp;			throw new IllegalArgumentException(&quot;Log types cannot be injected, please use DeferredLogFactory&quot;);</b>
+&nbsp;		});
+<b class="nc">&nbsp;		this.loaders = springFactoriesLoader.load(ConfigDataLoader.class, argumentResolver);</b>
+<b class="nc">&nbsp;		this.resourceTypes = getResourceTypes(this.loaders);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	private List&lt;Class&lt;?&gt;&gt; getResourceTypes(List&lt;ConfigDataLoader&gt; loaders) {
+<b class="nc">&nbsp;		List&lt;Class&lt;?&gt;&gt; resourceTypes = new ArrayList&lt;&gt;(loaders.size());</b>
+<b class="nc">&nbsp;		for (ConfigDataLoader&lt;?&gt; loader : loaders) {</b>
+<b class="nc">&nbsp;			resourceTypes.add(getResourceType(loader));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return Collections.unmodifiableList(resourceTypes);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Class&lt;?&gt; getResourceType(ConfigDataLoader&lt;?&gt; loader) {
+<b class="nc">&nbsp;		return ResolvableType.forClass(loader.getClass()).as(ConfigDataLoader.class).resolveGeneric();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Load {@link ConfigData} using the first appropriate {@link ConfigDataLoader}.
+&nbsp;	 * @param &lt;R&gt; the resource type
+&nbsp;	 * @param context the loader context
+&nbsp;	 * @param resource the resource to load
+&nbsp;	 * @return the loaded {@link ConfigData}
+&nbsp;	 * @throws IOException on IO error
+&nbsp;	 */
+&nbsp;	&lt;R extends ConfigDataResource&gt; ConfigData load(ConfigDataLoaderContext context, R resource) throws IOException {
+<b class="nc">&nbsp;		ConfigDataLoader&lt;R&gt; loader = getLoader(context, resource);</b>
+<b class="nc">&nbsp;		this.logger.trace(LogMessage.of(() -&gt; &quot;Loading &quot; + resource + &quot; using loader &quot; + loader.getClass().getName()));</b>
+<b class="nc">&nbsp;		return loader.load(context, resource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private &lt;R extends ConfigDataResource&gt; ConfigDataLoader&lt;R&gt; getLoader(ConfigDataLoaderContext context, R resource) {
+<b class="nc">&nbsp;		ConfigDataLoader&lt;R&gt; result = null;</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; this.loaders.size(); i++) {</b>
+<b class="nc">&nbsp;			ConfigDataLoader&lt;R&gt; candidate = this.loaders.get(i);</b>
+<b class="nc">&nbsp;			if (this.resourceTypes.get(i).isInstance(resource)) {</b>
+<b class="nc">&nbsp;				if (candidate.isLoadable(context, resource)) {</b>
+<b class="nc">&nbsp;					if (result != null) {</b>
+<b class="nc">&nbsp;						throw new IllegalStateException(&quot;Multiple loaders found for resource &#39;&quot; + resource + &quot;&#39; [&quot;</b>
+<b class="nc">&nbsp;								+ candidate.getClass().getName() + &quot;,&quot; + result.getClass().getName() + &quot;]&quot;);</b>
+&nbsp;					}
+<b class="nc">&nbsp;					result = candidate;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		Assert.state(result != null, () -&gt; &quot;No loader found for resource &#39;&quot; + resource + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

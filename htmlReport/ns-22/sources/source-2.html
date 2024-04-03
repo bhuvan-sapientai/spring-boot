@@ -1,0 +1,367 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigurationWarningsApplicationContextInitializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigurationWarningsApplicationContextInitializer (org.springframework.boot.context)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigurationWarningsApplicationContextInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConfigurationWarningsApplicationContextInitializer$Check</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationWarningsApplicationContextInitializer$ComponentScanPackageCheck</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConfigurationWarningsApplicationContextInitializer$ConfigurationWarningsPostProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+&nbsp;import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+&nbsp;import org.springframework.context.ApplicationContextInitializer;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.annotation.ComponentScan;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.PriorityOrdered;
+&nbsp;import org.springframework.core.annotation.AnnotationAttributes;
+&nbsp;import org.springframework.core.type.AnnotationMetadata;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ApplicationContextInitializer} to report warnings for common misconfiguration
+&nbsp; * mistakes.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.2.0
+&nbsp; */
+<b class="nc">&nbsp;public class ConfigurationWarningsApplicationContextInitializer</b>
+&nbsp;		implements ApplicationContextInitializer&lt;ConfigurableApplicationContext&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ConfigurationWarningsApplicationContextInitializer.class);</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void initialize(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;		context.addBeanFactoryPostProcessor(new ConfigurationWarningsPostProcessor(getChecks()));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the checks that should be applied.
+&nbsp;	 * @return the checks to apply
+&nbsp;	 */
+&nbsp;	protected Check[] getChecks() {
+<b class="nc">&nbsp;		return new Check[] { new ComponentScanPackageCheck() };</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link BeanDefinitionRegistryPostProcessor} to report warnings.
+&nbsp;	 */
+&nbsp;	protected static final class ConfigurationWarningsPostProcessor
+&nbsp;			implements PriorityOrdered, BeanDefinitionRegistryPostProcessor {
+&nbsp;
+&nbsp;		private final Check[] checks;
+&nbsp;
+<b class="nc">&nbsp;		public ConfigurationWarningsPostProcessor(Check[] checks) {</b>
+<b class="nc">&nbsp;			this.checks = checks;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int getOrder() {
+<b class="nc">&nbsp;			return Ordered.LOWEST_PRECEDENCE - 1;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;		}</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+<b class="nc">&nbsp;			for (Check check : this.checks) {</b>
+<b class="nc">&nbsp;				String message = check.getWarning(registry);</b>
+<b class="nc">&nbsp;				if (StringUtils.hasLength(message)) {</b>
+<b class="nc">&nbsp;					warn(message);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		private void warn(String message) {
+<b class="nc">&nbsp;			if (logger.isWarnEnabled()) {</b>
+<b class="nc">&nbsp;				logger.warn(String.format(&quot;%n%n** WARNING ** : %s%n%n&quot;, message));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A single check that can be applied.
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	protected interface Check {
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Returns a warning if the check fails or {@code null} if there are no problems.
+&nbsp;		 * @param registry the {@link BeanDefinitionRegistry}
+&nbsp;		 * @return a warning message or {@code null}
+&nbsp;		 */
+&nbsp;		String getWarning(BeanDefinitionRegistry registry);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Check} for {@code @ComponentScan} on problematic package.
+&nbsp;	 */
+<b class="nc">&nbsp;	protected static class ComponentScanPackageCheck implements Check {</b>
+&nbsp;
+&nbsp;		private static final Set&lt;String&gt; PROBLEM_PACKAGES;
+&nbsp;
+&nbsp;		static {
+<b class="nc">&nbsp;			Set&lt;String&gt; packages = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			packages.add(&quot;org.springframework&quot;);</b>
+<b class="nc">&nbsp;			packages.add(&quot;org&quot;);</b>
+<b class="nc">&nbsp;			PROBLEM_PACKAGES = Collections.unmodifiableSet(packages);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getWarning(BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;			Set&lt;String&gt; scannedPackages = getComponentScanningPackages(registry);</b>
+<b class="nc">&nbsp;			List&lt;String&gt; problematicPackages = getProblematicPackages(scannedPackages);</b>
+<b class="nc">&nbsp;			if (problematicPackages.isEmpty()) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return &quot;Your ApplicationContext is unlikely to start due to a @ComponentScan of &quot;</b>
+<b class="nc">&nbsp;					+ StringUtils.collectionToDelimitedString(problematicPackages, &quot;, &quot;) + &quot;.&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		protected Set&lt;String&gt; getComponentScanningPackages(BeanDefinitionRegistry registry) {
+<b class="nc">&nbsp;			Set&lt;String&gt; packages = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			String[] names = registry.getBeanDefinitionNames();</b>
+<b class="nc">&nbsp;			for (String name : names) {</b>
+<b class="nc">&nbsp;				BeanDefinition definition = registry.getBeanDefinition(name);</b>
+<b class="nc">&nbsp;				if (definition instanceof AnnotatedBeanDefinition annotatedDefinition) {</b>
+<b class="nc">&nbsp;					addComponentScanningPackages(packages, annotatedDefinition.getMetadata());</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return packages;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addComponentScanningPackages(Set&lt;String&gt; packages, AnnotationMetadata metadata) {
+<b class="nc">&nbsp;			AnnotationAttributes attributes = AnnotationAttributes</b>
+<b class="nc">&nbsp;				.fromMap(metadata.getAnnotationAttributes(ComponentScan.class.getName(), true));</b>
+<b class="nc">&nbsp;			if (attributes != null) {</b>
+<b class="nc">&nbsp;				addPackages(packages, attributes.getStringArray(&quot;value&quot;));</b>
+<b class="nc">&nbsp;				addPackages(packages, attributes.getStringArray(&quot;basePackages&quot;));</b>
+<b class="nc">&nbsp;				addClasses(packages, attributes.getStringArray(&quot;basePackageClasses&quot;));</b>
+<b class="nc">&nbsp;				if (packages.isEmpty()) {</b>
+<b class="nc">&nbsp;					packages.add(ClassUtils.getPackageName(metadata.getClassName()));</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addPackages(Set&lt;String&gt; packages, String[] values) {
+<b class="nc">&nbsp;			if (values != null) {</b>
+<b class="nc">&nbsp;				Collections.addAll(packages, values);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private void addClasses(Set&lt;String&gt; packages, String[] values) {
+<b class="nc">&nbsp;			if (values != null) {</b>
+<b class="nc">&nbsp;				for (String value : values) {</b>
+<b class="nc">&nbsp;					packages.add(ClassUtils.getPackageName(value));</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private List&lt;String&gt; getProblematicPackages(Set&lt;String&gt; scannedPackages) {
+<b class="nc">&nbsp;			List&lt;String&gt; problematicPackages = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (String scannedPackage : scannedPackages) {</b>
+<b class="nc">&nbsp;				if (isProblematicPackage(scannedPackage)) {</b>
+<b class="nc">&nbsp;					problematicPackages.add(getDisplayName(scannedPackage));</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return problematicPackages;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isProblematicPackage(String scannedPackage) {
+<b class="nc">&nbsp;			if (scannedPackage == null || scannedPackage.isEmpty()) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return PROBLEM_PACKAGES.contains(scannedPackage);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getDisplayName(String scannedPackage) {
+<b class="nc">&nbsp;			if (scannedPackage == null || scannedPackage.isEmpty()) {</b>
+<b class="nc">&nbsp;				return &quot;the default package&quot;;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return &quot;&#39;&quot; + scannedPackage + &quot;&#39;&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

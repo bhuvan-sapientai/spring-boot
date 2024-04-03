@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConfigDataLocation</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.config</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigDataLocation (org.springframework.boot.context.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigDataLocation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.config;
+&nbsp;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.OriginProvider;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A user specified location that can be {@link ConfigDataLocationResolver resolved} to
+&nbsp; * one or more {@link ConfigDataResource config data resources}. A
+&nbsp; * {@link ConfigDataLocation} is a simple wrapper around a {@link String} value. The exact
+&nbsp; * format of the value will depend on the underlying technology, but is usually a URL like
+&nbsp; * syntax consisting of a prefix and path. For example, {@code crypt:somehost/somepath}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Locations can be mandatory or {@link #isOptional() optional}. Optional locations are
+&nbsp; * prefixed with {@code optional:}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.4.0
+&nbsp; */
+&nbsp;public final class ConfigDataLocation implements OriginProvider {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Prefix used to indicate that a {@link ConfigDataResource} is optional.
+&nbsp;	 */
+&nbsp;	public static final String OPTIONAL_PREFIX = &quot;optional:&quot;;
+&nbsp;
+&nbsp;	private final boolean optional;
+&nbsp;
+&nbsp;	private final String value;
+&nbsp;
+&nbsp;	private final Origin origin;
+&nbsp;
+<b class="nc">&nbsp;	private ConfigDataLocation(boolean optional, String value, Origin origin) {</b>
+<b class="nc">&nbsp;		this.value = value;</b>
+<b class="nc">&nbsp;		this.optional = optional;</b>
+<b class="nc">&nbsp;		this.origin = origin;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if the location is optional and should ignore
+&nbsp;	 * {@link ConfigDataNotFoundException}.
+&nbsp;	 * @return if the location is optional
+&nbsp;	 */
+&nbsp;	public boolean isOptional() {
+<b class="nc">&nbsp;		return this.optional;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the value of the location (always excluding any user specified
+&nbsp;	 * {@code optional:} prefix).
+&nbsp;	 * @return the location value
+&nbsp;	 */
+&nbsp;	public String getValue() {
+<b class="nc">&nbsp;		return this.value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return if {@link #getValue()} has the specified prefix.
+&nbsp;	 * @param prefix the prefix to check
+&nbsp;	 * @return if the value has the prefix
+&nbsp;	 */
+&nbsp;	public boolean hasPrefix(String prefix) {
+<b class="nc">&nbsp;		return this.value.startsWith(prefix);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return {@link #getValue()} with the specified prefix removed. If the location does
+&nbsp;	 * not have the given prefix then the {@link #getValue()} is returned unchanged.
+&nbsp;	 * @param prefix the prefix to check
+&nbsp;	 * @return the value with the prefix removed
+&nbsp;	 */
+&nbsp;	public String getNonPrefixedValue(String prefix) {
+<b class="nc">&nbsp;		if (hasPrefix(prefix)) {</b>
+<b class="nc">&nbsp;			return this.value.substring(prefix.length());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Origin getOrigin() {
+<b class="nc">&nbsp;		return this.origin;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an array of {@link ConfigDataLocation} elements built by splitting this
+&nbsp;	 * {@link ConfigDataLocation} around a delimiter of {@code &quot;;&quot;}.
+&nbsp;	 * @return the split locations
+&nbsp;	 * @since 2.4.7
+&nbsp;	 */
+&nbsp;	public ConfigDataLocation[] split() {
+<b class="nc">&nbsp;		return split(&quot;;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an array of {@link ConfigDataLocation} elements built by splitting this
+&nbsp;	 * {@link ConfigDataLocation} around the specified delimiter.
+&nbsp;	 * @param delimiter the delimiter to split on
+&nbsp;	 * @return the split locations
+&nbsp;	 * @since 2.4.7
+&nbsp;	 */
+&nbsp;	public ConfigDataLocation[] split(String delimiter) {
+<b class="nc">&nbsp;		String[] values = StringUtils.delimitedListToStringArray(toString(), delimiter);</b>
+<b class="nc">&nbsp;		ConfigDataLocation[] result = new ConfigDataLocation[values.length];</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; values.length; i++) {</b>
+<b class="nc">&nbsp;			result[i] = of(values[i]).withOrigin(getOrigin());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		ConfigDataLocation other = (ConfigDataLocation) obj;</b>
+<b class="nc">&nbsp;		return this.value.equals(other.value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return this.value.hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return (!this.optional) ? this.value : OPTIONAL_PREFIX + this.value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link ConfigDataLocation} with a specific {@link Origin}.
+&nbsp;	 * @param origin the origin to set
+&nbsp;	 * @return a new {@link ConfigDataLocation} instance.
+&nbsp;	 */
+&nbsp;	ConfigDataLocation withOrigin(Origin origin) {
+<b class="nc">&nbsp;		return new ConfigDataLocation(this.optional, this.value, origin);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method to create a new {@link ConfigDataLocation} from a string.
+&nbsp;	 * @param location the location string
+&nbsp;	 * @return a {@link ConfigDataLocation} instance or {@code null} if no location was
+&nbsp;	 * provided
+&nbsp;	 */
+&nbsp;	public static ConfigDataLocation of(String location) {
+<b class="nc">&nbsp;		boolean optional = location != null &amp;&amp; location.startsWith(OPTIONAL_PREFIX);</b>
+<b class="nc">&nbsp;		String value = (!optional) ? location : location.substring(OPTIONAL_PREFIX.length());</b>
+<b class="nc">&nbsp;		if (!StringUtils.hasText(value)) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new ConfigDataLocation(optional, value, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

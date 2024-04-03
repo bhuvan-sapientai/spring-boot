@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LazyInitializationBeanFactoryPostProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot</a>
+</div>
+
+<h1>Coverage Summary for Class: LazyInitializationBeanFactoryPostProcessor (org.springframework.boot)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LazyInitializationBeanFactoryPostProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+&nbsp;import org.springframework.beans.factory.SmartInitializingSingleton;
+&nbsp;import org.springframework.beans.factory.config.BeanDefinition;
+&nbsp;import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.AbstractBeanDefinition;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link BeanFactoryPostProcessor} to set lazy-init on bean definitions that are not
+&nbsp; * {@link LazyInitializationExcludeFilter excluded} and have not already had a value
+&nbsp; * explicitly set.
+&nbsp; * &lt;p&gt;
+&nbsp; * Note that {@link SmartInitializingSingleton SmartInitializingSingletons} are
+&nbsp; * automatically excluded from lazy initialization to ensure that their
+&nbsp; * {@link SmartInitializingSingleton#afterSingletonsInstantiated() callback method} is
+&nbsp; * invoked.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Tyler Van Gorder
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.2.0
+&nbsp; * @see LazyInitializationExcludeFilter
+&nbsp; */
+<b class="nc">&nbsp;public final class LazyInitializationBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+<b class="nc">&nbsp;		Collection&lt;LazyInitializationExcludeFilter&gt; filters = getFilters(beanFactory);</b>
+<b class="nc">&nbsp;		for (String beanName : beanFactory.getBeanDefinitionNames()) {</b>
+<b class="nc">&nbsp;			BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);</b>
+<b class="nc">&nbsp;			if (beanDefinition instanceof AbstractBeanDefinition abstractBeanDefinition) {</b>
+<b class="nc">&nbsp;				postProcess(beanFactory, filters, beanName, abstractBeanDefinition);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Collection&lt;LazyInitializationExcludeFilter&gt; getFilters(ConfigurableListableBeanFactory beanFactory) {
+&nbsp;		// Take care not to force the eager init of factory beans when getting filters
+<b class="nc">&nbsp;		ArrayList&lt;LazyInitializationExcludeFilter&gt; filters = new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;				beanFactory.getBeansOfType(LazyInitializationExcludeFilter.class, false, false).values());</b>
+<b class="nc">&nbsp;		filters.add(LazyInitializationExcludeFilter.forBeanTypes(SmartInitializingSingleton.class));</b>
+<b class="nc">&nbsp;		return filters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void postProcess(ConfigurableListableBeanFactory beanFactory,
+&nbsp;			Collection&lt;LazyInitializationExcludeFilter&gt; filters, String beanName,
+&nbsp;			AbstractBeanDefinition beanDefinition) {
+<b class="nc">&nbsp;		Boolean lazyInit = beanDefinition.getLazyInit();</b>
+<b class="nc">&nbsp;		if (lazyInit != null) {</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		Class&lt;?&gt; beanType = getBeanType(beanFactory, beanName);</b>
+<b class="nc">&nbsp;		if (!isExcluded(filters, beanName, beanDefinition, beanType)) {</b>
+<b class="nc">&nbsp;			beanDefinition.setLazyInit(true);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Class&lt;?&gt; getBeanType(ConfigurableListableBeanFactory beanFactory, String beanName) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return beanFactory.getType(beanName, false);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (NoSuchBeanDefinitionException ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isExcluded(Collection&lt;LazyInitializationExcludeFilter&gt; filters, String beanName,
+&nbsp;			AbstractBeanDefinition beanDefinition, Class&lt;?&gt; beanType) {
+<b class="nc">&nbsp;		if (beanType != null) {</b>
+<b class="nc">&nbsp;			for (LazyInitializationExcludeFilter filter : filters) {</b>
+<b class="nc">&nbsp;				if (filter.isExcluded(beanName, beanDefinition, beanType)) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return Ordered.HIGHEST_PRECEDENCE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,338 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AnsiPropertySource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.ansi</a>
+</div>
+
+<h1>Coverage Summary for Class: AnsiPropertySource (org.springframework.boot.ansi)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AnsiPropertySource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AnsiPropertySource$Ansi8BitColorMapping</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AnsiPropertySource$EnumMapping</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AnsiPropertySource$Mapping</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.ansi;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.IntFunction;
+&nbsp;
+&nbsp;import org.springframework.core.env.PropertyResolver;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link PropertyResolver} for {@link AnsiStyle}, {@link AnsiColor},
+&nbsp; * {@link AnsiBackground} and {@link Ansi8BitColor} elements. Supports properties of the
+&nbsp; * form {@code AnsiStyle.BOLD}, {@code AnsiColor.RED} or {@code AnsiBackground.GREEN}.
+&nbsp; * Also supports a prefix of {@code Ansi.} which is an aggregation of everything (with
+&nbsp; * background colors prefixed {@code BG_}).
+&nbsp; * &lt;p&gt;
+&nbsp; * ANSI 8-bit color codes can be used with {@code AnsiColor} and {@code AnsiBackground}.
+&nbsp; * For example, {@code AnsiColor.208} will render orange text.
+&nbsp; * &lt;a href=&quot;https://en.wikipedia.org/wiki/ANSI_escape_code&quot;&gt;Wikipedia&lt;/a&gt; has a complete
+&nbsp; * list of the 8-bit color codes that can be used.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Toshiaki Maki
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;public class AnsiPropertySource extends PropertySource&lt;AnsiElement&gt; {
+&nbsp;
+&nbsp;	private static final Iterable&lt;Mapping&gt; MAPPINGS;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		List&lt;Mapping&gt; mappings = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		mappings.add(new EnumMapping&lt;&gt;(&quot;AnsiStyle.&quot;, AnsiStyle.class));</b>
+<b class="nc">&nbsp;		mappings.add(new EnumMapping&lt;&gt;(&quot;AnsiColor.&quot;, AnsiColor.class));</b>
+<b class="nc">&nbsp;		mappings.add(new Ansi8BitColorMapping(&quot;AnsiColor.&quot;, Ansi8BitColor::foreground));</b>
+<b class="nc">&nbsp;		mappings.add(new EnumMapping&lt;&gt;(&quot;AnsiBackground.&quot;, AnsiBackground.class));</b>
+<b class="nc">&nbsp;		mappings.add(new Ansi8BitColorMapping(&quot;AnsiBackground.&quot;, Ansi8BitColor::background));</b>
+<b class="nc">&nbsp;		mappings.add(new EnumMapping&lt;&gt;(&quot;Ansi.&quot;, AnsiStyle.class));</b>
+<b class="nc">&nbsp;		mappings.add(new EnumMapping&lt;&gt;(&quot;Ansi.&quot;, AnsiColor.class));</b>
+<b class="nc">&nbsp;		mappings.add(new EnumMapping&lt;&gt;(&quot;Ansi.BG_&quot;, AnsiBackground.class));</b>
+<b class="nc">&nbsp;		MAPPINGS = Collections.unmodifiableList(mappings);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final boolean encode;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link AnsiPropertySource} instance.
+&nbsp;	 * @param name the name of the property source
+&nbsp;	 * @param encode if the output should be encoded
+&nbsp;	 */
+&nbsp;	public AnsiPropertySource(String name, boolean encode) {
+<b class="nc">&nbsp;		super(name);</b>
+<b class="nc">&nbsp;		this.encode = encode;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object getProperty(String name) {
+<b class="nc">&nbsp;		if (StringUtils.hasLength(name)) {</b>
+<b class="nc">&nbsp;			for (Mapping mapping : MAPPINGS) {</b>
+<b class="nc">&nbsp;				String prefix = mapping.getPrefix();</b>
+<b class="nc">&nbsp;				if (name.startsWith(prefix)) {</b>
+<b class="nc">&nbsp;					String postfix = name.substring(prefix.length());</b>
+<b class="nc">&nbsp;					AnsiElement element = mapping.getElement(postfix);</b>
+<b class="nc">&nbsp;					if (element != null) {</b>
+<b class="nc">&nbsp;						return (this.encode) ? AnsiOutput.encode(element) : element;</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Mapping between a name and the pseudo property source.
+&nbsp;	 */
+&nbsp;	private abstract static class Mapping {
+&nbsp;
+&nbsp;		private final String prefix;
+&nbsp;
+<b class="nc">&nbsp;		Mapping(String prefix) {</b>
+<b class="nc">&nbsp;			this.prefix = prefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		String getPrefix() {
+<b class="nc">&nbsp;			return this.prefix;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		abstract AnsiElement getElement(String postfix);
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Mapping} for {@link AnsiElement} enums.
+&nbsp;	 */
+&nbsp;	private static class EnumMapping&lt;E extends Enum&lt;E&gt; &amp; AnsiElement&gt; extends Mapping {
+&nbsp;
+&nbsp;		private final Set&lt;E&gt; enums;
+&nbsp;
+&nbsp;		EnumMapping(String prefix, Class&lt;E&gt; enumType) {
+<b class="nc">&nbsp;			super(prefix);</b>
+<b class="nc">&nbsp;			this.enums = EnumSet.allOf(enumType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		AnsiElement getElement(String postfix) {
+<b class="nc">&nbsp;			for (Enum&lt;?&gt; candidate : this.enums) {</b>
+<b class="nc">&nbsp;				if (candidate.name().equals(postfix)) {</b>
+<b class="nc">&nbsp;					return (AnsiElement) candidate;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link Mapping} for {@link Ansi8BitColor}.
+&nbsp;	 */
+&nbsp;	private static class Ansi8BitColorMapping extends Mapping {
+&nbsp;
+&nbsp;		private final IntFunction&lt;Ansi8BitColor&gt; factory;
+&nbsp;
+&nbsp;		Ansi8BitColorMapping(String prefix, IntFunction&lt;Ansi8BitColor&gt; factory) {
+<b class="nc">&nbsp;			super(prefix);</b>
+<b class="nc">&nbsp;			this.factory = factory;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		AnsiElement getElement(String postfix) {
+<b class="nc">&nbsp;			if (containsOnlyDigits(postfix)) {</b>
+&nbsp;				try {
+<b class="nc">&nbsp;					return this.factory.apply(Integer.parseInt(postfix));</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (IllegalArgumentException ex) {</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean containsOnlyDigits(String postfix) {
+<b class="nc">&nbsp;			for (int i = 0; i &lt; postfix.length(); i++) {</b>
+<b class="nc">&nbsp;				if (!Character.isDigit(postfix.charAt(i))) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return !postfix.isEmpty();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

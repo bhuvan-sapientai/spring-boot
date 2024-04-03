@@ -1,0 +1,300 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PemSslStore</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.ssl.pem</a>
+</div>
+
+<h1>Coverage Summary for Class: PemSslStore (org.springframework.boot.ssl.pem)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PemSslStore</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PemSslStore$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.ssl.pem;
+&nbsp;
+&nbsp;import java.security.KeyStore;
+&nbsp;import java.security.PrivateKey;
+&nbsp;import java.security.cert.X509Certificate;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * An individual trust or key store that has been loaded from PEM content.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.2.0
+&nbsp; * @see PemSslStoreDetails
+&nbsp; * @see PemContent
+&nbsp; */
+&nbsp;public interface PemSslStore {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The key store type, for example {@code JKS} or {@code PKCS11}. A {@code null} value
+&nbsp;	 * will use {@link KeyStore#getDefaultType()}).
+&nbsp;	 * @return the key store type
+&nbsp;	 */
+&nbsp;	String type();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The alias used when setting entries in the {@link KeyStore}.
+&nbsp;	 * @return the alias
+&nbsp;	 */
+&nbsp;	String alias();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The password used when
+&nbsp;	 * {@link KeyStore#setKeyEntry(String, java.security.Key, char[], java.security.cert.Certificate[])
+&nbsp;	 * setting key entries} in the {@link KeyStore}.
+&nbsp;	 * @return the password
+&nbsp;	 */
+&nbsp;	String password();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The certificates for this store. When a {@link #privateKey() private key} is
+&nbsp;	 * present the returned value is treated as a certificate chain, otherwise it is
+&nbsp;	 * treated a list of certificates that should all be registered.
+&nbsp;	 * @return the X509 certificates
+&nbsp;	 */
+&nbsp;	List&lt;X509Certificate&gt; certificates();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The private key for this store or {@code null}.
+&nbsp;	 * @return the private key
+&nbsp;	 */
+&nbsp;	PrivateKey privateKey();
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PemSslStore} instance with a new alias.
+&nbsp;	 * @param alias the new alias
+&nbsp;	 * @return a new {@link PemSslStore} instance
+&nbsp;	 */
+&nbsp;	default PemSslStore withAlias(String alias) {
+<b class="nc">&nbsp;		return of(type(), alias, password(), certificates(), privateKey());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a new {@link PemSslStore} instance with a new password.
+&nbsp;	 * @param password the new password
+&nbsp;	 * @return a new {@link PemSslStore} instance
+&nbsp;	 */
+&nbsp;	default PemSslStore withPassword(String password) {
+<b class="nc">&nbsp;		return of(type(), alias(), password, certificates(), privateKey());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a {@link PemSslStore} instance loaded using the given
+&nbsp;	 * {@link PemSslStoreDetails}.
+&nbsp;	 * @param details the PEM store details
+&nbsp;	 * @return a loaded {@link PemSslStore} or {@code null}.
+&nbsp;	 */
+&nbsp;	static PemSslStore load(PemSslStoreDetails details) {
+<b class="nc">&nbsp;		if (details == null || details.isEmpty()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new LoadedPemSslStore(details);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method that can be used to create a new {@link PemSslStore} with the given
+&nbsp;	 * values.
+&nbsp;	 * @param type the key store type
+&nbsp;	 * @param certificates the certificates for this store
+&nbsp;	 * @param privateKey the private key
+&nbsp;	 * @return a new {@link PemSslStore} instance
+&nbsp;	 */
+&nbsp;	static PemSslStore of(String type, List&lt;X509Certificate&gt; certificates, PrivateKey privateKey) {
+<b class="nc">&nbsp;		return of(type, null, null, certificates, privateKey);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method that can be used to create a new {@link PemSslStore} with the given
+&nbsp;	 * values.
+&nbsp;	 * @param certificates the certificates for this store
+&nbsp;	 * @param privateKey the private key
+&nbsp;	 * @return a new {@link PemSslStore} instance
+&nbsp;	 */
+&nbsp;	static PemSslStore of(List&lt;X509Certificate&gt; certificates, PrivateKey privateKey) {
+<b class="nc">&nbsp;		return of(null, null, null, certificates, privateKey);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Factory method that can be used to create a new {@link PemSslStore} with the given
+&nbsp;	 * values.
+&nbsp;	 * @param type the key store type
+&nbsp;	 * @param alias the alias used when setting entries in the {@link KeyStore}
+&nbsp;	 * @param password the password used
+&nbsp;	 * {@link KeyStore#setKeyEntry(String, java.security.Key, char[], java.security.cert.Certificate[])
+&nbsp;	 * setting key entries} in the {@link KeyStore}
+&nbsp;	 * @param certificates the certificates for this store
+&nbsp;	 * @param privateKey the private key
+&nbsp;	 * @return a new {@link PemSslStore} instance
+&nbsp;	 */
+&nbsp;	static PemSslStore of(String type, String alias, String password, List&lt;X509Certificate&gt; certificates,
+&nbsp;			PrivateKey privateKey) {
+<b class="nc">&nbsp;		Assert.notEmpty(certificates, &quot;Certificates must not be empty&quot;);</b>
+<b class="nc">&nbsp;		return new PemSslStore() {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public String type() {
+<b class="nc">&nbsp;				return type;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public String alias() {
+<b class="nc">&nbsp;				return alias;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public String password() {
+<b class="nc">&nbsp;				return password;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public List&lt;X509Certificate&gt; certificates() {
+<b class="nc">&nbsp;				return certificates;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public PrivateKey privateKey() {
+<b class="nc">&nbsp;				return privateKey;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

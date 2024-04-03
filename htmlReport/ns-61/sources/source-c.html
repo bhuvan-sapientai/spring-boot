@@ -1,0 +1,315 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UndertowWebServerFactoryDelegate</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.undertow</a>
+</div>
+
+<h1>Coverage Summary for Class: UndertowWebServerFactoryDelegate (org.springframework.boot.web.embedded.undertow)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UndertowWebServerFactoryDelegate</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.undertow;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.net.InetAddress;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import io.undertow.Handlers;
+&nbsp;import io.undertow.Undertow;
+&nbsp;import io.undertow.Undertow.Builder;
+&nbsp;import io.undertow.UndertowOptions;
+&nbsp;
+&nbsp;import org.springframework.boot.ssl.SslBundle;
+&nbsp;import org.springframework.boot.web.server.AbstractConfigurableWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.Compression;
+&nbsp;import org.springframework.boot.web.server.Http2;
+&nbsp;import org.springframework.boot.web.server.Shutdown;
+&nbsp;import org.springframework.boot.web.server.Ssl;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Delegate class used by {@link UndertowServletWebServerFactory} and
+&nbsp; * {@link UndertowReactiveWebServerFactory}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;class UndertowWebServerFactoryDelegate {</b>
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;UndertowBuilderCustomizer&gt; builderCustomizers = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private Integer bufferSize;
+&nbsp;
+&nbsp;	private Integer ioThreads;
+&nbsp;
+&nbsp;	private Integer workerThreads;
+&nbsp;
+&nbsp;	private Boolean directBuffers;
+&nbsp;
+&nbsp;	private File accessLogDirectory;
+&nbsp;
+&nbsp;	private String accessLogPattern;
+&nbsp;
+&nbsp;	private String accessLogPrefix;
+&nbsp;
+&nbsp;	private String accessLogSuffix;
+&nbsp;
+<b class="nc">&nbsp;	private boolean accessLogEnabled = false;</b>
+&nbsp;
+<b class="nc">&nbsp;	private boolean accessLogRotate = true;</b>
+&nbsp;
+&nbsp;	private boolean useForwardHeaders;
+&nbsp;
+&nbsp;	void setBuilderCustomizers(Collection&lt;? extends UndertowBuilderCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.builderCustomizers = new LinkedHashSet&lt;&gt;(customizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void addBuilderCustomizers(UndertowBuilderCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.builderCustomizers.addAll(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Collection&lt;UndertowBuilderCustomizer&gt; getBuilderCustomizers() {
+<b class="nc">&nbsp;		return this.builderCustomizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setBufferSize(Integer bufferSize) {
+<b class="nc">&nbsp;		this.bufferSize = bufferSize;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setIoThreads(Integer ioThreads) {
+<b class="nc">&nbsp;		this.ioThreads = ioThreads;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setWorkerThreads(Integer workerThreads) {
+<b class="nc">&nbsp;		this.workerThreads = workerThreads;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setUseDirectBuffers(Boolean directBuffers) {
+<b class="nc">&nbsp;		this.directBuffers = directBuffers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setAccessLogDirectory(File accessLogDirectory) {
+<b class="nc">&nbsp;		this.accessLogDirectory = accessLogDirectory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setAccessLogPattern(String accessLogPattern) {
+<b class="nc">&nbsp;		this.accessLogPattern = accessLogPattern;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setAccessLogPrefix(String accessLogPrefix) {
+<b class="nc">&nbsp;		this.accessLogPrefix = accessLogPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getAccessLogPrefix() {
+<b class="nc">&nbsp;		return this.accessLogPrefix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setAccessLogSuffix(String accessLogSuffix) {
+<b class="nc">&nbsp;		this.accessLogSuffix = accessLogSuffix;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setAccessLogEnabled(boolean accessLogEnabled) {
+<b class="nc">&nbsp;		this.accessLogEnabled = accessLogEnabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isAccessLogEnabled() {
+<b class="nc">&nbsp;		return this.accessLogEnabled;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setAccessLogRotate(boolean accessLogRotate) {
+<b class="nc">&nbsp;		this.accessLogRotate = accessLogRotate;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void setUseForwardHeaders(boolean useForwardHeaders) {
+<b class="nc">&nbsp;		this.useForwardHeaders = useForwardHeaders;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	boolean isUseForwardHeaders() {
+<b class="nc">&nbsp;		return this.useForwardHeaders;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Builder createBuilder(AbstractConfigurableWebServerFactory factory, Supplier&lt;SslBundle&gt; sslBundleSupplier) {
+<b class="nc">&nbsp;		InetAddress address = factory.getAddress();</b>
+<b class="nc">&nbsp;		int port = factory.getPort();</b>
+<b class="nc">&nbsp;		Builder builder = Undertow.builder();</b>
+<b class="nc">&nbsp;		if (this.bufferSize != null) {</b>
+<b class="nc">&nbsp;			builder.setBufferSize(this.bufferSize);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.ioThreads != null) {</b>
+<b class="nc">&nbsp;			builder.setIoThreads(this.ioThreads);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.workerThreads != null) {</b>
+<b class="nc">&nbsp;			builder.setWorkerThreads(this.workerThreads);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.directBuffers != null) {</b>
+<b class="nc">&nbsp;			builder.setDirectBuffers(this.directBuffers);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Http2 http2 = factory.getHttp2();</b>
+<b class="nc">&nbsp;		if (http2 != null) {</b>
+<b class="nc">&nbsp;			builder.setServerOption(UndertowOptions.ENABLE_HTTP2, http2.isEnabled());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Ssl ssl = factory.getSsl();</b>
+<b class="nc">&nbsp;		if (Ssl.isEnabled(ssl)) {</b>
+<b class="nc">&nbsp;			new SslBuilderCustomizer(factory.getPort(), address, ssl.getClientAuth(), sslBundleSupplier.get())</b>
+<b class="nc">&nbsp;				.customize(builder);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			builder.addHttpListener(port, (address != null) ? address.getHostAddress() : &quot;0.0.0.0&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		builder.setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 0);</b>
+<b class="nc">&nbsp;		for (UndertowBuilderCustomizer customizer : this.builderCustomizers) {</b>
+<b class="nc">&nbsp;			customizer.customize(builder);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return builder;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	List&lt;HttpHandlerFactory&gt; createHttpHandlerFactories(AbstractConfigurableWebServerFactory webServerFactory,
+&nbsp;			HttpHandlerFactory... initialHttpHandlerFactories) {
+<b class="nc">&nbsp;		List&lt;HttpHandlerFactory&gt; factories = createHttpHandlerFactories(webServerFactory.getCompression(),</b>
+<b class="nc">&nbsp;				this.useForwardHeaders, webServerFactory.getServerHeader(), webServerFactory.getShutdown(),</b>
+&nbsp;				initialHttpHandlerFactories);
+<b class="nc">&nbsp;		if (isAccessLogEnabled()) {</b>
+<b class="nc">&nbsp;			factories.add(new AccessLogHttpHandlerFactory(this.accessLogDirectory, this.accessLogPattern,</b>
+&nbsp;					this.accessLogPrefix, this.accessLogSuffix, this.accessLogRotate));
+&nbsp;		}
+<b class="nc">&nbsp;		return factories;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	static List&lt;HttpHandlerFactory&gt; createHttpHandlerFactories(Compression compression, boolean useForwardHeaders,
+&nbsp;			String serverHeader, Shutdown shutdown, HttpHandlerFactory... initialHttpHandlerFactories) {
+<b class="nc">&nbsp;		List&lt;HttpHandlerFactory&gt; factories = new ArrayList&lt;&gt;(Arrays.asList(initialHttpHandlerFactories));</b>
+<b class="nc">&nbsp;		if (compression != null &amp;&amp; compression.getEnabled()) {</b>
+<b class="nc">&nbsp;			factories.add(new CompressionHttpHandlerFactory(compression));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (useForwardHeaders) {</b>
+<b class="nc">&nbsp;			factories.add(Handlers::proxyPeerAddress);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasText(serverHeader)) {</b>
+<b class="nc">&nbsp;			factories.add((next) -&gt; Handlers.header(next, &quot;Server&quot;, serverHeader));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (shutdown == Shutdown.GRACEFUL) {</b>
+<b class="nc">&nbsp;			factories.add(Handlers::gracefulShutdown);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return factories;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

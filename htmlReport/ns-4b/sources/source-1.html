@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AliasKeyManagerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: AliasKeyManagerFactory (org.springframework.boot.ssl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AliasKeyManagerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AliasKeyManagerFactory$AliasKeyManagerFactorySpi</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AliasKeyManagerFactory$AliasX509ExtendedKeyManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.ssl;
+&nbsp;
+&nbsp;import java.net.Socket;
+&nbsp;import java.security.InvalidAlgorithmParameterException;
+&nbsp;import java.security.KeyStore;
+&nbsp;import java.security.KeyStoreException;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.security.Principal;
+&nbsp;import java.security.PrivateKey;
+&nbsp;import java.security.UnrecoverableKeyException;
+&nbsp;import java.security.cert.X509Certificate;
+&nbsp;import java.util.Arrays;
+&nbsp;
+&nbsp;import javax.net.ssl.KeyManager;
+&nbsp;import javax.net.ssl.KeyManagerFactory;
+&nbsp;import javax.net.ssl.KeyManagerFactorySpi;
+&nbsp;import javax.net.ssl.ManagerFactoryParameters;
+&nbsp;import javax.net.ssl.SSLEngine;
+&nbsp;import javax.net.ssl.X509ExtendedKeyManager;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link KeyManagerFactory} that allows a configurable key alias to be used. Due to the
+&nbsp; * fact that the actual calls to retrieve the key by alias are done at request time the
+&nbsp; * approach is to wrap the actual key managers with a {@link AliasX509ExtendedKeyManager}.
+&nbsp; * The actual SPI has to be wrapped as well due to the fact that
+&nbsp; * {@link KeyManagerFactory#getKeyManagers()} is final.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; */
+&nbsp;final class AliasKeyManagerFactory extends KeyManagerFactory {
+&nbsp;
+&nbsp;	AliasKeyManagerFactory(KeyManagerFactory delegate, String alias, String algorithm) {
+<b class="nc">&nbsp;		super(new AliasKeyManagerFactorySpi(delegate, alias), delegate.getProvider(), algorithm);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link KeyManagerFactorySpi} that allows a configurable key alias to be used.
+&nbsp;	 */
+&nbsp;	private static final class AliasKeyManagerFactorySpi extends KeyManagerFactorySpi {
+&nbsp;
+&nbsp;		private final KeyManagerFactory delegate;
+&nbsp;
+&nbsp;		private final String alias;
+&nbsp;
+<b class="nc">&nbsp;		private AliasKeyManagerFactorySpi(KeyManagerFactory delegate, String alias) {</b>
+<b class="nc">&nbsp;			this.delegate = delegate;</b>
+<b class="nc">&nbsp;			this.alias = alias;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected void engineInit(KeyStore keyStore, char[] chars)
+&nbsp;				throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
+<b class="nc">&nbsp;			this.delegate.init(keyStore, chars);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected void engineInit(ManagerFactoryParameters managerFactoryParameters)
+&nbsp;				throws InvalidAlgorithmParameterException {
+<b class="nc">&nbsp;			throw new InvalidAlgorithmParameterException(&quot;Unsupported ManagerFactoryParameters&quot;);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected KeyManager[] engineGetKeyManagers() {
+<b class="nc">&nbsp;			return Arrays.stream(this.delegate.getKeyManagers())</b>
+<b class="nc">&nbsp;				.filter(X509ExtendedKeyManager.class::isInstance)</b>
+<b class="nc">&nbsp;				.map(X509ExtendedKeyManager.class::cast)</b>
+<b class="nc">&nbsp;				.map(this::wrap)</b>
+<b class="nc">&nbsp;				.toArray(KeyManager[]::new);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private AliasKeyManagerFactory.AliasX509ExtendedKeyManager wrap(X509ExtendedKeyManager keyManager) {
+<b class="nc">&nbsp;			return new AliasX509ExtendedKeyManager(keyManager, this.alias);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link X509ExtendedKeyManager} that allows a configurable key alias to be used.
+&nbsp;	 */
+&nbsp;	static final class AliasX509ExtendedKeyManager extends X509ExtendedKeyManager {
+&nbsp;
+&nbsp;		private final X509ExtendedKeyManager delegate;
+&nbsp;
+&nbsp;		private final String alias;
+&nbsp;
+<b class="nc">&nbsp;		private AliasX509ExtendedKeyManager(X509ExtendedKeyManager keyManager, String alias) {</b>
+<b class="nc">&nbsp;			this.delegate = keyManager;</b>
+<b class="nc">&nbsp;			this.alias = alias;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String chooseEngineClientAlias(String[] strings, Principal[] principals, SSLEngine sslEngine) {
+<b class="nc">&nbsp;			return this.delegate.chooseEngineClientAlias(strings, principals, sslEngine);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String chooseEngineServerAlias(String s, Principal[] principals, SSLEngine sslEngine) {
+<b class="nc">&nbsp;			return this.alias;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+<b class="nc">&nbsp;			return this.delegate.chooseClientAlias(keyType, issuers, socket);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+<b class="nc">&nbsp;			return this.delegate.chooseServerAlias(keyType, issuers, socket);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public X509Certificate[] getCertificateChain(String alias) {
+<b class="nc">&nbsp;			return this.delegate.getCertificateChain(alias);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String[] getClientAliases(String keyType, Principal[] issuers) {
+<b class="nc">&nbsp;			return this.delegate.getClientAliases(keyType, issuers);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public PrivateKey getPrivateKey(String alias) {
+<b class="nc">&nbsp;			return this.delegate.getPrivateKey(alias);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String[] getServerAliases(String keyType, Principal[] issuers) {
+<b class="nc">&nbsp;			return this.delegate.getServerAliases(keyType, issuers);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,350 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertyDescriptorResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertyDescriptorResolver (org.springframework.boot.configurationprocessor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertyDescriptorResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PropertyDescriptorResolver$ConfigurationPropertiesTypeElement</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import javax.lang.model.element.AnnotationMirror;
+&nbsp;import javax.lang.model.element.ExecutableElement;
+&nbsp;import javax.lang.model.element.Modifier;
+&nbsp;import javax.lang.model.element.NestingKind;
+&nbsp;import javax.lang.model.element.TypeElement;
+&nbsp;import javax.lang.model.element.VariableElement;
+&nbsp;import javax.lang.model.type.TypeMirror;
+&nbsp;import javax.lang.model.util.ElementFilter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Resolve {@link PropertyDescriptor} instances.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class PropertyDescriptorResolver {
+&nbsp;
+&nbsp;	private final MetadataGenerationEnvironment environment;
+&nbsp;
+<b class="nc">&nbsp;	PropertyDescriptorResolver(MetadataGenerationEnvironment environment) {</b>
+<b class="nc">&nbsp;		this.environment = environment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the {@link PropertyDescriptor} instances that are valid candidates for the
+&nbsp;	 * specified {@link TypeElement type} based on the specified {@link ExecutableElement
+&nbsp;	 * factory method}, if any.
+&nbsp;	 * @param type the target type
+&nbsp;	 * @param factoryMethod the method that triggered the metadata for that {@code type}
+&nbsp;	 * or {@code null}
+&nbsp;	 * @return the candidate properties for metadata generation
+&nbsp;	 */
+&nbsp;	Stream&lt;PropertyDescriptor&lt;?&gt;&gt; resolve(TypeElement type, ExecutableElement factoryMethod) {
+<b class="nc">&nbsp;		TypeElementMembers members = new TypeElementMembers(this.environment, type);</b>
+<b class="nc">&nbsp;		if (factoryMethod != null) {</b>
+<b class="nc">&nbsp;			return resolveJavaBeanProperties(type, factoryMethod, members);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return resolve(ConfigurationPropertiesTypeElement.of(type, this.environment), members);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Stream&lt;PropertyDescriptor&lt;?&gt;&gt; resolve(ConfigurationPropertiesTypeElement type, TypeElementMembers members) {
+<b class="nc">&nbsp;		if (type.isConstructorBindingEnabled()) {</b>
+<b class="nc">&nbsp;			ExecutableElement constructor = type.getBindConstructor();</b>
+<b class="nc">&nbsp;			if (constructor != null) {</b>
+<b class="nc">&nbsp;				return resolveConstructorProperties(type.getType(), members, constructor);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return Stream.empty();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return resolveJavaBeanProperties(type.getType(), null, members);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Stream&lt;PropertyDescriptor&lt;?&gt;&gt; resolveConstructorProperties(TypeElement type, TypeElementMembers members,
+&nbsp;			ExecutableElement constructor) {
+<b class="nc">&nbsp;		Map&lt;String, PropertyDescriptor&lt;?&gt;&gt; candidates = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		constructor.getParameters().forEach((parameter) -&gt; {</b>
+<b class="nc">&nbsp;			String name = getParameterName(parameter);</b>
+<b class="nc">&nbsp;			TypeMirror propertyType = parameter.asType();</b>
+<b class="nc">&nbsp;			ExecutableElement getter = members.getPublicGetter(name, propertyType);</b>
+<b class="nc">&nbsp;			ExecutableElement setter = members.getPublicSetter(name, propertyType);</b>
+<b class="nc">&nbsp;			VariableElement field = members.getFields().get(name);</b>
+<b class="nc">&nbsp;			register(candidates, new ConstructorParameterPropertyDescriptor(type, null, parameter, name, propertyType,</b>
+&nbsp;					field, getter, setter));
+&nbsp;		});
+<b class="nc">&nbsp;		return candidates.values().stream();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getParameterName(VariableElement parameter) {
+<b class="nc">&nbsp;		AnnotationMirror nameAnnotation = this.environment.getNameAnnotation(parameter);</b>
+<b class="nc">&nbsp;		if (nameAnnotation != null) {</b>
+<b class="nc">&nbsp;			return this.environment.getAnnotationElementStringValue(nameAnnotation, &quot;value&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return parameter.getSimpleName().toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Stream&lt;PropertyDescriptor&lt;?&gt;&gt; resolveJavaBeanProperties(TypeElement type, ExecutableElement factoryMethod,
+&nbsp;			TypeElementMembers members) {
+&nbsp;		// First check if we have regular java bean properties there
+<b class="nc">&nbsp;		Map&lt;String, PropertyDescriptor&lt;?&gt;&gt; candidates = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		members.getPublicGetters().forEach((name, getters) -&gt; {</b>
+<b class="nc">&nbsp;			VariableElement field = members.getFields().get(name);</b>
+<b class="nc">&nbsp;			ExecutableElement getter = findMatchingGetter(members, getters, field);</b>
+<b class="nc">&nbsp;			TypeMirror propertyType = getter.getReturnType();</b>
+<b class="nc">&nbsp;			register(candidates, new JavaBeanPropertyDescriptor(type, factoryMethod, getter, name, propertyType, field,</b>
+<b class="nc">&nbsp;					members.getPublicSetter(name, propertyType)));</b>
+&nbsp;		});
+&nbsp;		// Then check for Lombok ones
+<b class="nc">&nbsp;		members.getFields().forEach((name, field) -&gt; {</b>
+<b class="nc">&nbsp;			TypeMirror propertyType = field.asType();</b>
+<b class="nc">&nbsp;			ExecutableElement getter = members.getPublicGetter(name, propertyType);</b>
+<b class="nc">&nbsp;			ExecutableElement setter = members.getPublicSetter(name, propertyType);</b>
+<b class="nc">&nbsp;			register(candidates,</b>
+&nbsp;					new LombokPropertyDescriptor(type, factoryMethod, field, name, propertyType, getter, setter));
+&nbsp;		});
+<b class="nc">&nbsp;		return candidates.values().stream();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ExecutableElement findMatchingGetter(TypeElementMembers members, List&lt;ExecutableElement&gt; candidates,
+&nbsp;			VariableElement field) {
+<b class="nc">&nbsp;		if (candidates.size() &gt; 1 &amp;&amp; field != null) {</b>
+<b class="nc">&nbsp;			return members.getMatchingGetter(candidates, field.asType());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return candidates.get(0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void register(Map&lt;String, PropertyDescriptor&lt;?&gt;&gt; candidates, PropertyDescriptor&lt;?&gt; descriptor) {
+<b class="nc">&nbsp;		if (!candidates.containsKey(descriptor.getName()) &amp;&amp; isCandidate(descriptor)) {</b>
+<b class="nc">&nbsp;			candidates.put(descriptor.getName(), descriptor);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isCandidate(PropertyDescriptor&lt;?&gt; descriptor) {
+<b class="nc">&nbsp;		return descriptor.isProperty(this.environment) || descriptor.isNested(this.environment);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Wrapper around a {@link TypeElement} that could be bound.
+&nbsp;	 */
+&nbsp;	private static class ConfigurationPropertiesTypeElement {
+&nbsp;
+&nbsp;		private final TypeElement type;
+&nbsp;
+&nbsp;		private final List&lt;ExecutableElement&gt; constructors;
+&nbsp;
+&nbsp;		private final List&lt;ExecutableElement&gt; boundConstructors;
+&nbsp;
+&nbsp;		ConfigurationPropertiesTypeElement(TypeElement type, List&lt;ExecutableElement&gt; constructors,
+<b class="nc">&nbsp;				List&lt;ExecutableElement&gt; boundConstructors) {</b>
+<b class="nc">&nbsp;			this.type = type;</b>
+<b class="nc">&nbsp;			this.constructors = constructors;</b>
+<b class="nc">&nbsp;			this.boundConstructors = boundConstructors;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		TypeElement getType() {
+<b class="nc">&nbsp;			return this.type;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isConstructorBindingEnabled() {
+<b class="nc">&nbsp;			return !this.boundConstructors.isEmpty();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ExecutableElement getBindConstructor() {
+<b class="nc">&nbsp;			if (this.boundConstructors.isEmpty()) {</b>
+<b class="nc">&nbsp;				return findBoundConstructor();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.boundConstructors.size() == 1) {</b>
+<b class="nc">&nbsp;				return this.boundConstructors.get(0);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ExecutableElement findBoundConstructor() {
+<b class="nc">&nbsp;			ExecutableElement boundConstructor = null;</b>
+<b class="nc">&nbsp;			for (ExecutableElement candidate : this.constructors) {</b>
+<b class="nc">&nbsp;				if (!candidate.getParameters().isEmpty()) {</b>
+<b class="nc">&nbsp;					if (boundConstructor != null) {</b>
+<b class="nc">&nbsp;						return null;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					boundConstructor = candidate;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return boundConstructor;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static ConfigurationPropertiesTypeElement of(TypeElement type, MetadataGenerationEnvironment env) {
+<b class="nc">&nbsp;			List&lt;ExecutableElement&gt; constructors = ElementFilter.constructorsIn(type.getEnclosedElements());</b>
+<b class="nc">&nbsp;			List&lt;ExecutableElement&gt; boundConstructors = getBoundConstructors(type, env, constructors);</b>
+<b class="nc">&nbsp;			return new ConfigurationPropertiesTypeElement(type, constructors, boundConstructors);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static List&lt;ExecutableElement&gt; getBoundConstructors(TypeElement type, MetadataGenerationEnvironment env,
+&nbsp;				List&lt;ExecutableElement&gt; constructors) {
+<b class="nc">&nbsp;			ExecutableElement bindConstructor = deduceBindConstructor(type, constructors, env);</b>
+<b class="nc">&nbsp;			if (bindConstructor != null) {</b>
+<b class="nc">&nbsp;				return Collections.singletonList(bindConstructor);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return constructors.stream().filter(env::hasConstructorBindingAnnotation).toList();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static ExecutableElement deduceBindConstructor(TypeElement type, List&lt;ExecutableElement&gt; constructors,
+&nbsp;				MetadataGenerationEnvironment env) {
+<b class="nc">&nbsp;			if (constructors.size() == 1) {</b>
+<b class="nc">&nbsp;				ExecutableElement candidate = constructors.get(0);</b>
+<b class="nc">&nbsp;				if (!candidate.getParameters().isEmpty() &amp;&amp; !env.hasAutowiredAnnotation(candidate)) {</b>
+<b class="nc">&nbsp;					if (type.getNestingKind() == NestingKind.MEMBER</b>
+<b class="nc">&nbsp;							&amp;&amp; candidate.getModifiers().contains(Modifier.PRIVATE)) {</b>
+<b class="nc">&nbsp;						return null;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					return candidate;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

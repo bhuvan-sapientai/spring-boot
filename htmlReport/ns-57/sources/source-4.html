@@ -1,0 +1,348 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MockServletWebServer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.testsupport.web.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: MockServletWebServer (org.springframework.boot.testsupport.web.servlet)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MockServletWebServer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MockServletWebServer$Initializer</td>
+  </tr>
+  <tr>
+    <td class="name">MockServletWebServer$RegisteredFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MockServletWebServer$RegisteredServlet</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.testsupport.web.servlet;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import jakarta.servlet.Filter;
+&nbsp;import jakarta.servlet.FilterRegistration;
+&nbsp;import jakarta.servlet.Servlet;
+&nbsp;import jakarta.servlet.ServletContext;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;import jakarta.servlet.ServletRegistration;
+&nbsp;import jakarta.servlet.SessionCookieConfig;
+&nbsp;
+&nbsp;import org.springframework.mock.web.MockSessionCookieConfig;
+&nbsp;
+&nbsp;import static org.mockito.ArgumentMatchers.any;
+&nbsp;import static org.mockito.ArgumentMatchers.anyString;
+&nbsp;import static org.mockito.BDDMockito.given;
+&nbsp;import static org.mockito.Mockito.lenient;
+&nbsp;import static org.mockito.Mockito.mock;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for Mock {@code ServletWebServer} implementations. Reduces the amount of
+&nbsp; * code that would otherwise be duplicated in {@code spring-boot},
+&nbsp; * {@code spring-boot-autoconfigure} and {@code spring-boot-actuator}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+&nbsp;public abstract class MockServletWebServer {
+&nbsp;
+&nbsp;	private ServletContext servletContext;
+&nbsp;
+&nbsp;	private final Initializer[] initializers;
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;RegisteredServlet&gt; registeredServlets = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;RegisteredFilter&gt; registeredFilters = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private final int port;
+&nbsp;
+<b class="nc">&nbsp;	public MockServletWebServer(Initializer[] initializers, int port) {</b>
+<b class="nc">&nbsp;		this.initializers = initializers;</b>
+<b class="nc">&nbsp;		this.port = port;</b>
+<b class="nc">&nbsp;		initialize();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void initialize() {
+&nbsp;		try {
+<b class="nc">&nbsp;			this.servletContext = mock(ServletContext.class);</b>
+<b class="nc">&nbsp;			lenient().doAnswer((invocation) -&gt; {</b>
+<b class="nc">&nbsp;				RegisteredServlet registeredServlet = new RegisteredServlet(invocation.getArgument(1));</b>
+<b class="nc">&nbsp;				MockServletWebServer.this.registeredServlets.add(registeredServlet);</b>
+<b class="nc">&nbsp;				return registeredServlet.getRegistration();</b>
+<b class="nc">&nbsp;			}).when(this.servletContext).addServlet(anyString(), any(Servlet.class));</b>
+<b class="nc">&nbsp;			lenient().doAnswer((invocation) -&gt; {</b>
+<b class="nc">&nbsp;				RegisteredFilter registeredFilter = new RegisteredFilter(invocation.getArgument(1));</b>
+<b class="nc">&nbsp;				MockServletWebServer.this.registeredFilters.add(registeredFilter);</b>
+<b class="nc">&nbsp;				return registeredFilter.getRegistration();</b>
+<b class="nc">&nbsp;			}).when(this.servletContext).addFilter(anyString(), any(Filter.class));</b>
+<b class="nc">&nbsp;			final SessionCookieConfig sessionCookieConfig = new MockSessionCookieConfig();</b>
+<b class="nc">&nbsp;			given(this.servletContext.getSessionCookieConfig()).willReturn(sessionCookieConfig);</b>
+<b class="nc">&nbsp;			final Map&lt;String, String&gt; initParameters = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;			lenient().doAnswer((invocation) -&gt; {</b>
+<b class="nc">&nbsp;				initParameters.put(invocation.getArgument(0), invocation.getArgument(1));</b>
+<b class="nc">&nbsp;				return null;</b>
+<b class="nc">&nbsp;			}).when(this.servletContext).setInitParameter(anyString(), anyString());</b>
+<b class="nc">&nbsp;			given(this.servletContext.getInitParameterNames())</b>
+<b class="nc">&nbsp;				.willReturn(Collections.enumeration(initParameters.keySet()));</b>
+<b class="nc">&nbsp;			lenient().doAnswer((invocation) -&gt; initParameters.get(invocation.getArgument(0)))</b>
+<b class="nc">&nbsp;				.when(this.servletContext)</b>
+<b class="nc">&nbsp;				.getInitParameter(anyString());</b>
+<b class="nc">&nbsp;			given(this.servletContext.getAttributeNames()).willReturn(Collections.emptyEnumeration());</b>
+<b class="nc">&nbsp;			for (Initializer initializer : this.initializers) {</b>
+<b class="nc">&nbsp;				initializer.onStartup(this.servletContext);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (ServletException ex) {</b>
+<b class="nc">&nbsp;			throw new RuntimeException(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void stop() {
+<b class="nc">&nbsp;		this.servletContext = null;</b>
+<b class="nc">&nbsp;		this.registeredServlets.clear();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public ServletContext getServletContext() {
+<b class="nc">&nbsp;		return this.servletContext;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Servlet[] getServlets() {
+<b class="nc">&nbsp;		Servlet[] servlets = new Servlet[this.registeredServlets.size()];</b>
+<b class="nc">&nbsp;		Arrays.setAll(servlets, (i) -&gt; this.registeredServlets.get(i).getServlet());</b>
+<b class="nc">&nbsp;		return servlets;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public RegisteredServlet getRegisteredServlet(int index) {
+<b class="nc">&nbsp;		return getRegisteredServlets().get(index);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;RegisteredServlet&gt; getRegisteredServlets() {
+<b class="nc">&nbsp;		return this.registeredServlets;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public RegisteredFilter getRegisteredFilters(int index) {
+<b class="nc">&nbsp;		return getRegisteredFilters().get(index);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public List&lt;RegisteredFilter&gt; getRegisteredFilters() {
+<b class="nc">&nbsp;		return this.registeredFilters;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public int getPort() {
+<b class="nc">&nbsp;		return this.port;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A registered servlet.
+&nbsp;	 */
+&nbsp;	public static class RegisteredServlet {
+&nbsp;
+&nbsp;		private final Servlet servlet;
+&nbsp;
+&nbsp;		private final ServletRegistration.Dynamic registration;
+&nbsp;
+<b class="nc">&nbsp;		public RegisteredServlet(Servlet servlet) {</b>
+<b class="nc">&nbsp;			this.servlet = servlet;</b>
+<b class="nc">&nbsp;			this.registration = mock(ServletRegistration.Dynamic.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public ServletRegistration.Dynamic getRegistration() {
+<b class="nc">&nbsp;			return this.registration;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Servlet getServlet() {
+<b class="nc">&nbsp;			return this.servlet;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A registered filter.
+&nbsp;	 */
+&nbsp;	public static class RegisteredFilter {
+&nbsp;
+&nbsp;		private final Filter filter;
+&nbsp;
+&nbsp;		private final FilterRegistration.Dynamic registration;
+&nbsp;
+<b class="nc">&nbsp;		public RegisteredFilter(Filter filter) {</b>
+<b class="nc">&nbsp;			this.filter = filter;</b>
+<b class="nc">&nbsp;			this.registration = mock(FilterRegistration.Dynamic.class);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public FilterRegistration.Dynamic getRegistration() {
+<b class="nc">&nbsp;			return this.registration;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public Filter getFilter() {
+<b class="nc">&nbsp;			return this.filter;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Initializer (usually implement by adapting {@code Initializer}).
+&nbsp;	 */
+&nbsp;	@FunctionalInterface
+&nbsp;	protected interface Initializer {
+&nbsp;
+&nbsp;		void onStartup(ServletContext context) throws ServletException;
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,583 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TomcatWebServer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.tomcat</a>
+</div>
+
+<h1>Coverage Summary for Class: TomcatWebServer (org.springframework.boot.web.embedded.tomcat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TomcatWebServer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/178)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TomcatWebServer$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/180)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.tomcat;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.atomic.AtomicInteger;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.naming.NamingException;
+&nbsp;
+&nbsp;import org.apache.catalina.Container;
+&nbsp;import org.apache.catalina.Context;
+&nbsp;import org.apache.catalina.Engine;
+&nbsp;import org.apache.catalina.Lifecycle;
+&nbsp;import org.apache.catalina.LifecycleException;
+&nbsp;import org.apache.catalina.LifecycleState;
+&nbsp;import org.apache.catalina.Service;
+&nbsp;import org.apache.catalina.Wrapper;
+&nbsp;import org.apache.catalina.connector.Connector;
+&nbsp;import org.apache.catalina.startup.Tomcat;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import org.apache.naming.ContextBindings;
+&nbsp;
+&nbsp;import org.springframework.boot.web.server.GracefulShutdownCallback;
+&nbsp;import org.springframework.boot.web.server.GracefulShutdownResult;
+&nbsp;import org.springframework.boot.web.server.PortInUseException;
+&nbsp;import org.springframework.boot.web.server.Shutdown;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.boot.web.server.WebServerException;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link WebServer} that can be used to control a Tomcat web server. Usually this class
+&nbsp; * should be created using the {@link TomcatReactiveWebServerFactory} or
+&nbsp; * {@link TomcatServletWebServerFactory}, but not directly.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Kristine Jetzke
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class TomcatWebServer implements WebServer {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(TomcatWebServer.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final AtomicInteger containerCounter = new AtomicInteger(-1);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Object monitor = new Object();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;Service, Connector[]&gt; serviceConnectors = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private final Tomcat tomcat;
+&nbsp;
+&nbsp;	private final boolean autoStart;
+&nbsp;
+&nbsp;	private final GracefulShutdown gracefulShutdown;
+&nbsp;
+&nbsp;	private volatile boolean started;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link TomcatWebServer} instance.
+&nbsp;	 * @param tomcat the underlying Tomcat server
+&nbsp;	 */
+&nbsp;	public TomcatWebServer(Tomcat tomcat) {
+<b class="nc">&nbsp;		this(tomcat, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link TomcatWebServer} instance.
+&nbsp;	 * @param tomcat the underlying Tomcat server
+&nbsp;	 * @param autoStart if the server should be started
+&nbsp;	 */
+&nbsp;	public TomcatWebServer(Tomcat tomcat, boolean autoStart) {
+<b class="nc">&nbsp;		this(tomcat, autoStart, Shutdown.IMMEDIATE);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link TomcatWebServer} instance.
+&nbsp;	 * @param tomcat the underlying Tomcat server
+&nbsp;	 * @param autoStart if the server should be started
+&nbsp;	 * @param shutdown type of shutdown supported by the server
+&nbsp;	 * @since 2.3.0
+&nbsp;	 */
+<b class="nc">&nbsp;	public TomcatWebServer(Tomcat tomcat, boolean autoStart, Shutdown shutdown) {</b>
+<b class="nc">&nbsp;		Assert.notNull(tomcat, &quot;Tomcat Server must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.tomcat = tomcat;</b>
+<b class="nc">&nbsp;		this.autoStart = autoStart;</b>
+<b class="nc">&nbsp;		this.gracefulShutdown = (shutdown == Shutdown.GRACEFUL) ? new GracefulShutdown(tomcat) : null;</b>
+<b class="nc">&nbsp;		initialize();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void initialize() throws WebServerException {
+<b class="nc">&nbsp;		logger.info(&quot;Tomcat initialized with &quot; + getPortsDescription(false));</b>
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				addInstanceIdToEngineName();</b>
+&nbsp;
+<b class="nc">&nbsp;				Context context = findContext();</b>
+<b class="nc">&nbsp;				context.addLifecycleListener((event) -&gt; {</b>
+<b class="nc">&nbsp;					if (context.equals(event.getSource()) &amp;&amp; Lifecycle.START_EVENT.equals(event.getType())) {</b>
+&nbsp;						// Remove service connectors so that protocol binding doesn&#39;t
+&nbsp;						// happen when the service is started.
+<b class="nc">&nbsp;						removeServiceConnectors();</b>
+&nbsp;					}
+&nbsp;				});
+&nbsp;
+<b class="nc">&nbsp;				disableBindOnInit();</b>
+&nbsp;
+&nbsp;				// Start the server to trigger initialization listeners
+<b class="nc">&nbsp;				this.tomcat.start();</b>
+&nbsp;
+&nbsp;				// We can re-throw failure exception directly in the main thread
+<b class="nc">&nbsp;				rethrowDeferredStartupExceptions();</b>
+&nbsp;
+&nbsp;				try {
+<b class="nc">&nbsp;					ContextBindings.bindClassLoader(context, context.getNamingToken(), getClass().getClassLoader());</b>
+&nbsp;				}
+<b class="nc">&nbsp;				catch (NamingException ex) {</b>
+&nbsp;					// Naming is not enabled. Continue
+<b class="nc">&nbsp;				}</b>
+&nbsp;
+&nbsp;				// Unlike Jetty, all Tomcat threads are daemon threads. We create a
+&nbsp;				// blocking non-daemon to stop immediate shutdown
+<b class="nc">&nbsp;				startNonDaemonAwaitThread();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				stopSilently();</b>
+<b class="nc">&nbsp;				destroySilently();</b>
+<b class="nc">&nbsp;				throw new WebServerException(&quot;Unable to start embedded Tomcat&quot;, ex);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Context findContext() {
+<b class="nc">&nbsp;		for (Container child : this.tomcat.getHost().findChildren()) {</b>
+<b class="nc">&nbsp;			if (child instanceof Context context) {</b>
+<b class="nc">&nbsp;				return context;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(&quot;The host does not contain a Context&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addInstanceIdToEngineName() {
+<b class="nc">&nbsp;		int instanceId = containerCounter.incrementAndGet();</b>
+<b class="nc">&nbsp;		if (instanceId &gt; 0) {</b>
+<b class="nc">&nbsp;			Engine engine = this.tomcat.getEngine();</b>
+<b class="nc">&nbsp;			engine.setName(engine.getName() + &quot;-&quot; + instanceId);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void removeServiceConnectors() {
+<b class="nc">&nbsp;		doWithConnectors((service, connectors) -&gt; {</b>
+<b class="nc">&nbsp;			this.serviceConnectors.put(service, connectors);</b>
+<b class="nc">&nbsp;			for (Connector connector : connectors) {</b>
+<b class="nc">&nbsp;				service.removeConnector(connector);</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void disableBindOnInit() {
+<b class="nc">&nbsp;		doWithConnectors((service, connectors) -&gt; {</b>
+<b class="nc">&nbsp;			for (Connector connector : connectors) {</b>
+<b class="nc">&nbsp;				Object bindOnInit = connector.getProperty(&quot;bindOnInit&quot;);</b>
+<b class="nc">&nbsp;				if (bindOnInit == null) {</b>
+<b class="nc">&nbsp;					connector.setProperty(&quot;bindOnInit&quot;, &quot;false&quot;);</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	private void doWithConnectors(BiConsumer&lt;Service, Connector[]&gt; consumer) {
+<b class="nc">&nbsp;		for (Service service : this.tomcat.getServer().findServices()) {</b>
+<b class="nc">&nbsp;			Connector[] connectors = service.findConnectors().clone();</b>
+<b class="nc">&nbsp;			consumer.accept(service, connectors);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void rethrowDeferredStartupExceptions() throws Exception {
+<b class="nc">&nbsp;		Container[] children = this.tomcat.getHost().findChildren();</b>
+<b class="nc">&nbsp;		for (Container container : children) {</b>
+<b class="nc">&nbsp;			if (container instanceof TomcatEmbeddedContext embeddedContext) {</b>
+<b class="nc">&nbsp;				TomcatStarter tomcatStarter = embeddedContext.getStarter();</b>
+<b class="nc">&nbsp;				if (tomcatStarter != null) {</b>
+<b class="nc">&nbsp;					Exception exception = tomcatStarter.getStartUpException();</b>
+<b class="nc">&nbsp;					if (exception != null) {</b>
+<b class="nc">&nbsp;						throw exception;</b>
+&nbsp;					}
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			if (!LifecycleState.STARTED.equals(container.getState())) {</b>
+<b class="nc">&nbsp;				throw new IllegalStateException(container + &quot; failed to start&quot;);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void startNonDaemonAwaitThread() {
+<b class="nc">&nbsp;		Thread awaitThread = new Thread(&quot;container-&quot; + (containerCounter.get())) {</b>
+&nbsp;
+&nbsp;			@Override
+&nbsp;			public void run() {
+<b class="nc">&nbsp;				TomcatWebServer.this.tomcat.getServer().await();</b>
+&nbsp;			}
+&nbsp;
+&nbsp;		};
+<b class="nc">&nbsp;		awaitThread.setContextClassLoader(getClass().getClassLoader());</b>
+<b class="nc">&nbsp;		awaitThread.setDaemon(false);</b>
+<b class="nc">&nbsp;		awaitThread.start();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void start() throws WebServerException {
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			if (this.started) {</b>
+<b class="nc">&nbsp;				return;</b>
+&nbsp;			}
+&nbsp;
+&nbsp;			try {
+<b class="nc">&nbsp;				addPreviouslyRemovedConnectors();</b>
+<b class="nc">&nbsp;				Connector connector = this.tomcat.getConnector();</b>
+<b class="nc">&nbsp;				if (connector != null &amp;&amp; this.autoStart) {</b>
+<b class="nc">&nbsp;					performDeferredLoadOnStartup();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				checkThatConnectorsHaveStarted();</b>
+<b class="nc">&nbsp;				this.started = true;</b>
+<b class="nc">&nbsp;				logger.info(getStartedLogMessage());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (ConnectorStartFailedException ex) {</b>
+<b class="nc">&nbsp;				stopSilently();</b>
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				PortInUseException.throwIfPortBindingException(ex, () -&gt; this.tomcat.getConnector().getPort());</b>
+<b class="nc">&nbsp;				throw new WebServerException(&quot;Unable to start embedded Tomcat server&quot;, ex);</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				Context context = findContext();</b>
+<b class="nc">&nbsp;				ContextBindings.unbindClassLoader(context, context.getNamingToken(), getClass().getClassLoader());</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	String getStartedLogMessage() {
+<b class="nc">&nbsp;		String contextPath = getContextPath();</b>
+<b class="nc">&nbsp;		return &quot;Tomcat started on &quot; + getPortsDescription(true)</b>
+<b class="nc">&nbsp;				+ ((contextPath != null) ? &quot; with context path &#39;&quot; + contextPath + &quot;&#39;&quot; : &quot;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkThatConnectorsHaveStarted() {
+<b class="nc">&nbsp;		checkConnectorHasStarted(this.tomcat.getConnector());</b>
+<b class="nc">&nbsp;		for (Connector connector : this.tomcat.getService().findConnectors()) {</b>
+<b class="nc">&nbsp;			checkConnectorHasStarted(connector);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void checkConnectorHasStarted(Connector connector) {
+<b class="nc">&nbsp;		if (LifecycleState.FAILED.equals(connector.getState())) {</b>
+<b class="nc">&nbsp;			throw new ConnectorStartFailedException(connector.getPort());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void stopSilently() {
+&nbsp;		try {
+<b class="nc">&nbsp;			stopTomcat();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (LifecycleException ex) {</b>
+&nbsp;			// Ignore
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void destroySilently() {
+&nbsp;		try {
+<b class="nc">&nbsp;			this.tomcat.destroy();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (LifecycleException ex) {</b>
+&nbsp;			// Ignore
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void stopTomcat() throws LifecycleException {
+<b class="nc">&nbsp;		if (Thread.currentThread().getContextClassLoader() instanceof TomcatEmbeddedWebappClassLoader) {</b>
+<b class="nc">&nbsp;			Thread.currentThread().setContextClassLoader(getClass().getClassLoader());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.tomcat.stop();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void addPreviouslyRemovedConnectors() {
+<b class="nc">&nbsp;		Service[] services = this.tomcat.getServer().findServices();</b>
+<b class="nc">&nbsp;		for (Service service : services) {</b>
+<b class="nc">&nbsp;			Connector[] connectors = this.serviceConnectors.get(service);</b>
+<b class="nc">&nbsp;			if (connectors != null) {</b>
+<b class="nc">&nbsp;				for (Connector connector : connectors) {</b>
+<b class="nc">&nbsp;					service.addConnector(connector);</b>
+<b class="nc">&nbsp;					if (!this.autoStart) {</b>
+<b class="nc">&nbsp;						stopProtocolHandler(connector);</b>
+&nbsp;					}
+&nbsp;				}
+<b class="nc">&nbsp;				this.serviceConnectors.remove(service);</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void stopProtocolHandler(Connector connector) {
+&nbsp;		try {
+<b class="nc">&nbsp;			connector.getProtocolHandler().stop();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			logger.error(&quot;Cannot pause connector: &quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void performDeferredLoadOnStartup() {
+&nbsp;		try {
+<b class="nc">&nbsp;			for (Container child : this.tomcat.getHost().findChildren()) {</b>
+<b class="nc">&nbsp;				if (child instanceof TomcatEmbeddedContext embeddedContext) {</b>
+<b class="nc">&nbsp;					embeddedContext.deferredLoadOnStartup();</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			if (ex instanceof WebServerException webServerException) {</b>
+<b class="nc">&nbsp;				throw webServerException;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			throw new WebServerException(&quot;Unable to start embedded Tomcat connectors&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	Map&lt;Service, Connector[]&gt; getServiceConnectors() {
+<b class="nc">&nbsp;		return this.serviceConnectors;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void stop() throws WebServerException {
+<b class="nc">&nbsp;		synchronized (this.monitor) {</b>
+<b class="nc">&nbsp;			boolean wasStarted = this.started;</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				this.started = false;</b>
+<b class="nc">&nbsp;				if (this.gracefulShutdown != null) {</b>
+<b class="nc">&nbsp;					this.gracefulShutdown.abort();</b>
+&nbsp;				}
+<b class="nc">&nbsp;				removeServiceConnectors();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				throw new WebServerException(&quot;Unable to stop embedded Tomcat&quot;, ex);</b>
+&nbsp;			}
+&nbsp;			finally {
+<b class="nc">&nbsp;				if (wasStarted) {</b>
+<b class="nc">&nbsp;					containerCounter.decrementAndGet();</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void destroy() throws WebServerException {
+&nbsp;		try {
+<b class="nc">&nbsp;			stopTomcat();</b>
+<b class="nc">&nbsp;			this.tomcat.destroy();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (LifecycleException ex) {</b>
+&nbsp;			// Swallow and continue
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			throw new WebServerException(&quot;Unable to destroy embedded Tomcat&quot;, ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getPortsDescription(boolean localPort) {
+<b class="nc">&nbsp;		StringBuilder description = new StringBuilder();</b>
+<b class="nc">&nbsp;		Connector[] connectors = this.tomcat.getService().findConnectors();</b>
+<b class="nc">&nbsp;		description.append(&quot;port&quot;);</b>
+<b class="nc">&nbsp;		if (connectors.length != 1) {</b>
+<b class="nc">&nbsp;			description.append(&quot;s&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		description.append(&quot; &quot;);</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; connectors.length; i++) {</b>
+<b class="nc">&nbsp;			if (i != 0) {</b>
+<b class="nc">&nbsp;				description.append(&quot;, &quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Connector connector = connectors[i];</b>
+<b class="nc">&nbsp;			int port = localPort ? connector.getLocalPort() : connector.getPort();</b>
+<b class="nc">&nbsp;			description.append(port).append(&quot; (&quot;).append(connector.getScheme()).append(&#39;)&#39;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return description.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getPort() {
+<b class="nc">&nbsp;		Connector connector = this.tomcat.getConnector();</b>
+<b class="nc">&nbsp;		if (connector != null) {</b>
+<b class="nc">&nbsp;			return connector.getLocalPort();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return -1;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getContextPath() {
+<b class="nc">&nbsp;		String contextPath = Arrays.stream(this.tomcat.getHost().findChildren())</b>
+<b class="nc">&nbsp;			.filter(TomcatEmbeddedContext.class::isInstance)</b>
+<b class="nc">&nbsp;			.map(TomcatEmbeddedContext.class::cast)</b>
+<b class="nc">&nbsp;			.filter(this::imperative)</b>
+<b class="nc">&nbsp;			.map(TomcatEmbeddedContext::getPath)</b>
+<b class="nc">&nbsp;			.map((path) -&gt; path.equals(&quot;&quot;) ? &quot;/&quot; : path)</b>
+<b class="nc">&nbsp;			.collect(Collectors.joining(&quot; &quot;));</b>
+<b class="nc">&nbsp;		return StringUtils.hasText(contextPath) ? contextPath : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean imperative(TomcatEmbeddedContext context) {
+<b class="nc">&nbsp;		for (Container container : context.findChildren()) {</b>
+<b class="nc">&nbsp;			if (container instanceof Wrapper wrapper) {</b>
+<b class="nc">&nbsp;				if (wrapper.getServletClass()</b>
+<b class="nc">&nbsp;					.equals(&quot;org.springframework.http.server.reactive.TomcatHttpHandlerAdapter&quot;)) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns access to the underlying Tomcat server.
+&nbsp;	 * @return the Tomcat server
+&nbsp;	 */
+&nbsp;	public Tomcat getTomcat() {
+<b class="nc">&nbsp;		return this.tomcat;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void shutDownGracefully(GracefulShutdownCallback callback) {
+<b class="nc">&nbsp;		if (this.gracefulShutdown == null) {</b>
+<b class="nc">&nbsp;			callback.shutdownComplete(GracefulShutdownResult.IMMEDIATE);</b>
+&nbsp;			return;
+&nbsp;		}
+<b class="nc">&nbsp;		this.gracefulShutdown.shutDownGracefully(callback);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

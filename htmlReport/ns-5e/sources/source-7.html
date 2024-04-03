@@ -1,0 +1,359 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JettyReactiveWebServerFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.jetty</a>
+</div>
+
+<h1>Coverage Summary for Class: JettyReactiveWebServerFactory (org.springframework.boot.web.embedded.jetty)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JettyReactiveWebServerFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.jetty;
+&nbsp;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+&nbsp;import org.eclipse.jetty.ee10.servlet.ServletHolder;
+&nbsp;import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
+&nbsp;import org.eclipse.jetty.server.AbstractConnector;
+&nbsp;import org.eclipse.jetty.server.ConnectionFactory;
+&nbsp;import org.eclipse.jetty.server.ConnectionLimit;
+&nbsp;import org.eclipse.jetty.server.Handler;
+&nbsp;import org.eclipse.jetty.server.HttpConfiguration;
+&nbsp;import org.eclipse.jetty.server.HttpConnectionFactory;
+&nbsp;import org.eclipse.jetty.server.Server;
+&nbsp;import org.eclipse.jetty.server.ServerConnector;
+&nbsp;import org.eclipse.jetty.server.handler.StatisticsHandler;
+&nbsp;import org.eclipse.jetty.util.thread.ThreadPool;
+&nbsp;
+&nbsp;import org.springframework.boot.web.reactive.server.AbstractReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
+&nbsp;import org.springframework.boot.web.server.Shutdown;
+&nbsp;import org.springframework.boot.web.server.Ssl;
+&nbsp;import org.springframework.boot.web.server.WebServer;
+&nbsp;import org.springframework.http.client.reactive.JettyResourceFactory;
+&nbsp;import org.springframework.http.server.reactive.HttpHandler;
+&nbsp;import org.springframework.http.server.reactive.JettyHttpHandlerAdapter;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ReactiveWebServerFactory} that can be used to create {@link JettyWebServer}s.
+&nbsp; *
+&nbsp; * @author Brian Clozel
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class JettyReactiveWebServerFactory extends AbstractReactiveWebServerFactory
+&nbsp;		implements ConfigurableJettyWebServerFactory {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(JettyReactiveWebServerFactory.class);</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The number of acceptor threads to use.
+&nbsp;	 */
+<b class="nc">&nbsp;	private int acceptors = -1;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * The number of selector threads to use.
+&nbsp;	 */
+<b class="nc">&nbsp;	private int selectors = -1;</b>
+&nbsp;
+&nbsp;	private boolean useForwardHeaders;
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;JettyServerCustomizer&gt; jettyServerCustomizers = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private JettyResourceFactory resourceFactory;
+&nbsp;
+&nbsp;	private ThreadPool threadPool;
+&nbsp;
+<b class="nc">&nbsp;	private int maxConnections = -1;</b>
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JettyServletWebServerFactory} instance.
+&nbsp;	 */
+<b class="nc">&nbsp;	public JettyReactiveWebServerFactory() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link JettyServletWebServerFactory} that listens for requests using
+&nbsp;	 * the specified port.
+&nbsp;	 * @param port the port to listen on
+&nbsp;	 */
+&nbsp;	public JettyReactiveWebServerFactory(int port) {
+<b class="nc">&nbsp;		super(port);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setUseForwardHeaders(boolean useForwardHeaders) {
+<b class="nc">&nbsp;		this.useForwardHeaders = useForwardHeaders;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setAcceptors(int acceptors) {
+<b class="nc">&nbsp;		this.acceptors = acceptors;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public WebServer getWebServer(HttpHandler httpHandler) {
+<b class="nc">&nbsp;		JettyHttpHandlerAdapter servlet = new JettyHttpHandlerAdapter(httpHandler);</b>
+<b class="nc">&nbsp;		Server server = createJettyServer(servlet);</b>
+<b class="nc">&nbsp;		return new JettyWebServer(server, getPort() &gt;= 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addServerCustomizers(JettyServerCustomizer... customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.jettyServerCustomizers.addAll(Arrays.asList(customizers));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setMaxConnections(int maxConnections) {
+<b class="nc">&nbsp;		this.maxConnections = maxConnections;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets {@link JettyServerCustomizer}s that will be applied to the {@link Server}
+&nbsp;	 * before it is started. Calling this method will replace any existing customizers.
+&nbsp;	 * @param customizers the Jetty customizers to apply
+&nbsp;	 */
+&nbsp;	public void setServerCustomizers(Collection&lt;? extends JettyServerCustomizer&gt; customizers) {
+<b class="nc">&nbsp;		Assert.notNull(customizers, &quot;Customizers must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.jettyServerCustomizers = new LinkedHashSet&lt;&gt;(customizers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a mutable collection of Jetty {@link JettyServerCustomizer}s that will be
+&nbsp;	 * applied to the {@link Server} before it is created.
+&nbsp;	 * @return the Jetty customizers
+&nbsp;	 */
+&nbsp;	public Collection&lt;JettyServerCustomizer&gt; getServerCustomizers() {
+<b class="nc">&nbsp;		return this.jettyServerCustomizers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a Jetty {@link ThreadPool} that should be used by the {@link Server}.
+&nbsp;	 * @return a Jetty {@link ThreadPool} or {@code null}
+&nbsp;	 */
+&nbsp;	public ThreadPool getThreadPool() {
+<b class="nc">&nbsp;		return this.threadPool;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setThreadPool(ThreadPool threadPool) {
+<b class="nc">&nbsp;		this.threadPool = threadPool;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setSelectors(int selectors) {
+<b class="nc">&nbsp;		this.selectors = selectors;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@link JettyResourceFactory} to get the shared resources from.
+&nbsp;	 * @param resourceFactory the server resources
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	public void setResourceFactory(JettyResourceFactory resourceFactory) {
+<b class="nc">&nbsp;		this.resourceFactory = resourceFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected JettyResourceFactory getResourceFactory() {
+<b class="nc">&nbsp;		return this.resourceFactory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Server createJettyServer(JettyHttpHandlerAdapter servlet) {
+<b class="nc">&nbsp;		int port = Math.max(getPort(), 0);</b>
+<b class="nc">&nbsp;		InetSocketAddress address = new InetSocketAddress(getAddress(), port);</b>
+<b class="nc">&nbsp;		Server server = new Server(getThreadPool());</b>
+<b class="nc">&nbsp;		server.addConnector(createConnector(address, server));</b>
+<b class="nc">&nbsp;		server.setStopTimeout(0);</b>
+<b class="nc">&nbsp;		ServletHolder servletHolder = new ServletHolder(servlet);</b>
+<b class="nc">&nbsp;		servletHolder.setAsyncSupported(true);</b>
+<b class="nc">&nbsp;		ServletContextHandler contextHandler = new ServletContextHandler(&quot;/&quot;, false, false);</b>
+<b class="nc">&nbsp;		contextHandler.addServlet(servletHolder, &quot;/&quot;);</b>
+<b class="nc">&nbsp;		server.setHandler(addHandlerWrappers(contextHandler));</b>
+<b class="nc">&nbsp;		JettyReactiveWebServerFactory.logger.info(&quot;Server initialized with port: &quot; + port);</b>
+<b class="nc">&nbsp;		if (this.maxConnections &gt; -1) {</b>
+<b class="nc">&nbsp;			server.addBean(new ConnectionLimit(this.maxConnections, server));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (Ssl.isEnabled(getSsl())) {</b>
+<b class="nc">&nbsp;			customizeSsl(server, address);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (JettyServerCustomizer customizer : getServerCustomizers()) {</b>
+<b class="nc">&nbsp;			customizer.customize(server);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		if (this.useForwardHeaders) {</b>
+<b class="nc">&nbsp;			new ForwardHeadersCustomizer().customize(server);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (getShutdown() == Shutdown.GRACEFUL) {</b>
+<b class="nc">&nbsp;			StatisticsHandler statisticsHandler = new StatisticsHandler();</b>
+<b class="nc">&nbsp;			statisticsHandler.setHandler(server.getHandler());</b>
+<b class="nc">&nbsp;			server.setHandler(statisticsHandler);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		server.setAttribute(org.springframework.boot.web.server.WebServerFactory.class.getName(), getClass());</b>
+<b class="nc">&nbsp;		return server;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private AbstractConnector createConnector(InetSocketAddress address, Server server) {
+<b class="nc">&nbsp;		HttpConfiguration httpConfiguration = new HttpConfiguration();</b>
+<b class="nc">&nbsp;		httpConfiguration.setSendServerVersion(false);</b>
+<b class="nc">&nbsp;		List&lt;ConnectionFactory&gt; connectionFactories = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		connectionFactories.add(new HttpConnectionFactory(httpConfiguration));</b>
+<b class="nc">&nbsp;		if (getHttp2() != null &amp;&amp; getHttp2().isEnabled()) {</b>
+<b class="nc">&nbsp;			connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfiguration));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		JettyResourceFactory resourceFactory = getResourceFactory();</b>
+&nbsp;		ServerConnector connector;
+<b class="nc">&nbsp;		if (resourceFactory != null) {</b>
+<b class="nc">&nbsp;			connector = new ServerConnector(server, resourceFactory.getExecutor(), resourceFactory.getScheduler(),</b>
+<b class="nc">&nbsp;					resourceFactory.getByteBufferPool(), this.acceptors, this.selectors,</b>
+<b class="nc">&nbsp;					connectionFactories.toArray(new ConnectionFactory[0]));</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			connector = new ServerConnector(server, this.acceptors, this.selectors,</b>
+<b class="nc">&nbsp;					connectionFactories.toArray(new ConnectionFactory[0]));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		connector.setHost(address.getHostString());</b>
+<b class="nc">&nbsp;		connector.setPort(address.getPort());</b>
+<b class="nc">&nbsp;		return connector;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Handler addHandlerWrappers(Handler handler) {
+<b class="nc">&nbsp;		if (getCompression() != null &amp;&amp; getCompression().getEnabled()) {</b>
+<b class="nc">&nbsp;			handler = applyWrapper(handler, JettyHandlerWrappers.createGzipHandlerWrapper(getCompression()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasText(getServerHeader())) {</b>
+<b class="nc">&nbsp;			handler = applyWrapper(handler, JettyHandlerWrappers.createServerHeaderHandlerWrapper(getServerHeader()));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return handler;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Handler applyWrapper(Handler handler, Handler.Wrapper wrapper) {
+<b class="nc">&nbsp;		wrapper.setHandler(handler);</b>
+<b class="nc">&nbsp;		return wrapper;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void customizeSsl(Server server, InetSocketAddress address) {
+<b class="nc">&nbsp;		new SslServerCustomizer(getHttp2(), address, getSsl().getClientAuth(), getSslBundle()).customize(server);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

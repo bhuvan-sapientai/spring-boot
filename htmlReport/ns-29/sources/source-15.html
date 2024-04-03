@@ -1,0 +1,354 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MapBinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: MapBinder (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MapBinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MapBinder$EntryBinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.bind.Binder.Context;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName.Form;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyState;
+&nbsp;import org.springframework.boot.context.properties.source.IterableConfigurationPropertySource;
+&nbsp;import org.springframework.core.CollectionFactory;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link AggregateBinder} for Maps.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;class MapBinder extends AggregateBinder&lt;Map&lt;Object, Object&gt;&gt; {
+&nbsp;
+<b class="nc">&nbsp;	private static final Bindable&lt;Map&lt;String, String&gt;&gt; STRING_STRING_MAP = Bindable.mapOf(String.class, String.class);</b>
+&nbsp;
+&nbsp;	MapBinder(Context context) {
+<b class="nc">&nbsp;		super(context);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected boolean isAllowRecursiveBinding(ConfigurationPropertySource source) {
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Object bindAggregate(ConfigurationPropertyName name, Bindable&lt;?&gt; target,
+&nbsp;			AggregateElementBinder elementBinder) {
+&nbsp;		Map&lt;Object, Object&gt; map = CollectionFactory
+<b class="nc">&nbsp;			.createMap((target.getValue() != null) ? Map.class : target.getType().resolve(Object.class), 0);</b>
+<b class="nc">&nbsp;		Bindable&lt;?&gt; resolvedTarget = resolveTarget(target);</b>
+<b class="nc">&nbsp;		boolean hasDescendants = hasDescendants(name);</b>
+<b class="nc">&nbsp;		for (ConfigurationPropertySource source : getContext().getSources()) {</b>
+<b class="nc">&nbsp;			if (!ConfigurationPropertyName.EMPTY.equals(name)) {</b>
+<b class="nc">&nbsp;				ConfigurationProperty property = source.getConfigurationProperty(name);</b>
+<b class="nc">&nbsp;				if (property != null &amp;&amp; !hasDescendants) {</b>
+<b class="nc">&nbsp;					getContext().setConfigurationProperty(property);</b>
+<b class="nc">&nbsp;					return getContext().getConverter().convert(property.getValue(), target);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				source = source.filter(name::isAncestorOf);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			new EntryBinder(name, resolvedTarget, elementBinder).bindEntries(source, map);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return map.isEmpty() ? null : map;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasDescendants(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		for (ConfigurationPropertySource source : getContext().getSources()) {</b>
+<b class="nc">&nbsp;			if (source.containsDescendantOf(name) == ConfigurationPropertyState.PRESENT) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Bindable&lt;?&gt; resolveTarget(Bindable&lt;?&gt; target) {
+<b class="nc">&nbsp;		Class&lt;?&gt; type = target.getType().resolve(Object.class);</b>
+<b class="nc">&nbsp;		if (Properties.class.isAssignableFrom(type)) {</b>
+<b class="nc">&nbsp;			return STRING_STRING_MAP;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return target;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Map&lt;Object, Object&gt; merge(Supplier&lt;Map&lt;Object, Object&gt;&gt; existing, Map&lt;Object, Object&gt; additional) {
+<b class="nc">&nbsp;		Map&lt;Object, Object&gt; existingMap = getExistingIfPossible(existing);</b>
+<b class="nc">&nbsp;		if (existingMap == null) {</b>
+<b class="nc">&nbsp;			return additional;</b>
+&nbsp;		}
+&nbsp;		try {
+<b class="nc">&nbsp;			existingMap.putAll(additional);</b>
+<b class="nc">&nbsp;			return copyIfPossible(existingMap);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (UnsupportedOperationException ex) {</b>
+<b class="nc">&nbsp;			Map&lt;Object, Object&gt; result = createNewMap(additional.getClass(), existingMap);</b>
+<b class="nc">&nbsp;			result.putAll(additional);</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;Object, Object&gt; getExistingIfPossible(Supplier&lt;Map&lt;Object, Object&gt;&gt; existing) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return existing.get();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;Object, Object&gt; copyIfPossible(Map&lt;Object, Object&gt; map) {
+&nbsp;		try {
+<b class="nc">&nbsp;			return createNewMap(map.getClass(), map);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return map;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;Object, Object&gt; createNewMap(Class&lt;?&gt; mapClass, Map&lt;Object, Object&gt; map) {
+<b class="nc">&nbsp;		Map&lt;Object, Object&gt; result = CollectionFactory.createMap(mapClass, map.size());</b>
+<b class="nc">&nbsp;		result.putAll(map);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private class EntryBinder {
+&nbsp;
+&nbsp;		private final ConfigurationPropertyName root;
+&nbsp;
+&nbsp;		private final AggregateElementBinder elementBinder;
+&nbsp;
+&nbsp;		private final ResolvableType mapType;
+&nbsp;
+&nbsp;		private final ResolvableType keyType;
+&nbsp;
+&nbsp;		private final ResolvableType valueType;
+&nbsp;
+<b class="nc">&nbsp;		EntryBinder(ConfigurationPropertyName root, Bindable&lt;?&gt; target, AggregateElementBinder elementBinder) {</b>
+<b class="nc">&nbsp;			this.root = root;</b>
+<b class="nc">&nbsp;			this.elementBinder = elementBinder;</b>
+<b class="nc">&nbsp;			this.mapType = target.getType().asMap();</b>
+<b class="nc">&nbsp;			this.keyType = this.mapType.getGeneric(0);</b>
+<b class="nc">&nbsp;			this.valueType = this.mapType.getGeneric(1);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void bindEntries(ConfigurationPropertySource source, Map&lt;Object, Object&gt; map) {
+<b class="nc">&nbsp;			if (source instanceof IterableConfigurationPropertySource iterableSource) {</b>
+<b class="nc">&nbsp;				for (ConfigurationPropertyName name : iterableSource) {</b>
+<b class="nc">&nbsp;					Bindable&lt;?&gt; valueBindable = getValueBindable(name);</b>
+<b class="nc">&nbsp;					ConfigurationPropertyName entryName = getEntryName(source, name);</b>
+<b class="nc">&nbsp;					Object key = getContext().getConverter().convert(getKeyName(entryName), this.keyType);</b>
+<b class="nc">&nbsp;					map.computeIfAbsent(key, (k) -&gt; this.elementBinder.bind(entryName, valueBindable));</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private Bindable&lt;?&gt; getValueBindable(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;			if (!this.root.isParentOf(name) &amp;&amp; isValueTreatedAsNestedMap()) {</b>
+<b class="nc">&nbsp;				return Bindable.of(this.mapType);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return Bindable.of(this.valueType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConfigurationPropertyName getEntryName(ConfigurationPropertySource source,
+&nbsp;				ConfigurationPropertyName name) {
+<b class="nc">&nbsp;			Class&lt;?&gt; resolved = this.valueType.resolve(Object.class);</b>
+<b class="nc">&nbsp;			if (Collection.class.isAssignableFrom(resolved) || this.valueType.isArray()) {</b>
+<b class="nc">&nbsp;				return chopNameAtNumericIndex(name);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (!this.root.isParentOf(name) &amp;&amp; (isValueTreatedAsNestedMap() || !isScalarValue(source, name))) {</b>
+<b class="nc">&nbsp;				return name.chop(this.root.getNumberOfElements() + 1);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConfigurationPropertyName chopNameAtNumericIndex(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;			int start = this.root.getNumberOfElements() + 1;</b>
+<b class="nc">&nbsp;			int size = name.getNumberOfElements();</b>
+<b class="nc">&nbsp;			for (int i = start; i &lt; size; i++) {</b>
+<b class="nc">&nbsp;				if (name.isNumericIndex(i)) {</b>
+<b class="nc">&nbsp;					return name.chop(i);</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isValueTreatedAsNestedMap() {
+<b class="nc">&nbsp;			return Object.class.equals(this.valueType.resolve(Object.class));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isScalarValue(ConfigurationPropertySource source, ConfigurationPropertyName name) {
+<b class="nc">&nbsp;			Class&lt;?&gt; resolved = this.valueType.resolve(Object.class);</b>
+<b class="nc">&nbsp;			if (!resolved.getName().startsWith(&quot;java.lang&quot;) &amp;&amp; !resolved.isEnum()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			ConfigurationProperty property = source.getConfigurationProperty(name);</b>
+<b class="nc">&nbsp;			if (property == null) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Object value = property.getValue();</b>
+<b class="nc">&nbsp;			value = getContext().getPlaceholdersResolver().resolvePlaceholders(value);</b>
+<b class="nc">&nbsp;			return getContext().getConverter().canConvert(value, this.valueType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private String getKeyName(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;			StringBuilder result = new StringBuilder();</b>
+<b class="nc">&nbsp;			for (int i = this.root.getNumberOfElements(); i &lt; name.getNumberOfElements(); i++) {</b>
+<b class="nc">&nbsp;				if (!result.isEmpty()) {</b>
+<b class="nc">&nbsp;					result.append(&#39;.&#39;);</b>
+&nbsp;				}
+<b class="nc">&nbsp;				result.append(name.getElement(i, Form.ORIGINAL));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return result.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

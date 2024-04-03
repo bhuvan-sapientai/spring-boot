@@ -1,0 +1,342 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultBindConstructorProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultBindConstructorProvider (org.springframework.boot.context.properties.bind)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultBindConstructorProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DefaultBindConstructorProvider$Constructors</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind;
+&nbsp;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.springframework.beans.BeanUtils;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.core.KotlinDetector;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations;
+&nbsp;import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default {@link BindConstructorProvider} implementation.
+&nbsp; *
+&nbsp; * @author Madhura Bhave
+&nbsp; * @author Phillip Webb
+&nbsp; */
+<b class="nc">&nbsp;class DefaultBindConstructorProvider implements BindConstructorProvider {</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Constructor&lt;?&gt; getBindConstructor(Bindable&lt;?&gt; bindable, boolean isNestedConstructorBinding) {
+<b class="nc">&nbsp;		Constructors constructors = Constructors.getConstructors(bindable.getType().resolve(),</b>
+&nbsp;				isNestedConstructorBinding);
+<b class="nc">&nbsp;		if (constructors.getBind() != null &amp;&amp; constructors.isDeducedBindConstructor()</b>
+<b class="nc">&nbsp;				&amp;&amp; !constructors.isImmutableType()) {</b>
+<b class="nc">&nbsp;			if (bindable.getValue() != null &amp;&amp; bindable.getValue().get() != null) {</b>
+<b class="nc">&nbsp;				return null;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return constructors.getBind();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Constructor&lt;?&gt; getBindConstructor(Class&lt;?&gt; type, boolean isNestedConstructorBinding) {
+<b class="nc">&nbsp;		Constructors constructors = Constructors.getConstructors(type, isNestedConstructorBinding);</b>
+<b class="nc">&nbsp;		return constructors.getBind();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Data holder for autowired and bind constructors.
+&nbsp;	 */
+&nbsp;	static final class Constructors {
+&nbsp;
+<b class="nc">&nbsp;		private static final Constructors NONE = new Constructors(false, null, false, false);</b>
+&nbsp;
+&nbsp;		private final boolean hasAutowired;
+&nbsp;
+&nbsp;		private final Constructor&lt;?&gt; bind;
+&nbsp;
+&nbsp;		private final boolean deducedBindConstructor;
+&nbsp;
+&nbsp;		private final boolean immutableType;
+&nbsp;
+&nbsp;		private Constructors(boolean hasAutowired, Constructor&lt;?&gt; bind, boolean deducedBindConstructor,
+<b class="nc">&nbsp;				boolean immutableType) {</b>
+<b class="nc">&nbsp;			this.hasAutowired = hasAutowired;</b>
+<b class="nc">&nbsp;			this.bind = bind;</b>
+<b class="nc">&nbsp;			this.deducedBindConstructor = deducedBindConstructor;</b>
+<b class="nc">&nbsp;			this.immutableType = immutableType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean hasAutowired() {
+<b class="nc">&nbsp;			return this.hasAutowired;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		Constructor&lt;?&gt; getBind() {
+<b class="nc">&nbsp;			return this.bind;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isDeducedBindConstructor() {
+<b class="nc">&nbsp;			return this.deducedBindConstructor;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isImmutableType() {
+<b class="nc">&nbsp;			return this.immutableType;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		static Constructors getConstructors(Class&lt;?&gt; type, boolean isNestedConstructorBinding) {
+<b class="nc">&nbsp;			if (type == null) {</b>
+<b class="nc">&nbsp;				return NONE;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			boolean hasAutowiredConstructor = isAutowiredPresent(type);</b>
+<b class="nc">&nbsp;			Constructor&lt;?&gt;[] candidates = getCandidateConstructors(type);</b>
+<b class="nc">&nbsp;			MergedAnnotations[] candidateAnnotations = getAnnotations(candidates);</b>
+<b class="nc">&nbsp;			boolean deducedBindConstructor = false;</b>
+<b class="nc">&nbsp;			boolean immutableType = type.isRecord();</b>
+<b class="nc">&nbsp;			Constructor&lt;?&gt; bind = getConstructorBindingAnnotated(type, candidates, candidateAnnotations);</b>
+<b class="nc">&nbsp;			if (bind == null &amp;&amp; !hasAutowiredConstructor) {</b>
+<b class="nc">&nbsp;				bind = deduceBindConstructor(type, candidates);</b>
+<b class="nc">&nbsp;				deducedBindConstructor = bind != null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (bind == null &amp;&amp; !hasAutowiredConstructor &amp;&amp; isKotlinType(type)) {</b>
+<b class="nc">&nbsp;				bind = deduceKotlinBindConstructor(type);</b>
+<b class="nc">&nbsp;				deducedBindConstructor = bind != null;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (bind != null || isNestedConstructorBinding) {</b>
+<b class="nc">&nbsp;				Assert.state(!hasAutowiredConstructor,</b>
+<b class="nc">&nbsp;						() -&gt; type.getName() + &quot; declares @ConstructorBinding and @Autowired constructor&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return new Constructors(hasAutowiredConstructor, bind, deducedBindConstructor, immutableType);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isAutowiredPresent(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			if (Stream.of(type.getDeclaredConstructors())</b>
+<b class="nc">&nbsp;				.map(MergedAnnotations::from)</b>
+<b class="nc">&nbsp;				.anyMatch((annotations) -&gt; annotations.isPresent(Autowired.class))) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Class&lt;?&gt; userClass = ClassUtils.getUserClass(type);</b>
+<b class="nc">&nbsp;			return (userClass != type) &amp;&amp; isAutowiredPresent(userClass);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Constructor&lt;?&gt;[] getCandidateConstructors(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			if (isInnerClass(type)) {</b>
+<b class="nc">&nbsp;				return new Constructor&lt;?&gt;[0];</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return Arrays.stream(type.getDeclaredConstructors())</b>
+<b class="nc">&nbsp;				.filter(Constructors::isNonSynthetic)</b>
+<b class="nc">&nbsp;				.toArray(Constructor[]::new);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isInnerClass(Class&lt;?&gt; type) {
+&nbsp;			try {
+<b class="nc">&nbsp;				return type.getDeclaredField(&quot;this$0&quot;).isSynthetic();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (NoSuchFieldException ex) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isNonSynthetic(Constructor&lt;?&gt; constructor) {
+<b class="nc">&nbsp;			return !constructor.isSynthetic();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static MergedAnnotations[] getAnnotations(Constructor&lt;?&gt;[] candidates) {
+<b class="nc">&nbsp;			MergedAnnotations[] candidateAnnotations = new MergedAnnotations[candidates.length];</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; candidates.length; i++) {</b>
+<b class="nc">&nbsp;				candidateAnnotations[i] = MergedAnnotations.from(candidates[i], SearchStrategy.SUPERCLASS);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return candidateAnnotations;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Constructor&lt;?&gt; getConstructorBindingAnnotated(Class&lt;?&gt; type, Constructor&lt;?&gt;[] candidates,
+&nbsp;				MergedAnnotations[] mergedAnnotations) {
+<b class="nc">&nbsp;			Constructor&lt;?&gt; result = null;</b>
+<b class="nc">&nbsp;			for (int i = 0; i &lt; candidates.length; i++) {</b>
+<b class="nc">&nbsp;				if (mergedAnnotations[i].isPresent(ConstructorBinding.class)) {</b>
+<b class="nc">&nbsp;					Assert.state(candidates[i].getParameterCount() &gt; 0,</b>
+<b class="nc">&nbsp;							() -&gt; type.getName() + &quot; declares @ConstructorBinding on a no-args constructor&quot;);</b>
+<b class="nc">&nbsp;					Assert.state(result == null,</b>
+<b class="nc">&nbsp;							() -&gt; type.getName() + &quot; has more than one @ConstructorBinding constructor&quot;);</b>
+<b class="nc">&nbsp;					result = candidates[i];</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Constructor&lt;?&gt; deduceBindConstructor(Class&lt;?&gt; type, Constructor&lt;?&gt;[] candidates) {
+<b class="nc">&nbsp;			if (candidates.length == 1 &amp;&amp; candidates[0].getParameterCount() &gt; 0) {</b>
+<b class="nc">&nbsp;				if (type.isMemberClass() &amp;&amp; Modifier.isPrivate(candidates[0].getModifiers())) {</b>
+<b class="nc">&nbsp;					return null;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				return candidates[0];</b>
+&nbsp;			}
+<b class="nc">&nbsp;			Constructor&lt;?&gt; result = null;</b>
+<b class="nc">&nbsp;			for (Constructor&lt;?&gt; candidate : candidates) {</b>
+<b class="nc">&nbsp;				if (!Modifier.isPrivate(candidate.getModifiers())) {</b>
+<b class="nc">&nbsp;					if (result != null) {</b>
+<b class="nc">&nbsp;						return null;</b>
+&nbsp;					}
+<b class="nc">&nbsp;					result = candidate;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return (result != null &amp;&amp; result.getParameterCount() &gt; 0) ? result : null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static boolean isKotlinType(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			return KotlinDetector.isKotlinPresent() &amp;&amp; KotlinDetector.isKotlinType(type);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private static Constructor&lt;?&gt; deduceKotlinBindConstructor(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;			Constructor&lt;?&gt; primaryConstructor = BeanUtils.findPrimaryConstructor(type);</b>
+<b class="nc">&nbsp;			if (primaryConstructor != null &amp;&amp; primaryConstructor.getParameterCount() &gt; 0) {</b>
+<b class="nc">&nbsp;				return primaryConstructor;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

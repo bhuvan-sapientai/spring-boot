@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringApplicationAotProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringApplicationAotProcessor (org.springframework.boot)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringApplicationAotProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpringApplicationAotProcessor$AotProcessorHook</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SpringApplicationAotProcessor$AotProcessorHook$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.util.Arrays;
+&nbsp;
+&nbsp;import org.springframework.boot.SpringApplication.AbandonedRunException;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.aot.ContextAotProcessor;
+&nbsp;import org.springframework.context.support.GenericApplicationContext;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;import org.springframework.util.function.ThrowingSupplier;
+&nbsp;
+&nbsp;/**
+&nbsp; * Entry point for AOT processing of a {@link SpringApplication}.
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;strong&gt;For internal use only.&lt;/strong&gt;
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.0.0
+&nbsp; */
+&nbsp;public class SpringApplicationAotProcessor extends ContextAotProcessor {
+&nbsp;
+&nbsp;	private final String[] applicationArgs;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new processor for the specified application and settings.
+&nbsp;	 * @param application the application main class
+&nbsp;	 * @param settings the general AOT processor settings
+&nbsp;	 * @param applicationArgs the arguments to provide to the main method
+&nbsp;	 */
+&nbsp;	public SpringApplicationAotProcessor(Class&lt;?&gt; application, Settings settings, String[] applicationArgs) {
+<b class="nc">&nbsp;		super(application, settings);</b>
+<b class="nc">&nbsp;		this.applicationArgs = applicationArgs;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected GenericApplicationContext prepareApplicationContext(Class&lt;?&gt; application) {
+<b class="nc">&nbsp;		return new AotProcessorHook(application).run(() -&gt; {</b>
+<b class="nc">&nbsp;			Method mainMethod = application.getMethod(&quot;main&quot;, String[].class);</b>
+<b class="nc">&nbsp;			return ReflectionUtils.invokeMethod(mainMethod, null, new Object[] { this.applicationArgs });</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	public static void main(String[] args) throws Exception {
+<b class="nc">&nbsp;		int requiredArgs = 6;</b>
+<b class="nc">&nbsp;		Assert.isTrue(args.length &gt;= requiredArgs, () -&gt; &quot;Usage: &quot; + SpringApplicationAotProcessor.class.getName()</b>
+&nbsp;				+ &quot; &lt;applicationName&gt; &lt;sourceOutput&gt; &lt;resourceOutput&gt; &lt;classOutput&gt; &lt;groupId&gt; &lt;artifactId&gt; &lt;originalArgs...&gt;&quot;);
+<b class="nc">&nbsp;		Class&lt;?&gt; application = Class.forName(args[0]);</b>
+<b class="nc">&nbsp;		Settings settings = Settings.builder()</b>
+<b class="nc">&nbsp;			.sourceOutput(Paths.get(args[1]))</b>
+<b class="nc">&nbsp;			.resourceOutput(Paths.get(args[2]))</b>
+<b class="nc">&nbsp;			.classOutput(Paths.get(args[3]))</b>
+<b class="nc">&nbsp;			.groupId((StringUtils.hasText(args[4])) ? args[4] : &quot;unspecified&quot;)</b>
+<b class="nc">&nbsp;			.artifactId(args[5])</b>
+<b class="nc">&nbsp;			.build();</b>
+<b class="nc">&nbsp;		String[] applicationArgs = (args.length &gt; requiredArgs) ? Arrays.copyOfRange(args, requiredArgs, args.length)</b>
+<b class="nc">&nbsp;				: new String[0];</b>
+<b class="nc">&nbsp;		new SpringApplicationAotProcessor(application, settings, applicationArgs).process();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link SpringApplicationHook} used to capture the {@link ApplicationContext} and
+&nbsp;	 * trigger early exit of main method.
+&nbsp;	 */
+&nbsp;	private static final class AotProcessorHook implements SpringApplicationHook {
+&nbsp;
+&nbsp;		private final Class&lt;?&gt; application;
+&nbsp;
+<b class="nc">&nbsp;		private AotProcessorHook(Class&lt;?&gt; application) {</b>
+<b class="nc">&nbsp;			this.application = application;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public SpringApplicationRunListener getRunListener(SpringApplication application) {
+<b class="nc">&nbsp;			return new SpringApplicationRunListener() {</b>
+&nbsp;
+&nbsp;				@Override
+&nbsp;				public void contextLoaded(ConfigurableApplicationContext context) {
+<b class="nc">&nbsp;					throw new AbandonedRunException(context);</b>
+&nbsp;				}
+&nbsp;
+&nbsp;			};
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; GenericApplicationContext run(ThrowingSupplier&lt;T&gt; action) {
+&nbsp;			try {
+<b class="nc">&nbsp;				SpringApplication.withHook(this, action);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (AbandonedRunException ex) {</b>
+<b class="nc">&nbsp;				ApplicationContext context = ex.getApplicationContext();</b>
+<b class="nc">&nbsp;				Assert.isInstanceOf(GenericApplicationContext.class, context,</b>
+<b class="nc">&nbsp;						() -&gt; &quot;AOT processing requires a GenericApplicationContext but got a &quot;</b>
+<b class="nc">&nbsp;								+ context.getClass().getName());</b>
+<b class="nc">&nbsp;				return (GenericApplicationContext) context;</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			throw new IllegalStateException(</b>
+&nbsp;					&quot;No application context available after calling main method of &#39;%s&#39;. Does it run a SpringApplication?&quot;
+<b class="nc">&nbsp;						.formatted(this.application.getName()));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

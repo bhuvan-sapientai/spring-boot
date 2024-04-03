@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AnnotationConfigReactiveWebApplicationContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.reactive.context</a>
+</div>
+
+<h1>Coverage Summary for Class: AnnotationConfigReactiveWebApplicationContext (org.springframework.boot.web.reactive.context)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AnnotationConfigReactiveWebApplicationContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.reactive.context;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+&nbsp;import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfigurableReactiveWebApplicationContext} that accepts annotated classes as
+&nbsp; * input - in particular {@link Configuration @Configuration}-annotated classes, but also
+&nbsp; * plain {@link Component @Component} classes and JSR-330 compliant classes using
+&nbsp; * {@code javax.inject} annotations. Allows for registering classes one by one (specifying
+&nbsp; * class names as config location) as well as for classpath scanning (specifying base
+&nbsp; * packages as config location).
+&nbsp; * &lt;p&gt;
+&nbsp; * Note: In case of multiple {@code @Configuration} classes, later {@code @Bean}
+&nbsp; * definitions will override ones defined in earlier loaded files. This can be leveraged
+&nbsp; * to deliberately override certain bean definitions through an extra Configuration class.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.0.0
+&nbsp; * @see AnnotationConfigApplicationContext
+&nbsp; */
+&nbsp;public class AnnotationConfigReactiveWebApplicationContext extends AnnotationConfigApplicationContext
+&nbsp;		implements ConfigurableReactiveWebApplicationContext {
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new AnnotationConfigReactiveWebApplicationContext that needs to be
+&nbsp;	 * populated through {@link #register} calls and then manually {@linkplain #refresh
+&nbsp;	 * refreshed}.
+&nbsp;	 */
+<b class="nc">&nbsp;	public AnnotationConfigReactiveWebApplicationContext() {</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new AnnotationConfigApplicationContext with the given
+&nbsp;	 * DefaultListableBeanFactory.
+&nbsp;	 * @param beanFactory the DefaultListableBeanFactory instance to use for this context
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public AnnotationConfigReactiveWebApplicationContext(DefaultListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;		super(beanFactory);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new AnnotationConfigApplicationContext, deriving bean definitions from the
+&nbsp;	 * given annotated classes and automatically refreshing the context.
+&nbsp;	 * @param annotatedClasses one or more annotated classes, e.g.
+&nbsp;	 * {@link Configuration @Configuration} classes
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public AnnotationConfigReactiveWebApplicationContext(Class&lt;?&gt;... annotatedClasses) {
+<b class="nc">&nbsp;		super(annotatedClasses);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new AnnotationConfigApplicationContext, scanning for bean definitions in
+&nbsp;	 * the given packages and automatically refreshing the context.
+&nbsp;	 * @param basePackages the packages to check for annotated classes
+&nbsp;	 * @since 2.2.0
+&nbsp;	 */
+&nbsp;	public AnnotationConfigReactiveWebApplicationContext(String... basePackages) {
+<b class="nc">&nbsp;		super(basePackages);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected ConfigurableEnvironment createEnvironment() {
+<b class="nc">&nbsp;		return new StandardReactiveWebEnvironment();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	protected Resource getResourceByPath(String path) {
+&nbsp;		// We must be careful not to expose classpath resources
+<b class="nc">&nbsp;		return new FilteredReactiveWebContextResource(path);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

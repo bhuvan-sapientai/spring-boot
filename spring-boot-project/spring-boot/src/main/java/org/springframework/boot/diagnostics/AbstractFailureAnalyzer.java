@@ -54,7 +54,7 @@ public abstract class AbstractFailureAnalyzer<T extends Throwable> implements Fa
 	}
 
 	@SuppressWarnings("unchecked")
-	protected final <E extends Throwable> E findCause(Throwable failure, Class<E> type) {
+	public final <E extends Throwable> E findCause(Throwable failure, Class<E> type) {
 		while (failure != null) {
 			if (type.isInstance(failure)) {
 				return (E) failure;

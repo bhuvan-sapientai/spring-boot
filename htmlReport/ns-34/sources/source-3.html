@@ -1,0 +1,246 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataSourceUnwrapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.jdbc</a>
+</div>
+
+<h1>Coverage Summary for Class: DataSourceUnwrapper (org.springframework.boot.jdbc)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataSourceUnwrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DataSourceUnwrapper$DelegatingDataSourceUnwrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.jdbc;
+&nbsp;
+&nbsp;import java.sql.Wrapper;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.springframework.aop.framework.AopProxyUtils;
+&nbsp;import org.springframework.aop.support.AopUtils;
+&nbsp;import org.springframework.jdbc.datasource.DelegatingDataSource;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Unwraps a {@link DataSource} that may have been proxied or wrapped in a custom
+&nbsp; * {@link Wrapper} such as {@link DelegatingDataSource}.
+&nbsp; *
+&nbsp; * @author Tadaya Tsuyukubo
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 2.0.7
+&nbsp; */
+&nbsp;public final class DataSourceUnwrapper {
+&nbsp;
+<b class="nc">&nbsp;	private static final boolean DELEGATING_DATA_SOURCE_PRESENT = ClassUtils.isPresent(</b>
+<b class="nc">&nbsp;			&quot;org.springframework.jdbc.datasource.DelegatingDataSource&quot;, DataSourceUnwrapper.class.getClassLoader());</b>
+&nbsp;
+&nbsp;	private DataSourceUnwrapper() {
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an object that implements the given {@code target} type, unwrapping delegate
+&nbsp;	 * or proxy if necessary using the specified {@code unwrapInterface}.
+&nbsp;	 * @param dataSource the datasource to handle
+&nbsp;	 * @param unwrapInterface the interface that the target type must implement
+&nbsp;	 * @param target the type that the result must implement
+&nbsp;	 * @param &lt;I&gt; the interface that the target type must implement
+&nbsp;	 * @param &lt;T&gt; the target type
+&nbsp;	 * @return an object that implements the target type or {@code null}
+&nbsp;	 * @since 2.3.8
+&nbsp;	 * @see Wrapper#unwrap(Class)
+&nbsp;	 */
+&nbsp;	public static &lt;I, T extends I&gt; T unwrap(DataSource dataSource, Class&lt;I&gt; unwrapInterface, Class&lt;T&gt; target) {
+<b class="nc">&nbsp;		if (target.isInstance(dataSource)) {</b>
+<b class="nc">&nbsp;			return target.cast(dataSource);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		I unwrapped = safeUnwrap(dataSource, unwrapInterface);</b>
+<b class="nc">&nbsp;		if (unwrapped != null &amp;&amp; unwrapInterface.isAssignableFrom(target)) {</b>
+<b class="nc">&nbsp;			return target.cast(unwrapped);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (DELEGATING_DATA_SOURCE_PRESENT) {</b>
+<b class="nc">&nbsp;			DataSource targetDataSource = DelegatingDataSourceUnwrapper.getTargetDataSource(dataSource);</b>
+<b class="nc">&nbsp;			if (targetDataSource != null) {</b>
+<b class="nc">&nbsp;				return unwrap(targetDataSource, unwrapInterface, target);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (AopUtils.isAopProxy(dataSource)) {</b>
+<b class="nc">&nbsp;			Object proxyTarget = AopProxyUtils.getSingletonTarget(dataSource);</b>
+<b class="nc">&nbsp;			if (proxyTarget instanceof DataSource proxyDataSource) {</b>
+<b class="nc">&nbsp;				return unwrap(proxyDataSource, unwrapInterface, target);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return an object that implements the given {@code target} type, unwrapping delegate
+&nbsp;	 * or proxy if necessary. Consider using {@link #unwrap(DataSource, Class, Class)} as
+&nbsp;	 * {@link Wrapper#unwrap(Class) unwrapping} won&#39;t be considered if {@code target} is
+&nbsp;	 * not an interface.
+&nbsp;	 * @param dataSource the datasource to handle
+&nbsp;	 * @param target the type that the result must implement
+&nbsp;	 * @param &lt;T&gt; the target type
+&nbsp;	 * @return an object that implements the target type or {@code null}
+&nbsp;	 */
+&nbsp;	public static &lt;T&gt; T unwrap(DataSource dataSource, Class&lt;T&gt; target) {
+<b class="nc">&nbsp;		return unwrap(dataSource, target, target);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static &lt;S&gt; S safeUnwrap(Wrapper wrapper, Class&lt;S&gt; target) {
+&nbsp;		try {
+<b class="nc">&nbsp;			if (target.isInterface() &amp;&amp; wrapper.isWrapperFor(target)) {</b>
+<b class="nc">&nbsp;				return wrapper.unwrap(target);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+&nbsp;			// Continue
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class DelegatingDataSourceUnwrapper {
+&nbsp;
+&nbsp;		private static DataSource getTargetDataSource(DataSource dataSource) {
+<b class="nc">&nbsp;			if (dataSource instanceof DelegatingDataSource delegatingDataSource) {</b>
+<b class="nc">&nbsp;				return delegatingDataSource.getTargetDataSource();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

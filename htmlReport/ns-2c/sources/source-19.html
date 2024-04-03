@@ -1,0 +1,218 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SoftReferenceConfigurationPropertyCache</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.source</a>
+</div>
+
+<h1>Coverage Summary for Class: SoftReferenceConfigurationPropertyCache (org.springframework.boot.context.properties.source)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SoftReferenceConfigurationPropertyCache</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2021 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.source;
+&nbsp;
+&nbsp;import java.lang.ref.SoftReference;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.function.UnaryOperator;
+&nbsp;
+&nbsp;/**
+&nbsp; * Simple cache that uses a {@link SoftReference} to cache a value for as long as
+&nbsp; * possible.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; the value type
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class SoftReferenceConfigurationPropertyCache&lt;T&gt; implements ConfigurationPropertyCaching {
+&nbsp;
+<b class="nc">&nbsp;	private static final Duration UNLIMITED = Duration.ZERO;</b>
+&nbsp;
+&nbsp;	private final boolean neverExpire;
+&nbsp;
+&nbsp;	private volatile Duration timeToLive;
+&nbsp;
+<b class="nc">&nbsp;	private volatile SoftReference&lt;T&gt; value = new SoftReference&lt;&gt;(null);</b>
+&nbsp;
+<b class="nc">&nbsp;	private volatile Instant lastAccessed = now();</b>
+&nbsp;
+<b class="nc">&nbsp;	SoftReferenceConfigurationPropertyCache(boolean neverExpire) {</b>
+<b class="nc">&nbsp;		this.neverExpire = neverExpire;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void enable() {
+<b class="nc">&nbsp;		this.timeToLive = UNLIMITED;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void disable() {
+<b class="nc">&nbsp;		this.timeToLive = null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setTimeToLive(Duration timeToLive) {
+<b class="nc">&nbsp;		this.timeToLive = (timeToLive == null || timeToLive.isZero()) ? null : timeToLive;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void clear() {
+<b class="nc">&nbsp;		this.lastAccessed = null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Get a value from the cache, creating it if necessary.
+&nbsp;	 * @param factory a factory used to create the item if there is no reference to it.
+&nbsp;	 * @param refreshAction action called to refresh the value if it has expired
+&nbsp;	 * @return the value from the cache
+&nbsp;	 */
+&nbsp;	T get(Supplier&lt;T&gt; factory, UnaryOperator&lt;T&gt; refreshAction) {
+<b class="nc">&nbsp;		T value = getValue();</b>
+<b class="nc">&nbsp;		if (value == null) {</b>
+<b class="nc">&nbsp;			value = refreshAction.apply(factory.get());</b>
+<b class="nc">&nbsp;			setValue(value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		else if (hasExpired()) {</b>
+<b class="nc">&nbsp;			value = refreshAction.apply(value);</b>
+<b class="nc">&nbsp;			setValue(value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!this.neverExpire) {</b>
+<b class="nc">&nbsp;			this.lastAccessed = now();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return value;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasExpired() {
+<b class="nc">&nbsp;		if (this.neverExpire) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		Duration timeToLive = this.timeToLive;</b>
+<b class="nc">&nbsp;		Instant lastAccessed = this.lastAccessed;</b>
+<b class="nc">&nbsp;		if (timeToLive == null || lastAccessed == null) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return !UNLIMITED.equals(timeToLive) &amp;&amp; now().isAfter(lastAccessed.plus(timeToLive));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected Instant now() {
+<b class="nc">&nbsp;		return Instant.now();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected T getValue() {
+<b class="nc">&nbsp;		return this.value.get();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected void setValue(T value) {
+<b class="nc">&nbsp;		this.value = new SoftReference&lt;&gt;(value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

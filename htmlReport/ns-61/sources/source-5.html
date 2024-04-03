@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileSessionPersistence</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.embedded.undertow</a>
+</div>
+
+<h1>Coverage Summary for Class: FileSessionPersistence (org.springframework.boot.web.embedded.undertow)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileSessionPersistence</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FileSessionPersistence$SerializablePersistentSession</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2019 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.embedded.undertow;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.ObjectInputStream;
+&nbsp;import java.io.ObjectOutputStream;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import io.undertow.servlet.UndertowServletLogger;
+&nbsp;import io.undertow.servlet.api.SessionPersistenceManager;
+&nbsp;
+&nbsp;import org.springframework.core.ConfigurableObjectInputStream;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link SessionPersistenceManager} that stores session information in a file.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Peter Leibiger
+&nbsp; * @author Raja Kolli
+&nbsp; */
+&nbsp;class FileSessionPersistence implements SessionPersistenceManager {
+&nbsp;
+&nbsp;	private final File dir;
+&nbsp;
+<b class="nc">&nbsp;	FileSessionPersistence(File dir) {</b>
+<b class="nc">&nbsp;		this.dir = dir;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void persistSessions(String deploymentName, Map&lt;String, PersistentSession&gt; sessionData) {
+&nbsp;		try {
+<b class="nc">&nbsp;			save(sessionData, getSessionFile(deploymentName));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			UndertowServletLogger.ROOT_LOGGER.failedToPersistSessions(ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void save(Map&lt;String, PersistentSession&gt; sessionData, File file) throws IOException {
+<b class="nc">&nbsp;		try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(file))) {</b>
+<b class="nc">&nbsp;			save(sessionData, stream);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void save(Map&lt;String, PersistentSession&gt; sessionData, ObjectOutputStream stream) throws IOException {
+<b class="nc">&nbsp;		Map&lt;String, Serializable&gt; session = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		sessionData.forEach((key, value) -&gt; session.put(key, new SerializablePersistentSession(value)));</b>
+<b class="nc">&nbsp;		stream.writeObject(session);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Map&lt;String, PersistentSession&gt; loadSessionAttributes(String deploymentName, final ClassLoader classLoader) {
+&nbsp;		try {
+<b class="nc">&nbsp;			File file = getSessionFile(deploymentName);</b>
+<b class="nc">&nbsp;			if (file.exists()) {</b>
+<b class="nc">&nbsp;				return load(file, classLoader);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			UndertowServletLogger.ROOT_LOGGER.failedtoLoadPersistentSessions(ex);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, PersistentSession&gt; load(File file, ClassLoader classLoader)
+&nbsp;			throws IOException, ClassNotFoundException {
+<b class="nc">&nbsp;		try (ObjectInputStream stream = new ConfigurableObjectInputStream(new FileInputStream(file), classLoader)) {</b>
+<b class="nc">&nbsp;			return load(stream);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, PersistentSession&gt; load(ObjectInputStream stream) throws ClassNotFoundException, IOException {
+<b class="nc">&nbsp;		Map&lt;String, SerializablePersistentSession&gt; session = readSession(stream);</b>
+<b class="nc">&nbsp;		long time = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;		Map&lt;String, PersistentSession&gt; result = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		session.forEach((key, value) -&gt; {</b>
+<b class="nc">&nbsp;			PersistentSession entrySession = value.getPersistentSession();</b>
+<b class="nc">&nbsp;			if (entrySession.getExpiration().getTime() &gt; time) {</b>
+<b class="nc">&nbsp;				result.put(key, entrySession);</b>
+&nbsp;			}
+&nbsp;		});
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	private Map&lt;String, SerializablePersistentSession&gt; readSession(ObjectInputStream stream)
+&nbsp;			throws ClassNotFoundException, IOException {
+<b class="nc">&nbsp;		return ((Map&lt;String, SerializablePersistentSession&gt;) stream.readObject());</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private File getSessionFile(String deploymentName) {
+<b class="nc">&nbsp;		if (!this.dir.exists()) {</b>
+<b class="nc">&nbsp;			this.dir.mkdirs();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new File(this.dir, deploymentName + &quot;.session&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void clear(String deploymentName) {
+<b class="nc">&nbsp;		getSessionFile(deploymentName).delete();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Session data in a serializable form.
+&nbsp;	 */
+&nbsp;	static class SerializablePersistentSession implements Serializable {
+&nbsp;
+&nbsp;		private static final long serialVersionUID = 0L;
+&nbsp;
+&nbsp;		private final Date expiration;
+&nbsp;
+&nbsp;		private final Map&lt;String, Object&gt; sessionData;
+&nbsp;
+<b class="nc">&nbsp;		SerializablePersistentSession(PersistentSession session) {</b>
+<b class="nc">&nbsp;			this.expiration = session.getExpiration();</b>
+<b class="nc">&nbsp;			this.sessionData = new LinkedHashMap&lt;&gt;(session.getSessionData());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		PersistentSession getPersistentSession() {
+<b class="nc">&nbsp;			return new PersistentSession(this.expiration, this.sessionData);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

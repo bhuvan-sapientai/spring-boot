@@ -1,0 +1,295 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringApplicationAdminMXBeanRegistrar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.admin</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringApplicationAdminMXBeanRegistrar (org.springframework.boot.admin)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringApplicationAdminMXBeanRegistrar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.admin;
+&nbsp;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;
+&nbsp;import javax.management.MBeanServer;
+&nbsp;import javax.management.MalformedObjectNameException;
+&nbsp;import javax.management.ObjectName;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.beans.BeansException;
+&nbsp;import org.springframework.beans.factory.DisposableBean;
+&nbsp;import org.springframework.beans.factory.InitializingBean;
+&nbsp;import org.springframework.boot.context.event.ApplicationReadyEvent;
+&nbsp;import org.springframework.boot.web.context.WebServerInitializedEvent;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContextAware;
+&nbsp;import org.springframework.context.ApplicationEvent;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.context.EnvironmentAware;
+&nbsp;import org.springframework.context.event.GenericApplicationListener;
+&nbsp;import org.springframework.core.Ordered;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.StandardEnvironment;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Register a {@link SpringApplicationAdminMXBean} implementation to the platform
+&nbsp; * {@link MBeanServer}.
+&nbsp; *
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;public class SpringApplicationAdminMXBeanRegistrar implements ApplicationContextAware, GenericApplicationListener,
+&nbsp;		EnvironmentAware, InitializingBean, DisposableBean {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(SpringApplicationAdmin.class);</b>
+&nbsp;
+&nbsp;	private ConfigurableApplicationContext applicationContext;
+&nbsp;
+<b class="nc">&nbsp;	private Environment environment = new StandardEnvironment();</b>
+&nbsp;
+&nbsp;	private final ObjectName objectName;
+&nbsp;
+<b class="nc">&nbsp;	private boolean ready = false;</b>
+&nbsp;
+<b class="nc">&nbsp;	private boolean embeddedWebApplication = false;</b>
+&nbsp;
+<b class="nc">&nbsp;	public SpringApplicationAdminMXBeanRegistrar(String name) throws MalformedObjectNameException {</b>
+<b class="nc">&nbsp;		this.objectName = new ObjectName(name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+<b class="nc">&nbsp;		Assert.state(applicationContext instanceof ConfigurableApplicationContext,</b>
+&nbsp;				&quot;ApplicationContext does not implement ConfigurableApplicationContext&quot;);
+<b class="nc">&nbsp;		this.applicationContext = (ConfigurableApplicationContext) applicationContext;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void setEnvironment(Environment environment) {
+<b class="nc">&nbsp;		this.environment = environment;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean supportsEventType(ResolvableType eventType) {
+<b class="nc">&nbsp;		Class&lt;?&gt; type = eventType.getRawClass();</b>
+<b class="nc">&nbsp;		if (type == null) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ApplicationReadyEvent.class.isAssignableFrom(type)</b>
+<b class="nc">&nbsp;				|| WebServerInitializedEvent.class.isAssignableFrom(type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean supportsSourceType(Class&lt;?&gt; sourceType) {
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onApplicationEvent(ApplicationEvent event) {
+<b class="nc">&nbsp;		if (event instanceof ApplicationReadyEvent readyEvent) {</b>
+<b class="nc">&nbsp;			onApplicationReadyEvent(readyEvent);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (event instanceof WebServerInitializedEvent initializedEvent) {</b>
+<b class="nc">&nbsp;			onWebServerInitializedEvent(initializedEvent);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int getOrder() {
+<b class="nc">&nbsp;		return Ordered.HIGHEST_PRECEDENCE;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void onApplicationReadyEvent(ApplicationReadyEvent event) {
+<b class="nc">&nbsp;		if (this.applicationContext.equals(event.getApplicationContext())) {</b>
+<b class="nc">&nbsp;			this.ready = true;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	void onWebServerInitializedEvent(WebServerInitializedEvent event) {
+<b class="nc">&nbsp;		if (this.applicationContext.equals(event.getApplicationContext())) {</b>
+<b class="nc">&nbsp;			this.embeddedWebApplication = true;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void afterPropertiesSet() throws Exception {
+<b class="nc">&nbsp;		MBeanServer server = ManagementFactory.getPlatformMBeanServer();</b>
+<b class="nc">&nbsp;		server.registerMBean(new SpringApplicationAdmin(), this.objectName);</b>
+<b class="nc">&nbsp;		if (logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;			logger.debug(&quot;Application Admin MBean registered with name &#39;&quot; + this.objectName + &quot;&#39;&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void destroy() throws Exception {
+<b class="nc">&nbsp;		ManagementFactory.getPlatformMBeanServer().unregisterMBean(this.objectName);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private final class SpringApplicationAdmin implements SpringApplicationAdminMXBean {</b>
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isReady() {
+<b class="nc">&nbsp;			return SpringApplicationAdminMXBeanRegistrar.this.ready;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean isEmbeddedWebApplication() {
+<b class="nc">&nbsp;			return SpringApplicationAdminMXBeanRegistrar.this.embeddedWebApplication;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getProperty(String key) {
+<b class="nc">&nbsp;			return SpringApplicationAdminMXBeanRegistrar.this.environment.getProperty(key);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public void shutdown() {
+<b class="nc">&nbsp;			logger.info(&quot;Application shutdown requested.&quot;);</b>
+<b class="nc">&nbsp;			SpringApplicationAdminMXBeanRegistrar.this.applicationContext.close();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

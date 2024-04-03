@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ResourceBanner</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot</a>
+</div>
+
+<h1>Coverage Summary for Class: ResourceBanner (org.springframework.boot)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResourceBanner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot;
+&nbsp;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.ansi.AnsiPropertySource;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.MapPropertySource;
+&nbsp;import org.springframework.core.env.MutablePropertySources;
+&nbsp;import org.springframework.core.env.PropertyResolver;
+&nbsp;import org.springframework.core.env.PropertySourcesPropertyResolver;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.StreamUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Banner implementation that prints from a source text {@link Resource}.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Vedran Pavic
+&nbsp; * @author Toshiaki Maki
+&nbsp; * @author Krzysztof Krason
+&nbsp; * @since 1.2.0
+&nbsp; */
+&nbsp;public class ResourceBanner implements Banner {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(ResourceBanner.class);</b>
+&nbsp;
+&nbsp;	private final Resource resource;
+&nbsp;
+<b class="nc">&nbsp;	public ResourceBanner(Resource resource) {</b>
+<b class="nc">&nbsp;		Assert.notNull(resource, &quot;Resource must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(resource.exists(), &quot;Resource must exist&quot;);</b>
+<b class="nc">&nbsp;		this.resource = resource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void printBanner(Environment environment, Class&lt;?&gt; sourceClass, PrintStream out) {
+&nbsp;		try {
+<b class="nc">&nbsp;			String banner = StreamUtils.copyToString(this.resource.getInputStream(),</b>
+<b class="nc">&nbsp;					environment.getProperty(&quot;spring.banner.charset&quot;, Charset.class, StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;			for (PropertyResolver resolver : getPropertyResolvers(environment, sourceClass)) {</b>
+<b class="nc">&nbsp;				banner = resolver.resolvePlaceholders(banner);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			out.println(banner);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			logger.warn(LogMessage.format(&quot;Banner not printable: %s (%s: &#39;%s&#39;)&quot;, this.resource, ex.getClass(),</b>
+<b class="nc">&nbsp;					ex.getMessage()), ex);</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return a mutable list of the {@link PropertyResolver} instances that will be used
+&nbsp;	 * to resolve placeholders.
+&nbsp;	 * @param environment the environment
+&nbsp;	 * @param sourceClass the source class
+&nbsp;	 * @return a mutable list of property resolvers
+&nbsp;	 */
+&nbsp;	protected List&lt;PropertyResolver&gt; getPropertyResolvers(Environment environment, Class&lt;?&gt; sourceClass) {
+<b class="nc">&nbsp;		MutablePropertySources sources = new MutablePropertySources();</b>
+<b class="nc">&nbsp;		if (environment instanceof ConfigurableEnvironment) {</b>
+<b class="nc">&nbsp;			((ConfigurableEnvironment) environment).getPropertySources().forEach(sources::addLast);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		sources.addLast(getTitleSource(sourceClass));</b>
+<b class="nc">&nbsp;		sources.addLast(getAnsiSource());</b>
+<b class="nc">&nbsp;		sources.addLast(getVersionSource(sourceClass));</b>
+<b class="nc">&nbsp;		List&lt;PropertyResolver&gt; resolvers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		resolvers.add(new PropertySourcesPropertyResolver(sources));</b>
+<b class="nc">&nbsp;		return resolvers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private MapPropertySource getTitleSource(Class&lt;?&gt; sourceClass) {
+<b class="nc">&nbsp;		String applicationTitle = getApplicationTitle(sourceClass);</b>
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; titleMap = Collections.singletonMap(&quot;application.title&quot;,</b>
+<b class="nc">&nbsp;				(applicationTitle != null) ? applicationTitle : &quot;&quot;);</b>
+<b class="nc">&nbsp;		return new MapPropertySource(&quot;title&quot;, titleMap);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the application title that should be used for the source class. By default
+&nbsp;	 * will use {@link Package#getImplementationTitle()}.
+&nbsp;	 * @param sourceClass the source class
+&nbsp;	 * @return the application title
+&nbsp;	 */
+&nbsp;	protected String getApplicationTitle(Class&lt;?&gt; sourceClass) {
+<b class="nc">&nbsp;		Package sourcePackage = (sourceClass != null) ? sourceClass.getPackage() : null;</b>
+<b class="nc">&nbsp;		return (sourcePackage != null) ? sourcePackage.getImplementationTitle() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private AnsiPropertySource getAnsiSource() {
+<b class="nc">&nbsp;		return new AnsiPropertySource(&quot;ansi&quot;, true);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private MapPropertySource getVersionSource(Class&lt;?&gt; sourceClass) {
+<b class="nc">&nbsp;		return new MapPropertySource(&quot;version&quot;, getVersionsMap(sourceClass));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Object&gt; getVersionsMap(Class&lt;?&gt; sourceClass) {
+<b class="nc">&nbsp;		String appVersion = getApplicationVersion(sourceClass);</b>
+<b class="nc">&nbsp;		String bootVersion = getBootVersion();</b>
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; versions = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		versions.put(&quot;application.version&quot;, getVersionString(appVersion, false));</b>
+<b class="nc">&nbsp;		versions.put(&quot;spring-boot.version&quot;, getVersionString(bootVersion, false));</b>
+<b class="nc">&nbsp;		versions.put(&quot;application.formatted-version&quot;, getVersionString(appVersion, true));</b>
+<b class="nc">&nbsp;		versions.put(&quot;spring-boot.formatted-version&quot;, getVersionString(bootVersion, true));</b>
+<b class="nc">&nbsp;		return versions;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String getApplicationVersion(Class&lt;?&gt; sourceClass) {
+<b class="nc">&nbsp;		Package sourcePackage = (sourceClass != null) ? sourceClass.getPackage() : null;</b>
+<b class="nc">&nbsp;		return (sourcePackage != null) ? sourcePackage.getImplementationVersion() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected String getBootVersion() {
+<b class="nc">&nbsp;		return SpringBootVersion.getVersion();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getVersionString(String version, boolean format) {
+<b class="nc">&nbsp;		if (version == null) {</b>
+<b class="nc">&nbsp;			return &quot;&quot;;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return format ? &quot; (v&quot; + version + &quot;)&quot; : version;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

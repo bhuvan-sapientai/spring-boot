@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebServerPortFileWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.context</a>
+</div>
+
+<h1>Coverage Summary for Class: WebServerPortFileWriter (org.springframework.boot.web.context)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebServerPortFileWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.context;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.boot.system.SystemProperties;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.FileCopyUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * An {@link ApplicationListener} that saves embedded server port and management port into
+&nbsp; * file. This application listener will be triggered whenever the server starts, and the
+&nbsp; * file name can be overridden at runtime with a System property or environment variable
+&nbsp; * named &quot;PORTFILE&quot; or &quot;portfile&quot;.
+&nbsp; *
+&nbsp; * @author David Liu
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class WebServerPortFileWriter implements ApplicationListener&lt;WebServerInitializedEvent&gt; {
+&nbsp;
+&nbsp;	private static final String DEFAULT_FILE_NAME = &quot;application.port&quot;;
+&nbsp;
+<b class="nc">&nbsp;	private static final String[] PROPERTY_VARIABLES = { &quot;PORTFILE&quot;, &quot;portfile&quot; };</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(WebServerPortFileWriter.class);</b>
+&nbsp;
+&nbsp;	private final File file;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link WebServerPortFileWriter} instance using the filename
+&nbsp;	 * &#39;application.port&#39;.
+&nbsp;	 */
+&nbsp;	public WebServerPortFileWriter() {
+<b class="nc">&nbsp;		this(new File(DEFAULT_FILE_NAME));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link WebServerPortFileWriter} instance with a specified filename.
+&nbsp;	 * @param filename the name of file containing port
+&nbsp;	 */
+&nbsp;	public WebServerPortFileWriter(String filename) {
+<b class="nc">&nbsp;		this(new File(filename));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link WebServerPortFileWriter} instance with a specified file.
+&nbsp;	 * @param file the file containing port
+&nbsp;	 */
+<b class="nc">&nbsp;	public WebServerPortFileWriter(File file) {</b>
+<b class="nc">&nbsp;		Assert.notNull(file, &quot;File must not be null&quot;);</b>
+<b class="nc">&nbsp;		String override = SystemProperties.get(PROPERTY_VARIABLES);</b>
+<b class="nc">&nbsp;		if (override != null) {</b>
+<b class="nc">&nbsp;			this.file = new File(override);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			this.file = file;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onApplicationEvent(WebServerInitializedEvent event) {
+<b class="nc">&nbsp;		File portFile = getPortFile(event.getApplicationContext());</b>
+&nbsp;		try {
+<b class="nc">&nbsp;			String port = String.valueOf(event.getWebServer().getPort());</b>
+<b class="nc">&nbsp;			createParentDirectory(portFile);</b>
+<b class="nc">&nbsp;			FileCopyUtils.copy(port.getBytes(), portFile);</b>
+<b class="nc">&nbsp;			portFile.deleteOnExit();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			logger.warn(LogMessage.format(&quot;Cannot create port file %s&quot;, this.file));</b>
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the actual port file that should be written for the given application
+&nbsp;	 * context. The default implementation builds a file from the source file and the
+&nbsp;	 * application context namespace if available.
+&nbsp;	 * @param applicationContext the source application context
+&nbsp;	 * @return the file that should be written
+&nbsp;	 */
+&nbsp;	protected File getPortFile(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		String namespace = getServerNamespace(applicationContext);</b>
+<b class="nc">&nbsp;		if (!StringUtils.hasLength(namespace)) {</b>
+<b class="nc">&nbsp;			return this.file;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String name = this.file.getName();</b>
+<b class="nc">&nbsp;		String extension = StringUtils.getFilenameExtension(this.file.getName());</b>
+<b class="nc">&nbsp;		name = name.substring(0, name.length() - extension.length() - 1);</b>
+<b class="nc">&nbsp;		if (isUpperCase(name)) {</b>
+<b class="nc">&nbsp;			name = name + &quot;-&quot; + namespace.toUpperCase(Locale.ENGLISH);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			name = name + &quot;-&quot; + namespace.toLowerCase(Locale.ENGLISH);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (StringUtils.hasLength(extension)) {</b>
+<b class="nc">&nbsp;			name = name + &quot;.&quot; + extension;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new File(this.file.getParentFile(), name);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String getServerNamespace(ApplicationContext applicationContext) {
+<b class="nc">&nbsp;		if (applicationContext instanceof WebServerApplicationContext webServerApplicationContext) {</b>
+<b class="nc">&nbsp;			return webServerApplicationContext.getServerNamespace();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isUpperCase(String name) {
+<b class="nc">&nbsp;		for (int i = 0; i &lt; name.length(); i++) {</b>
+<b class="nc">&nbsp;			if (Character.isLetter(name.charAt(i)) &amp;&amp; !Character.isUpperCase(name.charAt(i))) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return true;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createParentDirectory(File file) {
+<b class="nc">&nbsp;		File parent = file.getParentFile();</b>
+<b class="nc">&nbsp;		if (parent != null) {</b>
+<b class="nc">&nbsp;			parent.mkdirs();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EnvironmentConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot</a>
+</div>
+
+<h1>Coverage Summary for Class: EnvironmentConverter (org.springframework.boot)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EnvironmentConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot;
+&nbsp;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.env.MutablePropertySources;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.core.env.StandardEnvironment;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ReflectionUtils;
+&nbsp;import org.springframework.web.context.support.StandardServletEnvironment;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility class for converting one type of {@link Environment} to another.
+&nbsp; *
+&nbsp; * @author Ethan Rubinson
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Madhura Bhave
+&nbsp; */
+&nbsp;final class EnvironmentConverter {
+&nbsp;
+&nbsp;	private static final String CONFIGURABLE_WEB_ENVIRONMENT_CLASS = &quot;org.springframework.web.context.ConfigurableWebEnvironment&quot;;
+&nbsp;
+&nbsp;	private static final Set&lt;String&gt; SERVLET_ENVIRONMENT_SOURCE_NAMES;
+&nbsp;
+&nbsp;	static {
+<b class="nc">&nbsp;		Set&lt;String&gt; names = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		names.add(StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME);</b>
+<b class="nc">&nbsp;		names.add(StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME);</b>
+<b class="nc">&nbsp;		names.add(StandardServletEnvironment.JNDI_PROPERTY_SOURCE_NAME);</b>
+<b class="nc">&nbsp;		SERVLET_ENVIRONMENT_SOURCE_NAMES = Collections.unmodifiableSet(names);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private final ClassLoader classLoader;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@link EnvironmentConverter} that will use the given
+&nbsp;	 * {@code classLoader} during conversion.
+&nbsp;	 * @param classLoader the class loader to use
+&nbsp;	 */
+<b class="nc">&nbsp;	EnvironmentConverter(ClassLoader classLoader) {</b>
+<b class="nc">&nbsp;		this.classLoader = classLoader;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Converts the given {@code environment} to the given {@link StandardEnvironment}
+&nbsp;	 * type. If the environment is already of the same type, no conversion is performed
+&nbsp;	 * and it is returned unchanged.
+&nbsp;	 * @param environment the Environment to convert
+&nbsp;	 * @param type the type to convert the Environment to
+&nbsp;	 * @return the converted Environment
+&nbsp;	 */
+&nbsp;	ConfigurableEnvironment convertEnvironmentIfNecessary(ConfigurableEnvironment environment,
+&nbsp;			Class&lt;? extends ConfigurableEnvironment&gt; type) {
+<b class="nc">&nbsp;		if (type.equals(environment.getClass())) {</b>
+<b class="nc">&nbsp;			return environment;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return convertEnvironment(environment, type);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurableEnvironment convertEnvironment(ConfigurableEnvironment environment,
+&nbsp;			Class&lt;? extends ConfigurableEnvironment&gt; type) {
+<b class="nc">&nbsp;		ConfigurableEnvironment result = createEnvironment(type);</b>
+<b class="nc">&nbsp;		result.setActiveProfiles(environment.getActiveProfiles());</b>
+<b class="nc">&nbsp;		result.setConversionService(environment.getConversionService());</b>
+<b class="nc">&nbsp;		copyPropertySources(environment, result);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private ConfigurableEnvironment createEnvironment(Class&lt;? extends ConfigurableEnvironment&gt; type) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Constructor&lt;? extends ConfigurableEnvironment&gt; constructor = type.getDeclaredConstructor();</b>
+<b class="nc">&nbsp;			ReflectionUtils.makeAccessible(constructor);</b>
+<b class="nc">&nbsp;			return constructor.newInstance();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Exception ex) {</b>
+<b class="nc">&nbsp;			return new ApplicationEnvironment();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void copyPropertySources(ConfigurableEnvironment source, ConfigurableEnvironment target) {
+<b class="nc">&nbsp;		removePropertySources(target.getPropertySources(), isServletEnvironment(target.getClass(), this.classLoader));</b>
+<b class="nc">&nbsp;		for (PropertySource&lt;?&gt; propertySource : source.getPropertySources()) {</b>
+<b class="nc">&nbsp;			if (!SERVLET_ENVIRONMENT_SOURCE_NAMES.contains(propertySource.getName())) {</b>
+<b class="nc">&nbsp;				target.getPropertySources().addLast(propertySource);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isServletEnvironment(Class&lt;?&gt; conversionType, ClassLoader classLoader) {
+&nbsp;		try {
+<b class="nc">&nbsp;			Class&lt;?&gt; webEnvironmentClass = ClassUtils.forName(CONFIGURABLE_WEB_ENVIRONMENT_CLASS, classLoader);</b>
+<b class="nc">&nbsp;			return webEnvironmentClass.isAssignableFrom(conversionType);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (Throwable ex) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private void removePropertySources(MutablePropertySources propertySources, boolean isServletEnvironment) {
+<b class="nc">&nbsp;		Set&lt;String&gt; names = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (PropertySource&lt;?&gt; propertySource : propertySources) {</b>
+<b class="nc">&nbsp;			names.add(propertySource.getName());</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		for (String name : names) {</b>
+<b class="nc">&nbsp;			if (!isServletEnvironment || !SERVLET_ENVIRONMENT_SOURCE_NAMES.contains(name)) {</b>
+<b class="nc">&nbsp;				propertySources.remove(name);</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

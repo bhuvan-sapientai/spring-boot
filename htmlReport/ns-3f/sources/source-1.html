@@ -1,0 +1,409 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntityManagerFactoryBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.orm.jpa</a>
+</div>
+
+<h1>Coverage Summary for Class: EntityManagerFactoryBuilder (org.springframework.boot.orm.jpa)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntityManagerFactoryBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EntityManagerFactoryBuilder$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.orm.jpa;
+&nbsp;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.springframework.core.task.AsyncTaskExecutor;
+&nbsp;import org.springframework.orm.jpa.JpaVendorAdapter;
+&nbsp;import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+&nbsp;import org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypes;
+&nbsp;import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
+&nbsp;import org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor;
+&nbsp;import org.springframework.util.ClassUtils;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Convenient builder for JPA EntityManagerFactory instances. Collects common
+&nbsp; * configuration when constructed and then allows you to create one or more
+&nbsp; * {@link LocalContainerEntityManagerFactoryBean} through a fluent builder pattern. The
+&nbsp; * most common options are covered in the builder, but you can always manipulate the
+&nbsp; * product of the builder if you need more control, before returning it from a
+&nbsp; * {@code @Bean} definition.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Stephane Nicoll
+&nbsp; * @since 1.3.0
+&nbsp; */
+&nbsp;public class EntityManagerFactoryBuilder {
+&nbsp;
+&nbsp;	private final JpaVendorAdapter jpaVendorAdapter;
+&nbsp;
+&nbsp;	private final PersistenceUnitManager persistenceUnitManager;
+&nbsp;
+&nbsp;	private final Map&lt;String, Object&gt; jpaProperties;
+&nbsp;
+&nbsp;	private final URL persistenceUnitRootLocation;
+&nbsp;
+&nbsp;	private AsyncTaskExecutor bootstrapExecutor;
+&nbsp;
+&nbsp;	private PersistenceUnitPostProcessor[] persistenceUnitPostProcessors;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new instance passing in the common pieces that will be shared if multiple
+&nbsp;	 * EntityManagerFactory instances are created.
+&nbsp;	 * @param jpaVendorAdapter a vendor adapter
+&nbsp;	 * @param jpaProperties the JPA properties to be passed to the persistence provider
+&nbsp;	 * @param persistenceUnitManager optional source of persistence unit information (can
+&nbsp;	 * be null)
+&nbsp;	 */
+&nbsp;	public EntityManagerFactoryBuilder(JpaVendorAdapter jpaVendorAdapter, Map&lt;String, ?&gt; jpaProperties,
+&nbsp;			PersistenceUnitManager persistenceUnitManager) {
+<b class="nc">&nbsp;		this(jpaVendorAdapter, jpaProperties, persistenceUnitManager, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new instance passing in the common pieces that will be shared if multiple
+&nbsp;	 * EntityManagerFactory instances are created.
+&nbsp;	 * @param jpaVendorAdapter a vendor adapter
+&nbsp;	 * @param jpaProperties the JPA properties to be passed to the persistence provider
+&nbsp;	 * @param persistenceUnitManager optional source of persistence unit information (can
+&nbsp;	 * be null)
+&nbsp;	 * @param persistenceUnitRootLocation the persistence unit root location to use as a
+&nbsp;	 * fallback or {@code null}
+&nbsp;	 * @since 1.4.1
+&nbsp;	 */
+&nbsp;	public EntityManagerFactoryBuilder(JpaVendorAdapter jpaVendorAdapter, Map&lt;String, ?&gt; jpaProperties,
+<b class="nc">&nbsp;			PersistenceUnitManager persistenceUnitManager, URL persistenceUnitRootLocation) {</b>
+<b class="nc">&nbsp;		this.jpaVendorAdapter = jpaVendorAdapter;</b>
+<b class="nc">&nbsp;		this.persistenceUnitManager = persistenceUnitManager;</b>
+<b class="nc">&nbsp;		this.jpaProperties = new LinkedHashMap&lt;&gt;(jpaProperties);</b>
+<b class="nc">&nbsp;		this.persistenceUnitRootLocation = persistenceUnitRootLocation;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public Builder dataSource(DataSource dataSource) {
+<b class="nc">&nbsp;		return new Builder(dataSource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the bootstrap executor to be used by the
+&nbsp;	 * {@link LocalContainerEntityManagerFactoryBean}.
+&nbsp;	 * @param bootstrapExecutor the executor
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	public void setBootstrapExecutor(AsyncTaskExecutor bootstrapExecutor) {
+<b class="nc">&nbsp;		this.bootstrapExecutor = bootstrapExecutor;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Set the {@linkplain PersistenceUnitPostProcessor persistence unit post processors}
+&nbsp;	 * to be applied to the PersistenceUnitInfo used for creating the
+&nbsp;	 * {@link LocalContainerEntityManagerFactoryBean}.
+&nbsp;	 * @param persistenceUnitPostProcessors the persistence unit post processors to use
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public void setPersistenceUnitPostProcessors(PersistenceUnitPostProcessor... persistenceUnitPostProcessors) {
+<b class="nc">&nbsp;		this.persistenceUnitPostProcessors = persistenceUnitPostProcessors;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * A fluent builder for a LocalContainerEntityManagerFactoryBean.
+&nbsp;	 */
+&nbsp;	public final class Builder {
+&nbsp;
+&nbsp;		private final DataSource dataSource;
+&nbsp;
+&nbsp;		private PersistenceManagedTypes managedTypes;
+&nbsp;
+&nbsp;		private String[] packagesToScan;
+&nbsp;
+&nbsp;		private String persistenceUnit;
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, Object&gt; properties = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private String[] mappingResources;
+&nbsp;
+&nbsp;		private boolean jta;
+&nbsp;
+<b class="nc">&nbsp;		private Builder(DataSource dataSource) {</b>
+<b class="nc">&nbsp;			this.dataSource = dataSource;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The persistence managed types, providing both the managed entities and packages
+&nbsp;		 * the entity manager should consider.
+&nbsp;		 * @param managedTypes managed types.
+&nbsp;		 * @return the builder for fluent usage
+&nbsp;		 */
+&nbsp;		public Builder managedTypes(PersistenceManagedTypes managedTypes) {
+<b class="nc">&nbsp;			this.managedTypes = managedTypes;</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The names of packages to scan for {@code @Entity} annotations.
+&nbsp;		 * @param packagesToScan packages to scan
+&nbsp;		 * @return the builder for fluent usage
+&nbsp;		 * @see #managedTypes(PersistenceManagedTypes)
+&nbsp;		 */
+&nbsp;		public Builder packages(String... packagesToScan) {
+<b class="nc">&nbsp;			this.packagesToScan = packagesToScan;</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The classes whose packages should be scanned for {@code @Entity} annotations.
+&nbsp;		 * @param basePackageClasses the classes to use
+&nbsp;		 * @return the builder for fluent usage
+&nbsp;		 * @see #managedTypes(PersistenceManagedTypes)
+&nbsp;		 */
+&nbsp;		public Builder packages(Class&lt;?&gt;... basePackageClasses) {
+<b class="nc">&nbsp;			Set&lt;String&gt; packages = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;			for (Class&lt;?&gt; type : basePackageClasses) {</b>
+<b class="nc">&nbsp;				packages.add(ClassUtils.getPackageName(type));</b>
+&nbsp;			}
+<b class="nc">&nbsp;			this.packagesToScan = StringUtils.toStringArray(packages);</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The name of the persistence unit. If only building one EntityManagerFactory you
+&nbsp;		 * can omit this, but if there are more than one in the same application you
+&nbsp;		 * should give them distinct names.
+&nbsp;		 * @param persistenceUnit the name of the persistence unit
+&nbsp;		 * @return the builder for fluent usage
+&nbsp;		 */
+&nbsp;		public Builder persistenceUnit(String persistenceUnit) {
+<b class="nc">&nbsp;			this.persistenceUnit = persistenceUnit;</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Generic properties for standard JPA or vendor-specific configuration. These
+&nbsp;		 * properties override any values provided in the constructor.
+&nbsp;		 * @param properties the properties to use
+&nbsp;		 * @return the builder for fluent usage
+&nbsp;		 */
+&nbsp;		public Builder properties(Map&lt;String, ?&gt; properties) {
+<b class="nc">&nbsp;			this.properties.putAll(properties);</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * The mapping resources (equivalent to {@code &lt;mapping-file&gt;} entries in
+&nbsp;		 * {@code persistence.xml}) for the persistence unit.
+&nbsp;		 * &lt;p&gt;
+&nbsp;		 * Note that mapping resources must be relative to the classpath root, e.g.
+&nbsp;		 * &quot;META-INF/mappings.xml&quot; or &quot;com/mycompany/repository/mappings.xml&quot;, so that
+&nbsp;		 * they can be loaded through {@code ClassLoader.getResource()}.
+&nbsp;		 * @param mappingResources the mapping resources to use
+&nbsp;		 * @return the builder for fluent usage
+&nbsp;		 */
+&nbsp;		public Builder mappingResources(String... mappingResources) {
+<b class="nc">&nbsp;			this.mappingResources = mappingResources;</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Configure if using a JTA {@link DataSource}, i.e. if
+&nbsp;		 * {@link LocalContainerEntityManagerFactoryBean#setDataSource(DataSource)
+&nbsp;		 * setDataSource} or
+&nbsp;		 * {@link LocalContainerEntityManagerFactoryBean#setJtaDataSource(DataSource)
+&nbsp;		 * setJtaDataSource} should be called on the
+&nbsp;		 * {@link LocalContainerEntityManagerFactoryBean}.
+&nbsp;		 * @param jta if the data source is JTA
+&nbsp;		 * @return the builder for fluent usage
+&nbsp;		 */
+&nbsp;		public Builder jta(boolean jta) {
+<b class="nc">&nbsp;			this.jta = jta;</b>
+<b class="nc">&nbsp;			return this;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		public LocalContainerEntityManagerFactoryBean build() {
+<b class="nc">&nbsp;			LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();</b>
+<b class="nc">&nbsp;			if (EntityManagerFactoryBuilder.this.persistenceUnitManager != null) {</b>
+<b class="nc">&nbsp;				entityManagerFactoryBean</b>
+<b class="nc">&nbsp;					.setPersistenceUnitManager(EntityManagerFactoryBuilder.this.persistenceUnitManager);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.persistenceUnit != null) {</b>
+<b class="nc">&nbsp;				entityManagerFactoryBean.setPersistenceUnitName(this.persistenceUnit);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			entityManagerFactoryBean.setJpaVendorAdapter(EntityManagerFactoryBuilder.this.jpaVendorAdapter);</b>
+&nbsp;
+<b class="nc">&nbsp;			if (this.jta) {</b>
+<b class="nc">&nbsp;				entityManagerFactoryBean.setJtaDataSource(this.dataSource);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				entityManagerFactoryBean.setDataSource(this.dataSource);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (this.managedTypes != null) {</b>
+<b class="nc">&nbsp;				entityManagerFactoryBean.setManagedTypes(this.managedTypes);</b>
+&nbsp;			}
+&nbsp;			else {
+<b class="nc">&nbsp;				entityManagerFactoryBean.setPackagesToScan(this.packagesToScan);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			entityManagerFactoryBean.getJpaPropertyMap().putAll(EntityManagerFactoryBuilder.this.jpaProperties);</b>
+<b class="nc">&nbsp;			entityManagerFactoryBean.getJpaPropertyMap().putAll(this.properties);</b>
+<b class="nc">&nbsp;			if (!ObjectUtils.isEmpty(this.mappingResources)) {</b>
+<b class="nc">&nbsp;				entityManagerFactoryBean.setMappingResources(this.mappingResources);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			URL rootLocation = EntityManagerFactoryBuilder.this.persistenceUnitRootLocation;</b>
+<b class="nc">&nbsp;			if (rootLocation != null) {</b>
+<b class="nc">&nbsp;				entityManagerFactoryBean.setPersistenceUnitRootLocation(rootLocation.toString());</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (EntityManagerFactoryBuilder.this.bootstrapExecutor != null) {</b>
+<b class="nc">&nbsp;				entityManagerFactoryBean.setBootstrapExecutor(EntityManagerFactoryBuilder.this.bootstrapExecutor);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (EntityManagerFactoryBuilder.this.persistenceUnitPostProcessors != null) {</b>
+<b class="nc">&nbsp;				entityManagerFactoryBean</b>
+<b class="nc">&nbsp;					.setPersistenceUnitPostProcessors(EntityManagerFactoryBuilder.this.persistenceUnitPostProcessors);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return entityManagerFactoryBean;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

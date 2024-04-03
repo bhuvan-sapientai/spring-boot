@@ -1,0 +1,376 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ValidationBindHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.bind.validation</a>
+</div>
+
+<h1>Coverage Summary for Class: ValidationBindHandler (org.springframework.boot.context.properties.bind.validation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ValidationBindHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ValidationBindHandler$ValidationResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.bind.validation;
+&nbsp;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.springframework.beans.NotReadablePropertyException;
+&nbsp;import org.springframework.boot.context.properties.bind.AbstractBindHandler;
+&nbsp;import org.springframework.boot.context.properties.bind.BindContext;
+&nbsp;import org.springframework.boot.context.properties.bind.BindHandler;
+&nbsp;import org.springframework.boot.context.properties.bind.Bindable;
+&nbsp;import org.springframework.boot.context.properties.bind.DataObjectPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationProperty;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName.Form;
+&nbsp;import org.springframework.core.ResolvableType;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;import org.springframework.validation.AbstractBindingResult;
+&nbsp;import org.springframework.validation.BeanPropertyBindingResult;
+&nbsp;import org.springframework.validation.Validator;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link BindHandler} to apply {@link Validator Validators} to bound results.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class ValidationBindHandler extends AbstractBindHandler {
+&nbsp;
+&nbsp;	private final Validator[] validators;
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;ConfigurationPropertyName, ResolvableType&gt; boundTypes = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;ConfigurationPropertyName, Object&gt; boundResults = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;ConfigurationProperty&gt; boundProperties = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private BindValidationException exception;
+&nbsp;
+<b class="nc">&nbsp;	public ValidationBindHandler(Validator... validators) {</b>
+<b class="nc">&nbsp;		this.validators = validators;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public ValidationBindHandler(BindHandler parent, Validator... validators) {
+<b class="nc">&nbsp;		super(parent);</b>
+<b class="nc">&nbsp;		this.validators = validators;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public &lt;T&gt; Bindable&lt;T&gt; onStart(ConfigurationPropertyName name, Bindable&lt;T&gt; target, BindContext context) {
+<b class="nc">&nbsp;		this.boundTypes.put(name, target.getType());</b>
+<b class="nc">&nbsp;		return super.onStart(name, target, context);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object onSuccess(ConfigurationPropertyName name, Bindable&lt;?&gt; target, BindContext context, Object result) {
+<b class="nc">&nbsp;		this.boundResults.put(name, result);</b>
+<b class="nc">&nbsp;		if (context.getConfigurationProperty() != null) {</b>
+<b class="nc">&nbsp;			this.boundProperties.add(context.getConfigurationProperty());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return super.onSuccess(name, target, context, result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object onFailure(ConfigurationPropertyName name, Bindable&lt;?&gt; target, BindContext context, Exception error)
+&nbsp;			throws Exception {
+<b class="nc">&nbsp;		Object result = super.onFailure(name, target, context, error);</b>
+<b class="nc">&nbsp;		if (result != null) {</b>
+<b class="nc">&nbsp;			clear();</b>
+<b class="nc">&nbsp;			this.boundResults.put(name, result);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		validate(name, target, context, result);</b>
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void clear() {
+<b class="nc">&nbsp;		this.boundTypes.clear();</b>
+<b class="nc">&nbsp;		this.boundResults.clear();</b>
+<b class="nc">&nbsp;		this.boundProperties.clear();</b>
+<b class="nc">&nbsp;		this.exception = null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void onFinish(ConfigurationPropertyName name, Bindable&lt;?&gt; target, BindContext context, Object result)
+&nbsp;			throws Exception {
+<b class="nc">&nbsp;		validate(name, target, context, result);</b>
+<b class="nc">&nbsp;		super.onFinish(name, target, context, result);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void validate(ConfigurationPropertyName name, Bindable&lt;?&gt; target, BindContext context, Object result) {
+<b class="nc">&nbsp;		if (this.exception == null) {</b>
+<b class="nc">&nbsp;			Object validationTarget = getValidationTarget(target, context, result);</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; validationType = target.getBoxedType().resolve();</b>
+<b class="nc">&nbsp;			if (validationTarget != null) {</b>
+<b class="nc">&nbsp;				validateAndPush(name, validationTarget, validationType);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (context.getDepth() == 0 &amp;&amp; this.exception != null) {</b>
+<b class="nc">&nbsp;			throw this.exception;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	private Object getValidationTarget(Bindable&lt;?&gt; target, BindContext context, Object result) {
+<b class="nc">&nbsp;		if (result != null) {</b>
+<b class="nc">&nbsp;			return result;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (context.getDepth() == 0 &amp;&amp; target.getValue() != null) {</b>
+<b class="nc">&nbsp;			return target.getValue().get();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void validateAndPush(ConfigurationPropertyName name, Object target, Class&lt;?&gt; type) {
+<b class="nc">&nbsp;		ValidationResult result = null;</b>
+<b class="nc">&nbsp;		for (Validator validator : this.validators) {</b>
+<b class="nc">&nbsp;			if (validator.supports(type)) {</b>
+<b class="nc">&nbsp;				result = (result != null) ? result : new ValidationResult(name, target);</b>
+<b class="nc">&nbsp;				validator.validate(target, result);</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		if (result != null &amp;&amp; result.hasErrors()) {</b>
+<b class="nc">&nbsp;			this.exception = new BindValidationException(result.getValidationErrors());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link AbstractBindingResult} implementation backed by the bound properties.
+&nbsp;	 */
+&nbsp;	private class ValidationResult extends BeanPropertyBindingResult {
+&nbsp;
+&nbsp;		private final ConfigurationPropertyName name;
+&nbsp;
+<b class="nc">&nbsp;		protected ValidationResult(ConfigurationPropertyName name, Object target) {</b>
+<b class="nc">&nbsp;			super(target, null);</b>
+<b class="nc">&nbsp;			this.name = name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String getObjectName() {
+<b class="nc">&nbsp;			return this.name.toString();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public Class&lt;?&gt; getFieldType(String field) {
+<b class="nc">&nbsp;			ResolvableType type = getBoundField(ValidationBindHandler.this.boundTypes, field);</b>
+<b class="nc">&nbsp;			Class&lt;?&gt; resolved = (type != null) ? type.resolve() : null;</b>
+<b class="nc">&nbsp;			if (resolved != null) {</b>
+<b class="nc">&nbsp;				return resolved;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return super.getFieldType(field);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		protected Object getActualFieldValue(String field) {
+<b class="nc">&nbsp;			Object boundField = getBoundField(ValidationBindHandler.this.boundResults, field);</b>
+<b class="nc">&nbsp;			if (boundField != null) {</b>
+<b class="nc">&nbsp;				return boundField;</b>
+&nbsp;			}
+&nbsp;			try {
+<b class="nc">&nbsp;				return super.getActualFieldValue(field);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;				if (isPropertyNotReadable(ex)) {</b>
+<b class="nc">&nbsp;					return null;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				throw ex;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isPropertyNotReadable(Throwable ex) {
+<b class="nc">&nbsp;			while (ex != null) {</b>
+<b class="nc">&nbsp;				if (ex instanceof NotReadablePropertyException) {</b>
+<b class="nc">&nbsp;					return true;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				ex = ex.getCause();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; T getBoundField(Map&lt;ConfigurationPropertyName, T&gt; boundFields, String field) {
+&nbsp;			try {
+<b class="nc">&nbsp;				ConfigurationPropertyName name = getName(field);</b>
+<b class="nc">&nbsp;				T bound = boundFields.get(name);</b>
+<b class="nc">&nbsp;				if (bound != null) {</b>
+<b class="nc">&nbsp;					return bound;</b>
+&nbsp;				}
+<b class="nc">&nbsp;				if (name.hasIndexedElement()) {</b>
+<b class="nc">&nbsp;					for (Map.Entry&lt;ConfigurationPropertyName, T&gt; entry : boundFields.entrySet()) {</b>
+<b class="nc">&nbsp;						if (isFieldNameMatch(entry.getKey(), name)) {</b>
+<b class="nc">&nbsp;							return entry.getValue();</b>
+&nbsp;						}
+<b class="nc">&nbsp;					}</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean isFieldNameMatch(ConfigurationPropertyName name, ConfigurationPropertyName fieldName) {
+<b class="nc">&nbsp;			if (name.getNumberOfElements() != fieldName.getNumberOfElements()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (int i = 0; i &lt; name.getNumberOfElements(); i++) {</b>
+<b class="nc">&nbsp;				String element = name.getElement(i, Form.ORIGINAL);</b>
+<b class="nc">&nbsp;				String fieldElement = fieldName.getElement(i, Form.ORIGINAL);</b>
+<b class="nc">&nbsp;				if (!ObjectUtils.nullSafeEquals(element, fieldElement)) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+&nbsp;			}
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private ConfigurationPropertyName getName(String field) {
+<b class="nc">&nbsp;			return this.name.append(DataObjectPropertyName.toDashedForm(field));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		ValidationErrors getValidationErrors() {
+<b class="nc">&nbsp;			Set&lt;ConfigurationProperty&gt; boundProperties = ValidationBindHandler.this.boundProperties.stream()</b>
+<b class="nc">&nbsp;				.filter((property) -&gt; this.name.isAncestorOf(property.getName()))</b>
+<b class="nc">&nbsp;				.collect(Collectors.toCollection(LinkedHashSet::new));</b>
+<b class="nc">&nbsp;			return new ValidationErrors(this.name, boundProperties, getAllErrors());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

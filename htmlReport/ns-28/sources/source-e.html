@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConversionServiceDeducer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties</a>
+</div>
+
+<h1>Coverage Summary for Class: ConversionServiceDeducer (org.springframework.boot.context.properties)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConversionServiceDeducer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConversionServiceDeducer$ConverterBeans</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2024 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.ListableBeanFactory;
+&nbsp;import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
+&nbsp;import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+&nbsp;import org.springframework.boot.convert.ApplicationConversionService;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.core.convert.ConversionService;
+&nbsp;import org.springframework.core.convert.converter.Converter;
+&nbsp;import org.springframework.core.convert.converter.GenericConverter;
+&nbsp;import org.springframework.core.convert.support.DefaultConversionService;
+&nbsp;import org.springframework.format.Formatter;
+&nbsp;import org.springframework.format.FormatterRegistry;
+&nbsp;import org.springframework.format.support.FormattingConversionService;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility to deduce the {@link ConversionService} to use for configuration properties
+&nbsp; * binding.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; */
+&nbsp;class ConversionServiceDeducer {
+&nbsp;
+&nbsp;	private final ApplicationContext applicationContext;
+&nbsp;
+<b class="nc">&nbsp;	ConversionServiceDeducer(ApplicationContext applicationContext) {</b>
+<b class="nc">&nbsp;		this.applicationContext = applicationContext;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	List&lt;ConversionService&gt; getConversionServices() {
+<b class="nc">&nbsp;		if (hasUserDefinedConfigurationServiceBean()) {</b>
+<b class="nc">&nbsp;			return Collections.singletonList(this.applicationContext</b>
+<b class="nc">&nbsp;				.getBean(ConfigurableApplicationContext.CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.applicationContext instanceof ConfigurableApplicationContext configurableContext) {</b>
+<b class="nc">&nbsp;			return getConversionServices(configurableContext);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;ConversionService&gt; getConversionServices(ConfigurableApplicationContext applicationContext) {
+<b class="nc">&nbsp;		List&lt;ConversionService&gt; conversionServices = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;		ConverterBeans converterBeans = new ConverterBeans(applicationContext);</b>
+<b class="nc">&nbsp;		if (!converterBeans.isEmpty()) {</b>
+<b class="nc">&nbsp;			FormattingConversionService beansConverterService = new FormattingConversionService();</b>
+<b class="nc">&nbsp;			DefaultConversionService.addCollectionConverters(beansConverterService);</b>
+<b class="nc">&nbsp;			beansConverterService</b>
+<b class="nc">&nbsp;				.addConverter(new ConfigurationPropertiesCharSequenceToObjectConverter(beansConverterService));</b>
+<b class="nc">&nbsp;			converterBeans.addTo(beansConverterService);</b>
+<b class="nc">&nbsp;			conversionServices.add(beansConverterService);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (applicationContext.getBeanFactory().getConversionService() != null) {</b>
+<b class="nc">&nbsp;			conversionServices.add(applicationContext.getBeanFactory().getConversionService());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (!converterBeans.isEmpty()) {</b>
+&nbsp;			// Converters beans used to be added to a custom ApplicationConversionService
+&nbsp;			// after the BeanFactory&#39;s ConversionService. For backwards compatibility, we
+&nbsp;			// add an ApplicationConversationService as a fallback in the same place in
+&nbsp;			// the list.
+<b class="nc">&nbsp;			conversionServices.add(ApplicationConversionService.getSharedInstance());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return conversionServices;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasUserDefinedConfigurationServiceBean() {
+<b class="nc">&nbsp;		String beanName = ConfigurableApplicationContext.CONVERSION_SERVICE_BEAN_NAME;</b>
+<b class="nc">&nbsp;		return this.applicationContext.containsBean(beanName) &amp;&amp; this.applicationContext.getAutowireCapableBeanFactory()</b>
+<b class="nc">&nbsp;			.isTypeMatch(beanName, ConversionService.class);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class ConverterBeans {
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;		private final List&lt;Converter&gt; converters;
+&nbsp;
+&nbsp;		private final List&lt;GenericConverter&gt; genericConverters;
+&nbsp;
+&nbsp;		@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;		private final List&lt;Formatter&gt; formatters;
+&nbsp;
+<b class="nc">&nbsp;		ConverterBeans(ConfigurableApplicationContext applicationContext) {</b>
+<b class="nc">&nbsp;			ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();</b>
+<b class="nc">&nbsp;			this.converters = beans(Converter.class, ConfigurationPropertiesBinding.VALUE, beanFactory);</b>
+<b class="nc">&nbsp;			this.genericConverters = beans(GenericConverter.class, ConfigurationPropertiesBinding.VALUE, beanFactory);</b>
+<b class="nc">&nbsp;			this.formatters = beans(Formatter.class, ConfigurationPropertiesBinding.VALUE, beanFactory);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private &lt;T&gt; List&lt;T&gt; beans(Class&lt;T&gt; type, String qualifier, ListableBeanFactory beanFactory) {
+<b class="nc">&nbsp;			return new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;					BeanFactoryAnnotationUtils.qualifiedBeansOfType(beanFactory, type, qualifier).values());</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		boolean isEmpty() {
+<b class="nc">&nbsp;			return this.converters.isEmpty() &amp;&amp; this.genericConverters.isEmpty() &amp;&amp; this.formatters.isEmpty();</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void addTo(FormatterRegistry registry) {
+<b class="nc">&nbsp;			for (Converter&lt;?, ?&gt; converter : this.converters) {</b>
+<b class="nc">&nbsp;				registry.addConverter(converter);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			for (GenericConverter genericConverter : this.genericConverters) {</b>
+<b class="nc">&nbsp;				registry.addConverter(genericConverter);</b>
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			for (Formatter&lt;?&gt; formatter : this.formatters) {</b>
+<b class="nc">&nbsp;				registry.addFormatter(formatter);</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PortInUseException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.web.server</a>
+</div>
+
+<h1>Coverage Summary for Class: PortInUseException (org.springframework.boot.web.server)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PortInUseException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (4/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2020 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.web.server;
+&nbsp;
+&nbsp;import java.net.BindException;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.IntSupplier;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@code PortInUseException} is thrown when a web server fails to start due to a port
+&nbsp; * already being in use.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 2.0.0
+&nbsp; */
+&nbsp;public class PortInUseException extends WebServerException {
+&nbsp;
+&nbsp;	private final int port;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new port in use exception for the given {@code port}.
+&nbsp;	 * @param port the port that was in use
+&nbsp;	 */
+&nbsp;	public PortInUseException(int port) {
+<b class="fc">&nbsp;		this(port, null);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new port in use exception for the given {@code port}.
+&nbsp;	 * @param port the port that was in use
+&nbsp;	 * @param cause the cause of the exception
+&nbsp;	 */
+&nbsp;	public PortInUseException(int port, Throwable cause) {
+<b class="fc">&nbsp;		super(&quot;Port &quot; + port + &quot; is already in use&quot;, cause);</b>
+<b class="fc">&nbsp;		this.port = port;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the port that was in use.
+&nbsp;	 * @return the port
+&nbsp;	 */
+&nbsp;	public int getPort() {
+<b class="fc">&nbsp;		return this.port;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Throw a {@link PortInUseException} if the given exception was caused by a &quot;port in
+&nbsp;	 * use&quot; {@link BindException}.
+&nbsp;	 * @param ex the source exception
+&nbsp;	 * @param port a suppler used to provide the port
+&nbsp;	 * @since 2.2.7
+&nbsp;	 */
+&nbsp;	public static void throwIfPortBindingException(Exception ex, IntSupplier port) {
+<b class="nc">&nbsp;		ifPortBindingException(ex, (bindException) -&gt; {</b>
+<b class="nc">&nbsp;			throw new PortInUseException(port.getAsInt(), ex);</b>
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Perform an action if the given exception was caused by a &quot;port in use&quot;
+&nbsp;	 * {@link BindException}.
+&nbsp;	 * @param ex the source exception
+&nbsp;	 * @param action the action to perform
+&nbsp;	 * @since 2.2.7
+&nbsp;	 */
+&nbsp;	public static void ifPortBindingException(Exception ex, Consumer&lt;BindException&gt; action) {
+<b class="nc">&nbsp;		ifCausedBy(ex, BindException.class, (bindException) -&gt; {</b>
+&nbsp;			// bind exception can be also thrown because an address can&#39;t be assigned
+<b class="nc">&nbsp;			if (bindException.getMessage().toLowerCase().contains(&quot;in use&quot;)) {</b>
+<b class="nc">&nbsp;				action.accept(bindException);</b>
+&nbsp;			}
+&nbsp;		});
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Perform an action if the given exception was caused by a specific exception type.
+&nbsp;	 * @param &lt;E&gt; the cause exception type
+&nbsp;	 * @param ex the source exception
+&nbsp;	 * @param causedBy the required cause type
+&nbsp;	 * @param action the action to perform
+&nbsp;	 * @since 2.2.7
+&nbsp;	 */
+&nbsp;	@SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;	public static &lt;E extends Exception&gt; void ifCausedBy(Exception ex, Class&lt;E&gt; causedBy, Consumer&lt;E&gt; action) {
+<b class="nc">&nbsp;		Throwable candidate = ex;</b>
+<b class="nc">&nbsp;		while (candidate != null) {</b>
+<b class="nc">&nbsp;			if (causedBy.isInstance(candidate)) {</b>
+<b class="nc">&nbsp;				action.accept((E) candidate);</b>
+&nbsp;				return;
+&nbsp;			}
+<b class="nc">&nbsp;			candidate = candidate.getCause();</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

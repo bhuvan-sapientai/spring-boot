@@ -1,0 +1,270 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CheckClasspathForConflicts</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.classpath</a>
+</div>
+
+<h1>Coverage Summary for Class: CheckClasspathForConflicts (org.springframework.boot.build.classpath)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CheckClasspathForConflicts</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CheckClasspathForConflicts$ClasspathContents</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.classpath;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.jar.JarEntry;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.gradle.api.DefaultTask;
+&nbsp;import org.gradle.api.GradleException;
+&nbsp;import org.gradle.api.Task;
+&nbsp;import org.gradle.api.file.FileCollection;
+&nbsp;import org.gradle.api.tasks.Classpath;
+&nbsp;import org.gradle.api.tasks.TaskAction;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Task} for checking the classpath for conflicting classes and resources.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class CheckClasspathForConflicts extends DefaultTask {</b>
+&nbsp;
+<b class="nc">&nbsp;	private final List&lt;Predicate&lt;String&gt;&gt; ignores = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private FileCollection classpath;
+&nbsp;
+&nbsp;	public void setClasspath(FileCollection classpath) {
+<b class="nc">&nbsp;		this.classpath = classpath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Classpath
+&nbsp;	public FileCollection getClasspath() {
+<b class="nc">&nbsp;		return this.classpath;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@TaskAction
+&nbsp;	public void checkForConflicts() throws IOException {
+<b class="nc">&nbsp;		ClasspathContents classpathContents = new ClasspathContents();</b>
+<b class="nc">&nbsp;		for (File file : this.classpath) {</b>
+<b class="nc">&nbsp;			if (file.isDirectory()) {</b>
+<b class="nc">&nbsp;				Path root = file.toPath();</b>
+<b class="nc">&nbsp;				try (Stream&lt;Path&gt; pathStream = Files.walk(root)) {</b>
+<b class="nc">&nbsp;					pathStream.filter(Files::isRegularFile)</b>
+<b class="nc">&nbsp;						.forEach((entry) -&gt; classpathContents.add(root.relativize(entry).toString(), root.toString()));</b>
+<b class="nc">&nbsp;				}</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;			else {
+<b class="nc">&nbsp;				try (JarFile jar = new JarFile(file)) {</b>
+<b class="nc">&nbsp;					for (JarEntry entry : Collections.list(jar.entries())) {</b>
+<b class="nc">&nbsp;						if (!entry.isDirectory()) {</b>
+<b class="nc">&nbsp;							classpathContents.add(entry.getName(), file.getAbsolutePath());</b>
+&nbsp;						}
+<b class="nc">&nbsp;					}</b>
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		Map&lt;String, List&lt;String&gt;&gt; conflicts = classpathContents.getConflicts(this.ignores);</b>
+<b class="nc">&nbsp;		if (!conflicts.isEmpty()) {</b>
+<b class="nc">&nbsp;			StringBuilder message = new StringBuilder(String.format(&quot;Found classpath conflicts:%n&quot;));</b>
+<b class="nc">&nbsp;			conflicts.forEach((entry, locations) -&gt; {</b>
+<b class="nc">&nbsp;				message.append(String.format(&quot;    %s%n&quot;, entry));</b>
+<b class="nc">&nbsp;				locations.forEach((location) -&gt; message.append(String.format(&quot;        %s%n&quot;, location)));</b>
+&nbsp;			});
+<b class="nc">&nbsp;			throw new GradleException(message.toString());</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	public void ignore(Predicate&lt;String&gt; predicate) {
+<b class="nc">&nbsp;		this.ignores.add(predicate);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	private static final class ClasspathContents {</b>
+&nbsp;
+<b class="nc">&nbsp;		private static final Set&lt;String&gt; IGNORED_NAMES = new HashSet&lt;&gt;(Arrays.asList(&quot;about.html&quot;, &quot;changelog.txt&quot;,</b>
+&nbsp;				&quot;LICENSE&quot;, &quot;license.txt&quot;, &quot;module-info.class&quot;, &quot;notice.txt&quot;, &quot;readme.txt&quot;));
+&nbsp;
+<b class="nc">&nbsp;		private final Map&lt;String, List&lt;String&gt;&gt; classpathContents = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private void add(String name, String source) {
+<b class="nc">&nbsp;			this.classpathContents.computeIfAbsent(name, (key) -&gt; new ArrayList&lt;&gt;()).add(source);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private Map&lt;String, List&lt;String&gt;&gt; getConflicts(List&lt;Predicate&lt;String&gt;&gt; ignores) {
+<b class="nc">&nbsp;			return this.classpathContents.entrySet()</b>
+<b class="nc">&nbsp;				.stream()</b>
+<b class="nc">&nbsp;				.filter((entry) -&gt; entry.getValue().size() &gt; 1)</b>
+<b class="nc">&nbsp;				.filter((entry) -&gt; canConflict(entry.getKey(), ignores))</b>
+<b class="nc">&nbsp;				.collect(Collectors.toMap(Entry::getKey, Entry::getValue, (v1, v2) -&gt; v1, TreeMap::new));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		private boolean canConflict(String name, List&lt;Predicate&lt;String&gt;&gt; ignores) {
+<b class="nc">&nbsp;			if (name.startsWith(&quot;META-INF/&quot;)) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			for (String ignoredName : IGNORED_NAMES) {</b>
+<b class="nc">&nbsp;				if (name.equals(ignoredName)) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			for (Predicate&lt;String&gt; ignore : ignores) {</b>
+<b class="nc">&nbsp;				if (ignore.test(name)) {</b>
+<b class="nc">&nbsp;					return false;</b>
+&nbsp;				}
+<b class="nc">&nbsp;			}</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StarterPlugin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.build.starters</a>
+</div>
+
+<h1>Coverage Summary for Class: StarterPlugin (org.springframework.boot.build.starters)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StarterPlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.build.starters;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.TreeMap;
+&nbsp;
+&nbsp;import org.gradle.api.Plugin;
+&nbsp;import org.gradle.api.Project;
+&nbsp;import org.gradle.api.artifacts.Configuration;
+&nbsp;import org.gradle.api.artifacts.ConfigurationContainer;
+&nbsp;import org.gradle.api.plugins.JavaBasePlugin;
+&nbsp;import org.gradle.api.plugins.JavaLibraryPlugin;
+&nbsp;import org.gradle.api.plugins.JavaPlugin;
+&nbsp;import org.gradle.api.plugins.PluginContainer;
+&nbsp;import org.gradle.api.tasks.bundling.Jar;
+&nbsp;
+&nbsp;import org.springframework.boot.build.ConventionsPlugin;
+&nbsp;import org.springframework.boot.build.DeployedPlugin;
+&nbsp;import org.springframework.boot.build.classpath.CheckClasspathForConflicts;
+&nbsp;import org.springframework.boot.build.classpath.CheckClasspathForUnconstrainedDirectDependencies;
+&nbsp;import org.springframework.boot.build.classpath.CheckClasspathForUnnecessaryExclusions;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A {@link Plugin} for a starter project.
+&nbsp; *
+&nbsp; * @author Andy Wilkinson
+&nbsp; */
+<b class="nc">&nbsp;public class StarterPlugin implements Plugin&lt;Project&gt; {</b>
+&nbsp;
+&nbsp;	private static final String JAR_TYPE = &quot;dependencies-starter&quot;;
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void apply(Project project) {
+<b class="nc">&nbsp;		PluginContainer plugins = project.getPlugins();</b>
+<b class="nc">&nbsp;		plugins.apply(DeployedPlugin.class);</b>
+<b class="nc">&nbsp;		plugins.apply(JavaLibraryPlugin.class);</b>
+<b class="nc">&nbsp;		plugins.apply(ConventionsPlugin.class);</b>
+<b class="nc">&nbsp;		StarterMetadata starterMetadata = project.getTasks().create(&quot;starterMetadata&quot;, StarterMetadata.class);</b>
+<b class="nc">&nbsp;		ConfigurationContainer configurations = project.getConfigurations();</b>
+<b class="nc">&nbsp;		Configuration runtimeClasspath = configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);</b>
+<b class="nc">&nbsp;		starterMetadata.setDependencies(runtimeClasspath);</b>
+<b class="nc">&nbsp;		File destination = new File(project.getBuildDir(), &quot;starter-metadata.properties&quot;);</b>
+<b class="nc">&nbsp;		starterMetadata.setDestination(destination);</b>
+<b class="nc">&nbsp;		configurations.create(&quot;starterMetadata&quot;);</b>
+<b class="nc">&nbsp;		project.getArtifacts()</b>
+<b class="nc">&nbsp;			.add(&quot;starterMetadata&quot;, project.provider(starterMetadata::getDestination),</b>
+<b class="nc">&nbsp;					(artifact) -&gt; artifact.builtBy(starterMetadata));</b>
+<b class="nc">&nbsp;		createClasspathConflictsCheck(runtimeClasspath, project);</b>
+<b class="nc">&nbsp;		createUnnecessaryExclusionsCheck(runtimeClasspath, project);</b>
+<b class="nc">&nbsp;		createUnconstrainedDirectDependenciesCheck(runtimeClasspath, project);</b>
+<b class="nc">&nbsp;		configureJarManifest(project);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createClasspathConflictsCheck(Configuration classpath, Project project) {
+<b class="nc">&nbsp;		CheckClasspathForConflicts checkClasspathForConflicts = project.getTasks()</b>
+<b class="nc">&nbsp;			.create(&quot;check&quot; + StringUtils.capitalize(classpath.getName() + &quot;ForConflicts&quot;),</b>
+&nbsp;					CheckClasspathForConflicts.class);
+<b class="nc">&nbsp;		checkClasspathForConflicts.setClasspath(classpath);</b>
+<b class="nc">&nbsp;		project.getTasks().getByName(JavaBasePlugin.CHECK_TASK_NAME).dependsOn(checkClasspathForConflicts);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createUnnecessaryExclusionsCheck(Configuration classpath, Project project) {
+<b class="nc">&nbsp;		CheckClasspathForUnnecessaryExclusions checkClasspathForUnnecessaryExclusions = project.getTasks()</b>
+<b class="nc">&nbsp;			.create(&quot;check&quot; + StringUtils.capitalize(classpath.getName() + &quot;ForUnnecessaryExclusions&quot;),</b>
+&nbsp;					CheckClasspathForUnnecessaryExclusions.class);
+<b class="nc">&nbsp;		checkClasspathForUnnecessaryExclusions.setClasspath(classpath);</b>
+<b class="nc">&nbsp;		project.getTasks().getByName(JavaBasePlugin.CHECK_TASK_NAME).dependsOn(checkClasspathForUnnecessaryExclusions);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void createUnconstrainedDirectDependenciesCheck(Configuration classpath, Project project) {
+<b class="nc">&nbsp;		CheckClasspathForUnconstrainedDirectDependencies checkClasspathForUnconstrainedDirectDependencies = project</b>
+<b class="nc">&nbsp;			.getTasks()</b>
+<b class="nc">&nbsp;			.create(&quot;check&quot; + StringUtils.capitalize(classpath.getName() + &quot;ForUnconstrainedDirectDependencies&quot;),</b>
+&nbsp;					CheckClasspathForUnconstrainedDirectDependencies.class);
+<b class="nc">&nbsp;		checkClasspathForUnconstrainedDirectDependencies.setClasspath(classpath);</b>
+<b class="nc">&nbsp;		project.getTasks()</b>
+<b class="nc">&nbsp;			.getByName(JavaBasePlugin.CHECK_TASK_NAME)</b>
+<b class="nc">&nbsp;			.dependsOn(checkClasspathForUnconstrainedDirectDependencies);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureJarManifest(Project project) {
+<b class="nc">&nbsp;		project.getTasks().withType(Jar.class, (jar) -&gt; project.afterEvaluate((evaluated) -&gt; {</b>
+<b class="nc">&nbsp;			jar.manifest((manifest) -&gt; {</b>
+<b class="nc">&nbsp;				Map&lt;String, Object&gt; attributes = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;				attributes.put(&quot;Spring-Boot-Jar-Type&quot;, JAR_TYPE);</b>
+<b class="nc">&nbsp;				manifest.attributes(attributes);</b>
+&nbsp;			});
+&nbsp;		}));
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

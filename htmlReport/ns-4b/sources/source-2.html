@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultSslBundleRegistry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultSslBundleRegistry (org.springframework.boot.ssl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultSslBundleRegistry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DefaultSslBundleRegistry$RegisteredSslBundle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.ssl;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import org.apache.commons.logging.Log;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;
+&nbsp;import org.springframework.core.log.LogMessage;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default {@link SslBundleRegistry} implementation.
+&nbsp; *
+&nbsp; * @author Scott Frederick
+&nbsp; * @author Moritz Halbritter
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 3.1.0
+&nbsp; */
+&nbsp;public class DefaultSslBundleRegistry implements SslBundleRegistry, SslBundles {
+&nbsp;
+<b class="nc">&nbsp;	private static final Log logger = LogFactory.getLog(DefaultSslBundleRegistry.class);</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, RegisteredSslBundle&gt; registeredBundles = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	public DefaultSslBundleRegistry() {</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public DefaultSslBundleRegistry(String name, SslBundle bundle) {</b>
+<b class="nc">&nbsp;		registerBundle(name, bundle);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void registerBundle(String name, SslBundle bundle) {
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(bundle, &quot;Bundle must not be null&quot;);</b>
+<b class="nc">&nbsp;		RegisteredSslBundle previous = this.registeredBundles.putIfAbsent(name, new RegisteredSslBundle(name, bundle));</b>
+<b class="nc">&nbsp;		Assert.state(previous == null, () -&gt; &quot;Cannot replace existing SSL bundle &#39;%s&#39;&quot;.formatted(name));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void updateBundle(String name, SslBundle updatedBundle) {
+<b class="nc">&nbsp;		getRegistered(name).update(updatedBundle);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public SslBundle getBundle(String name) {
+<b class="nc">&nbsp;		return getRegistered(name).getBundle();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void addBundleUpdateHandler(String name, Consumer&lt;SslBundle&gt; updateHandler) throws NoSuchSslBundleException {
+<b class="nc">&nbsp;		getRegistered(name).addUpdateHandler(updateHandler);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private RegisteredSslBundle getRegistered(String name) throws NoSuchSslBundleException {
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		RegisteredSslBundle registered = this.registeredBundles.get(name);</b>
+<b class="nc">&nbsp;		if (registered == null) {</b>
+<b class="nc">&nbsp;			throw new NoSuchSslBundleException(name, &quot;SSL bundle name &#39;%s&#39; cannot be found&quot;.formatted(name));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return registered;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static class RegisteredSslBundle {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+<b class="nc">&nbsp;		private final List&lt;Consumer&lt;SslBundle&gt;&gt; updateHandlers = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;		private volatile SslBundle bundle;
+&nbsp;
+<b class="nc">&nbsp;		RegisteredSslBundle(String name, SslBundle bundle) {</b>
+<b class="nc">&nbsp;			this.name = name;</b>
+<b class="nc">&nbsp;			this.bundle = bundle;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void update(SslBundle updatedBundle) {
+<b class="nc">&nbsp;			Assert.notNull(updatedBundle, &quot;UpdatedBundle must not be null&quot;);</b>
+<b class="nc">&nbsp;			this.bundle = updatedBundle;</b>
+<b class="nc">&nbsp;			if (this.updateHandlers.isEmpty()) {</b>
+<b class="nc">&nbsp;				logger.warn(LogMessage.format(</b>
+&nbsp;						&quot;SSL bundle &#39;%s&#39; has been updated but may be in use by a technology that doesn&#39;t support SSL reloading&quot;,
+&nbsp;						this.name));
+&nbsp;			}
+<b class="nc">&nbsp;			this.updateHandlers.forEach((handler) -&gt; handler.accept(updatedBundle));</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		SslBundle getBundle() {
+<b class="nc">&nbsp;			return this.bundle;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		void addUpdateHandler(Consumer&lt;SslBundle&gt; updateHandler) {
+<b class="nc">&nbsp;			Assert.notNull(updateHandler, &quot;UpdateHandler must not be null&quot;);</b>
+<b class="nc">&nbsp;			this.updateHandlers.add(updateHandler);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,773 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JSONArray</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.configurationprocessor.json</a>
+</div>
+
+<h1>Coverage Summary for Class: JSONArray (org.springframework.boot.configurationprocessor.json)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JSONArray</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/142)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright (C) 2010 The Android Open Source Project
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.configurationprocessor.json;
+&nbsp;
+&nbsp;import java.lang.reflect.Array;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;// Note: this class was written without inspecting the non-free org.json source code.
+&nbsp;
+&nbsp;/**
+&nbsp; * A dense indexed sequence of values. Values may be any mix of {@link JSONObject
+&nbsp; * JSONObjects}, other {@link JSONArray JSONArrays}, Strings, Booleans, Integers, Longs,
+&nbsp; * Doubles, {@code null} or {@link JSONObject#NULL}. Values may not be
+&nbsp; * {@link Double#isNaN() NaNs}, {@link Double#isInfinite() infinities}, or of any type not
+&nbsp; * listed here.
+&nbsp; * &lt;p&gt;
+&nbsp; * {@code JSONArray} has the same type coercion behavior and optional/mandatory accessors
+&nbsp; * as {@link JSONObject}. See that class&#39; documentation for details.
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;strong&gt;Warning:&lt;/strong&gt; this class represents null in two incompatible ways: the
+&nbsp; * standard Java {@code null} reference, and the sentinel value {@link JSONObject#NULL}.
+&nbsp; * In particular, {@code get} fails if the requested index holds the null reference, but
+&nbsp; * succeeds if it holds {@code JSONObject.NULL}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Instances of this class are not thread safe. Although this class is nonfinal, it was
+&nbsp; * not designed for inheritance and should not be subclassed. In particular, self-use by
+&nbsp; * overridable methods is not specified. See &lt;i&gt;Effective Java&lt;/i&gt; Item 17, &quot;Design and
+&nbsp; * Document or inheritance or else prohibit it&quot; for further information.
+&nbsp; */
+&nbsp;public class JSONArray {
+&nbsp;
+&nbsp;	private final List&lt;Object&gt; values;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a {@code JSONArray} with no values.
+&nbsp;	 */
+<b class="nc">&nbsp;	public JSONArray() {</b>
+<b class="nc">&nbsp;		this.values = new ArrayList&lt;&gt;();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code JSONArray} by copying all values from the given collection.
+&nbsp;	 * @param copyFrom a collection whose values are of supported types. Unsupported
+&nbsp;	 * values are not permitted and will yield an array in an inconsistent state.
+&nbsp;	 */
+&nbsp;	/* Accept a raw type for API compatibility */
+&nbsp;	@SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;	public JSONArray(Collection copyFrom) {
+<b class="nc">&nbsp;		this();</b>
+<b class="nc">&nbsp;		if (copyFrom != null) {</b>
+<b class="nc">&nbsp;			for (Iterator it = copyFrom.iterator(); it.hasNext();) {</b>
+<b class="nc">&nbsp;				put(JSONObject.wrap(it.next()));</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code JSONArray} with values from the next array in the tokener.
+&nbsp;	 * @param readFrom a tokener whose nextValue() method will yield a {@code JSONArray}.
+&nbsp;	 * @throws JSONException if the parse fails or doesn&#39;t yield a {@code JSONArray}.
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+<b class="nc">&nbsp;	public JSONArray(JSONTokener readFrom) throws JSONException {</b>
+&nbsp;		/*
+&nbsp;		 * Getting the parser to populate this could get tricky. Instead, just parse to
+&nbsp;		 * temporary JSONArray and then steal the data from that.
+&nbsp;		 */
+<b class="nc">&nbsp;		Object object = readFrom.nextValue();</b>
+<b class="nc">&nbsp;		if (object instanceof JSONArray) {</b>
+<b class="nc">&nbsp;			this.values = ((JSONArray) object).values;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			throw JSON.typeMismatch(object, &quot;JSONArray&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code JSONArray} with values from the JSON string.
+&nbsp;	 * @param json a JSON-encoded string containing an array.
+&nbsp;	 * @throws JSONException if the parse fails or doesn&#39;t yield a {@code
+&nbsp;	 *     JSONArray}.
+&nbsp;	 */
+&nbsp;	public JSONArray(String json) throws JSONException {
+<b class="nc">&nbsp;		this(new JSONTokener(json));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@code JSONArray} with values from the given primitive array.
+&nbsp;	 * @param array a primitive array
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+<b class="nc">&nbsp;	public JSONArray(Object array) throws JSONException {</b>
+<b class="nc">&nbsp;		if (!array.getClass().isArray()) {</b>
+<b class="nc">&nbsp;			throw new JSONException(&quot;Not a primitive array: &quot; + array.getClass());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		final int length = Array.getLength(array);</b>
+<b class="nc">&nbsp;		this.values = new ArrayList&lt;&gt;(length);</b>
+<b class="nc">&nbsp;		for (int i = 0; i &lt; length; ++i) {</b>
+<b class="nc">&nbsp;			put(JSONObject.wrap(Array.get(array, i)));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the number of values in this array.
+&nbsp;	 * @return the length of this array
+&nbsp;	 */
+&nbsp;	public int length() {
+<b class="nc">&nbsp;		return this.values.size();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Appends {@code value} to the end of this array.
+&nbsp;	 * @param value the value
+&nbsp;	 * @return this array.
+&nbsp;	 */
+&nbsp;	public JSONArray put(boolean value) {
+<b class="nc">&nbsp;		this.values.add(value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Appends {@code value} to the end of this array.
+&nbsp;	 * @param value a finite value. May not be {@link Double#isNaN() NaNs} or
+&nbsp;	 * {@link Double#isInfinite() infinities}.
+&nbsp;	 * @return this array.
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public JSONArray put(double value) throws JSONException {
+<b class="nc">&nbsp;		this.values.add(JSON.checkDouble(value));</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Appends {@code value} to the end of this array.
+&nbsp;	 * @param value the value
+&nbsp;	 * @return this array.
+&nbsp;	 */
+&nbsp;	public JSONArray put(int value) {
+<b class="nc">&nbsp;		this.values.add(value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Appends {@code value} to the end of this array.
+&nbsp;	 * @param value the value
+&nbsp;	 * @return this array.
+&nbsp;	 */
+&nbsp;	public JSONArray put(long value) {
+<b class="nc">&nbsp;		this.values.add(value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Appends {@code value} to the end of this array.
+&nbsp;	 * @param value a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer,
+&nbsp;	 * Long, Double, {@link JSONObject#NULL}, or {@code null}. May not be
+&nbsp;	 * {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}. Unsupported
+&nbsp;	 * values are not permitted and will cause the array to be in an inconsistent state.
+&nbsp;	 * @return this array.
+&nbsp;	 */
+&nbsp;	public JSONArray put(Object value) {
+<b class="nc">&nbsp;		this.values.add(value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the value at {@code index} to {@code value}, null padding this array to the
+&nbsp;	 * required length if necessary. If a value already exists at {@code
+&nbsp;	 * index}, it will be replaced.
+&nbsp;	 * @param index the index to set the value to
+&nbsp;	 * @param value the value
+&nbsp;	 * @return this array.
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public JSONArray put(int index, boolean value) throws JSONException {
+<b class="nc">&nbsp;		return put(index, (Boolean) value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the value at {@code index} to {@code value}, null padding this array to the
+&nbsp;	 * required length if necessary. If a value already exists at {@code
+&nbsp;	 * index}, it will be replaced.
+&nbsp;	 * @param index the index to set the value to
+&nbsp;	 * @param value a finite value. May not be {@link Double#isNaN() NaNs} or
+&nbsp;	 * {@link Double#isInfinite() infinities}.
+&nbsp;	 * @return this array.
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public JSONArray put(int index, double value) throws JSONException {
+<b class="nc">&nbsp;		return put(index, (Double) value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the value at {@code index} to {@code value}, null padding this array to the
+&nbsp;	 * required length if necessary. If a value already exists at {@code
+&nbsp;	 * index}, it will be replaced.
+&nbsp;	 * @param index the index to set the value to
+&nbsp;	 * @param value the value
+&nbsp;	 * @return this array.
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public JSONArray put(int index, int value) throws JSONException {
+<b class="nc">&nbsp;		return put(index, (Integer) value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the value at {@code index} to {@code value}, null padding this array to the
+&nbsp;	 * required length if necessary. If a value already exists at {@code
+&nbsp;	 * index}, it will be replaced.
+&nbsp;	 * @param index the index to set the value to
+&nbsp;	 * @param value the value
+&nbsp;	 * @return this array.
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public JSONArray put(int index, long value) throws JSONException {
+<b class="nc">&nbsp;		return put(index, (Long) value);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the value at {@code index} to {@code value}, null padding this array to the
+&nbsp;	 * required length if necessary. If a value already exists at {@code
+&nbsp;	 * index}, it will be replaced.
+&nbsp;	 * @param index the index to set the value to
+&nbsp;	 * @param value a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer,
+&nbsp;	 * Long, Double, {@link JSONObject#NULL}, or {@code null}. May not be
+&nbsp;	 * {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
+&nbsp;	 * @return this array.
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public JSONArray put(int index, Object value) throws JSONException {
+<b class="nc">&nbsp;		if (value instanceof Number) {</b>
+&nbsp;			// deviate from the original by checking all Numbers, not just floats &amp;
+&nbsp;			// doubles
+<b class="nc">&nbsp;			JSON.checkDouble(((Number) value).doubleValue());</b>
+&nbsp;		}
+<b class="nc">&nbsp;		while (this.values.size() &lt;= index) {</b>
+<b class="nc">&nbsp;			this.values.add(null);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		this.values.set(index, value);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns true if this array has no value at {@code index}, or if its value is the
+&nbsp;	 * {@code null} reference or {@link JSONObject#NULL}.
+&nbsp;	 * @param index the index to set the value to
+&nbsp;	 * @return true if this array has no value at {@code index}
+&nbsp;	 */
+&nbsp;	public boolean isNull(int index) {
+<b class="nc">&nbsp;		Object value = opt(index);</b>
+<b class="nc">&nbsp;		return value == null || value == JSONObject.NULL;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index}.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the value at {@code index}.
+&nbsp;	 * @throws JSONException if this array has no value at {@code index}, or if that value
+&nbsp;	 * is the {@code null} reference. This method returns normally if the value is
+&nbsp;	 * {@code JSONObject#NULL}.
+&nbsp;	 */
+&nbsp;	public Object get(int index) throws JSONException {
+&nbsp;		try {
+<b class="nc">&nbsp;			Object value = this.values.get(index);</b>
+<b class="nc">&nbsp;			if (value == null) {</b>
+<b class="nc">&nbsp;				throw new JSONException(&quot;Value at &quot; + index + &quot; is null.&quot;);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			return value;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (IndexOutOfBoundsException e) {</b>
+<b class="nc">&nbsp;			throw new JSONException(&quot;Index &quot; + index + &quot; out of range [0..&quot; + this.values.size() + &quot;)&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index}, or null if the array has no value at
+&nbsp;	 * {@code index}.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the value at {@code index} or {@code null}
+&nbsp;	 */
+&nbsp;	public Object opt(int index) {
+<b class="nc">&nbsp;		if (index &lt; 0 || index &gt;= this.values.size()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.values.get(index);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Removes and returns the value at {@code index}, or null if the array has no value
+&nbsp;	 * at {@code index}.
+&nbsp;	 * @param index the index of the value to remove
+&nbsp;	 * @return the previous value at {@code index}
+&nbsp;	 */
+&nbsp;	public Object remove(int index) {
+<b class="nc">&nbsp;		if (index &lt; 0 || index &gt;= this.values.size()) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.values.remove(index);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a boolean or can be coerced
+&nbsp;	 * to a boolean.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the value at {@code index}
+&nbsp;	 * @throws JSONException if the value at {@code index} doesn&#39;t exist or cannot be
+&nbsp;	 * coerced to a boolean.
+&nbsp;	 */
+&nbsp;	public boolean getBoolean(int index) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(index);</b>
+<b class="nc">&nbsp;		Boolean result = JSON.toBoolean(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(index, object, &quot;boolean&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a boolean or can be coerced
+&nbsp;	 * to a boolean. Returns false otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value} or {@code false}
+&nbsp;	 */
+&nbsp;	public boolean optBoolean(int index) {
+<b class="nc">&nbsp;		return optBoolean(index, false);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a boolean or can be coerced
+&nbsp;	 * to a boolean. Returns {@code fallback} otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @param fallback the fallback value
+&nbsp;	 * @return the value at {@code index} of {@code fallback}
+&nbsp;	 */
+&nbsp;	public boolean optBoolean(int index, boolean fallback) {
+<b class="nc">&nbsp;		Object object = opt(index);</b>
+<b class="nc">&nbsp;		Boolean result = JSON.toBoolean(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a double or can be coerced
+&nbsp;	 * to a double.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value}
+&nbsp;	 * @throws JSONException if the value at {@code index} doesn&#39;t exist or cannot be
+&nbsp;	 * coerced to a double.
+&nbsp;	 */
+&nbsp;	public double getDouble(int index) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(index);</b>
+<b class="nc">&nbsp;		Double result = JSON.toDouble(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(index, object, &quot;double&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a double or can be coerced
+&nbsp;	 * to a double. Returns {@code NaN} otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value} or {@code NaN}
+&nbsp;	 */
+&nbsp;	public double optDouble(int index) {
+<b class="nc">&nbsp;		return optDouble(index, Double.NaN);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a double or can be coerced
+&nbsp;	 * to a double. Returns {@code fallback} otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @param fallback the fallback value
+&nbsp;	 * @return the value at {@code index} of {@code fallback}
+&nbsp;	 */
+&nbsp;	public double optDouble(int index, double fallback) {
+<b class="nc">&nbsp;		Object object = opt(index);</b>
+<b class="nc">&nbsp;		Double result = JSON.toDouble(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is an int or can be coerced to
+&nbsp;	 * an int.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value}
+&nbsp;	 * @throws JSONException if the value at {@code index} doesn&#39;t exist or cannot be
+&nbsp;	 * coerced to an int.
+&nbsp;	 */
+&nbsp;	public int getInt(int index) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(index);</b>
+<b class="nc">&nbsp;		Integer result = JSON.toInteger(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(index, object, &quot;int&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is an int or can be coerced to
+&nbsp;	 * an int. Returns 0 otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value} or {@code 0}
+&nbsp;	 */
+&nbsp;	public int optInt(int index) {
+<b class="nc">&nbsp;		return optInt(index, 0);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is an int or can be coerced to
+&nbsp;	 * an int. Returns {@code fallback} otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @param fallback the fallback value
+&nbsp;	 * @return the value at {@code index} of {@code fallback}
+&nbsp;	 */
+&nbsp;	public int optInt(int index, int fallback) {
+<b class="nc">&nbsp;		Object object = opt(index);</b>
+<b class="nc">&nbsp;		Integer result = JSON.toInteger(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a long or can be coerced to
+&nbsp;	 * a long.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value}
+&nbsp;	 * @throws JSONException if the value at {@code index} doesn&#39;t exist or cannot be
+&nbsp;	 * coerced to a long.
+&nbsp;	 */
+&nbsp;	public long getLong(int index) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(index);</b>
+<b class="nc">&nbsp;		Long result = JSON.toLong(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(index, object, &quot;long&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a long or can be coerced to
+&nbsp;	 * a long. Returns 0 otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value} or {@code 0}
+&nbsp;	 */
+&nbsp;	public long optLong(int index) {
+<b class="nc">&nbsp;		return optLong(index, 0L);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a long or can be coerced to
+&nbsp;	 * a long. Returns {@code fallback} otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @param fallback the fallback value
+&nbsp;	 * @return the value at {@code index} of {@code fallback}
+&nbsp;	 */
+&nbsp;	public long optLong(int index, long fallback) {
+<b class="nc">&nbsp;		Object object = opt(index);</b>
+<b class="nc">&nbsp;		Long result = JSON.toLong(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists, coercing it if necessary.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value}
+&nbsp;	 * @throws JSONException if no such value exists.
+&nbsp;	 */
+&nbsp;	public String getString(int index) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(index);</b>
+<b class="nc">&nbsp;		String result = JSON.toString(object);</b>
+<b class="nc">&nbsp;		if (result == null) {</b>
+<b class="nc">&nbsp;			throw JSON.typeMismatch(index, object, &quot;String&quot;);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists, coercing it if necessary. Returns
+&nbsp;	 * the empty string if no such value exists.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the {@code value} or an empty string
+&nbsp;	 */
+&nbsp;	public String optString(int index) {
+<b class="nc">&nbsp;		return optString(index, &quot;&quot;);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists, coercing it if necessary. Returns
+&nbsp;	 * {@code fallback} if no such value exists.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @param fallback the fallback value
+&nbsp;	 * @return the value at {@code index} of {@code fallback}
+&nbsp;	 */
+&nbsp;	public String optString(int index, String fallback) {
+<b class="nc">&nbsp;		Object object = opt(index);</b>
+<b class="nc">&nbsp;		String result = JSON.toString(object);</b>
+<b class="nc">&nbsp;		return result != null ? result : fallback;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a {@code
+&nbsp;	 * JSONArray}.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the array at {@code index}
+&nbsp;	 * @throws JSONException if the value doesn&#39;t exist or is not a {@code
+&nbsp;	 *     JSONArray}.
+&nbsp;	 */
+&nbsp;	public JSONArray getJSONArray(int index) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(index);</b>
+<b class="nc">&nbsp;		if (object instanceof JSONArray) {</b>
+<b class="nc">&nbsp;			return (JSONArray) object;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			throw JSON.typeMismatch(index, object, &quot;JSONArray&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a {@code
+&nbsp;	 * JSONArray}. Returns null otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the array at {@code index} or {@code null}
+&nbsp;	 */
+&nbsp;	public JSONArray optJSONArray(int index) {
+<b class="nc">&nbsp;		Object object = opt(index);</b>
+<b class="nc">&nbsp;		return object instanceof JSONArray ? (JSONArray) object : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a {@code
+&nbsp;	 * JSONObject}.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the object at {@code index}
+&nbsp;	 * @throws JSONException if the value doesn&#39;t exist or is not a {@code
+&nbsp;	 *     JSONObject}.
+&nbsp;	 */
+&nbsp;	public JSONObject getJSONObject(int index) throws JSONException {
+<b class="nc">&nbsp;		Object object = get(index);</b>
+<b class="nc">&nbsp;		if (object instanceof JSONObject) {</b>
+<b class="nc">&nbsp;			return (JSONObject) object;</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			throw JSON.typeMismatch(index, object, &quot;JSONObject&quot;);</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the value at {@code index} if it exists and is a {@code
+&nbsp;	 * JSONObject}. Returns null otherwise.
+&nbsp;	 * @param index the index to get the value from
+&nbsp;	 * @return the object at {@code index} or {@code null}
+&nbsp;	 */
+&nbsp;	public JSONObject optJSONObject(int index) {
+<b class="nc">&nbsp;		Object object = opt(index);</b>
+<b class="nc">&nbsp;		return object instanceof JSONObject ? (JSONObject) object : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a new object whose values are the values in this array, and whose names are
+&nbsp;	 * the values in {@code names}. Names and values are paired up by index from 0 through
+&nbsp;	 * to the shorter array&#39;s length. Names that are not strings will be coerced to
+&nbsp;	 * strings. This method returns null if either array is empty.
+&nbsp;	 * @param names the property names
+&nbsp;	 * @return a json object
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public JSONObject toJSONObject(JSONArray names) throws JSONException {
+<b class="nc">&nbsp;		JSONObject result = new JSONObject();</b>
+<b class="nc">&nbsp;		int length = Math.min(names.length(), this.values.size());</b>
+<b class="nc">&nbsp;		if (length == 0) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (int i = 0; i &lt; length; i++) {</b>
+<b class="nc">&nbsp;			String name = JSON.toString(names.opt(i));</b>
+<b class="nc">&nbsp;			result.put(name, opt(i));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return result;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a new string by alternating this array&#39;s values with {@code
+&nbsp;	 * separator}. This array&#39;s string values are quoted and have their special characters
+&nbsp;	 * escaped. For example, the array containing the strings &#39;12&quot; pizza&#39;, &#39;taco&#39; and
+&nbsp;	 * &#39;soda&#39; joined on &#39;+&#39; returns this: &lt;pre&gt;&quot;12\&quot; pizza&quot;+&quot;taco&quot;+&quot;soda&quot;&lt;/pre&gt;
+&nbsp;	 * @param separator the separator to use
+&nbsp;	 * @return the joined value
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public String join(String separator) throws JSONException {
+<b class="nc">&nbsp;		JSONStringer stringer = new JSONStringer();</b>
+<b class="nc">&nbsp;		stringer.open(JSONStringer.Scope.NULL, &quot;&quot;);</b>
+<b class="nc">&nbsp;		for (int i = 0, size = this.values.size(); i &lt; size; i++) {</b>
+<b class="nc">&nbsp;			if (i &gt; 0) {</b>
+<b class="nc">&nbsp;				stringer.out.append(separator);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			stringer.value(this.values.get(i));</b>
+&nbsp;		}
+<b class="nc">&nbsp;		stringer.close(JSONStringer.Scope.NULL, JSONStringer.Scope.NULL, &quot;&quot;);</b>
+<b class="nc">&nbsp;		return stringer.out.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encodes this array as a compact JSON string, such as: &lt;pre&gt;[94043,90210]&lt;/pre&gt;
+&nbsp;	 * @return a compact JSON string representation of this array
+&nbsp;	 */
+&nbsp;	@Override
+&nbsp;	public String toString() {
+&nbsp;		try {
+<b class="nc">&nbsp;			JSONStringer stringer = new JSONStringer();</b>
+<b class="nc">&nbsp;			writeTo(stringer);</b>
+<b class="nc">&nbsp;			return stringer.toString();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		catch (JSONException e) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Encodes this array as a human-readable JSON string for debugging, such as: &lt;pre&gt;
+&nbsp;	 * [
+&nbsp;	 *     94043,
+&nbsp;	 *     90210
+&nbsp;	 * ]&lt;/pre&gt;
+&nbsp;	 * @param indentSpaces the number of spaces to indent for each level of nesting.
+&nbsp;	 * @return a human-readable JSON string of this array
+&nbsp;	 * @throws JSONException if processing of json failed
+&nbsp;	 */
+&nbsp;	public String toString(int indentSpaces) throws JSONException {
+<b class="nc">&nbsp;		JSONStringer stringer = new JSONStringer(indentSpaces);</b>
+<b class="nc">&nbsp;		writeTo(stringer);</b>
+<b class="nc">&nbsp;		return stringer.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	void writeTo(JSONStringer stringer) throws JSONException {
+<b class="nc">&nbsp;		stringer.array();</b>
+<b class="nc">&nbsp;		for (Object value : this.values) {</b>
+<b class="nc">&nbsp;			stringer.value(value);</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		stringer.endArray();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object o) {
+<b class="nc">&nbsp;		return o instanceof JSONArray &amp;&amp; ((JSONArray) o).values.equals(this.values);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+&nbsp;		// diverge from the original, which doesn&#39;t implement hashCode
+<b class="nc">&nbsp;		return this.values.hashCode();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

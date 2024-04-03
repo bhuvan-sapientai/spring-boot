@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringConfigurationPropertySource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.context.properties.source</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringConfigurationPropertySource (org.springframework.boot.context.properties.source)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringConfigurationPropertySource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2022 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.context.properties.source;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Random;
+&nbsp;
+&nbsp;import org.springframework.boot.context.properties.source.ConfigurationPropertyName.Form;
+&nbsp;import org.springframework.boot.origin.Origin;
+&nbsp;import org.springframework.boot.origin.PropertySourceOrigin;
+&nbsp;import org.springframework.core.env.EnumerablePropertySource;
+&nbsp;import org.springframework.core.env.PropertySource;
+&nbsp;import org.springframework.core.env.StandardEnvironment;
+&nbsp;import org.springframework.core.env.SystemEnvironmentPropertySource;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfigurationPropertySource} backed by a non-enumerable Spring
+&nbsp; * {@link PropertySource} or a restricted {@link EnumerablePropertySource} implementation
+&nbsp; * (such as a security restricted {@code systemEnvironment} source). A
+&nbsp; * {@link PropertySource} is adapted with the help of a {@link PropertyMapper} which
+&nbsp; * provides the mapping rules for individual properties.
+&nbsp; * &lt;p&gt;
+&nbsp; * Each {@link ConfigurationPropertySource#getConfigurationProperty
+&nbsp; * getConfigurationProperty} call attempts to
+&nbsp; * {@link PropertyMapper#map(ConfigurationPropertyName) map} the
+&nbsp; * {@link ConfigurationPropertyName} to one or more {@code String} based names. This
+&nbsp; * allows fast property resolution for well-formed property sources.
+&nbsp; * &lt;p&gt;
+&nbsp; * When possible the {@link SpringIterableConfigurationPropertySource} will be used in
+&nbsp; * preference to this implementation since it supports full &quot;relaxed&quot; style resolution.
+&nbsp; *
+&nbsp; * @author Phillip Webb
+&nbsp; * @author Madhura Bhave
+&nbsp; * @see #from(PropertySource)
+&nbsp; * @see PropertyMapper
+&nbsp; * @see SpringIterableConfigurationPropertySource
+&nbsp; */
+&nbsp;class SpringConfigurationPropertySource implements ConfigurationPropertySource {
+&nbsp;
+<b class="nc">&nbsp;	private static final PropertyMapper[] DEFAULT_MAPPERS = { DefaultPropertyMapper.INSTANCE };</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final PropertyMapper[] SYSTEM_ENVIRONMENT_MAPPERS = { SystemEnvironmentPropertyMapper.INSTANCE,</b>
+&nbsp;			DefaultPropertyMapper.INSTANCE };
+&nbsp;
+&nbsp;	private final PropertySource&lt;?&gt; propertySource;
+&nbsp;
+&nbsp;	private final PropertyMapper[] mappers;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link SpringConfigurationPropertySource} implementation.
+&nbsp;	 * @param propertySource the source property source
+&nbsp;	 * @param mappers the property mappers
+&nbsp;	 */
+<b class="nc">&nbsp;	SpringConfigurationPropertySource(PropertySource&lt;?&gt; propertySource, PropertyMapper... mappers) {</b>
+<b class="nc">&nbsp;		Assert.notNull(propertySource, &quot;PropertySource must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.isTrue(mappers.length &gt; 0, &quot;Mappers must contain at least one item&quot;);</b>
+<b class="nc">&nbsp;		this.propertySource = propertySource;</b>
+<b class="nc">&nbsp;		this.mappers = mappers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConfigurationProperty getConfigurationProperty(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		if (name == null) {</b>
+<b class="nc">&nbsp;			return null;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		for (PropertyMapper mapper : this.mappers) {</b>
+&nbsp;			try {
+<b class="nc">&nbsp;				for (String candidate : mapper.map(name)) {</b>
+<b class="nc">&nbsp;					Object value = getPropertySource().getProperty(candidate);</b>
+<b class="nc">&nbsp;					if (value != null) {</b>
+<b class="nc">&nbsp;						Origin origin = PropertySourceOrigin.get(this.propertySource, candidate);</b>
+<b class="nc">&nbsp;						return ConfigurationProperty.of(this, name, value, origin);</b>
+&nbsp;					}
+<b class="nc">&nbsp;				}</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (Exception ex) {</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public ConfigurationPropertyState containsDescendantOf(ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		PropertySource&lt;?&gt; source = getPropertySource();</b>
+<b class="nc">&nbsp;		Object underlyingSource = source.getSource();</b>
+<b class="nc">&nbsp;		if (underlyingSource instanceof Random) {</b>
+<b class="nc">&nbsp;			return containsDescendantOfForRandom(&quot;random&quot;, name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (underlyingSource instanceof PropertySource&lt;?&gt; underlyingPropertySource</b>
+<b class="nc">&nbsp;				&amp;&amp; underlyingPropertySource.getSource() instanceof Random) {</b>
+&nbsp;			// Assume wrapped random sources use the source name as the prefix
+<b class="nc">&nbsp;			return containsDescendantOfForRandom(source.getName(), name);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConfigurationPropertyState.UNKNOWN;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static ConfigurationPropertyState containsDescendantOfForRandom(String prefix,
+&nbsp;			ConfigurationPropertyName name) {
+<b class="nc">&nbsp;		if (name.getNumberOfElements() &gt; 1 &amp;&amp; name.getElement(0, Form.DASHED).equals(prefix)) {</b>
+<b class="nc">&nbsp;			return ConfigurationPropertyState.PRESENT;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return ConfigurationPropertyState.ABSENT;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public Object getUnderlyingSource() {
+<b class="nc">&nbsp;		return this.propertySource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected PropertySource&lt;?&gt; getPropertySource() {
+<b class="nc">&nbsp;		return this.propertySource;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	protected final PropertyMapper[] getMappers() {
+<b class="nc">&nbsp;		return this.mappers;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return this.propertySource.toString();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link SpringConfigurationPropertySource} for the specified
+&nbsp;	 * {@link PropertySource}.
+&nbsp;	 * @param source the source Spring {@link PropertySource}
+&nbsp;	 * @return a {@link SpringConfigurationPropertySource} or
+&nbsp;	 * {@link SpringIterableConfigurationPropertySource} instance
+&nbsp;	 */
+&nbsp;	static SpringConfigurationPropertySource from(PropertySource&lt;?&gt; source) {
+<b class="nc">&nbsp;		Assert.notNull(source, &quot;Source must not be null&quot;);</b>
+<b class="nc">&nbsp;		PropertyMapper[] mappers = getPropertyMappers(source);</b>
+<b class="nc">&nbsp;		if (isFullEnumerable(source)) {</b>
+<b class="nc">&nbsp;			return new SpringIterableConfigurationPropertySource((EnumerablePropertySource&lt;?&gt;) source, mappers);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return new SpringConfigurationPropertySource(source, mappers);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PropertyMapper[] getPropertyMappers(PropertySource&lt;?&gt; source) {
+<b class="nc">&nbsp;		if (source instanceof SystemEnvironmentPropertySource &amp;&amp; hasSystemEnvironmentName(source)) {</b>
+<b class="nc">&nbsp;			return SYSTEM_ENVIRONMENT_MAPPERS;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return DEFAULT_MAPPERS;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean hasSystemEnvironmentName(PropertySource&lt;?&gt; source) {
+<b class="nc">&nbsp;		String name = source.getName();</b>
+<b class="nc">&nbsp;		return StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME.equals(name)</b>
+<b class="nc">&nbsp;				|| name.endsWith(&quot;-&quot; + StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static boolean isFullEnumerable(PropertySource&lt;?&gt; source) {
+<b class="nc">&nbsp;		PropertySource&lt;?&gt; rootSource = getRootSource(source);</b>
+<b class="nc">&nbsp;		if (rootSource.getSource() instanceof Map) {</b>
+&nbsp;			// Check we&#39;re not security restricted
+&nbsp;			try {
+<b class="nc">&nbsp;				((Map&lt;?, ?&gt;) rootSource.getSource()).size();</b>
+&nbsp;			}
+<b class="nc">&nbsp;			catch (UnsupportedOperationException ex) {</b>
+<b class="nc">&nbsp;				return false;</b>
+<b class="nc">&nbsp;			}</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return (source instanceof EnumerablePropertySource);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static PropertySource&lt;?&gt; getRootSource(PropertySource&lt;?&gt; source) {
+<b class="nc">&nbsp;		while (source.getSource() != null &amp;&amp; source.getSource() instanceof PropertySource) {</b>
+<b class="nc">&nbsp;			source = (PropertySource&lt;?&gt;) source.getSource();</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return source;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

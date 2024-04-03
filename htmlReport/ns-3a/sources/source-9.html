@@ -1,0 +1,398 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoggerConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: LoggerConfiguration (org.springframework.boot.logging)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoggerConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoggerConfiguration$ConfigurationScope</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LoggerConfiguration$LevelConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.logging;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.springframework.util.Assert;
+&nbsp;import org.springframework.util.ObjectUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Immutable class that represents the configuration of a {@link LoggingSystem}&#39;s logger.
+&nbsp; *
+&nbsp; * @author Ben Hale
+&nbsp; * @author Phillip Webb
+&nbsp; * @since 1.5.0
+&nbsp; */
+&nbsp;public final class LoggerConfiguration {
+&nbsp;
+&nbsp;	private final String name;
+&nbsp;
+&nbsp;	private final LevelConfiguration levelConfiguration;
+&nbsp;
+&nbsp;	private final LevelConfiguration inheritedLevelConfiguration;
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LoggerConfiguration instance}.
+&nbsp;	 * @param name the name of the logger
+&nbsp;	 * @param configuredLevel the configured level of the logger
+&nbsp;	 * @param effectiveLevel the effective level of the logger
+&nbsp;	 */
+<b class="nc">&nbsp;	public LoggerConfiguration(String name, LogLevel configuredLevel, LogLevel effectiveLevel) {</b>
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(effectiveLevel, &quot;EffectiveLevel must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.name = name;</b>
+<b class="nc">&nbsp;		this.levelConfiguration = (configuredLevel != null) ? LevelConfiguration.of(configuredLevel) : null;</b>
+<b class="nc">&nbsp;		this.inheritedLevelConfiguration = LevelConfiguration.of(effectiveLevel);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a new {@link LoggerConfiguration instance}.
+&nbsp;	 * @param name the name of the logger
+&nbsp;	 * @param levelConfiguration the level configuration
+&nbsp;	 * @param inheritedLevelConfiguration the inherited level configuration
+&nbsp;	 * @since 2.7.13
+&nbsp;	 */
+&nbsp;	public LoggerConfiguration(String name, LevelConfiguration levelConfiguration,
+<b class="nc">&nbsp;			LevelConfiguration inheritedLevelConfiguration) {</b>
+<b class="nc">&nbsp;		Assert.notNull(name, &quot;Name must not be null&quot;);</b>
+<b class="nc">&nbsp;		Assert.notNull(inheritedLevelConfiguration, &quot;InheritedLevelConfiguration must not be null&quot;);</b>
+<b class="nc">&nbsp;		this.name = name;</b>
+<b class="nc">&nbsp;		this.levelConfiguration = levelConfiguration;</b>
+<b class="nc">&nbsp;		this.inheritedLevelConfiguration = inheritedLevelConfiguration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the name of the logger.
+&nbsp;	 * @return the name of the logger
+&nbsp;	 */
+&nbsp;	public String getName() {
+<b class="nc">&nbsp;		return this.name;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the configured level of the logger.
+&nbsp;	 * @return the configured level of the logger
+&nbsp;	 * @see #getLevelConfiguration(ConfigurationScope)
+&nbsp;	 */
+&nbsp;	public LogLevel getConfiguredLevel() {
+<b class="nc">&nbsp;		LevelConfiguration configuration = getLevelConfiguration(ConfigurationScope.DIRECT);</b>
+<b class="nc">&nbsp;		return (configuration != null) ? configuration.getLevel() : null;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns the effective level of the logger.
+&nbsp;	 * @return the effective level of the logger
+&nbsp;	 * @see #getLevelConfiguration(ConfigurationScope)
+&nbsp;	 */
+&nbsp;	public LogLevel getEffectiveLevel() {
+<b class="nc">&nbsp;		return getLevelConfiguration().getLevel();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the level configuration, considering inherited loggers.
+&nbsp;	 * @return the level configuration
+&nbsp;	 * @since 2.7.13
+&nbsp;	 */
+&nbsp;	public LevelConfiguration getLevelConfiguration() {
+<b class="nc">&nbsp;		return getLevelConfiguration(ConfigurationScope.INHERITED);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Return the level configuration for the given scope.
+&nbsp;	 * @param scope the configuration scope
+&nbsp;	 * @return the level configuration or {@code null} for
+&nbsp;	 * {@link ConfigurationScope#DIRECT direct scope} results without applied
+&nbsp;	 * configuration
+&nbsp;	 * @since 2.7.13
+&nbsp;	 */
+&nbsp;	public LevelConfiguration getLevelConfiguration(ConfigurationScope scope) {
+<b class="nc">&nbsp;		return (scope != ConfigurationScope.DIRECT) ? this.inheritedLevelConfiguration : this.levelConfiguration;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean equals(Object obj) {
+<b class="nc">&nbsp;		if (this == obj) {</b>
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		LoggerConfiguration other = (LoggerConfiguration) obj;</b>
+<b class="nc">&nbsp;		return ObjectUtils.nullSafeEquals(this.name, other.name)</b>
+<b class="nc">&nbsp;				&amp;&amp; ObjectUtils.nullSafeEquals(this.levelConfiguration, other.levelConfiguration)</b>
+<b class="nc">&nbsp;				&amp;&amp; ObjectUtils.nullSafeEquals(this.inheritedLevelConfiguration, other.inheritedLevelConfiguration);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public int hashCode() {
+<b class="nc">&nbsp;		return Objects.hash(this.name, this.levelConfiguration, this.inheritedLevelConfiguration);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public String toString() {
+<b class="nc">&nbsp;		return &quot;LoggerConfiguration [name=&quot; + this.name + &quot;, levelConfiguration=&quot; + this.levelConfiguration</b>
+&nbsp;				+ &quot;, inheritedLevelConfiguration=&quot; + this.inheritedLevelConfiguration + &quot;]&quot;;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Supported logger configuration scopes.
+&nbsp;	 *
+&nbsp;	 * @since 2.7.13
+&nbsp;	 */
+<b class="nc">&nbsp;	public enum ConfigurationScope {</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Only return configuration that has been applied directly. Often referred to as
+&nbsp;		 * &#39;configured&#39; or &#39;assigned&#39; configuration.
+&nbsp;		 */
+<b class="nc">&nbsp;		DIRECT,</b>
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * May return configuration that has been applied to a parent logger. Often
+&nbsp;		 * referred to as &#39;effective&#39; configuration.
+&nbsp;		 */
+<b class="nc">&nbsp;		INHERITED</b>
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Logger level configuration.
+&nbsp;	 *
+&nbsp;	 * @since 2.7.13
+&nbsp;	 */
+&nbsp;	public static final class LevelConfiguration {
+&nbsp;
+&nbsp;		private final String name;
+&nbsp;
+&nbsp;		private final LogLevel logLevel;
+&nbsp;
+<b class="nc">&nbsp;		private LevelConfiguration(String name, LogLevel logLevel) {</b>
+<b class="nc">&nbsp;			this.name = name;</b>
+<b class="nc">&nbsp;			this.logLevel = logLevel;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the name of the level.
+&nbsp;		 * @return the level name
+&nbsp;		 */
+&nbsp;		public String getName() {
+<b class="nc">&nbsp;			return this.name;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return the actual level value if possible.
+&nbsp;		 * @return the level value
+&nbsp;		 * @throws IllegalStateException if this is a {@link #isCustom() custom} level
+&nbsp;		 */
+&nbsp;		public LogLevel getLevel() {
+<b class="nc">&nbsp;			Assert.state(this.logLevel != null, &quot;Unable to provide LogLevel for &#39;&quot; + this.name + &quot;&#39;&quot;);</b>
+<b class="nc">&nbsp;			return this.logLevel;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Return if this is a custom level and cannot be represented by {@link LogLevel}.
+&nbsp;		 * @return if this is a custom level
+&nbsp;		 */
+&nbsp;		public boolean isCustom() {
+<b class="nc">&nbsp;			return this.logLevel == null;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public boolean equals(Object obj) {
+<b class="nc">&nbsp;			if (this == obj) {</b>
+<b class="nc">&nbsp;				return true;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			if (obj == null || getClass() != obj.getClass()) {</b>
+<b class="nc">&nbsp;				return false;</b>
+&nbsp;			}
+<b class="nc">&nbsp;			LevelConfiguration other = (LevelConfiguration) obj;</b>
+<b class="nc">&nbsp;			return this.logLevel == other.logLevel &amp;&amp; ObjectUtils.nullSafeEquals(this.name, other.name);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public int hashCode() {
+<b class="nc">&nbsp;			return Objects.hash(this.logLevel, this.name);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		@Override
+&nbsp;		public String toString() {
+<b class="nc">&nbsp;			return &quot;LevelConfiguration [name=&quot; + this.name + &quot;, logLevel=&quot; + this.logLevel + &quot;]&quot;;</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Create a new {@link LevelConfiguration} instance of the given {@link LogLevel}.
+&nbsp;		 * @param logLevel the log level
+&nbsp;		 * @return a new {@link LevelConfiguration} instance
+&nbsp;		 */
+&nbsp;		public static LevelConfiguration of(LogLevel logLevel) {
+<b class="nc">&nbsp;			Assert.notNull(logLevel, &quot;LogLevel must not be null&quot;);</b>
+<b class="nc">&nbsp;			return new LevelConfiguration(logLevel.name(), logLevel);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;		/**
+&nbsp;		 * Create a new {@link LevelConfiguration} instance for a custom level name.
+&nbsp;		 * @param name the log level name
+&nbsp;		 * @return a new {@link LevelConfiguration} instance
+&nbsp;		 */
+&nbsp;		public static LevelConfiguration ofCustom(String name) {
+<b class="nc">&nbsp;			Assert.hasText(name, &quot;Name must not be empty&quot;);</b>
+<b class="nc">&nbsp;			return new LevelConfiguration(name, null);</b>
+&nbsp;		}
+&nbsp;
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>

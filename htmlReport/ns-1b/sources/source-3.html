@@ -1,0 +1,707 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpringApplicationBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.springframework.boot.builder</a>
+</div>
+
+<h1>Coverage Summary for Class: SpringApplicationBuilder (org.springframework.boot.builder)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpringApplicationBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/129)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright 2012-2023 the original author or authors.
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      https://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.springframework.boot.builder;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
+&nbsp;import org.springframework.beans.factory.support.BeanNameGenerator;
+&nbsp;import org.springframework.boot.ApplicationContextFactory;
+&nbsp;import org.springframework.boot.Banner;
+&nbsp;import org.springframework.boot.BootstrapRegistry;
+&nbsp;import org.springframework.boot.BootstrapRegistryInitializer;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.WebApplicationType;
+&nbsp;import org.springframework.boot.convert.ApplicationConversionService;
+&nbsp;import org.springframework.context.ApplicationContext;
+&nbsp;import org.springframework.context.ApplicationContextInitializer;
+&nbsp;import org.springframework.context.ApplicationListener;
+&nbsp;import org.springframework.context.ConfigurableApplicationContext;
+&nbsp;import org.springframework.core.env.ConfigurableEnvironment;
+&nbsp;import org.springframework.core.env.Environment;
+&nbsp;import org.springframework.core.io.ResourceLoader;
+&nbsp;import org.springframework.core.metrics.ApplicationStartup;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builder for {@link SpringApplication} and {@link ApplicationContext} instances with
+&nbsp; * convenient fluent API and context hierarchy support. Simple example of a context
+&nbsp; * hierarchy:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * new SpringApplicationBuilder(ParentConfig.class).child(ChildConfig.class).run(args);
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * Another common use case is setting active profiles and default properties to set up the
+&nbsp; * environment for an application:
+&nbsp; *
+&nbsp; * &lt;pre class=&quot;code&quot;&gt;
+&nbsp; * new SpringApplicationBuilder(Application.class).profiles(&amp;quot;server&amp;quot;)
+&nbsp; * 		.properties(&amp;quot;transport=local&amp;quot;).run(args);
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * If your needs are simpler, consider using the static convenience methods in
+&nbsp; * SpringApplication instead.
+&nbsp; *
+&nbsp; * @author Dave Syer
+&nbsp; * @author Andy Wilkinson
+&nbsp; * @since 1.0.0
+&nbsp; * @see SpringApplication
+&nbsp; */
+&nbsp;public class SpringApplicationBuilder {
+&nbsp;
+&nbsp;	private final SpringApplication application;
+&nbsp;
+&nbsp;	private volatile ConfigurableApplicationContext context;
+&nbsp;
+&nbsp;	private SpringApplicationBuilder parent;
+&nbsp;
+<b class="nc">&nbsp;	private final AtomicBoolean running = new AtomicBoolean();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Set&lt;Class&lt;?&gt;&gt; sources = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;	private final Map&lt;String, Object&gt; defaultProperties = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private ConfigurableEnvironment environment;
+&nbsp;
+<b class="nc">&nbsp;	private Set&lt;String&gt; additionalProfiles = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;	private boolean registerShutdownHookApplied;
+&nbsp;
+<b class="nc">&nbsp;	private boolean configuredAsChild = false;</b>
+&nbsp;
+&nbsp;	public SpringApplicationBuilder(Class&lt;?&gt;... sources) {
+<b class="nc">&nbsp;		this(null, sources);</b>
+&nbsp;	}
+&nbsp;
+<b class="nc">&nbsp;	public SpringApplicationBuilder(ResourceLoader resourceLoader, Class&lt;?&gt;... sources) {</b>
+<b class="nc">&nbsp;		this.application = createSpringApplication(resourceLoader, sources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Creates a new {@link SpringApplication} instance from the given sources using the
+&nbsp;	 * given {@link ResourceLoader}. Subclasses may override in order to provide a custom
+&nbsp;	 * subclass of {@link SpringApplication}.
+&nbsp;	 * @param resourceLoader the resource loader or {@code null}
+&nbsp;	 * @param sources the sources
+&nbsp;	 * @return the {@link SpringApplication} instance
+&nbsp;	 * @since 2.6.0
+&nbsp;	 */
+&nbsp;	protected SpringApplication createSpringApplication(ResourceLoader resourceLoader, Class&lt;?&gt;... sources) {
+<b class="nc">&nbsp;		return new SpringApplication(resourceLoader, sources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Accessor for the current application context.
+&nbsp;	 * @return the current application context (or null if not yet running)
+&nbsp;	 */
+&nbsp;	public ConfigurableApplicationContext context() {
+<b class="nc">&nbsp;		return this.context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Accessor for the current application.
+&nbsp;	 * @return the current application (never null)
+&nbsp;	 */
+&nbsp;	public SpringApplication application() {
+<b class="nc">&nbsp;		return this.application;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create an application context (and its parent if specified) with the command line
+&nbsp;	 * args provided. The parent is run first with the same arguments if it has not yet
+&nbsp;	 * been started.
+&nbsp;	 * @param args the command line arguments
+&nbsp;	 * @return an application context created from the current state
+&nbsp;	 */
+&nbsp;	public ConfigurableApplicationContext run(String... args) {
+<b class="nc">&nbsp;		if (this.running.get()) {</b>
+&nbsp;			// If already created we just return the existing context
+<b class="nc">&nbsp;			return this.context;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		configureAsChildIfNecessary(args);</b>
+<b class="nc">&nbsp;		if (this.running.compareAndSet(false, true)) {</b>
+&nbsp;			// If not already running copy the sources over and then run.
+<b class="nc">&nbsp;			this.context = build().run(args);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.context;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void configureAsChildIfNecessary(String... args) {
+<b class="nc">&nbsp;		if (this.parent != null &amp;&amp; !this.configuredAsChild) {</b>
+<b class="nc">&nbsp;			this.configuredAsChild = true;</b>
+<b class="nc">&nbsp;			if (!this.registerShutdownHookApplied) {</b>
+<b class="nc">&nbsp;				this.application.setRegisterShutdownHook(false);</b>
+&nbsp;			}
+<b class="nc">&nbsp;			initializers(new ParentContextApplicationContextInitializer(this.parent.run(args)));</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a fully configured {@link SpringApplication} that is ready to run.
+&nbsp;	 * @return the fully configured {@link SpringApplication}.
+&nbsp;	 */
+&nbsp;	public SpringApplication build() {
+<b class="nc">&nbsp;		return build(new String[0]);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Returns a fully configured {@link SpringApplication} that is ready to run. Any
+&nbsp;	 * parent that has been configured will be run with the given {@code args}.
+&nbsp;	 * @param args the parent&#39;s args
+&nbsp;	 * @return the fully configured {@link SpringApplication}.
+&nbsp;	 */
+&nbsp;	public SpringApplication build(String... args) {
+<b class="nc">&nbsp;		configureAsChildIfNecessary(args);</b>
+<b class="nc">&nbsp;		this.application.addPrimarySources(this.sources);</b>
+<b class="nc">&nbsp;		return this.application;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a child application with the provided sources. Default args and environment
+&nbsp;	 * are copied down into the child, but everything else is a clean sheet.
+&nbsp;	 * @param sources the sources for the application (Spring configuration)
+&nbsp;	 * @return the child application builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder child(Class&lt;?&gt;... sources) {
+<b class="nc">&nbsp;		SpringApplicationBuilder child = new SpringApplicationBuilder();</b>
+<b class="nc">&nbsp;		child.sources(sources);</b>
+&nbsp;
+&nbsp;		// Copy environment stuff from parent to child
+<b class="nc">&nbsp;		child.properties(this.defaultProperties)</b>
+<b class="nc">&nbsp;			.environment(this.environment)</b>
+<b class="nc">&nbsp;			.additionalProfiles(this.additionalProfiles);</b>
+<b class="nc">&nbsp;		child.parent = this;</b>
+&nbsp;
+&nbsp;		// It&#39;s not possible if embedded web server are enabled to support web contexts as
+&nbsp;		// parents because the servlets cannot be initialized at the right point in
+&nbsp;		// lifecycle.
+<b class="nc">&nbsp;		web(WebApplicationType.NONE);</b>
+&nbsp;
+&nbsp;		// Probably not interested in multiple banners
+<b class="nc">&nbsp;		bannerMode(Banner.Mode.OFF);</b>
+&nbsp;
+&nbsp;		// Make sure sources get copied over
+<b class="nc">&nbsp;		this.application.addPrimarySources(this.sources);</b>
+&nbsp;
+<b class="nc">&nbsp;		return child;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add a parent application with the provided sources. Default args and environment
+&nbsp;	 * are copied up into the parent, but everything else is a clean sheet.
+&nbsp;	 * @param sources the sources for the application (Spring configuration)
+&nbsp;	 * @return the parent builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder parent(Class&lt;?&gt;... sources) {
+<b class="nc">&nbsp;		if (this.parent == null) {</b>
+<b class="nc">&nbsp;			this.parent = new SpringApplicationBuilder(sources).web(WebApplicationType.NONE)</b>
+<b class="nc">&nbsp;				.properties(this.defaultProperties)</b>
+<b class="nc">&nbsp;				.environment(this.environment);</b>
+&nbsp;		}
+&nbsp;		else {
+<b class="nc">&nbsp;			this.parent.sources(sources);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this.parent;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private SpringApplicationBuilder runAndExtractParent(String... args) {
+<b class="nc">&nbsp;		if (this.context == null) {</b>
+<b class="nc">&nbsp;			run(args);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (this.parent != null) {</b>
+<b class="nc">&nbsp;			return this.parent;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		throw new IllegalStateException(</b>
+&nbsp;				&quot;No parent defined yet (please use the other overloaded parent methods to set one)&quot;);
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add an already running parent context to an existing application.
+&nbsp;	 * @param parent the parent context
+&nbsp;	 * @return the current builder (not the parent)
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder parent(ConfigurableApplicationContext parent) {
+<b class="nc">&nbsp;		this.parent = new SpringApplicationBuilder();</b>
+<b class="nc">&nbsp;		this.parent.context = parent;</b>
+<b class="nc">&nbsp;		this.parent.running.set(true);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a sibling application (one with the same parent). A side effect of calling
+&nbsp;	 * this method is that the current application (and its parent) are started without
+&nbsp;	 * any arguments if they are not already running. To supply arguments when starting
+&nbsp;	 * the current application and its parent use {@link #sibling(Class[], String...)}
+&nbsp;	 * instead.
+&nbsp;	 * @param sources the sources for the application (Spring configuration)
+&nbsp;	 * @return the new sibling builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder sibling(Class&lt;?&gt;... sources) {
+<b class="nc">&nbsp;		return runAndExtractParent().child(sources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Create a sibling application (one with the same parent). A side effect of calling
+&nbsp;	 * this method is that the current application (and its parent) are started if they
+&nbsp;	 * are not already running.
+&nbsp;	 * @param sources the sources for the application (Spring configuration)
+&nbsp;	 * @param args the command line arguments to use when starting the current app and its
+&nbsp;	 * parent
+&nbsp;	 * @return the new sibling builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder sibling(Class&lt;?&gt;[] sources, String... args) {
+<b class="nc">&nbsp;		return runAndExtractParent(args).child(sources);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Explicitly set the factory used to create the application context.
+&nbsp;	 * @param factory the factory to use
+&nbsp;	 * @return the current builder
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder contextFactory(ApplicationContextFactory factory) {
+<b class="nc">&nbsp;		this.application.setApplicationContextFactory(factory);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add more sources (configuration classes and components) to this application.
+&nbsp;	 * @param sources the sources to add
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder sources(Class&lt;?&gt;... sources) {
+<b class="nc">&nbsp;		this.sources.addAll(new LinkedHashSet&lt;&gt;(Arrays.asList(sources)));</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flag to explicitly request a specific type of web application. Auto-detected based
+&nbsp;	 * on the classpath if not set.
+&nbsp;	 * @param webApplicationType the type of web application
+&nbsp;	 * @return the current builder
+&nbsp;	 * @since 2.0.0
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder web(WebApplicationType webApplicationType) {
+<b class="nc">&nbsp;		this.application.setWebApplicationType(webApplicationType);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flag to indicate the startup information should be logged.
+&nbsp;	 * @param logStartupInfo the flag to set. Default true.
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder logStartupInfo(boolean logStartupInfo) {
+<b class="nc">&nbsp;		this.application.setLogStartupInfo(logStartupInfo);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets the {@link Banner} instance which will be used to print the banner when no
+&nbsp;	 * static banner file is provided.
+&nbsp;	 * @param banner the banner to use
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder banner(Banner banner) {
+<b class="nc">&nbsp;		this.application.setBanner(banner);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public SpringApplicationBuilder bannerMode(Banner.Mode bannerMode) {
+<b class="nc">&nbsp;		this.application.setBannerMode(bannerMode);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets if the application is headless and should not instantiate AWT. Defaults to
+&nbsp;	 * {@code true} to prevent java icons appearing.
+&nbsp;	 * @param headless if the application is headless
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder headless(boolean headless) {
+<b class="nc">&nbsp;		this.application.setHeadless(headless);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Sets if the created {@link ApplicationContext} should have a shutdown hook
+&nbsp;	 * registered.
+&nbsp;	 * @param registerShutdownHook if the shutdown hook should be registered
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder registerShutdownHook(boolean registerShutdownHook) {
+<b class="nc">&nbsp;		this.registerShutdownHookApplied = true;</b>
+<b class="nc">&nbsp;		this.application.setRegisterShutdownHook(registerShutdownHook);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Fixes the main application class that is used to anchor the startup messages.
+&nbsp;	 * @param mainApplicationClass the class to use.
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder main(Class&lt;?&gt; mainApplicationClass) {
+<b class="nc">&nbsp;		this.application.setMainApplicationClass(mainApplicationClass);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flag to indicate that command line arguments should be added to the environment.
+&nbsp;	 * @param addCommandLineProperties the flag to set. Default true.
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder addCommandLineProperties(boolean addCommandLineProperties) {
+<b class="nc">&nbsp;		this.application.setAddCommandLineProperties(addCommandLineProperties);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flag to indicate if the {@link ApplicationConversionService} should be added to the
+&nbsp;	 * application context&#39;s {@link Environment}.
+&nbsp;	 * @param addConversionService if the conversion service should be added.
+&nbsp;	 * @return the current builder
+&nbsp;	 * @since 2.1.0
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder setAddConversionService(boolean addConversionService) {
+<b class="nc">&nbsp;		this.application.setAddConversionService(addConversionService);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Adds {@link BootstrapRegistryInitializer} instances that can be used to initialize
+&nbsp;	 * the {@link BootstrapRegistry}.
+&nbsp;	 * @param bootstrapRegistryInitializer the bootstrap registry initializer to add
+&nbsp;	 * @return the current builder
+&nbsp;	 * @since 2.4.5
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder addBootstrapRegistryInitializer(
+&nbsp;			BootstrapRegistryInitializer bootstrapRegistryInitializer) {
+<b class="nc">&nbsp;		this.application.addBootstrapRegistryInitializer(bootstrapRegistryInitializer);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Flag to control whether the application should be initialized lazily.
+&nbsp;	 * @param lazyInitialization the flag to set. Defaults to false.
+&nbsp;	 * @return the current builder
+&nbsp;	 * @since 2.2
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder lazyInitialization(boolean lazyInitialization) {
+<b class="nc">&nbsp;		this.application.setLazyInitialization(lazyInitialization);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Default properties for the environment in the form {@code key=value} or
+&nbsp;	 * {@code key:value}. Multiple calls to this method are cumulative and will not clear
+&nbsp;	 * any previously set properties.
+&nbsp;	 * @param defaultProperties the properties to set.
+&nbsp;	 * @return the current builder
+&nbsp;	 * @see SpringApplicationBuilder#properties(Properties)
+&nbsp;	 * @see SpringApplicationBuilder#properties(Map)
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder properties(String... defaultProperties) {
+<b class="nc">&nbsp;		return properties(getMapFromKeyValuePairs(defaultProperties));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Object&gt; getMapFromKeyValuePairs(String[] properties) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (String property : properties) {</b>
+<b class="nc">&nbsp;			int index = lowestIndexOf(property, &quot;:&quot;, &quot;=&quot;);</b>
+<b class="nc">&nbsp;			String key = (index &gt; 0) ? property.substring(0, index) : property;</b>
+<b class="nc">&nbsp;			String value = (index &gt; 0) ? property.substring(index + 1) : &quot;&quot;;</b>
+<b class="nc">&nbsp;			map.put(key, value);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return map;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int lowestIndexOf(String property, String... candidates) {
+<b class="nc">&nbsp;		int index = -1;</b>
+<b class="nc">&nbsp;		for (String candidate : candidates) {</b>
+<b class="nc">&nbsp;			int candidateIndex = property.indexOf(candidate);</b>
+<b class="nc">&nbsp;			if (candidateIndex &gt; 0) {</b>
+<b class="nc">&nbsp;				index = (index != -1) ? Math.min(index, candidateIndex) : candidateIndex;</b>
+&nbsp;			}
+&nbsp;		}
+<b class="nc">&nbsp;		return index;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Default properties for the environment.Multiple calls to this method are cumulative
+&nbsp;	 * and will not clear any previously set properties.
+&nbsp;	 * @param defaultProperties the properties to set.
+&nbsp;	 * @return the current builder
+&nbsp;	 * @see SpringApplicationBuilder#properties(String...)
+&nbsp;	 * @see SpringApplicationBuilder#properties(Map)
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder properties(Properties defaultProperties) {
+<b class="nc">&nbsp;		return properties(getMapFromProperties(defaultProperties));</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private Map&lt;String, Object&gt; getMapFromProperties(Properties properties) {
+<b class="nc">&nbsp;		Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;		for (Object key : Collections.list(properties.propertyNames())) {</b>
+<b class="nc">&nbsp;			map.put((String) key, properties.get(key));</b>
+<b class="nc">&nbsp;		}</b>
+<b class="nc">&nbsp;		return map;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Default properties for the environment. Multiple calls to this method are
+&nbsp;	 * cumulative and will not clear any previously set properties.
+&nbsp;	 * @param defaults the default properties
+&nbsp;	 * @return the current builder
+&nbsp;	 * @see SpringApplicationBuilder#properties(String...)
+&nbsp;	 * @see SpringApplicationBuilder#properties(Properties)
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder properties(Map&lt;String, Object&gt; defaults) {
+<b class="nc">&nbsp;		this.defaultProperties.putAll(defaults);</b>
+<b class="nc">&nbsp;		this.application.setDefaultProperties(this.defaultProperties);</b>
+<b class="nc">&nbsp;		if (this.parent != null) {</b>
+<b class="nc">&nbsp;			this.parent.properties(this.defaultProperties);</b>
+<b class="nc">&nbsp;			this.parent.environment(this.environment);</b>
+&nbsp;		}
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add to the active Spring profiles for this app (and its parent and children).
+&nbsp;	 * @param profiles the profiles to add.
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder profiles(String... profiles) {
+<b class="nc">&nbsp;		this.additionalProfiles.addAll(Arrays.asList(profiles));</b>
+<b class="nc">&nbsp;		this.application.setAdditionalProfiles(StringUtils.toStringArray(this.additionalProfiles));</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private SpringApplicationBuilder additionalProfiles(Collection&lt;String&gt; additionalProfiles) {
+<b class="nc">&nbsp;		this.additionalProfiles = new LinkedHashSet&lt;&gt;(additionalProfiles);</b>
+<b class="nc">&nbsp;		this.application.setAdditionalProfiles(StringUtils.toStringArray(this.additionalProfiles));</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Bean name generator for automatically generated bean names in the application
+&nbsp;	 * context.
+&nbsp;	 * @param beanNameGenerator the generator to set.
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder beanNameGenerator(BeanNameGenerator beanNameGenerator) {
+<b class="nc">&nbsp;		this.application.setBeanNameGenerator(beanNameGenerator);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Environment for the application context.
+&nbsp;	 * @param environment the environment to set.
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder environment(ConfigurableEnvironment environment) {
+<b class="nc">&nbsp;		this.application.setEnvironment(environment);</b>
+<b class="nc">&nbsp;		this.environment = environment;</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Prefix that should be applied when obtaining configuration properties from the
+&nbsp;	 * system environment.
+&nbsp;	 * @param environmentPrefix the environment property prefix to set
+&nbsp;	 * @return the current builder
+&nbsp;	 * @since 2.5.0
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder environmentPrefix(String environmentPrefix) {
+<b class="nc">&nbsp;		this.application.setEnvironmentPrefix(environmentPrefix);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * {@link ResourceLoader} for the application context. If a custom class loader is
+&nbsp;	 * needed, this is where it would be added.
+&nbsp;	 * @param resourceLoader the resource loader to set.
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder resourceLoader(ResourceLoader resourceLoader) {
+<b class="nc">&nbsp;		this.application.setResourceLoader(resourceLoader);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add some initializers to the application (applied to the {@link ApplicationContext}
+&nbsp;	 * before any bean definitions are loaded).
+&nbsp;	 * @param initializers some initializers to add
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder initializers(ApplicationContextInitializer&lt;?&gt;... initializers) {
+<b class="nc">&nbsp;		this.application.addInitializers(initializers);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Add some listeners to the application (listening for SpringApplication events as
+&nbsp;	 * well as regular Spring events once the context is running). Any listeners that are
+&nbsp;	 * also {@link ApplicationContextInitializer} will be added to the
+&nbsp;	 * {@link #initializers(ApplicationContextInitializer...) initializers} automatically.
+&nbsp;	 * @param listeners some listeners to add
+&nbsp;	 * @return the current builder
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder listeners(ApplicationListener&lt;?&gt;... listeners) {
+<b class="nc">&nbsp;		this.application.addListeners(listeners);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Configure the {@link ApplicationStartup} to be used with the
+&nbsp;	 * {@link ApplicationContext} for collecting startup metrics.
+&nbsp;	 * @param applicationStartup the application startup to use
+&nbsp;	 * @return the current builder
+&nbsp;	 * @since 2.4.0
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder applicationStartup(ApplicationStartup applicationStartup) {
+<b class="nc">&nbsp;		this.application.setApplicationStartup(applicationStartup);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	/**
+&nbsp;	 * Whether to allow circular references between beans and automatically try to resolve
+&nbsp;	 * them.
+&nbsp;	 * @param allowCircularReferences whether circular references are allowed
+&nbsp;	 * @return the current builder
+&nbsp;	 * @since 2.6.0
+&nbsp;	 * @see AbstractAutowireCapableBeanFactory#setAllowCircularReferences(boolean)
+&nbsp;	 */
+&nbsp;	public SpringApplicationBuilder allowCircularReferences(boolean allowCircularReferences) {
+<b class="nc">&nbsp;		this.application.setAllowCircularReferences(allowCircularReferences);</b>
+<b class="nc">&nbsp;		return this;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-28 21:28</div>
+</div>
+</body>
+</html>
