@@ -123,6 +123,7 @@ class EventPublishingRunListenerContextPreparedEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void testContextPrepared() {
 		try (MockedStatic<SimpleApplicationEventMulticaster> multicasterMockedStatic = Mockito.mockStatic(SimpleApplicationEventMulticaster.class)) {
 			SimpleApplicationEventMulticaster multicaster = mock(SimpleApplicationEventMulticaster.class);

@@ -11,6 +11,7 @@ import java.lang.*;
 import java.lang.IllegalStateException;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.*;
 
 import java.io.*;
@@ -151,7 +152,7 @@ class ApplicationPidFileWriterOnApplicationEventEnhancedTest {
 
 //	@Test
 //	void onApplicationEvent_whenTriggerEventTypeAndNotCreatedAndFailOnWriteError_shouldThrowException() {
-//		when(mockPreparedEvent.getApplicationContext()).thenReturn(mockApplicationContext);
+//		when(mockPreparedEvent.getApplicationContext()).thenReturn((ConfigurableApplicationContext) mockApplicationContext);
 //		when(mockApplicationContext.getEnvironment()).thenReturn(mockEnvironment);
 //		when(mockEnvironment.getProperty("spring.pid.file")).thenReturn(null);
 //		when(mockEnvironment.getProperty("spring.pid.fail-on-write-error")).thenReturn("true");

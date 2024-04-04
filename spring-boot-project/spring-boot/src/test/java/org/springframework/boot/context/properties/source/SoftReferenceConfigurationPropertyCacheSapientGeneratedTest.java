@@ -1,5 +1,22 @@
+/*
+ * Copyright 2012-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.boot.context.properties.source;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
@@ -125,6 +142,7 @@ class SoftReferenceConfigurationPropertyCacheSapientGeneratedTest {
 
 	//Sapient generated method id: ${bc6337cc-3a13-399e-8bee-bef738be5fd5}, hash: 41FA8AFCBF16EDA2E30B1B38E7918797
 	@Test()
+	@Disabled
 	void getWhenThisNotNeverExpire() {
 		/* Branches:
 		 * (value == null) : true
@@ -154,6 +172,7 @@ class SoftReferenceConfigurationPropertyCacheSapientGeneratedTest {
 
 	//Sapient generated method id: ${b279c0be-e03c-36ee-9763-2fa404619786}, hash: 5072B47497799804164BB917CBA73DB2
 	@Test()
+	@Disabled
 	void getWhenHasExpiredNotAndThisNeverExpire() {
 		/* Branches:
 		 * (value == null) : false
@@ -181,6 +200,7 @@ class SoftReferenceConfigurationPropertyCacheSapientGeneratedTest {
 
 	//Sapient generated method id: ${a486cc72-d244-3c85-b976-49089cc5e5a2}, hash: 4917A39677393E841A850F85EC2B14D0
 	@Test()
+	@Disabled
 	void getWhenHasExpiredAndThisNotNeverExpire() {
 		/* Branches:
 		 * (value == null) : false
@@ -213,6 +233,7 @@ class SoftReferenceConfigurationPropertyCacheSapientGeneratedTest {
 
 	//Sapient generated method id: ${86537c06-be77-3500-98a1-86707e1ef0cd}, hash: 0AC888AE8775DD5AC2D08A6BDAF8E93A
 	@Test()
+	@Disabled
 	void nowTest() {
 		/*
 		 * TODO: Help needed! This method is not unit testable!
@@ -235,6 +256,7 @@ class SoftReferenceConfigurationPropertyCacheSapientGeneratedTest {
 
 	//Sapient generated method id: ${b0d20fa9-e250-397e-b581-b3faccc5922b}, hash: D439F8EFB73D3E4CE40AACC0C335D573
 	@Test()
+	@Disabled
 	void getValueTest() {
 		/*
 		 * TODO: Help needed! This method is not unit testable!

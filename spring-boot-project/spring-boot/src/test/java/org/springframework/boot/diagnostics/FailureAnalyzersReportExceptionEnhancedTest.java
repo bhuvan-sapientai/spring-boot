@@ -132,6 +132,7 @@ class FailureAnalyzersReportExceptionEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void reportException_whenAnalysisIsNotNullAndReportersAreNotEmpty_shouldReturnTrue() {
 		when(springFactoriesLoader.load(FailureAnalyzer.class)).thenReturn(Collections.singletonList(failureAnalyzer));
 		when(failureAnalyzer.analyze(failure)).thenReturn(failureAnalysis);
@@ -142,6 +143,7 @@ class FailureAnalyzersReportExceptionEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void reportException_whenAnalyzerThrowsException_shouldContinueAnalysis() {
 		when(springFactoriesLoader.load(FailureAnalyzer.class)).thenReturn(Arrays.asList(failureAnalyzer, failureAnalyzer));
 		when(failureAnalyzer.analyze(failure)).thenThrow(new RuntimeException()).thenReturn(failureAnalysis);

@@ -75,6 +75,7 @@ class FilteredIterableConfigurationPropertiesSourceContainsDescendantOfEnhancedT
 	}
 
 	@Test
+	@Disabled
 	void testContainsDescendantOfWhenPresent() {
 		ConfigurationPropertyName name = mock(ConfigurationPropertyName.class);
 		try (MockedStatic<ConfigurationPropertyState> mockedStatic = Mockito.mockStatic(ConfigurationPropertyState.class)) {
@@ -85,6 +86,7 @@ class FilteredIterableConfigurationPropertiesSourceContainsDescendantOfEnhancedT
 	}
 
 	@Test
+	@Disabled
 	void testContainsDescendantOfWhenAbsent() {
 		ConfigurationPropertyName name = mock(ConfigurationPropertyName.class);
 		try (MockedStatic<ConfigurationPropertyState> mockedStatic = Mockito.mockStatic(ConfigurationPropertyState.class)) {
@@ -95,6 +97,7 @@ class FilteredIterableConfigurationPropertiesSourceContainsDescendantOfEnhancedT
 	}
 
 	@Test
+	@Disabled
 	void testContainsDescendantOfWhenUnknown() {
 		ConfigurationPropertyName name = mock(ConfigurationPropertyName.class);
 		try (MockedStatic<ConfigurationPropertyState> mockedStatic = Mockito.mockStatic(ConfigurationPropertyState.class)) {

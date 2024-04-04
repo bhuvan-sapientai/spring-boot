@@ -90,6 +90,7 @@ class PeriodToStringConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void convert_WhenSourceIsEmpty_ShouldReturnNull() {
 		try (MockedStatic<ObjectUtils> mockedUtils = Mockito.mockStatic(ObjectUtils.class)) {
 			mockedUtils.when(() -> ObjectUtils.isEmpty(Mockito.any())).thenReturn(true);

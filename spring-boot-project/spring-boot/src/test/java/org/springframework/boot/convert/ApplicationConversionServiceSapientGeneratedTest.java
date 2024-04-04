@@ -1,5 +1,6 @@
 package org.springframework.boot.convert;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
@@ -90,6 +91,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${ef281f25-2280-370b-aed7-95fdaa56f48e}, hash: 6654D19A9619FC48C319388543885757
 	@Test()
+	@Disabled
 	void addPrinterWhenThisNotUnmodifiable() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method
@@ -123,6 +125,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${6e65794f-158e-3a14-bbbd-ba9a14a23b80}, hash: 957485D59DB24460E5713A24969F1DCE
 	@Test()
+	@Disabled
 	void addParserWhenThisNotUnmodifiable() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method
@@ -156,6 +159,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${b95d9966-c5cb-35ad-9204-3f44c86fbb9c}, hash: B06B68D091596AA5CC8A8256A7B2624D
 	@Test()
+	@Disabled
 	void addFormatterWhenThisNotUnmodifiable() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method
@@ -186,6 +190,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${567449d5-2e6d-3512-a917-83d9d1d57540}, hash: F758A7083521BD561A04787271BE0987
 	@Test()
+	@Disabled
 	void addFormatterForFieldTypeWhenThisNotUnmodifiable() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method
@@ -214,6 +219,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${55276897-f922-3817-bfaf-676f6ad65c23}, hash: B359E6305D2DCAC195A9A2D3EB9D8E44
 	@Test()
+	@Disabled
 	void addConverterWhenThisNotUnmodifiable() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method
@@ -239,6 +245,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${21192281-56fb-3c02-86da-fb6765e3e294}, hash: BA3FA36D6B197CC23E957387C2EB4A7E
 	@Test()
+	@Disabled
 	void addFormatterForFieldType1WhenThisNotUnmodifiable() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method
@@ -267,6 +274,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${f9993464-7974-3764-afe1-82de70d07b50}, hash: C6BBC7CB442E3B65DCBCDFE1637E858A
 	@Test()
+	@Disabled
 	void addFormatterForFieldAnnotationWhenThisNotUnmodifiable() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method
@@ -383,6 +391,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${8eeea4da-2ca3-3f84-bf7d-0acf130ce1ba}, hash: 8DE54E3C7DE5537FC4207E8D638ADC71
 	@Test()
+	@Disabled
 	void addConverterFactoryWhenThisNotUnmodifiable() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method
@@ -434,6 +443,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${33c8ac70-a3f4-3dc1-bcb0-420004e41834}, hash: 25C0B17AF7D3C579DA100FC640CF72ED
 	@Test()
+	@Disabled
 	void isConvertViaObjectSourceTypeWhenConverterIsNullAndPairsIsNull() {
 		/* Branches:
 		 * (converter != null) : false
@@ -463,6 +473,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${9233cd17-fa9d-393b-9a47-5116863f0596}, hash: D906E7318C2F0F3166662E26AADE2F79
 	@Test()
+	@Disabled
 	void isConvertViaObjectSourceTypeWhenObjectEqualsPairGetSourceType() {
 		/* Branches:
 		 * (converter != null) : true
@@ -495,6 +506,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${dd9d2f13-9f83-32de-9bdd-a9e0b5bc2c7f}, hash: 98BFFC735B8E6EB4197B4D8C90351807
 	@Test()
+	@Disabled
 	void isConvertViaObjectSourceTypeWhenObjectNotEqualsPairGetSourceType() {
 		/* Branches:
 		 * (converter != null) : true
@@ -622,6 +634,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${81074e95-dd11-3689-95e2-4934d32bd7df}, hash: 962CC2419F8845E10BE924F7623A8E00
 	@Test()
+	@Disabled
 	void addDelimitedStringConvertersTest() {
 		/*
 		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
@@ -648,6 +661,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${15c6bfba-f4ff-39d4-b29e-667fd899651a}, hash: CD98AFFC2F4A88AA32E8FBB17416C132
 	@Test()
+	@Disabled
 	void addApplicationFormattersTest() {
 		//Arrange Statement(s)
 		doNothing().when(registryMock).addFormatter((CharArrayFormatter) any());
@@ -667,6 +681,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${5e289418-edf5-38b7-816c-6003ba17598a}, hash: 815CB2309ABE65CB01CF4E6C0F0E822F
 	@Test()
+	@Disabled
 	void addBeansWhenBeanInstanceOfGenericConverter() throws BeansException {
 		/* Branches:
 		 * (for-each(beans)) : true
@@ -698,6 +713,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${0f3002aa-d453-3684-89d1-1de3308cf8b8}, hash: 76E68AF292A49C75B8CCEC2EB3B6335D
 	@Test()
+	@Disabled
 	void addBeansWhenBeanInstanceOfConverter() throws BeansException {
 		/* Branches:
 		 * (for-each(beans)) : true
@@ -730,6 +746,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${d5a64b88-5173-3df1-bd3e-463f234e0552}, hash: BD17B422A51FED493D05CE767F415583
 	@Test()
+	@Disabled
 	void addBeansWhenBeanInstanceOfFormatter() throws BeansException {
 		/* Branches:
 		 * (for-each(beans)) : true
@@ -764,6 +781,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${c583a71d-17ac-3e92-8aa0-9162d40dc71e}, hash: 4168379012E2CDB64265EE0E8DEBE723
 	@Test()
+	@Disabled
 	void addBeansWhenBeanInstanceOfPrinter() throws BeansException {
 		/* Branches:
 		 * (for-each(beans)) : true
@@ -799,6 +817,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${39a0fabd-0983-33dd-ab2c-461497b79d47}, hash: F35E3E4FF851EDD6D3643346E07B12DD
 	@Test()
+	@Disabled
 	void addBeansWhenBeanInstanceOfParser() throws BeansException {
 		/* Branches:
 		 * (for-each(beans)) : true

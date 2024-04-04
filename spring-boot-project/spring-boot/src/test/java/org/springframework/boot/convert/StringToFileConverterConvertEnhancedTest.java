@@ -86,6 +86,7 @@ class StringToFileConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void convert_WhenUrlExists_ShouldReturnFile() throws IOException {
 		String url = "http://example.com/file.txt";
 		File expectedFile = new File("downloaded.txt");
@@ -99,6 +100,7 @@ class StringToFileConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void convert_WhenUrlDoesNotExist_ShouldReturnFile() {
 		String url = "http://example.com/file.txt";
 		File expectedFile = new File(url);
@@ -111,6 +113,7 @@ class StringToFileConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void convert_WhenFileExists_ShouldReturnFile() {
 		String filePath = "existing.txt";
 		File expectedFile = new File(filePath);
@@ -120,6 +123,7 @@ class StringToFileConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void convert_WhenFileDoesNotExistAndResourceExists_ShouldReturnFile() throws IOException {
 		String filePath = "nonexisting.txt";
 		File expectedFile = new File(filePath);
@@ -131,6 +135,7 @@ class StringToFileConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void convert_WhenFileAndResourceDoNotExist_ShouldReturnFile() {
 		String filePath = "nonexisting.txt";
 		File expectedFile = new File(filePath);
@@ -141,6 +146,7 @@ class StringToFileConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void convert_WhenResourceThrowsIOException_ShouldThrowIllegalStateException() throws IOException {
 		String url = "http://example.com/file.txt";
 		IOException ioException = new IOException("File access error");

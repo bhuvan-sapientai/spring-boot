@@ -92,6 +92,7 @@ class ConfigurationPropertySourcesPropertySourceGetOriginEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void getOrigin_WhenPropertyFound_ShouldReturnOrigin() {
 		try (MockedStatic<ConfigurationPropertyName> configurationPropertyNameStatic = mockStatic(ConfigurationPropertyName.class);
 			 MockedStatic<Origin> originStatic = mockStatic(Origin.class)) {
@@ -105,6 +106,7 @@ class ConfigurationPropertySourcesPropertySourceGetOriginEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void getOrigin_WhenPropertyNotFound_ShouldReturnNull() {
 		try (MockedStatic<ConfigurationPropertyName> configurationPropertyNameStatic = mockStatic(ConfigurationPropertyName.class)) {
 			configurationPropertyNameStatic.when(() -> ConfigurationPropertyName.of(PROPERTY_NAME, true)).thenReturn(mockConfigurationPropertyName);

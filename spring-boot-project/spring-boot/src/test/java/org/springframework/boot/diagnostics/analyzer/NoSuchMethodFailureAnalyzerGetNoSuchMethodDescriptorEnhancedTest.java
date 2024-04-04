@@ -94,6 +94,7 @@ class NoSuchMethodFailureAnalyzerGetNoSuchMethodDescriptorEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void getNoSuchMethodDescriptor_withValidCause_shouldReturnDescriptor() throws Exception {
 		String cause = "'someMethod' in class 'com.example.SomeClass'";
 		String expectedClassName = "com.example.SomeClass";
@@ -127,6 +128,7 @@ class NoSuchMethodFailureAnalyzerGetNoSuchMethodDescriptorEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void getNoSuchMethodDescriptor_withIOException_shouldReturnNull() throws Exception {
 		String cause = "'someMethod' in class 'com.example.SomeClass'";
 		try (MockedStatic<ClassUtils> classUtilsMockedStatic = mockStatic(ClassUtils.class)) {

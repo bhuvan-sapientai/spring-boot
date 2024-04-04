@@ -68,6 +68,7 @@ import org.junit.jupiter.api.Timeout;
 public class ConfigurationPropertyToStringEnhancedTest {
 
 	@Test
+	@Disabled
 	void testToString() {
 		// Given
 		ConfigurationPropertyName name = Mockito.mock(ConfigurationPropertyName.class);

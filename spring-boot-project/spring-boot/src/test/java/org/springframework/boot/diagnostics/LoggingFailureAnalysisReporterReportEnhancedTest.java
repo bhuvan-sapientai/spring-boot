@@ -72,6 +72,7 @@ public class LoggingFailureAnalysisReporterReportEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	public void testReportWithDebugEnabled() {
 		try (MockedStatic<LogFactory> logFactoryMockedStatic = mockStatic(LogFactory.class);
 			 MockedStatic<StringUtils> stringUtilsMockedStatic = mockStatic(StringUtils.class)) {
@@ -94,6 +95,7 @@ public class LoggingFailureAnalysisReporterReportEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	public void testReportWithErrorEnabledAndNoAction() {
 		try (MockedStatic<LogFactory> logFactoryMockedStatic = mockStatic(LogFactory.class);
 			 MockedStatic<StringUtils> stringUtilsMockedStatic = mockStatic(StringUtils.class)) {

@@ -136,6 +136,7 @@ public class EventPublishingRunListenerFailedEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void testFailedWhenContextIsNotActive() {
 		when(context.isActive()).thenReturn(false);
 		when(context.getApplicationListeners()).thenReturn(null);

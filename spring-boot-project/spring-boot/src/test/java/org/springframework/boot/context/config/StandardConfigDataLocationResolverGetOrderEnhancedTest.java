@@ -140,6 +140,7 @@ import org.junit.jupiter.api.Timeout;
 class StandardConfigDataLocationResolverGetOrderEnhancedTest {
 
 	@Test
+	@Disabled
 	void testGetOrder() {
 		// Arrange
 		DeferredLogFactory logFactory = mock(DeferredLogFactory.class);

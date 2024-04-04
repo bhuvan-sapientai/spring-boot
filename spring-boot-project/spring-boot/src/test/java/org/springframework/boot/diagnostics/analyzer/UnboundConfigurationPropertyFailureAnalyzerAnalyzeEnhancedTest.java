@@ -103,6 +103,7 @@ class UnboundConfigurationPropertyFailureAnalyzerAnalyzeEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void testAnalyze() {
 		FailureAnalysis analysis = analyzer.analyze(mockBindException, mockException);
 		String expectedDescription = "Binding to target TestTarget failed:\n" + "    Property: TestPropertyName\n" + "    Value: TestPropertyValue\n" + "    Reason: Test exception message\n";

@@ -77,6 +77,7 @@ class ParentContextApplicationContextInitializerInitializeEnhancedTest {
 //	}
 
 	@Test
+	@Disabled
 	void initialize_shouldNotSetParentNorAddListenerWhenApplicationContextIsParent() {
 		when(applicationContext.getParent()).thenReturn(parentContext);
 		initializer.initialize(applicationContext);

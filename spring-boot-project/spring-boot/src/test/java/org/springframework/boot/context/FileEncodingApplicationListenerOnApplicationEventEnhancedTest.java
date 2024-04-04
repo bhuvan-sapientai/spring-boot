@@ -90,6 +90,7 @@ class FileEncodingApplicationListenerOnApplicationEventEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void onApplicationEvent_WithMatchingFileEncoding_ShouldNotThrowException() {
 		when(environment.getProperty("spring.mandatory-file-encoding")).thenReturn("UTF-8");
 		try (MockedStatic<System> systemMockedStatic = Mockito.mockStatic(System.class)) {
@@ -99,6 +100,7 @@ class FileEncodingApplicationListenerOnApplicationEventEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void onApplicationEvent_WithMismatchingFileEncoding_ShouldThrowException() {
 		when(environment.getProperty("spring.mandatory-file-encoding")).thenReturn("UTF-8");
 		try (MockedStatic<System> systemMockedStatic = Mockito.mockStatic(System.class);

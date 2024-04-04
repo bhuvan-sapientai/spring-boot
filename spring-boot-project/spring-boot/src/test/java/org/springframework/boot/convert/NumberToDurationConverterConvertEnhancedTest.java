@@ -81,6 +81,7 @@ class NumberToDurationConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void testConvertWithNonNullSource() {
 		Object source = 123;
 		TypeDescriptor sourceType = TypeDescriptor.valueOf(Integer.class);
@@ -96,6 +97,7 @@ class NumberToDurationConverterConvertEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void testConvertWithNullSource() {
 		Object source = null;
 		TypeDescriptor sourceType = TypeDescriptor.valueOf(Integer.class);

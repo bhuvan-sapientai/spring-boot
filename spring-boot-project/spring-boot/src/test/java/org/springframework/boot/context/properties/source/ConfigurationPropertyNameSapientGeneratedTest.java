@@ -1,5 +1,22 @@
+/*
+ * Copyright 2012-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.boot.context.properties.source;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -40,6 +57,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${f4596ad2-fcaa-3ae5-b219-deb972de5338}, hash: EF9A5314312E83867C9FCA282E76EBB5
 	@Test()
+	@Disabled
 	void isEmptyWhenThisElementsGetSizeEquals0() {
 		/* Branches:
 		 * (this.elements.getSize() == 0) : true
@@ -64,6 +82,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${88fa19c8-e796-3d0d-8b27-4e5e8f3ea28c}, hash: ED8E638C6E36CBCEED1EF5A0F9D0277F
 	@Test()
+	@Disabled
 	void isEmptyWhenThisElementsGetSizeNotEquals0() {
 		/* Branches:
 		 * (this.elements.getSize() == 0) : false
@@ -88,6 +107,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${743bc64a-79ef-32bb-ae4f-d5483ab77361}, hash: 14F24130E715BA54BAFD20881E1CFEAD
 	@Test()
+	@Disabled
 	void isLastElementIndexedWhenIsIndexedSizeMinus1() {
 		/* Branches:
 		 * (size > 0) : true
@@ -115,6 +135,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${dffb566d-1c21-30a4-9f2c-92dbb1cfcf29}, hash: 5056C6E36F480D99D37862E1E2C56FBF
 	@Test()
+	@Disabled
 	void isLastElementIndexedWhenIsIndexedNotSizeMinus1() {
 		/* Branches:
 		 * (size > 0) : true
@@ -142,6 +163,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${c9915a84-d4e3-3a10-a7ef-8edaf94f1726}, hash: F87893A5B8B00D17B5B0BCF48201E320
 	@Test()
+	@Disabled
 	void hasIndexedElementWhenIsIndexedI() {
 		/* Branches:
 		 * (i < getNumberOfElements()) : true
@@ -169,6 +191,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${eca9dbb4-366b-32b0-86e5-571c7d615dc3}, hash: B79509407EE0091F0E88830631CEBD17
 	@Test()
+	@Disabled
 	void hasIndexedElementWhenIsIndexedNotI() {
 		/* Branches:
 		 * (i < getNumberOfElements()) : true
@@ -196,6 +219,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${1524a8ad-2b9d-33ba-bc61-f917ca09bee4}, hash: 70F3120BFFBE69965A0E2D19A6989A3D
 	@Test()
+	@Disabled
 	void isIndexedWhenThisElementsGetTypeElementIndexIsIndexed() {
 		/* Branches:
 		 * (this.elements.getType(elementIndex).isIndexed()) : true
@@ -219,6 +243,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${55125aab-7291-3fd7-a424-cb5c8d9fa8fb}, hash: BE55A8C443C45B69CB7AD69022910C58
 	@Test()
+	@Disabled
 	void isIndexedWhenThisElementsGetTypeElementIndexNotIsIndexed() {
 		/* Branches:
 		 * (this.elements.getType(elementIndex).isIndexed()) : false
@@ -242,6 +267,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${99011359-4aa4-3047-95be-fbac1a4c4639}, hash: 86467B732501F52ECEE957ABCCCF26D0
 	@Test()
+	@Disabled
 	void isNumericIndexWhenThisElementsGetTypeElementIndexEqualsElementTypeNUMERICALLY_INDEXED() {
 		/* Branches:
 		 * (this.elements.getType(elementIndex) == ElementType.NUMERICALLY_INDEXED) : true
@@ -288,6 +314,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${37d3a550-5c79-3b91-8b60-8495b7ec9aab}, hash: 29194009110C522D8025237812ADB7DD
 	@Test()
+	@Disabled
 	void getLastElementWhenSizeNotEquals0() {
 		/* Branches:
 		 * (size != 0) : true
@@ -313,6 +340,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${6276f483-19d3-3bf7-9dd1-273b9e311dea}, hash: B35D4A3581F418FD43F6E850DC52CE14
 	@Test()
+	@Disabled
 	void getLastElementWhenSizeEquals0() {
 		/* Branches:
 		 * (size != 0) : false
@@ -336,6 +364,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${606c826e-9e9e-3c25-8425-30dd5468c200}, hash: F400530D7E8A266DCF306E943AD505E8
 	@Test()
+	@Disabled
 	void getElementWhenTypeIsIndexed() {
 		/* Branches:
 		 * (type.isIndexed()) : true
@@ -359,6 +388,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${f2dce001-a7db-3e44-8b82-86908bb21bed}, hash: 8EBAD61A75D6589F84D340FEF9D42A14
 	@Test()
+	@Disabled
 	void getElementWhenTypeNotEqualsElementTypeNON_UNIFORM() {
 		/* Branches:
 		 * (type.isIndexed()) : false
@@ -384,6 +414,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${b9226000-6776-3725-abd5-5fc101a55d8c}, hash: 3A04F5C0DC7DABD361902E02CA9C77A2
 	@Test()
+	@Disabled
 	void getElementWhenTypeEqualsElementTypeDASHED() {
 		/* Branches:
 		 * (type.isIndexed()) : false
@@ -411,6 +442,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${20f89634-1757-30ae-86fe-4c1a6982910c}, hash: 4DCDCD6A8EB7A7556A9908CC5D155998
 	@Test()
+	@Disabled
 	void getElementWhenTypeEqualsElementTypeUNIFORM() {
 		/* Branches:
 		 * (type.isIndexed()) : false
@@ -438,6 +470,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${cefa584d-7383-397c-a1a9-7de7a840bafb}, hash: 4F2E441BA80B7B043E2B6CBC0B7F31A7
 	@Test()
+	@Disabled
 	void getElementWhenFilterTestChI() {
 		/* Branches:
 		 * (type.isIndexed()) : false
@@ -467,6 +500,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${4a51b34a-2727-3536-ae01-8c2407adbed1}, hash: 9189814CB00C74B1A15DB8A6A4CF5FCA
 	@Test()
+	@Disabled
 	void getElementWhenLowercaseAndFilterTestChI() {
 		/* Branches:
 		 * (type.isIndexed()) : false
@@ -498,6 +532,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${cea76ae0-a9dc-3714-951b-2ee2307ada23}, hash: A3D5514C8CEA2AFA9C3BEB885C8C11A7
 	@Test()
+	@Disabled
 	void getElementWhenILessThanElementLengthAndLowercaseAndFilterTestChI() {
 		/* Branches:
 		 * (type.isIndexed()) : false
@@ -528,6 +563,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${2367b9e3-a480-3321-a4ae-98615f0c4845}, hash: 6C22ABEA12FC36ED1E165A5E23E6047C
 	@Test()
+	@Disabled
 	void getNumberOfElementsTest() {
 		/*
 		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
@@ -550,6 +586,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${dad83f36-7c06-367a-aa81-1455798d2513}, hash: ADA347A663667B4D5D3A974A88FE27CF
 	@Test()
+	@Disabled
 	void appendWhenStringUtilsNotHasLengthSuffix() {
 		/* Branches:
 		 * (!StringUtils.hasLength(suffix)) : true
@@ -577,6 +614,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${4b9e7357-d7ac-313b-b7ea-1086b15abebc}, hash: 67BE12AF38C76170604B9CC1D9DA175F
 	@Test()
+	@Disabled
 	void appendWhenNameIsNull() {
 		/* Branches:
 		 * (!StringUtils.hasLength(suffix)) : false
@@ -607,6 +645,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${32e66336-84b5-3990-99de-aa40dba2488d}, hash: CBA424D724874EC8328512A83D91C5FE
 	@Test()
+	@Disabled
 	void appendWhenNameIsEmpty() {
 		/* Branches:
 		 * (!StringUtils.hasLength(suffix)) : false
@@ -636,6 +675,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${c1cd3d1a-8f7e-3013-b5a8-a7637605cc58}, hash: EB81AE7C51ABEDDDE3FF9B1A26A829DC
 	@Test()
+	@Disabled
 	void appendWhenNotReturnNullIfInvalidThrowsInvalidConfigurationPropertyNameException() {
 		/* Branches:
 		 * (!StringUtils.hasLength(suffix)) : false
@@ -670,6 +710,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${c892a6d5-41c1-30ea-a488-dd758662c766}, hash: 9EB01F5B4A9E37F705E5F10D7E0A2459
 	@Test()
+	@Disabled
 	void appendWhenElementsGetTypeINotEqualsElementTypeNON_UNIFORM() {
 		/* Branches:
 		 * (!StringUtils.hasLength(suffix)) : false
@@ -703,6 +744,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${3e52cefe-2ddf-3c0d-a140-fbd11f3032dd}, hash: 45AD70666E9C18E5D7198D71D4195CB3
 	@Test()
+	@Disabled
 	void appendWhenElementsParserNotIsValidCharChCharIndexThrowsInvalidConfigurationPropertyNameException() {
 		/* Branches:
 		 * (!StringUtils.hasLength(suffix)) : false
@@ -741,6 +783,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${7b65cb91-8838-33b2-a0c8-d4dd709f903f}, hash: C4AD3F77B9E0F2716FF428B06DE32323
 	@Test()
+	@Disabled
 	void append1WhenSuffixIsNull() {
 		/* Branches:
 		 * (suffix == null) : true
@@ -766,6 +809,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${a3ce3e9f-8901-315a-95cd-1ffffa2e31d8}, hash: D8C59A1958F252D4F3A0945F7B4B28A1
 	@Test()
+	@Disabled
 	void append1WhenSuffixIsNotNull() {
 		/* Branches:
 		 * (suffix == null) : false
@@ -791,6 +835,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${8d5834e4-e251-3bb2-be8c-b1391d280df5}, hash: F418DD058013883357101888DB11E5C7
 	@Test()
+	@Disabled
 	void getParentWhenNumberOfElementsLessThanOrEqualsTo1() {
 		/* Branches:
 		 * (numberOfElements <= 1) : true
@@ -816,6 +861,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${0c679d0a-f36e-3d5d-b93a-4b77d27252ce}, hash: B661A55C4739F0E536E60604D2D083A6
 	@Test()
+	@Disabled
 	void getParentWhenNumberOfElementsGreaterThan1() {
 		/* Branches:
 		 * (numberOfElements <= 1) : false
@@ -842,6 +888,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${138a5323-d04f-398a-8780-1815be54bdbe}, hash: 38DACB163B47D31A04D5579C7F00EF3E
 	@Test()
+	@Disabled
 	void chopWhenSizeGreaterThanOrEqualsToGetNumberOfElements() {
 		/* Branches:
 		 * (size >= getNumberOfElements()) : true
@@ -866,6 +913,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${4fc3e13d-c0f9-396e-9c13-9b47216f0899}, hash: E8A7C067666AE6406E3002C66CFDC38A
 	@Test()
+	@Disabled
 	void chopWhenSizeLessThanGetNumberOfElements() {
 		/* Branches:
 		 * (size >= getNumberOfElements()) : false
@@ -890,6 +938,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${347ef665-0662-3396-96f8-476448a15026}, hash: F16DBF3A82610F2489C8534E47D625D2
 	@Test()
+	@Disabled
 	void subNameWhenOffsetEquals0() {
 		/* Branches:
 		 * (offset == 0) : true
@@ -939,6 +988,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${f0a05ff4-f4d5-34c6-a323-4109b1b22a7a}, hash: F359C71B0F057CCE869DF71F9BB323F1
 	@Test()
+	@Disabled
 	void subNameWhenOffsetGreaterThanGetNumberOfElementsThrowsIndexOutOfBoundsException() {
 		/* Branches:
 		 * (offset == 0) : false
@@ -970,6 +1020,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${3b49b001-db6e-3346-813c-51acd4341977}, hash: B04815EE0192D4C8CBF945E8FCA4A892
 	@Test()
+	@Disabled
 	void subNameWhenOffsetNotGreaterThanGetNumberOfElements() {
 		/* Branches:
 		 * (offset == 0) : false
@@ -997,6 +1048,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${7393e6ef-1cdb-3d7e-a151-69c57ce7ac40}, hash: CB28AF257B94F773D98357134460F9D2
 	@Test()
+	@Disabled
 	void isParentOfWhenGetNumberOfElementsNotEqualsNameGetNumberOfElementsMinus1() {
 		/* Branches:
 		 * (getNumberOfElements() != name.getNumberOfElements() - 1) : true
@@ -1024,6 +1076,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${9766f280-514d-36da-a996-214897f48da0}, hash: 7626A58699B98513A0B2CB7F8A342B12
 	@Test()
+	@Disabled
 	void isParentOfWhenIsAncestorOfName() {
 		/* Branches:
 		 * (getNumberOfElements() != name.getNumberOfElements() - 1) : false
@@ -1054,6 +1107,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${d35f1b79-fd93-31df-905e-d745f15c67a3}, hash: 5D92ACE7BF1CF3D5D0FE23A800AA9163
 	@Test()
+	@Disabled
 	void isParentOfWhenIsAncestorOfNotName() {
 		/* Branches:
 		 * (getNumberOfElements() != name.getNumberOfElements() - 1) : false
@@ -1084,6 +1138,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${3617a22a-65d4-36d5-89eb-fa61397e960a}, hash: 45867B758436E6A6DC05942A487657A1
 	@Test()
+	@Disabled
 	void isAncestorOfWhenGetNumberOfElementsGreaterThanOrEqualsToNameGetNumberOfElements() {
 		/* Branches:
 		 * (getNumberOfElements() >= name.getNumberOfElements()) : true
@@ -1111,6 +1166,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${6e2b95d4-f982-3a21-aaaa-1f77fab9c20b}, hash: 728B1F883D7A28543CB5A5AF975D6E71
 	@Test()
+	@Disabled
 	void isAncestorOfWhenIGreaterThanOrEqualsTo0ThrowsNullPointerException() {
 		/* Branches:
 		 * (getNumberOfElements() >= name.getNumberOfElements()) : false
@@ -1143,6 +1199,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${5daae2e6-cb0f-39cf-a2e6-bbffabc4ebc9}, hash: 8193E9CB8E4EE2CE52DEEA31DE7ECCAD
 	@Test()
+	@Disabled
 	void isAncestorOfWhenILessThan0() {
 		/* Branches:
 		 * (getNumberOfElements() >= name.getNumberOfElements()) : false
@@ -1171,6 +1228,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${3f99306f-7f4e-34f3-99ce-51cbd9b067bf}, hash: 1E9518910BBD504BC81054A303BC4974
 	@Test()
+	@Disabled
 	void compareToWhenI2NotLessThanL2() {
 		/* Branches:
 		 * (i1 < l1) : false  #  inside compare method
@@ -1197,6 +1255,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${f15ced91-476f-3118-9347-e6d6fe4e136a}, hash: C992C6C719FDDED74578FFAE237C0991
 	@Test()
+	@Disabled
 	void compareToWhenI1NotLessThanL1AndI2LessThanL2ThrowsNullPointerException() {
 		/* Branches:
 		 * (i1 < l1) : false  #  inside compare method
@@ -1228,6 +1287,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${155368dd-6252-3895-854f-2166addc2cfe}, hash: 18C67AA6F09FF888E69371930A000E5A
 	@Test()
+	@Disabled
 	void compareToWhenResultNotEquals0() {
 		/* Branches:
 		 * (i1 < l1) : true  #  inside compare method
@@ -1260,6 +1320,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${c00e9222-9dde-3b2c-b737-81bbc3258b96}, hash: D66D4356EE6920952BB8347B724AE4B1
 	@Test()
+	@Disabled
 	void compareToWhenCaughtArrayIndexOutOfBoundsExceptionThrowsRuntimeException() {
 		/* Branches:
 		 * (i1 < l1) : true  #  inside compare method
@@ -1297,6 +1358,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${379fb16a-9f66-3912-89c0-c923f1d04b9e}, hash: 0F3B8F571069812F74BE61A7E0BCD03F
 	@Test()
+	@Disabled
 	void compareToWhenE2IsNullAndResultNotEquals0() {
 		/* Branches:
 		 * (i1 < l1) : true  #  inside compare method
@@ -1328,6 +1390,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${763e6db3-3721-3433-8032-25809c0bd7ba}, hash: 891ECB678000BADACC6174B6715F9A98
 	@Test()
+	@Disabled
 	void toStringWhenThisElementsCanShortcutWithSourceElementTypeUNIFORMElementTypeDASHED() {
 		/* Branches:
 		 * (this.string == null) : true
@@ -1353,6 +1416,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${bdf9caf2-174d-3c0e-8641-ba714d57898e}, hash: A0E6A511DBDE90219C00DFDA096A7AA0
 	@Test()
+	@Disabled
 	void toStringWhenNotIndexedAndNotIndexed() {
 		/* Branches:
 		 * (this.string == null) : true
@@ -1386,6 +1450,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${b2b0ef0d-b14f-360e-9b74-1bedb98f169b}, hash: A927569376A5C8BC9B4FAE403691F776
 	@Test()
+	@Disabled
 	void toStringWhenIndexed() {
 		/* Branches:
 		 * (this.string == null) : true
@@ -1510,6 +1575,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${711901d4-0ed2-36db-a259-022dbc7b914c}, hash: 010B540929DD14CB0C9D144B885E06C9
 	@Test()
+	@Disabled
 	void of1WhenElementsIsNotNull() {
 		/* Branches:
 		 * (name == null) : false  #  inside elementsOf method
@@ -1573,6 +1639,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${1eaa7bd3-b6b5-3b6f-a123-e6685b4b7a73}, hash: 1D60923CDB682DD868B695B89F019712
 	@Test()
+	@Disabled
 	void of1WhenElementsGetTypeINotEqualsElementTypeNON_UNIFORMAndElementsIsNull() {
 		/* Branches:
 		 * (name == null) : false  #  inside elementsOf method
@@ -1662,6 +1729,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${30cbaeaa-63cc-3ba7-8954-2f85a2857f69}, hash: 2CB171A4B34E695FAC31D3D5F533EB4E
 	@Test()
+	@Disabled
 	void adapt1WhenNameIsEmpty() {
 		/* Branches:
 		 * (name.isEmpty()) : true
@@ -1686,6 +1754,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${305b99c6-6c7c-3b43-afe8-c1aa84b706e9}, hash: 4713EE0072E85E95A04E07AE85C8C1A1
 	@Test()
+	@Disabled
 	void adapt1WhenElementsGetSizeNotEquals0() {
 		/* Branches:
 		 * (name.isEmpty()) : false

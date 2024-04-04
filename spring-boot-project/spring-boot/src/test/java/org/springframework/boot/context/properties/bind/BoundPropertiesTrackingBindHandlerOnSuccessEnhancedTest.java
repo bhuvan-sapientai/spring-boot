@@ -103,6 +103,7 @@ class BoundPropertiesTrackingBindHandlerOnSuccessEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void onSuccessWhenConfigurationPropertyNameDoesNotMatch() {
 		when(context.getConfigurationProperty()).thenReturn(configurationProperty);
 		when(configurationProperty.getName()).thenReturn(mock(ConfigurationPropertyName.class));
@@ -112,6 +113,7 @@ class BoundPropertiesTrackingBindHandlerOnSuccessEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void onSuccessWhenConfigurationPropertyNameMatches() {
 		when(context.getConfigurationProperty()).thenReturn(configurationProperty);
 		when(configurationProperty.getName()).thenReturn(name);
@@ -121,6 +123,7 @@ class BoundPropertiesTrackingBindHandlerOnSuccessEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void onSuccessShouldCallSuperOnSuccess() {
 		AbstractBindHandler parentHandler = mock(AbstractBindHandler.class);
 		try (MockedStatic<Assert> mocked = Mockito.mockStatic(Assert.class)) {

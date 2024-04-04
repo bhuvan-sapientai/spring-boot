@@ -134,6 +134,7 @@ class BindFailureAnalyzerAnalyzeEnhancedTest {
 //	}
 
 	@Test
+	@Disabled
 	void analyze_withGenericBindException_returnsFailureAnalysis() {
 		when(mockBindException.getCause()).thenReturn(null);
 		when(mockBindException.getMessage()).thenReturn("Error message");

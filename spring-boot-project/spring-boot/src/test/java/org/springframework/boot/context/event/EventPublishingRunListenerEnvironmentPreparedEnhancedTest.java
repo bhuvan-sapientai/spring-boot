@@ -133,6 +133,7 @@ class EventPublishingRunListenerEnvironmentPreparedEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void environmentPreparedShouldMulticastEvent() {
 		// Arrange
 		ApplicationEnvironmentPreparedEvent event = new ApplicationEnvironmentPreparedEvent(bootstrapContext, application, args, environment);

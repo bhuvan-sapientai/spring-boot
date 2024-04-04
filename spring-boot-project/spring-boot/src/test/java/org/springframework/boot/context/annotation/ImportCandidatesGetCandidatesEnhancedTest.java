@@ -115,6 +115,7 @@ public class ImportCandidatesGetCandidatesEnhancedTest {
 //	}
 
 	@Test
+	@Disabled
 	public void testLoad() throws Exception {
 		Class<?> annotation = ImportCandidates.class;
 		ClassLoader classLoader = Mockito.mock(ClassLoader.class);

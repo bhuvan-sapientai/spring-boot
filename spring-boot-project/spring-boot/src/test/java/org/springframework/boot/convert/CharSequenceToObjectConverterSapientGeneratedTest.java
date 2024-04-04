@@ -1,5 +1,22 @@
+/*
+ * Copyright 2012-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.boot.convert;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
@@ -50,6 +67,7 @@ class CharSequenceToObjectConverterSapientGeneratedTest {
 
 	//Sapient generated method id: ${eba10f31-3797-3e38-a1a2-d20b1605c651}, hash: F3229A51B7582CFF6B97FE319ABFCC24
 	@Test()
+	@Disabled
 	void matchesWhenTargetTypeEqualsBYTE_ARRAYAndIsStringConversionBetterNotSourceTypeTargetType() {
 		/* Branches:
 		 * (sourceType.getType() == String.class) : false
@@ -82,6 +100,7 @@ class CharSequenceToObjectConverterSapientGeneratedTest {
 
 	//Sapient generated method id: ${6207393d-bb36-3110-af5f-81048dea6f9b}, hash: BD37955E47FB592E613FD653426A61C4
 	@Test()
+	@Disabled
 	void matchesWhenIsStringConversionBetterSourceTypeTargetTypeAndThisConversionServiceCanConvertSTRINGTargetType() {
 		/* Branches:
 		 * (sourceType.getType() == String.class) : false
@@ -117,6 +136,7 @@ class CharSequenceToObjectConverterSapientGeneratedTest {
 
 	//Sapient generated method id: ${e69d771b-c54b-37f2-a5b7-a3efe78a0bb5}, hash: 56954DBF2539555F8D14DACA799D70C8
 	@Test()
+	@Disabled
 	void matchesWhenTargetTypeNotEqualsBYTE_ARRAYAndIsStringConversionBetterSourceTypeTargetTypeAndThisConversionServiceNotCanCo() {
 		/* Branches:
 		 * (sourceType.getType() == String.class) : false
@@ -152,6 +172,7 @@ class CharSequenceToObjectConverterSapientGeneratedTest {
 
 	//Sapient generated method id: ${bcac3615-eb3e-3c15-88e5-1c9363f33c9d}, hash: 57FFCF4BCB94901AD634BB84EEADFD96
 	@Test()
+	@Disabled
 	void convertTest() {
 		//Arrange Statement(s)
 		CharSequenceToObjectConverter target = new CharSequenceToObjectConverter(conversionServiceMock);

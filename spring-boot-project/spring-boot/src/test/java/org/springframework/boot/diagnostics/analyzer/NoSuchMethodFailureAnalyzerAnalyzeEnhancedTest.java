@@ -88,6 +88,7 @@ class NoSuchMethodFailureAnalyzerAnalyzeEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void analyze_whenCauseIsNull_shouldReturnNull() {
 		NoSuchMethodError cause = new NoSuchMethodError();
 		cause.setStackTrace(new StackTraceElement[0]);

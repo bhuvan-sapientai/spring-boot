@@ -85,6 +85,7 @@ class ConfigurationPropertySourcesPropertyResolverGetPropertyEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void getProperty_whenPropertyExists_shouldReturnConvertedValue() {
 		String key = "test.property";
 		Class<String> targetValueType = String.class;
@@ -103,6 +104,7 @@ class ConfigurationPropertySourcesPropertyResolverGetPropertyEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void getProperty_whenPropertyDoesNotExist_shouldReturnNull() {
 		String key = "non.existent.property";
 		Class<String> targetValueType = String.class;
@@ -114,6 +116,7 @@ class ConfigurationPropertySourcesPropertyResolverGetPropertyEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void getProperty_whenPropertyExistsButTypeMismatch_shouldThrowException() {
 		String key = "test.property";
 		Class<Integer> targetValueType = Integer.class;

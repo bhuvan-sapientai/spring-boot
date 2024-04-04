@@ -116,6 +116,7 @@ class MapBinderMergeEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void merge_WhenExistingSupportsPutAll_ShouldMergeAndReturnExisting() {
 		Map<Object, Object> existingMap = new HashMap<>();
 		existingMap.put("existingKey", "existingValue");

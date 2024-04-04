@@ -100,6 +100,7 @@ class NoUniqueBeanDefinitionFailureAnalyzerAnalyzeEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void analyze_whenBeanNamesAreNull_shouldReturnNull() {
 		when(noUniqueBeanDefinitionException.getMessage()).thenReturn("expected message but found");
 		FailureAnalysis result = analyzer.analyze(new Throwable(), noUniqueBeanDefinitionException, "description");

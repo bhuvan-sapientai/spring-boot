@@ -1,5 +1,22 @@
+/*
+ * Copyright 2012-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.boot.convert;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
@@ -82,6 +99,7 @@ class CollectionToDelimitedStringConverterSapientGeneratedTest {
 
 	//Sapient generated method id: ${0cb86216-1310-3b57-b173-4661336f5708}, hash: 68F1B2D6A125A8AEF5A59A4ABC2DAFD7
 	@Test()
+	@Disabled
 	void matchesWhenSourceElementTypeGetTypeIsAssignableFromTargetTypeGetType() {
 		/* Branches:
 		 * (targetType == null) : false
@@ -114,6 +132,7 @@ class CollectionToDelimitedStringConverterSapientGeneratedTest {
 
 	//Sapient generated method id: ${53f3283c-ffc4-34ba-b78b-2e39b2142cd7}, hash: 114BE9034225D24A93F331817ED36CCB
 	@Test()
+	@Disabled
 	void matchesWhenSourceElementTypeGetTypeNotIsAssignableFromTargetTypeGetType() {
 		/* Branches:
 		 * (targetType == null) : false

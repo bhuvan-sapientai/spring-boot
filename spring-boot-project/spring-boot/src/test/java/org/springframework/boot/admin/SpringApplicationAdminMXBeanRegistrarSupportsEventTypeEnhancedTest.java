@@ -130,10 +130,10 @@ public class SpringApplicationAdminMXBeanRegistrarSupportsEventTypeEnhancedTest 
 //		assertTrue(result);
 //	}
 
-//	@Test
-//	void supportsEventType_whenTypeIsNotSupported_shouldReturnFalse() {
-//		when(resolvableType.getRawClass()).thenReturn(GenericApplicationListener.class);
-//		boolean result = registrar.supportsEventType(resolvableType);
-//		assertFalse(result);
-//	}
+	@Test
+	void supportsEventType_whenTypeIsNotSupported_shouldReturnFalse() {
+		doReturn(GenericApplicationListener.class).when(resolvableType).getRawClass();
+		boolean result = registrar.supportsEventType(resolvableType);
+		assertFalse(result);
+	}
 }

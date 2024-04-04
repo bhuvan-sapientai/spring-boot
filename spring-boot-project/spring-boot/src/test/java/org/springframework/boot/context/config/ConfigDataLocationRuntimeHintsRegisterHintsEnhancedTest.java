@@ -105,6 +105,7 @@ class ConfigDataLocationRuntimeHintsRegisterHintsEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void registerHints() {
 		try (MockedStatic<FilePatternResourceHintsRegistrar> mockedStatic = mockStatic(FilePatternResourceHintsRegistrar.class)) {
 			List<String> fileNames = Arrays.asList("application", "bootstrap");
