@@ -5,24 +5,25 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import org.mockito.stubbing.Answer;
+
+import org.springframework.boot.origin.Origin;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.util.Assert;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
 
-import org.mockito.stubbing.Answer;
-
-import org.springframework.boot.origin.Origin;
-import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.boot.origin.PropertySourceOrigin;
 
 import org.mockito.MockedStatic;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
@@ -53,16 +54,15 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 
 	private final SystemEnvironmentPropertySource sourceMock = mock(SystemEnvironmentPropertySource.class);
 
-	//Sapient generated method id: ${b9f4539f-22c1-3b32-b0e6-3ab60afe5a86}, hash: 2AD2939EA11331563860854267A9E6D6
+	//Sapient generated method id: ${b9f4539f-22c1-3b32-b0e6-3ab60afe5a86}, hash: C24C482D2E40073AB1B6B89CCECC7730
 	@Test()
 	void getConfigurationPropertyWhenNameIsNull() throws Exception {
 		/* Branches:
 		 * (name == null) : true
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			_assert.when(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { propertyMapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(propertySourceMock, propertyMapperArray);
 			ConfigurationPropertyName configurationPropertyName = null;
@@ -72,12 +72,11 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
 				_assert.verify(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${57054a1e-10ca-3fbe-8b8c-9d6a45d7edfc}, hash: 3D8F9FF4C760C75AA778BDB9C6511601
+	//Sapient generated method id: ${57054a1e-10ca-3fbe-8b8c-9d6a45d7edfc}, hash: 74F3A0CD4F6D4CC3917BE22026B182B7
 	@Test()
 	void getConfigurationPropertyWhenValueIsNotNull() throws Exception {
 		/* Branches:
@@ -90,14 +89,13 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		ConfigurationProperty configurationPropertyMock = mock(ConfigurationProperty.class);
 		try (MockedStatic<ConfigurationProperty> configurationProperty = mockStatic(ConfigurationProperty.class);
 			 MockedStatic<PropertySourceOrigin> propertySourceOrigin = mockStatic(PropertySourceOrigin.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			Object object = new Object();
 			doReturn(object).when(propertySourceMock).getProperty("return_of_mapItem1");
 			List<String> stringList = new ArrayList<>();
 			stringList.add("return_of_mapItem1");
 			doReturn(stringList).when(mapperMock).map(configurationPropertyNameMock);
 			_assert.when(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			propertySourceOrigin.when(() -> PropertySourceOrigin.get(propertySourceMock, "return_of_mapItem1")).thenReturn(originMock);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { mapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(propertySourceMock, propertyMapperArray);
@@ -107,17 +105,16 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(configurationPropertyMock));
-				verify(propertySourceMock).getProperty("return_of_mapItem1");
-				verify(mapperMock).map(configurationPropertyNameMock);
+				verify(propertySourceMock, atLeast(1)).getProperty("return_of_mapItem1");
+				verify(mapperMock, atLeast(1)).map(configurationPropertyNameMock);
 				_assert.verify(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 				propertySourceOrigin.verify(() -> PropertySourceOrigin.get(propertySourceMock, "return_of_mapItem1"), atLeast(1));
 				configurationProperty.verify(() -> ConfigurationProperty.of(target, configurationPropertyNameMock, object, originMock), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${e893205b-f056-31da-9a8b-883b9fa7b02b}, hash: 9187ABCF58E1EE2AB2DD0272B2277A54
+	//Sapient generated method id: ${e893205b-f056-31da-9a8b-883b9fa7b02b}, hash: DC74B61D0012E7F07CFE4F3F2C12D214
 	@Test()
 	void getConfigurationPropertyWhenValueIsNull() throws Exception {
 		/* Branches:
@@ -130,13 +127,12 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn(null).when(propertySourceMock).getProperty("return_of_mapItem1");
 			List<String> stringList = new ArrayList<>();
 			stringList.add("return_of_mapItem1");
 			doReturn(stringList).when(mapperMock).map(configurationPropertyNameMock);
 			_assert.when(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { mapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(propertySourceMock, propertyMapperArray);
 			//Act Statement(s)
@@ -144,15 +140,14 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				verify(propertySourceMock).getProperty("return_of_mapItem1");
-				verify(mapperMock).map(configurationPropertyNameMock);
+				verify(propertySourceMock, atLeast(1)).getProperty("return_of_mapItem1");
+				verify(mapperMock, atLeast(1)).map(configurationPropertyNameMock);
 				_assert.verify(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${b05f9563-c00e-35b0-ac54-e5a6743c0e45}, hash: 6A8413CCAEDCC19B5ADDDAFC45F6B371
+	//Sapient generated method id: ${b05f9563-c00e-35b0-ac54-e5a6743c0e45}, hash: ED2CBA039566866571CEE73590ECE123
 	@Test()
 	void getConfigurationPropertyWhenValueIsNotNullAndCaughtException() throws Exception {
 		/* Branches:
@@ -165,14 +160,13 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		//Arrange Statement(s)
 		try (MockedStatic<ConfigurationProperty> configurationProperty = mockStatic(ConfigurationProperty.class);
 			 MockedStatic<PropertySourceOrigin> propertySourceOrigin = mockStatic(PropertySourceOrigin.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			Object object = new Object();
 			doReturn(object).when(propertySourceMock).getProperty("return_of_mapItem1");
 			List<String> stringList = new ArrayList<>();
 			stringList.add("return_of_mapItem1");
 			doReturn(stringList).when(mapperMock).map(configurationPropertyNameMock);
 			_assert.when(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			propertySourceOrigin.when(() -> PropertySourceOrigin.get(propertySourceMock, "return_of_mapItem1")).thenReturn(originMock);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { mapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(propertySourceMock, propertyMapperArray);
@@ -183,17 +177,16 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				verify(propertySourceMock).getProperty("return_of_mapItem1");
-				verify(mapperMock).map(configurationPropertyNameMock);
+				verify(propertySourceMock, atLeast(1)).getProperty("return_of_mapItem1");
+				verify(mapperMock, atLeast(1)).map(configurationPropertyNameMock);
 				_assert.verify(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 				propertySourceOrigin.verify(() -> PropertySourceOrigin.get(propertySourceMock, "return_of_mapItem1"), atLeast(1));
 				configurationProperty.verify(() -> ConfigurationProperty.of(target, configurationPropertyNameMock, object, originMock), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${a20fdfe4-cdf6-38cc-838b-6f56df8c64d8}, hash: 3D84789F65CAC4AC2DB0B26A9B33C2D6
+	//Sapient generated method id: ${a20fdfe4-cdf6-38cc-838b-6f56df8c64d8}, hash: 309D9556EC9BEE775C19F427E75AC921
 	@Test()
 	void containsDescendantOfWhenNameGetElement0FormDASHEDEqualsPrefix() {
 		/* Branches:
@@ -203,13 +196,12 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		PropertySource<?> sourceMock = mock(PropertySource.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn(2).when(nameMock).getNumberOfElements();
 			doReturn("random").when(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
 			Random random = new Random();
 			doReturn(random).when(sourceMock).getSource();
 			_assert.when(() -> Assert.notNull(sourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { propertyMapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(sourceMock, propertyMapperArray);
 			//Act Statement(s)
@@ -217,16 +209,15 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(ConfigurationPropertyState.PRESENT));
-				verify(nameMock).getNumberOfElements();
-				verify(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
-				verify(sourceMock).getSource();
+				verify(nameMock, atLeast(1)).getNumberOfElements();
+				verify(nameMock, atLeast(1)).getElement(0, ConfigurationPropertyName.Form.DASHED);
+				verify(sourceMock, atLeast(1)).getSource();
 				_assert.verify(() -> Assert.notNull(sourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${b514815c-5d5f-3106-8992-cabdec07f0e1}, hash: A8268406E20390363CE2041E32F1DC18
+	//Sapient generated method id: ${b514815c-5d5f-3106-8992-cabdec07f0e1}, hash: B797449ED9D353C03B3797355152ABD6
 	@Test()
 	void containsDescendantOfWhenNameGetElement0FormDASHEDNotEqualsPrefix() {
 		/* Branches:
@@ -236,13 +227,12 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		PropertySource<?> sourceMock = mock(PropertySource.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn(2).when(nameMock).getNumberOfElements();
 			doReturn("A").when(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
 			Random random = new Random();
 			doReturn(random).when(sourceMock).getSource();
 			_assert.when(() -> Assert.notNull(sourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { propertyMapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(sourceMock, propertyMapperArray);
 			//Act Statement(s)
@@ -250,16 +240,15 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(ConfigurationPropertyState.ABSENT));
-				verify(nameMock).getNumberOfElements();
-				verify(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
-				verify(sourceMock).getSource();
+				verify(nameMock, atLeast(1)).getNumberOfElements();
+				verify(nameMock, atLeast(1)).getElement(0, ConfigurationPropertyName.Form.DASHED);
+				verify(sourceMock, atLeast(1)).getSource();
 				_assert.verify(() -> Assert.notNull(sourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${3480a059-111e-3cd7-8876-097390f04f0b}, hash: 3C9D17A90F81646A5FC4032DFD5C9F0B
+	//Sapient generated method id: ${3480a059-111e-3cd7-8876-097390f04f0b}, hash: 22D1D4C13EFAA3A92908F3B4A58606A1
 	@Test()
 	void containsDescendantOfWhenUnderlyingPropertySourceGetSourceNotInstanceOfRandom() {
 		/* Branches:
@@ -270,12 +259,11 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		//Arrange Statement(s)
 		PropertySource<?> sourceMock = mock(PropertySource.class);
 		PropertySource propertySourceMock = mock(PropertySource.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn(propertySourceMock).when(sourceMock).getSource();
 			Object object = new Object();
 			doReturn(object).when(propertySourceMock).getSource();
 			_assert.when(() -> Assert.notNull(sourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { propertyMapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(sourceMock, propertyMapperArray);
 			//Act Statement(s)
@@ -283,15 +271,14 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(ConfigurationPropertyState.UNKNOWN));
-				verify(sourceMock).getSource();
-				verify(propertySourceMock).getSource();
+				verify(sourceMock, atLeast(1)).getSource();
+				verify(propertySourceMock, atLeast(1)).getSource();
 				_assert.verify(() -> Assert.notNull(sourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${167a029e-7228-3e41-8223-6ba2de054634}, hash: 6E3C8F050BC658ABB99290CCB0D7D744
+	//Sapient generated method id: ${167a029e-7228-3e41-8223-6ba2de054634}, hash: 3F8D5D3EEE113A7FEA2CB8752EE698A8
 	@Test()
 	void containsDescendantOfWhenNameGetNumberOfElementsGreaterThan1AndNameGetElement0FormDASHEDEqualsPrefix() {
 		/* Branches:
@@ -304,7 +291,7 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		//Arrange Statement(s)
 		PropertySource<?> sourceMock = mock(PropertySource.class);
 		PropertySource propertySourceMock = mock(PropertySource.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn(2).when(nameMock).getNumberOfElements();
 			doReturn("A").when(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
 			doReturn(propertySourceMock).when(sourceMock).getSource();
@@ -312,7 +299,6 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			doReturn(random).when(propertySourceMock).getSource();
 			doReturn("A").when(sourceMock).getName();
 			_assert.when(() -> Assert.notNull(sourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { propertyMapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(sourceMock, propertyMapperArray);
 			//Act Statement(s)
@@ -320,18 +306,17 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(ConfigurationPropertyState.PRESENT));
-				verify(nameMock).getNumberOfElements();
-				verify(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
-				verify(sourceMock).getSource();
-				verify(propertySourceMock).getSource();
-				verify(sourceMock).getName();
+				verify(nameMock, atLeast(1)).getNumberOfElements();
+				verify(nameMock, atLeast(1)).getElement(0, ConfigurationPropertyName.Form.DASHED);
+				verify(sourceMock, atLeast(1)).getSource();
+				verify(propertySourceMock, atLeast(1)).getSource();
+				verify(sourceMock, atLeast(1)).getName();
 				_assert.verify(() -> Assert.notNull(sourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${5e8ae88e-57b6-3519-814b-ed5c83f6309f}, hash: C80B3524D37A4B936C0FC03CBAA4540B
+	//Sapient generated method id: ${5e8ae88e-57b6-3519-814b-ed5c83f6309f}, hash: 5F6280794101EBCBF73A60FB6D4E1BC3
 	@Test()
 	void containsDescendantOfWhenNameGetNumberOfElementsGreaterThan1AndNameGetElement0FormDASHEDNotEqualsPrefix() {
 		/* Branches:
@@ -344,7 +329,7 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		//Arrange Statement(s)
 		PropertySource<?> sourceMock = mock(PropertySource.class);
 		PropertySource propertySourceMock = mock(PropertySource.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn(2).when(nameMock).getNumberOfElements();
 			doReturn("A").when(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
 			doReturn(propertySourceMock).when(sourceMock).getSource();
@@ -352,7 +337,6 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			doReturn(random).when(propertySourceMock).getSource();
 			doReturn("B").when(sourceMock).getName();
 			_assert.when(() -> Assert.notNull(sourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { propertyMapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(sourceMock, propertyMapperArray);
 			//Act Statement(s)
@@ -360,24 +344,22 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(ConfigurationPropertyState.ABSENT));
-				verify(nameMock).getNumberOfElements();
-				verify(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
-				verify(sourceMock).getSource();
-				verify(propertySourceMock).getSource();
-				verify(sourceMock).getName();
+				verify(nameMock, atLeast(1)).getNumberOfElements();
+				verify(nameMock, atLeast(1)).getElement(0, ConfigurationPropertyName.Form.DASHED);
+				verify(sourceMock, atLeast(1)).getSource();
+				verify(propertySourceMock, atLeast(1)).getSource();
+				verify(sourceMock, atLeast(1)).getName();
 				_assert.verify(() -> Assert.notNull(sourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${72fc3519-47ef-3838-a2f1-90ba712b0e09}, hash: 2B2607611E26A419ACBCF1BF086576C3
+	//Sapient generated method id: ${72fc3519-47ef-3838-a2f1-90ba712b0e09}, hash: FCD1E9E10A8DF0146804F45D366D636D
 	@Test()
 	void getUnderlyingSourceTest() {
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			_assert.when(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { propertyMapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(propertySourceMock, propertyMapperArray);
 			//Act Statement(s)
@@ -386,19 +368,17 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			assertAll("result", () -> {
 				assertThat(result, equalTo(propertySourceMock));
 				_assert.verify(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${363d3698-f34c-39ad-914f-376a19498023}, hash: BBEB537CD0BA704C56BB4D979101DBE1
+	//Sapient generated method id: ${363d3698-f34c-39ad-914f-376a19498023}, hash: A4B18E0EF5C661B99ECCE959F93F4B43
 	@Test()
 	void toStringTest() {
 		//Arrange Statement(s)
 		PropertySource<?> propertySourceMock = mock(PropertySource.class, "<init>_propertySource1");
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			_assert.when(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			PropertyMapper[] propertyMapperArray = new PropertyMapper[] { propertyMapperMock };
 			SpringConfigurationPropertySource target = new SpringConfigurationPropertySource(propertySourceMock, propertyMapperArray);
 			//Act Statement(s)
@@ -407,12 +387,11 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 			assertAll("result", () -> {
 				assertThat(result, equalTo("<init>_propertySource1"));
 				_assert.verify(() -> Assert.notNull(propertySourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${2b28a53e-8877-3ae9-8aa0-a0a4712c9edc}, hash: 191642C6699BF7431147EE0931CE7B1E
+	//Sapient generated method id: ${2b28a53e-8877-3ae9-8aa0-a0a4712c9edc}, hash: 85028CF64CF9C7A46DDEF65A7A7D5F85
 	@Test()
 	void fromWhenDefaultBranch() {
 		/* Branches:
@@ -424,11 +403,10 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		PropertySource<?> sourceMock = mock(PropertySource.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn(null).when(sourceMock).getSource();
 			_assert.when(() -> Assert.notNull(sourceMock, "Source must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(sourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			//Act Statement(s)
 			SpringConfigurationPropertySource result = SpringConfigurationPropertySource.from(sourceMock);
 			//Assert statement(s)
@@ -438,7 +416,6 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 				verify(sourceMock, atLeast(2)).getSource();
 				_assert.verify(() -> Assert.notNull(sourceMock, "Source must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(sourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}
@@ -601,7 +578,7 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${7f100488-911f-3e27-bc67-2051b101c34d}, hash: E445EC49100CFDFC50B3DE5E1A578E38
+	//Sapient generated method id: ${7f100488-911f-3e27-bc67-2051b101c34d}, hash: AA39A8F47AF66C54D5EE4C7D7A5C3C8D
 	@Test()
 	void fromWhenIsFullEnumerableNotSourceAndDefaultBranch() {
 		/* Branches:
@@ -620,13 +597,12 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		UnsupportedOperationException unsupportedOperationExceptionMock = mock(UnsupportedOperationException.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
 			doReturn("systemEnvironment").when(sourceMock).getName();
 			Map map = new HashMap<>();
 			doThrow(unsupportedOperationExceptionMock).when(sourceMock).getSource();
 			_assert.when(() -> Assert.notNull(sourceMock, "Source must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(sourceMock, "PropertySource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.isTrue(true, "Mappers must contain at least one item")).thenAnswer((Answer<Void>) invocation -> null);
 			//Act Statement(s)
 			SpringConfigurationPropertySource result = SpringConfigurationPropertySource.from(sourceMock);
 			//Assert statement(s)
@@ -637,7 +613,6 @@ class SpringConfigurationPropertySourceSapientGeneratedTest {
 				verify(sourceMock, atLeast(4)).getSource();
 				_assert.verify(() -> Assert.notNull(sourceMock, "Source must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(sourceMock, "PropertySource must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.isTrue(true, "Mappers must contain at least one item"), atLeast(1));
 			});
 		}
 	}

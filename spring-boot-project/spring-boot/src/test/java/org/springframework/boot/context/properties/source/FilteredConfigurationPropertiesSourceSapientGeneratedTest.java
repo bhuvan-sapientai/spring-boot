@@ -3,13 +3,11 @@ package org.springframework.boot.context.properties.source;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
+import org.mockito.MockedStatic;
 
-import org.springframework.boot.origin.Origin;
 import org.springframework.util.Assert;
 
 import java.util.function.Predicate;
-
-import org.mockito.MockedStatic;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,8 +21,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class FilteredConfigurationPropertiesSourceSapientGeneratedTest {
 
@@ -34,22 +30,18 @@ class FilteredConfigurationPropertiesSourceSapientGeneratedTest {
 
 	private final Predicate predicateMock = mock(Predicate.class);
 
-	//Sapient generated method id: ${83cc193e-c3fe-3d15-89d9-324b130ff7fa}, hash: EA7D16B691C2636C93A867E82F778437
-	@Disabled()
+	//Sapient generated method id: ${83cc193e-c3fe-3d15-89d9-324b130ff7fa}, hash: 0084AC3D91F061127010B039B945DB30
 	@Test()
 	void getConfigurationPropertyWhenFiltered() {
 		/* Branches:
 		 * (filtered) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Origin originMock = mock(Origin.class);
+		ConfigurationProperty configurationPropertyMock = mock(ConfigurationProperty.class);
+		Predicate<ConfigurationPropertyName> predicateMock = mock(Predicate.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			Object object = new Object();
-			ConfigurationProperty configurationProperty = new ConfigurationProperty(configurationPropertyNameMock, object, originMock);
-			doReturn(configurationProperty).when(sourceMock).getConfigurationProperty((ConfigurationPropertyName) any());
+			doReturn(configurationPropertyMock).when(sourceMock).getConfigurationProperty((ConfigurationPropertyName) any());
+			doReturn(true).when(predicateMock).test((ConfigurationPropertyName) any());
 			_assert.when(() -> Assert.notNull(sourceMock, "Source must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(predicateMock, "Filter must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			FilteredConfigurationPropertiesSource target = new FilteredConfigurationPropertiesSource(sourceMock, predicateMock);
@@ -58,26 +50,25 @@ class FilteredConfigurationPropertiesSourceSapientGeneratedTest {
 			ConfigurationProperty result = target.getConfigurationProperty(configurationPropertyName);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, equalTo(configurationProperty));
+				assertThat(result, equalTo(configurationPropertyMock));
 				verify(sourceMock).getConfigurationProperty((ConfigurationPropertyName) any());
+				verify(predicateMock).test((ConfigurationPropertyName) any());
 				_assert.verify(() -> Assert.notNull(sourceMock, "Source must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(predicateMock, "Filter must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${17249c2a-2677-3381-9b43-5c4eb5883a4b}, hash: 3EC09E5D789FF3ACC837C1FD421A7B50
-	@Disabled()
+	//Sapient generated method id: ${17249c2a-2677-3381-9b43-5c4eb5883a4b}, hash: B1881BB7D7408E93651D4B3277159DCC
 	@Test()
 	void getConfigurationPropertyWhenNotFiltered() {
 		/* Branches:
 		 * (filtered) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		Predicate<ConfigurationPropertyName> predicateMock = mock(Predicate.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			doReturn(false).when(predicateMock).test((ConfigurationPropertyName) any());
 			_assert.when(() -> Assert.notNull(sourceMock, "Source must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(predicateMock, "Filter must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			FilteredConfigurationPropertiesSource target = new FilteredConfigurationPropertiesSource(sourceMock, predicateMock);
@@ -87,6 +78,7 @@ class FilteredConfigurationPropertiesSourceSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
+				verify(predicateMock).test((ConfigurationPropertyName) any());
 				_assert.verify(() -> Assert.notNull(sourceMock, "Source must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(predicateMock, "Filter must not be null"), atLeast(1));
 			});

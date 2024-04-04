@@ -24,8 +24,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataSapientGeneratedTest {
 
@@ -34,7 +32,6 @@ class ConfigDataSapientGeneratedTest {
 	private final PropertySource<?> propertySourceMock = mock(PropertySource.class);
 
 	//Sapient generated method id: ${35c45523-e5c7-34f7-8d6d-4e96598349f7}, hash: 281D1FBEFBD64E30BBFEE413E2C82DC1
-	@Disabled()
 	@Test()
 	void getOptionsWhenOptionsIsNotNull() {
 		/* Branches:

@@ -7,14 +7,14 @@ import org.springframework.core.env.ConfigurableEnvironment;
 
 import org.mockito.stubbing.Answer;
 
-import java.util.Set;
-
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.Assert;
 import org.springframework.core.env.ConfigurablePropertyResolver;
 
 import org.mockito.MockedStatic;
+
+import java.util.ArrayList;
 
 import static org.mockito.Mockito.doNothing;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,8 +37,6 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 	private final ConfigurableEnvironment configurableEnvironmentMock = mock(ConfigurableEnvironment.class);
 
 	private final ConfigurationPropertySourcesPropertySource configurationPropertySourcesPropertySourceMock = mock(ConfigurationPropertySourcesPropertySource.class);
-
-	private final Iterable iterableMock = mock(Iterable.class);
 
 	private final MutablePropertySources mutablePropertySourcesMock = mock(MutablePropertySources.class);
 
@@ -124,7 +122,7 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${8ca6ff15-4e18-3bbd-a3bc-7521e6d8bfe0}, hash: 795567DAD6FD1204456BC1945EA5A897
+	//Sapient generated method id: ${8ca6ff15-4e18-3bbd-a3bc-7521e6d8bfe0}, hash: D9E9F3D6FF952BFA46A2AE751AB606F3
 	@Test()
 	void attachWhenAttachedGetSourceNotIsUsingSourcesSourcesAndIsUsingSourcesNotAttachedSources() {
 		/* Branches:
@@ -138,7 +136,7 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(mutablePropertySourcesMock).when(configurableEnvironmentMock).getPropertySources();
 			doReturn(propertySourceMock).when(mutablePropertySourcesMock).remove("configurationProperties");
-			doNothing().when(mutablePropertySourcesMock).addFirst((ConfigurationPropertySourcesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addFirst((PropertySource) any());
 			_assert.when(() -> Assert.isInstanceOf(ConfigurableEnvironment.class, configurableEnvironmentMock)).thenAnswer((Answer<Void>) invocation -> null);
 			configurationPropertySources.when(() -> ConfigurationPropertySources.getAttached(mutablePropertySourcesMock)).thenReturn(configurationPropertySourcesPropertySourceMock);
 			doReturn(springConfigurationPropertySourcesMock).when(configurationPropertySourcesPropertySourceMock).getSource();
@@ -149,7 +147,7 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 			assertAll("result", () -> {
 				verify(configurableEnvironmentMock, atLeast(1)).getPropertySources();
 				verify(mutablePropertySourcesMock, atLeast(1)).remove("configurationProperties");
-				verify(mutablePropertySourcesMock, atLeast(1)).addFirst((ConfigurationPropertySourcesPropertySource) any());
+				verify(mutablePropertySourcesMock, atLeast(1)).addFirst((PropertySource) any());
 				_assert.verify(() -> Assert.isInstanceOf(ConfigurableEnvironment.class, configurableEnvironmentMock), atLeast(1));
 				configurationPropertySources.verify(() -> ConfigurationPropertySources.getAttached(mutablePropertySourcesMock), atLeast(1));
 				verify(configurationPropertySourcesPropertySourceMock, atLeast(1)).getSource();
@@ -194,7 +192,7 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${a610375f-03b0-3911-b8e6-2e398a6d5879}, hash: F15C702EF934E8582767830B45312BFA
+	//Sapient generated method id: ${a610375f-03b0-3911-b8e6-2e398a6d5879}, hash: C49753F6835B0174CFB4E85A9F2717DA
 	@Test()
 	void getWhenAttachedIsNull() {
 		/* Branches:
@@ -206,12 +204,13 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 			doReturn(mutablePropertySourcesMock).when(configurableEnvironmentMock).getPropertySources();
 			doReturn(null).when(mutablePropertySourcesMock).get("configurationProperties");
 			_assert.when(() -> Assert.isInstanceOf(ConfigurableEnvironment.class, configurableEnvironmentMock)).thenAnswer((Answer<Void>) invocation -> null);
-			configurationPropertySources.when(() -> ConfigurationPropertySources.from(mutablePropertySourcesMock)).thenReturn(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from(mutablePropertySourcesMock)).thenReturn(iterable);
 			//Act Statement(s)
 			Iterable<ConfigurationPropertySource> result = ConfigurationPropertySources.get(configurableEnvironmentMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, equalTo(iterableMock));
+				assertThat(result, equalTo(iterable));
 				verify(configurableEnvironmentMock, atLeast(1)).getPropertySources();
 				verify(mutablePropertySourcesMock, atLeast(1)).get("configurationProperties");
 				_assert.verify(() -> Assert.isInstanceOf(ConfigurableEnvironment.class, configurableEnvironmentMock), atLeast(1));
@@ -220,7 +219,7 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${5bf81d9e-fba5-3b14-b80a-1e242c0b880a}, hash: 664928EAE440E402B157C232C4AF2786
+	//Sapient generated method id: ${5bf81d9e-fba5-3b14-b80a-1e242c0b880a}, hash: 95F584E7BD52978BC1E50C4537618192
 	@Test()
 	void getWhenAttachedIsNotNull() {
 		/* Branches:
@@ -230,13 +229,14 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(mutablePropertySourcesMock).when(configurableEnvironmentMock).getPropertySources();
 			doReturn(configurationPropertySourcesPropertySourceMock).when(mutablePropertySourcesMock).get("configurationProperties");
-			doReturn(iterableMock).when(configurationPropertySourcesPropertySourceMock).getSource();
+			Iterable iterable = new ArrayList<>();
+			doReturn(iterable).when(configurationPropertySourcesPropertySourceMock).getSource();
 			_assert.when(() -> Assert.isInstanceOf(ConfigurableEnvironment.class, configurableEnvironmentMock)).thenAnswer((Answer<Void>) invocation -> null);
 			//Act Statement(s)
 			Iterable<ConfigurationPropertySource> result = ConfigurationPropertySources.get(configurableEnvironmentMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, equalTo(iterableMock));
+				assertThat(result, equalTo(iterable));
 				verify(configurableEnvironmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).get("configurationProperties");
 				verify(configurationPropertySourcesPropertySourceMock).getSource();
@@ -262,12 +262,14 @@ class ConfigurationPropertySourcesSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${4d14331c-3461-34d2-9c31-3612d7b953ef}, hash: E29F81263336155447089005286E42AC
+	//Sapient generated method id: ${4d14331c-3461-34d2-9c31-3612d7b953ef}, hash: E30C139F526AE783CD93E9605ED7CC76
 	@Test()
 	void from1Test() {
+		//Arrange Statement(s)
+		Iterable<PropertySource<?>> iterable = new ArrayList<>();
 
 		//Act Statement(s)
-		Iterable<ConfigurationPropertySource> result = ConfigurationPropertySources.from(iterableMock);
+		Iterable<ConfigurationPropertySource> result = ConfigurationPropertySources.from(iterable);
 
 		//Assert statement(s)
 		//TODO: Please implement equals method in SpringConfigurationPropertySources for verification of the entire object or you need to adjust respective assertion statements

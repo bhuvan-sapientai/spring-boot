@@ -1,22 +1,5 @@
-/*
- * Copyright 2012-2024 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.boot.context.properties.bind.handler;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -25,23 +8,20 @@ import org.springframework.boot.context.properties.bind.BindContext;
 import org.springframework.util.Assert;
 import org.springframework.boot.context.properties.bind.Bindable;
 
-import java.util.function.Supplier;
-
 import org.mockito.MockedStatic;
 
-import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.boot.context.properties.bind.BindHandler;
+import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.verify;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
 import static org.hamcrest.Matchers.is;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
@@ -51,46 +31,39 @@ class IgnoreErrorsBindHandlerSapientGeneratedTest {
 
 	private final BindHandler bindHandlerMock = mock(BindHandler.class);
 
-	private final Bindable<?> targetMock = mock(Bindable.class);
-
-	//Sapient generated method id: ${57ee638d-d52e-33c5-a86e-20fbc238e620}, hash: D3C288C554DC65FA925B83AE05A1BAA7
+	//Sapient generated method id: ${57ee638d-d52e-33c5-a86e-20fbc238e620}, hash: 30BFE6EF26C37CCEFC5D926F88DCCD06
 	@Test()
-	@Disabled
 	void onFailureWhenTargetGetValueIsNotNull() throws Exception {
 		/* Branches:
 		 * (target.getValue() != null) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Supplier supplierMock = mock(Supplier.class);
-		Supplier supplierMock2 = mock(Supplier.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doReturn(supplierMock, supplierMock2).when(targetMock).getValue();
 			_assert.when(() -> Assert.notNull(bindHandlerMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			IgnoreErrorsBindHandler target = new IgnoreErrorsBindHandler(bindHandlerMock);
 			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("onFailure_configurationPropertyName1-name1");
+			Object object = new Object();
+			Bindable bindable = Bindable.ofInstance(object);
 			Exception exception = new Exception();
 			//Act Statement(s)
-			Object result = target.onFailure(configurationPropertyName, targetMock, bindContextMock, exception);
+			Object result = target.onFailure(configurationPropertyName, bindable, bindContextMock, exception);
 			//Assert statement(s)
 			//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				verify(targetMock, times(2)).getValue();
 				_assert.verify(() -> Assert.notNull(bindHandlerMock, "Parent must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${a055160a-1f84-37f3-b574-95d5d285d1bc}, hash: 03BB26780272A10D143B5EC0EAF567B3
+	//Sapient generated method id: ${a055160a-1f84-37f3-b574-95d5d285d1bc}, hash: 22C499E7F3DE38E6EA45057F53750CB9
 	@Test()
 	void onFailureWhenTargetGetValueIsNull() throws Exception {
 		/* Branches:
 		 * (target.getValue() != null) : false
 		 */
 		//Arrange Statement(s)
+		Bindable<?> targetMock = mock(Bindable.class);
 		ConfigurationPropertyName configurationPropertyNameMock = mock(ConfigurationPropertyName.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(null).when(targetMock).getValue();

@@ -18,8 +18,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class JavaBeanBinderSapientGeneratedTest {
 
@@ -28,7 +26,6 @@ class JavaBeanBinderSapientGeneratedTest {
 	private final ResolvableType resolvableTypeMock = mock(ResolvableType.class);
 
 	//Sapient generated method id: ${b7f6e049-53d8-30b7-bb8b-f15c1a9c42c6}, hash: B8A668E31C1228FA0FD5CFA52080701C
-	@Disabled()
 	@Test()
 	void createWhenTypeIsNotNull() {
 		/* Branches:
@@ -53,7 +50,6 @@ class JavaBeanBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${707e5d6d-b3d1-3884-b706-e7d8563d81a2}, hash: 1EFAEE84690A1553AB17B3289A1F5CB1
-	@Disabled()
 	@Test()
 	void createWhenTypeIsNull() {
 		/* Branches:
@@ -63,8 +59,10 @@ class JavaBeanBinderSapientGeneratedTest {
 		doReturn(null).when(resolvableTypeMock).resolve();
 		JavaBeanBinder target = new JavaBeanBinder();
 		Bindable bindable = Bindable.of(resolvableTypeMock);
+
 		//Act Statement(s)
 		Object result = target.create(bindable, binderContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(nullValue()));

@@ -13,8 +13,6 @@ import org.mockito.MockedStatic;
 
 import java.util.ArrayList;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.verify;
@@ -24,12 +22,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class AliasedConfigurationPropertySourceSapientGeneratedTest {
 
-	private final ConfigurationPropertySource sourceMock = mock(ConfigurationPropertySource.class, "testConfigurationProperty");
+	private final ConfigurationPropertySource sourceMock = mock(ConfigurationPropertySource.class, "source");
 
 	private final ConfigurationProperty configurationPropertyMock = mock(ConfigurationProperty.class);
 
@@ -40,6 +36,8 @@ class AliasedConfigurationPropertySourceSapientGeneratedTest {
 	private final ConfigurationPropertyName configurationPropertyNameMock2 = mock(ConfigurationPropertyName.class);
 
 	private final ConfigurationPropertyName configurationPropertyNameMock3 = mock(ConfigurationPropertyName.class);
+
+	private final ConfigurationPropertyName nameMock = mock(ConfigurationPropertyName.class);
 
 	//Sapient generated method id: ${afdea9c1-05b9-3355-84f5-40a88d07c949}, hash: C3E1683F9054AC6439666E93180E2C1F
 	@Test()
@@ -131,8 +129,7 @@ class AliasedConfigurationPropertySourceSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${4ff7f135-5180-33e6-8972-004d6855a6eb}, hash: F465BDFF087069BC76F1FBE5D1667E19
-	@Disabled()
+	//Sapient generated method id: ${4ff7f135-5180-33e6-8972-004d6855a6eb}, hash: 5FD3DEFB2CC656DBAC0E82B979489352
 	@Test()
 	void containsDescendantOfWhenNameIsAncestorOfAliasAndThisSourceGetConfigurationPropertyFromIsNotNull() {
 		/* Branches:
@@ -143,12 +140,8 @@ class AliasedConfigurationPropertySourceSapientGeneratedTest {
 		 * (for-each(getAliases().getAliases(from))) : true
 		 * (name.isAncestorOf(alias)) : true
 		 * (this.source.getConfigurationProperty(from) != null) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigurationPropertyName nameMock = mock(ConfigurationPropertyName.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(true).when(nameMock).isAncestorOf(configurationPropertyNameMock);
 			List<ConfigurationPropertyName> configurationPropertyNameList = new ArrayList<>();
@@ -184,8 +177,7 @@ class AliasedConfigurationPropertySourceSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${02477335-0c9a-3ec3-adf5-ef11b2752a73}, hash: BF8C9C9808524584BF45940839DCA647
-	@Disabled()
+	//Sapient generated method id: ${02477335-0c9a-3ec3-adf5-ef11b2752a73}, hash: 9F89E4910768F75A3CDC6C45708933E5
 	@Test()
 	void containsDescendantOfWhenNameIsAncestorOfAliasAndThisSourceGetConfigurationPropertyFromIsNull() {
 		/* Branches:
@@ -196,40 +188,38 @@ class AliasedConfigurationPropertySourceSapientGeneratedTest {
 		 * (for-each(getAliases().getAliases(from))) : true
 		 * (name.isAncestorOf(alias)) : true
 		 * (this.source.getConfigurationProperty(from) != null) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			doReturn(true).when(nameMock).isAncestorOf(configurationPropertyNameMock);
 			List<ConfigurationPropertyName> configurationPropertyNameList = new ArrayList<>();
-			configurationPropertyNameList.add(configurationPropertyNameMock);
-			doReturn(configurationPropertyNameList).when(configurationPropertyNameAliasesMock).getAliases((ConfigurationPropertyName) any());
+			configurationPropertyNameList.add(configurationPropertyNameMock2);
+			doReturn(configurationPropertyNameList).when(configurationPropertyNameAliasesMock).getAliases(nameMock);
 			doReturn(null).when(configurationPropertyNameAliasesMock).iterator();
 			List<ConfigurationPropertyName> configurationPropertyNameList2 = new ArrayList<>();
-			configurationPropertyNameList2.add(configurationPropertyNameMock2);
+			configurationPropertyNameList2.add(configurationPropertyNameMock);
 			doReturn(configurationPropertyNameList2).when(configurationPropertyNameAliasesMock).getAliases(configurationPropertyNameMock3);
 			_assert.when(() -> Assert.notNull(sourceMock, "Source must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(configurationPropertyNameAliasesMock, "Aliases must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.notNull(nameMock, "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			AliasedConfigurationPropertySource target = new AliasedConfigurationPropertySource(sourceMock, configurationPropertyNameAliasesMock);
-			doReturn(ConfigurationPropertyState.ABSENT).when(sourceMock).containsDescendantOf((ConfigurationPropertyName) any());
-			doReturn(ConfigurationPropertyState.ABSENT).when(sourceMock).containsDescendantOf(configurationPropertyNameMock);
+			doReturn(ConfigurationPropertyState.ABSENT).when(sourceMock).containsDescendantOf(nameMock);
+			doReturn(ConfigurationPropertyState.ABSENT).when(sourceMock).containsDescendantOf(configurationPropertyNameMock2);
 			doReturn(null).when(sourceMock).getConfigurationProperty(configurationPropertyNameMock3);
-			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("containsDescendantOf_configurationPropertyName1-name1");
 			//Act Statement(s)
-			ConfigurationPropertyState result = target.containsDescendantOf(configurationPropertyName);
+			ConfigurationPropertyState result = target.containsDescendantOf(nameMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(ConfigurationPropertyState.ABSENT));
-				verify(configurationPropertyNameAliasesMock).getAliases((ConfigurationPropertyName) any());
+				verify(nameMock).isAncestorOf(configurationPropertyNameMock);
+				verify(configurationPropertyNameAliasesMock).getAliases(nameMock);
 				verify(configurationPropertyNameAliasesMock).iterator();
 				verify(configurationPropertyNameAliasesMock).getAliases(configurationPropertyNameMock3);
 				_assert.verify(() -> Assert.notNull(sourceMock, "Source must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(configurationPropertyNameAliasesMock, "Aliases must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.notNull((ConfigurationPropertyName) any(), eq("Name must not be null")));
-				verify(sourceMock).containsDescendantOf((ConfigurationPropertyName) any());
-				verify(sourceMock).containsDescendantOf(configurationPropertyNameMock);
+				_assert.verify(() -> Assert.notNull(nameMock, "Name must not be null"), atLeast(1));
+				verify(sourceMock).containsDescendantOf(nameMock);
+				verify(sourceMock).containsDescendantOf(configurationPropertyNameMock2);
 				verify(sourceMock).getConfigurationProperty(configurationPropertyNameMock3);
 			});
 		}

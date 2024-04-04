@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.is;
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class BeanCurrentlyInCreationFailureAnalyzerSapientGeneratedTest {
 
-	//Sapient generated method id: ${70b66d63-ea88-3ba4-976b-6788efdfcbb9}, hash: 6E710AFC2F4B17FCD280E9A0DF88CE9E
+	//Sapient generated method id: ${70b66d63-ea88-3ba4-976b-6788efdfcbb9}, hash: 07C2C5F7822E18683E94A3ED6F325EAB
 	@Test()
 	void analyze2WhenCycleStartEqualsMinus1AndDependencyCycleIsNull() {
 		/* Branches:
@@ -31,12 +31,14 @@ class BeanCurrentlyInCreationFailureAnalyzerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		AbstractAutowireCapableBeanFactory abstractAutowireCapableBeanFactoryMock = mock(AbstractAutowireCapableBeanFactory.class);
+		AbstractAutowireCapableBeanFactory abstractAutowireCapableBeanFactoryMock = mock(AbstractAutowireCapableBeanFactory.class, "valid_value");
 		BeanCurrentlyInCreationFailureAnalyzer target = new BeanCurrentlyInCreationFailureAnalyzer(abstractAutowireCapableBeanFactoryMock);
 		Throwable throwable = new Throwable();
 		BeanCurrentlyInCreationException beanCurrentlyInCreationException = new BeanCurrentlyInCreationException("beanName1");
+
 		//Act Statement(s)
 		FailureAnalysis result = target.analyze(throwable, beanCurrentlyInCreationException);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}

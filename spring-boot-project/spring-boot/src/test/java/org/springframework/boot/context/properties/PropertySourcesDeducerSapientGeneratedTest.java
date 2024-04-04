@@ -52,8 +52,10 @@ class PropertySourcesDeducerSapientGeneratedTest {
 		doReturn(stringPropertySourcesPlaceholderConfigurerMap).when(applicationContextMock).getBeansOfType(PropertySourcesPlaceholderConfigurer.class, false, false);
 		PropertySources propertySourcesMock = mock(PropertySources.class);
 		doReturn(propertySourcesMock).when(propertySourcesPlaceholderConfigurerMock).getAppliedPropertySources();
+
 		//Act Statement(s)
 		PropertySources result = target.getPropertySources();
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(propertySourcesMock));
@@ -62,7 +64,7 @@ class PropertySourcesDeducerSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${eb630e05-3d88-3aef-8d53-0792c10b60f4}, hash: CA6CF166DA37C5A8427CE9D6A2B2130E
+	//Sapient generated method id: ${eb630e05-3d88-3aef-8d53-0792c10b60f4}, hash: FF771A63E4BFE43CD11E5CDFD775D1C0
 	@Test()
 	void getPropertySourcesWhenSourcesIsNotNull() throws BeansException {
 		/* Branches:
@@ -72,27 +74,25 @@ class PropertySourcesDeducerSapientGeneratedTest {
 		 * (sources != null) : true
 		 */
 		//Arrange Statement(s)
+		PropertySourcesDeducer target = new PropertySourcesDeducer(applicationContextMock);
+		Map<String, PropertySourcesPlaceholderConfigurer> stringPropertySourcesPlaceholderConfigurerMap = new HashMap<>();
+		stringPropertySourcesPlaceholderConfigurerMap.put("0", (PropertySourcesPlaceholderConfigurer) null);
+		doReturn(stringPropertySourcesPlaceholderConfigurerMap).when(applicationContextMock).getBeansOfType(PropertySourcesPlaceholderConfigurer.class, false, false);
 		ConfigurableEnvironment configurableEnvironmentMock = mock(ConfigurableEnvironment.class);
+		doReturn(configurableEnvironmentMock).when(applicationContextMock).getEnvironment();
 		MutablePropertySources mutablePropertySourcesMock = mock(MutablePropertySources.class);
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.state(true, "Unable to obtain PropertySources from PropertySourcesPlaceholderConfigurer or Environment")).thenAnswer((Answer<Void>) invocation -> null);
-			PropertySourcesDeducer target = new PropertySourcesDeducer(applicationContextMock);
-			Map<String, PropertySourcesPlaceholderConfigurer> stringPropertySourcesPlaceholderConfigurerMap = new HashMap<>();
-			stringPropertySourcesPlaceholderConfigurerMap.put("0", (PropertySourcesPlaceholderConfigurer) null);
-			doReturn(stringPropertySourcesPlaceholderConfigurerMap).when(applicationContextMock).getBeansOfType(PropertySourcesPlaceholderConfigurer.class, false, false);
-			doReturn(configurableEnvironmentMock).when(applicationContextMock).getEnvironment();
-			doReturn(mutablePropertySourcesMock).when(configurableEnvironmentMock).getPropertySources();
-			//Act Statement(s)
-			PropertySources result = target.getPropertySources();
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(mutablePropertySourcesMock));
-				_assert.verify(() -> Assert.state(true, "Unable to obtain PropertySources from PropertySourcesPlaceholderConfigurer or Environment"), atLeast(1));
-				verify(applicationContextMock).getBeansOfType(PropertySourcesPlaceholderConfigurer.class, false, false);
-				verify(applicationContextMock).getEnvironment();
-				verify(configurableEnvironmentMock).getPropertySources();
-			});
-		}
+		doReturn(mutablePropertySourcesMock).when(configurableEnvironmentMock).getPropertySources();
+
+		//Act Statement(s)
+		PropertySources result = target.getPropertySources();
+
+		//Assert statement(s)
+		assertAll("result", () -> {
+			assertThat(result, equalTo(mutablePropertySourcesMock));
+			verify(applicationContextMock).getBeansOfType(PropertySourcesPlaceholderConfigurer.class, false, false);
+			verify(applicationContextMock).getEnvironment();
+			verify(configurableEnvironmentMock).getPropertySources();
+		});
 	}
 
 	//Sapient generated method id: ${1694a2f6-4b78-3766-8cef-333024b46f49}, hash: ACBEC34D3ED85C56F656F0584FB91ECA
@@ -105,9 +105,6 @@ class PropertySourcesDeducerSapientGeneratedTest {
 		 * (configurer != null) : false
 		 * (environment instanceof ConfigurableEnvironment configurableEnvironment) : false  #  inside extractEnvironmentPropertySources method
 		 * (sources != null) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurerMock2 = mock(PropertySourcesPlaceholderConfigurer.class);

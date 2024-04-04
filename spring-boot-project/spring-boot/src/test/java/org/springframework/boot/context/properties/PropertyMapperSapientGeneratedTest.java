@@ -34,8 +34,10 @@ class PropertyMapperSapientGeneratedTest {
 		PropertyMapper target = spy(PropertyMapper.get());
 		PropertyMapper propertyMapperMock = mock(PropertyMapper.class);
 		doReturn(propertyMapperMock).when(target).alwaysApplying((PropertyMapper.SourceOperator) any());
+
 		//Act Statement(s)
 		PropertyMapper result = target.alwaysApplyingWhenNonNull();
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(propertyMapperMock));
@@ -102,8 +104,10 @@ class PropertyMapperSapientGeneratedTest {
 		PropertyMapper.Source propertyMapperSourceMock = mock(PropertyMapper.Source.class);
 		doReturn(propertyMapperSourceMock).when(target).from((Supplier) any());
 		Object object = new Object();
+
 		//Act Statement(s)
 		PropertyMapper.Source result = target.from(object);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(propertyMapperSourceMock));
@@ -114,8 +118,10 @@ class PropertyMapperSapientGeneratedTest {
 	//Sapient generated method id: ${9c25887d-767d-38e9-b5ae-c2e4012c49be}, hash: 5FAEA5DB87B3CAC50D6E0E57372FBF79
 	@Test()
 	void getTest() {
+
 		//Act Statement(s)
 		PropertyMapper result = PropertyMapper.get();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}

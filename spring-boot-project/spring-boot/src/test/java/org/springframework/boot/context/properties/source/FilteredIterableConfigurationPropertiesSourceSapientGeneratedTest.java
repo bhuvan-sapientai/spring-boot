@@ -26,22 +26,16 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class FilteredIterableConfigurationPropertiesSourceSapientGeneratedTest {
 
 	private final IterableConfigurationPropertySource iterableConfigurationPropertySourceMock = mock(IterableConfigurationPropertySource.class);
 
-	private final Predicate predicateMock = mock(Predicate.class);
+	private final Predicate<ConfigurationPropertyName> predicateMock = mock(Predicate.class);
 
 	//Sapient generated method id: ${b4af2388-e781-3800-820a-b8ede09bd914}, hash: 7C33935AA02FC62BF8ED2FA6BC9AA3D5
 	@Test()
 	void streamTest() {
-		/*
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
 		//Arrange Statement(s)
 		IterableConfigurationPropertySource iterableConfigurationPropertySourceMock2 = mock(IterableConfigurationPropertySource.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
@@ -65,10 +59,11 @@ class FilteredIterableConfigurationPropertiesSourceSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${bfcb6725-5fb8-3080-8655-dc87e9921af1}, hash: E6673DEFB9A8F7E7A8CFDD2BAF22F39D
+	//Sapient generated method id: ${bfcb6725-5fb8-3080-8655-dc87e9921af1}, hash: 0F12DD380146E3EB5CCD1C569BC59970
 	@Test()
 	void getSource1Test() {
 		//Arrange Statement(s)
+		Predicate predicateMock = mock(Predicate.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull(iterableConfigurationPropertySourceMock, "Source must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(predicateMock, "Filter must not be null")).thenAnswer((Answer<Void>) invocation -> null);
@@ -85,7 +80,6 @@ class FilteredIterableConfigurationPropertiesSourceSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${409a869f-7d3e-391d-9ac0-8089d0ba1991}, hash: B099AAC742D5138E773B863A1CC66A48
-	@Disabled()
 	@Test()
 	void containsDescendantOfTest() {
 		/*

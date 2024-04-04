@@ -9,7 +9,6 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 
 import org.mockito.stubbing.Answer;
 
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.util.StringUtils;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.util.Assert;
@@ -20,7 +19,9 @@ import org.springframework.core.annotation.MergedAnnotation;
 
 import org.mockito.MockedStatic;
 
+import org.springframework.core.AttributeAccessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.bind.BindMethod;
 
 import static org.mockito.Mockito.doNothing;
@@ -35,8 +36,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertiesBeanRegistrarSapientGeneratedTest {
 
@@ -45,7 +44,6 @@ class ConfigurationPropertiesBeanRegistrarSapientGeneratedTest {
 	private final MergedAnnotation<ConfigurationProperties> annotationMock = mock(MergedAnnotation.class);
 
 	//Sapient generated method id: ${853913a6-18ed-366c-8d01-10d393fd970e}, hash: 846D1D24DED31F0E4DBEDD8B677D6E4F
-	@Disabled()
 	@Test()
 	void registerTest() {
 		/*
@@ -71,8 +69,7 @@ class ConfigurationPropertiesBeanRegistrarSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${1f68e201-ef10-35df-9a07-1476241b36f5}, hash: EDBF3953BC18AB1982B4B8017D403CFD
-	@Disabled()
+	//Sapient generated method id: ${1f68e201-ef10-35df-9a07-1476241b36f5}, hash: B3D65FF3AE34041190A5B97FA6BDC3B2
 	@Test()
 	void register1WhenContainsBeanDefinitionName() throws NoSuchElementException {
 		/* Branches:
@@ -86,24 +83,21 @@ class ConfigurationPropertiesBeanRegistrarSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
-			doReturn(true).when(annotationMock).isPresent();
-			doReturn("A").when(annotationMock).getString("prefix");
-			stringUtils.when(() -> StringUtils.hasText("A")).thenReturn(true);
-			ConfigurationPropertiesBeanRegistrar target = new ConfigurationPropertiesBeanRegistrar(registryMock);
-			//Act Statement(s)
-			target.register(Object.class, annotationMock);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				verify(annotationMock).isPresent();
-				verify(annotationMock).getString("prefix");
-				stringUtils.verify(() -> StringUtils.hasText("A"), atLeast(1));
-			});
-		}
+		doReturn(true).when(annotationMock).isPresent();
+		doReturn("A").when(annotationMock).getString("prefix");
+		ConfigurationPropertiesBeanRegistrar target = new ConfigurationPropertiesBeanRegistrar(registryMock);
+
+		//Act Statement(s)
+		target.register(Object.class, annotationMock);
+
+		//Assert statement(s)
+		assertAll("result", () -> {
+			verify(annotationMock).isPresent();
+			verify(annotationMock).getString("prefix");
+		});
 	}
 
-	//Sapient generated method id: ${1e8acbc1-030a-3bca-aab8-13cf04495245}, hash: 1E757D193C97549445E15DDFD3C34C5E
-	@Disabled()
+	//Sapient generated method id: ${1e8acbc1-030a-3bca-aab8-13cf04495245}, hash: EE17E712BFCF2E7D236ADC90BFFDBC25
 	@Test()
 	void register1WhenContainsBeanDefinitionThisBeanFactoryNameAndContainsBeanDefinitionName() throws NoSuchElementException {
 		/* Branches:
@@ -118,26 +112,23 @@ class ConfigurationPropertiesBeanRegistrarSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
-			doReturn(true).when(annotationMock).isPresent();
-			doReturn("A").when(annotationMock).getString("prefix");
-			stringUtils.when(() -> StringUtils.hasText("A")).thenReturn(true);
-			ConfigurationPropertiesBeanRegistrar target = new ConfigurationPropertiesBeanRegistrar(registryMock);
-			//Act Statement(s)
-			target.register(Object.class, annotationMock);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				verify(annotationMock).isPresent();
-				verify(annotationMock).getString("prefix");
-				stringUtils.verify(() -> StringUtils.hasText("A"), atLeast(1));
-			});
-		}
+		doReturn(true).when(annotationMock).isPresent();
+		doReturn("A").when(annotationMock).getString("prefix");
+		ConfigurationPropertiesBeanRegistrar target = new ConfigurationPropertiesBeanRegistrar(registryMock);
+
+		//Act Statement(s)
+		target.register(Object.class, annotationMock);
+
+		//Assert statement(s)
+		assertAll("result", () -> {
+			verify(annotationMock).isPresent();
+			verify(annotationMock).getString("prefix");
+		});
 	}
 
-	//Sapient generated method id: ${48ed7d2c-dbfd-3e0e-bbaf-2e09ae4a7a01}, hash: 94E7E4953B82C66B3D08DBC117989EB8
-	@Disabled()
+	//Sapient generated method id: ${457da517-a828-386b-9bee-c57d15eca370}, hash: B6F035D50EAF43919B4A750B9204F5A0
 	@Test()
-	void register1WhenContainsBeanDefinitionNotNameAndBindMethodNotEqualsBindMethodVALUE_OBJECT2() throws BeanDefinitionStoreException {
+	void register1WhenBeanFactoryNotInstanceOfHierarchicalBeanFactoryAndContainsBeanDefinitionNotNameAndBindMethodNotEqualsBindM() throws BeanDefinitionStoreException {
 		/* Branches:
 		 * (annotation.isPresent()) : false  #  inside getName method
 		 * (StringUtils.hasText(prefix)) : false  #  inside getName method
@@ -152,31 +143,27 @@ class ConfigurationPropertiesBeanRegistrarSapientGeneratedTest {
 		//Arrange Statement(s)
 		try (MockedStatic<BindMethodAttribute> bindMethodAttribute = mockStatic(BindMethodAttribute.class);
 			 MockedStatic<ConfigurationPropertiesBean> configurationPropertiesBean = mockStatic(ConfigurationPropertiesBean.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(false).when(annotationMock).isPresent();
-			stringUtils.when(() -> StringUtils.hasText("")).thenReturn(false);
 			_assert.when(() -> Assert.state(eq(false), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
 			configurationPropertiesBean.when(() -> ConfigurationPropertiesBean.deduceBindMethod(Object.class)).thenReturn(BindMethod.JAVA_BEAN);
-			bindMethodAttribute.when(() -> BindMethodAttribute.set((RootBeanDefinition) any(), eq(BindMethod.JAVA_BEAN))).thenAnswer((Answer<Void>) invocation -> null);
+			bindMethodAttribute.when(() -> BindMethodAttribute.set((AttributeAccessor) any(), eq(BindMethod.JAVA_BEAN))).thenAnswer((Answer<Void>) invocation -> null);
 			ConfigurationPropertiesBeanRegistrar target = new ConfigurationPropertiesBeanRegistrar(registryMock);
-			doNothing().when(registryMock).registerBeanDefinition(eq("java.lang.Object"), (RootBeanDefinition) any());
+			doNothing().when(registryMock).registerBeanDefinition(eq("java.lang.Object"), (BeanDefinition) any());
 			//Act Statement(s)
 			target.register(Object.class, annotationMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				verify(annotationMock, times(2)).isPresent();
-				stringUtils.verify(() -> StringUtils.hasText(""), atLeast(1));
 				_assert.verify(() -> Assert.state(eq(false), (Supplier) any()));
 				configurationPropertiesBean.verify(() -> ConfigurationPropertiesBean.deduceBindMethod(Object.class), atLeast(1));
-				bindMethodAttribute.verify(() -> BindMethodAttribute.set((RootBeanDefinition) any(), eq(BindMethod.JAVA_BEAN)));
-				verify(registryMock).registerBeanDefinition(eq("java.lang.Object"), (RootBeanDefinition) any());
+				bindMethodAttribute.verify(() -> BindMethodAttribute.set((AttributeAccessor) any(), eq(BindMethod.JAVA_BEAN)));
+				verify(registryMock).registerBeanDefinition(eq("java.lang.Object"), (BeanDefinition) any());
 			});
 		}
 	}
 
-	//Sapient generated method id: ${0d78ece8-4b86-3d5e-b785-087ad7a58e66}, hash: 1E145AF2C94A1E4560663B1767F8C8C1
-	@Disabled()
+	//Sapient generated method id: ${0d78ece8-4b86-3d5e-b785-087ad7a58e66}, hash: 6E8B2B55C42016F635462819A48E7752
 	@Test()
 	void register1WhenBindMethodEqualsBindMethodVALUE_OBJECT() throws NoSuchElementException, BeanDefinitionStoreException {
 		/* Branches:
@@ -194,27 +181,24 @@ class ConfigurationPropertiesBeanRegistrarSapientGeneratedTest {
 		//Arrange Statement(s)
 		try (MockedStatic<BindMethodAttribute> bindMethodAttribute = mockStatic(BindMethodAttribute.class);
 			 MockedStatic<ConfigurationPropertiesBean> configurationPropertiesBean = mockStatic(ConfigurationPropertiesBean.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
-			doReturn("D").when(annotationMock).getString("prefix");
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			doReturn("A").when(annotationMock).getString("prefix");
 			doReturn(true, false).when(annotationMock).isPresent();
-			stringUtils.when(() -> StringUtils.hasText("D")).thenReturn(true);
 			_assert.when(() -> Assert.state(eq(false), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
 			configurationPropertiesBean.when(() -> ConfigurationPropertiesBean.deduceBindMethod(Object.class)).thenReturn(BindMethod.VALUE_OBJECT);
-			bindMethodAttribute.when(() -> BindMethodAttribute.set((RootBeanDefinition) any(), eq(BindMethod.VALUE_OBJECT))).thenAnswer((Answer<Void>) invocation -> null);
+			bindMethodAttribute.when(() -> BindMethodAttribute.set((AttributeAccessor) any(), eq(BindMethod.VALUE_OBJECT))).thenAnswer((Answer<Void>) invocation -> null);
 			ConfigurationPropertiesBeanRegistrar target = new ConfigurationPropertiesBeanRegistrar(registryMock);
-			doNothing().when(registryMock).registerBeanDefinition(eq("D-java.lang.Object"), (RootBeanDefinition) any());
+			doNothing().when(registryMock).registerBeanDefinition(eq("A-java.lang.Object"), (BeanDefinition) any());
 			//Act Statement(s)
 			target.register(Object.class, annotationMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				verify(annotationMock, times(2)).isPresent();
 				verify(annotationMock).getString("prefix");
-				stringUtils.verify(() -> StringUtils.hasText("D"), atLeast(1));
 				_assert.verify(() -> Assert.state(eq(false), (Supplier) any()));
 				configurationPropertiesBean.verify(() -> ConfigurationPropertiesBean.deduceBindMethod(Object.class), atLeast(1));
-				bindMethodAttribute.verify(() -> BindMethodAttribute.set((RootBeanDefinition) any(), eq(BindMethod.VALUE_OBJECT)));
-				verify(registryMock).registerBeanDefinition(eq("D-java.lang.Object"), (RootBeanDefinition) any());
+				bindMethodAttribute.verify(() -> BindMethodAttribute.set((AttributeAccessor) any(), eq(BindMethod.VALUE_OBJECT)));
+				verify(registryMock).registerBeanDefinition(eq("A-java.lang.Object"), (BeanDefinition) any());
 			});
 		}
 	}

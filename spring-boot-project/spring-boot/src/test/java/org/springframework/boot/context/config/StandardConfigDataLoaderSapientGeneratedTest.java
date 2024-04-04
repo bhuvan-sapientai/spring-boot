@@ -29,8 +29,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class StandardConfigDataLoaderSapientGeneratedTest {
 
@@ -64,8 +62,10 @@ class StandardConfigDataLoaderSapientGeneratedTest {
 		StandardConfigDataResource resourceMock = mock(StandardConfigDataResource.class);
 		doReturn(true).when(resourceMock).isEmptyDirectory();
 		StandardConfigDataLoader target = new StandardConfigDataLoader();
+
 		//Act Statement(s)
 		ConfigData result = target.load(configDataLoaderContextMock, resourceMock);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigData for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -75,7 +75,6 @@ class StandardConfigDataLoaderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${e33a41e9-2b70-3d61-8a58-9954526f5c6b}, hash: 7B5359ED23A5941C380E5BD0B6BE6EC4
-	@Disabled()
 	@Test()
 	void loadWhenResourceGetProfileIsNotNull() throws IOException, ConfigDataNotFoundException {
 		/* Branches:
@@ -119,7 +118,6 @@ class StandardConfigDataLoaderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${e1a160d5-022e-389a-903a-30984214f4a1}, hash: 93C5A9D79B2FC85B5371A0DE88217BA6
-	@Disabled()
 	@Test()
 	void loadWhenResourceGetProfileIsNull() throws IOException, ConfigDataNotFoundException {
 		/* Branches:

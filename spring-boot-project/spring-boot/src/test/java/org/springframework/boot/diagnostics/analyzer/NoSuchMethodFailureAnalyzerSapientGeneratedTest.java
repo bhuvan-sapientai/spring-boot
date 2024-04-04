@@ -28,8 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 
@@ -37,8 +35,7 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 
 	private final URL uRLMock2 = mock(URL.class);
 
-	//Sapient generated method id: ${704eaada-d20a-3dfa-adfd-a484b34d4e53}, hash: 41E283808F0D4BBEF202AC84F4DDD7C9
-	@Disabled()
+	//Sapient generated method id: ${704eaada-d20a-3dfa-adfd-a484b34d4e53}, hash: 26D1CF0F3A6259BCEE58F7244A5F4278
 	@Test()
 	void analyze2WhenCallerDescriptorIsNull() throws Throwable {
 		/* Branches:
@@ -51,15 +48,19 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		//Arrange Statement(s)
 		NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 		Throwable throwable = new Throwable();
+		StackTraceElement stackTraceElement = new StackTraceElement("declaringClass1", "methodName1", "fileName1", 0);
+		StackTraceElement[] stackTraceElementArray = new StackTraceElement[] { stackTraceElement };
 		NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
+		noSuchMethodError.setStackTrace(stackTraceElementArray);
+
 		//Act Statement(s)
 		FailureAnalysis result = target.analyze(throwable, noSuchMethodError);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${6fbb3818-3e5a-3c60-a4bc-a4f9d001e509}, hash: 3DB7A798A830B4F723D3B5B902BA4B4E
-	@Disabled()
+	//Sapient generated method id: ${6fbb3818-3e5a-3c60-a4bc-a4f9d001e509}, hash: 6E521C22AD9770541C80CC7C18156D62
 	@Test()
 	void analyze2WhenCandidatesIsNullAndCallerDescriptorIsNull() throws Throwable {
 		/* Branches:
@@ -72,7 +73,7 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			Throwable throwable = new Throwable();
 			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
@@ -81,13 +82,12 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${b29d7342-ebab-3a0d-9728-0d79a6d7c706}, hash: 1BB978B3336639FFBD142CF7804D7A92
-	@Disabled()
+	//Sapient generated method id: ${b29d7342-ebab-3a0d-9728-0d79a6d7c706}, hash: 353E9C8F6DFD08934381D66891B37541
 	@Test()
 	void analyze2WhenTypeIsNullAndCallerDescriptorIsNull() throws Throwable {
 		/* Branches:
@@ -101,7 +101,7 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			Throwable throwable = new Throwable();
 			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
@@ -110,13 +110,12 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${206a33ac-70eb-3ff2-9ee4-90320a86047a}, hash: 276AC401B974CDC04812AC29A6AB8045
-	@Disabled()
+	//Sapient generated method id: ${206a33ac-70eb-3ff2-9ee4-90320a86047a}, hash: 85CF9D1E64B2E13354CDCA23707D8DE9
 	@Test()
 	void analyze2WhenCaughtThrowableAndCandidatesIsNullAndCallerDescriptorIsNull() throws Throwable {
 		/* Branches:
@@ -130,7 +129,7 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("java/lang/String.class");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("<value>");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			Throwable throwable = new Throwable();
 			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
@@ -139,13 +138,12 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${f4e264c8-31c9-34e8-acd1-9e99b5229330}, hash: 1FB03362364D8BDF50D67736FCCD50EF
-	@Disabled()
+	//Sapient generated method id: ${f4e264c8-31c9-34e8-acd1-9e99b5229330}, hash: 59B5879BB2FA785FE85364606AC29166
 	@Test()
 	void analyze2WhenCaughtThrowableAndTypeIsNullAndCallerDescriptorIsNull() throws Throwable {
 		/* Branches:
@@ -161,8 +159,8 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		//Arrange Statement(s)
 		try (MockedStatic<Class> _class = mockStatic(Class.class);
 			 MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("org/springframework/util/ClassUtils.class");
-			_class.when(() -> Class.forName(eq("java.lang.String"), eq(false), (ClassLoader) any())).thenReturn(NoSuchMethodFailureAnalyzer.class);
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("org.springframework.boot.diagnostics.analyzer.NoSuchMethodFailureAnalyzer");
+			_class.when(() -> Class.forName(eq("jdk.internal.reflect.GeneratedConstructorAccessor424"), eq(false), (ClassLoader) any())).thenReturn(ClassNotFoundException.class);
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			Throwable throwable = new Throwable();
 			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
@@ -171,14 +169,13 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
-				_class.verify(() -> Class.forName(eq("java.lang.String"), eq(false), (ClassLoader) any()));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
+				_class.verify(() -> Class.forName(eq("jdk.internal.reflect.GeneratedConstructorAccessor424"), eq(false), (ClassLoader) any()));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${afabb07b-a959-3e25-b98c-7d5e9c454e74}, hash: 18BAD629C64CD4880AA281907E56833A
-	@Disabled()
+	//Sapient generated method id: ${afabb07b-a959-3e25-b98c-7d5e9c454e74}, hash: 6C7C518C629DAAE5E27F914E475C58D1
 	@Test()
 	void analyze2WhenTypeHierarchyIsNullAndCallerDescriptorIsNull() throws Throwable {
 		/* Branches:
@@ -195,7 +192,7 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("some_value");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("some_value");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			Throwable throwable = new Throwable();
 			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
@@ -204,13 +201,12 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${fde1cfb1-74d7-34a6-b921-4198b5c8db60}, hash: 46A43EC7A38A214B2667B2E1A831618A
-	@Disabled()
+	//Sapient generated method id: ${fde1cfb1-74d7-34a6-b921-4198b5c8db60}, hash: B7ABC0AE6A34CBB08E64DE57D944B40B
 	@Test()
 	void analyze2WhenCalledDescriptorIsNull() throws Throwable {
 		/* Branches:
@@ -228,9 +224,9 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("org/springframework/boot/diagnostics/analyzer/NoSuchMethodFailureAnalyzer.class");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("org/springframework/boot/diagnostics/analyzer/");
 			NoSuchMethodFailureAnalyzer target = spy(new NoSuchMethodFailureAnalyzer());
-			doReturn(null).when(target).getNoSuchMethodDescriptor("cause1");
+			doReturn(null).when(target).getNoSuchMethodDescriptor((String) null);
 			Throwable throwable = new Throwable();
 			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
 			//Act Statement(s)
@@ -238,14 +234,13 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
-				verify(target).getNoSuchMethodDescriptor("cause1");
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
+				verify(target).getNoSuchMethodDescriptor((String) null);
 			});
 		}
 	}
 
-	//Sapient generated method id: ${43a85aae-4c7b-361b-93a3-0a08feefbb73}, hash: EEA5723A44343D9E3F5719FF1B6B9EFA
-	@Disabled()
+	//Sapient generated method id: ${43a85aae-4c7b-361b-93a3-0a08feefbb73}, hash: 3F493C46D328DCE037A9F6C87A456466
 	@Test()
 	void analyze2WhenCaughtThrowableAndTypeHierarchyIsNullAndCallerDescriptorIsNull() throws Throwable {
 		/* Branches:
@@ -263,7 +258,7 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("some_value");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			Throwable throwable = new Throwable();
 			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
@@ -272,12 +267,12 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${7a2df98d-0caa-32ab-b012-b9fce2ca49e3}, hash: 28BE7E8A306C17B82D0B091A37D834A5
+	//Sapient generated method id: ${7a2df98d-0caa-32ab-b012-b9fce2ca49e3}, hash: 28244F20284B615E2FA043F986A74C51
 	@Test()
 	void analyze2WhenCallerDescriptorGetClassNameNotEqualsCalledDescriptorGetClassName() throws Throwable {
 		/* Branches:
@@ -298,32 +293,31 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-    classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("A")).thenReturn("<value>");
-    NoSuchMethodFailureAnalyzer target = spy(new NoSuchMethodFailureAnalyzer());
-    NoSuchMethodFailureAnalyzer.ClassDescriptor noSuchMethodFailureAnalyzerClassDescriptor = new NoSuchMethodFailureAnalyzer.ClassDescriptor("name1", uRLMock);
-    List<NoSuchMethodFailureAnalyzer.ClassDescriptor> noSuchMethodFailureAnalyzerClassDescriptorList = new ArrayList<>();
-    noSuchMethodFailureAnalyzerClassDescriptorList.add(noSuchMethodFailureAnalyzerClassDescriptor);
-    List<NoSuchMethodFailureAnalyzer.ClassDescriptor> noSuchMethodFailureAnalyzerClassDescriptorList2 = new ArrayList<>();
-    noSuchMethodFailureAnalyzerClassDescriptorList2.add(noSuchMethodFailureAnalyzerClassDescriptor);
-    NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor noSuchMethodFailureAnalyzerNoSuchMethodDescriptor = new NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor("errorMessage1", "F", noSuchMethodFailureAnalyzerClassDescriptorList, noSuchMethodFailureAnalyzerClassDescriptorList2);
-    doReturn(noSuchMethodFailureAnalyzerNoSuchMethodDescriptor).when(target).getNoSuchMethodDescriptor("cause1");
-    Throwable throwable = new Throwable();
-    NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
-    //Act Statement(s)
-    FailureAnalysis result = target.analyze(throwable, noSuchMethodError);
-    //Assert statement(s)
-    //TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("A"), atLeast(1));
-        verify(target).getNoSuchMethodDescriptor("cause1");
-    });
-}*/
+		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("<value>");
+			NoSuchMethodFailureAnalyzer target = spy(new NoSuchMethodFailureAnalyzer());
+			NoSuchMethodFailureAnalyzer.ClassDescriptor noSuchMethodFailureAnalyzerClassDescriptor = new NoSuchMethodFailureAnalyzer.ClassDescriptor("name1", uRLMock);
+			List<NoSuchMethodFailureAnalyzer.ClassDescriptor> noSuchMethodFailureAnalyzerClassDescriptorList = new ArrayList<>();
+			noSuchMethodFailureAnalyzerClassDescriptorList.add(noSuchMethodFailureAnalyzerClassDescriptor);
+			List<NoSuchMethodFailureAnalyzer.ClassDescriptor> noSuchMethodFailureAnalyzerClassDescriptorList2 = new ArrayList<>();
+			noSuchMethodFailureAnalyzerClassDescriptorList2.add(noSuchMethodFailureAnalyzerClassDescriptor);
+			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor noSuchMethodFailureAnalyzerNoSuchMethodDescriptor = new NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor("errorMessage1", "B", noSuchMethodFailureAnalyzerClassDescriptorList, noSuchMethodFailureAnalyzerClassDescriptorList2);
+			doReturn(noSuchMethodFailureAnalyzerNoSuchMethodDescriptor).when(target).getNoSuchMethodDescriptor((String) null);
+			Throwable throwable = new Throwable();
+			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
+			//Act Statement(s)
+			FailureAnalysis result = target.analyze(throwable, noSuchMethodError);
+			//Assert statement(s)
+			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
+				verify(target).getNoSuchMethodDescriptor((String) null);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${4426d88f-f417-34bc-9500-2ae3aa57161f}, hash: 2E382A1645B342E91859A1F4EDC3A8FB
-	@Disabled()
+	//Sapient generated method id: ${4426d88f-f417-34bc-9500-2ae3aa57161f}, hash: CE5089C45324A12CBC16257F2D9FF442
 	@Test()
 	void analyze2WhenCallerDescriptorGetClassNameEqualsCalledDescriptorGetClassName() throws Throwable {
 		/* Branches:
@@ -345,32 +339,32 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("B")).thenReturn("<String>");
-			NoSuchMethodFailureAnalyzer target = spy(new NoSuchMethodFailureAnalyzer());
-			List<URL> uRLList = new ArrayList<>();
-			uRLList.add(uRLMock);
-			NoSuchMethodFailureAnalyzer.ClassDescriptor noSuchMethodFailureAnalyzerClassDescriptor = new NoSuchMethodFailureAnalyzer.ClassDescriptor("name1", uRLMock2);
-			List<NoSuchMethodFailureAnalyzer.ClassDescriptor> noSuchMethodFailureAnalyzerClassDescriptorList = new ArrayList<>();
-			noSuchMethodFailureAnalyzerClassDescriptorList.add(noSuchMethodFailureAnalyzerClassDescriptor);
-			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor noSuchMethodFailureAnalyzerNoSuchMethodDescriptor = new NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor("errorMessage1", "B", uRLList, noSuchMethodFailureAnalyzerClassDescriptorList);
-			doReturn(noSuchMethodFailureAnalyzerNoSuchMethodDescriptor).when(target).getNoSuchMethodDescriptor("cause1");
-			Throwable throwable = new Throwable();
-			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
-			//Act Statement(s)
-			FailureAnalysis result = target.analyze(throwable, noSuchMethodError);
-			//Assert statement(s)
-			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("B"), atLeast(1));
-				verify(target).getNoSuchMethodDescriptor("cause1");
-			});
-		}
+		NoSuchMethodFailureAnalyzer target = spy(new NoSuchMethodFailureAnalyzer());
+		List<URL> uRLList = new ArrayList<>();
+		uRLList.add(uRLMock);
+		NoSuchMethodFailureAnalyzer.ClassDescriptor noSuchMethodFailureAnalyzerClassDescriptor = new NoSuchMethodFailureAnalyzer.ClassDescriptor("name1", uRLMock2);
+		List<NoSuchMethodFailureAnalyzer.ClassDescriptor> noSuchMethodFailureAnalyzerClassDescriptorList = new ArrayList<>();
+		noSuchMethodFailureAnalyzerClassDescriptorList.add(noSuchMethodFailureAnalyzerClassDescriptor);
+		NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor noSuchMethodFailureAnalyzerNoSuchMethodDescriptor = new NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor("errorMessage1", "A", uRLList, noSuchMethodFailureAnalyzerClassDescriptorList);
+		doReturn(noSuchMethodFailureAnalyzerNoSuchMethodDescriptor).when(target).getNoSuchMethodDescriptor("s1");
+		Throwable throwable = new Throwable();
+		StackTraceElement stackTraceElement = new StackTraceElement("declaringClass1", "methodName1", "fileName1", 0);
+		StackTraceElement[] stackTraceElementArray = new StackTraceElement[] { stackTraceElement };
+		NoSuchMethodError noSuchMethodError = new NoSuchMethodError("s1");
+		noSuchMethodError.setStackTrace(stackTraceElementArray);
+
+		//Act Statement(s)
+		FailureAnalysis result = target.analyze(throwable, noSuchMethodError);
+
+		//Assert statement(s)
+		//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
+		assertAll("result", () -> {
+			assertThat(result, is(notNullValue()));
+			verify(target).getNoSuchMethodDescriptor("s1");
+		});
 	}
 
-	//Sapient generated method id: ${0c3f36ec-db06-34b6-92e4-f72114cad8fa}, hash: C4AC6C4FB39355F4AF96ED774298CF7E
-	@Disabled()
+	//Sapient generated method id: ${0c3f36ec-db06-34b6-92e4-f72114cad8fa}, hash: 1C186F0099FD203098BAC2633E2DD191
 	@Test()
 	void analyze2WhenCalledDescriptorGetTypeHierarchyIsNotEmptyAndCallerDescriptorGetClassNameNotEqualsCalledDescriptorGetClassN2() throws Throwable {
 		/* Branches:
@@ -393,15 +387,15 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("A")).thenReturn("<value>");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424")).thenReturn("<value>");
 			NoSuchMethodFailureAnalyzer target = spy(new NoSuchMethodFailureAnalyzer());
 			List<URL> uRLList = new ArrayList<>();
 			uRLList.add(uRLMock);
 			NoSuchMethodFailureAnalyzer.ClassDescriptor noSuchMethodFailureAnalyzerClassDescriptor = new NoSuchMethodFailureAnalyzer.ClassDescriptor("name1", uRLMock2);
 			List<NoSuchMethodFailureAnalyzer.ClassDescriptor> noSuchMethodFailureAnalyzerClassDescriptorList = new ArrayList<>();
 			noSuchMethodFailureAnalyzerClassDescriptorList.add(noSuchMethodFailureAnalyzerClassDescriptor);
-			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor noSuchMethodFailureAnalyzerNoSuchMethodDescriptor = new NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor("errorMessage1", "F", uRLList, noSuchMethodFailureAnalyzerClassDescriptorList);
-			doReturn(noSuchMethodFailureAnalyzerNoSuchMethodDescriptor).when(target).getNoSuchMethodDescriptor("cause1");
+			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor noSuchMethodFailureAnalyzerNoSuchMethodDescriptor = new NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor("errorMessage1", "B", uRLList, noSuchMethodFailureAnalyzerClassDescriptorList);
+			doReturn(noSuchMethodFailureAnalyzerNoSuchMethodDescriptor).when(target).getNoSuchMethodDescriptor((String) null);
 			Throwable throwable = new Throwable();
 			NoSuchMethodError noSuchMethodError = new NoSuchMethodError();
 			//Act Statement(s)
@@ -410,8 +404,8 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("A"), atLeast(1));
-				verify(target).getNoSuchMethodDescriptor("cause1");
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("jdk.internal.reflect.GeneratedConstructorAccessor424"), atLeast(1));
+				verify(target).getNoSuchMethodDescriptor((String) null);
 			});
 		}
 	}
@@ -428,8 +422,10 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
+
 		//Act Statement(s)
 		NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("'");
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
@@ -447,13 +443,15 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
+
 		//Act Statement(s)
 		NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("'  '");
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${d65a6d3d-a9e1-394c-b9ee-0c8570fe3653}, hash: CFA34D02458F0D84BCF9C0B8B15A30C2
+	//Sapient generated method id: ${d65a6d3d-a9e1-394c-b9ee-0c8570fe3653}, hash: B47E75986063F6DA6C88184F2B7BD787
 	@Test()
 	void getNoSuchMethodDescriptorWhenSplitIndexNotEqualsMinus1AndDescriptorIndexNotEqualsMinus1AndMethodNameIndexEqualsMinus1An() throws Throwable {
 		/* Branches:
@@ -470,14 +468,15 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
+
 		//Act Statement(s)
-		NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("' ('");
+		NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("cause1");
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${70022c1c-728e-3c66-87dc-42f436b04517}, hash: A24A824B820AC79F112CB72F904B2B36
-	@Disabled()
+	//Sapient generated method id: ${70022c1c-728e-3c66-87dc-42f436b04517}, hash: 714C305BF055002EA5F80BFCAFC872E3
 	@Test()
 	void getNoSuchMethodDescriptorWhenCandidatesIsNull() throws Throwable {
 		/* Branches:
@@ -495,20 +494,19 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("")).thenReturn("J");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("return_of_convertClassNameToResourcePath1");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			//Act Statement(s)
-			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("' C(I'");
+			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("cause1");
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath(""), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${bdcf8c78-4b80-3efe-bc2c-65aff3d65a3f}, hash: 0C069D8D1C669156F4221E5A4E55A3F8
-	@Disabled()
+	//Sapient generated method id: ${bdcf8c78-4b80-3efe-bc2c-65aff3d65a3f}, hash: BC18AF5FBCB320AA7BA2695CCF6E6659
 	@Test()
 	void getNoSuchMethodDescriptorWhenTypeIsNull() throws Throwable {
 		/* Branches:
@@ -527,20 +525,19 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("")).thenReturn("J");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("return_of_convertClassNameToResourcePath1");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			//Act Statement(s)
-			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("' C(I'");
+			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("cause1");
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath(""), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${a8af11c4-bdea-39bd-a356-8355a188edd9}, hash: 16546E77BF4A56E7BD5E0C63518A70AD
-	@Disabled()
+	//Sapient generated method id: ${a8af11c4-bdea-39bd-a356-8355a188edd9}, hash: 669E40F0F30EA641061D94502F575628
 	@Test()
 	void getNoSuchMethodDescriptorWhenCaughtThrowableAndCandidatesIsNull() throws Throwable {
 		/* Branches:
@@ -559,22 +556,21 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("")).thenReturn("J");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("NoSuchMethodError: com.example.TestClass")).thenReturn("com/example/TestClass.class");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			//Act Statement(s)
-			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("' C(I'");
+			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("NoSuchMethodError: com.example.TestClass.testMethod()");
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath(""), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("NoSuchMethodError: com.example.TestClass"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${b3afc51e-5ddf-37bb-abf9-e06fc5d2e47d}, hash: D253DCC62EA15CF782E8D8EB66F3796C
-	@Disabled()
+	//Sapient generated method id: ${5978b965-b6f0-3306-ae27-b0ecaf58b4ae}, hash: 26727145FDE7197C1BF242A5CF98F503
 	@Test()
-	void getNoSuchMethodDescriptorWhenTypeEqualsObjectAndTypeHierarchyIsNotNull() throws Throwable {
+	void getNoSuchMethodDescriptorWhenTypeHierarchyIsNotNull() throws Throwable {
 		/* Branches:
 		 * (loadedFromIndex == -1) : false  #  inside cleanMessage method
 		 * (message.startsWith("'")) : false  #  inside extractClassName method
@@ -592,21 +588,20 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("<value>");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("org.springframework.boot.diagnostics.analyzer.Test")).thenReturn("org/springframework/boot/diagnostics/analyzer");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			//Act Statement(s)
-			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("<value>");
+			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("org.springframework.boot.diagnostics.analyzer.Test.methodName(Ljava/lang/String;)V (loaded from Test.java)");
 			//Assert statement(s)
 			//TODO: Please implement equals method in NoSuchMethodDescriptor for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("org.springframework.boot.diagnostics.analyzer.Test"), atLeast(1));
 			});
 		}
 	}
 
 	//Sapient generated method id: ${0b9c1389-dc3b-33be-a162-cf11a92a5a06}, hash: 7C1800B00164649348E7BA4B5C7E7895
-	@Disabled()
 	@Test()
 	void getNoSuchMethodDescriptorWhenTypeHierarchyIsNull() throws Throwable {
 		/* Branches:
@@ -640,8 +635,7 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${258c1ae3-1861-3d56-872a-db04669ab3d1}, hash: 8D1BC9C1B4C7C916FC8C7C595F6F567C
-	@Disabled()
+	//Sapient generated method id: ${258c1ae3-1861-3d56-872a-db04669ab3d1}, hash: 54DE82CC33541CCD608FD0725FC12BB1
 	@Test()
 	void getNoSuchMethodDescriptorWhenTypeNotEqualsObjectAndTypeHierarchyIsNotNull() throws Throwable {
 		/* Branches:
@@ -663,21 +657,20 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath(" ")).thenReturn("S");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("return_of_convertClassNameToResourcePath1");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			//Act Statement(s)
-			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("'  (('");
+			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("cause1");
 			//Assert statement(s)
 			//TODO: Please implement equals method in NoSuchMethodDescriptor for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath(" "), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${19dfbaac-d8b9-3bac-abc8-63285332bd07}, hash: 12A8637752B85C55873C62B1A971B45E
-	@Disabled()
+	//Sapient generated method id: ${19dfbaac-d8b9-3bac-abc8-63285332bd07}, hash: 210F825C3D83C094F732C3C3C3F50FED
 	@Test()
 	void getNoSuchMethodDescriptorWhenCaughtThrowableAndTypeHierarchyIsNull() throws Throwable {
 		/* Branches:
@@ -700,14 +693,14 @@ class NoSuchMethodFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ClassUtils> classUtils = mockStatic(ClassUtils.class)) {
-			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String")).thenReturn("return_of_convertClassNameToResourcePath1");
+			classUtils.when(() -> ClassUtils.convertClassNameToResourcePath("java.lang.NoSuchMethodError: org.springframework.boot.autoconfigure.condition.OnBeanCondition")).thenReturn("org/springframework/util/ClassUtils.class");
 			NoSuchMethodFailureAnalyzer target = new NoSuchMethodFailureAnalyzer();
 			//Act Statement(s)
-			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("cause1");
+			NoSuchMethodFailureAnalyzer.NoSuchMethodDescriptor result = target.getNoSuchMethodDescriptor("java.lang.NoSuchMethodError: org.springframework.boot.autoconfigure.condition.OnBeanCondition.<init>(Lorg/springframework/boot/autoconfigure/condition/ConditionEvaluator;Z)V (loaded from file:/C:/Users/John/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/2.5.4/spring-boot-autoconfigure-2.5.4.jar))");
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(nullValue()));
-				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.String"), atLeast(1));
+				classUtils.verify(() -> ClassUtils.convertClassNameToResourcePath("java.lang.NoSuchMethodError: org.springframework.boot.autoconfigure.condition.OnBeanCondition"), atLeast(1));
 			});
 		}
 	}

@@ -31,13 +31,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class AnsiOutputApplicationListenerSapientGeneratedTest {
 
-	//Sapient generated method id: ${472c146e-fdf0-3ffc-9db9-d5a3f9028e9d}, hash: 09FBB7B973E8FBCC71933B8962399F35
-	@Disabled()
+	//Sapient generated method id: ${472c146e-fdf0-3ffc-9db9-d5a3f9028e9d}, hash: 68501FBB521B1BC67A79474B0936647E
 	@Test()
 	void onApplicationEventTest() {
 		//Arrange Statement(s)
@@ -52,7 +49,7 @@ class AnsiOutputApplicationListenerSapientGeneratedTest {
 			binder.when(() -> Binder.get(environmentMock)).thenReturn(binderMock);
 			doReturn(bindResultMock).when(binderMock).bind("spring.output.ansi.enabled", AnsiOutput.Enabled.class);
 			doNothing().when(bindResultMock).ifBound((Consumer) any());
-			ansiOutput.when(() -> AnsiOutput.setEnabled(AnsiOutput.Enabled.DETECT)).thenAnswer((Answer<Void>) invocation -> null);
+			ansiOutput.when(() -> AnsiOutput.setEnabled(AnsiOutput.Enabled.NEVER)).thenAnswer((Answer<Void>) invocation -> null);
 			ansiOutput.when(() -> AnsiOutput.setConsoleAvailable(false)).thenAnswer((Answer<Void>) invocation -> null);
 			AnsiOutputApplicationListener target = new AnsiOutputApplicationListener();
 			String[] stringArray = new String[] {};
@@ -65,7 +62,7 @@ class AnsiOutputApplicationListenerSapientGeneratedTest {
 				binder.verify(() -> Binder.get(environmentMock), atLeast(1));
 				verify(binderMock).bind("spring.output.ansi.enabled", AnsiOutput.Enabled.class);
 				verify(bindResultMock).ifBound((Consumer) any());
-				ansiOutput.verify(() -> AnsiOutput.setEnabled(AnsiOutput.Enabled.DETECT), atLeast(1));
+				ansiOutput.verify(() -> AnsiOutput.setEnabled(AnsiOutput.Enabled.NEVER), atLeast(1));
 				ansiOutput.verify(() -> AnsiOutput.setConsoleAvailable(false), atLeast(1));
 			});
 		}
@@ -76,8 +73,10 @@ class AnsiOutputApplicationListenerSapientGeneratedTest {
 	void getOrderTest() {
 		//Arrange Statement(s)
 		AnsiOutputApplicationListener target = new AnsiOutputApplicationListener();
+
 		//Act Statement(s)
 		int result = target.getOrder();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(-2147483637)));
 	}

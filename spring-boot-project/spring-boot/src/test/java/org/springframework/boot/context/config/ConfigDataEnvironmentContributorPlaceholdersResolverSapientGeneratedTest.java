@@ -3,12 +3,12 @@ package org.springframework.boot.context.config;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.mock;
-
-import org.junit.jupiter.api.Disabled;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataEnvironmentContributorPlaceholdersResolverSapientGeneratedTest {
@@ -17,10 +17,7 @@ class ConfigDataEnvironmentContributorPlaceholdersResolverSapientGeneratedTest {
 
 	private final ConfigDataEnvironmentContributor configDataEnvironmentContributorMock = mock(ConfigDataEnvironmentContributor.class);
 
-	private final Iterable iterableMock = mock(Iterable.class);
-
-	//Sapient generated method id: ${92f654c1-59d0-3f5f-8724-669bbd7eff5a}, hash: 5EAD571E3C5B9BB4F2A816980F678A03
-	@Disabled()
+	//Sapient generated method id: ${92f654c1-59d0-3f5f-8724-669bbd7eff5a}, hash: 994F0EF1373C806A60AF1C2931477F42
 	@Test()
 	void resolvePlaceholdersWhenValueInstanceOfString() {
 		/* Branches:
@@ -34,24 +31,30 @@ class ConfigDataEnvironmentContributorPlaceholdersResolverSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigDataEnvironmentContributorPlaceholdersResolver target = new ConfigDataEnvironmentContributorPlaceholdersResolver(iterableMock, configDataActivationContextMock, configDataEnvironmentContributorMock, false);
+		Iterable<ConfigDataEnvironmentContributor> iterable = new ArrayList<>();
+		ConfigDataEnvironmentContributorPlaceholdersResolver target = new ConfigDataEnvironmentContributorPlaceholdersResolver(iterable, configDataActivationContextMock, configDataEnvironmentContributorMock, false);
+
 		//Act Statement(s)
 		Object result = target.resolvePlaceholders("value1");
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo("return_of_replacePlaceholders1")));
 	}
 
-	//Sapient generated method id: ${2e755de7-a01c-3580-9542-15932e99692f}, hash: B7864185960EA35C071660942ADE6270
+	//Sapient generated method id: ${2e755de7-a01c-3580-9542-15932e99692f}, hash: 197C9A82B193F8D43BEAB9CED184BBB3
 	@Test()
 	void resolvePlaceholdersWhenValueNotInstanceOfString() {
 		/* Branches:
 		 * (value instanceof String string) : false
 		 */
 		//Arrange Statement(s)
-		ConfigDataEnvironmentContributorPlaceholdersResolver target = new ConfigDataEnvironmentContributorPlaceholdersResolver(iterableMock, configDataActivationContextMock, configDataEnvironmentContributorMock, false);
+		Iterable<ConfigDataEnvironmentContributor> iterable = new ArrayList<>();
+		ConfigDataEnvironmentContributorPlaceholdersResolver target = new ConfigDataEnvironmentContributorPlaceholdersResolver(iterable, configDataActivationContextMock, configDataEnvironmentContributorMock, false);
 		Object object = new Object();
+
 		//Act Statement(s)
 		Object result = target.resolvePlaceholders(object);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(object)));
 	}

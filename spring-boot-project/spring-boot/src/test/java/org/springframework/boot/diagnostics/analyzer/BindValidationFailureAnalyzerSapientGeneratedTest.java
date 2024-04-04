@@ -30,14 +30,14 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class BindValidationFailureAnalyzerSapientGeneratedTest {
 
-	private final ValidationErrors validationErrorsMock = mock(ValidationErrors.class);
+	private final BindValidationException failureMock = mock(BindValidationException.class, "BindValidationException");
 
-	//Sapient generated method id: ${74528cc7-6566-32ce-bcb9-9d46fce74dc2}, hash: 21E12531091896D74BD919DA2C17653D
+	private final ValidationErrors validationErrorsMock = mock(ValidationErrors.class, "ValidationErrors");
+
+	//Sapient generated method id: ${74528cc7-6566-32ce-bcb9-9d46fce74dc2}, hash: 813ABB994DCC631A46E87D5C128F8C47
 	@Test()
 	void analyze2WhenDetailsIsNotNullAndDetailsGetErrorsIsEmpty() {
 		/* Branches:
@@ -51,26 +51,29 @@ class BindValidationFailureAnalyzerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		BindValidationException validationExceptionMock = mock(BindValidationException.class);
-		doReturn(validationErrorsMock).when(validationExceptionMock).getValidationErrors();
+		doReturn(null).when(failureMock).getCause();
+		doReturn(validationErrorsMock).when(failureMock).getValidationErrors();
 		ObjectError objectError = new ObjectError("objectName1", "defaultMessage1");
 		List<ObjectError> objectErrorList = new ArrayList<>();
 		objectErrorList.add(objectError);
 		doReturn(objectErrorList).when(validationErrorsMock).getAllErrors();
 		BindValidationFailureAnalyzer target = new BindValidationFailureAnalyzer();
 		Throwable throwable = new Throwable();
+
 		//Act Statement(s)
-		FailureAnalysis result = target.analyze((Throwable) validationExceptionMock, throwable);
+		FailureAnalysis result = target.analyze((Throwable) failureMock, throwable);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
 			assertThat(result, is(notNullValue()));
-			verify(validationExceptionMock).getValidationErrors();
+			verify(failureMock).getCause();
+			verify(failureMock).getValidationErrors();
 			verify(validationErrorsMock).getAllErrors();
 		});
 	}
 
-	//Sapient generated method id: ${4b493960-dc90-359c-8031-c5ab43a592c4}, hash: E681E362B72B5B12F1B94F67C666AF61
+	//Sapient generated method id: ${4b493960-dc90-359c-8031-c5ab43a592c4}, hash: DF259948BB4450BAD562C63B365AF4AA
 	@Test()
 	void analyze2WhenBindExceptionIsNullAndDetailsIsNull() {
 		/* Branches:
@@ -79,16 +82,15 @@ class BindValidationFailureAnalyzerSapientGeneratedTest {
 		 * (validationException != null) : false  #  inside getBindValidationExceptionDetails method
 		 * (bindException != null) : false  #  inside getBindValidationExceptionDetails method
 		 * (details == null) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		BindValidationFailureAnalyzer target = new BindValidationFailureAnalyzer();
-		Throwable throwable = new Throwable("message1", (Throwable) null);
+		Throwable throwable = new Throwable();
 		Throwable throwable2 = new Throwable();
+
 		//Act Statement(s)
 		FailureAnalysis result = target.analyze(throwable, throwable2);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
@@ -115,8 +117,10 @@ class BindValidationFailureAnalyzerSapientGeneratedTest {
 		doReturn(object).when(bindExceptionMock).getTarget();
 		BindValidationFailureAnalyzer target = new BindValidationFailureAnalyzer();
 		Throwable throwable = new Throwable();
+
 		//Act Statement(s)
 		FailureAnalysis result = target.analyze((Throwable) bindExceptionMock, throwable);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -126,8 +130,7 @@ class BindValidationFailureAnalyzerSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${9e0f0ffa-acc2-39f4-ae79-30dee02dbcff}, hash: 0BBBC7D16A375CD46EB5B9C662CA97AE
-	@Disabled()
+	//Sapient generated method id: ${9e0f0ffa-acc2-39f4-ae79-30dee02dbcff}, hash: 3FAADE1A9C2A3A74636A4E9F9EC9C98E
 	@Test()
 	void analyze2WhenOriginIsNotNull() {
 		/* Branches:
@@ -143,28 +146,29 @@ class BindValidationFailureAnalyzerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		BindValidationException validationExceptionMock = mock(BindValidationException.class, "BindValidationException");
 		Origin originMock = mock(Origin.class, "Origin");
+		Object objectMock = mock(Object.class, "Object");
 		try (MockedStatic<Origin> origin = mockStatic(Origin.class)) {
-			doReturn(validationErrorsMock).when(validationExceptionMock).getValidationErrors();
+			doReturn(null).when(failureMock).getCause();
+			doReturn(validationErrorsMock).when(failureMock).getValidationErrors();
 			ObjectError objectError = new ObjectError("objectName1", "defaultMessage1");
 			List<ObjectError> objectErrorList = new ArrayList<>();
 			objectErrorList.add(objectError);
 			doReturn(objectErrorList).when(validationErrorsMock).getAllErrors();
-			Object object = new Object();
 			String[] stringArray = new String[] {};
 			Object[] objectArray = new Object[] {};
-			FieldError fieldError = new FieldError("", "", object, false, stringArray, objectArray, "");
+			FieldError fieldError = new FieldError("", "", objectMock, false, stringArray, objectArray, "");
 			origin.when(() -> Origin.from(fieldError)).thenReturn(originMock);
 			BindValidationFailureAnalyzer target = new BindValidationFailureAnalyzer();
 			Throwable throwable = new Throwable();
 			//Act Statement(s)
-			FailureAnalysis result = target.analyze((Throwable) validationExceptionMock, throwable);
+			FailureAnalysis result = target.analyze((Throwable) failureMock, throwable);
 			//Assert statement(s)
 			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				verify(validationExceptionMock).getValidationErrors();
+				verify(failureMock).getCause();
+				verify(failureMock).getValidationErrors();
 				verify(validationErrorsMock).getAllErrors();
 				origin.verify(() -> Origin.from(fieldError), atLeast(1));
 			});

@@ -29,14 +29,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 
 	private final ConfigurableBeanFactory beanFactoryMock = mock(ConfigurableBeanFactory.class, "null");
 
-	private final BeanDefinition beanDefinitionMock = mock(BeanDefinition.class);
+	private final BeanDefinition beanDefinitionMock = mock(BeanDefinition.class, "BeanDefinition");
 
 	//Sapient generated method id: ${e4d18dad-5216-3a78-b497-0dd59f754c79}, hash: 547B99991F01970E74EFBF97422294B3
 	@Test()
@@ -84,8 +82,7 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${833eacca-32be-371a-bfb1-d8472f8673b8}, hash: 6B7BA30FD6E38DFCE0E42C5647E359DE
-	@Disabled()
+	//Sapient generated method id: ${833eacca-32be-371a-bfb1-d8472f8673b8}, hash: 99886C6D8BE65150B1617251ECC17BC4
 	@Test()
 	void analyze3WhenResourceDescriptionIsNotNull() throws NoSuchBeanDefinitionException {
 		/* Branches:
@@ -100,40 +97,40 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		BeanDefinition beanDefinitionMock = mock(BeanDefinition.class);
 		try (MockedStatic<MissingParameterNamesFailureAnalyzer> missingParameterNamesFailureAnalyzer = mockStatic(MissingParameterNamesFailureAnalyzer.class);
 			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock)).thenAnswer((Answer<Void>) invocation -> null);
-			String[] stringArray = new String[] { "\"String[]\"" };
-			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("A")).thenReturn(stringArray);
-			stringUtils.when(() -> StringUtils.hasText("return_of_getFactoryMethodName1")).thenReturn(true);
+			String[] stringArray = new String[] {};
+			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("str1")).thenReturn(stringArray);
+			stringUtils.when(() -> StringUtils.hasText("return_of_getFactoryMethodName1")).thenReturn(false);
 			StringBuilder stringBuilder = new StringBuilder();
 			missingParameterNamesFailureAnalyzer.when(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder)).thenAnswer((Answer<Void>) invocation -> null);
 			NoUniqueBeanDefinitionFailureAnalyzer target = new NoUniqueBeanDefinitionFailureAnalyzer(beanFactoryMock);
-			doReturn(beanDefinitionMock).when(beanFactoryMock).getMergedBeanDefinition("\"String[]\"");
-			doReturn("return_of_getFactoryMethodName1", "String").when(beanDefinitionMock).getFactoryMethodName();
-			doReturn("String").when(beanDefinitionMock).getResourceDescription();
+			doReturn(beanDefinitionMock).when(beanFactoryMock).getMergedBeanDefinition("beanName1");
+			doReturn("return_of_getFactoryMethodName1").when(beanDefinitionMock).getFactoryMethodName();
+			doReturn("return_of_getResourceDescription1").when(beanDefinitionMock).getResourceDescription();
 			Throwable throwable = new Throwable();
 			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "message1");
 			//Act Statement(s)
-			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "description");
+			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "description1");
 			//Assert statement(s)
 			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
 				_assert.verify(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock), atLeast(1));
-				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("A"), atLeast(1));
+				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("str1"), atLeast(1));
 				stringUtils.verify(() -> StringUtils.hasText("return_of_getFactoryMethodName1"), atLeast(1));
 				missingParameterNamesFailureAnalyzer.verify(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder), atLeast(1));
-				verify(beanFactoryMock).getMergedBeanDefinition("\"String[]\"");
+				verify(beanFactoryMock).getMergedBeanDefinition("beanName1");
 				verify(beanDefinitionMock, times(2)).getFactoryMethodName();
 				verify(beanDefinitionMock).getResourceDescription();
 			});
 		}
 	}
 
-	//Sapient generated method id: ${2827698e-da01-37d9-9109-e2bfb5758c79}, hash: 4F39F99F3D0BF6287213CC26D93E1235
-	@Disabled()
+	//Sapient generated method id: ${2827698e-da01-37d9-9109-e2bfb5758c79}, hash: C86F01D3ABEF19A3B1DAFE00207A7FE1
 	@Test()
 	void analyze3WhenResourceDescriptionIsNull() throws NoSuchBeanDefinitionException {
 		/* Branches:
@@ -148,40 +145,40 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		BeanDefinition beanDefinitionMock = mock(BeanDefinition.class);
 		try (MockedStatic<MissingParameterNamesFailureAnalyzer> missingParameterNamesFailureAnalyzer = mockStatic(MissingParameterNamesFailureAnalyzer.class);
 			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock)).thenAnswer((Answer<Void>) invocation -> null);
-			String[] stringArray = new String[] { "H", "return_of_commaDelimitedListToStringArrayItem1" };
-			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("foundJG")).thenReturn(stringArray);
-			stringUtils.when(() -> StringUtils.hasText("return_of_getFactoryMethodName1")).thenReturn(true);
+			String[] stringArray = new String[] {};
+			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("str1")).thenReturn(stringArray);
+			stringUtils.when(() -> StringUtils.hasText("return_of_getFactoryMethodName1")).thenReturn(false);
 			StringBuilder stringBuilder = new StringBuilder();
 			missingParameterNamesFailureAnalyzer.when(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder)).thenAnswer((Answer<Void>) invocation -> null);
 			NoUniqueBeanDefinitionFailureAnalyzer target = new NoUniqueBeanDefinitionFailureAnalyzer(beanFactoryMock);
-			doReturn(beanDefinitionMock).when(beanFactoryMock).getMergedBeanDefinition("H");
-			doReturn("return_of_getFactoryMethodName1", "I").when(beanDefinitionMock).getFactoryMethodName();
+			doReturn(beanDefinitionMock).when(beanFactoryMock).getMergedBeanDefinition("beanName1");
+			doReturn("return_of_getFactoryMethodName1").when(beanDefinitionMock).getFactoryMethodName();
 			doReturn(null).when(beanDefinitionMock).getResourceDescription();
 			Throwable throwable = new Throwable();
-			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "but foundJG ");
+			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "message1");
 			//Act Statement(s)
-			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "F");
+			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "description1");
 			//Assert statement(s)
 			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
 				_assert.verify(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock), atLeast(1));
-				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("foundJG"), atLeast(1));
+				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("str1"), atLeast(1));
 				stringUtils.verify(() -> StringUtils.hasText("return_of_getFactoryMethodName1"), atLeast(1));
 				missingParameterNamesFailureAnalyzer.verify(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder), atLeast(1));
-				verify(beanFactoryMock).getMergedBeanDefinition("H");
+				verify(beanFactoryMock).getMergedBeanDefinition("beanName1");
 				verify(beanDefinitionMock, times(2)).getFactoryMethodName();
 				verify(beanDefinitionMock).getResourceDescription();
 			});
 		}
 	}
 
-	//Sapient generated method id: ${5be01d84-cfc5-31ce-8522-57c395482f85}, hash: D17E013615020664C50040B0D242EEC4
-	@Disabled()
+	//Sapient generated method id: ${5be01d84-cfc5-31ce-8522-57c395482f85}, hash: 7C0A995C41D331D8FB7F7193A8C66AAF
 	@Test()
 	void analyze3WhenStringUtilsNotHasTextDefinitionGetFactoryMethodNameAndResourceDescriptionIsNotNull() throws NoSuchBeanDefinitionException {
 		/* Branches:
@@ -197,11 +194,9 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<MissingParameterNamesFailureAnalyzer> missingParameterNamesFailureAnalyzer = mockStatic(MissingParameterNamesFailureAnalyzer.class);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock)).thenAnswer((Answer<Void>) invocation -> null);
+			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
 			String[] stringArray = new String[] { "String[]" };
-			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("but found")).thenReturn(stringArray);
+			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("str1")).thenReturn(stringArray);
 			stringUtils.when(() -> StringUtils.hasText("return_of_getFactoryMethodName1")).thenReturn(false);
 			StringBuilder stringBuilder = new StringBuilder();
 			missingParameterNamesFailureAnalyzer.when(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder)).thenAnswer((Answer<Void>) invocation -> null);
@@ -210,15 +205,14 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 			doReturn("return_of_getFactoryMethodName1").when(beanDefinitionMock).getFactoryMethodName();
 			doReturn("String").when(beanDefinitionMock).getResourceDescription();
 			Throwable throwable = new Throwable();
-			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "but found ");
+			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "message1");
 			//Act Statement(s)
 			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "");
 			//Assert statement(s)
 			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock), atLeast(1));
-				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("but found"), atLeast(1));
+				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("str1"), atLeast(1));
 				stringUtils.verify(() -> StringUtils.hasText("return_of_getFactoryMethodName1"), atLeast(1));
 				missingParameterNamesFailureAnalyzer.verify(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder), atLeast(1));
 				verify(beanFactoryMock).getMergedBeanDefinition("String[]");
@@ -228,8 +222,7 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${6db1bb6c-21d5-3993-8869-72d0e508ed36}, hash: 137F7F9CDF677F240C801536C68A3B1D
-	@Disabled()
+	//Sapient generated method id: ${6db1bb6c-21d5-3993-8869-72d0e508ed36}, hash: 4C6E0345FDEA32E4E5F5C2597FCAF306
 	@Test()
 	void analyze3WhenStringUtilsNotHasTextDefinitionGetFactoryMethodNameAndResourceDescriptionIsNull() throws NoSuchBeanDefinitionException {
 		/* Branches:
@@ -245,11 +238,9 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<MissingParameterNamesFailureAnalyzer> missingParameterNamesFailureAnalyzer = mockStatic(MissingParameterNamesFailureAnalyzer.class);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock)).thenAnswer((Answer<Void>) invocation -> null);
+			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
 			String[] stringArray = new String[] { "String[]" };
-			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("but found")).thenReturn(stringArray);
+			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("str1")).thenReturn(stringArray);
 			stringUtils.when(() -> StringUtils.hasText("return_of_getFactoryMethodName1")).thenReturn(false);
 			StringBuilder stringBuilder = new StringBuilder();
 			missingParameterNamesFailureAnalyzer.when(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder)).thenAnswer((Answer<Void>) invocation -> null);
@@ -258,15 +249,14 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 			doReturn("return_of_getFactoryMethodName1").when(beanDefinitionMock).getFactoryMethodName();
 			doReturn(null).when(beanDefinitionMock).getResourceDescription();
 			Throwable throwable = new Throwable();
-			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "but found ");
+			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "message1");
 			//Act Statement(s)
-			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "");
+			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "String");
 			//Assert statement(s)
 			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock), atLeast(1));
-				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("but found"), atLeast(1));
+				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("str1"), atLeast(1));
 				stringUtils.verify(() -> StringUtils.hasText("return_of_getFactoryMethodName1"), atLeast(1));
 				missingParameterNamesFailureAnalyzer.verify(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder), atLeast(1));
 				verify(beanFactoryMock).getMergedBeanDefinition("String[]");
@@ -276,8 +266,7 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${75e156d5-d2d0-3353-857c-0947bdd8c647}, hash: CAF628258B8D9DDC8AF2082904C234A5
-	@Disabled()
+	//Sapient generated method id: ${75e156d5-d2d0-3353-857c-0947bdd8c647}, hash: 58A3D55180F25FE335D8A78B116A56E3
 	@Test()
 	void analyze3WhenCaughtNoSuchBeanDefinitionException() throws NoSuchBeanDefinitionException {
 		/* Branches:
@@ -294,78 +283,26 @@ class NoUniqueBeanDefinitionFailureAnalyzerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<MissingParameterNamesFailureAnalyzer> missingParameterNamesFailureAnalyzer = mockStatic(MissingParameterNamesFailureAnalyzer.class);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock)).thenAnswer((Answer<Void>) invocation -> null);
+			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
 			String[] stringArray = new String[] { "String[]" };
-			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("but found")).thenReturn(stringArray);
-			stringUtils.when(() -> StringUtils.hasText("return_of_getFactoryMethodName1")).thenReturn(false);
+			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("str1")).thenReturn(stringArray);
+			stringUtils.when(() -> StringUtils.hasText((String) null)).thenReturn(false);
 			StringBuilder stringBuilder = new StringBuilder();
 			missingParameterNamesFailureAnalyzer.when(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder)).thenAnswer((Answer<Void>) invocation -> null);
 			NoUniqueBeanDefinitionFailureAnalyzer target = new NoUniqueBeanDefinitionFailureAnalyzer(beanFactoryMock);
 			doReturn(beanDefinitionMock).when(beanFactoryMock).getMergedBeanDefinition("String[]");
-			doReturn("return_of_getFactoryMethodName1").when(beanDefinitionMock).getFactoryMethodName();
+			doReturn(null).when(beanDefinitionMock).getFactoryMethodName();
 			doReturn(null).when(beanDefinitionMock).getResourceDescription();
 			Throwable throwable = new Throwable();
-			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "but found ");
+			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "message1");
 			//Act Statement(s)
-			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "");
+			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "description");
 			//Assert statement(s)
 			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock), atLeast(1));
-				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("but found"), atLeast(1));
-				stringUtils.verify(() -> StringUtils.hasText("return_of_getFactoryMethodName1"), atLeast(1));
-				missingParameterNamesFailureAnalyzer.verify(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder), atLeast(1));
-				verify(beanFactoryMock).getMergedBeanDefinition("String[]");
-				verify(beanDefinitionMock).getFactoryMethodName();
-				verify(beanDefinitionMock).getResourceDescription();
-			});
-		}
-	}
-
-	//Sapient generated method id: ${7ac30bfe-bdea-3f14-a549-4a7dcc38f23e}, hash: 338087E24D758E291F261E0080162EE3
-	@Disabled()
-	@Test()
-	void analyze3WhenResourceDescriptionIsNullAndCaughtNoSuchBeanDefinitionException() throws NoSuchBeanDefinitionException {
-		/* Branches:
-		 * (description == null) : false
-		 * (cause.getMessage().contains("but found")) : true  #  inside extractBeanNames method
-		 * (beanNames == null) : false
-		 * (for-each(beanNames)) : true
-		 * (StringUtils.hasText(definition.getFactoryMethodName())) : false  #  inside getDefinitionDescription method
-		 * (resourceDescription != null) : false  #  inside getResourceDescription method
-		 * (catch-exception (NoSuchBeanDefinitionException)) : true  #  inside buildMessage method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
-		//Arrange Statement(s)
-		try (MockedStatic<MissingParameterNamesFailureAnalyzer> missingParameterNamesFailureAnalyzer = mockStatic(MissingParameterNamesFailureAnalyzer.class);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock)).thenAnswer((Answer<Void>) invocation -> null);
-			String[] stringArray = new String[] { "String[]" };
-			stringUtils.when(() -> StringUtils.commaDelimitedListToStringArray("but found")).thenReturn(stringArray);
-			stringUtils.when(() -> StringUtils.hasText("return_of_getFactoryMethodName1")).thenReturn(false);
-			StringBuilder stringBuilder = new StringBuilder();
-			missingParameterNamesFailureAnalyzer.when(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder)).thenAnswer((Answer<Void>) invocation -> null);
-			NoUniqueBeanDefinitionFailureAnalyzer target = new NoUniqueBeanDefinitionFailureAnalyzer(beanFactoryMock);
-			doReturn(beanDefinitionMock).when(beanFactoryMock).getMergedBeanDefinition("String[]");
-			doReturn("return_of_getFactoryMethodName1").when(beanDefinitionMock).getFactoryMethodName();
-			doReturn(null).when(beanDefinitionMock).getResourceDescription();
-			Throwable throwable = new Throwable();
-			NoUniqueBeanDefinitionException noUniqueBeanDefinitionException = new NoUniqueBeanDefinitionException(Object.class, 0, "but found ");
-			//Act Statement(s)
-			FailureAnalysis result = target.analyze(throwable, noUniqueBeanDefinitionException, "");
-			//Assert statement(s)
-			//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.isInstanceOf(ConfigurableBeanFactory.class, beanFactoryMock), atLeast(1));
-				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("but found"), atLeast(1));
-				stringUtils.verify(() -> StringUtils.hasText("return_of_getFactoryMethodName1"), atLeast(1));
+				stringUtils.verify(() -> StringUtils.commaDelimitedListToStringArray("str1"), atLeast(1));
+				stringUtils.verify(() -> StringUtils.hasText((String) null), atLeast(1));
 				missingParameterNamesFailureAnalyzer.verify(() -> MissingParameterNamesFailureAnalyzer.appendPossibility(stringBuilder), atLeast(1));
 				verify(beanFactoryMock).getMergedBeanDefinition("String[]");
 				verify(beanDefinitionMock).getFactoryMethodName();

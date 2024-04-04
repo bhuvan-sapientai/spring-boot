@@ -23,8 +23,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertySapientGeneratedTest {
 
@@ -37,7 +35,6 @@ class ConfigurationPropertySapientGeneratedTest {
 	private final Origin originMock = mock(Origin.class);
 
 	//Sapient generated method id: ${363d3698-f34c-39ad-914f-376a19498023}, hash: 364154EEAABE8D86C73E0469D096C141
-	@Disabled()
 	@Test()
 	void toStringTest() {
 		/*
@@ -98,34 +95,32 @@ class ConfigurationPropertySapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		OriginTrackedValue originTrackedValue = null;
+
 		//Act Statement(s)
 		ConfigurationProperty result = ConfigurationProperty.of(configurationPropertyNameMock, originTrackedValue);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${5ddb9e9b-119c-3723-b99f-1c385f211650}, hash: D2D247A5C6700573ABFB186295B4D0C5
+	//Sapient generated method id: ${5ddb9e9b-119c-3723-b99f-1c385f211650}, hash: 52B2D8D5918F77649276EA27AB753D84
 	@Test()
 	void ofWhenValueIsNotNull() {
 		/* Branches:
 		 * (value == null) : false
 		 */
 		//Arrange Statement(s)
-		OriginTrackedValue valueMock = mock(OriginTrackedValue.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			Object object = new Object();
-			doReturn(object).when(valueMock).getValue();
-			doReturn(originMock).when(valueMock).getOrigin();
 			_assert.when(() -> Assert.notNull(configurationPropertyNameMock, "Name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			Object object = new Object();
 			_assert.when(() -> Assert.notNull(object, "Value must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			OriginTrackedValue originTrackedValue = OriginTrackedValue.of(object, originMock);
 			//Act Statement(s)
-			ConfigurationProperty result = ConfigurationProperty.of(configurationPropertyNameMock, valueMock);
+			ConfigurationProperty result = ConfigurationProperty.of(configurationPropertyNameMock, originTrackedValue);
 			ConfigurationProperty configurationProperty = new ConfigurationProperty(configurationPropertyNameMock, object, originMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(configurationProperty));
-				verify(valueMock).getValue();
-				verify(valueMock).getOrigin();
 				_assert.verify(() -> Assert.notNull(configurationPropertyNameMock, "Name must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(object, "Value must not be null"), atLeast(1));
 			});
@@ -140,8 +135,10 @@ class ConfigurationPropertySapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		Object object = null;
+
 		//Act Statement(s)
 		ConfigurationProperty result = ConfigurationProperty.of(configurationPropertySourceMock, configurationPropertyNameMock, object, originMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}

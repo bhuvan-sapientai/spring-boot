@@ -12,80 +12,50 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class UnboundElementsSourceFilterSapientGeneratedTest {
 
 	private final ConfigurationPropertySource configurationPropertySourceMock = mock(ConfigurationPropertySource.class);
 
-	//Sapient generated method id: ${5f3aefae-6212-3c03-9286-f562997697c1}, hash: 300362C64F9C23AED7ADA1425B9FE962
-	@Disabled()
+	//Sapient generated method id: ${5f3aefae-6212-3c03-9286-f562997697c1}, hash: 52B05A5B5F6D109AFF9D0E078A87E6F5
 	@Test()
 	void applyWhenUnderlyingSourceNotInstanceOfPropertySource() {
 		/* Branches:
 		 * (underlyingSource instanceof PropertySource) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigurationPropertySource configurationPropertySourceMock = mock(ConfigurationPropertySource.class, "Object");
 		Object object = new Object();
 		doReturn(object).when(configurationPropertySourceMock).getUnderlyingSource();
 		UnboundElementsSourceFilter target = new UnboundElementsSourceFilter();
+
 		//Act Statement(s)
 		Boolean result = target.apply(configurationPropertySourceMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
-			assertThat(result, equalTo(Boolean.FALSE));
+			assertThat(result, equalTo(Boolean.TRUE));
 			verify(configurationPropertySourceMock).getUnderlyingSource();
 		});
 	}
 
-	//Sapient generated method id: ${0000fa7d-6b33-3661-a73a-b594448e0a97}, hash: CAEF1E3C0C166B8DFF6F498DD05F872F
-	@Disabled()
+	//Sapient generated method id: ${0000fa7d-6b33-3661-a73a-b594448e0a97}, hash: 85027818AC4341266EE44A5806E5F379
 	@Test()
 	void applyWhenBENIGN_PROPERTY_SOURCE_NAMESNotContainsName() {
 		/* Branches:
 		 * (underlyingSource instanceof PropertySource) : true
 		 * (!BENIGN_PROPERTY_SOURCE_NAMES.contains(name)) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		PropertySource propertySource = PropertySource.named("A");
+		PropertySource propertySource = PropertySource.named("name1");
 		doReturn(propertySource).when(configurationPropertySourceMock).getUnderlyingSource();
 		UnboundElementsSourceFilter target = new UnboundElementsSourceFilter();
-		//Act Statement(s)
-		Boolean result = target.apply(configurationPropertySourceMock);
-		//Assert statement(s)
-		assertAll("result", () -> {
-			assertThat(result, equalTo(Boolean.FALSE));
-			verify(configurationPropertySourceMock).getUnderlyingSource();
-		});
-	}
 
-	//Sapient generated method id: ${3fe2d48d-60a8-3b7b-ac26-5152b14a648a}, hash: 0C6BE450DB0162B495C7C08DB7297B53
-	@Test()
-	void applyWhenBENIGN_PROPERTY_SOURCE_NAMESContainsName() {
-		/* Branches:
-		 * (underlyingSource instanceof PropertySource) : true
-		 * (!BENIGN_PROPERTY_SOURCE_NAMES.contains(name)) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
-		//Arrange Statement(s)
-		PropertySource propertySource = PropertySource.named("systemProperties");
-		doReturn(propertySource).when(configurationPropertySourceMock).getUnderlyingSource();
-		UnboundElementsSourceFilter target = new UnboundElementsSourceFilter();
 		//Act Statement(s)
 		Boolean result = target.apply(configurationPropertySourceMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
-			assertThat(result, equalTo(Boolean.FALSE));
+			assertThat(result, equalTo(Boolean.TRUE));
 			verify(configurationPropertySourceMock).getUnderlyingSource();
 		});
 	}

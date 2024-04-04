@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.bind.BindContext;
 import org.mockito.stubbing.Answer;
 
 import org.springframework.core.ResolvableType;
+import org.springframework.validation.Errors;
 import org.springframework.boot.context.properties.source.ConfigurationProperty;
 import org.springframework.util.Assert;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -200,14 +201,14 @@ class ValidationBindHandlerSapientGeneratedTest {
 		//doReturn(0).when(contextMock).getDepth();
 		//doReturn(true).when(validatorMock).supports(Object.class);
 		//Object object = new Object();
-		//doNothing().when(validatorMock).validate(eq(object), (ValidationBindHandler.ValidationResult) any());
+		//doNothing().when(validatorMock).validate(eq(object), (Errors) any());
 		//_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 		//Validator[] validatorArray = new Validator[] { validatorMock };
 		//ValidationBindHandler target = new ValidationBindHandler(parentMock, validatorArray);
 		//Exception exception = new Exception();
 		//doReturn(object).when(parentMock).onFailure(configurationPropertyNameMock, targetMock, contextMock, exception);
 		//final BindValidationException result = assertThrows(BindValidationException.class, () -> {    target.onFailure(configurationPropertyNameMock, targetMock, contextMock, exception);});
-		//assertAll("result", () -> {    assertThat(result, is(notNullValue()));    verify(targetMock).getBoxedType();    verify(resolvableTypeMock).resolve();    verify(contextMock).getDepth();    verify(validatorMock).supports(Object.class);    verify(validatorMock).validate(eq(object), (ValidationBindHandler.ValidationResult) any());    _assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));    verify(parentMock).onFailure(configurationPropertyNameMock, targetMock, contextMock, exception);});
+		//assertAll("result", () -> {    assertThat(result, is(notNullValue()));    verify(targetMock).getBoxedType();    verify(resolvableTypeMock).resolve();    verify(contextMock).getDepth();    verify(validatorMock).supports(Object.class);    verify(validatorMock).validate(eq(object), (Errors) any());    _assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));    verify(parentMock).onFailure(configurationPropertyNameMock, targetMock, contextMock, exception);});
 	}
 
 	//Sapient generated method id: ${b670b6ae-bd0b-3a1e-88a3-185e0745b766}, hash: 971CA2CE691468BF871BFF4AE548B999
@@ -299,12 +300,12 @@ class ValidationBindHandlerSapientGeneratedTest {
 		//doReturn(0).when(contextMock).getDepth();
 		//doReturn(true).when(validatorMock).supports(Object.class);
 		//Object object = new Object();
-		//doNothing().when(validatorMock).validate(eq(object), (ValidationBindHandler.ValidationResult) any());
+		//doNothing().when(validatorMock).validate(eq(object), (Errors) any());
 		//_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 		//Validator[] validatorArray = new Validator[] { validatorMock };
 		//ValidationBindHandler target = new ValidationBindHandler(parentMock, validatorArray);
 		//final BindValidationException result = assertThrows(BindValidationException.class, () -> {    target.onFinish(configurationPropertyNameMock, targetMock, contextMock, object);});
-		//assertAll("result", () -> {    assertThat(result, is(notNullValue()));    verify(targetMock).getBoxedType();    verify(resolvableTypeMock).resolve();    verify(contextMock).getDepth();    verify(validatorMock).supports(Object.class);    verify(validatorMock).validate(eq(object), (ValidationBindHandler.ValidationResult) any());    _assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));});
+		//assertAll("result", () -> {    assertThat(result, is(notNullValue()));    verify(targetMock).getBoxedType();    verify(resolvableTypeMock).resolve();    verify(contextMock).getDepth();    verify(validatorMock).supports(Object.class);    verify(validatorMock).validate(eq(object), (Errors) any());    _assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));});
 	}
 
 	//Sapient generated method id: ${30bfa1ff-53a1-3693-ac79-5a311bc116f3}, hash: A4C9F00AC2CF022DDB9C60D031D3B717
@@ -318,12 +319,12 @@ class ValidationBindHandlerSapientGeneratedTest {
 		//doReturn(0).when(contextMock).getDepth();
 		//doReturn(true).when(validatorMock).supports(Object.class);
 		//Object object = new Object();
-		//doNothing().when(validatorMock).validate(eq(object), (ValidationBindHandler.ValidationResult) any());
+		//doNothing().when(validatorMock).validate(eq(object), (Errors) any());
 		//_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 		//Validator[] validatorArray = new Validator[] { validatorMock };
 		//ValidationBindHandler target = new ValidationBindHandler(parentMock, validatorArray);
 		//doNothing().when(parentMock).onFinish(configurationPropertyNameMock, targetMock, contextMock, object);
 		//target.onFinish(configurationPropertyNameMock, targetMock, contextMock, object);
-		//assertAll("result", () -> {    verify(targetMock).getBoxedType();    verify(resolvableTypeMock).resolve();    verify(contextMock).getDepth();    verify(validatorMock).supports(Object.class);    verify(validatorMock).validate(eq(object), (ValidationBindHandler.ValidationResult) any());    _assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));    verify(parentMock).onFinish(configurationPropertyNameMock, targetMock, contextMock, object);});
+		//assertAll("result", () -> {    verify(targetMock).getBoxedType();    verify(resolvableTypeMock).resolve();    verify(contextMock).getDepth();    verify(validatorMock).supports(Object.class);    verify(validatorMock).validate(eq(object), (Errors) any());    _assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));    verify(parentMock).onFinish(configurationPropertyNameMock, targetMock, contextMock, object);});
 	}
 }

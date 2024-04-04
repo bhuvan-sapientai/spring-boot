@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.time.Duration;
 
+import org.springframework.context.ApplicationEvent;
 import org.springframework.boot.ConfigurableBootstrapContext;
 
 import org.mockito.MockedStatic;
@@ -52,8 +53,10 @@ class EventPublishingRunListenerSapientGeneratedTest {
 		//Arrange Statement(s)
 		String[] stringArray = new String[] {};
 		EventPublishingRunListener target = new EventPublishingRunListener(applicationMock, stringArray);
+
 		//Act Statement(s)
 		int result = target.getOrder();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(0)));
 	}
@@ -75,8 +78,10 @@ class EventPublishingRunListenerSapientGeneratedTest {
 		Set<ApplicationListener<?>> anySet = new HashSet<>();
 		anySet.add(applicationListenerMock);
 		doReturn(anySet).when(applicationMock).getListeners();
+
 		//Act Statement(s)
 		target.starting(configurableBootstrapContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> verify(applicationMock).getListeners());
 	}
@@ -99,8 +104,10 @@ class EventPublishingRunListenerSapientGeneratedTest {
 		anySet.add(applicationListenerMock);
 		doReturn(anySet).when(applicationMock).getListeners();
 		ConfigurableEnvironment configurableEnvironmentMock = mock(ConfigurableEnvironment.class);
+
 		//Act Statement(s)
 		target.environmentPrepared(configurableBootstrapContextMock, configurableEnvironmentMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> verify(applicationMock).getListeners());
 	}
@@ -123,8 +130,10 @@ class EventPublishingRunListenerSapientGeneratedTest {
 		anySet.add(applicationListenerMock);
 		doReturn(anySet).when(applicationMock).getListeners();
 		ConfigurableApplicationContext configurableApplicationContextMock = mock(ConfigurableApplicationContext.class);
+
 		//Act Statement(s)
 		target.contextPrepared(configurableApplicationContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> verify(applicationMock).getListeners());
 	}
@@ -153,8 +162,10 @@ class EventPublishingRunListenerSapientGeneratedTest {
 		Set<ApplicationListener<?>> anySet2 = new HashSet<>();
 		anySet2.add(applicationListenerMock2);
 		doReturn(anySet, anySet2).when(applicationMock).getListeners();
+
 		//Act Statement(s)
 		target.contextLoaded(contextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			verify(contextMock).addApplicationListener(applicationListenerMock);
@@ -162,12 +173,12 @@ class EventPublishingRunListenerSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${e0963f6c-062e-35ce-b94f-1908590884bd}, hash: F2989AA35EB2FC0C608D350C826BAC35
+	//Sapient generated method id: ${e0963f6c-062e-35ce-b94f-1908590884bd}, hash: 7F09A1C5470BDF241384C54921B4E76D
 	@Test()
 	void startedTest() {
 		//Arrange Statement(s)
 		try (MockedStatic<AvailabilityChangeEvent> availabilityChangeEvent = mockStatic(AvailabilityChangeEvent.class)) {
-			doNothing().when(contextMock).publishEvent((ApplicationStartedEvent) any());
+			doNothing().when(contextMock).publishEvent((ApplicationEvent) any());
 			availabilityChangeEvent.when(() -> AvailabilityChangeEvent.publish(contextMock, LivenessState.CORRECT)).thenAnswer((Answer<Void>) invocation -> null);
 			String[] stringArray = new String[] {};
 			EventPublishingRunListener target = new EventPublishingRunListener(applicationMock, stringArray);
@@ -176,18 +187,18 @@ class EventPublishingRunListenerSapientGeneratedTest {
 			target.started(contextMock, duration);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				verify(contextMock).publishEvent((ApplicationStartedEvent) any());
+				verify(contextMock).publishEvent((ApplicationEvent) any());
 				availabilityChangeEvent.verify(() -> AvailabilityChangeEvent.publish(contextMock, LivenessState.CORRECT), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${40151341-834f-3327-9d6d-0248563b4e54}, hash: 2573A7AE147A43278E2A1E7B938C1332
+	//Sapient generated method id: ${40151341-834f-3327-9d6d-0248563b4e54}, hash: CC2D763C9F2A2A3150FBF10C076EA2FF
 	@Test()
 	void readyTest() {
 		//Arrange Statement(s)
 		try (MockedStatic<AvailabilityChangeEvent> availabilityChangeEvent = mockStatic(AvailabilityChangeEvent.class)) {
-			doNothing().when(contextMock).publishEvent((ApplicationReadyEvent) any());
+			doNothing().when(contextMock).publishEvent((ApplicationEvent) any());
 			availabilityChangeEvent.when(() -> AvailabilityChangeEvent.publish(contextMock, ReadinessState.ACCEPTING_TRAFFIC)).thenAnswer((Answer<Void>) invocation -> null);
 			String[] stringArray = new String[] {};
 			EventPublishingRunListener target = new EventPublishingRunListener(applicationMock, stringArray);
@@ -196,13 +207,13 @@ class EventPublishingRunListenerSapientGeneratedTest {
 			target.ready(contextMock, duration);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				verify(contextMock).publishEvent((ApplicationReadyEvent) any());
+				verify(contextMock).publishEvent((ApplicationEvent) any());
 				availabilityChangeEvent.verify(() -> AvailabilityChangeEvent.publish(contextMock, ReadinessState.ACCEPTING_TRAFFIC), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${87ce5f58-89d8-32e1-a56b-c1f247247abd}, hash: 77056C87FCF30A2EBE01644A2499AC77
+	//Sapient generated method id: ${87ce5f58-89d8-32e1-a56b-c1f247247abd}, hash: F6624D9983A60BF3652E96A821BD2B70
 	@Test()
 	void failedWhenContextIsActive() {
 		/* Branches:
@@ -211,16 +222,18 @@ class EventPublishingRunListenerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		doReturn(true).when(contextMock).isActive();
-		doNothing().when(contextMock).publishEvent((ApplicationFailedEvent) any());
+		doNothing().when(contextMock).publishEvent((ApplicationEvent) any());
 		String[] stringArray = new String[] {};
 		EventPublishingRunListener target = new EventPublishingRunListener(applicationMock, stringArray);
 		Throwable throwable = new Throwable();
+
 		//Act Statement(s)
 		target.failed(contextMock, throwable);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			verify(contextMock).isActive();
-			verify(contextMock).publishEvent((ApplicationFailedEvent) any());
+			verify(contextMock).publishEvent((ApplicationEvent) any());
 		});
 	}
 
@@ -244,8 +257,10 @@ class EventPublishingRunListenerSapientGeneratedTest {
 		String[] stringArray = new String[] {};
 		EventPublishingRunListener target = new EventPublishingRunListener(applicationMock, stringArray);
 		Throwable throwable = new Throwable();
+
 		//Act Statement(s)
 		target.failed(contextMock, throwable);
+
 		//Assert statement(s)
 		assertAll("result", () -> verify(contextMock).isActive());
 	}

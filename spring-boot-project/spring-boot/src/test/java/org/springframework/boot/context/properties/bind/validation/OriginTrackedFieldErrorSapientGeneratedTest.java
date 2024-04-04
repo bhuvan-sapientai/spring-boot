@@ -41,7 +41,7 @@ class OriginTrackedFieldErrorSapientGeneratedTest {
 		assertAll("result", () -> assertThat(result, equalTo(fieldErrorMock)));
 	}
 
-	//Sapient generated method id: ${f83ff2ce-3d42-31e0-8a6d-6022f2f3326b}, hash: 2EED1FC2ED887FB0ADB87143CC1FDFB1
+	//Sapient generated method id: ${f83ff2ce-3d42-31e0-8a6d-6022f2f3326b}, hash: BEDE09F8A61C287154F13E35E6C347C8
 	@Test()
 	void ofWhenOriginIsNotNull() {
 		/* Branches:
@@ -51,19 +51,19 @@ class OriginTrackedFieldErrorSapientGeneratedTest {
 		//Arrange Statement(s)
 		Origin originMock = mock(Origin.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull("objectName1", "Object name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			_assert.when(() -> Assert.notNull("field1", "Field must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.notNull("A", "Object name must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.notNull("B", "Field must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			Object object = new Object();
 			String[] stringArray = new String[] {};
 			Object[] objectArray = new Object[] {};
-			FieldError fieldError = new FieldError("objectName1", "field1", object, false, stringArray, objectArray, "defaultMessage1");
+			FieldError fieldError = new FieldError("A", "B", object, false, stringArray, objectArray, "defaultMessage1");
 			//Act Statement(s)
 			FieldError result = OriginTrackedFieldError.of(fieldError, originMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.notNull("objectName1", "Object name must not be null"), atLeast(1));
-				_assert.verify(() -> Assert.notNull("field1", "Field must not be null"), atLeast(1));
+				_assert.verify(() -> Assert.notNull("A", "Object name must not be null"), atLeast(1));
+				_assert.verify(() -> Assert.notNull("B", "Field must not be null"), atLeast(1));
 			});
 		}
 	}

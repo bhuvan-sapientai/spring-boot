@@ -26,37 +26,33 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class SystemEnvironmentPropertyMapperSapientGeneratedTest {
 
 	private final ConfigurationPropertyName nameMock = mock(ConfigurationPropertyName.class);
 
-	//Sapient generated method id: ${0d351d26-e57f-3cfd-8d08-746ed9b81454}, hash: C9CDE18A8A73D322906B1C3586ACCA3A
-	@Disabled()
+	//Sapient generated method id: ${4bc6d568-33bd-3381-aab0-0eed86d11886}, hash: EC94E9BC2906AB1725636341B1244FB8
 	@Test()
-	void mapWhenResultNotIsEmptyAndNameEqualsLegacyName() {
+	void mapWhenResultIsEmptyAndNameEqualsLegacyName() {
 		/* Branches:
 		 * (i < numberOfElements) : true  #  inside convertName method
-		 * (!result.isEmpty()) : true  #  inside convertName method
+		 * (!result.isEmpty()) : false  #  inside convertName method
 		 * (i < name.getNumberOfElements()) : true  #  inside convertLegacyName method
-		 * (!result.isEmpty()) : true  #  inside convertLegacyName method
+		 * (!result.isEmpty()) : false  #  inside convertLegacyName method
 		 * (name.equals(legacyName)) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
-		doReturn("string").when(nameMock).getElement(0, ConfigurationPropertyName.Form.UNIFORM);
-		doReturn("String").when(nameMock).getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
+		doReturn("_").when(nameMock).getElement(0, ConfigurationPropertyName.Form.UNIFORM);
+		doReturn("-").when(nameMock).getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
 		doReturn(1, 1, 0).when(nameMock).getNumberOfElements();
 		SystemEnvironmentPropertyMapper target = new SystemEnvironmentPropertyMapper();
+
 		//Act Statement(s)
 		List<String> result = target.map(nameMock);
-		List<String> stringResultList = new ArrayList<>(List.of("_STRING"));
+		List<String> stringResultList = new ArrayList<>(List.of("_"));
+
 		//Assert statement(s)
 		assertAll("result", () -> {
-			assertThat(result.size(), equalTo(stringResultList.size()));
+			assertThat(result.size(), equalTo(1));
 			assertThat(result, containsInRelativeOrder(stringResultList.toArray()));
 			verify(nameMock, times(3)).getNumberOfElements();
 			verify(nameMock).getElement(0, ConfigurationPropertyName.Form.UNIFORM);
@@ -64,31 +60,28 @@ class SystemEnvironmentPropertyMapperSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${11c06ecb-0abf-3531-b987-8b008d643352}, hash: 5951147EBB4CFA3C905D93ACE3C67870
-	@Disabled()
+	//Sapient generated method id: ${18d0dda8-e7b4-3e8d-98be-1fa7502e874f}, hash: 32AC8102D8FF19C3EE0631E67F6579A6
 	@Test()
-	void mapWhenResultNotIsEmptyAndNameNotEqualsLegacyName() {
+	void mapWhenResultIsEmptyAndNameNotEqualsLegacyName() {
 		/* Branches:
 		 * (i < numberOfElements) : true  #  inside convertName method
-		 * (!result.isEmpty()) : true  #  inside convertName method
+		 * (!result.isEmpty()) : false  #  inside convertName method
 		 * (i < name.getNumberOfElements()) : true  #  inside convertLegacyName method
-		 * (!result.isEmpty()) : true  #  inside convertLegacyName method
+		 * (!result.isEmpty()) : false  #  inside convertLegacyName method
 		 * (name.equals(legacyName)) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
-		//Arrange Statement(s)
-		doReturn(1).when(nameMock).getNumberOfElements();
 		doReturn("A").when(nameMock).getElement(0, ConfigurationPropertyName.Form.UNIFORM);
-		doReturn("uniform").when(nameMock).getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
+		doReturn("-").when(nameMock).getElement(0, ConfigurationPropertyName.Form.ORIGINAL);
+		doReturn(1, 1, 0).when(nameMock).getNumberOfElements();
 		SystemEnvironmentPropertyMapper target = new SystemEnvironmentPropertyMapper();
+
 		//Act Statement(s)
 		List<String> result = target.map(nameMock);
-		List<String> stringResultList = new ArrayList<>(List.of("_A", "_UNIFORM"));
+		List<String> stringResultList = new ArrayList<>(List.of("A", "_"));
+
 		//Assert statement(s)
 		assertAll("result", () -> {
-			assertThat(result.size(), equalTo(stringResultList.size()));
+			assertThat(result.size(), equalTo(2));
 			assertThat(result, containsInRelativeOrder(stringResultList.toArray()));
 			verify(nameMock, times(3)).getNumberOfElements();
 			verify(nameMock).getElement(0, ConfigurationPropertyName.Form.UNIFORM);
@@ -141,8 +134,10 @@ class SystemEnvironmentPropertyMapperSapientGeneratedTest {
 	void getAncestorOfCheckTest() {
 		//Arrange Statement(s)
 		SystemEnvironmentPropertyMapper target = new SystemEnvironmentPropertyMapper();
+
 		//Act Statement(s)
 		BiPredicate<ConfigurationPropertyName, ConfigurationPropertyName> result = target.getAncestorOfCheck();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
@@ -158,8 +153,10 @@ class SystemEnvironmentPropertyMapperSapientGeneratedTest {
 		doReturn(1).when(nameMock).getNumberOfElements();
 		doReturn("-").when(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
 		SystemEnvironmentPropertyMapper target = new SystemEnvironmentPropertyMapper();
+
 		//Act Statement(s)
 		boolean result = target.hasDashedEntries(nameMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.TRUE));
@@ -178,8 +175,10 @@ class SystemEnvironmentPropertyMapperSapientGeneratedTest {
 		doReturn("").when(nameMock).getElement(0, ConfigurationPropertyName.Form.DASHED);
 		doReturn(1, 0).when(nameMock).getNumberOfElements();
 		SystemEnvironmentPropertyMapper target = new SystemEnvironmentPropertyMapper();
+
 		//Act Statement(s)
 		boolean result = target.hasDashedEntries(nameMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.FALSE));

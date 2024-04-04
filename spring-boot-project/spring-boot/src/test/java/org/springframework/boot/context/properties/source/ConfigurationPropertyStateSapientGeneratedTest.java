@@ -2,57 +2,59 @@ package org.springframework.boot.context.properties.source;
 
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import org.mockito.stubbing.Answer;
 import org.mockito.MockedStatic;
+
+import java.util.ArrayList;
 
 import org.springframework.util.Assert;
 
 import java.util.function.Predicate;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-
-import org.junit.jupiter.api.Disabled;
+import static org.mockito.Mockito.doReturn;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertyStateSapientGeneratedTest {
 
-	private final Iterable iterableMock = mock(Iterable.class);
-
-	private final Predicate predicateMock = mock(Predicate.class);
-
-	//Sapient generated method id: ${06fff9e8-aab3-3323-9bf4-83f0394f49b3}, hash: 5042F8ACAF76E418CCB7C9C1AE145946
-	@Disabled()
+	//Sapient generated method id: ${06fff9e8-aab3-3323-9bf4-83f0394f49b3}, hash: C8A6028B6F609EF8DB44917755B9C8B1
 	@Test()
 	void searchWhenPredicateTestItem() {
 		/* Branches:
 		 * (for-each(source)) : true
 		 * (predicate.test(item)) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull(iterableMock, "Source must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+		Predicate<Object> predicateMock = mock(Predicate.class);
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS)) {
+			Object object = new Object();
+			doReturn(true).when(predicateMock).test(object);
 			_assert.when(() -> Assert.notNull(predicateMock, "Predicate must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			Iterable<Object> iterable = new ArrayList<>(List.of(object));
 			//Act Statement(s)
-			ConfigurationPropertyState result = ConfigurationPropertyState.search(iterableMock, predicateMock);
+			ConfigurationPropertyState result = ConfigurationPropertyState.search(iterable, predicateMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(ConfigurationPropertyState.PRESENT));
-				_assert.verify(() -> Assert.notNull(iterableMock, "Source must not be null"), atLeast(1));
+				verify(predicateMock, atLeast(1)).test(object);
 				_assert.verify(() -> Assert.notNull(predicateMock, "Predicate must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${f328f7bb-da87-3b6f-9463-4aa7094b1003}, hash: 7E85945C1612E2BFDDCF0E876DEAF019
-	@Disabled()
+	//Sapient generated method id: ${f328f7bb-da87-3b6f-9463-4aa7094b1003}, hash: 25B19A478BCDF761A0CDFFA951CFBC89
 	@Test()
 	void searchWhenPredicateNotTestItem() {
 		/* Branches:
@@ -63,15 +65,18 @@ class ConfigurationPropertyStateSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		Predicate predicateMock = mock(Predicate.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull(iterableMock, "Source must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.notNull((Iterable) any(), eq("Source must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(predicateMock, "Predicate must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			Object object = new Object();
+			Iterable<Object> iterable = new ArrayList<>(List.of(object));
 			//Act Statement(s)
-			ConfigurationPropertyState result = ConfigurationPropertyState.search(iterableMock, predicateMock);
+			ConfigurationPropertyState result = ConfigurationPropertyState.search(iterable, predicateMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(ConfigurationPropertyState.ABSENT));
-				_assert.verify(() -> Assert.notNull(iterableMock, "Source must not be null"), atLeast(1));
+				_assert.verify(() -> Assert.notNull((Iterable) any(), eq("Source must not be null")));
 				_assert.verify(() -> Assert.notNull(predicateMock, "Predicate must not be null"), atLeast(1));
 			});
 		}

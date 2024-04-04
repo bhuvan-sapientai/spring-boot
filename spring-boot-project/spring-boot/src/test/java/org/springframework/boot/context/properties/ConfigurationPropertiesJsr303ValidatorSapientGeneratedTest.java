@@ -21,61 +21,73 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertiesJsr303ValidatorSapientGeneratedTest {
 
 	private final ApplicationContext applicationContextMock = mock(ApplicationContext.class);
 
 	//Sapient generated method id: ${b0fd6193-6bc2-3249-baf1-975b64959d5f}, hash: 7D34D181554BAE49DF815049FE6C4BF8
-	@Disabled()
 	@Test()
 	void supportsWhenThisDelegateSupportsType() {
 		/* Branches:
 		 * (this.delegate.supports(type)) : true
 		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 * TODO: Help needed! This method is not unit testable!
+		 *  Following variables could not be isolated/mocked: delegate
+		 *  Suggestions:
+		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
+		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		ConfigurationPropertiesJsr303Validator target = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
+
 		//Act Statement(s)
 		boolean result = target.supports(Object.class);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(Boolean.TRUE)));
 	}
 
 	//Sapient generated method id: ${195f945e-2726-31ec-ab88-a6194c87df0a}, hash: AF498B75D8A49C6EC63BB0B0595D2632
-	@Disabled()
 	@Test()
 	void supportsWhenThisDelegateNotSupportsType() {
 		/* Branches:
 		 * (this.delegate.supports(type)) : false
 		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 * TODO: Help needed! This method is not unit testable!
+		 *  Following variables could not be isolated/mocked: delegate
+		 *  Suggestions:
+		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
+		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		ConfigurationPropertiesJsr303Validator target = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
+
 		//Act Statement(s)
 		boolean result = target.supports(Object.class);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(Boolean.FALSE)));
 	}
 
 	//Sapient generated method id: ${d6258f2b-2170-3e1b-a0f4-0e909ecdbd95}, hash: 0E77ADFC2C8D178050BB874316B13FF0
-	@Disabled()
 	@Test()
 	void validateTest() {
 		/*
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 * TODO: Help needed! This method is not unit testable!
+		 *  Following variables could not be isolated/mocked: delegate
+		 *  Suggestions:
+		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
+		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		ConfigurationPropertiesJsr303Validator target = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
 		Object object = new Object();
 		Errors errorsMock = mock(Errors.class);
+
 		//Act Statement(s)
 		target.validate(object, errorsMock);
 	}

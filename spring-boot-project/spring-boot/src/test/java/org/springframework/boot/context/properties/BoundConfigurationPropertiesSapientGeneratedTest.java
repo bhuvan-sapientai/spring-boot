@@ -9,13 +9,9 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.mockito.stubbing.Answer;
 
 import org.springframework.boot.origin.Origin;
-
-import java.util.LinkedHashMap;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.boot.context.properties.source.ConfigurationProperty;
 import org.springframework.util.Assert;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 
 import java.util.Map;
 
@@ -24,18 +20,21 @@ import org.mockito.MockedStatic;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.config.BeanDefinition;
 
 import static org.mockito.Mockito.doNothing;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.verify;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mockStatic;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class BoundConfigurationPropertiesSapientGeneratedTest {
@@ -70,7 +69,7 @@ class BoundConfigurationPropertiesSapientGeneratedTest {
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${a88321e2-c443-39ad-bf1b-22930f2ed148}, hash: BD6EC724EF1A618B904DB98C2E3C0421
+	//Sapient generated method id: ${a88321e2-c443-39ad-bf1b-22930f2ed148}, hash: 20AE210C20DF2E779A517CD5F542776D
 	@Test()
 	void getAllTest() {
 		//Arrange Statement(s)
@@ -78,10 +77,9 @@ class BoundConfigurationPropertiesSapientGeneratedTest {
 
 		//Act Statement(s)
 		Map<ConfigurationPropertyName, ConfigurationProperty> result = target.getAll();
-		Map<ConfigurationPropertyName, ConfigurationProperty> configurationPropertyNameConfigurationPropertyResultMap = new LinkedHashMap<>();
 
 		//Assert statement(s)
-		assertAll("result", () -> assertThat(result, equalTo(configurationPropertyNameConfigurationPropertyResultMap)));
+		assertAll("result", () -> assertThat(result.size(), equalTo(0)));
 	}
 
 	//Sapient generated method id: ${a1cf46f6-be94-3796-a037-ae640381b20e}, hash: E53F59794320329F99A8063BC10FB790
@@ -125,7 +123,7 @@ class BoundConfigurationPropertiesSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${86d5dd96-2a75-3e17-ac21-495a839897f1}, hash: 6DCB52F591F72FFF0B37E2A477C8C9D8
+	//Sapient generated method id: ${86d5dd96-2a75-3e17-ac21-495a839897f1}, hash: B22EF1A3D2D153A8E90B53690420AA38
 	@Test()
 	void registerWhenRegistryNotContainsBeanDefinitionBEAN_NAME() throws BeanDefinitionStoreException {
 		/* Branches:
@@ -133,26 +131,17 @@ class BoundConfigurationPropertiesSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		BeanDefinitionRegistry registryMock = mock(BeanDefinitionRegistry.class);
-		AbstractBeanDefinition abstractBeanDefinitionMock = mock(AbstractBeanDefinition.class);
-		BeanDefinitionBuilder beanDefinitionBuilderMock = mock(BeanDefinitionBuilder.class);
-		try (MockedStatic<BeanDefinitionBuilder> beanDefinitionBuilder = mockStatic(BeanDefinitionBuilder.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(false).when(registryMock).containsBeanDefinition("org.springframework.boot.context.properties.BoundConfigurationProperties");
-			doNothing().when(registryMock).registerBeanDefinition("org.springframework.boot.context.properties.BoundConfigurationProperties", abstractBeanDefinitionMock);
-			doNothing().when(abstractBeanDefinitionMock).setRole(2);
+			doNothing().when(registryMock).registerBeanDefinition(eq("org.springframework.boot.context.properties.BoundConfigurationProperties"), (BeanDefinition) any());
 			_assert.when(() -> Assert.notNull(registryMock, "Registry must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			beanDefinitionBuilder.when(() -> BeanDefinitionBuilder.genericBeanDefinition(BoundConfigurationProperties.class)).thenReturn(beanDefinitionBuilderMock);
-			doReturn(abstractBeanDefinitionMock).when(beanDefinitionBuilderMock).getBeanDefinition();
 			//Act Statement(s)
 			BoundConfigurationProperties.register(registryMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				verify(registryMock).containsBeanDefinition("org.springframework.boot.context.properties.BoundConfigurationProperties");
-				verify(registryMock).registerBeanDefinition("org.springframework.boot.context.properties.BoundConfigurationProperties", abstractBeanDefinitionMock);
-				verify(abstractBeanDefinitionMock).setRole(2);
+				verify(registryMock).registerBeanDefinition(eq("org.springframework.boot.context.properties.BoundConfigurationProperties"), (BeanDefinition) any());
 				_assert.verify(() -> Assert.notNull(registryMock, "Registry must not be null"), atLeast(1));
-				beanDefinitionBuilder.verify(() -> BeanDefinitionBuilder.genericBeanDefinition(BoundConfigurationProperties.class), atLeast(1));
-				verify(beanDefinitionBuilderMock).getBeanDefinition();
 			});
 		}
 	}

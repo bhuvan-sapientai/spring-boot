@@ -18,8 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class FileEncodingApplicationListenerSapientGeneratedTest {
 
@@ -40,14 +38,15 @@ class FileEncodingApplicationListenerSapientGeneratedTest {
 		FileEncodingApplicationListener target = new FileEncodingApplicationListener();
 		String[] stringArray = new String[] {};
 		ApplicationEnvironmentPreparedEvent applicationEnvironmentPreparedEvent = new ApplicationEnvironmentPreparedEvent(configurableBootstrapContextMock, springApplicationMock, stringArray, environmentMock);
+
 		//Act Statement(s)
 		target.onApplicationEvent(applicationEnvironmentPreparedEvent);
+
 		//Assert statement(s)
 		assertAll("result", () -> verify(environmentMock).getProperty("spring.mandatory-file-encoding"));
 	}
 
 	//Sapient generated method id: ${dd92fe74-4b53-31b0-9ac9-f5b39cecb33a}, hash: BA056B8DA145BF726B1343518E1A4BA5
-	@Disabled()
 	@Test()
 	void onApplicationEventWhenDesiredEqualsIgnoreCaseEncoding() {
 		/* Branches:
@@ -67,8 +66,10 @@ class FileEncodingApplicationListenerSapientGeneratedTest {
 		FileEncodingApplicationListener target = new FileEncodingApplicationListener();
 		String[] stringArray = new String[] {};
 		ApplicationEnvironmentPreparedEvent applicationEnvironmentPreparedEvent = new ApplicationEnvironmentPreparedEvent(configurableBootstrapContextMock, springApplicationMock, stringArray, environmentMock);
+
 		//Act Statement(s)
 		target.onApplicationEvent(applicationEnvironmentPreparedEvent);
+
 		//Assert statement(s)
 		assertAll("result", () -> verify(environmentMock).getProperty("spring.mandatory-file-encoding"));
 	}
@@ -99,6 +100,7 @@ class FileEncodingApplicationListenerSapientGeneratedTest {
 		final IllegalStateException result = assertThrows(IllegalStateException.class, () -> {
 			target.onApplicationEvent(applicationEnvironmentPreparedEvent);
 		});
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(notNullValue()));

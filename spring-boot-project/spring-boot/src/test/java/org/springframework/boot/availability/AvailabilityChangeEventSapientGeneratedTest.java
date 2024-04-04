@@ -10,6 +10,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.core.ResolvableType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
+import org.springframework.context.ApplicationEvent;
 
 import org.mockito.MockedStatic;
 
@@ -25,8 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
-
-import org.junit.jupiter.api.Disabled;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class AvailabilityChangeEventSapientGeneratedTest {
@@ -65,7 +64,6 @@ class AvailabilityChangeEventSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${0fdcc628-f655-30f9-a6a4-254974870393}, hash: 9000FDC4231625F8DB9E5E1490B31631
-	@Disabled()
 	@Test()
 	void getResolvableTypeWhenStateNotInstanceOfEnum() {
 		/* Branches:
@@ -122,7 +120,7 @@ class AvailabilityChangeEventSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${125fc076-78de-38a4-953e-6a261fd08c0c}, hash: 1740D041D208DD0FEB247FD1F62BA32B
+	//Sapient generated method id: ${125fc076-78de-38a4-953e-6a261fd08c0c}, hash: ED1C37CFB24F333E103765C5FB4FF581
 	@Test()
 	void publish1Test() {
 		/*
@@ -137,7 +135,7 @@ class AvailabilityChangeEventSapientGeneratedTest {
 		ApplicationEventPublisher publisherMock = mock(ApplicationEventPublisher.class);
 		try (MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			doNothing().when(publisherMock).publishEvent((AvailabilityChangeEvent) any());
+			doNothing().when(publisherMock).publishEvent((ApplicationEvent) any());
 			_assert.when(() -> Assert.notNull(publisherMock, "Publisher must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(availabilityStateMock, "Payload must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			resolvableType.when(() -> ResolvableType.forInstance(availabilityStateMock)).thenReturn(resolvableTypeMock);
@@ -146,7 +144,7 @@ class AvailabilityChangeEventSapientGeneratedTest {
 			AvailabilityChangeEvent.publish(publisherMock, object, availabilityStateMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
-				verify(publisherMock).publishEvent((AvailabilityChangeEvent) any());
+				verify(publisherMock).publishEvent((ApplicationEvent) any());
 				_assert.verify(() -> Assert.notNull(publisherMock, "Publisher must not be null"), atLeast(1));
 				_assert.verify(() -> Assert.notNull(availabilityStateMock, "Payload must not be null"), atLeast(1));
 				resolvableType.verify(() -> ResolvableType.forInstance(availabilityStateMock), atLeast(1));

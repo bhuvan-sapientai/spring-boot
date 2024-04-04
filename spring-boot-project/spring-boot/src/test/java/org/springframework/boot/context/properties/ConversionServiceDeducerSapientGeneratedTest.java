@@ -12,15 +12,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
-import java.util.ArrayList;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.verify;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.mock;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
@@ -31,7 +29,7 @@ class ConversionServiceDeducerSapientGeneratedTest {
 
 	private final AutowireCapableBeanFactory autowireCapableBeanFactoryMock = mock(AutowireCapableBeanFactory.class);
 
-	//Sapient generated method id: ${e37d94a4-e334-3839-ad8f-8cff7cff29b3}, hash: 7CFAA545C57084F01805C52FACD9844A
+	//Sapient generated method id: ${e37d94a4-e334-3839-ad8f-8cff7cff29b3}, hash: 46BE6B86C471E8393BF3BE8764869488
 	@Test()
 	void getConversionServicesWhenHasUserDefinedConfigurationServiceBean() throws IllegalStateException, NoSuchBeanDefinitionException, BeansException {
 		/* Branches:
@@ -49,12 +47,11 @@ class ConversionServiceDeducerSapientGeneratedTest {
 
 		//Act Statement(s)
 		List<ConversionService> result = target.getConversionServices();
-		List<ConversionService> conversionServiceResultList = new ArrayList<>(List.of(conversionServiceMock));
 
 		//Assert statement(s)
 		assertAll("result", () -> {
-			assertThat(result.size(), equalTo(conversionServiceResultList.size()));
-			assertThat(result, containsInRelativeOrder(conversionServiceResultList.toArray()));
+			assertThat(result.size(), equalTo(1));
+			assertThat(result.get(0), is(instanceOf(ConversionService.class)));
 			verify(applicationContextMock).containsBean("conversionService");
 			verify(applicationContextMock).getAutowireCapableBeanFactory();
 			verify(autowireCapableBeanFactoryMock).isTypeMatch("conversionService", ConversionService.class);

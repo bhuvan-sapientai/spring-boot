@@ -26,8 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class StandardConfigDataResourceSapientGeneratedTest {
 
@@ -57,24 +55,20 @@ class StandardConfigDataResourceSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${c5555d08-d01a-3a52-a66e-e1e21ecbfbf3}, hash: 2D5A6D5892D83401E81DA9BA8ADE6018
-	@Disabled()
+	//Sapient generated method id: ${c5555d08-d01a-3a52-a66e-e1e21ecbfbf3}, hash: 7ADA4127A6E81F426E3F17778E2A40F3
 	@Test()
 	void toStringWhenThisResourceInstanceOfFileUrlResource() throws IOException {
 		/* Branches:
 		 * (this.resource instanceof FileSystemResource) : false
 		 * (this.resource instanceof FileUrlResource) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		File fileMock = mock(File.class, "toString_file1");
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull(referenceMock, "Reference must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			_assert.when(() -> Assert.notNull(resourceMock, "Resource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			StandardConfigDataResource target = new StandardConfigDataResource(referenceMock, resourceMock, false);
-			File file = new File("pathname1");
-			doReturn(file).when(resourceMock).getFile();
+			doReturn(fileMock).when(resourceMock).getFile();
 			//Act Statement(s)
 			String result = target.toString();
 			//Assert statement(s)
@@ -112,7 +106,6 @@ class StandardConfigDataResourceSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${75dc4ff8-2cf2-313b-a667-5df014450199}, hash: 1F23D563E281630D85492F655E4B1C88
-	@Disabled()
 	@Test()
 	void toStringWhenCaughtIOException() throws IOException {
 		/* Branches:

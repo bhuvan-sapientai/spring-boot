@@ -43,8 +43,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ValueObjectBinderSapientGeneratedTest {
 
@@ -52,7 +50,7 @@ class ValueObjectBinderSapientGeneratedTest {
 
 	private final BindConverter bindConverterMock = mock(BindConverter.class);
 
-	private final Bindable<Object> bindableMock = mock(Bindable.class);
+	private final Bindable bindableMock = mock(Bindable.class);
 
 	private final Binder.Context binderContextMock = mock(Binder.Context.class);
 
@@ -68,10 +66,7 @@ class ValueObjectBinderSapientGeneratedTest {
 
 	private final ResolvableType resolvableTypeMock2 = mock(ResolvableType.class);
 
-	private final Bindable<Object> targetMock = mock(Bindable.class);
-
-	//Sapient generated method id: ${396b0ce3-400d-3549-b5a7-5b74cebdca3d}, hash: FCF152ED780C4C1B6A6767F61FB4F44E
-	@Disabled()
+	//Sapient generated method id: ${396b0ce3-400d-3549-b5a7-5b74cebdca3d}, hash: EC34E7F2DB2981218AC5CE5D9E228F61
 	@Test()
 	void bindWhenValueObjectIsNull() {
 		/* Branches:
@@ -83,14 +78,17 @@ class ValueObjectBinderSapientGeneratedTest {
 		//Arrange Statement(s)
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
 		ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("bind_configurationPropertyName1-name1");
+		Object object = new Object();
+		Bindable bindable = Bindable.ofInstance(object);
+
 		//Act Statement(s)
-		Object result = target.bind(configurationPropertyName, bindableMock, binderContextMock, dataObjectPropertyBinderMock);
+		Object result = target.bind(configurationPropertyName, bindable, binderContextMock, dataObjectPropertyBinderMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${a8ebfbf7-690c-3476-ad27-c3f187a7527e}, hash: D044A1BE8A6F62EFA50759881D7B91C2
-	@Disabled()
+	//Sapient generated method id: ${a8ebfbf7-690c-3476-ad27-c3f187a7527e}, hash: B07531EC33AEC7A8CD5228F079C72708
 	@Test()
 	void bindWhenBound() {
 		/* Branches:
@@ -105,29 +103,28 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		doReturn(resolvableTypeMock).when(targetMock).getType();
-		doReturn(Object.class).when(resolvableTypeMock).resolve();
 		doNothing().when(contextMock).pushConstructorBoundTypes(Object.class);
 		doNothing().when(contextMock).clearConfigurationProperty();
 		doNothing().when(contextMock).popConstructorBoundTypes();
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
 		ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("bind_configurationPropertyName1-name1");
+		Object object = new Object();
+		Bindable bindable = Bindable.ofInstance(object);
+
 		//Act Statement(s)
-		Object result = target.bind(configurationPropertyName, targetMock, contextMock, dataObjectPropertyBinderMock);
+		Object result = target.bind(configurationPropertyName, bindable, contextMock, dataObjectPropertyBinderMock);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
 			assertThat(result, is(notNullValue()));
-			verify(targetMock).getType();
-			verify(resolvableTypeMock).resolve();
 			verify(contextMock).pushConstructorBoundTypes(Object.class);
 			verify(contextMock).clearConfigurationProperty();
 			verify(contextMock).popConstructorBoundTypes();
 		});
 	}
 
-	//Sapient generated method id: ${d9ae5de6-dae4-33a2-85b1-27dcf8cc78a4}, hash: A109FF026F7A8F7CAE4EC67CA36A5F49
-	@Disabled()
+	//Sapient generated method id: ${d9ae5de6-dae4-33a2-85b1-27dcf8cc78a4}, hash: 78D42A6670D8C5870CC75D832DD8A73B
 	@Test()
 	void bindWhenAnnotationNotInstanceOfDefaultValueAndNotBound() {
 		/* Branches:
@@ -144,28 +141,27 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		doReturn(resolvableTypeMock).when(targetMock).getType();
-		doReturn(Object.class).when(resolvableTypeMock).resolve();
 		doNothing().when(contextMock).pushConstructorBoundTypes(Object.class);
 		doNothing().when(contextMock).clearConfigurationProperty();
 		doNothing().when(contextMock).popConstructorBoundTypes();
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
 		ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("bind_configurationPropertyName1-name1");
+		Object object = new Object();
+		Bindable bindable = Bindable.ofInstance(object);
+
 		//Act Statement(s)
-		Object result = target.bind(configurationPropertyName, targetMock, contextMock, dataObjectPropertyBinderMock);
+		Object result = target.bind(configurationPropertyName, bindable, contextMock, dataObjectPropertyBinderMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(nullValue()));
-			verify(targetMock).getType();
-			verify(resolvableTypeMock).resolve();
 			verify(contextMock).pushConstructorBoundTypes(Object.class);
 			verify(contextMock).clearConfigurationProperty();
 			verify(contextMock).popConstructorBoundTypes();
 		});
 	}
 
-	//Sapient generated method id: ${e7777e7a-937a-3703-905e-a47723d7f6f8}, hash: FD8D5EC69BE886EA590EE7E27CF1D74A
-	@Disabled()
+	//Sapient generated method id: ${e7777e7a-937a-3703-905e-a47723d7f6f8}, hash: E071FED6BE6B68C969DAE349BBE3AF93
 	@Test()
 	void bindWhenDefaultValueLengthNotEquals0AndNotBound() {
 		/* Branches:
@@ -183,29 +179,29 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		doReturn(resolvableTypeMock).when(targetMock).getType();
-		doReturn(Object.class).when(resolvableTypeMock).resolve();
 		doNothing().when(contextMock).pushConstructorBoundTypes(Object.class);
 		doReturn(bindConverterMock).when(contextMock).getConverter();
 		Object object = new Object();
 		String[] stringArray = new String[] { "return_of_valueItem1" };
 		Annotation[] annotationArray = new Annotation[] { defaultValueMock };
-		doReturn(object).when(bindConverterMock).convert(stringArray, resolvableTypeMock2, annotationArray);
+		doReturn(object).when(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
 		doReturn(stringArray).when(defaultValueMock).value();
 		doNothing().when(contextMock).clearConfigurationProperty();
 		doNothing().when(contextMock).popConstructorBoundTypes();
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
 		ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("bind_configurationPropertyName1-name1");
+		Object object2 = new Object();
+		Bindable bindable = Bindable.ofInstance(object2);
+
 		//Act Statement(s)
-		Object result = target.bind(configurationPropertyName, targetMock, contextMock, dataObjectPropertyBinderMock);
+		Object result = target.bind(configurationPropertyName, bindable, contextMock, dataObjectPropertyBinderMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(nullValue()));
-			verify(targetMock).getType();
-			verify(resolvableTypeMock).resolve();
 			verify(contextMock).pushConstructorBoundTypes(Object.class);
 			verify(contextMock).getConverter();
-			verify(bindConverterMock).convert(stringArray, resolvableTypeMock2, annotationArray);
+			verify(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
 			verify(defaultValueMock).value();
 			verify(contextMock).clearConfigurationProperty();
 			verify(contextMock).popConstructorBoundTypes();
@@ -213,7 +209,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${a5badf6e-60f5-3ad5-b6f5-dbd66cf45559}, hash: C9E4F9445FE9BDF26F382CBF3726313C
-	@Disabled()
 	@Test()
 	void bindWhenDefaultValueLengthNotEquals1ThrowsConversionException() {
 		/* Branches:
@@ -246,6 +241,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		final ConversionException result = assertThrows(ConversionException.class, () -> {
 			target.bind(configurationPropertyNameMock, bindable, contextMock, dataObjectPropertyBinderMock);
 		});
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(notNullValue()));
@@ -257,8 +253,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${2c19e2c5-9a2b-3fc5-b5a6-106a12f8424d}, hash: D9A7EC1ACBC718E7D8CAFD4EC54D79E5
-	@Disabled()
+	//Sapient generated method id: ${2c19e2c5-9a2b-3fc5-b5a6-106a12f8424d}, hash: 664019B63947E13CCDC11E30DBF3446E
 	@Test()
 	void bindWhenDefaultValueLengthEquals1AndNotBound() {
 		/* Branches:
@@ -278,40 +273,39 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		doReturn(resolvableTypeMock).when(targetMock).getType();
-		doReturn(Object.class).when(resolvableTypeMock).resolve();
 		doNothing().when(contextMock).pushConstructorBoundTypes(Object.class);
 		doReturn(bindConverterMock).when(contextMock).getConverter();
 		Object object = new Object();
 		String[] stringArray = new String[] { "return_of_valueItem1" };
 		Annotation[] annotationArray = new Annotation[] { defaultValueMock };
-		doReturn(object).when(bindConverterMock).convert(stringArray, resolvableTypeMock2, annotationArray);
+		doReturn(object).when(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
 		doReturn(stringArray).when(defaultValueMock).value();
 		Object object2 = new Object();
-		doReturn(object2).when(bindConverterMock).convert("return_of_valueItem1", resolvableTypeMock2, annotationArray);
+		doReturn(object2).when(bindConverterMock).convert("return_of_valueItem1", resolvableTypeMock, annotationArray);
 		doNothing().when(contextMock).clearConfigurationProperty();
 		doNothing().when(contextMock).popConstructorBoundTypes();
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
 		ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("bind_configurationPropertyName1-name1");
+		Object object3 = new Object();
+		Bindable bindable = Bindable.ofInstance(object3);
+
 		//Act Statement(s)
-		Object result = target.bind(configurationPropertyName, targetMock, contextMock, dataObjectPropertyBinderMock);
+		Object result = target.bind(configurationPropertyName, bindable, contextMock, dataObjectPropertyBinderMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(nullValue()));
-			verify(targetMock).getType();
-			verify(resolvableTypeMock).resolve();
 			verify(contextMock).pushConstructorBoundTypes(Object.class);
 			verify(contextMock).getConverter();
-			verify(bindConverterMock).convert(stringArray, resolvableTypeMock2, annotationArray);
+			verify(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
 			verify(defaultValueMock).value();
-			verify(bindConverterMock).convert("return_of_valueItem1", resolvableTypeMock2, annotationArray);
+			verify(bindConverterMock).convert("return_of_valueItem1", resolvableTypeMock, annotationArray);
 			verify(contextMock).clearConfigurationProperty();
 			verify(contextMock).popConstructorBoundTypes();
 		});
 	}
 
-	//Sapient generated method id: ${6ba5b61f-8186-3e9c-a08d-2dcded05eb3b}, hash: 18F9F4B48DEA67C0F41423304570198F
-	@Disabled()
+	//Sapient generated method id: ${6ba5b61f-8186-3e9c-a08d-2dcded05eb3b}, hash: 667E8175A102CCD324AD3185A24F72B0
 	@Test()
 	void bindWhenResolvedIsNullAndNotBound() {
 		/* Branches:
@@ -333,7 +327,6 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable bindableMock = mock(Bindable.class);
 		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(Object.class).when(resolvableTypeMock).resolve();
@@ -364,7 +357,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${5b77b4cf-8c75-3e57-aa2c-5c1a50861d7d}, hash: 22072BDE93AD05CD40508EFA37B7E2B8
-	@Disabled()
 	@Test()
 	void bindWhenResolvedIsNotNullAndOptionalEqualsResolvedAndNotBound() {
 		/* Branches:
@@ -414,7 +406,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${7c70f353-9d72-39e5-b5e0-051ad1348ef8}, hash: AF4415F9EE4EA26E372615926F3B1795
-	@Disabled()
 	@Test()
 	void bindWhenCollectionIsAssignableFromResolvedAndNotBound() {
 		/* Branches:
@@ -469,7 +460,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${6c65c349-2304-370d-a1a9-f355b25a6323}, hash: 0B98670C7C0EAE002C64B1CD086982CA
-	@Disabled()
 	@Test()
 	void bindWhenMapIsAssignableFromResolvedAndNotBound() {
 		/* Branches:
@@ -525,7 +515,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${f93eab2a-79a6-3949-9e08-7bdccda1deec}, hash: 4F346FB0488D31DC16C87FDE752FC6C4
-	@Disabled()
 	@Test()
 	void bindWhenResolvedIsArrayAndNotBound() {
 		/* Branches:
@@ -577,8 +566,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${2cc03739-dbce-300a-bcab-aab6318f1001}, hash: CC2BD8D47AC6850998743B05CA906694
-	@Disabled()
+	//Sapient generated method id: ${2cc03739-dbce-300a-bcab-aab6318f1001}, hash: ECF9E2799AFB52FDE41BD0C50C49DCA0
 	@Test()
 	void bindWhenResolvedNotIsArrayAndInstanceIsNotNullAndNotBound() {
 		/* Branches:
@@ -609,7 +597,6 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable bindableMock = mock(Bindable.class);
 		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(Object.class).when(resolvableTypeMock).resolve();
@@ -640,8 +627,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${8b91121e-a2be-39c9-a6c5-baf0c8ad6f77}, hash: 8318F2C1E5E70629A6E9DF8C5C23465C
-	@Disabled()
+	//Sapient generated method id: ${8b91121e-a2be-39c9-a6c5-baf0c8ad6f77}, hash: EF974CC0B3663B6FC08CDAC0759A1371
 	@Test()
 	void bindWhenResolvedNotIsArrayAndInstanceIsNullAndResolvedIsNotNullAndNotBound() {
 		/* Branches:
@@ -676,7 +662,6 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable bindableMock = mock(Bindable.class);
 		try (MockedStatic<BeanUtils> beanUtils = mockStatic(BeanUtils.class);
 			 MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
@@ -710,8 +695,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${be5b17f5-6362-3d9a-9425-1d56441fb1ef}, hash: DA114D42BEF01BDA9CE120CCA9E2B866
-	@Disabled()
+	//Sapient generated method id: ${be5b17f5-6362-3d9a-9425-1d56441fb1ef}, hash: 79F6C4DC865F39715011417811B2FB2F
 	@Test()
 	void bindWhenMapNotIsAssignableFromResolvedAndResolvedNotIsArrayAndInstanceIsNullAndResolvedIsNotNullAndNotBound() {
 		/* Branches:
@@ -746,7 +730,6 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable bindableMock = mock(Bindable.class);
 		try (MockedStatic<BeanUtils> beanUtils = mockStatic(BeanUtils.class);
 			 MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
@@ -780,8 +763,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${9c267fdf-62c0-3872-adfb-821555fde66f}, hash: C5970E01287ACFF95F44E106DDC94F6E
-	@Disabled()
+	//Sapient generated method id: ${9c267fdf-62c0-3872-adfb-821555fde66f}, hash: 2C171A529F52BAF21F988299DBC454B1
 	@Test()
 	void createWhenValueObjectIsNull() {
 		/* Branches:
@@ -792,14 +774,17 @@ class ValueObjectBinderSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
+		Object object = new Object();
+		Bindable bindable = Bindable.ofInstance(object);
+
 		//Act Statement(s)
-		Object result = target.create(bindableMock, binderContextMock);
+		Object result = target.create(bindable, binderContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${85b45b51-d56e-36e8-8017-5dca8e66ede3}, hash: EC537C869A3C205BB7CB3581CAEC2CEF
-	@Disabled()
+	//Sapient generated method id: ${85b45b51-d56e-36e8-8017-5dca8e66ede3}, hash: 7C2C961D49AD76F0AF708BD00E29C4A3
 	@Test()
 	void createWhenAnnotationNotInstanceOfDefaultValue() {
 		/* Branches:
@@ -813,15 +798,18 @@ class ValueObjectBinderSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
+		Object object = new Object();
+		Bindable bindable = Bindable.ofInstance(object);
+
 		//Act Statement(s)
-		Object result = target.create(bindableMock, binderContextMock);
+		Object result = target.create(bindable, binderContextMock);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${f7a9c911-158c-3edf-9684-e66e05956f1e}, hash: EF84E9687E02ED81AB39AEF6AFE580D8
-	@Disabled()
+	//Sapient generated method id: ${f7a9c911-158c-3edf-9684-e66e05956f1e}, hash: 890B14582612CA6A08F78749CC7575E0
 	@Test()
 	void createWhenDefaultValueLengthNotEquals0() {
 		/* Branches:
@@ -842,8 +830,12 @@ class ValueObjectBinderSapientGeneratedTest {
 		doReturn(object).when(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
 		doReturn(stringArray).when(defaultValueMock).value();
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
+		Object object2 = new Object();
+		Bindable bindable = Bindable.ofInstance(object2);
+
 		//Act Statement(s)
-		Object result = target.create(bindableMock, contextMock);
+		Object result = target.create(bindable, contextMock);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -854,8 +846,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${c048560a-1fee-3839-bdd8-8b17d65e50dc}, hash: BDFC36BADE8662EEAC30D70188AE6D8C
-	@Disabled()
+	//Sapient generated method id: ${c048560a-1fee-3839-bdd8-8b17d65e50dc}, hash: 2639FEFE7F0F40FC4E005628D1FF7D4B
 	@Test()
 	void createWhenDefaultValueLengthEquals1() {
 		/* Branches:
@@ -880,8 +871,12 @@ class ValueObjectBinderSapientGeneratedTest {
 		Object object2 = new Object();
 		doReturn(object2).when(bindConverterMock).convert("return_of_valueItem1", resolvableTypeMock, annotationArray);
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
+		Object object3 = new Object();
+		Bindable bindable = Bindable.ofInstance(object3);
+
 		//Act Statement(s)
-		Object result = target.create(bindableMock, contextMock);
+		Object result = target.create(bindable, contextMock);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -893,8 +888,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${0b33c793-dd49-30cd-a55b-68b0ea844f32}, hash: 49849B711BD0C4FB82CC6AA7F95DC7A6
-	@Disabled()
+	//Sapient generated method id: ${0b33c793-dd49-30cd-a55b-68b0ea844f32}, hash: 21471D48B23313B06AF6B495A5AFFDEE
 	@Test()
 	void createWhenDefaultValueLengthNotEquals1ThrowsConversionException() {
 		/* Branches:
@@ -917,10 +911,13 @@ class ValueObjectBinderSapientGeneratedTest {
 		doReturn(object).when(bindConverterMock).convert(stringArray, resolvableTypeMock, annotationArray);
 		doReturn(stringArray).when(defaultValueMock).value();
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
+		Object object2 = new Object();
+		Bindable bindable = Bindable.ofInstance(object2);
 		//Act Statement(s)
 		final ConversionException result = assertThrows(ConversionException.class, () -> {
-			target.create(bindableMock, contextMock);
+			target.create(bindable, contextMock);
 		});
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(notNullValue()));
@@ -930,8 +927,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${a8d68e8a-c54c-387f-b53d-4705dc127b65}, hash: 32E53BB2A974578F58FC6366B039192A
-	@Disabled()
+	//Sapient generated method id: ${a8d68e8a-c54c-387f-b53d-4705dc127b65}, hash: 7DB2B6C154C131192187F86D460D9536
 	@Test()
 	void createWhenResolvedIsNull() {
 		/* Branches:
@@ -949,7 +945,6 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable bindableMock = mock(Bindable.class);
 		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
@@ -972,7 +967,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${83a2bc80-6204-3bc9-88e7-fd39f0e7cb8f}, hash: FF3B66019B20E2D8DD0B625F14D26306
-	@Disabled()
 	@Test()
 	void createWhenResolvedIsNotNullAndOptionalEqualsResolved() {
 		/* Branches:
@@ -1012,7 +1006,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${7e533f9c-924b-3b0e-946a-ec458d6b869d}, hash: 44AB84FB2148F12D3D60EA40296BAEE9
-	@Disabled()
 	@Test()
 	void createWhenCollectionIsAssignableFromResolved() {
 		/* Branches:
@@ -1057,7 +1050,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${66572780-b490-3572-9458-648b62524552}, hash: 208AACDC64867D0388D36C22EF30628A
-	@Disabled()
 	@Test()
 	void createWhenMapIsAssignableFromResolved() {
 		/* Branches:
@@ -1103,7 +1095,6 @@ class ValueObjectBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${48a99ce1-9780-3a6a-9b76-98876310acd0}, hash: D8082D71C215F9FDC6971BBFFD08C267
-	@Disabled()
 	@Test()
 	void createWhenResolvedIsArray() {
 		/* Branches:
@@ -1145,8 +1136,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${b9f63205-e000-3690-9d21-595389dd5578}, hash: 1F7E8958A71207EB706CD744013979EA
-	@Disabled()
+	//Sapient generated method id: ${b9f63205-e000-3690-9d21-595389dd5578}, hash: 46E4491A4473DFF5080845E75D52A85D
 	@Test()
 	void createWhenResolvedNotIsArrayAndInstanceIsNotNull() {
 		/* Branches:
@@ -1173,7 +1163,6 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable bindableMock = mock(Bindable.class);
 		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
@@ -1195,8 +1184,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${583da591-af2a-3186-b946-4f10ac6bc7ac}, hash: F05D6F628FA88FE7E4221D6BD4126661
-	@Disabled()
+	//Sapient generated method id: ${583da591-af2a-3186-b946-4f10ac6bc7ac}, hash: FE055C2325DAB95B9222CD246436EC3D
 	@Test()
 	void createWhenResolvedNotIsArrayAndInstanceIsNullAndResolvedIsNotNull() {
 		/* Branches:
@@ -1227,7 +1215,6 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable bindableMock = mock(Bindable.class);
 		try (MockedStatic<BeanUtils> beanUtils = mockStatic(BeanUtils.class);
 			 MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
@@ -1253,8 +1240,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${4e712e0d-eabf-354f-88e4-0fccd79ec1e8}, hash: E1E2A29BEED8DCDE240DC4C1662976F9
-	@Disabled()
+	//Sapient generated method id: ${4e712e0d-eabf-354f-88e4-0fccd79ec1e8}, hash: 645BE902CAF82A39E085E1B0E14F8E18
 	@Test()
 	void createWhenMapNotIsAssignableFromResolvedAndResolvedNotIsArrayAndInstanceIsNullAndResolvedIsNotNull() {
 		/* Branches:
@@ -1285,7 +1271,6 @@ class ValueObjectBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Bindable bindableMock = mock(Bindable.class);
 		try (MockedStatic<BeanUtils> beanUtils = mockStatic(BeanUtils.class);
 			 MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
@@ -1311,7 +1296,7 @@ class ValueObjectBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${b0367e9d-6924-36be-8a48-6a95c051c241}, hash: 74B6F510F70E0E449448ECC235525128
+	//Sapient generated method id: ${b0367e9d-6924-36be-8a48-6a95c051c241}, hash: BAE585AE43CB5799FB4FC5A6C7236025
 	@Test()
 	void onUnableToCreateInstanceTest() throws Exception {
 		/*
@@ -1320,8 +1305,11 @@ class ValueObjectBinderSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		ValueObjectBinder target = new ValueObjectBinder(bindConstructorProviderMock);
+		Object object = new Object();
+		Bindable bindable = Bindable.ofInstance(object);
 		RuntimeException runtimeException = new RuntimeException();
+
 		//Act Statement(s)
-		target.onUnableToCreateInstance(bindableMock, binderContextMock, runtimeException);
+		target.onUnableToCreateInstance(bindable, binderContextMock, runtimeException);
 	}
 }

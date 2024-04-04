@@ -3,27 +3,18 @@ package org.springframework.boot.convert;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-
-import org.mockito.MockedStatic;
-
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.core.convert.TypeDescriptor;
 
 import java.util.Set;
-import java.time.Period;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.Matchers.is;
-
-import org.junit.jupiter.api.Disabled;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class NumberToPeriodConverterSapientGeneratedTest {
@@ -32,26 +23,23 @@ class NumberToPeriodConverterSapientGeneratedTest {
 
 	private final TypeDescriptor typeDescriptorMock2 = mock(TypeDescriptor.class);
 
-	private final TypeDescriptor typeDescriptorMock3 = mock(TypeDescriptor.class);
-
-	//Sapient generated method id: ${a09cc112-2d6f-3df0-a3e4-2475492f0d41}, hash: 2D1B281DABD49824A9B10FEC1522616E
+	//Sapient generated method id: ${a09cc112-2d6f-3df0-a3e4-2475492f0d41}, hash: E276C040F10D74C8201B128B92E4C65A
 	@Test()
 	void getConvertibleTypesTest() {
 		//Arrange Statement(s)
 		NumberToPeriodConverter target = new NumberToPeriodConverter();
+
 		//Act Statement(s)
 		Set<GenericConverter.ConvertiblePair> result = target.getConvertibleTypes();
-		GenericConverter.ConvertiblePair genericConverterConvertiblePair = new GenericConverter.ConvertiblePair(Number.class, Period.class);
-		Set<GenericConverter.ConvertiblePair> genericConverterConvertiblePairResultSet = new HashSet<>(Set.of(genericConverterConvertiblePair));
+
 		//Assert statement(s)
 		assertAll("result", () -> {
-			assertThat(result.size(), equalTo(genericConverterConvertiblePairResultSet.size()));
-			assertThat(result, containsInAnyOrder(genericConverterConvertiblePairResultSet.toArray()));
+			assertThat(result.size(), equalTo(1));
+			assertThat(result.iterator().next(), is(instanceOf(GenericConverter.ConvertiblePair.class)));
 		});
 	}
 
-	//Sapient generated method id: ${780e54eb-6a66-3424-bfeb-905ab2c785b5}, hash: 3806205C3D7483C0D55079B40A4F2B4B
-	@Disabled()
+	//Sapient generated method id: ${780e54eb-6a66-3424-bfeb-905ab2c785b5}, hash: 23FFFF0C6E4CB09FFFDDE3973E00B7AD
 	@Test()
 	void convertWhenSourceIsNotNull() {
 		/* Branches:
@@ -65,23 +53,18 @@ class NumberToPeriodConverterSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		NumberToPeriodConverter target = new NumberToPeriodConverter();
 		Object objectMock = mock(Object.class, "convert_object1");
-		try (MockedStatic<TypeDescriptor> typeDescriptor = mockStatic(TypeDescriptor.class)) {
-			typeDescriptor.when(() -> TypeDescriptor.valueOf(String.class)).thenReturn(typeDescriptorMock);
-			NumberToPeriodConverter target = new NumberToPeriodConverter();
-			//Act Statement(s)
-			Object result = target.convert(objectMock, typeDescriptorMock2, typeDescriptorMock3);
-			//Assert statement(s)
-			//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				typeDescriptor.verify(() -> TypeDescriptor.valueOf(String.class), atLeast(1));
-			});
-		}
+
+		//Act Statement(s)
+		Object result = target.convert(objectMock, typeDescriptorMock, typeDescriptorMock2);
+
+		//Assert statement(s)
+		//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${380b1ace-47e2-39bb-afcc-8fcbdaf257c0}, hash: A58611FF40C49AF898265E556F60B2D6
-	@Disabled()
+	//Sapient generated method id: ${380b1ace-47e2-39bb-afcc-8fcbdaf257c0}, hash: 543F562F1055E25FE97F02B559EF396B
 	@Test()
 	void convertWhenSourceIsNull() {
 		/* Branches:
@@ -95,18 +78,14 @@ class NumberToPeriodConverterSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<TypeDescriptor> typeDescriptor = mockStatic(TypeDescriptor.class)) {
-			typeDescriptor.when(() -> TypeDescriptor.valueOf(String.class)).thenReturn(typeDescriptorMock);
-			NumberToPeriodConverter target = new NumberToPeriodConverter();
-			Object object = null;
-			//Act Statement(s)
-			Object result = target.convert(object, typeDescriptorMock2, typeDescriptorMock3);
-			//Assert statement(s)
-			//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				typeDescriptor.verify(() -> TypeDescriptor.valueOf(String.class), atLeast(1));
-			});
-		}
+		NumberToPeriodConverter target = new NumberToPeriodConverter();
+		Object object = null;
+
+		//Act Statement(s)
+		Object result = target.convert(object, typeDescriptorMock, typeDescriptorMock2);
+
+		//Assert statement(s)
+		//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 }

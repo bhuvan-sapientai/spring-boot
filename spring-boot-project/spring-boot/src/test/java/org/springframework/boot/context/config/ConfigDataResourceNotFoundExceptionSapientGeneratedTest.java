@@ -28,8 +28,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 
@@ -63,7 +61,6 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${b4470aa6-1ce4-3fc4-a2b4-8f47ac67a20a}, hash: 63930C771A2F15B6DBEB5697D8D70BC0
-	@Disabled()
 	@Test()
 	void getReferenceDescriptionWhenLocationIsNull() {
 		/* Branches:
@@ -112,7 +109,6 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${8e39f001-ff63-3d33-94d7-fa209eb1ad0f}, hash: BFF332537C590E8723661D2130430A04
-	@Disabled()
 	@Test()
 	void throwIfDoesNotExistWhenExists() {
 		/* Branches:
@@ -123,12 +119,12 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class, "exampleResource");
+
 		//Act Statement(s)
 		ConfigDataResourceNotFoundException.throwIfDoesNotExist(configDataResourceMock, pathMock);
 	}
 
-	//Sapient generated method id: ${dc4bd248-8b37-3f2a-a9b0-4a944b46e201}, hash: E2EA526035EE3B04AD4B7FFA2D0F671D
-	@Disabled()
+	//Sapient generated method id: ${dc4bd248-8b37-3f2a-a9b0-4a944b46e201}, hash: D199F8A87914237C2910731458910B34
 	@Test()
 	void throwIfDoesNotExistWhenLocationIsNullThrowsConfigDataResourceNotFoundException() {
 		/* Branches:
@@ -138,23 +134,16 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
-		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.notNull(configDataResourceMock, "Resource must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			//Act Statement(s)
-			final ConfigDataResourceNotFoundException result = assertThrows(ConfigDataResourceNotFoundException.class, () -> {
-				ConfigDataResourceNotFoundException.throwIfDoesNotExist(configDataResourceMock, pathMock);
-			});
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				_assert.verify(() -> Assert.notNull(configDataResourceMock, "Resource must not be null"), atLeast(1));
-			});
-		}
+		//Act Statement(s)
+		final ConfigDataResourceNotFoundException result = assertThrows(ConfigDataResourceNotFoundException.class, () -> {
+			ConfigDataResourceNotFoundException.throwIfDoesNotExist(configDataResourceMock, pathMock);
+		});
+
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${938d5bf5-111a-3abc-9453-0daf6e32f4de}, hash: 2D18E83470999D13F33DF54485B6C0E7
-	@Disabled()
+	//Sapient generated method id: ${938d5bf5-111a-3abc-9453-0daf6e32f4de}, hash: 02D2E2F7AD07C40BE1299791246D8F86
 	@Test()
 	void throwIfDoesNotExist1WhenExists() {
 		/* Branches:
@@ -164,8 +153,9 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class, "example_resource");
+		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class);
 		File file = new File("pathname1");
+
 		//Act Statement(s)
 		ConfigDataResourceNotFoundException.throwIfDoesNotExist(configDataResourceMock, file);
 	}
@@ -176,9 +166,6 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 		/* Branches:
 		 * (!exists) : true  #  inside throwIfDoesNotExist method
 		 * (location != null) : false  #  inside getReferenceDescription method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
@@ -205,8 +192,10 @@ class ConfigDataResourceNotFoundExceptionSapientGeneratedTest {
 		//Arrange Statement(s)
 		doReturn(true).when(resourceToCheckMock).exists();
 		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class);
+
 		//Act Statement(s)
 		ConfigDataResourceNotFoundException.throwIfDoesNotExist(configDataResourceMock, resourceToCheckMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> verify(resourceToCheckMock).exists());
 	}

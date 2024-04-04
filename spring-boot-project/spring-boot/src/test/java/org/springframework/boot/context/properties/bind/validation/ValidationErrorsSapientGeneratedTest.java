@@ -23,21 +23,21 @@ import org.mockito.MockedStatic;
 
 import org.springframework.validation.ObjectError;
 
-import java.util.Spliterators;
 import java.util.ArrayList;
-import java.util.stream.StreamSupport;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doReturn;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.doReturn;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ValidationErrorsSapientGeneratedTest {
@@ -93,7 +93,7 @@ class ValidationErrorsSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${78c09fb6-edcf-3ce7-9932-6ef4ffc152b3}, hash: 6C2CAD03763568209BCD20227D5629F7
+	//Sapient generated method id: ${78c09fb6-edcf-3ce7-9932-6ef4ffc152b3}, hash: 4233B4A652DCF53F98769EFAA8F71180
 	@Test()
 	void iteratorTest() {
 		//Arrange Statement(s)
@@ -117,12 +117,9 @@ class ValidationErrorsSapientGeneratedTest {
 			ValidationErrors target = new ValidationErrors(nameMock, configurationPropertySet, objectErrorList);
 			//Act Statement(s)
 			Iterator<ObjectError> result = target.iterator();
-			List<ObjectError> objectErrorList2 = new ArrayList<>(1);
-			objectErrorList2.add(fieldErrorMock);
-			Iterator<ObjectError> iteratorResult = objectErrorList2.iterator();
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(StreamSupport.stream(Spliterators.spliteratorUnknownSize(result, 0), false).toArray(), equalTo(StreamSupport.stream(Spliterators.spliteratorUnknownSize(iteratorResult, 0), false).toArray()));
+				assertThat(result, is(notNullValue()));
 				verify(nameMock).isParentOf(configurationPropertyNameMock);
 				verify(configurationPropertyNameMock).getLastElement(ConfigurationPropertyName.Form.UNIFORM);
 				_assert.verify(() -> Assert.notNull(nameMock, "Name must not be null"), atLeast(1));

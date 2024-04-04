@@ -3,13 +3,18 @@ package org.springframework.boot.context.properties.bind.handler;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.bind.BindContext;
 
 import org.mockito.stubbing.Answer;
 
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+import org.springframework.boot.context.properties.source.ConfigurationProperty;
 import org.springframework.util.Assert;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 
+import java.util.function.Predicate;
 import java.util.function.Function;
 
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -17,22 +22,25 @@ import org.springframework.boot.context.properties.bind.Bindable;
 import org.mockito.MockedStatic;
 
 import org.springframework.boot.context.properties.bind.BindHandler;
+
+import java.util.ArrayList;
+
+import org.springframework.boot.context.properties.source.IterableConfigurationPropertySource;
 import org.springframework.boot.context.properties.bind.UnboundConfigurationPropertiesException;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.hamcrest.Matchers.is;
-
-import org.junit.jupiter.api.Disabled;
+import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mockStatic;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class NoUnboundElementsBindHandlerSapientGeneratedTest {
@@ -43,17 +51,27 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 
 	private final Bindable<?> bindableMock = mock(Bindable.class);
 
+	private final ConfigurationProperty configurationPropertyMock = mock(ConfigurationProperty.class);
+
 	private final ConfigurationPropertyName configurationPropertyNameMock = mock(ConfigurationPropertyName.class);
 
 	private final ConfigurationPropertyName configurationPropertyNameMock2 = mock(ConfigurationPropertyName.class);
 
 	private final ConfigurationPropertyName configurationPropertyNameMock3 = mock(ConfigurationPropertyName.class);
 
+	private final ConfigurationPropertyName configurationPropertyNameMock4 = mock(ConfigurationPropertyName.class);
+
+	private final ConfigurationPropertyName configurationPropertyNameMock5 = mock(ConfigurationPropertyName.class);
+
 	private final BindContext contextMock = mock(BindContext.class);
 
 	private final Function functionMock = mock(Function.class);
 
-	private final Iterable iterableMock = mock(Iterable.class);
+	private final IterableConfigurationPropertySource iterableConfigurationPropertySourceMock = mock(IterableConfigurationPropertySource.class);
+
+	private final IterableConfigurationPropertySource iterableConfigurationPropertySourceMock2 = mock(IterableConfigurationPropertySource.class);
+
+	private final IterableConfigurationPropertySource iterableConfigurationPropertySourceMock3 = mock(IterableConfigurationPropertySource.class);
 
 	private final ConfigurationPropertyName nameMock = mock(ConfigurationPropertyName.class);
 
@@ -146,8 +164,7 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${2dceed88-84e4-300e-baab-f0be556459d4}, hash: 25F77F78E93E6367FC0C1A3D8819C930
-	@Disabled()
+	//Sapient generated method id: ${2dceed88-84e4-300e-baab-f0be556459d4}, hash: 98CDC6B7AF529BA6E01F086942B1ED8D
 	@Test()
 	void onFinishWhenFilteredIsEmptyAndUnboundIsEmpty() throws Exception {
 		/* Branches:
@@ -166,7 +183,10 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(false).when(nameMock).isAncestorOf(configurationPropertyNameMock);
 			doReturn(0).when(contextMock).getDepth();
-			doReturn(iterableMock).when(contextMock).getSources();
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(iterableConfigurationPropertySourceMock));
+			doReturn(iterable).when(contextMock).getSources();
+			doReturn(iterableConfigurationPropertySourceMock2).when(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+			doReturn(null).when(iterableConfigurationPropertySourceMock2).iterator();
 			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			NoUnboundElementsBindHandler target = new NoUnboundElementsBindHandler(parentMock, functionMock);
 			Object object = new Object();
@@ -177,13 +197,14 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 				verify(nameMock).isAncestorOf(configurationPropertyNameMock);
 				verify(contextMock).getDepth();
 				verify(contextMock).getSources();
+				verify(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+				verify(iterableConfigurationPropertySourceMock2).iterator();
 				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${698714d5-5d6b-3dde-9e92-fc4f0adb5cb3}, hash: FF43181A94D4E3120728800F7B167CF4
-	@Disabled()
+	//Sapient generated method id: ${698714d5-5d6b-3dde-9e92-fc4f0adb5cb3}, hash: 8EE3FA42093F61BE06BE80AC4726C457
 	@Test()
 	void onFinishWhenUnboundNotIsEmptyThrowsUnboundConfigurationPropertiesException() throws Exception {
 		/* Branches:
@@ -200,30 +221,38 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		Function functionMock = mock(Function.class, "IterableConfigurationPropertySource");
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			doReturn(false).when(nameMock).isAncestorOf(configurationPropertyNameMock);
+			doReturn(false).when(nameMock).isAncestorOf(configurationPropertyNameMock2);
 			doReturn(0).when(contextMock).getDepth();
-			doReturn(iterableMock).when(contextMock).getSources();
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(iterableConfigurationPropertySourceMock));
+			doReturn(iterable).when(contextMock).getSources();
+			doReturn(null).when(iterableConfigurationPropertySourceMock2).iterator();
+			doReturn(iterableConfigurationPropertySourceMock2, iterableConfigurationPropertySourceMock3).when(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+			doReturn(configurationPropertyMock).when(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock3);
 			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			NoUnboundElementsBindHandler target = new NoUnboundElementsBindHandler(parentMock, functionMock);
-			ConfigurationPropertyName configurationPropertyName = ConfigurationPropertyName.of("onFinish_configurationPropertyName1-name1");
 			Object object = new Object();
 			//Act Statement(s)
 			final UnboundConfigurationPropertiesException result = assertThrows(UnboundConfigurationPropertiesException.class, () -> {
-				target.onFinish(configurationPropertyName, bindableMock, contextMock, object);
+				target.onFinish(nameMock, bindableMock, contextMock, object);
 			});
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
+				verify(nameMock).isAncestorOf(configurationPropertyNameMock);
+				verify(nameMock).isAncestorOf(configurationPropertyNameMock2);
 				verify(contextMock).getDepth();
 				verify(contextMock).getSources();
+				verify(iterableConfigurationPropertySourceMock, atLeast(2)).filter((Predicate) any());
+				verify(iterableConfigurationPropertySourceMock2).iterator();
+				verify(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock3);
 				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${038aa6b3-25c1-383d-816c-b7d5cea3a188}, hash: 328A1362937CFAEF02AF7C1D8C8D5ED9
-	@Disabled()
+	//Sapient generated method id: ${038aa6b3-25c1-383d-816c-b7d5cea3a188}, hash: 612B24A6803BC39248B8F8A0E53D5D7B
 	@Test()
 	void onFinishWhenFilteredIsNotEmptyAndUnboundNotIsEmptyThrowsUnboundConfigurationPropertiesException() throws Exception {
 		/* Branches:
@@ -242,7 +271,6 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigurationPropertyName configurationPropertyNameMock4 = mock(ConfigurationPropertyName.class);
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(true).when(nameMock).isAncestorOf(configurationPropertyNameMock);
 			doReturn(0).when(configurationPropertyNameMock).getNumberOfElements();
@@ -253,7 +281,11 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 			doReturn(true).when(configurationPropertyNameMock3).isLastElementIndexed();
 			doReturn(configurationPropertyNameMock4).when(configurationPropertyNameMock3).chop(-1);
 			doReturn(0).when(contextMock).getDepth();
-			doReturn(iterableMock).when(contextMock).getSources();
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(iterableConfigurationPropertySourceMock));
+			doReturn(iterable).when(contextMock).getSources();
+			doReturn(null).when(iterableConfigurationPropertySourceMock2).iterator();
+			doReturn(iterableConfigurationPropertySourceMock2, iterableConfigurationPropertySourceMock3).when(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+			doReturn(configurationPropertyMock).when(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock5);
 			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			NoUnboundElementsBindHandler target = new NoUnboundElementsBindHandler(parentMock, functionMock);
 			Object object = new Object();
@@ -274,13 +306,15 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 				verify(configurationPropertyNameMock3).chop(-1);
 				verify(contextMock).getDepth();
 				verify(contextMock).getSources();
+				verify(iterableConfigurationPropertySourceMock, atLeast(2)).filter((Predicate) any());
+				verify(iterableConfigurationPropertySourceMock2).iterator();
+				verify(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock5);
 				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${a1f701ab-7041-32d7-84ba-317a9511a810}, hash: 85C29C23C232F9186F461904639A5D91
-	@Disabled()
+	//Sapient generated method id: ${a1f701ab-7041-32d7-84ba-317a9511a810}, hash: D9E90593E6E4347FE834BC4BB694DB71
 	@Test()
 	void onFinishWhenIsOverriddenCollectionElementNotCandidateAndFilteredIsNotEmptyThrowsUnboundConfigurationPropertiesException() throws Exception {
 		/* Branches:
@@ -306,7 +340,11 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 			doReturn(configurationPropertyNameMock2).when(configurationPropertyNameMock).chop(-1);
 			doReturn(false).when(nameMock).isAncestorOf(configurationPropertyNameMock3);
 			doReturn(0).when(contextMock).getDepth();
-			doReturn(iterableMock).when(contextMock).getSources();
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(iterableConfigurationPropertySourceMock));
+			doReturn(iterable).when(contextMock).getSources();
+			doReturn(null).when(iterableConfigurationPropertySourceMock2).iterator();
+			doReturn(iterableConfigurationPropertySourceMock2, iterableConfigurationPropertySourceMock3).when(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+			doReturn(configurationPropertyMock).when(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock4);
 			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			NoUnboundElementsBindHandler target = new NoUnboundElementsBindHandler(parentMock, functionMock);
 			Object object = new Object();
@@ -324,13 +362,15 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 				verify(nameMock).isAncestorOf(configurationPropertyNameMock3);
 				verify(contextMock).getDepth();
 				verify(contextMock).getSources();
+				verify(iterableConfigurationPropertySourceMock, atLeast(2)).filter((Predicate) any());
+				verify(iterableConfigurationPropertySourceMock2).iterator();
+				verify(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock4);
 				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${aa226bc7-1dc5-3393-806a-53064e2ce99d}, hash: 3A6BF93E580870D2D325F412ED02BFD1
-	@Disabled()
+	//Sapient generated method id: ${aa226bc7-1dc5-3393-806a-53064e2ce99d}, hash: C8CB8FCCEDAB081761D27B0C03E8F20E
 	@Test()
 	void onFinishWhenIndexedIsNullAndUnboundNotIsEmpty2ThrowsUnboundConfigurationPropertiesException() throws Exception {
 		/* Branches:
@@ -362,7 +402,11 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 			doReturn(0, 1, 0).when(configurationPropertyNameMock3).getNumberOfElements();
 			doReturn(false).when(configurationPropertyNameMock3).isNumericIndex(0);
 			doReturn(0).when(contextMock).getDepth();
-			doReturn(iterableMock).when(contextMock).getSources();
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(iterableConfigurationPropertySourceMock));
+			doReturn(iterable).when(contextMock).getSources();
+			doReturn(null).when(iterableConfigurationPropertySourceMock2).iterator();
+			doReturn(iterableConfigurationPropertySourceMock2, iterableConfigurationPropertySourceMock3).when(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+			doReturn(configurationPropertyMock).when(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock4);
 			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			NoUnboundElementsBindHandler target = new NoUnboundElementsBindHandler(parentMock, functionMock);
 			Object object = new Object();
@@ -383,13 +427,15 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 				verify(configurationPropertyNameMock3).isNumericIndex(0);
 				verify(contextMock).getDepth();
 				verify(contextMock).getSources();
+				verify(iterableConfigurationPropertySourceMock, atLeast(2)).filter((Predicate) any());
+				verify(iterableConfigurationPropertySourceMock2).iterator();
+				verify(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock4);
 				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${62176b12-0f52-30d7-90ab-1ee4d6d175a8}, hash: D6E97C93ED7C4F3E25D3C89FF4611ED2
-	@Disabled()
+	//Sapient generated method id: ${62176b12-0f52-30d7-90ab-1ee4d6d175a8}, hash: F988DBECA48A40FB17BFA911CA7A80D2
 	@Test()
 	void onFinishWhenCandidateNotIsNumericIndexIAndIndexedIsNullAndIsOverriddenCollectionElementNotCandidateAndFilteredIsEmptyAn() throws Exception {
 		/* Branches:
@@ -417,7 +463,10 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 			doReturn(0, 1, 0).when(configurationPropertyNameMock).getNumberOfElements();
 			doReturn(false).when(configurationPropertyNameMock).isNumericIndex(0);
 			doReturn(0).when(contextMock).getDepth();
-			doReturn(iterableMock).when(contextMock).getSources();
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(iterableConfigurationPropertySourceMock));
+			doReturn(iterable).when(contextMock).getSources();
+			doReturn(iterableConfigurationPropertySourceMock2).when(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+			doReturn(null).when(iterableConfigurationPropertySourceMock2).iterator();
 			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			NoUnboundElementsBindHandler target = new NoUnboundElementsBindHandler(parentMock, functionMock);
 			Object object = new Object();
@@ -431,13 +480,14 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 				verify(configurationPropertyNameMock).isNumericIndex(0);
 				verify(contextMock).getDepth();
 				verify(contextMock).getSources();
+				verify(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+				verify(iterableConfigurationPropertySourceMock2).iterator();
 				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${1191da43-293e-3c12-bc85-962bb9330879}, hash: 7DE8914FB3762077E1CE641FE9F75545
-	@Disabled()
+	//Sapient generated method id: ${1191da43-293e-3c12-bc85-962bb9330879}, hash: 814BC56C527BAAAB0D80790A4F5A1D2C
 	@Test()
 	void onFinishWhenThisBoundNamesNotContainsConfigurationPropertyNameOfZeroethProThrowsUnboundConfigurationPropertiesException() throws Exception {
 		/* Branches:
@@ -461,7 +511,7 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		ConfigurationPropertyName configurationPropertyNameMock4 = mock(ConfigurationPropertyName.class, "getIndexed_configurationPropertyName1");
-		ConfigurationPropertyName configurationPropertyNameMock5 = mock(ConfigurationPropertyName.class);
+		ConfigurationPropertyName configurationPropertyNameMock6 = mock(ConfigurationPropertyName.class);
 		try (MockedStatic<ConfigurationPropertyName> configurationPropertyName = mockStatic(ConfigurationPropertyName.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(true).when(nameMock).isAncestorOf(configurationPropertyNameMock);
@@ -475,9 +525,13 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 			doReturn(configurationPropertyNameMock4).when(configurationPropertyNameMock3).chop(0);
 			doReturn("return_of_getElement1").when(configurationPropertyNameMock3).getElement(1, ConfigurationPropertyName.Form.UNIFORM);
 			doReturn(0).when(contextMock).getDepth();
-			doReturn(iterableMock).when(contextMock).getSources();
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(iterableConfigurationPropertySourceMock));
+			doReturn(iterable).when(contextMock).getSources();
+			doReturn(null).when(iterableConfigurationPropertySourceMock2).iterator();
+			doReturn(iterableConfigurationPropertySourceMock2, iterableConfigurationPropertySourceMock3).when(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+			doReturn(configurationPropertyMock).when(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock5);
 			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			configurationPropertyName.when(() -> ConfigurationPropertyName.of("A[0]")).thenReturn(configurationPropertyNameMock5);
+			configurationPropertyName.when(() -> ConfigurationPropertyName.of("A[0]")).thenReturn(configurationPropertyNameMock6);
 			NoUnboundElementsBindHandler target = new NoUnboundElementsBindHandler(parentMock, functionMock);
 			Object object = new Object();
 			//Act Statement(s)
@@ -499,14 +553,16 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 				verify(configurationPropertyNameMock3).getElement(1, ConfigurationPropertyName.Form.UNIFORM);
 				verify(contextMock).getDepth();
 				verify(contextMock).getSources();
+				verify(iterableConfigurationPropertySourceMock, atLeast(2)).filter((Predicate) any());
+				verify(iterableConfigurationPropertySourceMock2).iterator();
+				verify(iterableConfigurationPropertySourceMock3).getConfigurationProperty(configurationPropertyNameMock5);
 				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
 				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("A[0]"), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${17e6a4a9-b7a6-3e21-a734-76bb0c509b93}, hash: 7E28EFC23C5FAA7680E8ED6C4357758A
-	@Disabled()
+	//Sapient generated method id: ${17e6a4a9-b7a6-3e21-a734-76bb0c509b93}, hash: BAF0F9C374EB61FD2E496BFAFB94B553
 	@Test()
 	void onFinishWhenThisBoundNamesNotContainsConfigurationPropertyNameOfZeroethPropertyAndIsOverriddenCollectionElementNotCandi() throws Exception {
 		/* Branches:
@@ -539,7 +595,10 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 			doReturn(configurationPropertyNameMock2).when(configurationPropertyNameMock).chop(0);
 			doReturn("return_of_getElement1").when(configurationPropertyNameMock).getElement(1, ConfigurationPropertyName.Form.UNIFORM);
 			doReturn(0).when(contextMock).getDepth();
-			doReturn(iterableMock).when(contextMock).getSources();
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(iterableConfigurationPropertySourceMock));
+			doReturn(iterable).when(contextMock).getSources();
+			doReturn(iterableConfigurationPropertySourceMock2).when(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+			doReturn(null).when(iterableConfigurationPropertySourceMock2).iterator();
 			_assert.when(() -> Assert.notNull(parentMock, "Parent must not be null")).thenAnswer((Answer<Void>) invocation -> null);
 			configurationPropertyName.when(() -> ConfigurationPropertyName.of("A[0]")).thenReturn(configurationPropertyNameMock3);
 			NoUnboundElementsBindHandler target = new NoUnboundElementsBindHandler(parentMock, functionMock);
@@ -556,6 +615,8 @@ class NoUnboundElementsBindHandlerSapientGeneratedTest {
 				verify(configurationPropertyNameMock).getElement(1, ConfigurationPropertyName.Form.UNIFORM);
 				verify(contextMock).getDepth();
 				verify(contextMock).getSources();
+				verify(iterableConfigurationPropertySourceMock).filter((Predicate) any());
+				verify(iterableConfigurationPropertySourceMock2).iterator();
 				_assert.verify(() -> Assert.notNull(parentMock, "Parent must not be null"), atLeast(1));
 				configurationPropertyName.verify(() -> ConfigurationPropertyName.of("A[0]"), atLeast(1));
 			});

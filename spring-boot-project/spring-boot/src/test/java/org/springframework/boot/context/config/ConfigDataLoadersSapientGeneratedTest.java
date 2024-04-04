@@ -38,8 +38,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataLoadersSapientGeneratedTest {
 
@@ -65,8 +63,52 @@ class ConfigDataLoadersSapientGeneratedTest {
 
 	private final SpringFactoriesLoader springFactoriesLoaderMock = mock(SpringFactoriesLoader.class);
 
+	//Sapient generated method id: ${c6f02f39-2528-3d02-ae51-aedc7b309f5d}, hash: BB63C9EE2798B3BD9E9F00653F37AC2D
+	@Test()
+	void loadWhenCandidateNotIsLoadableContextResourceAndResultIsNullThrowsNullPointerException() throws IOException, ConfigDataResourceNotFoundException {
+		/* Branches:
+		 * (i < this.loaders.size()) : true  #  inside getLoader method
+		 * (this.resourceTypes.get(i).isInstance(resource)) : true  #  inside getLoader method
+		 * (candidate.isLoadable(context, resource)) : false  #  inside getLoader method
+		 * (result != null) : false  #  inside getLoader method
+		 *
+		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 *  The test code, including the assertion statements, has been successfully generated.
+		 */
+		//Arrange Statement(s)
+		try (MockedStatic<LogMessage> logMessage = mockStatic(LogMessage.class);
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class);
+			 MockedStatic<SpringFactoriesLoader.ArgumentResolver> springFactoriesLoaderArgumentResolver = mockStatic(SpringFactoriesLoader.ArgumentResolver.class)) {
+			NoOpLog noOpLog = new NoOpLog();
+			doReturn(noOpLog).when(logFactoryMock).getLog(ConfigDataLoaders.class);
+			springFactoriesLoaderArgumentResolver.when(() -> SpringFactoriesLoader.ArgumentResolver.of(DeferredLogFactory.class, logFactoryMock)).thenReturn(springFactoriesLoaderArgumentResolverMock);
+			doReturn(springFactoriesLoaderArgumentResolverMock2).when(springFactoriesLoaderArgumentResolverMock).and(ConfigurableBootstrapContext.class, configurableBootstrapContextMock);
+			doReturn(springFactoriesLoaderArgumentResolverMock3).when(springFactoriesLoaderArgumentResolverMock2).and(BootstrapContext.class, configurableBootstrapContextMock);
+			doReturn(springFactoriesLoaderArgumentResolverMock4).when(springFactoriesLoaderArgumentResolverMock3).and(BootstrapRegistry.class, configurableBootstrapContextMock);
+			doReturn(springFactoriesLoaderArgumentResolverMock5).when(springFactoriesLoaderArgumentResolverMock4).andSupplied(eq(Log.class), (Supplier) any());
+			_assert.when(() -> Assert.state(eq(false), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			logMessage.when(() -> LogMessage.of((Supplier) any())).thenReturn(logMessageMock);
+			ConfigDataLoaders target = new ConfigDataLoaders(logFactoryMock, configurableBootstrapContextMock, springFactoriesLoaderMock);
+			//Act Statement(s)
+			final NullPointerException result = assertThrows(NullPointerException.class, () -> {
+				target.load(configDataLoaderContextMock, configDataResourceMock);
+			});
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				verify(logFactoryMock).getLog(ConfigDataLoaders.class);
+				springFactoriesLoaderArgumentResolver.verify(() -> SpringFactoriesLoader.ArgumentResolver.of(DeferredLogFactory.class, logFactoryMock), atLeast(1));
+				verify(springFactoriesLoaderArgumentResolverMock).and(ConfigurableBootstrapContext.class, configurableBootstrapContextMock);
+				verify(springFactoriesLoaderArgumentResolverMock2).and(BootstrapContext.class, configurableBootstrapContextMock);
+				verify(springFactoriesLoaderArgumentResolverMock3).and(BootstrapRegistry.class, configurableBootstrapContextMock);
+				verify(springFactoriesLoaderArgumentResolverMock4).andSupplied(eq(Log.class), (Supplier) any());
+				_assert.verify(() -> Assert.state(eq(false), (Supplier) any()));
+				logMessage.verify(() -> LogMessage.of((Supplier) any()));
+			});
+		}
+	}
+
 	//Sapient generated method id: ${e3cf0279-6830-3a5e-95c0-323aba8ef93f}, hash: D15A595FB5CDFDA5D419EF3BD4EC8805
-	@Disabled()
 	@Test()
 	void loadWhenResultIsNotNull() throws IOException, ConfigDataResourceNotFoundException {
 		/* Branches:
@@ -105,52 +147,6 @@ class ConfigDataLoadersSapientGeneratedTest {
 				verify(springFactoriesLoaderArgumentResolverMock3).and(BootstrapRegistry.class, configurableBootstrapContextMock);
 				verify(springFactoriesLoaderArgumentResolverMock4).andSupplied(eq(Log.class), (Supplier) any());
 				_assert.verify(() -> Assert.state(eq(true), (Supplier) any()));
-				logMessage.verify(() -> LogMessage.of((Supplier) any()));
-			});
-		}
-	}
-
-	//Sapient generated method id: ${8af7da23-036e-3ce2-a062-9f91b92a61a3}, hash: 0A35E728A5D68C26D26E2A14632BC51B
-	@Test()
-	void loadWhenResultIsNullAndResultIsNullThrowsNullPointerException() throws IOException, ConfigDataResourceNotFoundException {
-		/* Branches:
-		 * (i < this.loaders.size()) : true  #  inside getLoader method
-		 * (this.resourceTypes.get(i).isInstance(resource)) : true  #  inside getLoader method
-		 * (candidate.isLoadable(context, resource)) : true  #  inside getLoader method
-		 * (result != null) : false  #  inside getLoader method
-		 * (result != null) : false  #  inside getLoader method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
-		//Arrange Statement(s)
-		try (MockedStatic<LogMessage> logMessage = mockStatic(LogMessage.class);
-			 MockedStatic<Assert> _assert = mockStatic(Assert.class);
-			 MockedStatic<SpringFactoriesLoader.ArgumentResolver> springFactoriesLoaderArgumentResolver = mockStatic(SpringFactoriesLoader.ArgumentResolver.class)) {
-			NoOpLog noOpLog = new NoOpLog();
-			doReturn(noOpLog).when(logFactoryMock).getLog(ConfigDataLoaders.class);
-			springFactoriesLoaderArgumentResolver.when(() -> SpringFactoriesLoader.ArgumentResolver.of(DeferredLogFactory.class, logFactoryMock)).thenReturn(springFactoriesLoaderArgumentResolverMock);
-			doReturn(springFactoriesLoaderArgumentResolverMock2).when(springFactoriesLoaderArgumentResolverMock).and(ConfigurableBootstrapContext.class, configurableBootstrapContextMock);
-			doReturn(springFactoriesLoaderArgumentResolverMock3).when(springFactoriesLoaderArgumentResolverMock2).and(BootstrapContext.class, configurableBootstrapContextMock);
-			doReturn(springFactoriesLoaderArgumentResolverMock4).when(springFactoriesLoaderArgumentResolverMock3).and(BootstrapRegistry.class, configurableBootstrapContextMock);
-			doReturn(springFactoriesLoaderArgumentResolverMock5).when(springFactoriesLoaderArgumentResolverMock4).andSupplied(eq(Log.class), (Supplier) any());
-			_assert.when(() -> Assert.state(eq(false), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
-			logMessage.when(() -> LogMessage.of((Supplier) any())).thenReturn(logMessageMock);
-			ConfigDataLoaders target = new ConfigDataLoaders(logFactoryMock, configurableBootstrapContextMock, springFactoriesLoaderMock);
-			//Act Statement(s)
-			final NullPointerException result = assertThrows(NullPointerException.class, () -> {
-				target.load(configDataLoaderContextMock, configDataResourceMock);
-			});
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				verify(logFactoryMock).getLog(ConfigDataLoaders.class);
-				springFactoriesLoaderArgumentResolver.verify(() -> SpringFactoriesLoader.ArgumentResolver.of(DeferredLogFactory.class, logFactoryMock), atLeast(1));
-				verify(springFactoriesLoaderArgumentResolverMock).and(ConfigurableBootstrapContext.class, configurableBootstrapContextMock);
-				verify(springFactoriesLoaderArgumentResolverMock2).and(BootstrapContext.class, configurableBootstrapContextMock);
-				verify(springFactoriesLoaderArgumentResolverMock3).and(BootstrapRegistry.class, configurableBootstrapContextMock);
-				verify(springFactoriesLoaderArgumentResolverMock4).andSupplied(eq(Log.class), (Supplier) any());
-				_assert.verify(() -> Assert.state(eq(false), (Supplier) any()));
 				logMessage.verify(() -> LogMessage.of((Supplier) any()));
 			});
 		}

@@ -20,13 +20,10 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigTreeConfigDataLoaderSapientGeneratedTest {
 
 	//Sapient generated method id: ${ff42effe-8e08-33e3-9690-b409079214e3}, hash: 39F7AA905245981DA3BF7E5899731424
-	@Disabled()
 	@Test()
 	void loadTest() throws IOException, ConfigDataResourceNotFoundException {
 		/*

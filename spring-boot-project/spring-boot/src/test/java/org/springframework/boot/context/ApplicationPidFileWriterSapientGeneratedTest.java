@@ -26,12 +26,10 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mockStatic;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ApplicationPidFileWriterSapientGeneratedTest {
 
-	private final SpringApplicationEvent springApplicationEventMock = mock(SpringApplicationEvent.class, "ApplicationPreparedEvent");
+	private final SpringApplicationEvent springApplicationEventMock = mock(SpringApplicationEvent.class);
 
 	//Sapient generated method id: ${5ff1d027-0f41-3e3a-800d-d1703f753974}, hash: E6F17A53CD94C39BDFC3194C15D95879
 	@Test()
@@ -51,7 +49,7 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${5e7879e8-3f8f-34af-8d3b-4a0b41de4bc6}, hash: 9E50869A90B27BBFA5F4FB72C6ED7233
+	//Sapient generated method id: ${5e7879e8-3f8f-34af-8d3b-4a0b41de4bc6}, hash: 3468E4012D0B61A0DD6CD5F9EEAA8A50
 	@Test()
 	void onApplicationEventWhenOverrideIsNotNull() throws Exception {
 		/* Branches:
@@ -67,7 +65,7 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((File) any(), eq("File must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
-			ApplicationPidFileWriter target = new ApplicationPidFileWriter("application.pid");
+			ApplicationPidFileWriter target = new ApplicationPidFileWriter("filename1");
 			//Act Statement(s)
 			target.onApplicationEvent(springApplicationEventMock);
 			//Assert statement(s)
@@ -75,7 +73,7 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${62c4eb21-8829-3c9f-a880-556ff00b2926}, hash: 350D29B997ABE207AA7C92FB198C7005
+	//Sapient generated method id: ${62c4eb21-8829-3c9f-a880-556ff00b2926}, hash: 5A4F66A27D3F200657A16A7239B1D7C7
 	@Test()
 	void onApplicationEventWhenOverrideIsNull() throws Exception {
 		/* Branches:
@@ -91,7 +89,7 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((File) any(), eq("File must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
-			ApplicationPidFileWriter target = new ApplicationPidFileWriter("application.pid");
+			ApplicationPidFileWriter target = new ApplicationPidFileWriter("filename1");
 			//Act Statement(s)
 			target.onApplicationEvent(springApplicationEventMock);
 			//Assert statement(s)
@@ -99,8 +97,7 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${2e6bfade-6826-3482-8fe9-e3368cba5c83}, hash: 1A5F1C0784793F1E35FEE57CCCF0A589
-	@Disabled()
+	//Sapient generated method id: ${2e6bfade-6826-3482-8fe9-e3368cba5c83}, hash: 335A984F60C976FFF74823372D920924
 	@Test()
 	void onApplicationEventWhenFailOnWriteErrorEventThrowsIllegalStateException() throws IOException {
 		/* Branches:
@@ -119,13 +116,13 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((File) any(), eq("File must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
-			ApplicationPidFileWriter target = new ApplicationPidFileWriter("application.pid");
+			ApplicationPidFileWriter target = new ApplicationPidFileWriter("filename1");
 			//Act Statement(s)
 			final IllegalStateException result = assertThrows(IllegalStateException.class, () -> {
 				target.onApplicationEvent(springApplicationEventMock);
 			});
 			Exception exception = new Exception();
-			IllegalStateException illegalStateException = new IllegalStateException("Cannot create pid file NewInstanceContent{target='java.io.File', parameters=[java.lang.String pathname]}", exception);
+			IllegalStateException illegalStateException = new IllegalStateException("message1", exception);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
@@ -136,7 +133,7 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${03bec59c-edde-3403-9e5b-210ba3ff13ae}, hash: 98563200BAAFBD2D5C98EB38EBCA36C3
+	//Sapient generated method id: ${03bec59c-edde-3403-9e5b-210ba3ff13ae}, hash: 81095DDB6786B910E2BADA472F474033
 	@Test()
 	void onApplicationEventWhenFailOnWriteErrorNotEvent() throws Exception {
 		/* Branches:
@@ -155,7 +152,7 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			_assert.when(() -> Assert.notNull((File) any(), eq("File must not be null"))).thenAnswer((Answer<Void>) invocation -> null);
-			ApplicationPidFileWriter target = new ApplicationPidFileWriter("application.pid");
+			ApplicationPidFileWriter target = new ApplicationPidFileWriter("filename1");
 			//Act Statement(s)
 			target.onApplicationEvent(springApplicationEventMock);
 			//Assert statement(s)
@@ -166,10 +163,7 @@ class ApplicationPidFileWriterSapientGeneratedTest {
 	//Sapient generated method id: ${956fb832-abf7-3971-aedb-c516d557eacc}, hash: 9B7C61320ACC4995E1FFF5F77C4A9E31
 	@Test()
 	void resetTest() {
-		/*
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
+
 		//Act Statement(s)
 		ApplicationPidFileWriter.reset();
 	}

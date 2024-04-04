@@ -3,28 +3,26 @@ package org.springframework.boot.context.properties.source;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.time.Duration;
 
 import org.mockito.MockedStatic;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertySourcesCachingSapientGeneratedTest {
 
-	private final ConfigurationPropertyCaching configurationPropertyCachingMock = mock(ConfigurationPropertyCaching.class, "ConfigurationPropertyCaching");
+	private final ConfigurationPropertyCaching configurationPropertyCachingMock = mock(ConfigurationPropertyCaching.class);
 
 	private final ConfigurationPropertySource configurationPropertySourceMock = mock(ConfigurationPropertySource.class);
 
-	private final Iterable iterableMock = mock(Iterable.class);
-
-	//Sapient generated method id: ${cb96b1fd-4c54-332e-a77f-27ba1bdaf688}, hash: 8ECCC2F9F931B34D9B1F37FAFF6C5400
-	@Disabled()
+	//Sapient generated method id: ${cb96b1fd-4c54-332e-a77f-27ba1bdaf688}, hash: AFDE590F800C79FAFBE71CF6922D942F
 	@Test()
 	void enableWhenCachingIsNotNull() {
 		/* Branches:
@@ -32,13 +30,18 @@ class ConfigurationPropertySourcesCachingSapientGeneratedTest {
 		 * (for-each(this.sources)) : true  #  inside forEach method
 		 * (caching != null) : true  #  inside forEach method
 		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 * TODO: Help needed! This method is not unit testable!
+		 *  A variable could not be isolated or mocked when calling a method - Variable name: action - Method: accept
+		 *  Suggestions:
+		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
+		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<CachingConfigurationPropertySource> cachingConfigurationPropertySource = mockStatic(CachingConfigurationPropertySource.class)) {
 			cachingConfigurationPropertySource.when(() -> CachingConfigurationPropertySource.find(configurationPropertySourceMock)).thenReturn(configurationPropertyCachingMock);
-			ConfigurationPropertySourcesCaching target = new ConfigurationPropertySourcesCaching(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(configurationPropertySourceMock));
+			ConfigurationPropertySourcesCaching target = new ConfigurationPropertySourcesCaching(iterable);
 			//Act Statement(s)
 			target.enable();
 			//Assert statement(s)
@@ -46,8 +49,7 @@ class ConfigurationPropertySourcesCachingSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${b8533de4-b672-3d9c-95d3-41074b1432ac}, hash: E30C86E8CF7122239B4E830105663E8F
-	@Disabled()
+	//Sapient generated method id: ${b8533de4-b672-3d9c-95d3-41074b1432ac}, hash: 6A84A339FE4D129B736183B0F78324D9
 	@Test()
 	void disableWhenCachingIsNotNull() {
 		/* Branches:
@@ -55,13 +57,18 @@ class ConfigurationPropertySourcesCachingSapientGeneratedTest {
 		 * (for-each(this.sources)) : true  #  inside forEach method
 		 * (caching != null) : true  #  inside forEach method
 		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 * TODO: Help needed! This method is not unit testable!
+		 *  A variable could not be isolated or mocked when calling a method - Variable name: action - Method: accept
+		 *  Suggestions:
+		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
+		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<CachingConfigurationPropertySource> cachingConfigurationPropertySource = mockStatic(CachingConfigurationPropertySource.class)) {
 			cachingConfigurationPropertySource.when(() -> CachingConfigurationPropertySource.find(configurationPropertySourceMock)).thenReturn(configurationPropertyCachingMock);
-			ConfigurationPropertySourcesCaching target = new ConfigurationPropertySourcesCaching(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(configurationPropertySourceMock));
+			ConfigurationPropertySourcesCaching target = new ConfigurationPropertySourcesCaching(iterable);
 			//Act Statement(s)
 			target.disable();
 			//Assert statement(s)
@@ -69,8 +76,7 @@ class ConfigurationPropertySourcesCachingSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${8cb0e90a-05d6-3fb9-aa16-eb1e353994f7}, hash: A13E6273F07F204F2848987AAA9FAB4D
-	@Disabled()
+	//Sapient generated method id: ${8cb0e90a-05d6-3fb9-aa16-eb1e353994f7}, hash: E6CEF3F6EAF137232EA36A31233F131B
 	@Test()
 	void setTimeToLiveWhenCachingIsNotNull() {
 		/* Branches:
@@ -78,14 +84,18 @@ class ConfigurationPropertySourcesCachingSapientGeneratedTest {
 		 * (for-each(this.sources)) : true  #  inside forEach method
 		 * (caching != null) : true  #  inside forEach method
 		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 * TODO: Help needed! This method is not unit testable!
+		 *  A variable could not be isolated or mocked when calling a method - Variable name: action - Method: accept
+		 *  Suggestions:
+		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
+		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		ConfigurationPropertyCaching configurationPropertyCachingMock = mock(ConfigurationPropertyCaching.class);
 		try (MockedStatic<CachingConfigurationPropertySource> cachingConfigurationPropertySource = mockStatic(CachingConfigurationPropertySource.class)) {
 			cachingConfigurationPropertySource.when(() -> CachingConfigurationPropertySource.find(configurationPropertySourceMock)).thenReturn(configurationPropertyCachingMock);
-			ConfigurationPropertySourcesCaching target = new ConfigurationPropertySourcesCaching(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(configurationPropertySourceMock));
+			ConfigurationPropertySourcesCaching target = new ConfigurationPropertySourcesCaching(iterable);
 			Duration duration = Duration.ofDays(0L);
 			//Act Statement(s)
 			target.setTimeToLive(duration);
@@ -94,8 +104,7 @@ class ConfigurationPropertySourcesCachingSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${94b1de9e-8161-348d-92ce-f93cee722361}, hash: 6F1BAB3153D4E9FA6DC986749ABB92FF
-	@Disabled()
+	//Sapient generated method id: ${94b1de9e-8161-348d-92ce-f93cee722361}, hash: B6840F24B5BEA0E8D0E04968E8E357E2
 	@Test()
 	void clearWhenCachingIsNotNull() {
 		/* Branches:
@@ -103,13 +112,18 @@ class ConfigurationPropertySourcesCachingSapientGeneratedTest {
 		 * (for-each(this.sources)) : true  #  inside forEach method
 		 * (caching != null) : true  #  inside forEach method
 		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 * TODO: Help needed! This method is not unit testable!
+		 *  A variable could not be isolated or mocked when calling a method - Variable name: action - Method: accept
+		 *  Suggestions:
+		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
+		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<CachingConfigurationPropertySource> cachingConfigurationPropertySource = mockStatic(CachingConfigurationPropertySource.class)) {
 			cachingConfigurationPropertySource.when(() -> CachingConfigurationPropertySource.find(configurationPropertySourceMock)).thenReturn(configurationPropertyCachingMock);
-			ConfigurationPropertySourcesCaching target = new ConfigurationPropertySourcesCaching(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>(List.of(configurationPropertySourceMock));
+			ConfigurationPropertySourcesCaching target = new ConfigurationPropertySourcesCaching(iterable);
 			//Act Statement(s)
 			target.clear();
 			//Assert statement(s)

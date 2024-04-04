@@ -12,7 +12,7 @@ import org.apache.commons.logging.impl.NoOpLog;
 
 import org.springframework.util.StringUtils;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.PropertySource;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -39,8 +39,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 
@@ -52,10 +50,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 
 	private final MutablePropertySources mutablePropertySourcesMock = mock(MutablePropertySources.class);
 
-	private final SpringApplication springApplicationMock = mock(SpringApplication.class);
-
-	//Sapient generated method id: ${3455ee6d-dba6-36a0-95d4-22a28703dc49}, hash: 42223602FBE1D25EB1414C02389EB0E7
-	@Disabled()
+	//Sapient generated method id: ${3455ee6d-dba6-36a0-95d4-22a28703dc49}, hash: D314268BA63C394DF393DDECD77D5B0A
 	@Test()
 	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesNotContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_N2() throws Exception {
 		/* Branches:
@@ -65,7 +60,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		 * (value instanceof Map) : false  #  inside lambda$flatten$0 method
 		 * (value instanceof Collection) : true  #  inside lambda$flatten$0 method
 		 * (for-each(collection)) : true  #  inside lambda$flatten$0 method
-		 * (for-each(other.stringPropertyNames())) : false  #  inside addWithPrefix method
+		 * (for-each(other.stringPropertyNames())) : true  #  inside addWithPrefix method
 		 * (map != null) : false  #  inside extractPropertiesFromServices method
 		 * (propertySources.contains(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME)) : false
 		 *
@@ -80,7 +75,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
 			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 			doReturn(false).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addFirst((PropertySource) any());
 			NoOpLog noOpLog = new NoOpLog();
 			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
@@ -103,7 +98,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
 				verify(environmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+				verify(mutablePropertySourcesMock).addFirst((PropertySource) any());
 				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
 				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");
@@ -113,8 +108,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${72a45eb0-94a7-3ba0-887e-dde4e2dd6be5}, hash: 3F0D987F4CCC342206B50E90C13C264B
-	@Disabled()
+	//Sapient generated method id: ${72a45eb0-94a7-3ba0-887e-dde4e2dd6be5}, hash: D3DC9BFD78DF065F2D31A1D24B886808
 	@Test()
 	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesNotContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_N4() throws Exception {
 		/* Branches:
@@ -139,7 +133,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
 			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 			doReturn(false).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addFirst((PropertySource) any());
 			NoOpLog noOpLog = new NoOpLog();
 			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
@@ -158,7 +152,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
 				verify(environmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+				verify(mutablePropertySourcesMock).addFirst((PropertySource) any());
 				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
 				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");
@@ -167,8 +161,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${870b8789-4c8e-359d-957f-5c7e62dfb414}, hash: 57071899E3106BB4391329F9C2974B22
-	@Disabled()
+	//Sapient generated method id: ${870b8789-4c8e-359d-957f-5c7e62dfb414}, hash: 38DFC44A763D22E7666F8044E6E99E04
 	@Test()
 	void postProcessEnvironmentWhenPropertySourcesContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_NAME() throws Exception {
 		/* Branches:
@@ -176,7 +169,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		 * (map != null) : true  #  inside extractPropertiesFromApplication method
 		 * (!StringUtils.hasText(path)) : true  #  inside getPropertyName method
 		 * (value instanceof Map) : true  #  inside lambda$flatten$0 method
-		 * (for-each(other.stringPropertyNames())) : true  #  inside addWithPrefix method
+		 * (for-each(other.stringPropertyNames())) : false  #  inside addWithPrefix method
 		 * (map != null) : true  #  inside extractPropertiesFromServices method
 		 * (for-each(map.values())) : true  #  inside extractPropertiesFromServices method
 		 * (for-each(list)) : true  #  inside extractPropertiesFromServices method
@@ -187,13 +180,13 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
-			 MockedStatic<JsonParserFactory> jsonParserFactory = mockStatic(JsonParserFactory.class)) {
+		SpringApplication springApplicationMock = mock(SpringApplication.class);
+		try (MockedStatic<JsonParserFactory> jsonParserFactory = mockStatic(JsonParserFactory.class)) {
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_APPLICATION", "{}");
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
 			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 			doReturn(true).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addAfter(eq("commandLineArgs"), (PropertiesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addAfter(eq("commandLineArgs"), (PropertySource) any());
 			NoOpLog noOpLog = new NoOpLog();
 			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
@@ -208,7 +201,6 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 			Map<String, Object> stringObjectMap2 = new HashMap<>();
 			stringObjectMap2.put("0", list);
 			doReturn(stringObjectMap, stringObjectMap2).when(jsonParserMock).parseMap("return_of_getProperty1");
-			stringUtils.when(() -> StringUtils.hasText("")).thenReturn(false);
 			CloudFoundryVcapEnvironmentPostProcessor target = new CloudFoundryVcapEnvironmentPostProcessor(logFactoryMock);
 			//Act Statement(s)
 			target.postProcessEnvironment(environmentMock, springApplicationMock);
@@ -218,17 +210,15 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
 				verify(environmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addAfter(eq("commandLineArgs"), (PropertiesPropertySource) any());
+				verify(mutablePropertySourcesMock).addAfter(eq("commandLineArgs"), (PropertySource) any());
 				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
 				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");
-				stringUtils.verify(() -> StringUtils.hasText(""), atLeast(1));
 			});
 		}
 	}
 
-	//Sapient generated method id: ${dc9d06ca-4f21-39ec-9dcd-146c1b94b9e5}, hash: C616A04DD50696B7338FD2DC355C5847
-	@Disabled()
+	//Sapient generated method id: ${dc9d06ca-4f21-39ec-9dcd-146c1b94b9e5}, hash: 64CD4E915A48E62A10C5238D8AB8A26E
 	@Test()
 	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesNotContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_N5() throws Exception {
 		/* Branches:
@@ -254,7 +244,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
 			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 			doReturn(false).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addFirst((PropertySource) any());
 			NoOpLog noOpLog = new NoOpLog();
 			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
@@ -273,7 +263,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
 				verify(environmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+				verify(mutablePropertySourcesMock).addFirst((PropertySource) any());
 				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
 				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");
@@ -282,8 +272,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${a09b0f79-e2cf-3515-9ae5-056593a550d8}, hash: CB684213DE1186A1A736F6B33906D3C8
-	@Disabled()
+	//Sapient generated method id: ${a09b0f79-e2cf-3515-9ae5-056593a550d8}, hash: 99E3204BDC7B71BE360328A4F05F37B3
 	@Test()
 	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesNotContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_N6() throws Exception {
 		/* Branches:
@@ -310,7 +299,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
 			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 			doReturn(false).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addFirst((PropertySource) any());
 			NoOpLog noOpLog = new NoOpLog();
 			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
@@ -329,7 +318,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
 				verify(environmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+				verify(mutablePropertySourcesMock).addFirst((PropertySource) any());
 				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
 				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");
@@ -338,8 +327,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${566092f5-898d-329e-8169-c68a6186ab7a}, hash: AC3460401563AA5C005C686EA171F346
-	@Disabled()
+	//Sapient generated method id: ${566092f5-898d-329e-8169-c68a6186ab7a}, hash: 9D076AAE2F0FAAB9AB6624065DEACD5E
 	@Test()
 	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesNotContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_N7() throws Exception {
 		/* Branches:
@@ -367,7 +355,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
 			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 			doReturn(false).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addFirst((PropertySource) any());
 			NoOpLog noOpLog = new NoOpLog();
 			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
@@ -387,7 +375,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
 				verify(environmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+				verify(mutablePropertySourcesMock).addFirst((PropertySource) any());
 				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
 				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");
@@ -396,15 +384,13 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${a6abce76-a336-3bd5-ad3e-f27aec96b5f9}, hash: 40A523BFAD097E3AA585FAB7CB9DA890
-	@Disabled()
+	//Sapient generated method id: ${89f1d8f4-9989-3c64-837e-cbd3f8d9128b}, hash: F12157DF9BB1A52E3FD97636C6E47D1E
 	@Test()
-	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesNotContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_N9() throws Exception {
+	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesNotContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_N8() throws Exception {
 		/* Branches:
 		 * (CloudPlatform.CLOUD_FOUNDRY.isActive(environment)) : true
 		 * (map != null) : true  #  inside extractPropertiesFromApplication method
-		 * (!StringUtils.hasText(path)) : false  #  inside getPropertyName method
-		 * (key.startsWith("[")) : true  #  inside getPropertyName method
+		 * (!StringUtils.hasText(path)) : true  #  inside getPropertyName method
 		 * (value instanceof Map) : false  #  inside lambda$flatten$0 method
 		 * (value instanceof Collection) : false  #  inside lambda$flatten$0 method
 		 * (value instanceof String) : false  #  inside lambda$flatten$0 method
@@ -426,24 +412,26 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
 			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 			doReturn(false).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addFirst((PropertySource) any());
 			NoOpLog noOpLog = new NoOpLog();
 			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
 			Map<String, Object> stringObjectMap = new HashMap<>();
-			stringObjectMap.put("[", (Object) null);
+			stringObjectMap.put("return_of_parseMapItem1Key1", (Object) null);
 			doReturn(stringObjectMap, map).when(jsonParserMock).parseMap("return_of_getProperty1");
-			stringUtils.when(() -> StringUtils.hasText("")).thenReturn(true);
+			stringUtils.when(() -> StringUtils.hasText("")).thenReturn(false);
 			CloudFoundryVcapEnvironmentPostProcessor target = new CloudFoundryVcapEnvironmentPostProcessor(logFactoryMock);
+			Class[] classArray = new Class[] {};
+			SpringApplication springApplication = new SpringApplication(classArray);
 			//Act Statement(s)
-			target.postProcessEnvironment(environmentMock, springApplicationMock);
+			target.postProcessEnvironment(environmentMock, springApplication);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				verify(environmentMock).getProperty("VCAP_APPLICATION", "{}");
 				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
 				verify(environmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+				verify(mutablePropertySourcesMock).addFirst((PropertySource) any());
 				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
 				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");
@@ -452,71 +440,13 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${9b2b65f2-f4fb-369e-a757-69aaaf8424aa}, hash: 685697538BA128C7C1AD36F787C70C97
-	@Disabled()
-	@Test()
-	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesNotContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_N10() throws Exception {
-		/* Branches:
-		 * (CloudPlatform.CLOUD_FOUNDRY.isActive(environment)) : true
-		 * (map != null) : true  #  inside extractPropertiesFromApplication method
-		 * (!StringUtils.hasText(path)) : false  #  inside getPropertyName method
-		 * (key.startsWith("[")) : false  #  inside getPropertyName method
-		 * (value instanceof Map) : false  #  inside lambda$flatten$0 method
-		 * (value instanceof Collection) : false  #  inside lambda$flatten$0 method
-		 * (value instanceof String) : false  #  inside lambda$flatten$0 method
-		 * (value instanceof Number) : false  #  inside lambda$flatten$0 method
-		 * (value instanceof Boolean) : false  #  inside lambda$flatten$0 method
-		 * (value != null) : false  #  inside lambda$flatten$0 method
-		 * (for-each(other.stringPropertyNames())) : false  #  inside addWithPrefix method
-		 * (map != null) : false  #  inside extractPropertiesFromServices method
-		 * (propertySources.contains(CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME)) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
-		//Arrange Statement(s)
-		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class);
-			 MockedStatic<JsonParserFactory> jsonParserFactory = mockStatic(JsonParserFactory.class)) {
-			Map map = null;
-			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_APPLICATION", "{}");
-			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
-			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
-			doReturn(false).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
-			NoOpLog noOpLog = new NoOpLog();
-			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
-			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
-			Map<String, Object> stringObjectMap = new HashMap<>();
-			stringObjectMap.put("A", (Object) null);
-			doReturn(stringObjectMap, map).when(jsonParserMock).parseMap("return_of_getProperty1");
-			stringUtils.when(() -> StringUtils.hasText("")).thenReturn(true);
-			CloudFoundryVcapEnvironmentPostProcessor target = new CloudFoundryVcapEnvironmentPostProcessor(logFactoryMock);
-			//Act Statement(s)
-			target.postProcessEnvironment(environmentMock, springApplicationMock);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				verify(environmentMock).getProperty("VCAP_APPLICATION", "{}");
-				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
-				verify(environmentMock).getPropertySources();
-				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
-				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
-				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
-				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");
-				stringUtils.verify(() -> StringUtils.hasText(""), atLeast(1));
-			});
-		}
-	}
-
-	//Sapient generated method id: ${e493d1ff-cdb6-3754-9135-8cc89c2c4047}, hash: 3C3594736009620FDF1042467965A5EE
-	@Disabled()
+	//Sapient generated method id: ${e493d1ff-cdb6-3754-9135-8cc89c2c4047}, hash: 1A0015FD3C3C8AA64639BC270D6D42AC
 	@Test()
 	void postProcessEnvironmentWhenMapIsNullAndPropertySourcesContainsCommandLinePropertySourceCOMMAND_LINE_PROPERTY_SOURCE_NAME() throws Exception {
 		/* Branches:
 		 * (CloudPlatform.CLOUD_FOUNDRY.isActive(environment)) : true
 		 * (map != null) : true  #  inside extractPropertiesFromApplication method
-		 * (!StringUtils.hasText(path)) : false  #  inside getPropertyName method
-		 * (key.startsWith("[")) : false  #  inside getPropertyName method
+		 * (!StringUtils.hasText(path)) : true  #  inside getPropertyName method
 		 * (value instanceof Map) : false  #  inside lambda$flatten$0 method
 		 * (value instanceof Collection) : false  #  inside lambda$flatten$0 method
 		 * (value instanceof String) : false  #  inside lambda$flatten$0 method
@@ -539,7 +469,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 			doReturn("return_of_getProperty1").when(environmentMock).getProperty("VCAP_SERVICES", "{}");
 			doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 			doReturn(false).when(mutablePropertySourcesMock).contains("commandLineArgs");
-			doNothing().when(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+			doNothing().when(mutablePropertySourcesMock).addFirst((PropertySource) any());
 			NoOpLog noOpLog = new NoOpLog();
 			doReturn(noOpLog).when(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 			jsonParserFactory.when(() -> JsonParserFactory.getJsonParser()).thenReturn(jsonParserMock);
@@ -558,7 +488,7 @@ class CloudFoundryVcapEnvironmentPostProcessorSapientGeneratedTest {
 				verify(environmentMock).getProperty("VCAP_SERVICES", "{}");
 				verify(environmentMock).getPropertySources();
 				verify(mutablePropertySourcesMock).contains("commandLineArgs");
-				verify(mutablePropertySourcesMock).addFirst((PropertiesPropertySource) any());
+				verify(mutablePropertySourcesMock).addFirst((PropertySource) any());
 				verify(logFactoryMock).getLog(CloudFoundryVcapEnvironmentPostProcessor.class);
 				jsonParserFactory.verify(() -> JsonParserFactory.getJsonParser(), atLeast(1));
 				verify(jsonParserMock, times(2)).parseMap("return_of_getProperty1");

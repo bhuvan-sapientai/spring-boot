@@ -34,8 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataLocationResolversSapientGeneratedTest {
 
@@ -104,7 +102,6 @@ class ConfigDataLocationResolversSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${8ca5cb1f-f519-3f47-b0dd-9a36e07de474}, hash: 3372B1642CDB15BB1546FE6DAC261C5A
-	@Disabled()
 	@Test()
 	void resolveWhenLocationIsNotNullThrowsNullPointerException() {
 		/* Branches:

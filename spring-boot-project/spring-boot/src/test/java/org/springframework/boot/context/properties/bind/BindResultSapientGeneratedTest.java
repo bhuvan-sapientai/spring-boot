@@ -18,15 +18,16 @@ import org.springframework.util.Assert;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.doThrow;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
-
-import org.junit.jupiter.api.Disabled;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class BindResultSapientGeneratedTest {
@@ -44,6 +45,7 @@ class BindResultSapientGeneratedTest {
 		final NoSuchElementException result = assertThrows(NoSuchElementException.class, () -> {
 			target.get();
 		});
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(notNullValue()));
@@ -59,8 +61,10 @@ class BindResultSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		BindResult<Object> target = BindResult.of((Object) null);
+
 		//Act Statement(s)
 		boolean result = target.isBound();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(Boolean.FALSE)));
 	}
@@ -84,7 +88,6 @@ class BindResultSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${74e4065b-c033-33e8-a3d4-093ee8c47c2e}, hash: 9708B919247F2E2AE20C43002D612E21
-	@Disabled()
 	@Test()
 	void mapWhenThisValueIsNull() {
 		/* Branches:
@@ -118,50 +121,57 @@ class BindResultSapientGeneratedTest {
 		//Arrange Statement(s)
 		BindResult<Object> target = BindResult.of((Object) null);
 		Object object = new Object();
+
 		//Act Statement(s)
 		Object result = target.orElse(object);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(object)));
 	}
 
-	//Sapient generated method id: ${444168c3-4331-390f-aa58-703b32bd8917}, hash: C61673D3545BFDDC229B7D1260C4527A
-	@Disabled()
+	//Sapient generated method id: ${444168c3-4331-390f-aa58-703b32bd8917}, hash: 8AC273CE6E10170B607AFAC6483F8B8A
 	@Test()
 	void orElseGetWhenThisValueIsNull() {
 		/* Branches:
 		 * (this.value != null) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		Supplier otherMock = mock(Supplier.class);
+		Object object = new Object();
+		doReturn(object).when(otherMock).get();
 		BindResult<Object> target = BindResult.of((Object) null);
-		Supplier supplierMock = mock(Supplier.class, "someValue");
+
 		//Act Statement(s)
-		Object result = target.orElseGet(supplierMock);
+		Object result = target.orElseGet(otherMock);
+
 		//Assert statement(s)
-		//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
-		assertAll("result", () -> assertThat(result, is(notNullValue())));
+		assertAll("result", () -> {
+			assertThat(result, equalTo(object));
+			verify(otherMock).get();
+		});
 	}
 
-	//Sapient generated method id: ${97d0df98-01f0-33f8-89ee-251d3daf4b64}, hash: C1F8FA40DDD27CE057CD296945365EDB
+	//Sapient generated method id: ${97d0df98-01f0-33f8-89ee-251d3daf4b64}, hash: 6AB1DE2F36B10DD31CF85A52A5BDB69B
 	@Test()
 	void orElseThrowWhenThisValueIsNullThrowsThrowable() throws Throwable {
 		/* Branches:
 		 * (this.value == null) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		Supplier exceptionSupplierMock = mock(Supplier.class, "null");
+		Throwable throwable = new Throwable();
+		doThrow(throwable).when(exceptionSupplierMock).get();
 		BindResult<Object> target = BindResult.of((Object) null);
-		Supplier supplierMock = mock(Supplier.class, "null");
 		//Act Statement(s)
 		final Throwable result = assertThrows(Throwable.class, () -> {
-			target.orElseThrow(supplierMock);
+			target.orElseThrow(exceptionSupplierMock);
 		});
+
 		//Assert statement(s)
-		assertAll("result", () -> assertThat(result, is(notNullValue())));
+		assertAll("result", () -> {
+			assertThat(result, equalTo(throwable));
+			verify(exceptionSupplierMock).get();
+		});
 	}
 
 	//Sapient generated method id: ${57d57d84-5000-3dae-b8ae-1c38bc642ec8}, hash: 50D692C6BC6D6983092834455E2AE5BB
@@ -172,8 +182,10 @@ class BindResultSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		Object object = null;
+
 		//Act Statement(s)
 		BindResult result = BindResult.of(object);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
@@ -186,8 +198,10 @@ class BindResultSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		Object object = new Object();
+
 		//Act Statement(s)
 		BindResult result = BindResult.of(object);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}

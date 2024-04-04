@@ -2,11 +2,15 @@ package org.springframework.boot.availability;
 
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.context.ApplicationEventPublisher;
+
 import org.mockito.stubbing.Answer;
-import org.mockito.MockedStatic;
 import org.apache.commons.logging.impl.NoOpLog;
 
 import org.springframework.util.Assert;
+
+import org.mockito.MockedStatic;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,12 +22,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.hamcrest.Matchers.is;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ApplicationAvailabilityBeanSapientGeneratedTest {
 
 	private final AvailabilityState availabilityStateMock = mock(AvailabilityState.class);
+
+	private final AvailabilityState availabilityStateMock2 = mock(AvailabilityState.class, "getLogMessage_availabilityState1");
+
+	private final AvailabilityChangeEvent<?> eventMock = mock(AvailabilityChangeEvent.class);
 
 	//Sapient generated method id: ${64152be7-31de-3288-8023-c6b41ffd74a5}, hash: F362FEDCF8BC47C6D17AE307BBD9A88B
 	@Test()
@@ -85,8 +94,10 @@ class ApplicationAvailabilityBeanSapientGeneratedTest {
 		//Arrange Statement(s)
 		NoOpLog noOpLog = new NoOpLog();
 		ApplicationAvailabilityBean target = new ApplicationAvailabilityBean(noOpLog);
+
 		//Act Statement(s)
 		AvailabilityState result = target.getState(AvailabilityState.class);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
@@ -97,13 +108,15 @@ class ApplicationAvailabilityBeanSapientGeneratedTest {
 		//Arrange Statement(s)
 		NoOpLog noOpLog = new NoOpLog();
 		ApplicationAvailabilityBean target = new ApplicationAvailabilityBean(noOpLog);
+
 		//Act Statement(s)
 		AvailabilityChangeEvent result = target.getLastChangeEvent(AvailabilityState.class);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${a4325331-e0b5-3fdc-b8e3-15262fba61d0}, hash: 92F1D1007F03622D04B9C736D8CFF330
+	//Sapient generated method id: ${a4325331-e0b5-3fdc-b8e3-15262fba61d0}, hash: 95B6972D5A8A3E560532B628489FF797
 	@Test()
 	void onApplicationEventWhenSourceInstanceOfApplicationEventPublisher() {
 		/* Branches:
@@ -112,20 +125,24 @@ class ApplicationAvailabilityBeanSapientGeneratedTest {
 		 * (lastChangeEvent != null) : false  #  inside getLogMessage method
 		 * (source == null) : false  #  inside getSourceDescription method
 		 * (source instanceof ApplicationEventPublisher) : true  #  inside getSourceDescription method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
-		//Arrange Statement(s)
+		doReturn(availabilityStateMock, availabilityStateMock2).when(eventMock).getState();
+		ApplicationEventPublisher applicationEventPublisherMock = mock(ApplicationEventPublisher.class);
+		doReturn(applicationEventPublisherMock).when(eventMock).getSource();
 		NoOpLog noOpLog = new NoOpLog();
 		ApplicationAvailabilityBean target = new ApplicationAvailabilityBean(noOpLog);
-		Object object = new Object();
-		AvailabilityChangeEvent availabilityChangeEvent = new AvailabilityChangeEvent(object, availabilityStateMock);
+
 		//Act Statement(s)
-		target.onApplicationEvent(availabilityChangeEvent);
+		target.onApplicationEvent(eventMock);
+
+		//Assert statement(s)
+		assertAll("result", () -> {
+			verify(eventMock, times(2)).getState();
+			verify(eventMock).getSource();
+		});
 	}
 
-	//Sapient generated method id: ${38a7e1b3-288c-3652-b5a2-ff233cb89830}, hash: EA9C23064062D63CACB242F34149D3AC
+	//Sapient generated method id: ${38a7e1b3-288c-3652-b5a2-ff233cb89830}, hash: 42CF00C5F901DE5BBEC97A8562910EB2
 	@Test()
 	void onApplicationEventWhenSourceInstanceOfThrowable() {
 		/* Branches:
@@ -135,20 +152,24 @@ class ApplicationAvailabilityBeanSapientGeneratedTest {
 		 * (source == null) : false  #  inside getSourceDescription method
 		 * (source instanceof ApplicationEventPublisher) : false  #  inside getSourceDescription method
 		 * (source instanceof Throwable) : true  #  inside getSourceDescription method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
-		//Arrange Statement(s)
+		doReturn(availabilityStateMock, availabilityStateMock2).when(eventMock).getState();
+		Throwable throwableMock = mock(Throwable.class, "getLogMessage_object1");
+		doReturn(throwableMock).when(eventMock).getSource();
 		NoOpLog noOpLog = new NoOpLog();
 		ApplicationAvailabilityBean target = new ApplicationAvailabilityBean(noOpLog);
-		Object object = new Object();
-		AvailabilityChangeEvent availabilityChangeEvent = new AvailabilityChangeEvent(object, availabilityStateMock);
+
 		//Act Statement(s)
-		target.onApplicationEvent(availabilityChangeEvent);
+		target.onApplicationEvent(eventMock);
+
+		//Assert statement(s)
+		assertAll("result", () -> {
+			verify(eventMock, times(2)).getState();
+			verify(eventMock).getSource();
+		});
 	}
 
-	//Sapient generated method id: ${82df71e9-4a6b-385f-9c85-f2c00a6b9775}, hash: B8BD61BE7F488A4EF80958EFB5C09E58
+	//Sapient generated method id: ${82df71e9-4a6b-385f-9c85-f2c00a6b9775}, hash: FDE2CE4C81DBE196FD0940E4F9DF829A
 	@Test()
 	void onApplicationEventWhenSourceNotInstanceOfThrowable() {
 		/* Branches:
@@ -158,20 +179,20 @@ class ApplicationAvailabilityBeanSapientGeneratedTest {
 		 * (source == null) : false  #  inside getSourceDescription method
 		 * (source instanceof ApplicationEventPublisher) : false  #  inside getSourceDescription method
 		 * (source instanceof Throwable) : false  #  inside getSourceDescription method
-		 *
-		 * TODO: Help needed! This method is not unit testable!
-		 *  Following variables could not be isolated/mocked: event
-		 *  Suggestions:
-		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
-		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
-		//Arrange Statement(s)
+		doReturn(availabilityStateMock, availabilityStateMock2).when(eventMock).getState();
+		Object object = new Object();
+		doReturn(object).when(eventMock).getSource();
 		NoOpLog noOpLog = new NoOpLog();
 		ApplicationAvailabilityBean target = new ApplicationAvailabilityBean(noOpLog);
-		Object object = new Object();
-		AvailabilityChangeEvent availabilityChangeEvent = new AvailabilityChangeEvent(object, availabilityStateMock);
+
 		//Act Statement(s)
-		target.onApplicationEvent(availabilityChangeEvent);
+		target.onApplicationEvent(eventMock);
+
+		//Assert statement(s)
+		assertAll("result", () -> {
+			verify(eventMock, times(2)).getState();
+			verify(eventMock).getSource();
+		});
 	}
 }

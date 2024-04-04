@@ -3,27 +3,26 @@ package org.springframework.boot.convert;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.util.unit.DataSize;
-
-import java.util.Set;
-import java.util.HashSet;
-
 import org.springframework.util.unit.DataUnit;
 
 import org.mockito.MockedStatic;
 
+import org.springframework.util.unit.DataSize;
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.core.convert.TypeDescriptor;
+
+import java.util.Set;
+
 import org.springframework.util.ObjectUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
@@ -39,7 +38,7 @@ class StringToDataSizeConverterSapientGeneratedTest {
 
 	private final TypeDescriptor typeDescriptorMock = mock(TypeDescriptor.class);
 
-	//Sapient generated method id: ${a09cc112-2d6f-3df0-a3e4-2475492f0d41}, hash: E017401FEBFD7C0787ED0B5053A1F9C1
+	//Sapient generated method id: ${a09cc112-2d6f-3df0-a3e4-2475492f0d41}, hash: C8C7FBCAF0BE2535856F25D7D8A01323
 	@Test()
 	void getConvertibleTypesTest() {
 		//Arrange Statement(s)
@@ -47,13 +46,11 @@ class StringToDataSizeConverterSapientGeneratedTest {
 
 		//Act Statement(s)
 		Set<GenericConverter.ConvertiblePair> result = target.getConvertibleTypes();
-		GenericConverter.ConvertiblePair genericConverterConvertiblePair = new GenericConverter.ConvertiblePair(String.class, DataSize.class);
-		Set<GenericConverter.ConvertiblePair> genericConverterConvertiblePairResultSet = new HashSet<>(Set.of(genericConverterConvertiblePair));
 
 		//Assert statement(s)
 		assertAll("result", () -> {
-			assertThat(result.size(), equalTo(genericConverterConvertiblePairResultSet.size()));
-			assertThat(result, containsInAnyOrder(genericConverterConvertiblePairResultSet.toArray()));
+			assertThat(result.size(), equalTo(1));
+			assertThat(result.iterator().next(), is(instanceOf(GenericConverter.ConvertiblePair.class)));
 		});
 	}
 

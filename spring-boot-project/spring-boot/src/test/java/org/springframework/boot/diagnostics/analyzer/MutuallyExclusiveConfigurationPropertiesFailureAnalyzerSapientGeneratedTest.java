@@ -27,14 +27,43 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class MutuallyExclusiveConfigurationPropertiesFailureAnalyzerSapientGeneratedTest {
 
-	private final ConfigurableEnvironment environmentMock = mock(ConfigurableEnvironment.class, "environment");
+	private final ConfigurableEnvironment environmentMock = mock(ConfigurableEnvironment.class, "null");
 
 	private final MutuallyExclusiveConfigurationPropertiesException causeMock = mock(MutuallyExclusiveConfigurationPropertiesException.class);
+
+	//Sapient generated method id: ${73e72d81-eef6-3c3f-9c7b-d18087f94179}, hash: 18AB8B9B8EF9D988129B225E2E40B1F0
+	@Test()
+	void analyze2WhenInputIsNotEmpty() {
+		/* Branches:
+		 * (for-each(cause.getConfiguredNames())) : false
+		 * (for-each(input)) : true  #  inside sortedStrings method
+		 *
+		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 *  The test code, including the assertion statements, has been successfully generated.
+		 */
+		//Arrange Statement(s)
+		Set<String> stringSet = new HashSet<>();
+		doReturn(stringSet).when(causeMock).getConfiguredNames();
+		Set<String> stringSet2 = new HashSet<>();
+		stringSet2.add("A");
+		doReturn(stringSet2).when(causeMock).getMutuallyExclusiveNames();
+		MutuallyExclusiveConfigurationPropertiesFailureAnalyzer target = new MutuallyExclusiveConfigurationPropertiesFailureAnalyzer(environmentMock);
+		Throwable throwable = new Throwable();
+
+		//Act Statement(s)
+		FailureAnalysis result = target.analyze(throwable, causeMock);
+
+		//Assert statement(s)
+		//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
+		assertAll("result", () -> {
+			assertThat(result, is(notNullValue()));
+			verify(causeMock, atLeast(1)).getConfiguredNames();
+			verify(causeMock, atLeast(1)).getMutuallyExclusiveNames();
+		});
+	}
 
 	//Sapient generated method id: ${3ae87aff-95b6-3319-9eb1-3e60f26478c5}, hash: 071E4A2F2B2B66DE99B3D9217A218A50
 	@Test()
@@ -50,8 +79,10 @@ class MutuallyExclusiveConfigurationPropertiesFailureAnalyzerSapientGeneratedTes
 		doReturn(stringSet).when(causeMock).getConfiguredNames();
 		MutuallyExclusiveConfigurationPropertiesFailureAnalyzer target = new MutuallyExclusiveConfigurationPropertiesFailureAnalyzer((ConfigurableEnvironment) null);
 		Throwable throwable = new Throwable();
+
 		//Act Statement(s)
 		FailureAnalysis result = target.analyze(throwable, causeMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(nullValue()));
@@ -59,40 +90,40 @@ class MutuallyExclusiveConfigurationPropertiesFailureAnalyzerSapientGeneratedTes
 		});
 	}
 
-	//Sapient generated method id: ${73e72d81-eef6-3c3f-9c7b-d18087f94179}, hash: 479085C32B32C198E4E2C2211422AF72
-	@Disabled()
+	//Sapient generated method id: ${721b3bec-7391-3fda-9715-f520b77b0d6e}, hash: 61E900431270A17859344DA987D72FC7
 	@Test()
-	void analyze2WhenInputIsNotEmpty() {
+	void analyze2WhenThisEnvironmentIsNotNullAndDescriptorsForNameIsEmpty() {
 		/* Branches:
 		 * (for-each(cause.getConfiguredNames())) : true
 		 * (this.environment == null) : false  #  inside getPropertySources method
-		 * (descriptorsForName.isEmpty()) : false
-		 * (for-each(input)) : true  #  inside sortedStrings method
+		 * (descriptorsForName.isEmpty()) : true
 		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 * TODO: Help needed! This method is not unit testable!
+		 *  A variable could not be isolated or mocked when calling a method - Variable name: object of type Stream - Method: filter
+		 *  Suggestions:
+		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
+		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		MutuallyExclusiveConfigurationPropertiesException causeMock = mock(MutuallyExclusiveConfigurationPropertiesException.class, "null");
 		Set<String> stringSet = new HashSet<>();
-		stringSet.add("return_of_getConfiguredNamesItem1");
+		stringSet.add("Set<String>");
 		doReturn(stringSet).when(causeMock).getConfiguredNames();
-		Set<String> stringSet2 = new HashSet<>();
-		stringSet2.add("return_of_getMutuallyExclusiveNamesItem1");
-		doReturn(stringSet2).when(causeMock).getMutuallyExclusiveNames();
 		MutuallyExclusiveConfigurationPropertiesFailureAnalyzer target = new MutuallyExclusiveConfigurationPropertiesFailureAnalyzer(environmentMock);
-		MutablePropertySources mutablePropertySourcesMock = mock(MutablePropertySources.class);
+		MutablePropertySources mutablePropertySourcesMock = mock(MutablePropertySources.class, "MutablePropertySources");
 		doReturn(mutablePropertySourcesMock).when(environmentMock).getPropertySources();
 		Stream stream = Stream.empty();
 		doReturn(stream).when(mutablePropertySourcesMock).stream();
 		Throwable throwable = new Throwable();
+
 		//Act Statement(s)
 		FailureAnalysis result = target.analyze(throwable, causeMock);
+
 		//Assert statement(s)
-		//TODO: Please implement equals method in FailureAnalysis for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
-			assertThat(result, is(notNullValue()));
-			verify(causeMock, atLeast(1)).getConfiguredNames();
-			verify(causeMock, atLeast(1)).getMutuallyExclusiveNames();
+			assertThat(result, is(nullValue()));
+			verify(causeMock).getConfiguredNames();
 			verify(environmentMock).getPropertySources();
 			verify(mutablePropertySourcesMock).stream();
 		});

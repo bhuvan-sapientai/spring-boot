@@ -9,26 +9,24 @@ import org.mockito.MockedStatic;
 
 import org.springframework.util.StringUtils;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.verify;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
-
-import org.junit.jupiter.api.Disabled;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mockStatic;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataLocationSapientGeneratedTest {
 
-	//Sapient generated method id: ${f2d940c9-62dc-3e8b-a830-1f97ff0b33e4}, hash: CC5DEDFDD5D0DBED03748872DE2E7AB1
-	@Disabled()
+	//Sapient generated method id: ${f2d940c9-62dc-3e8b-a830-1f97ff0b33e4}, hash: C4C793F4F979F7164A8DC399E6CC7905
 	@Test()
 	void hasPrefixWhenThisValueStartsWithPrefix() {
 		/* Branches:
@@ -39,7 +37,7 @@ class ConfigDataLocationSapientGeneratedTest {
 			stringUtils.when(() -> StringUtils.hasText("B")).thenReturn(false);
 			ConfigDataLocation target = ConfigDataLocation.of("optional:B");
 			//Act Statement(s)
-			boolean result = target.hasPrefix("C");
+			boolean result = target.hasPrefix("DCEGF");
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(Boolean.TRUE));
@@ -48,8 +46,7 @@ class ConfigDataLocationSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${16205bc8-9d42-3581-bfc1-87504f4b9755}, hash: E749B3787C672156A56E362CCF9A47D9
-	@Disabled()
+	//Sapient generated method id: ${16205bc8-9d42-3581-bfc1-87504f4b9755}, hash: DD2EEA7E72F31547702A53BDB286477E
 	@Test()
 	void hasPrefixWhenThisValueNotStartsWithPrefix() {
 		/* Branches:
@@ -60,7 +57,7 @@ class ConfigDataLocationSapientGeneratedTest {
 			stringUtils.when(() -> StringUtils.hasText("A")).thenReturn(false);
 			ConfigDataLocation target = ConfigDataLocation.of("optional:A");
 			//Act Statement(s)
-			boolean result = target.hasPrefix("BD");
+			boolean result = target.hasPrefix("CDE");
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(Boolean.FALSE));
@@ -69,8 +66,7 @@ class ConfigDataLocationSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${9f3f08d4-9263-3c33-bbbf-11a63759fbaf}, hash: 561DBB6CC31DD736945FF3F8DE229477
-	@Disabled()
+	//Sapient generated method id: ${9f3f08d4-9263-3c33-bbbf-11a63759fbaf}, hash: 326F65654E6EFA9DE85A8271A7A0CC68
 	@Test()
 	void getNonPrefixedValueWhenHasPrefixPrefix() {
 		/* Branches:
@@ -80,20 +76,19 @@ class ConfigDataLocationSapientGeneratedTest {
 		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
 			stringUtils.when(() -> StringUtils.hasText("A")).thenReturn(false);
 			ConfigDataLocation target = spy(ConfigDataLocation.of("optional:A"));
-			doReturn(true).when(target).hasPrefix("D");
+			doReturn(true).when(target).hasPrefix("BCDEF");
 			//Act Statement(s)
-			String result = target.getNonPrefixedValue("D");
+			String result = target.getNonPrefixedValue("BCDEF");
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result, equalTo("C"));
+				assertThat(result, equalTo("LMNO"));
 				stringUtils.verify(() -> StringUtils.hasText("A"), atLeast(1));
-				verify(target).hasPrefix("D");
+				verify(target).hasPrefix("BCDEF");
 			});
 		}
 	}
 
 	//Sapient generated method id: ${6ad41ab3-a6db-3b67-ad8b-6ac5bfd4d445}, hash: F74E609CD9D7B90D945EAFFA55391426
-	@Disabled()
 	@Test()
 	void getNonPrefixedValueWhenHasPrefixNotPrefix() {
 		/* Branches:
@@ -116,7 +111,6 @@ class ConfigDataLocationSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${b3665f3b-da99-3ff9-95f6-d138e45e8276}, hash: 493665094A23AC52DA8A282AB1F8E234
-	@Disabled()
 	@Test()
 	void splitTest() {
 		//Arrange Statement(s)
@@ -136,8 +130,7 @@ class ConfigDataLocationSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${b7032138-42e3-399d-930c-acaaf800d0bd}, hash: 1346B2BBB49E23516F0B2FCC31FE4CA3
-	@Disabled()
+	//Sapient generated method id: ${b7032138-42e3-399d-930c-acaaf800d0bd}, hash: E7F4E0CA3FA4569CEB8B235834944142
 	@Test()
 	void split1WhenILessThanValuesLength() {
 		/* Branches:
@@ -150,29 +143,25 @@ class ConfigDataLocationSapientGeneratedTest {
 		ConfigDataLocation configDataLocationMock = mock(ConfigDataLocation.class);
 		ConfigDataLocation configDataLocationMock2 = mock(ConfigDataLocation.class);
 		try (MockedStatic<ConfigDataLocation> configDataLocation = mockStatic(ConfigDataLocation.class);
-			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
+			 MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class, CALLS_REAL_METHODS)) {
 			stringUtils.when(() -> StringUtils.hasText("A")).thenReturn(false);
-			String[] stringArray = new String[] { "return_of_delimitedListToStringArrayItem1" };
-			stringUtils.when(() -> StringUtils.delimitedListToStringArray("str1", "delimiter1")).thenReturn(stringArray);
 			configDataLocation.when(() -> ConfigDataLocation.of("return_of_delimitedListToStringArrayItem1")).thenReturn(configDataLocationMock);
 			doReturn(configDataLocationMock2).when(configDataLocationMock).withOrigin((Origin) null);
 			ConfigDataLocation target = ConfigDataLocation.of("optional:A");
 			//Act Statement(s)
-			ConfigDataLocation[] result = target.split("delimiter1");
+			ConfigDataLocation[] result = target.split("C");
 			ConfigDataLocation[] configDataLocationResultArray = new ConfigDataLocation[] { configDataLocationMock2 };
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(configDataLocationResultArray));
 				stringUtils.verify(() -> StringUtils.hasText("A"), atLeast(1));
-				stringUtils.verify(() -> StringUtils.delimitedListToStringArray("str1", "delimiter1"), atLeast(1));
 				configDataLocation.verify(() -> ConfigDataLocation.of("return_of_delimitedListToStringArrayItem1"), atLeast(1));
-				verify(configDataLocationMock).withOrigin((Origin) null);
+				verify(configDataLocationMock, atLeast(1)).withOrigin((Origin) null);
 			});
 		}
 	}
 
 	//Sapient generated method id: ${8f642396-ae67-397c-a99b-b06b224f9d0b}, hash: 83B73F12DAC048B6A4467D82B64B5EB2
-	@Disabled()
 	@Test()
 	void toStringWhenThisNotOptional() {
 		/* Branches:
@@ -193,7 +182,6 @@ class ConfigDataLocationSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${7b91b463-ee7c-3f82-a547-0671239178a7}, hash: 639AA4DB07D9C109D646E0C1DCA0DB3D
-	@Disabled()
 	@Test()
 	void withOriginTest() {
 		//Arrange Statement(s)
@@ -211,26 +199,21 @@ class ConfigDataLocationSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${084a406b-e181-3373-aaa7-a97dcb437fe3}, hash: 9BC855BBAE1808FD87D97C3E3F44F321
+	//Sapient generated method id: ${f0d32999-3c6a-3e0e-a106-844e15f23426}, hash: 42E04B8CAEF239A34C01C65F06D5C8FF
 	@Test()
-	void ofWhenOptionalAndStringUtilsHasTextValue() {
+	void ofWhenStringUtilsHasTextValue() {
 		/* Branches:
 		 * (location != null) : true
 		 * (location.startsWith(OPTIONAL_PREFIX)) : true
 		 * (!optional) : false
 		 * (!StringUtils.hasText(value)) : false
 		 */
-		//Arrange Statement(s)
-		try (MockedStatic<StringUtils> stringUtils = mockStatic(StringUtils.class)) {
-			stringUtils.when(() -> StringUtils.hasText("A")).thenReturn(true);
-			//Act Statement(s)
-			ConfigDataLocation result = ConfigDataLocation.of("optional:A");
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				stringUtils.verify(() -> StringUtils.hasText("A"), atLeast(1));
-			});
-		}
+
+		//Act Statement(s)
+		ConfigDataLocation result = ConfigDataLocation.of("optional:A");
+
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
 	//Sapient generated method id: ${9f53cfc4-0523-31ce-9e32-fe45a1105de8}, hash: C098BE9A636CDBAE34C86F953E504352

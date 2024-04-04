@@ -32,15 +32,12 @@ import static org.mockito.Mockito.atLeast;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class InputStreamSourceToByteArrayConverterSapientGeneratedTest {
 
 	private final InputStreamSource sourceMock = mock(InputStreamSource.class);
 
 	//Sapient generated method id: ${bcac3615-eb3e-3c15-88e5-1c9363f33c9d}, hash: 7E00C5999556A724DE1240CB93AB7624
-	@Disabled()
 	@Test()
 	void convertTest() throws IOException {
 		//Arrange Statement(s)

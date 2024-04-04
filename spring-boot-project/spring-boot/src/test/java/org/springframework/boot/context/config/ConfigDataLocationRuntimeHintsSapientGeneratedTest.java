@@ -31,73 +31,70 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataLocationRuntimeHintsSapientGeneratedTest {
 
 	private final SpringFactoriesLoader springFactoriesLoaderMock = mock(SpringFactoriesLoader.class);
 
-	//Sapient generated method id: ${0df63eb7-2b74-306a-9b9c-0370947f5ae0}, hash: C7D31EA3B7F4EC564B245C847354EA1D
-	@Disabled()
+	//Sapient generated method id: ${0df63eb7-2b74-306a-9b9c-0370947f5ae0}, hash: 2298220189EB0C860595934F525D2F68
 	@Test()
 	void registerHintsWhenLoggerIsDebugEnabled() {
 		/* Branches:
 		 * (logger.isDebugEnabled()) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		RuntimeHints hintsMock = mock(RuntimeHints.class);
+		ResourceHints resourceHintsMock = mock(ResourceHints.class);
 		FilePatternResourceHintsRegistrar.Builder filePatternResourceHintsRegistrarBuilderMock = mock(FilePatternResourceHintsRegistrar.Builder.class);
 		FilePatternResourceHintsRegistrar.Builder filePatternResourceHintsRegistrarBuilderMock2 = mock(FilePatternResourceHintsRegistrar.Builder.class);
 		FilePatternResourceHintsRegistrar.Builder filePatternResourceHintsRegistrarBuilderMock3 = mock(FilePatternResourceHintsRegistrar.Builder.class);
 		try (MockedStatic<FilePatternResourceHintsRegistrar> filePatternResourceHintsRegistrar = mockStatic(FilePatternResourceHintsRegistrar.class)) {
+			doReturn(resourceHintsMock).when(hintsMock).resources();
 			filePatternResourceHintsRegistrar.when(() -> FilePatternResourceHintsRegistrar.forClassPathLocations(anyList())).thenReturn(filePatternResourceHintsRegistrarBuilderMock);
 			List<String> stringList = new ArrayList<>(List.of("application"));
 			doReturn(filePatternResourceHintsRegistrarBuilderMock2).when(filePatternResourceHintsRegistrarBuilderMock).withFilePrefixes(stringList);
 			List<String> stringList2 = new ArrayList<>();
 			doReturn(filePatternResourceHintsRegistrarBuilderMock3).when(filePatternResourceHintsRegistrarBuilderMock2).withFileExtensions(stringList2);
-			ResourceHints resourceHints = new ResourceHints();
-			doNothing().when(filePatternResourceHintsRegistrarBuilderMock3).registerHints(eq(resourceHints), (ClassLoader) any());
+			doNothing().when(filePatternResourceHintsRegistrarBuilderMock3).registerHints(eq(resourceHintsMock), (ClassLoader) any());
 			ConfigDataLocationRuntimeHints target = spy(new ConfigDataLocationRuntimeHints());
 			List<String> stringList3 = new ArrayList<>();
 			doReturn(stringList3).when(target).getLocations((ClassLoader) any());
 			doReturn(stringList2).when(target).getExtensions((ClassLoader) any());
-			RuntimeHints runtimeHints = new RuntimeHints();
 			ClassLoader classLoader = ClassLoader.getPlatformClassLoader();
 			//Act Statement(s)
-			target.registerHints(runtimeHints, classLoader);
+			target.registerHints(hintsMock, classLoader);
 			//Assert statement(s)
 			assertAll("result", () -> {
+				verify(hintsMock).resources();
 				filePatternResourceHintsRegistrar.verify(() -> FilePatternResourceHintsRegistrar.forClassPathLocations(anyList()));
 				verify(filePatternResourceHintsRegistrarBuilderMock).withFilePrefixes(stringList);
 				verify(filePatternResourceHintsRegistrarBuilderMock2).withFileExtensions(stringList2);
-				verify(filePatternResourceHintsRegistrarBuilderMock3).registerHints(eq(resourceHints), (ClassLoader) any());
+				verify(filePatternResourceHintsRegistrarBuilderMock3).registerHints(eq(resourceHintsMock), (ClassLoader) any());
 				verify(target).getLocations((ClassLoader) any());
 				verify(target).getExtensions((ClassLoader) any());
 			});
 		}
 	}
 
-	//Sapient generated method id: ${a4f1ca8a-1fdc-3656-8e4e-e441e6678b0d}, hash: E7E97C17B3DECB641CEB55E24D31F740
+	//Sapient generated method id: ${a4f1ca8a-1fdc-3656-8e4e-e441e6678b0d}, hash: 08689DBBFD86CF3FD930FCCC879DCA81
 	@Test()
 	void getFileNamesTest() {
 		//Arrange Statement(s)
 		ConfigDataLocationRuntimeHints target = new ConfigDataLocationRuntimeHints();
 		ClassLoader classLoader = ClassLoader.getPlatformClassLoader();
+
 		//Act Statement(s)
 		List<String> result = target.getFileNames(classLoader);
 		List<String> stringResultList = new ArrayList<>(List.of("application"));
+
 		//Assert statement(s)
 		assertAll("result", () -> {
-			assertThat(result.size(), equalTo(stringResultList.size()));
+			assertThat(result.size(), equalTo(1));
 			assertThat(result, containsInRelativeOrder(stringResultList.toArray()));
 		});
 	}
 
 	//Sapient generated method id: ${d4bb8a91-76ef-34f8-8f22-79aa7127ad7b}, hash: CA166D0DF7C667C69F762179496D4912
-	@Disabled()
 	@Test()
 	void getLocationsWhenConfigDataEnvironmentDEFAULT_SEARCH_LOCATIONSIsEmpty() {
 		/* Branches:
@@ -106,19 +103,24 @@ class ConfigDataLocationRuntimeHintsSapientGeneratedTest {
 		//Arrange Statement(s)
 		ConfigDataLocationRuntimeHints target = new ConfigDataLocationRuntimeHints();
 		ClassLoader classLoader = ClassLoader.getPlatformClassLoader();
+
 		//Act Statement(s)
 		List<String> result = target.getLocations(classLoader);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result.size(), equalTo(0)));
 	}
 
-	//Sapient generated method id: ${9b78a88c-7858-3826-b0c3-1eed0b72872a}, hash: 123769746E65104270B54F8AD0B870FF
+	//Sapient generated method id: ${9b78a88c-7858-3826-b0c3-1eed0b72872a}, hash: 345A6AE9BC6247FF4CF48E8FFF65ED8D
 	@Test()
 	void getExtensionsWhenExtensionsNotContainsCandidate() {
 		/* Branches:
 		 * (for-each(propertySourceLoaders)) : true
 		 * (for-each(propertySourceLoader.getFileExtensions())) : true
 		 * (!extensions.contains(candidate)) : true
+		 *
+		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		PropertySourceLoader propertySourceLoaderMock = mock(PropertySourceLoader.class);
@@ -137,7 +139,7 @@ class ConfigDataLocationRuntimeHintsSapientGeneratedTest {
 			stringResultList.add(".A");
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result.size(), equalTo(stringResultList.size()));
+				assertThat(result.size(), equalTo(1));
 				assertThat(result, containsInRelativeOrder(stringResultList.toArray()));
 				springFactoriesLoader.verify(() -> SpringFactoriesLoader.forDefaultResourceLocation((ClassLoader) any()));
 				verify(springFactoriesLoaderMock).load(PropertySourceLoader.class);

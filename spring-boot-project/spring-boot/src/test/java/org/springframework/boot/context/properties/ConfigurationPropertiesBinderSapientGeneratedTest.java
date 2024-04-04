@@ -14,6 +14,7 @@ import org.springframework.boot.context.properties.bind.PropertySourcesPlacehold
 import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.core.env.PropertySources;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.context.properties.bind.handler.IgnoreErrorsBindHandler;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -21,6 +22,7 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.bind.BindConstructorProvider;
 import org.springframework.validation.Validator;
+import org.springframework.boot.context.properties.bind.handler.NoUnboundElementsBindHandler;
 
 import java.lang.annotation.Annotation;
 
@@ -28,35 +30,35 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyS
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.beans.factory.BeanFactory;
 
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.source.UnboundElementsSourceFilter;
 
 import java.util.function.Supplier;
 
 import org.mockito.MockedStatic;
 
 import org.springframework.boot.context.properties.bind.BindHandler;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.validation.annotation.Validated;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.atLeast;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
-
-import org.junit.jupiter.api.Disabled;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.atLeast;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.mockStatic;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertiesBinderSapientGeneratedTest {
@@ -71,13 +73,13 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 
 	private final ConfigurationProperties configurationPropertiesMock = mock(ConfigurationProperties.class);
 
-	private final Iterable iterableMock = mock(Iterable.class);
-
 	private final ObjectProvider objectProviderMock = mock(ObjectProvider.class);
 
 	private final ConfigurationPropertiesBean propertiesBeanMock = mock(ConfigurationPropertiesBean.class);
 
 	private final ResolvableType resolvableTypeMock = mock(ResolvableType.class);
+
+	private final Stream streamMock = mock(Stream.class);
 
 	private final Supplier supplierMock = mock(Supplier.class);
 
@@ -85,10 +87,9 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 
 	private final Validator validatorMock = mock(Validator.class);
 
-	//Sapient generated method id: ${5f413733-eae9-3716-8b35-15f8913f74a7}, hash: 2AC778221F83F271A104E3C33465E2B5
-	@Disabled()
+	//Sapient generated method id: ${dbd67070-cc00-3a51-9249-3d864df3d5a4}, hash: 44FDC7D729F6A1FF1C7A98D1CA19BCF9
 	@Test()
-	void bindWhenGetBindHandlerAdvisorsIsNotEmptyAndThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicatio() throws BeansException {
+	void bindWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext3() throws BeansException {
 		/* Branches:
 		 * (this.configurationPropertiesValidator != null) : true  #  inside getValidators method
 		 * (this.jsr303Present) : true  #  inside getValidators method
@@ -101,7 +102,7 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		 * (annotation.ignoreInvalidFields()) : true  #  inside getBindHandler method
 		 * (!annotation.ignoreUnknownFields()) : true  #  inside getBindHandler method
 		 * (!validators.isEmpty()) : true  #  inside getBindHandler method
-		 * (for-each(getBindHandlerAdvisors())) : true  #  inside getBindHandler method
+		 * (for-each(getBindHandlerAdvisors())) : false  #  inside getBindHandler method
 		 * (this.binder == null) : true  #  inside getBinder method
 		 * (this.applicationContext instanceof ConfigurableApplicationContext configurableContext) : false  #  inside getPropertyEditorInitializer method
 		 *
@@ -113,7 +114,7 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		BindHandler bindHandlerMock = mock(BindHandler.class);
+		Validator validatorMock2 = mock(Validator.class);
 		try (MockedStatic<ConfigurationPropertySources> configurationPropertySources = mockStatic(ConfigurationPropertySources.class);
 			 MockedStatic<BoundConfigurationProperties> boundConfigurationProperties = mockStatic(BoundConfigurationProperties.class);
 			 MockedStatic<ConfigurationPropertiesJsr303Validator> configurationPropertiesJsr303Validator = mockStatic(ConfigurationPropertiesJsr303Validator.class)) {
@@ -128,19 +129,25 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 			doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
 			configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
 			boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(boundConfigurationPropertiesMock);
-			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterable);
 			ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
 			doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-			Stream stream = Stream.empty();
-			doReturn(stream).when(objectProviderMock).orderedStream();
+			doReturn(streamMock).when(objectProviderMock).orderedStream();
 			//Act Statement(s)
 			BindResult<?> result = target.bind(propertiesBeanMock);
 			PropertySourcesDeducer propertySourcesDeducer = new PropertySourcesDeducer(applicationContextMock);
 			PropertySources propertySources = propertySourcesDeducer.getPropertySources();
 			PropertySourcesPlaceholdersResolver propertySourcesPlaceholdersResolver = new PropertySourcesPlaceholdersResolver(propertySources);
 			List<ConversionService> conversionServiceList = new ArrayList<>();
-			Binder binder = new Binder(iterableMock, propertySourcesPlaceholdersResolver, conversionServiceList, (Consumer) null, (BindHandler) null, (BindConstructorProvider) null);
-			BindResult bindResult = binder.bind("return_of_prefix1", bindableMock, bindHandlerMock);
+			Binder binder = new Binder(iterable, propertySourcesPlaceholdersResolver, conversionServiceList, (Consumer) null, (BindHandler) null, (BindConstructorProvider) null);
+			IgnoreErrorsBindHandler ignoreErrorsBindHandler = new IgnoreErrorsBindHandler((BindHandler) null);
+			UnboundElementsSourceFilter unboundElementsSourceFilter = new UnboundElementsSourceFilter();
+			NoUnboundElementsBindHandler noUnboundElementsBindHandler = new NoUnboundElementsBindHandler(ignoreErrorsBindHandler, unboundElementsSourceFilter);
+			ConfigurationPropertiesJsr303Validator configurationPropertiesJsr303Validator2 = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
+			Validator[] validatorArray = new Validator[] { validatorMock, configurationPropertiesJsr303Validator2, validatorMock2 };
+			ValidationBindHandler validationBindHandler = new ValidationBindHandler(noUnboundElementsBindHandler, validatorArray);
+			BindResult bindResult = binder.bind("return_of_prefix1", bindableMock, validationBindHandler);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, equalTo(bindResult));
@@ -151,20 +158,20 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 				verify(configurationPropertiesMock).ignoreInvalidFields();
 				verify(configurationPropertiesMock).ignoreUnknownFields();
 				verify(configurationPropertiesMock).prefix();
-				verify(applicationContextMock).containsBean("configurationPropertiesValidator");
-				verify(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
+				verify(applicationContextMock, atLeast(1)).containsBean("configurationPropertiesValidator");
+				verify(applicationContextMock, atLeast(1)).getBean("configurationPropertiesValidator", Validator.class);
 				configurationPropertiesJsr303Validator.verify(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock), atLeast(1));
 				boundConfigurationProperties.verify(() -> BoundConfigurationProperties.get(applicationContextMock), atLeast(1));
 				configurationPropertySources.verify(() -> ConfigurationPropertySources.from((PropertySources) any()));
-				verify(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
+				verify(applicationContextMock, atLeast(1)).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
 				verify(objectProviderMock).orderedStream();
 			});
 		}
 	}
 
-	//Sapient generated method id: ${9e1bd0f0-b824-31a4-a8dd-599ee376f612}, hash: 4E973E67B2B4AE0F800AA5494454DDC9
+	//Sapient generated method id: ${3e7d48c5-b552-3961-9baa-0a7feb1e24c8}, hash: 905ABA41062CBE49166CEBC0D8A139E6
 	@Test()
-	void bindWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext12() throws BeansException {
+	void bindWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext9() throws BeansException {
 		/* Branches:
 		 * (this.configurationPropertiesValidator != null) : true  #  inside getValidators method
 		 * (this.jsr303Present) : true  #  inside getValidators method
@@ -189,60 +196,60 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<ConfigurationPropertySources> configurationPropertySources = mockStatic(ConfigurationPropertySources.class);
-    MockedStatic<BoundConfigurationProperties> boundConfigurationProperties = mockStatic(BoundConfigurationProperties.class);
-    MockedStatic<ConfigurationPropertiesJsr303Validator> configurationPropertiesJsr303Validator = mockStatic(ConfigurationPropertiesJsr303Validator.class)) {
-    doReturn(bindableMock).when(propertiesBeanMock).asBindTarget();
-    doReturn(annotationMock).when(bindableMock).getAnnotation(Validated.class);
-    doReturn(supplierMock, supplierMock2).when(bindableMock).getValue();
-    doReturn(configurationPropertiesMock).when(propertiesBeanMock).getAnnotation();
-    doReturn(false).when(configurationPropertiesMock).ignoreInvalidFields();
-    doReturn(true).when(configurationPropertiesMock).ignoreUnknownFields();
-    doReturn("return_of_prefix1").when(configurationPropertiesMock).prefix();
-    doReturn(true).when(applicationContextMock).containsBean("configurationPropertiesValidator");
-    doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
-    configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
-    boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
-    configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterableMock);
-    ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
-    doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-    Stream stream = Stream.empty();
-    doReturn(stream).when(objectProviderMock).orderedStream();
-    //Act Statement(s)
-    BindResult<?> result = target.bind(propertiesBeanMock);
-    PropertySourcesDeducer propertySourcesDeducer = new PropertySourcesDeducer(applicationContextMock);
-    PropertySources propertySources = propertySourcesDeducer.getPropertySources();
-    PropertySourcesPlaceholdersResolver propertySourcesPlaceholdersResolver = new PropertySourcesPlaceholdersResolver(propertySources);
-    List<ConversionService> conversionServiceList = new ArrayList<>();
-    Binder binder = new Binder(iterableMock, propertySourcesPlaceholdersResolver, conversionServiceList, (Consumer) null, (BindHandler) null, (BindConstructorProvider) null);
-    ConfigurationPropertiesJsr303Validator configurationPropertiesJsr303Validator2 = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
-    Validator[] validatorArray = new Validator[] { validatorMock, configurationPropertiesJsr303Validator2 };
-    ValidationBindHandler validationBindHandler = new ValidationBindHandler((ConfigurationPropertiesBinder.ConfigurationPropertiesBindHandler) null, validatorArray);
-    BindResult bindResult = binder.bind("return_of_prefix1", bindableMock, validationBindHandler);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, equalTo(bindResult));
-        verify(propertiesBeanMock).asBindTarget();
-        verify(bindableMock, atLeast(1)).getAnnotation(Validated.class);
-        verify(bindableMock, atLeast(2)).getValue();
-        verify(propertiesBeanMock).getAnnotation();
-        verify(configurationPropertiesMock).ignoreInvalidFields();
-        verify(configurationPropertiesMock).ignoreUnknownFields();
-        verify(configurationPropertiesMock).prefix();
-        verify(applicationContextMock, atLeast(1)).containsBean("configurationPropertiesValidator");
-        verify(applicationContextMock, atLeast(1)).getBean("configurationPropertiesValidator", Validator.class);
-        configurationPropertiesJsr303Validator.verify(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock), atLeast(1));
-        boundConfigurationProperties.verify(() -> BoundConfigurationProperties.get(applicationContextMock), atLeast(1));
-        configurationPropertySources.verify(() -> ConfigurationPropertySources.from((PropertySources) any()));
-        verify(applicationContextMock, atLeast(1)).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-        verify(objectProviderMock).orderedStream();
-    });
-}*/
+		try (MockedStatic<ConfigurationPropertySources> configurationPropertySources = mockStatic(ConfigurationPropertySources.class);
+			 MockedStatic<BoundConfigurationProperties> boundConfigurationProperties = mockStatic(BoundConfigurationProperties.class);
+			 MockedStatic<ConfigurationPropertiesJsr303Validator> configurationPropertiesJsr303Validator = mockStatic(ConfigurationPropertiesJsr303Validator.class)) {
+			doReturn(bindableMock).when(propertiesBeanMock).asBindTarget();
+			doReturn(annotationMock).when(bindableMock).getAnnotation(Validated.class);
+			doReturn(supplierMock, supplierMock2).when(bindableMock).getValue();
+			doReturn(configurationPropertiesMock).when(propertiesBeanMock).getAnnotation();
+			doReturn(false).when(configurationPropertiesMock).ignoreInvalidFields();
+			doReturn(true).when(configurationPropertiesMock).ignoreUnknownFields();
+			doReturn("return_of_prefix1").when(configurationPropertiesMock).prefix();
+			doReturn(true).when(applicationContextMock).containsBean("configurationPropertiesValidator");
+			doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
+			configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
+			boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterable);
+			ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
+			doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
+			doReturn(streamMock).when(objectProviderMock).orderedStream();
+			//Act Statement(s)
+			BindResult<?> result = target.bind(propertiesBeanMock);
+			PropertySourcesDeducer propertySourcesDeducer = new PropertySourcesDeducer(applicationContextMock);
+			PropertySources propertySources = propertySourcesDeducer.getPropertySources();
+			PropertySourcesPlaceholdersResolver propertySourcesPlaceholdersResolver = new PropertySourcesPlaceholdersResolver(propertySources);
+			List<ConversionService> conversionServiceList = new ArrayList<>();
+			Binder binder = new Binder(iterable, propertySourcesPlaceholdersResolver, conversionServiceList, (Consumer) null, (BindHandler) null, (BindConstructorProvider) null);
+			ConfigurationPropertiesJsr303Validator configurationPropertiesJsr303Validator2 = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
+			Validator[] validatorArray = new Validator[] { validatorMock, configurationPropertiesJsr303Validator2 };
+			ValidationBindHandler validationBindHandler = new ValidationBindHandler((BindHandler) null, validatorArray);
+			BindResult bindResult = binder.bind("return_of_prefix1", bindableMock, validationBindHandler);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(bindResult));
+				verify(propertiesBeanMock).asBindTarget();
+				verify(bindableMock, atLeast(1)).getAnnotation(Validated.class);
+				verify(bindableMock, atLeast(2)).getValue();
+				verify(propertiesBeanMock).getAnnotation();
+				verify(configurationPropertiesMock).ignoreInvalidFields();
+				verify(configurationPropertiesMock).ignoreUnknownFields();
+				verify(configurationPropertiesMock).prefix();
+				verify(applicationContextMock, atLeast(1)).containsBean("configurationPropertiesValidator");
+				verify(applicationContextMock, atLeast(1)).getBean("configurationPropertiesValidator", Validator.class);
+				configurationPropertiesJsr303Validator.verify(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock), atLeast(1));
+				boundConfigurationProperties.verify(() -> BoundConfigurationProperties.get(applicationContextMock), atLeast(1));
+				configurationPropertySources.verify(() -> ConfigurationPropertySources.from((PropertySources) any()));
+				verify(applicationContextMock, atLeast(1)).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
+				verify(objectProviderMock).orderedStream();
+			});
+		}
 	}
 
-	//Sapient generated method id: ${28c86dbf-2039-3d1a-9133-49e664a200a0}, hash: 6E90DFC65BBD81008EF3CCFEE5F11D93
+	//Sapient generated method id: ${fbadc550-82e1-3c97-a60e-781aeb43e970}, hash: B79D24C2CEA3FC64A0BDF286F146C1DC
 	@Test()
-	void bindWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext13() throws BeansException {
+	void bindWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext10() throws BeansException {
 		/* Branches:
 		 * (this.configurationPropertiesValidator != null) : true  #  inside getValidators method
 		 * (this.jsr303Present) : true  #  inside getValidators method
@@ -267,64 +274,64 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<ConfigurationPropertySources> configurationPropertySources = mockStatic(ConfigurationPropertySources.class);
-    MockedStatic<BoundConfigurationProperties> boundConfigurationProperties = mockStatic(BoundConfigurationProperties.class);
-    MockedStatic<ConfigurationPropertiesJsr303Validator> configurationPropertiesJsr303Validator = mockStatic(ConfigurationPropertiesJsr303Validator.class)) {
-    doReturn(bindableMock).when(propertiesBeanMock).asBindTarget();
-    doReturn(annotationMock).when(bindableMock).getAnnotation(Validated.class);
-    doReturn(null).when(bindableMock).getValue();
-    doReturn(resolvableTypeMock).when(bindableMock).getType();
-    doReturn(Object.class).when(resolvableTypeMock).resolve();
-    doReturn(configurationPropertiesMock).when(propertiesBeanMock).getAnnotation();
-    doReturn(false).when(configurationPropertiesMock).ignoreInvalidFields();
-    doReturn(true).when(configurationPropertiesMock).ignoreUnknownFields();
-    doReturn("return_of_prefix1").when(configurationPropertiesMock).prefix();
-    doReturn(true).when(applicationContextMock).containsBean("configurationPropertiesValidator");
-    doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
-    configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
-    boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
-    configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterableMock);
-    ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
-    doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-    Stream stream = Stream.empty();
-    doReturn(stream).when(objectProviderMock).orderedStream();
-    //Act Statement(s)
-    BindResult<?> result = target.bind(propertiesBeanMock);
-    PropertySourcesDeducer propertySourcesDeducer = new PropertySourcesDeducer(applicationContextMock);
-    PropertySources propertySources = propertySourcesDeducer.getPropertySources();
-    PropertySourcesPlaceholdersResolver propertySourcesPlaceholdersResolver = new PropertySourcesPlaceholdersResolver(propertySources);
-    List<ConversionService> conversionServiceList = new ArrayList<>();
-    Binder binder = new Binder(iterableMock, propertySourcesPlaceholdersResolver, conversionServiceList, (Consumer) null, (BindHandler) null, (BindConstructorProvider) null);
-    ConfigurationPropertiesJsr303Validator configurationPropertiesJsr303Validator2 = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
-    Validator[] validatorArray = new Validator[] { validatorMock, configurationPropertiesJsr303Validator2 };
-    ValidationBindHandler validationBindHandler = new ValidationBindHandler((ConfigurationPropertiesBinder.ConfigurationPropertiesBindHandler) null, validatorArray);
-    BindResult bindResult = binder.bind("return_of_prefix1", bindableMock, validationBindHandler);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, equalTo(bindResult));
-        verify(propertiesBeanMock).asBindTarget();
-        verify(bindableMock, atLeast(1)).getAnnotation(Validated.class);
-        verify(bindableMock, atLeast(1)).getValue();
-        verify(bindableMock, atLeast(1)).getType();
-        verify(resolvableTypeMock).resolve();
-        verify(propertiesBeanMock).getAnnotation();
-        verify(configurationPropertiesMock).ignoreInvalidFields();
-        verify(configurationPropertiesMock).ignoreUnknownFields();
-        verify(configurationPropertiesMock).prefix();
-        verify(applicationContextMock, atLeast(1)).containsBean("configurationPropertiesValidator");
-        verify(applicationContextMock, atLeast(1)).getBean("configurationPropertiesValidator", Validator.class);
-        configurationPropertiesJsr303Validator.verify(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock), atLeast(1));
-        boundConfigurationProperties.verify(() -> BoundConfigurationProperties.get(applicationContextMock), atLeast(1));
-        configurationPropertySources.verify(() -> ConfigurationPropertySources.from((PropertySources) any()));
-        verify(applicationContextMock, atLeast(1)).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-        verify(objectProviderMock).orderedStream();
-    });
-}*/
+		try (MockedStatic<ConfigurationPropertySources> configurationPropertySources = mockStatic(ConfigurationPropertySources.class);
+			 MockedStatic<BoundConfigurationProperties> boundConfigurationProperties = mockStatic(BoundConfigurationProperties.class);
+			 MockedStatic<ConfigurationPropertiesJsr303Validator> configurationPropertiesJsr303Validator = mockStatic(ConfigurationPropertiesJsr303Validator.class)) {
+			doReturn(bindableMock).when(propertiesBeanMock).asBindTarget();
+			doReturn(annotationMock).when(bindableMock).getAnnotation(Validated.class);
+			doReturn(null).when(bindableMock).getValue();
+			doReturn(resolvableTypeMock).when(bindableMock).getType();
+			doReturn(Object.class).when(resolvableTypeMock).resolve();
+			doReturn(configurationPropertiesMock).when(propertiesBeanMock).getAnnotation();
+			doReturn(false).when(configurationPropertiesMock).ignoreInvalidFields();
+			doReturn(true).when(configurationPropertiesMock).ignoreUnknownFields();
+			doReturn("return_of_prefix1").when(configurationPropertiesMock).prefix();
+			doReturn(true).when(applicationContextMock).containsBean("configurationPropertiesValidator");
+			doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
+			configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
+			boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterable);
+			ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
+			doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
+			doReturn(streamMock).when(objectProviderMock).orderedStream();
+			//Act Statement(s)
+			BindResult<?> result = target.bind(propertiesBeanMock);
+			PropertySourcesDeducer propertySourcesDeducer = new PropertySourcesDeducer(applicationContextMock);
+			PropertySources propertySources = propertySourcesDeducer.getPropertySources();
+			PropertySourcesPlaceholdersResolver propertySourcesPlaceholdersResolver = new PropertySourcesPlaceholdersResolver(propertySources);
+			List<ConversionService> conversionServiceList = new ArrayList<>();
+			Binder binder = new Binder(iterable, propertySourcesPlaceholdersResolver, conversionServiceList, (Consumer) null, (BindHandler) null, (BindConstructorProvider) null);
+			ConfigurationPropertiesJsr303Validator configurationPropertiesJsr303Validator2 = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
+			Validator[] validatorArray = new Validator[] { validatorMock, configurationPropertiesJsr303Validator2 };
+			ValidationBindHandler validationBindHandler = new ValidationBindHandler((BindHandler) null, validatorArray);
+			BindResult bindResult = binder.bind("return_of_prefix1", bindableMock, validationBindHandler);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(bindResult));
+				verify(propertiesBeanMock).asBindTarget();
+				verify(bindableMock, atLeast(1)).getAnnotation(Validated.class);
+				verify(bindableMock, atLeast(1)).getValue();
+				verify(bindableMock, atLeast(1)).getType();
+				verify(resolvableTypeMock).resolve();
+				verify(propertiesBeanMock).getAnnotation();
+				verify(configurationPropertiesMock).ignoreInvalidFields();
+				verify(configurationPropertiesMock).ignoreUnknownFields();
+				verify(configurationPropertiesMock).prefix();
+				verify(applicationContextMock, atLeast(1)).containsBean("configurationPropertiesValidator");
+				verify(applicationContextMock, atLeast(1)).getBean("configurationPropertiesValidator", Validator.class);
+				configurationPropertiesJsr303Validator.verify(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock), atLeast(1));
+				boundConfigurationProperties.verify(() -> BoundConfigurationProperties.get(applicationContextMock), atLeast(1));
+				configurationPropertySources.verify(() -> ConfigurationPropertySources.from((PropertySources) any()));
+				verify(applicationContextMock, atLeast(1)).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
+				verify(objectProviderMock).orderedStream();
+			});
+		}
 	}
 
-	//Sapient generated method id: ${257f579d-62cf-30d3-8fa8-2f1fa261c8a4}, hash: 90DE9D51937A4E7A45B446444C865DC0
+	//Sapient generated method id: ${efbb3a09-9d75-3706-a411-489d5edc7a7f}, hash: 94A428B163BE5C91810C633122C499D0
 	@Test()
-	void bindWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext14() throws BeansException {
+	void bindWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext11() throws BeansException {
 		/* Branches:
 		 * (this.configurationPropertiesValidator != null) : true  #  inside getValidators method
 		 * (this.jsr303Present) : true  #  inside getValidators method
@@ -349,65 +356,64 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<ConfigurationPropertySources> configurationPropertySources = mockStatic(ConfigurationPropertySources.class);
-    MockedStatic<BoundConfigurationProperties> boundConfigurationProperties = mockStatic(BoundConfigurationProperties.class);
-    MockedStatic<ConfigurationPropertiesJsr303Validator> configurationPropertiesJsr303Validator = mockStatic(ConfigurationPropertiesJsr303Validator.class)) {
-    doReturn(bindableMock).when(propertiesBeanMock).asBindTarget();
-    doReturn(annotationMock).when(bindableMock).getAnnotation(Validated.class);
-    doReturn(null).when(bindableMock).getValue();
-    doReturn(resolvableTypeMock).when(bindableMock).getType();
-    doReturn(Object.class).when(resolvableTypeMock).resolve();
-    doReturn(configurationPropertiesMock).when(propertiesBeanMock).getAnnotation();
-    doReturn(false).when(configurationPropertiesMock).ignoreInvalidFields();
-    doReturn(true).when(configurationPropertiesMock).ignoreUnknownFields();
-    doReturn("return_of_prefix1").when(configurationPropertiesMock).prefix();
-    doReturn(true).when(applicationContextMock).containsBean("configurationPropertiesValidator");
-    doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
-    configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
-    boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
-    configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterableMock);
-    ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
-    doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-    Stream stream = Stream.empty();
-    doReturn(stream).when(objectProviderMock).orderedStream();
-    //Act Statement(s)
-    BindResult<?> result = target.bind(propertiesBeanMock);
-    PropertySourcesDeducer propertySourcesDeducer = new PropertySourcesDeducer(applicationContextMock);
-    PropertySources propertySources = propertySourcesDeducer.getPropertySources();
-    PropertySourcesPlaceholdersResolver propertySourcesPlaceholdersResolver = new PropertySourcesPlaceholdersResolver(propertySources);
-    List<ConversionService> conversionServiceList = new ArrayList<>();
-    Binder binder = new Binder(iterableMock, propertySourcesPlaceholdersResolver, conversionServiceList, (Consumer) null, (BindHandler) null, (BindConstructorProvider) null);
-    ConfigurationPropertiesJsr303Validator configurationPropertiesJsr303Validator2 = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
-    Validator[] validatorArray = new Validator[] { validatorMock, configurationPropertiesJsr303Validator2 };
-    ValidationBindHandler validationBindHandler = new ValidationBindHandler((ConfigurationPropertiesBinder.ConfigurationPropertiesBindHandler) null, validatorArray);
-    BindResult bindResult = binder.bind("return_of_prefix1", bindableMock, validationBindHandler);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, equalTo(bindResult));
-        verify(propertiesBeanMock).asBindTarget();
-        verify(bindableMock, atLeast(1)).getAnnotation(Validated.class);
-        verify(bindableMock, atLeast(1)).getValue();
-        verify(bindableMock, atLeast(1)).getType();
-        verify(resolvableTypeMock).resolve();
-        verify(propertiesBeanMock).getAnnotation();
-        verify(configurationPropertiesMock).ignoreInvalidFields();
-        verify(configurationPropertiesMock).ignoreUnknownFields();
-        verify(configurationPropertiesMock).prefix();
-        verify(applicationContextMock, atLeast(1)).containsBean("configurationPropertiesValidator");
-        verify(applicationContextMock, atLeast(1)).getBean("configurationPropertiesValidator", Validator.class);
-        configurationPropertiesJsr303Validator.verify(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock), atLeast(1));
-        boundConfigurationProperties.verify(() -> BoundConfigurationProperties.get(applicationContextMock), atLeast(1));
-        configurationPropertySources.verify(() -> ConfigurationPropertySources.from((PropertySources) any()));
-        verify(applicationContextMock, atLeast(1)).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-        verify(objectProviderMock).orderedStream();
-    });
-}*/
+		try (MockedStatic<ConfigurationPropertySources> configurationPropertySources = mockStatic(ConfigurationPropertySources.class);
+			 MockedStatic<BoundConfigurationProperties> boundConfigurationProperties = mockStatic(BoundConfigurationProperties.class);
+			 MockedStatic<ConfigurationPropertiesJsr303Validator> configurationPropertiesJsr303Validator = mockStatic(ConfigurationPropertiesJsr303Validator.class)) {
+			doReturn(bindableMock).when(propertiesBeanMock).asBindTarget();
+			doReturn(annotationMock).when(bindableMock).getAnnotation(Validated.class);
+			doReturn(null).when(bindableMock).getValue();
+			doReturn(resolvableTypeMock).when(bindableMock).getType();
+			doReturn(Object.class).when(resolvableTypeMock).resolve();
+			doReturn(configurationPropertiesMock).when(propertiesBeanMock).getAnnotation();
+			doReturn(false).when(configurationPropertiesMock).ignoreInvalidFields();
+			doReturn(true).when(configurationPropertiesMock).ignoreUnknownFields();
+			doReturn("return_of_prefix1").when(configurationPropertiesMock).prefix();
+			doReturn(true).when(applicationContextMock).containsBean("configurationPropertiesValidator");
+			doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
+			configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
+			boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterable);
+			ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
+			doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
+			doReturn(streamMock).when(objectProviderMock).orderedStream();
+			//Act Statement(s)
+			BindResult<?> result = target.bind(propertiesBeanMock);
+			PropertySourcesDeducer propertySourcesDeducer = new PropertySourcesDeducer(applicationContextMock);
+			PropertySources propertySources = propertySourcesDeducer.getPropertySources();
+			PropertySourcesPlaceholdersResolver propertySourcesPlaceholdersResolver = new PropertySourcesPlaceholdersResolver(propertySources);
+			List<ConversionService> conversionServiceList = new ArrayList<>();
+			Binder binder = new Binder(iterable, propertySourcesPlaceholdersResolver, conversionServiceList, (Consumer) null, (BindHandler) null, (BindConstructorProvider) null);
+			ConfigurationPropertiesJsr303Validator configurationPropertiesJsr303Validator2 = new ConfigurationPropertiesJsr303Validator(applicationContextMock);
+			Validator[] validatorArray = new Validator[] { validatorMock, configurationPropertiesJsr303Validator2 };
+			ValidationBindHandler validationBindHandler = new ValidationBindHandler((BindHandler) null, validatorArray);
+			BindResult bindResult = binder.bind("return_of_prefix1", bindableMock, validationBindHandler);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(bindResult));
+				verify(propertiesBeanMock).asBindTarget();
+				verify(bindableMock, atLeast(1)).getAnnotation(Validated.class);
+				verify(bindableMock, atLeast(1)).getValue();
+				verify(bindableMock, atLeast(1)).getType();
+				verify(resolvableTypeMock).resolve();
+				verify(propertiesBeanMock).getAnnotation();
+				verify(configurationPropertiesMock).ignoreInvalidFields();
+				verify(configurationPropertiesMock).ignoreUnknownFields();
+				verify(configurationPropertiesMock).prefix();
+				verify(applicationContextMock, atLeast(1)).containsBean("configurationPropertiesValidator");
+				verify(applicationContextMock, atLeast(1)).getBean("configurationPropertiesValidator", Validator.class);
+				configurationPropertiesJsr303Validator.verify(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock), atLeast(1));
+				boundConfigurationProperties.verify(() -> BoundConfigurationProperties.get(applicationContextMock), atLeast(1));
+				configurationPropertySources.verify(() -> ConfigurationPropertySources.from((PropertySources) any()));
+				verify(applicationContextMock, atLeast(1)).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
+				verify(objectProviderMock).orderedStream();
+			});
+		}
 	}
 
-	//Sapient generated method id: ${cbcd0f61-e28b-316e-b0b7-548e04a4da3e}, hash: DCE007D6D66CFEFEB85F48D5A3BF9C3C
-	@Disabled()
+	//Sapient generated method id: ${810e1a5f-2450-3dcb-961e-ea09e0333548}, hash: 2A2D0F0D44125F41FE515FDE4A7E39DC
 	@Test()
-	void bindOrCreateWhenGetBindHandlerAdvisorsIsNotEmptyAndThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableAp() throws BeansException {
+	void bindOrCreateWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext3() throws BeansException {
 		/* Branches:
 		 * (this.configurationPropertiesValidator != null) : true  #  inside getValidators method
 		 * (this.jsr303Present) : true  #  inside getValidators method
@@ -420,7 +426,7 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		 * (annotation.ignoreInvalidFields()) : true  #  inside getBindHandler method
 		 * (!annotation.ignoreUnknownFields()) : true  #  inside getBindHandler method
 		 * (!validators.isEmpty()) : true  #  inside getBindHandler method
-		 * (for-each(getBindHandlerAdvisors())) : true  #  inside getBindHandler method
+		 * (for-each(getBindHandlerAdvisors())) : false  #  inside getBindHandler method
 		 * (this.binder == null) : true  #  inside getBinder method
 		 * (this.applicationContext instanceof ConfigurableApplicationContext configurableContext) : false  #  inside getPropertyEditorInitializer method
 		 *
@@ -446,11 +452,11 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 			doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
 			configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
 			boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(boundConfigurationPropertiesMock);
-			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterable);
 			ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
 			doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-			Stream stream = Stream.empty();
-			doReturn(stream).when(objectProviderMock).orderedStream();
+			doReturn(streamMock).when(objectProviderMock).orderedStream();
 			//Act Statement(s)
 			Object result = target.bindOrCreate(propertiesBeanMock);
 			//Assert statement(s)
@@ -464,21 +470,20 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 				verify(configurationPropertiesMock).ignoreInvalidFields();
 				verify(configurationPropertiesMock).ignoreUnknownFields();
 				verify(configurationPropertiesMock).prefix();
-				verify(applicationContextMock).containsBean("configurationPropertiesValidator");
-				verify(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
+				verify(applicationContextMock, atLeast(1)).containsBean("configurationPropertiesValidator");
+				verify(applicationContextMock, atLeast(1)).getBean("configurationPropertiesValidator", Validator.class);
 				configurationPropertiesJsr303Validator.verify(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock), atLeast(1));
 				boundConfigurationProperties.verify(() -> BoundConfigurationProperties.get(applicationContextMock), atLeast(1));
 				configurationPropertySources.verify(() -> ConfigurationPropertySources.from((PropertySources) any()));
-				verify(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
+				verify(applicationContextMock, atLeast(1)).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
 				verify(objectProviderMock).orderedStream();
 			});
 		}
 	}
 
-	//Sapient generated method id: ${a77da511-e4a4-3b6c-9785-bbbeaed49824}, hash: 42E1B21154154E01AE8EB46911FD87C1
-	@Disabled()
+	//Sapient generated method id: ${95a7404e-cc43-3854-af78-87189531e94a}, hash: 9B94726BCD8541409CDFA436B464FA7D
 	@Test()
-	void bindOrCreateWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext12() throws BeansException {
+	void bindOrCreateWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext9() throws BeansException {
 		/* Branches:
 		 * (this.configurationPropertiesValidator != null) : true  #  inside getValidators method
 		 * (this.jsr303Present) : true  #  inside getValidators method
@@ -517,11 +522,11 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 			doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
 			configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
 			boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
-			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterable);
 			ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
 			doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-			Stream stream = Stream.empty();
-			doReturn(stream).when(objectProviderMock).orderedStream();
+			doReturn(streamMock).when(objectProviderMock).orderedStream();
 			//Act Statement(s)
 			Object result = target.bindOrCreate(propertiesBeanMock);
 			//Assert statement(s)
@@ -546,10 +551,9 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${759ed4a6-e5ec-311f-a311-51064f364f74}, hash: 5BBAC4BFD05D693D188FBC5B1888B8AB
-	@Disabled()
+	//Sapient generated method id: ${ced07714-71fd-37a7-a064-1d69de239efa}, hash: 3ED3233AE65DED77DAFD3E42DF5309C0
 	@Test()
-	void bindOrCreateWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext13() throws BeansException {
+	void bindOrCreateWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext10() throws BeansException {
 		/* Branches:
 		 * (this.configurationPropertiesValidator != null) : true  #  inside getValidators method
 		 * (this.jsr303Present) : true  #  inside getValidators method
@@ -590,11 +594,11 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 			doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
 			configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
 			boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
-			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterable);
 			ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
 			doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-			Stream stream = Stream.empty();
-			doReturn(stream).when(objectProviderMock).orderedStream();
+			doReturn(streamMock).when(objectProviderMock).orderedStream();
 			//Act Statement(s)
 			Object result = target.bindOrCreate(propertiesBeanMock);
 			//Assert statement(s)
@@ -621,10 +625,9 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${8176d8cc-b749-33d3-abc5-f6a4031faa7b}, hash: 31987A424463CDED0861B004E7497D5B
-	@Disabled()
+	//Sapient generated method id: ${3e8c3bdc-9203-331e-97f3-78a9de369fc6}, hash: A4073C5EB0028B5E025E98E2B39FB303
 	@Test()
-	void bindOrCreateWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext14() throws BeansException {
+	void bindOrCreateWhenThisBinderIsNullAndThisApplicationContextNotInstanceOfConfigurableApplicationContext11() throws BeansException {
 		/* Branches:
 		 * (this.configurationPropertiesValidator != null) : true  #  inside getValidators method
 		 * (this.jsr303Present) : true  #  inside getValidators method
@@ -665,11 +668,11 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 			doReturn(validatorMock).when(applicationContextMock).getBean("configurationPropertiesValidator", Validator.class);
 			configurationPropertiesJsr303Validator.when(() -> ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContextMock)).thenReturn(true);
 			boundConfigurationProperties.when(() -> BoundConfigurationProperties.get(applicationContextMock)).thenReturn(null);
-			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterableMock);
+			Iterable<ConfigurationPropertySource> iterable = new ArrayList<>();
+			configurationPropertySources.when(() -> ConfigurationPropertySources.from((PropertySources) any())).thenReturn(iterable);
 			ConfigurationPropertiesBinder target = new ConfigurationPropertiesBinder(applicationContextMock);
 			doReturn(objectProviderMock).when(applicationContextMock).getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class);
-			Stream stream = Stream.empty();
-			doReturn(stream).when(objectProviderMock).orderedStream();
+			doReturn(streamMock).when(objectProviderMock).orderedStream();
 			//Act Statement(s)
 			Object result = target.bindOrCreate(propertiesBeanMock);
 			//Assert statement(s)
@@ -696,7 +699,7 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${86d5dd96-2a75-3e17-ac21-495a839897f1}, hash: 9B03A707FC6FA24E7F12EF34DD27F2C1
+	//Sapient generated method id: ${86d5dd96-2a75-3e17-ac21-495a839897f1}, hash: 9F3A2995392EEB89140DA656DBCB7398
 	@Test()
 	void registerWhenRegistryNotContainsBeanDefinitionBEAN_NAME() throws BeanDefinitionStoreException {
 		/* Branches:
@@ -704,25 +707,17 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		BeanDefinitionRegistry registryMock = mock(BeanDefinitionRegistry.class);
-		AbstractBeanDefinition abstractBeanDefinitionMock = mock(AbstractBeanDefinition.class);
-		BeanDefinitionBuilder beanDefinitionBuilderMock = mock(BeanDefinitionBuilder.class);
-		try (MockedStatic<BeanDefinitionBuilder> beanDefinitionBuilder = mockStatic(BeanDefinitionBuilder.class)) {
-			doReturn(false).when(registryMock).containsBeanDefinition("org.springframework.boot.context.internalConfigurationPropertiesBinder");
-			doNothing().when(registryMock).registerBeanDefinition("org.springframework.boot.context.internalConfigurationPropertiesBinder", abstractBeanDefinitionMock);
-			doNothing().when(abstractBeanDefinitionMock).setRole(2);
-			beanDefinitionBuilder.when(() -> BeanDefinitionBuilder.rootBeanDefinition(ConfigurationPropertiesBinder.ConfigurationPropertiesBinderFactory.class)).thenReturn(beanDefinitionBuilderMock);
-			doReturn(abstractBeanDefinitionMock).when(beanDefinitionBuilderMock).getBeanDefinition();
-			//Act Statement(s)
-			ConfigurationPropertiesBinder.register(registryMock);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				verify(registryMock).containsBeanDefinition("org.springframework.boot.context.internalConfigurationPropertiesBinder");
-				verify(registryMock).registerBeanDefinition("org.springframework.boot.context.internalConfigurationPropertiesBinder", abstractBeanDefinitionMock);
-				verify(abstractBeanDefinitionMock).setRole(2);
-				beanDefinitionBuilder.verify(() -> BeanDefinitionBuilder.rootBeanDefinition(ConfigurationPropertiesBinder.ConfigurationPropertiesBinderFactory.class), atLeast(1));
-				verify(beanDefinitionBuilderMock).getBeanDefinition();
-			});
-		}
+		doReturn(false).when(registryMock).containsBeanDefinition("org.springframework.boot.context.internalConfigurationPropertiesBinder");
+		doNothing().when(registryMock).registerBeanDefinition(eq("org.springframework.boot.context.internalConfigurationPropertiesBinder"), (BeanDefinition) any());
+
+		//Act Statement(s)
+		ConfigurationPropertiesBinder.register(registryMock);
+
+		//Assert statement(s)
+		assertAll("result", () -> {
+			verify(registryMock).containsBeanDefinition("org.springframework.boot.context.internalConfigurationPropertiesBinder");
+			verify(registryMock).registerBeanDefinition(eq("org.springframework.boot.context.internalConfigurationPropertiesBinder"), (BeanDefinition) any());
+		});
 	}
 
 	//Sapient generated method id: ${9c25887d-767d-38e9-b5ae-c2e4012c49be}, hash: 70152A5EC2A3B526FA8BFD199513E858
@@ -732,8 +727,10 @@ class ConfigurationPropertiesBinderSapientGeneratedTest {
 		BeanFactory beanFactoryMock = mock(BeanFactory.class);
 		ConfigurationPropertiesBinder configurationPropertiesBinderMock = mock(ConfigurationPropertiesBinder.class);
 		doReturn(configurationPropertiesBinderMock).when(beanFactoryMock).getBean("org.springframework.boot.context.internalConfigurationPropertiesBinder", ConfigurationPropertiesBinder.class);
+
 		//Act Statement(s)
 		ConfigurationPropertiesBinder result = ConfigurationPropertiesBinder.get(beanFactoryMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(configurationPropertiesBinderMock));

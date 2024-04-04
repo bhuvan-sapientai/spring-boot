@@ -18,12 +18,12 @@ import org.mockito.stubbing.Answer;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.boot.context.properties.bind.Bindable;
 
 import org.mockito.MockedStatic;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.bind.BindMethod;
 
 import static org.mockito.Mockito.doNothing;
@@ -32,6 +32,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.doThrow;
@@ -40,8 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mockStatic;
-
-import org.junit.jupiter.api.Disabled;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
@@ -62,7 +62,6 @@ class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${a1e3d830-abee-3fcd-84b8-da92369a5da4}, hash: B7DDF1688A4F95A540FBBAB3F984C62C
-	@Disabled()
 	@Test()
 	void afterPropertiesSetTest() throws Exception, IllegalStateException {
 		/*
@@ -93,8 +92,10 @@ class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
 		//Arrange Statement(s)
 		target = new ConfigurationPropertiesBindingPostProcessor();
 		autoCloseableMocks = MockitoAnnotations.openMocks(this);
+
 		//Act Statement(s)
 		int result = target.getOrder();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(-2147483647)));
 	}
@@ -123,7 +124,6 @@ class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${e6126cec-8afc-3bb1-ba53-10f7f5367792}, hash: 666C46AF666370A7FC3B00B2B22C9521
-	@Disabled()
 	@Test()
 	void postProcessBeforeInitializationWhenBeanIsNull() throws Exception {
 		/* Branches:
@@ -151,7 +151,6 @@ class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${c9adc945-173e-3492-af14-dbfd76804149}, hash: 72380FC86BD0B6F59B926AC8A891C335
-	@Disabled()
 	@Test()
 	void postProcessBeforeInitializationWhenBeanAsBindTargetGetBindMethodNotEqualsBindMethodVALUE_OBJECT() throws Exception {
 		/* Branches:
@@ -194,7 +193,6 @@ class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${a612dd02-cfe1-3d7f-a31d-2371d7a0eb0e}, hash: 808F70DDF60032662648E68B5D54AB11
-	@Disabled()
 	@Test()
 	void postProcessBeforeInitializationWhenBeanAsBindTargetGetBindMethodEqualsBindMethodVALUE_OBJECT() throws Exception {
 		/* Branches:
@@ -237,7 +235,6 @@ class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${4d7d246d-b274-319d-9bb1-bb0939771461}, hash: 1D337476D78A223A6B0E4FAF90F0FEF2
-	@Disabled()
 	@Test()
 	void postProcessBeforeInitializationWhenCaughtExceptionThrowsConfigurationPropertiesBindException() throws BeansException {
 		/* Branches:
@@ -283,7 +280,7 @@ class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${86d5dd96-2a75-3e17-ac21-495a839897f1}, hash: 6CF88E13DEBB0E5D0924613E8D6D2966
+	//Sapient generated method id: ${86d5dd96-2a75-3e17-ac21-495a839897f1}, hash: B0FEA2170E53AA2DBBCBB27D862A1F23
 	@Test()
 	void registerWhenRegistryNotContainsBeanDefinitionBEAN_NAME() throws BeanDefinitionStoreException {
 		/* Branches:
@@ -291,28 +288,19 @@ class ConfigurationPropertiesBindingPostProcessorSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		BeanDefinitionRegistry registryMock = mock(BeanDefinitionRegistry.class);
-		AbstractBeanDefinition abstractBeanDefinitionMock = mock(AbstractBeanDefinition.class);
-		BeanDefinitionBuilder beanDefinitionBuilderMock = mock(BeanDefinitionBuilder.class);
 		try (MockedStatic<ConfigurationPropertiesBinder> configurationPropertiesBinder = mockStatic(ConfigurationPropertiesBinder.class);
-			 MockedStatic<BeanDefinitionBuilder> beanDefinitionBuilder = mockStatic(BeanDefinitionBuilder.class);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(false).when(registryMock).containsBeanDefinition("org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor");
-			doNothing().when(registryMock).registerBeanDefinition("org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor", abstractBeanDefinitionMock);
-			doNothing().when(abstractBeanDefinitionMock).setRole(2);
+			doNothing().when(registryMock).registerBeanDefinition(eq("org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor"), (BeanDefinition) any());
 			_assert.when(() -> Assert.notNull(registryMock, "Registry must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			beanDefinitionBuilder.when(() -> BeanDefinitionBuilder.rootBeanDefinition(ConfigurationPropertiesBindingPostProcessor.class)).thenReturn(beanDefinitionBuilderMock);
-			doReturn(abstractBeanDefinitionMock).when(beanDefinitionBuilderMock).getBeanDefinition();
 			configurationPropertiesBinder.when(() -> ConfigurationPropertiesBinder.register(registryMock)).thenAnswer((Answer<Void>) invocation -> null);
 			//Act Statement(s)
 			ConfigurationPropertiesBindingPostProcessor.register(registryMock);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				verify(registryMock).containsBeanDefinition("org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor");
-				verify(registryMock).registerBeanDefinition("org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor", abstractBeanDefinitionMock);
-				verify(abstractBeanDefinitionMock).setRole(2);
+				verify(registryMock).registerBeanDefinition(eq("org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor"), (BeanDefinition) any());
 				_assert.verify(() -> Assert.notNull(registryMock, "Registry must not be null"), atLeast(1));
-				beanDefinitionBuilder.verify(() -> BeanDefinitionBuilder.rootBeanDefinition(ConfigurationPropertiesBindingPostProcessor.class), atLeast(1));
-				verify(beanDefinitionBuilderMock).getBeanDefinition();
 				configurationPropertiesBinder.verify(() -> ConfigurationPropertiesBinder.register(registryMock), atLeast(1));
 			});
 		}

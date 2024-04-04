@@ -27,8 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigurationPropertiesScanRegistrarSapientGeneratedTest {
 
@@ -43,7 +41,6 @@ class ConfigurationPropertiesScanRegistrarSapientGeneratedTest {
 	private final ResourceLoader resourceLoaderMock = mock(ResourceLoader.class);
 
 	//Sapient generated method id: ${c0d90754-6ebc-3056-b15b-c420e58b8d90}, hash: 995F2645268955C41C88F7ED4512732C
-	@Disabled()
 	@Test()
 	void registerBeanDefinitionsWhenIsComponentType() throws LinkageError, ClassNotFoundException {
 		/* Branches:
@@ -89,7 +86,6 @@ class ConfigurationPropertiesScanRegistrarSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${5e22f4f9-a410-369e-8df0-14d8223d71c9}, hash: 6CF179CEB0E95B541C4A370CE4CF1143
-	@Disabled()
 	@Test()
 	void registerBeanDefinitionsWhenIsComponentNotType() throws LinkageError, ClassNotFoundException {
 		/* Branches:
@@ -134,8 +130,7 @@ class ConfigurationPropertiesScanRegistrarSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${fbec5789-e71d-313e-b81a-35bd5444035b}, hash: F04B03A18342B7E4D55D0F8E23F4661E
-	@Disabled()
+	//Sapient generated method id: ${fbec5789-e71d-313e-b81a-35bd5444035b}, hash: D4ADFDBF75B9EC2BF566EA235BEC913A
 	@Test()
 	void registerBeanDefinitionsWhenCaughtClassNotFoundException() throws LinkageError, ClassNotFoundException {
 		/* Branches:
@@ -152,6 +147,7 @@ class ConfigurationPropertiesScanRegistrarSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		AnnotationMetadata metadataMock = mock(AnnotationMetadata.class, "AnnotationMetadata");
+		MergedAnnotations mergedAnnotationsMock = mock(MergedAnnotations.class, "MergedAnnotations");
 		Environment environmentMock = mock(Environment.class, "Environment");
 		ResourceLoader resourceLoaderMock = mock(ResourceLoader.class, "ResourceLoader");
 		BeanDefinitionRegistry beanDefinitionRegistryMock = mock(BeanDefinitionRegistry.class, "BeanDefinitionRegistry");

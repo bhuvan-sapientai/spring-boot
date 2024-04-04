@@ -17,8 +17,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataLocationNotFoundExceptionSapientGeneratedTest {
 
@@ -46,7 +44,6 @@ class ConfigDataLocationNotFoundExceptionSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${ce5624c4-d029-3185-9cec-77e45be74ad0}, hash: DBDDBC111A85DCC6CF3EB6559777F391
-	@Disabled()
 	@Test()
 	void getReferenceDescriptionTest() {
 		//Arrange Statement(s)

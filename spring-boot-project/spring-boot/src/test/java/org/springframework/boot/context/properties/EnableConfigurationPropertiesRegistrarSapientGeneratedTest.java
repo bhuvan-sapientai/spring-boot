@@ -7,20 +7,19 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 
 import org.mockito.stubbing.Answer;
 
-import org.springframework.boot.validation.beanvalidation.MethodValidationExcludeFilter;
 import org.springframework.core.annotation.MergedAnnotations;
 
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-
 import org.mockito.MockedStatic;
 
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.config.BeanDefinition;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -29,15 +28,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class EnableConfigurationPropertiesRegistrarSapientGeneratedTest {
 
 	private final BeanDefinitionRegistry beanDefinitionRegistryMock = mock(BeanDefinitionRegistry.class);
 
 	//Sapient generated method id: ${65ccd99f-3bf8-36f1-bca0-bbb723609f6b}, hash: 91C36F65AE98B94B7769AB2A9D1B27C6
-	@Disabled()
 	@Test()
 	void registerBeanDefinitionsTest() {
 		/*
@@ -92,8 +88,7 @@ class EnableConfigurationPropertiesRegistrarSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${a8406ee8-52ed-335b-bd8c-e91c55a8b744}, hash: FD4BA1FB647FBBCCE6107B16E742E5D0
-	@Disabled()
+	//Sapient generated method id: ${a8406ee8-52ed-335b-bd8c-e91c55a8b744}, hash: 7D6729257B25434CF9A563314CAD9986
 	@Test()
 	void registerMethodValidationExcludeFilterWhenRegistryNotContainsBeanDefinitionMETHOD_VALIDATION_EXCLUDE_FILTER_BEAN_NAME() throws BeanDefinitionStoreException {
 		/* Branches:
@@ -101,28 +96,16 @@ class EnableConfigurationPropertiesRegistrarSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		BeanDefinitionRegistry registryMock = mock(BeanDefinitionRegistry.class);
-		AbstractBeanDefinition abstractBeanDefinitionMock = mock(AbstractBeanDefinition.class);
-		BeanDefinitionBuilder beanDefinitionBuilderMock = mock(BeanDefinitionBuilder.class);
-		BeanDefinitionBuilder beanDefinitionBuilderMock2 = mock(BeanDefinitionBuilder.class);
-		BeanDefinitionBuilder beanDefinitionBuilderMock3 = mock(BeanDefinitionBuilder.class);
-		try (MockedStatic<BeanDefinitionBuilder> beanDefinitionBuilder = mockStatic(BeanDefinitionBuilder.class)) {
-			doReturn(false).when(registryMock).containsBeanDefinition("arg0");
-			doNothing().when(registryMock).registerBeanDefinition("arg0", abstractBeanDefinitionMock);
-			beanDefinitionBuilder.when(() -> BeanDefinitionBuilder.rootBeanDefinition(MethodValidationExcludeFilter.class, "byAnnotation")).thenReturn(beanDefinitionBuilderMock);
-			doReturn(beanDefinitionBuilderMock2).when(beanDefinitionBuilderMock).addConstructorArgValue(ConfigurationProperties.class);
-			doReturn(beanDefinitionBuilderMock3).when(beanDefinitionBuilderMock2).setRole(2);
-			doReturn(abstractBeanDefinitionMock).when(beanDefinitionBuilderMock3).getBeanDefinition();
-			//Act Statement(s)
-			EnableConfigurationPropertiesRegistrar.registerMethodValidationExcludeFilter(registryMock);
-			//Assert statement(s)
-			assertAll("result", () -> {
-				verify(registryMock).containsBeanDefinition("arg0");
-				verify(registryMock).registerBeanDefinition("arg0", abstractBeanDefinitionMock);
-				beanDefinitionBuilder.verify(() -> BeanDefinitionBuilder.rootBeanDefinition(MethodValidationExcludeFilter.class, "byAnnotation"), atLeast(1));
-				verify(beanDefinitionBuilderMock).addConstructorArgValue(ConfigurationProperties.class);
-				verify(beanDefinitionBuilderMock2).setRole(2);
-				verify(beanDefinitionBuilderMock3).getBeanDefinition();
-			});
-		}
+		doReturn(false).when(registryMock).containsBeanDefinition("org.springframework.boot.context.properties.EnableConfigurationPropertiesRegistrar.methodValidationExcludeFilter");
+		doNothing().when(registryMock).registerBeanDefinition(eq("org.springframework.boot.context.properties.EnableConfigurationPropertiesRegistrar.methodValidationExcludeFilter"), (BeanDefinition) any());
+
+		//Act Statement(s)
+		EnableConfigurationPropertiesRegistrar.registerMethodValidationExcludeFilter(registryMock);
+
+		//Assert statement(s)
+		assertAll("result", () -> {
+			verify(registryMock).containsBeanDefinition("org.springframework.boot.context.properties.EnableConfigurationPropertiesRegistrar.methodValidationExcludeFilter");
+			verify(registryMock).registerBeanDefinition(eq("org.springframework.boot.context.properties.EnableConfigurationPropertiesRegistrar.methodValidationExcludeFilter"), (BeanDefinition) any());
+		});
 	}
 }

@@ -1,22 +1,5 @@
-/*
- * Copyright 2012-2024 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.boot.admin;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
@@ -24,15 +7,9 @@ import org.springframework.beans.BeansException;
 
 import javax.management.MalformedObjectNameException;
 
-import org.mockito.stubbing.Answer;
-
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.core.ResolvableType;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.util.Assert;
-
-import org.mockito.MockedStatic;
-
 import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -41,10 +18,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
@@ -54,24 +29,18 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	private final ResolvableType eventTypeMock = mock(ResolvableType.class);
 
-	//Sapient generated method id: ${8965c77a-005e-3a50-b8bb-0a78bd407600}, hash: AA100954A0D977AC292108E2594B6D68
+	//Sapient generated method id: ${8965c77a-005e-3a50-b8bb-0a78bd407600}, hash: D7F12CA6334853B1605561D2773D6038
 	@Test()
-	@Disabled
 	void setApplicationContextTest() throws BeansException, MalformedObjectNameException {
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.state(true, "ApplicationContext does not implement ConfigurableApplicationContext")).thenAnswer((Answer<Void>) invocation -> null);
-			SpringApplicationAdminMXBeanRegistrar target = new SpringApplicationAdminMXBeanRegistrar("name1");
-			//Act Statement(s)
-			target.setApplicationContext(configurableApplicationContextMock);
-			//Assert statement(s)
-			assertAll("result", () -> _assert.verify(() -> Assert.state(true, "ApplicationContext does not implement ConfigurableApplicationContext"), atLeast(1)));
-		}
+		SpringApplicationAdminMXBeanRegistrar target = new SpringApplicationAdminMXBeanRegistrar("name1");
+
+		//Act Statement(s)
+		target.setApplicationContext(configurableApplicationContextMock);
 	}
 
 	//Sapient generated method id: ${34811332-9f1e-3299-9053-9889102380f6}, hash: 71592EEADE936E4EB9F9779F9B10436B
 	@Test()
-	@Disabled
 	void supportsEventTypeWhenTypeIsNull() throws MalformedObjectNameException {
 		/* Branches:
 		 * (type == null) : true
@@ -92,7 +61,6 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${2b6ba708-ef5f-3afc-ba2e-fdd6e49c2982}, hash: 65C746C9B1AE85259E703E5D27475C06
 	@Test()
-	@Disabled
 	void supportsEventTypeWhenWebServerInitializedEventIsAssignableFromType() throws MalformedObjectNameException {
 		/* Branches:
 		 * (type == null) : false
@@ -122,7 +90,6 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${25276624-a93b-33b7-981f-506c5ac36042}, hash: 7D27B097A6F702574BE6AB1232017DE8
 	@Test()
-	@Disabled
 	void supportsEventTypeWhenWebServerInitializedEventNotIsAssignableFromType() throws MalformedObjectNameException {
 		/* Branches:
 		 * (type == null) : false
@@ -152,7 +119,6 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${70b9b3d9-c047-3af9-8d3a-f4dd5a0efcb0}, hash: FC1ACEE30A92D303DB2999C4228B8B3B
 	@Test()
-	@Disabled
 	void supportsSourceTypeTest() throws MalformedObjectNameException {
 		//Arrange Statement(s)
 		SpringApplicationAdminMXBeanRegistrar target = new SpringApplicationAdminMXBeanRegistrar("name1");
@@ -166,7 +132,6 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${baad31e7-bd13-34f7-b6c5-965196e7d669}, hash: 6AB449AB90367EC31E2A612D67EC77F6
 	@Test()
-	@Disabled
 	void onApplicationEventWhenEventNotInstanceOfWebServerInitializedEvent() throws MalformedObjectNameException {
 		/* Branches:
 		 * (event instanceof ApplicationReadyEvent readyEvent) : true
@@ -186,7 +151,6 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${313fc74a-87c2-3f00-8f44-e20b5061874e}, hash: 618BB609C60905117AF3C883DF60646C
 	@Test()
-	@Disabled
 	void onApplicationEventWhenEventInstanceOfWebServerInitializedEvent() throws MalformedObjectNameException {
 		/* Branches:
 		 * (event instanceof ApplicationReadyEvent readyEvent) : false
@@ -206,7 +170,6 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${4333ca59-f65f-3c9a-8f2b-ce3fb89303fc}, hash: 63C9E3A0848D2EC81A087D106CE3410A
 	@Test()
-	@Disabled
 	void onApplicationReadyEventWhenThisApplicationContextEqualsEventGetApplicationContext() throws MalformedObjectNameException {
 		/* Branches:
 		 * (this.applicationContext.equals(event.getApplicationContext())) : true
@@ -225,7 +188,6 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${120c298f-acf8-370b-b520-c705c08070c5}, hash: 8408547E690C1BD3C98E29CC057536BE
 	@Test()
-	@Disabled
 	void onWebServerInitializedEventWhenThisApplicationContextEqualsEventGetApplicationContext() throws MalformedObjectNameException {
 		/* Branches:
 		 * (this.applicationContext.equals(event.getApplicationContext())) : true
@@ -252,13 +214,12 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${09b1b803-de86-31c2-bf4d-87adb9044ea5}, hash: F6B71161215BC0284CF82AB38917D8B0
 	@Test()
-	@Disabled
 	void afterPropertiesSetWhenLoggerIsDebugEnabled() throws Exception, MalformedObjectNameException {
 		/* Branches:
 		 * (logger.isDebugEnabled()) : true
 		 *
 		 * TODO: Help needed! This method is not unit testable!
-		 *  No constructor found to create an object without any exception for class javax.management.ObjectName
+		 *  Following variables could not be isolated/mocked: server
 		 *  Suggestions:
 		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
 		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
@@ -273,11 +234,10 @@ class SpringApplicationAdminMXBeanRegistrarSapientGeneratedTest {
 
 	//Sapient generated method id: ${55bedf20-e502-313f-adac-b98311a330e0}, hash: 2BC0D205A2C58FDB617468CEFF8264A2
 	@Test()
-	@Disabled
 	void destroyTest() throws Exception, MalformedObjectNameException {
 		/*
 		 * TODO: Help needed! This method is not unit testable!
-		 *  No constructor found to create an object without any exception for class javax.management.ObjectName
+		 *  Following variables could not be isolated/mocked: object of type MBeanServer
 		 *  Suggestions:
 		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
 		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.

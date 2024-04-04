@@ -35,8 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mockStatic;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class BindableSapientGeneratedTest {
 
@@ -44,13 +42,15 @@ class BindableSapientGeneratedTest {
 
 	private final ResolvableType boxedTypeMock = mock(ResolvableType.class, "boxedType");
 
-	private final Bindable<Map<Object, Object>> bindableMock = mock(Bindable.class);
+	private final Bindable<Object> bindableMock = mock(Bindable.class);
+
+	private final Bindable bindableMock2 = mock(Bindable.class);
 
 	private final ResolvableType resolvableTypeMock = mock(ResolvableType.class);
 
 	private final ResolvableType typeMock2 = mock(ResolvableType.class);
 
-	//Sapient generated method id: ${0c0b54df-f145-3614-8d79-f6601fa56d79}, hash: 60490134B05C7002CB33B20C0CD55E6A
+	//Sapient generated method id: ${0c0b54df-f145-3614-8d79-f6601fa56d79}, hash: 94DC17B355CAFBE91CEED546ADA003CC
 	@Test()
 	void getAnnotationWhenTypeIsInstanceAnnotation() {
 		/* Branches:
@@ -61,27 +61,25 @@ class BindableSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    ResolvableType resolvableType2 = ResolvableType.forClass(Object.class);
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableType2);
-    Object object = new Object();
-    Bindable<Map<Object, Object>> bindable2 = Bindable.ofInstance(object);
-    bindable.when(() -> Bindable.of((ResolvableType) any())).thenReturn(bindable2);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    //Act Statement(s)
-    Annotation result = target.getAnnotation(Annotation.class);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of((ResolvableType) any()));
-    });
-}*/
+		Bindable<Object> bindableMock = mock(Bindable.class, "Bindable");
+		Bindable bindableMock2 = mock(Bindable.class, "Bindable");
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class)) {
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			Object object = new Object();
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			//Act Statement(s)
+			Annotation result = target.getAnnotation(Annotation.class);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${4eb7db39-0a57-38ad-a72d-511d50e04994}, hash: F1EF028955E0D1AD10A93C8FC8D8B3D7
+	//Sapient generated method id: ${4eb7db39-0a57-38ad-a72d-511d50e04994}, hash: A009F1EF737FB95802CDB7FEFF9ACF7B
 	@Test()
 	void getAnnotationWhenTypeNotIsInstanceAnnotation() {
 		/* Branches:
@@ -92,75 +90,77 @@ class BindableSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    ResolvableType resolvableType2 = ResolvableType.forClass(Object.class);
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableType2);
-    Object object = new Object();
-    Bindable<Map<Object, Object>> bindable2 = Bindable.ofInstance(object);
-    bindable.when(() -> Bindable.of((ResolvableType) any())).thenReturn(bindable2);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    //Act Statement(s)
-    Annotation result = target.getAnnotation(Annotation.class);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(nullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of((ResolvableType) any()));
-    });
-}*/
+		Bindable<Object> bindableMock = mock(Bindable.class, "Bindable");
+		Bindable bindableMock2 = mock(Bindable.class, "Bindable");
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class)) {
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			Object object = new Object();
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			//Act Statement(s)
+			Annotation result = target.getAnnotation(Annotation.class);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(nullValue()));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${2a98fe32-b8a9-36b6-836e-6db8e42d23b4}, hash: B36FA08ABF9423AAF01063D00AD1658B
+	//Sapient generated method id: ${2a98fe32-b8a9-36b6-836e-6db8e42d23b4}, hash: 1201C810ED1CD23F9614D2DD7B1E7EB5
 	@Test()
 	void hasBindRestrictionWhenThisBindRestrictionsContainsBindRestriction() {
 		/* Branches:
 		 * (this.bindRestrictions.contains(bindRestriction)) : true
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    //Act Statement(s)
-    boolean result = target.hasBindRestriction(Bindable.BindRestriction.NO_DIRECT_PROPERTY);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, equalTo(Boolean.TRUE));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-    });
-}*/
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			//Act Statement(s)
+			boolean result = target.hasBindRestriction(Bindable.BindRestriction.NO_DIRECT_PROPERTY);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(Boolean.TRUE));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${5e37aa51-fcf5-3095-9f2c-5a579041ad64}, hash: E76223DA6A5A09A3803BCCBA5BAB9410
+	//Sapient generated method id: ${5e37aa51-fcf5-3095-9f2c-5a579041ad64}, hash: 43C2D9F74414B6EE22D44DE877226C62
 	@Test()
 	void hasBindRestrictionWhenThisBindRestrictionsNotContainsBindRestriction() {
 		/* Branches:
 		 * (this.bindRestrictions.contains(bindRestriction)) : false
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    //Act Statement(s)
-    boolean result = target.hasBindRestriction(Bindable.BindRestriction.NO_DIRECT_PROPERTY);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, equalTo(Boolean.FALSE));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-    });
-}*/
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			//Act Statement(s)
+			boolean result = target.hasBindRestriction(Bindable.BindRestriction.NO_DIRECT_PROPERTY);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo(Boolean.FALSE));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${71eb015a-95ed-3787-b890-7174d4d99f79}, hash: C4A06199E7ACB4B9B530C6A4B67A16FD
+	//Sapient generated method id: ${71eb015a-95ed-3787-b890-7174d4d99f79}, hash: 2B2F88690E09A39F6EF76E2B41E785A1
 	@Test()
 	void toStringWhenThisValueIsNull() {
 		/* Branches:
@@ -174,74 +174,80 @@ class BindableSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    //Act Statement(s)
-    String result = target.toString();
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, equalTo("result1"));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-    });
-}*/
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			//Act Statement(s)
+			String result = target.toString();
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, equalTo("result1"));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${98869e93-f5c9-3b6c-ba2d-3272eeab77b3}, hash: 9F3F467BFA7BD2FBABDE2C6D6C293C26
+	//Sapient generated method id: ${98869e93-f5c9-3b6c-ba2d-3272eeab77b3}, hash: D27A488F58709B51CC60C42BBEC80564
 	@Test()
 	void withAnnotationsWhenAnnotationsIsNotNull() {
 		/* Branches:
 		 * (annotations != null) : true
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    Annotation[] annotationArray = new Annotation[] {};
-    //Act Statement(s)
-    Bindable result = target.withAnnotations(annotationArray);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-    });
-}*/
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			Annotation[] annotationArray = new Annotation[] {};
+			//Act Statement(s)
+			Bindable result = target.withAnnotations(annotationArray);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${0a923754-1598-368b-923e-63ff46b9f177}, hash: 5E89F0ED70E48B96A29382A12A39143F
+	//Sapient generated method id: ${0a923754-1598-368b-923e-63ff46b9f177}, hash: 101B33B54E8097108E42F5B4381D74F0
 	@Test()
 	void withAnnotationsWhenAnnotationsIsNull() {
 		/* Branches:
 		 * (annotations != null) : false
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    Annotation[] annotation = null;
-    //Act Statement(s)
-    Bindable result = target.withAnnotations(annotation);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-    });
-}*/
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			Annotation[] annotation = null;
+			//Act Statement(s)
+			Bindable result = target.withAnnotations(annotation);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${b6c83d41-f625-3420-9839-04f9ae84dc5a}, hash: 8F51F57E71BBABB605183E4DDC86AD46
+	//Sapient generated method id: ${b6c83d41-f625-3420-9839-04f9ae84dc5a}, hash: EF6CCFFC56B33926E4BB20F70DF483B6
 	@Test()
 	void withExistingValueWhenExistingValueIsNull() {
 		/* Branches:
@@ -250,30 +256,31 @@ class BindableSapientGeneratedTest {
 		 * (existingValue != null) : false
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
-    MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    _assert.when(() -> Assert.isTrue(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
-    _assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    Object object = null;
-    //Act Statement(s)
-    Bindable result = target.withExistingValue(object);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-        _assert.verify(() -> Assert.isTrue(eq(true), (Supplier) any()));
-        _assert.verify(() -> Assert.state(eq(true), (Supplier) any()));
-    });
-}*/
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
+			 MockedStatic<Bindable> bindable = mockStatic(Bindable.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			_assert.when(() -> Assert.isTrue(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			Object object2 = null;
+			//Act Statement(s)
+			Bindable result = target.withExistingValue(object2);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+				_assert.verify(() -> Assert.isTrue(eq(true), (Supplier) any()));
+				_assert.verify(() -> Assert.state(eq(true), (Supplier) any()));
+			});
+		}
 	}
 
-	//Sapient generated method id: ${b7446969-16fe-3200-a92a-363fafc23073}, hash: 3B291A3D52BBC01404DB59C4F4FBC300
+	//Sapient generated method id: ${b7446969-16fe-3200-a92a-363fafc23073}, hash: ACEA6582AA81DDC7F9CF2F3CA7041013
 	@Test()
 	void withExistingValueWhenThisBindMethodNotEqualsBindMethodVALUE_OBJECTAndExistingValueIsNotNull() {
 		/* Branches:
@@ -282,39 +289,36 @@ class BindableSapientGeneratedTest {
 		 * (this.type.isArray()) : true
 		 * (this.bindMethod != BindMethod.VALUE_OBJECT) : true
 		 * (existingValue != null) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
-    MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    _assert.when(() -> Assert.isTrue(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
-    _assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    doReturn(false).when(typeMock).isArray();
-    doReturn(ResolvableType.class).when(boxedTypeMock).resolve();
-    Object object = new Object();
-    //Act Statement(s)
-    Bindable result = target.withExistingValue(object);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-        _assert.verify(() -> Assert.isTrue(eq(true), (Supplier) any()));
-        _assert.verify(() -> Assert.state(eq(true), (Supplier) any()));
-        verify(typeMock, atLeast(1)).isArray();
-        verify(boxedTypeMock, atLeast(1)).resolve();
-    });
-}*/
+		Bindable bindableMock2 = mock(Bindable.class, "true");
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class, CALLS_REAL_METHODS);
+			 MockedStatic<Bindable> bindable = mockStatic(Bindable.class)) {
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			Object object = new Object();
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			_assert.when(() -> Assert.isTrue(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			doReturn(false).when(typeMock).isArray();
+			doReturn(Object.class).when(boxedTypeMock).resolve();
+			Object object2 = new Object();
+			//Act Statement(s)
+			Bindable result = target.withExistingValue(object2);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock, atLeast(1)).withExistingValue(object);
+				_assert.verify(() -> Assert.isTrue(eq(true), (Supplier) any()), atLeast(1));
+				_assert.verify(() -> Assert.state(eq(true), (Supplier) any()), atLeast(1));
+				verify(typeMock, atLeast(1)).isArray();
+				verify(boxedTypeMock, atLeast(1)).resolve();
+			});
+		}
 	}
 
-	//Sapient generated method id: ${c9bb1644-d672-3aaa-9855-15df24c7157e}, hash: 4E82111B2E30D9784F4A03D562EB9437
+	//Sapient generated method id: ${c9bb1644-d672-3aaa-9855-15df24c7157e}, hash: A07E6D25C748D953B99156BE87584A26
 	@Test()
 	void withExistingValueWhenThisTypeNotIsArrayAndThisBindMethodNotEqualsBindMethodVALUE_OBJECTAndExistingValueIsNotNull() {
 		/* Branches:
@@ -328,56 +332,59 @@ class BindableSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
-    MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    _assert.when(() -> Assert.isTrue(eq(false), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
-    _assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    doReturn(false).when(typeMock).isArray();
-    doReturn(Object.class).when(boxedTypeMock).resolve();
-    Object object = new Object();
-    //Act Statement(s)
-    Bindable result = target.withExistingValue(object);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-        _assert.verify(() -> Assert.isTrue(eq(false), (Supplier) any()));
-        _assert.verify(() -> Assert.state(eq(true), (Supplier) any()));
-        verify(typeMock, atLeast(1)).isArray();
-        verify(boxedTypeMock, atLeast(1)).resolve();
-    });
-}*/
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
+			 MockedStatic<Bindable> bindable = mockStatic(Bindable.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			_assert.when(() -> Assert.isTrue(eq(false), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			_assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			doReturn(false).when(typeMock).isArray();
+			doReturn(Object.class).when(boxedTypeMock).resolve();
+			Object object2 = new Object();
+			//Act Statement(s)
+			Bindable result = target.withExistingValue(object2);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+				_assert.verify(() -> Assert.isTrue(eq(false), (Supplier) any()));
+				_assert.verify(() -> Assert.state(eq(true), (Supplier) any()));
+				verify(typeMock, atLeast(1)).isArray();
+				verify(boxedTypeMock, atLeast(1)).resolve();
+			});
+		}
 	}
 
-	//Sapient generated method id: ${887d4022-14db-348b-8a3d-fa4aa86d8237}, hash: 4125428488C374D0F751EB356A9856D6
+	//Sapient generated method id: ${887d4022-14db-348b-8a3d-fa4aa86d8237}, hash: 75F876879147033BE2CEB1C1883E1729
 	@Test()
 	void withSuppliedValueTest() {
 		//Arrange Statement(s)
-		//Supplier supplierMock = mock(Supplier.class);
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    //Act Statement(s)
-    Bindable result = target.withSuppliedValue(supplierMock);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-    });
-}*/
+		Supplier supplierMock = mock(Supplier.class);
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
+			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			//Act Statement(s)
+			Bindable result = target.withSuppliedValue(supplierMock);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${4623f66f-2eaf-3b78-b9eb-6d6cecb5f962}, hash: 6E35AF3BD01E8D68079AA112ABB606E4
+	//Sapient generated method id: ${4623f66f-2eaf-3b78-b9eb-6d6cecb5f962}, hash: 74006863C432729EE81DCC832844AE29
 	@Test()
 	void withBindRestrictionsTest() {
 		/*
@@ -385,28 +392,29 @@ class BindableSapientGeneratedTest {
 		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    ResolvableType resolvableType2 = ResolvableType.forClass(Object.class);
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableType2);
-    Object object = new Object();
-    Bindable<Map<Object, Object>> bindable2 = Bindable.ofInstance(object);
-    bindable.when(() -> Bindable.of((ResolvableType) any())).thenReturn(bindable2);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    Bindable.BindRestriction[] bindRestrictionArray = new Bindable.BindRestriction[] {};
-    //Act Statement(s)
-    Bindable result = target.withBindRestrictions(bindRestrictionArray);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of((ResolvableType) any()));
-    });
-}*/
+		Bindable<Object> bindableMock = mock(Bindable.class, "Bindable");
+		Bindable bindableMock2 = mock(Bindable.class, "Bindable");
+		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class)) {
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			Object object = new Object();
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			Bindable.BindRestriction[] bindRestrictionArray2 = new Bindable.BindRestriction[] { Bindable.BindRestriction.NO_DIRECT_PROPERTY };
+			Bindable.BindRestriction[] bindRestrictionArray3 = new Bindable.BindRestriction[] { Bindable.BindRestriction.NO_DIRECT_PROPERTY };
+			Bindable.BindRestriction[] bindRestrictionArray4 = new Bindable.BindRestriction[] { Bindable.BindRestriction.NO_DIRECT_PROPERTY };
+			Bindable.BindRestriction[] bindRestrictionArray = new Bindable.BindRestriction[] { bindRestrictionArray2, bindRestrictionArray3, bindRestrictionArray4 };
+			//Act Statement(s)
+			Bindable result = target.withBindRestrictions(bindRestrictionArray);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+			});
+		}
 	}
 
-	//Sapient generated method id: ${9c096587-2488-3865-9fb2-ad8cf97bbd6b}, hash: 9CA6C122ED8D4A11004635C8C94CE542
+	//Sapient generated method id: ${9c096587-2488-3865-9fb2-ad8cf97bbd6b}, hash: 391329737F42B25C8862ED5D042C4219
 	@Test()
 	void withBindMethodWhenThisValueIsNull() {
 		/* Branches:
@@ -414,32 +422,31 @@ class BindableSapientGeneratedTest {
 		 * (this.value == null) : true
 		 */
 		//Arrange Statement(s)
-        /*try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
-    MockedStatic<Bindable> bindable = mockStatic(Bindable.class);
-    MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
-    Class<Object>[] classArray = new Class[] { Object.class, Object.class };
-    resolvableType.when(() -> ResolvableType.forClassWithGenerics(Map.class, classArray)).thenReturn(resolvableTypeMock);
-    bindable.when(() -> Bindable.of(resolvableTypeMock)).thenReturn(bindableMock);
-    _assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
-    Bindable<Object> target = Bindable.mapOf(Object.class, Object.class);
-    //Act Statement(s)
-    Bindable result = target.withBindMethod(BindMethod.VALUE_OBJECT);
-    //Assert statement(s)
-    assertAll("result", () -> {
-        assertThat(result, is(notNullValue()));
-        resolvableType.verify(() -> ResolvableType.forClassWithGenerics(Map.class, classArray), atLeast(1));
-        bindable.verify(() -> Bindable.of(resolvableTypeMock), atLeast(1));
-        _assert.verify(() -> Assert.state(eq(true), (Supplier) any()));
-    });
-}*/
+		try (MockedStatic<Assert> _assert = mockStatic(Assert.class);
+			 MockedStatic<Bindable> bindable = mockStatic(Bindable.class)) {
+			Object object = new Object();
+			_assert.when(() -> Assert.notNull(object, "Instance must not be null")).thenAnswer((Answer<Void>) invocation -> null);
+			bindable.when(() -> Bindable.of(Object.class)).thenReturn(bindableMock);
+			doReturn(bindableMock2).when(bindableMock).withExistingValue(object);
+			_assert.when(() -> Assert.state(eq(true), (Supplier) any())).thenAnswer((Answer<Void>) invocation -> null);
+			Bindable<Object> target = Bindable.ofInstance(object);
+			//Act Statement(s)
+			Bindable result = target.withBindMethod(BindMethod.VALUE_OBJECT);
+			//Assert statement(s)
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				_assert.verify(() -> Assert.notNull(object, "Instance must not be null"), atLeast(1));
+				bindable.verify(() -> Bindable.of(Object.class), atLeast(1));
+				verify(bindableMock).withExistingValue(object);
+				_assert.verify(() -> Assert.state(eq(true), (Supplier) any()));
+			});
+		}
 	}
 
-	//Sapient generated method id: ${99269197-38e4-3e61-b80e-c546d61e22ee}, hash: FC3FA5C9EAC7B1999E11D38A3E34515C
+	//Sapient generated method id: ${99269197-38e4-3e61-b80e-c546d61e22ee}, hash: 297D1567AB8FC9AB81304E9ECD669A0D
 	@Test()
 	void ofInstanceTest() {
 		//Arrange Statement(s)
-		Bindable<Object> bindableMock = mock(Bindable.class);
-		Bindable bindableMock2 = mock(Bindable.class);
 		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class, CALLS_REAL_METHODS);
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			Object object = new Object();
@@ -523,10 +530,11 @@ class BindableSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${fdc5ff0e-48f6-3ffc-bd15-6aa54a16a841}, hash: B4C9C0363A6883956906A4C8388033F1
+	//Sapient generated method id: ${fdc5ff0e-48f6-3ffc-bd15-6aa54a16a841}, hash: F7223F72F6EE17B8AE6F4E90730A5B1E
 	@Test()
 	void mapOfTest() {
 		//Arrange Statement(s)
+		Bindable<Map<Object, Object>> bindableMock = mock(Bindable.class);
 		try (MockedStatic<Bindable> bindable = mockStatic(Bindable.class, CALLS_REAL_METHODS);
 			 MockedStatic<ResolvableType> resolvableType = mockStatic(ResolvableType.class)) {
 			Class<Object>[] classArray = new Class[] { Object.class, Object.class };
@@ -543,7 +551,7 @@ class BindableSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${47c9fee2-c871-304a-9717-afca5a5be807}, hash: DEA38EE8523E4BCDDEFB693A5999BDD1
+	//Sapient generated method id: ${47c9fee2-c871-304a-9717-afca5a5be807}, hash: 9D4D889697F9254DAFFA3A754BEBD5AF
 	@Test()
 	void of1WhenResolvedIsPrimitive() {
 		/* Branches:
@@ -558,8 +566,7 @@ class BindableSapientGeneratedTest {
 			 MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
 			doReturn(Object.class).when(typeMock2).resolve();
 			_assert.when(() -> Assert.notNull(typeMock2, "Type must not be null")).thenAnswer((Answer<Void>) invocation -> null);
-			ResolvableType resolvableType2 = ResolvableType.forClass(Object.class);
-			resolvableType.when(() -> ResolvableType.forClass(Object.class)).thenReturn(resolvableType2);
+			resolvableType.when(() -> ResolvableType.forClass(Object.class)).thenReturn(resolvableTypeMock);
 			//Act Statement(s)
 			Bindable result = Bindable.of(typeMock2);
 			//Assert statement(s)
@@ -573,7 +580,6 @@ class BindableSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${9f281972-2c76-3ba7-b3f7-825e7fd33cca}, hash: 4ADA6EE92638F3B1976E8C31BC3D2D95
-	@Disabled()
 	@Test()
 	void of1WhenResolvedIsArray() {
 		/* Branches:
@@ -615,9 +621,6 @@ class BindableSapientGeneratedTest {
 		 * (resolved.isPrimitive()) : false  #  inside box method
 		 * (resolved != null) : true  #  inside box method
 		 * (resolved.isArray()) : false  #  inside box method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {

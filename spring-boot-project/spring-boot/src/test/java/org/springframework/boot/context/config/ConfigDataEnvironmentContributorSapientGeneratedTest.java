@@ -9,7 +9,6 @@ import org.springframework.boot.context.properties.bind.Binder;
 
 import java.util.Spliterator;
 
-import org.springframework.util.CollectionUtils;
 import org.springframework.core.env.PropertySource;
 
 import java.util.Map;
@@ -23,21 +22,18 @@ import java.util.stream.Stream;
 
 import org.mockito.MockedStatic;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.doReturn;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.mockStatic;
-
-import org.junit.jupiter.api.Disabled;
+import static org.mockito.Mockito.doReturn;
+import static org.hamcrest.Matchers.is;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataEnvironmentContributorSapientGeneratedTest {
@@ -62,17 +58,11 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 
 	private final ConfigData.Options configDataOptionsMock2 = mock(ConfigData.Options.class);
 
-	private final ConfigDataProperties configDataPropertiesMock = mock(ConfigDataProperties.class);
-
-	private final ConfigDataProperties configDataPropertiesMock2 = mock(ConfigDataProperties.class);
-
 	private final ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class);
 
 	private final ConfigurationPropertySource configurationPropertySourceMock = mock(ConfigurationPropertySource.class);
 
 	private final ConfigDataEnvironmentContributor contributorMock = mock(ConfigDataEnvironmentContributor.class);
-
-	private final Iterable iterableMock = mock(Iterable.class);
 
 	private final PropertySource<?> propertySourceMock = mock(PropertySource.class);
 
@@ -85,8 +75,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		//Arrange Statement(s)
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.UNBOUND_IMPORT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+
 		//Act Statement(s)
 		boolean result = target.isActive(configDataActivationContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(Boolean.FALSE)));
 	}
@@ -103,8 +95,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.EMPTY_LOCATION, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
 		doReturn(true).when(propertiesMock).isActive(configDataActivationContextMock);
+
 		//Act Statement(s)
 		boolean result = target.isActive(configDataActivationContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.TRUE));
@@ -124,8 +118,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.EMPTY_LOCATION, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
 		doReturn(false).when(propertiesMock).isActive(configDataActivationContextMock);
+
 		//Act Statement(s)
 		boolean result = target.isActive(configDataActivationContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.FALSE));
@@ -143,8 +139,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
 		doReturn(true).when(configDataOptionsMock).contains(ConfigData.Option.IGNORE_IMPORTS);
+
 		//Act Statement(s)
 		boolean result = target.hasConfigDataOption(ConfigData.Option.IGNORE_IMPORTS);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.TRUE));
@@ -162,8 +160,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
 		doReturn(false).when(configDataOptionsMock).contains(ConfigData.Option.IGNORE_IMPORTS);
+
 		//Act Statement(s)
 		boolean result = target.hasConfigDataOption(ConfigData.Option.IGNORE_IMPORTS);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.FALSE));
@@ -182,8 +182,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
 		doReturn(configDataOptionsMock2).when(configDataOptionsMock).without(ConfigData.Option.IGNORE_IMPORTS);
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = target.withoutConfigDataOption(ConfigData.Option.IGNORE_IMPORTS);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -198,15 +200,14 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		/* Branches:
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, (Map) null);
 		doReturn(null).when(configDataOptionsMock).without(ConfigData.Option.IGNORE_IMPORTS);
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = target.withoutConfigDataOption(ConfigData.Option.IGNORE_IMPORTS);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -226,8 +227,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
 		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
 		doReturn(configDataLocationList).when(propertiesMock).getImports();
+
 		//Act Statement(s)
 		List<ConfigDataLocation> result = target.getImports();
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(configDataLocationList));
@@ -244,8 +247,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		//Arrange Statement(s)
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, (ConfigDataProperties) null, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+
 		//Act Statement(s)
 		List<ConfigDataLocation> result = target.getImports();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result.size(), equalTo(0)));
 	}
@@ -261,8 +266,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		ConfigDataEnvironmentContributor target = spy(new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap));
 		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
 		doReturn(configDataLocationList).when(target).getImports();
+
 		//Act Statement(s)
 		boolean result = target.hasUnprocessedImports(ConfigDataEnvironmentContributor.ImportPhase.BEFORE_PROFILE_ACTIVATION);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.FALSE));
@@ -283,8 +290,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
 		configDataLocationList.add(configDataLocationMock2);
 		doReturn(configDataLocationList).when(target).getImports();
+
 		//Act Statement(s)
 		boolean result = target.hasUnprocessedImports(ConfigDataEnvironmentContributor.ImportPhase.BEFORE_PROFILE_ACTIVATION);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.TRUE));
@@ -307,8 +316,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
 		configDataLocationList.add(configDataLocationMock2);
 		doReturn(configDataLocationList).when(target).getImports();
+
 		//Act Statement(s)
 		boolean result = target.hasUnprocessedImports(ConfigDataEnvironmentContributor.ImportPhase.BEFORE_PROFILE_ACTIVATION);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.FALSE));
@@ -322,8 +333,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		//Arrange Statement(s)
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+
 		//Act Statement(s)
 		List<ConfigDataEnvironmentContributor> result = target.getChildren(ConfigDataEnvironmentContributor.ImportPhase.BEFORE_PROFILE_ACTIVATION);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result.size(), equalTo(0)));
 	}
@@ -340,8 +353,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		ConfigDataEnvironmentContributor target = spy(new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap));
 		Spliterator spliteratorMock = mock(Spliterator.class);
 		doReturn(spliteratorMock).when(target).spliterator();
+
 		//Act Statement(s)
 		Stream<ConfigDataEnvironmentContributor> result = target.stream();
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in Stream for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -356,37 +371,60 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		//Arrange Statement(s)
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+
 		//Act Statement(s)
 		Iterator<ConfigDataEnvironmentContributor> result = target.iterator();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${39d8d987-8ae8-34f4-9542-0c62340c8800}, hash: 23B7B99B97849DBA8A9193F1BDD76832
+	//Sapient generated method id: ${39d8d987-8ae8-34f4-9542-0c62340c8800}, hash: 4804CF8EF2AB4168C48F1F8C65711B8E
 	@Test()
 	void withBoundPropertiesWhenDefaultBranchAndDefaultBranch() {
+		/* Branches:
+		 * (properties != null) : false
+		 * (branch expression (line 102)) : false  #  inside <init> method
+		 * (branch expression (line 103)) : false  #  inside <init> method
+		 */
+		//Arrange Statement(s)
+		try (MockedStatic<ConfigDataProperties> configDataProperties = mockStatic(ConfigDataProperties.class)) {
+			configDataProperties.when(() -> ConfigDataProperties.get((Binder) any())).thenReturn(null);
+			Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
+			ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, (ConfigData.Options) null, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+			Iterable<ConfigDataEnvironmentContributor> iterable = new ArrayList<>();
+			//Act Statement(s)
+			ConfigDataEnvironmentContributor result = target.withBoundProperties(iterable, configDataActivationContextMock);
+			//Assert statement(s)
+			//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
+			assertAll("result", () -> {
+				assertThat(result, is(notNullValue()));
+				configDataProperties.verify(() -> ConfigDataProperties.get((Binder) any()));
+			});
+		}
+	}
+
+	//Sapient generated method id: ${54ebdb6c-4004-3202-8032-07d8930855ae}, hash: C612B6694D164786DE829BCD5B31ACCF
+	@Test()
+	void withBoundPropertiesWhenThisConfigDataOptionsContainsConfigDataOptionIGNORE_IMPORTSAndDefaultBranchAndDefaultBranch() {
 		/* Branches:
 		 * (properties != null) : true
 		 * (this.configDataOptions.contains(ConfigData.Option.IGNORE_IMPORTS)) : true
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! This method is not unit testable!
-		 *  No constructor found to create an object without any exception for class org.springframework.boot.context.properties.bind.Binder
-		 *  Suggestions:
-		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
-		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
+		ConfigDataProperties configDataPropertiesMock = mock(ConfigDataProperties.class);
+		ConfigDataProperties configDataPropertiesMock2 = mock(ConfigDataProperties.class);
 		try (MockedStatic<ConfigDataProperties> configDataProperties = mockStatic(ConfigDataProperties.class)) {
 			configDataProperties.when(() -> ConfigDataProperties.get((Binder) any())).thenReturn(configDataPropertiesMock);
 			doReturn(configDataPropertiesMock2).when(configDataPropertiesMock).withoutImports();
 			Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 			ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
 			doReturn(true).when(configDataOptionsMock).contains(ConfigData.Option.IGNORE_IMPORTS);
+			Iterable<ConfigDataEnvironmentContributor> iterable = new ArrayList<>();
 			//Act Statement(s)
-			ConfigDataEnvironmentContributor result = target.withBoundProperties(iterableMock, configDataActivationContextMock);
+			ConfigDataEnvironmentContributor result = target.withBoundProperties(iterable, configDataActivationContextMock);
 			//Assert statement(s)
 			//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 			assertAll("result", () -> {
@@ -398,67 +436,7 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		}
 	}
 
-	//Sapient generated method id: ${54ebdb6c-4004-3202-8032-07d8930855ae}, hash: B9FFCEE70343A96485E6DC381E2AF636
-	@Disabled()
-	@Test()
-	void withBoundPropertiesWhenThisConfigDataOptionsContainsConfigDataOptionIGNORE_IMPORTSAndDefaultBranchAndDefaultBranch() {
-		/* Branches:
-		 * (properties != null) : true
-		 * (this.configDataOptions.contains(ConfigData.Option.IGNORE_IMPORTS)) : true
-		 * (branch expression (line 102)) : false  #  inside <init> method
-		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! This method is not unit testable!
-		 *  No constructor found to create an object without any exception for class org.springframework.boot.context.properties.bind.Binder
-		 *  Suggestions:
-		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
-		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
-		//Arrange Statement(s)
-		try (MockedStatic<ConfigDataProperties> configDataProperties = mockStatic(ConfigDataProperties.class)) {
-			configDataProperties.when(() -> ConfigDataProperties.get((Binder) any())).thenReturn(configDataPropertiesMock);
-			doReturn(configDataPropertiesMock2).when(configDataPropertiesMock).withoutImports();
-			Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
-			ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, (ConfigData.Options) null, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
-			//Act Statement(s)
-			ConfigDataEnvironmentContributor result = target.withBoundProperties(iterableMock, configDataActivationContextMock);
-			//Assert statement(s)
-			//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				configDataProperties.verify(() -> ConfigDataProperties.get((Binder) any()));
-				verify(configDataPropertiesMock).withoutImports();
-			});
-		}
-	}
-
-	//Sapient generated method id: ${f45ad42a-47fd-3e29-aea4-a0561c9c7bc0}, hash: 2105FA7B0F417A2E4267AEADF9F0C2D1
-	@Test()
-	void withChildrenWhenCollectionUtilsNotIsEmptyContributorsThrowsNullPointerException() {
-		/* Branches:
-		 * (importPhase == ImportPhase.AFTER_PROFILE_ACTIVATION) : true
-		 * (CollectionUtils.isEmpty(contributors)) : false  #  inside hasAnyProfileSpecificChildren method
-		 */
-		//Arrange Statement(s)
-		try (MockedStatic<CollectionUtils> collectionUtils = mockStatic(CollectionUtils.class)) {
-			collectionUtils.when(() -> CollectionUtils.isEmpty((List) null)).thenReturn(false);
-			Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
-			ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
-			List<ConfigDataEnvironmentContributor> configDataEnvironmentContributorList = new ArrayList<>();
-			//Act Statement(s)
-			final NullPointerException result = assertThrows(NullPointerException.class, () -> {
-				target.withChildren(ConfigDataEnvironmentContributor.ImportPhase.AFTER_PROFILE_ACTIVATION, configDataEnvironmentContributorList);
-			});
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				collectionUtils.verify(() -> CollectionUtils.isEmpty((List) null), atLeast(1));
-			});
-		}
-	}
-
-	//Sapient generated method id: ${7f195377-6e5a-3f00-8510-1486f1d78813}, hash: A35816CFE7EF1F22740F69DE06F104B9
+	//Sapient generated method id: ${7f195377-6e5a-3f00-8510-1486f1d78813}, hash: 20BA0CD7F9CABAAE1BE0656C9A4BE874
 	@Test()
 	void withChildrenWhenDefaultBranchAndDefaultBranch() {
 		/* Branches:
@@ -469,23 +447,19 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		 * (branch expression (line 103)) : false  #  inside <init> method
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<CollectionUtils> collectionUtils = mockStatic(CollectionUtils.class)) {
-			collectionUtils.when(() -> CollectionUtils.isEmpty((List) null)).thenReturn(true);
-			Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
-			ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
-			List<ConfigDataEnvironmentContributor> configDataEnvironmentContributorList = new ArrayList<>();
-			//Act Statement(s)
-			ConfigDataEnvironmentContributor result = target.withChildren(ConfigDataEnvironmentContributor.ImportPhase.AFTER_PROFILE_ACTIVATION, configDataEnvironmentContributorList);
-			//Assert statement(s)
-			//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				collectionUtils.verify(() -> CollectionUtils.isEmpty((List) null), atLeast(1));
-			});
-		}
+		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
+		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+		List<ConfigDataEnvironmentContributor> configDataEnvironmentContributorList = new ArrayList<>();
+
+		//Act Statement(s)
+		ConfigDataEnvironmentContributor result = target.withChildren(ConfigDataEnvironmentContributor.ImportPhase.AFTER_PROFILE_ACTIVATION, configDataEnvironmentContributorList);
+
+		//Assert statement(s)
+		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${395e5e51-3b18-3916-85d3-20ad3a325456}, hash: 393DCBA0AC4A81E18E535820282754C8
+	//Sapient generated method id: ${395e5e51-3b18-3916-85d3-20ad3a325456}, hash: C64666A21C4F0032F85C00CF8FC1A926
 	@Test()
 	void withChildrenWhenHasAnyProfileSpecificChildrenNotBeforeAndDefaultBranchAndDefaultBranch() {
 		/* Branches:
@@ -496,20 +470,16 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		 * (branch expression (line 103)) : false  #  inside <init> method
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<CollectionUtils> collectionUtils = mockStatic(CollectionUtils.class)) {
-			collectionUtils.when(() -> CollectionUtils.isEmpty((List) null)).thenReturn(true);
-			Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
-			ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, (ConfigData.Options) null, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
-			List<ConfigDataEnvironmentContributor> configDataEnvironmentContributorList = new ArrayList<>();
-			//Act Statement(s)
-			ConfigDataEnvironmentContributor result = target.withChildren(ConfigDataEnvironmentContributor.ImportPhase.AFTER_PROFILE_ACTIVATION, configDataEnvironmentContributorList);
-			//Assert statement(s)
-			//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
-			assertAll("result", () -> {
-				assertThat(result, is(notNullValue()));
-				collectionUtils.verify(() -> CollectionUtils.isEmpty((List) null), atLeast(1));
-			});
-		}
+		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
+		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, (ConfigData.Options) null, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+		List<ConfigDataEnvironmentContributor> configDataEnvironmentContributorList = new ArrayList<>();
+
+		//Act Statement(s)
+		ConfigDataEnvironmentContributor result = target.withChildren(ConfigDataEnvironmentContributor.ImportPhase.AFTER_PROFILE_ACTIVATION, configDataEnvironmentContributorList);
+
+		//Assert statement(s)
+		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
+		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
 	//Sapient generated method id: ${3ebab24a-8ca0-37bb-946f-abeb0886c8dc}, hash: 738B7028607D19B60427896B7EE3994C
@@ -521,8 +491,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		//Arrange Statement(s)
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = target.withReplacement(target, configDataEnvironmentContributorMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(configDataEnvironmentContributorMock)));
 	}
@@ -543,8 +515,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap.put(ConfigDataEnvironmentContributor.ImportPhase.BEFORE_PROFILE_ACTIVATION, configDataEnvironmentContributorList);
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = target.withReplacement(configDataEnvironmentContributorMock2, configDataEnvironmentContributorMock3);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -561,9 +535,6 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		 * (for-each(contributors)) : true  #  inside lambda$withReplacement$1 method
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		doReturn(configDataEnvironmentContributorMock).when(contributorMock).withReplacement(configDataEnvironmentContributorMock2, configDataEnvironmentContributorMock3);
@@ -572,8 +543,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap.put(ConfigDataEnvironmentContributor.ImportPhase.BEFORE_PROFILE_ACTIVATION, configDataEnvironmentContributorList);
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.ROOT, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, (ConfigData.Options) null, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = target.withReplacement(configDataEnvironmentContributorMock2, configDataEnvironmentContributorMock3);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -597,8 +570,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		ConfigDataResource configDataResourceMock = mock(ConfigDataResource.class, "<init>_configDataResource1");
 		Map<ConfigDataEnvironmentContributor.ImportPhase, List<ConfigDataEnvironmentContributor>> configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap = new HashMap<>();
 		ConfigDataEnvironmentContributor target = new ConfigDataEnvironmentContributor(ConfigDataEnvironmentContributor.Kind.EMPTY_LOCATION, configDataLocationMock, configDataResourceMock, false, propertySourceMock, configurationPropertySourceMock, propertiesMock, configDataOptionsMock, configDataEnvironmentContributorImportPhaseListConfigDataEnvironmentContributorMap);
+
 		//Act Statement(s)
 		String result = target.toString();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo("EMPTY_LOCATION <init>_configDataLocation1 <init>_configDataResource1 <init>_configData.Options1\n")));
 	}
@@ -612,8 +587,10 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		List<ConfigDataEnvironmentContributor> configDataEnvironmentContributorList = new ArrayList<>();
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = ConfigDataEnvironmentContributor.of(configDataEnvironmentContributorList);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
@@ -625,14 +602,13 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		/* Branches:
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		List<ConfigDataEnvironmentContributor> configDataEnvironmentContributorList = new ArrayList<>();
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = ConfigDataEnvironmentContributor.of(configDataEnvironmentContributorList);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
@@ -644,12 +620,11 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		/* Branches:
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = ConfigDataEnvironmentContributor.ofInitialImport(configDataLocationMock);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
@@ -661,9 +636,6 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		/* Branches:
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ConfigurationPropertySource> configurationPropertySource = mockStatic(ConfigurationPropertySource.class)) {
@@ -685,9 +657,6 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		/* Branches:
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ConfigurationPropertySource> configurationPropertySource = mockStatic(ConfigurationPropertySource.class)) {
@@ -715,9 +684,6 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		/* Branches:
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		try (MockedStatic<ConfigurationPropertySource> configurationPropertySource = mockStatic(ConfigurationPropertySource.class)) {
@@ -745,12 +711,11 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		/* Branches:
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = ConfigDataEnvironmentContributor.ofEmptyLocation(configDataLocationMock, false);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
@@ -762,12 +727,11 @@ class ConfigDataEnvironmentContributorSapientGeneratedTest {
 		/* Branches:
 		 * (branch expression (line 102)) : false  #  inside <init> method
 		 * (branch expression (line 103)) : false  #  inside <init> method
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
+
 		//Act Statement(s)
 		ConfigDataEnvironmentContributor result = ConfigDataEnvironmentContributor.ofEmptyLocation(configDataLocationMock, false);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataEnvironmentContributor for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> assertThat(result, is(notNullValue())));

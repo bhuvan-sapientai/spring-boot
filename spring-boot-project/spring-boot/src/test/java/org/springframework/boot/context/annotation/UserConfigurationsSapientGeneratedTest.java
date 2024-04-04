@@ -27,13 +27,10 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mockStatic;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class UserConfigurationsSapientGeneratedTest {
 
 	//Sapient generated method id: ${e876de3d-41c8-338f-8f90-1b71d6116f6e}, hash: 42A6B66E1D9522A5AD62D33F1D6307A2
-	@Disabled()
 	@Test()
 	void merge2Test() {
 		//Arrange Statement(s)

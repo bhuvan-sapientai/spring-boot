@@ -1,22 +1,5 @@
-/*
- * Copyright 2012-2024 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.boot.convert;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +17,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.mock;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mockStatic;
 import static org.hamcrest.Matchers.is;
@@ -42,14 +24,9 @@ import static org.hamcrest.Matchers.is;
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class InetAddressFormatterSapientGeneratedTest {
 
-	//Sapient generated method id: ${4be23dda-8ff3-3c4c-9e48-c9e760f75759}, hash: 73B69B9F35E7DA5CBE0CFBDC50886998
+	//Sapient generated method id: ${4be23dda-8ff3-3c4c-9e48-c9e760f75759}, hash: 2913DFDCEDCB51A3F4D22AE2E53D0E44
 	@Test()
-	@Disabled
 	void printTest() {
-		/*
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
 		//Arrange Statement(s)
 		InetAddressFormatter target = new InetAddressFormatter();
 		InetAddress inetAddress = InetAddress.getLoopbackAddress();
@@ -59,53 +36,47 @@ class InetAddressFormatterSapientGeneratedTest {
 		String result = target.print(inetAddress, locale);
 
 		//Assert statement(s)
-		assertAll("result", () -> assertThat(result, equalTo("result1")));
+		assertAll("result", () -> assertThat(result, equalTo("127.0.0.1")));
 	}
 
-	//Sapient generated method id: ${3a1fa216-77d7-3552-a886-5cb34f671ab0}, hash: F94BB376CA8893338B3814364AA44B68
+	//Sapient generated method id: ${3a1fa216-77d7-3552-a886-5cb34f671ab0}, hash: 864E76651BED141CAD076EE2F1B7B81A
 	@Test()
-	@Disabled
 	void parseTest() throws ParseException, UnknownHostException {
-		/*
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
 		//Arrange Statement(s)
 		InetAddressFormatter target = new InetAddressFormatter();
 		Locale locale = new Locale("language1");
 
 		//Act Statement(s)
-		InetAddress result = target.parse("example.com", locale);
-		InetAddress inetAddress = InetAddress.getLoopbackAddress();
+		InetAddress result = target.parse("www.example.com", locale);
+		InetAddress inetAddress = InetAddress.getByName("www.example.com");
 
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(inetAddress)));
 	}
 
-	//Sapient generated method id: ${eead3185-0f02-3bfd-950f-cfa6f39f1563}, hash: EBE69EBF1DC141E72DB28781B0F09939
+	//Sapient generated method id: ${eead3185-0f02-3bfd-950f-cfa6f39f1563}, hash: EB079E89C0516EDCEFCB79EC2BEBEFF4
 	@Test()
 	void parseWhenCaughtUnknownHostExceptionThrowsIllegalStateException() throws ParseException, UnknownHostException {
 		/* Branches:
 		 * (catch-exception (UnknownHostException)) : true
 		 */
 		//Arrange Statement(s)
-		UnknownHostException unknownHostExceptionMock = mock(UnknownHostException.class);
 		try (MockedStatic<InetAddress> inetAddress = mockStatic(InetAddress.class)) {
-			inetAddress.when(() -> InetAddress.getByName("example.com")).thenThrow(unknownHostExceptionMock);
+			UnknownHostException unknownHostException = new UnknownHostException();
+			inetAddress.when(() -> InetAddress.getByName("A")).thenThrow(unknownHostException);
 			InetAddressFormatter target = new InetAddressFormatter();
 			Locale locale = new Locale("language1");
 			//Act Statement(s)
 			final IllegalStateException result = assertThrows(IllegalStateException.class, () -> {
-				target.parse("example.com", locale);
+				target.parse("A", locale);
 			});
-			UnknownHostException unknownHostException = new UnknownHostException();
-			IllegalStateException illegalStateException = new IllegalStateException("Unknown host example.com", unknownHostException);
+			IllegalStateException illegalStateException = new IllegalStateException("Unknown host A", unknownHostException);
 			//Assert statement(s)
 			assertAll("result", () -> {
 				assertThat(result, is(notNullValue()));
 				assertThat(result.getMessage(), equalTo(illegalStateException.getMessage()));
 				assertThat(result.getCause(), is(instanceOf(unknownHostException.getClass())));
-				inetAddress.verify(() -> InetAddress.getByName("example.com"), atLeast(1));
+				inetAddress.verify(() -> InetAddress.getByName("A"), atLeast(1));
 			});
 		}
 	}

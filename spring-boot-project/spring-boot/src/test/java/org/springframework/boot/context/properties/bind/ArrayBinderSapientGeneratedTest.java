@@ -23,8 +23,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ArrayBinderSapientGeneratedTest {
 
@@ -56,8 +54,10 @@ class ArrayBinderSapientGeneratedTest {
 		ArrayBinder target = spy(new ArrayBinder(binderContextMock));
 		doNothing().when(target).bindIndexed(eq(configurationPropertyNameMock), (Bindable) any(), eq(aggregateElementBinderMock), eq(resolvableTypeMock), eq(resolvableTypeMock2), (IndexedElementsBinder.IndexedCollectionSupplier) any());
 		Bindable bindable = Bindable.of(resolvableTypeMock);
+
 		//Act Statement(s)
 		Object result = target.bindAggregate(configurationPropertyNameMock, bindable, aggregateElementBinderMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, is(nullValue()));
@@ -67,7 +67,6 @@ class ArrayBinderSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${72274d74-1f0b-3808-9f6e-51f3a942e2d8}, hash: 55F50D5B97EAE9E27690BAEAEBE0A28B
-	@Disabled()
 	@Test()
 	void bindAggregateWhenILessThanListSize() {
 		/* Branches:
@@ -75,7 +74,7 @@ class ArrayBinderSapientGeneratedTest {
 		 * (i < list.size()) : true
 		 *
 		 * TODO: Help needed! This method is not unit testable!
-		 *  Following variables could not be isolated/mocked: result
+		 *  Following variables could not be isolated/mocked: result, list
 		 *  Suggestions:
 		 *  You can pass them as constructor arguments or create a setter for them (avoid new operator)
 		 *  or adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
@@ -87,8 +86,10 @@ class ArrayBinderSapientGeneratedTest {
 		ArrayBinder target = spy(new ArrayBinder(binderContextMock));
 		doNothing().when(target).bindIndexed(eq(configurationPropertyNameMock), (Bindable) any(), eq(aggregateElementBinderMock), eq(resolvableTypeMock), eq(resolvableTypeMock2), (IndexedElementsBinder.IndexedCollectionSupplier) any());
 		Bindable bindable = Bindable.of(resolvableTypeMock);
+
 		//Act Statement(s)
 		Object result = target.bindAggregate(configurationPropertyNameMock, bindable, aggregateElementBinderMock);
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in Object for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> {
@@ -106,8 +107,10 @@ class ArrayBinderSapientGeneratedTest {
 		ArrayBinder target = new ArrayBinder(binderContextMock);
 		Supplier supplierMock = mock(Supplier.class);
 		Object object = new Object();
+
 		//Act Statement(s)
 		Object result = target.merge(supplierMock, object);
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(object)));
 	}

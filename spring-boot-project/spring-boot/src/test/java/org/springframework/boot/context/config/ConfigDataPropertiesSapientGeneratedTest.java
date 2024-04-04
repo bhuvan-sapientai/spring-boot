@@ -13,7 +13,6 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
 import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -23,8 +22,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
-
-import org.junit.jupiter.api.Disabled;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class ConfigDataPropertiesSapientGeneratedTest {
@@ -44,8 +41,10 @@ class ConfigDataPropertiesSapientGeneratedTest {
 		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
 		ConfigDataProperties target = new ConfigDataProperties(configDataLocationList, activateMock);
 		doReturn(true).when(activateMock).isActive(configDataActivationContextMock);
+
 		//Act Statement(s)
 		boolean result = target.isActive(configDataActivationContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.TRUE));
@@ -64,8 +63,10 @@ class ConfigDataPropertiesSapientGeneratedTest {
 		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
 		ConfigDataProperties target = new ConfigDataProperties(configDataLocationList, activateMock);
 		doReturn(false).when(activateMock).isActive(configDataActivationContextMock);
+
 		//Act Statement(s)
 		boolean result = target.isActive(configDataActivationContextMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(Boolean.FALSE));
@@ -82,31 +83,32 @@ class ConfigDataPropertiesSapientGeneratedTest {
 		//Arrange Statement(s)
 		List<ConfigDataLocation> configDataLocationList = new ArrayList<>();
 		ConfigDataProperties target = new ConfigDataProperties(configDataLocationList, activateMock);
+
 		//Act Statement(s)
 		ConfigDataProperties result = target.withoutImports();
+
 		//Assert statement(s)
 		//TODO: Please implement equals method in ConfigDataProperties for verification of the entire object or you need to adjust respective assertion statements
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${9c25887d-767d-38e9-b5ae-c2e4012c49be}, hash: 17A79804B8CFB1BFF9885464099CC761
-	@Disabled()
+	//Sapient generated method id: ${9c25887d-767d-38e9-b5ae-c2e4012c49be}, hash: 9010FFA3E4E619781D4FC8E14BE6DE62
 	@Test()
 	void getTest() {
 		//Arrange Statement(s)
 		Binder binderMock = mock(Binder.class);
 		BindResult bindResultMock = mock(BindResult.class);
-		ConfigurationPropertyName configurationPropertyNameMock = mock(ConfigurationPropertyName.class);
-		Bindable<ConfigDataProperties> bindableMock = mock(Bindable.class);
-		doReturn(bindResultMock).when(binderMock).bind(eq(configurationPropertyNameMock), eq(bindableMock), (ConfigDataLocationBindHandler) any());
+		doReturn(bindResultMock).when(binderMock).bind((ConfigurationPropertyName) any(), (Bindable) any(), (ConfigDataLocationBindHandler) any());
 		ConfigDataProperties configDataPropertiesMock = mock(ConfigDataProperties.class);
 		doReturn(configDataPropertiesMock).when(bindResultMock).orElse(null);
+
 		//Act Statement(s)
 		ConfigDataProperties result = ConfigDataProperties.get(binderMock);
+
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(configDataPropertiesMock));
-			verify(binderMock).bind(eq(configurationPropertyNameMock), eq(bindableMock), (ConfigDataLocationBindHandler) any());
+			verify(binderMock).bind((ConfigurationPropertyName) any(), (Bindable) any(), (ConfigDataLocationBindHandler) any());
 			verify(bindResultMock).orElse(null);
 		});
 	}

@@ -32,8 +32,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.hamcrest.Matchers.is;
 
-import org.junit.jupiter.api.Disabled;
-
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class NotConstructorBoundInjectionFailureAnalyzerSapientGeneratedTest {
 
@@ -50,13 +48,15 @@ class NotConstructorBoundInjectionFailureAnalyzerSapientGeneratedTest {
 	void getOrderTest() {
 		//Arrange Statement(s)
 		NotConstructorBoundInjectionFailureAnalyzer target = new NotConstructorBoundInjectionFailureAnalyzer();
+
 		//Act Statement(s)
 		int result = target.getOrder();
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, equalTo(0)));
 	}
 
-	//Sapient generated method id: ${ba610d9d-b1af-383f-af9a-689a624cef1e}, hash: B162904054A050721CBEA578177A7D77
+	//Sapient generated method id: ${ba610d9d-b1af-383f-af9a-689a624cef1e}, hash: 4C9B522F221C7D192EB00AC43ED72F6B
 	@Test()
 	void analyze3WhenIsConstructorBindingConfigurationPropertiesNotConstructorAndIsConstructorBindingConfigurationPropertiesNotI2() {
 		/* Branches:
@@ -65,21 +65,19 @@ class NotConstructorBoundInjectionFailureAnalyzerSapientGeneratedTest {
 		 * (unsatisfiedDependencyException == null) : true  #  inside findInjectionPoint method
 		 * (isConstructorBindingConfigurationProperties(constructor)) : false  #  inside isConstructorBindingConfigurationProperties method
 		 * (isConstructorBindingConfigurationProperties(injectionPoint)) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
 		NotConstructorBoundInjectionFailureAnalyzer target = new NotConstructorBoundInjectionFailureAnalyzer();
-		Throwable throwable = new Throwable("message1", (Throwable) null);
+		Throwable throwable = new Throwable();
+
 		//Act Statement(s)
 		FailureAnalysis result = target.analyze(throwable, noSuchBeanDefinitionExceptionMock, "description1");
+
 		//Assert statement(s)
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
 	//Sapient generated method id: ${77164c51-d227-33be-a051-155949f82382}, hash: AAEF473D70078AF23AFA30EC28EAE65E
-	@Disabled()
 	@Test()
 	void analyze3WhenIsConstructorBindingConfigurationPropertiesInjectionPoint() {
 		/* Branches:
@@ -120,7 +118,6 @@ class NotConstructorBoundInjectionFailureAnalyzerSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${fc9f6b87-fd74-33ec-8c40-6ffd4eb5f134}, hash: B0E4AFCECDE16F0EAAF397C55FDF769D
-	@Disabled()
 	@Test()
 	void analyze3WhenMergedAnnotationsFromDeclaringClassSearchStrategyTYPE_HIERARCHYNotIsPresentConfigurationPropertiesAndIsCons() {
 		/* Branches:

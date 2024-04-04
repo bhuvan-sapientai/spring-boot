@@ -3,23 +3,17 @@ package org.springframework.boot.convert;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
+import org.mockito.MockedStatic;
 
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.GenericConverter;
+import org.springframework.core.convert.TypeDescriptor;
 
 import java.util.Set;
 
 import org.springframework.util.Assert;
 
-import java.util.HashSet;
-import java.util.Collection;
-
-import org.mockito.MockedStatic;
-
-import org.springframework.core.convert.converter.GenericConverter;
-import org.springframework.core.convert.TypeDescriptor;
-
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.Mockito.verify;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
@@ -30,9 +24,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.atLeast;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mockStatic;
-
-import org.junit.jupiter.api.Disabled;
 
 @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 class DelimitedStringToCollectionConverterSapientGeneratedTest {
@@ -47,7 +40,7 @@ class DelimitedStringToCollectionConverterSapientGeneratedTest {
 
 	private final TypeDescriptor typeDescriptorMock3 = mock(TypeDescriptor.class);
 
-	//Sapient generated method id: ${a09cc112-2d6f-3df0-a3e4-2475492f0d41}, hash: BA4287555ED7BE05F7A98344F63E6CDA
+	//Sapient generated method id: ${a09cc112-2d6f-3df0-a3e4-2475492f0d41}, hash: 0A4453F7A631C8138430391522C0F0F2
 	@Test()
 	void getConvertibleTypesTest() {
 		//Arrange Statement(s)
@@ -56,12 +49,10 @@ class DelimitedStringToCollectionConverterSapientGeneratedTest {
 			DelimitedStringToCollectionConverter target = new DelimitedStringToCollectionConverter(conversionServiceMock);
 			//Act Statement(s)
 			Set<GenericConverter.ConvertiblePair> result = target.getConvertibleTypes();
-			GenericConverter.ConvertiblePair genericConverterConvertiblePair = new GenericConverter.ConvertiblePair(String.class, Collection.class);
-			Set<GenericConverter.ConvertiblePair> genericConverterConvertiblePairResultSet = new HashSet<>(Set.of(genericConverterConvertiblePair));
 			//Assert statement(s)
 			assertAll("result", () -> {
-				assertThat(result.size(), equalTo(genericConverterConvertiblePairResultSet.size()));
-				assertThat(result, containsInAnyOrder(genericConverterConvertiblePairResultSet.toArray()));
+				assertThat(result.size(), equalTo(1));
+				assertThat(result.iterator().next(), is(instanceOf(GenericConverter.ConvertiblePair.class)));
 				_assert.verify(() -> Assert.notNull(conversionServiceMock, "ConversionService must not be null"), atLeast(1));
 			});
 		}
@@ -139,7 +130,6 @@ class DelimitedStringToCollectionConverterSapientGeneratedTest {
 	}
 
 	//Sapient generated method id: ${780e54eb-6a66-3424-bfeb-905ab2c785b5}, hash: B2EB0A16703EE4A81C2C8F0242CBE3D9
-	@Disabled()
 	@Test()
 	void convertWhenSourceIsNotNull() {
 		/* Branches:

@@ -1,48 +1,23 @@
-/*
- * Copyright 2012-2024 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.boot.context.metrics.buffering;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.core.metrics.StartupStep;
 
-import org.mockito.stubbing.Answer;
-
 import java.util.function.Supplier;
-
-import org.mockito.MockedStatic;
-
 import java.util.function.Consumer;
 import java.time.Instant;
 
-import org.springframework.util.Assert;
-
+import static org.mockito.Mockito.doNothing;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.verify;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.doReturn;
 import static org.hamcrest.Matchers.is;
 
@@ -51,9 +26,9 @@ class BufferedStartupStepSapientGeneratedTest {
 
 	private final BufferedStartupStep parentMock = mock(BufferedStartupStep.class, "null");
 
-	private final Consumer consumerMock = mock(Consumer.class);
+	private final Consumer<BufferedStartupStep> recorderMock = mock(Consumer.class, "null");
 
-	//Sapient generated method id: ${5fdfba7e-6b5c-369a-b59f-2fcad9fad4db}, hash: 2C7B80A2BF3478F40E546E1528337F7D
+	//Sapient generated method id: ${5fdfba7e-6b5c-369a-b59f-2fcad9fad4db}, hash: 24E35FB7F0C5706820D173865D5C6F6B
 	@Test()
 	void getParentIdWhenThisParentIsNotNull() {
 		/* Branches:
@@ -61,7 +36,7 @@ class BufferedStartupStepSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		Instant instant = Instant.ofEpochSecond(1700000000);
-		BufferedStartupStep target = new BufferedStartupStep(parentMock, "name1", 0L, instant, consumerMock);
+		BufferedStartupStep target = new BufferedStartupStep(parentMock, "name1", 0L, instant, recorderMock);
 		doReturn(1L).when(parentMock).getId();
 
 		//Act Statement(s)
@@ -74,7 +49,7 @@ class BufferedStartupStepSapientGeneratedTest {
 		});
 	}
 
-	//Sapient generated method id: ${95008174-021a-3024-a11b-30baf1e3002b}, hash: 6302C8CDF7A397997F273B94595520A2
+	//Sapient generated method id: ${95008174-021a-3024-a11b-30baf1e3002b}, hash: 96E9BF2910D0D001A84A45FDB24AEB77
 	@Test()
 	void getParentIdWhenThisParentIsNull() {
 		/* Branches:
@@ -82,7 +57,7 @@ class BufferedStartupStepSapientGeneratedTest {
 		 */
 		//Arrange Statement(s)
 		Instant instant = Instant.ofEpochSecond(1700000000);
-		BufferedStartupStep target = new BufferedStartupStep((BufferedStartupStep) null, "name1", 0L, instant, consumerMock);
+		BufferedStartupStep target = new BufferedStartupStep((BufferedStartupStep) null, "name1", 0L, instant, recorderMock);
 
 		//Act Statement(s)
 		Long result = target.getParentId();
@@ -91,12 +66,12 @@ class BufferedStartupStepSapientGeneratedTest {
 		assertAll("result", () -> assertThat(result, is(nullValue())));
 	}
 
-	//Sapient generated method id: ${59fc8b6d-9cf4-385e-b4d4-3f0361c77781}, hash: 22560AF74AA2A4989A19E2933C570452
+	//Sapient generated method id: ${59fc8b6d-9cf4-385e-b4d4-3f0361c77781}, hash: 1F85437BECE6F7CCD94B70165AA04BBA
 	@Test()
 	void getTagsTest() {
 		//Arrange Statement(s)
 		Instant instant = Instant.ofEpochSecond(1700000000);
-		BufferedStartupStep target = new BufferedStartupStep(parentMock, "name1", 0L, instant, consumerMock);
+		BufferedStartupStep target = new BufferedStartupStep(parentMock, "name1", 0L, instant, recorderMock);
 
 		//Act Statement(s)
 		StartupStep.Tags result = target.getTags();
@@ -105,131 +80,66 @@ class BufferedStartupStepSapientGeneratedTest {
 		assertAll("result", () -> assertThat(result, is(notNullValue())));
 	}
 
-	//Sapient generated method id: ${1492b9c2-b980-3a4a-9204-051aa921c1c9}, hash: E2F1695D6C4343DB98AD06C2DDEB9DB5
+	//Sapient generated method id: ${1492b9c2-b980-3a4a-9204-051aa921c1c9}, hash: CB8AC17A5F72CE4D3129C9E55C3B6046
 	@Test()
-	@Disabled
 	void tagTest() {
-		/*
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
 		//Arrange Statement(s)
+		Supplier valueMock = mock(Supplier.class);
+		doReturn("return_of_get1").when(valueMock).get();
 		Instant instant = Instant.now();
-		BufferedStartupStep target = spy(new BufferedStartupStep(parentMock, "<string>", 0L, instant, consumerMock));
+		BufferedStartupStep target = spy(new BufferedStartupStep(parentMock, "<string>", 0L, instant, recorderMock));
 		StartupStep startupStepMock = mock(StartupStep.class);
-		doReturn(startupStepMock).when(target).tag("<string>", "value1");
-		Supplier supplierMock = mock(Supplier.class);
+		doReturn(startupStepMock).when(target).tag("<string>", "return_of_get1");
 
 		//Act Statement(s)
-		StartupStep result = target.tag("<string>", supplierMock);
+		StartupStep result = target.tag("<string>", valueMock);
 
 		//Assert statement(s)
 		assertAll("result", () -> {
 			assertThat(result, equalTo(startupStepMock));
-			verify(target).tag("<string>", "value1");
+			verify(valueMock).get();
+			verify(target).tag("<string>", "return_of_get1");
 		});
 	}
 
-	//Sapient generated method id: ${9c1d60d2-3642-35ae-8a13-dd374591872a}, hash: B72292A66AB3F9CEA6B05EFAF6E82C79
+	//Sapient generated method id: ${9c1d60d2-3642-35ae-8a13-dd374591872a}, hash: 4363FDE149134FEA42613F3F992B5EFF
 	@Test()
 	void tag1WhenThisEndedNotGet() {
 		/* Branches:
 		 * (!this.ended.get()) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
 		 */
 		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.state(true, "StartupStep has already ended.")).thenAnswer((Answer<Void>) invocation -> null);
-			Instant instant = Instant.now();
-			BufferedStartupStep target = new BufferedStartupStep(parentMock, "<String>", 0L, instant, consumerMock);
-			//Act Statement(s)
-			StartupStep result = target.tag("<value>", "<value>");
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(target));
-				_assert.verify(() -> Assert.state(true, "StartupStep has already ended."), atLeast(1));
-			});
-		}
+		Instant instant = Instant.ofEpochSecond(1700000000);
+		BufferedStartupStep target = new BufferedStartupStep(parentMock, "name1", 0L, instant, recorderMock);
+
+		//Act Statement(s)
+		StartupStep result = target.tag("key1", "value1");
+
+		//Assert statement(s)
+		assertAll("result", () -> assertThat(result, equalTo(target)));
 	}
 
-	//Sapient generated method id: ${04611057-dea2-3e81-9f88-7d97b72cc4cf}, hash: 4214EC97AD0A1ADCAAD5816DB23E5641
-	@Test()
-	@Disabled
-	void tag1WhenThisEndedGet() {
-		/* Branches:
-		 * (!this.ended.get()) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
-		//Arrange Statement(s)
-		try (MockedStatic<Assert> _assert = mockStatic(Assert.class)) {
-			_assert.when(() -> Assert.state(false, "StartupStep has already ended.")).thenAnswer((Answer<Void>) invocation -> null);
-			Instant instant = Instant.now();
-			BufferedStartupStep target = new BufferedStartupStep(parentMock, "<String>", 0L, instant, consumerMock);
-			//Act Statement(s)
-			StartupStep result = target.tag("<String>", "<String>");
-			//Assert statement(s)
-			assertAll("result", () -> {
-				assertThat(result, equalTo(target));
-				_assert.verify(() -> Assert.state(false, "StartupStep has already ended."), atLeast(1));
-			});
-		}
-	}
-
-	//Sapient generated method id: ${ad1c9377-0a10-3767-87a5-3115a50be4cd}, hash: 7E0C9F2AE340DCF20D45ECE397BACD1E
+	//Sapient generated method id: ${ad1c9377-0a10-3767-87a5-3115a50be4cd}, hash: A9D12C9B6E68796711C06A07D3EB15E8
 	@Test()
 	void endTest() {
-		/*
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
 		//Arrange Statement(s)
 		Instant instant = Instant.now();
-		Consumer consumerMock = mock(Consumer.class, "null");
-		BufferedStartupStep target = new BufferedStartupStep(parentMock, "test", 123L, instant, consumerMock);
+		BufferedStartupStep target = new BufferedStartupStep(parentMock, "test", 123L, instant, recorderMock);
+		doNothing().when(recorderMock).accept(target);
 
 		//Act Statement(s)
 		target.end();
-	}
-
-	//Sapient generated method id: ${6f56fa65-9b9b-30d4-95fe-9adeb7b08d7b}, hash: 5D41B7A759716126CCD3280CD208C180
-	@Test()
-	@Disabled
-	void isEndedWhenThisEndedGet() {
-		/* Branches:
-		 * (this.ended.get()) : true
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
-		//Arrange Statement(s)
-		Instant instant = Instant.now();
-		Consumer consumerMock = mock(Consumer.class, "null");
-		BufferedStartupStep target = new BufferedStartupStep(parentMock, "test", 123L, instant, consumerMock);
-
-		//Act Statement(s)
-		boolean result = target.isEnded();
 
 		//Assert statement(s)
-		assertAll("result", () -> assertThat(result, equalTo(Boolean.TRUE)));
+		assertAll("result", () -> verify(recorderMock).accept(target));
 	}
 
-	//Sapient generated method id: ${dfa4f607-23f3-3889-a73a-b00379cbc0e9}, hash: 67762D692C30AB0C02A2D5B099B3403A
+	//Sapient generated method id: ${6120f7f7-3b69-3400-9ac0-126d5ae7bc19}, hash: E9607B25354294D879CA45CA5D39DE6A
 	@Test()
-	void isEndedWhenThisEndedNotGet() {
-		/* Branches:
-		 * (this.ended.get()) : false
-		 *
-		 * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
-		 *  The test code, including the assertion statements, has been successfully generated.
-		 */
+	void isEndedTest() {
 		//Arrange Statement(s)
-		Instant instant = Instant.now();
-		Consumer consumerMock = mock(Consumer.class, "null");
-		BufferedStartupStep target = new BufferedStartupStep(parentMock, "test", 123L, instant, consumerMock);
+		Instant instant = Instant.ofEpochSecond(1700000000);
+		BufferedStartupStep target = new BufferedStartupStep(parentMock, "name1", 0L, instant, recorderMock);
 
 		//Act Statement(s)
 		boolean result = target.isEnded();

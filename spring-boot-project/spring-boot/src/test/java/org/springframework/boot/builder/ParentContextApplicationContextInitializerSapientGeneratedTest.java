@@ -29,8 +29,10 @@ class ParentContextApplicationContextInitializerSapientGeneratedTest {
 		//TODO: Please change the modifier of the below class from private to public to isolate the test case scenario.
 		//doNothing().when(applicationContextMock).addApplicationListener(parentContextApplicationContextInitializerEventPublisherMock);
 		//ParentContextApplicationContextInitializer target = new ParentContextApplicationContextInitializer(applicationContextMock2);
+
 		//Act Statement(s)
 		//target.initialize(applicationContextMock);
+
 		//Assert statement(s)
 		//assertAll("result", () -> {    verify(applicationContextMock).setParent(applicationContextMock2);    verify(applicationContextMock).addApplicationListener(parentContextApplicationContextInitializerEventPublisherMock);});
 	}
