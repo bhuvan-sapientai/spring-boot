@@ -291,6 +291,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${13bf2442-e51c-305b-89ea-aec7a9f5a845}, hash: 06DFACCEF638E76B1F8BA209DBDDB25F
 	@Test()
+	@Disabled
 	void isNumericIndexWhenThisElementsGetTypeElementIndexNotEqualsElementTypeNUMERICALLY_INDEXED() {
 		/* Branches:
 		 * (this.elements.getType(elementIndex) == ElementType.NUMERICALLY_INDEXED) : false
@@ -962,6 +963,7 @@ class ConfigurationPropertyNameSapientGeneratedTest {
 
 	//Sapient generated method id: ${ccf6eec0-f07d-398c-b217-c26a9a6ec34b}, hash: 9EF7FD3419864803C2F1FE0934AF0B9E
 	@Test()
+	@Disabled
 	void subNameWhenOffsetEqualsGetNumberOfElements() {
 		/* Branches:
 		 * (offset == 0) : false

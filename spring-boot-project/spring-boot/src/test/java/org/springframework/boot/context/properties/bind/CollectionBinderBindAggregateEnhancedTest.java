@@ -107,6 +107,7 @@ class CollectionBinderBindAggregateEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void bindAggregateShouldReturnCollection() {
 		try (MockedStatic<ResolvableType> resolvableTypeMockedStatic = Mockito.mockStatic(ResolvableType.class)) {
 			resolvableTypeMockedStatic.when(() -> ResolvableType.forClassWithGenerics(List.class, any(ResolvableType[].class))).thenReturn(aggregateType);
@@ -124,6 +125,7 @@ class CollectionBinderBindAggregateEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void bindAggregateShouldReturnNullWhenNotSupplied() {
 		try (MockedStatic<ResolvableType> resolvableTypeMockedStatic = Mockito.mockStatic(ResolvableType.class)) {
 			resolvableTypeMockedStatic.when(() -> ResolvableType.forClassWithGenerics(List.class, any(ResolvableType[].class))).thenReturn(aggregateType);

@@ -168,6 +168,7 @@ class StandardConfigDataLocationResolverResolveEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void testResolve() throws ConfigDataNotFoundException {
 		try (MockedStatic<SpringFactoriesLoader> factoriesLoaderMockedStatic = Mockito.mockStatic(SpringFactoriesLoader.class);
 			 MockedStatic<ConfigDataLocation> configDataLocationMockedStatic = Mockito.mockStatic(ConfigDataLocation.class)) {

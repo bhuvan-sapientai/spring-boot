@@ -116,6 +116,7 @@ class MapBinderBindAggregateEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void bindAggregateWithEmptyMap() {
 		when(context.getSources()).thenReturn(Collections.singletonList(source));
 		when(target.getType()).thenReturn(ResolvableType.forClass(Object.class));

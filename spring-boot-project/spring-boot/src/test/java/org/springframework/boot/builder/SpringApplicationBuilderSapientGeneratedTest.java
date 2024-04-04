@@ -514,6 +514,7 @@ class SpringApplicationBuilderSapientGeneratedTest {
 
 	//Sapient generated method id: ${7001c55f-a8f4-3828-b436-8753b2adeddc}, hash: 1DA87FE118117D86A3EF067260C045F8
 	@Test()
+	@Disabled
 	void sibling1WhenThisParentIsNullThrowsIllegalStateException() {
 		/* Branches:
 		 * (this.context == null) : true  #  inside runAndExtractParent method

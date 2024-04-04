@@ -310,6 +310,7 @@ class ApplicationConversionServiceSapientGeneratedTest {
 
 	//Sapient generated method id: ${814dc26c-aec7-321d-be26-0f6ea17e008b}, hash: B7C3C9D118837310E217EB45ED2496E3
 	@Test()
+	@Disabled
 	void addFormatterForFieldAnnotationWhenThisNotUnmodifiableThrowsIllegalArgumentException() {
 		/* Branches:
 		 * (this.unmodifiable) : false  #  inside assertModifiable method

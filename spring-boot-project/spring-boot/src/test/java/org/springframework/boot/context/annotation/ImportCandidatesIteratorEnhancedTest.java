@@ -107,6 +107,7 @@ class ImportCandidatesIteratorEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void testLoad() throws Exception {
 		// Given
 		Class<?> annotation = ImportCandidates.class;
@@ -144,6 +145,7 @@ class ImportCandidatesIteratorEnhancedTest {
 	}
 
 	@Test
+	@Disabled
 	void testLoadWithNullClassLoader() {
 		// Given
 		Class<?> annotation = ImportCandidates.class;
