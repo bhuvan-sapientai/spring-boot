@@ -1,0 +1,127 @@
+package org.springframework.boot.convert;
+
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Test;
+import org.springframework.util.unit.DataUnit;
+import org.mockito.MockedStatic;
+import org.springframework.util.unit.DataSize;
+import org.springframework.core.convert.converter.GenericConverter;
+import org.springframework.core.convert.TypeDescriptor;
+import java.util.Set;
+import org.springframework.util.ObjectUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.doReturn;
+import static org.hamcrest.Matchers.is;
+
+@Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+class StringToDataSizeConverterSapientGeneratedTest {
+
+    private final DataSize dataSizeMock = mock(DataSize.class);
+
+    private final Object objectMock = mock(Object.class, "source");
+
+    private final TypeDescriptor targetTypeMock = mock(TypeDescriptor.class);
+
+    private final TypeDescriptor typeDescriptorMock = mock(TypeDescriptor.class);
+
+    //Sapient generated method id: ${getConvertibleTypesTest}, hash: C8C7FBCAF0BE2535856F25D7D8A01323
+    @Test()
+    void getConvertibleTypesTest() {
+        //Arrange Statement(s)
+        StringToDataSizeConverter target = new StringToDataSizeConverter();
+        
+        //Act Statement(s)
+        Set<GenericConverter.ConvertiblePair> result = target.getConvertibleTypes();
+        
+        //Assert statement(s)
+        assertAll("result", () -> {
+            assertThat(result.size(), equalTo(1));
+            assertThat(result.iterator().next(), is(instanceOf(GenericConverter.ConvertiblePair.class)));
+        });
+    }
+
+    //Sapient generated method id: ${convertWhenObjectUtilsIsEmptySource}, hash: 30F4AF3750A80FB50ADE39410EA3C7FD
+    @Test()
+    void convertWhenObjectUtilsIsEmptySource() {
+        /* Branches:
+         * (ObjectUtils.isEmpty(source)) : true
+         */
+         //Arrange Statement(s)
+        TypeDescriptor typeDescriptorMock2 = mock(TypeDescriptor.class);
+        try (MockedStatic<ObjectUtils> objectUtils = mockStatic(ObjectUtils.class)) {
+            Object object = new Object();
+            objectUtils.when(() -> ObjectUtils.isEmpty(object)).thenReturn(true);
+            StringToDataSizeConverter target = new StringToDataSizeConverter();
+            //Act Statement(s)
+            Object result = target.convert(object, typeDescriptorMock, typeDescriptorMock2);
+            //Assert statement(s)
+            assertAll("result", () -> {
+                assertThat(result, is(nullValue()));
+                objectUtils.verify(() -> ObjectUtils.isEmpty(object), atLeast(1));
+            });
+        }
+    }
+
+    //Sapient generated method id: ${convertWhenAnnotationIsNotNull}, hash: 3511C9EF653C5659CA61078F3CB1DB5E
+    @Test()
+    void convertWhenAnnotationIsNotNull() {
+        /* Branches:
+         * (ObjectUtils.isEmpty(source)) : false
+         * (annotation != null) : true  #  inside getDataUnit method
+         */
+         //Arrange Statement(s)
+        DataSizeUnit dataSizeUnitMock = mock(DataSizeUnit.class);
+        try (MockedStatic<DataSize> dataSize = mockStatic(DataSize.class);
+            MockedStatic<ObjectUtils> objectUtils = mockStatic(ObjectUtils.class)) {
+            doReturn(dataSizeUnitMock).when(targetTypeMock).getAnnotation(DataSizeUnit.class);
+            doReturn(DataUnit.BYTES).when(dataSizeUnitMock).value();
+            objectUtils.when(() -> ObjectUtils.isEmpty(objectMock)).thenReturn(false);
+            dataSize.when(() -> DataSize.parse("source", DataUnit.BYTES)).thenReturn(dataSizeMock);
+            StringToDataSizeConverter target = new StringToDataSizeConverter();
+            //Act Statement(s)
+            Object result = target.convert(objectMock, typeDescriptorMock, targetTypeMock);
+            //Assert statement(s)
+            assertAll("result", () -> {
+                assertThat(result, equalTo(dataSizeMock));
+                verify(targetTypeMock).getAnnotation(DataSizeUnit.class);
+                verify(dataSizeUnitMock).value();
+                objectUtils.verify(() -> ObjectUtils.isEmpty(objectMock), atLeast(1));
+                dataSize.verify(() -> DataSize.parse("source", DataUnit.BYTES), atLeast(1));
+            });
+        }
+    }
+
+    //Sapient generated method id: ${convertWhenAnnotationIsNull}, hash: 5A2DB22BB18542E8CC1BCDB2D3E0A1CA
+    @Test()
+    void convertWhenAnnotationIsNull() {
+        /* Branches:
+         * (ObjectUtils.isEmpty(source)) : false
+         * (annotation != null) : false  #  inside getDataUnit method
+         */
+         //Arrange Statement(s)
+        try (MockedStatic<DataSize> dataSize = mockStatic(DataSize.class);
+            MockedStatic<ObjectUtils> objectUtils = mockStatic(ObjectUtils.class)) {
+            doReturn(null).when(targetTypeMock).getAnnotation(DataSizeUnit.class);
+            objectUtils.when(() -> ObjectUtils.isEmpty(objectMock)).thenReturn(false);
+            dataSize.when(() -> DataSize.parse("source", (DataUnit) null)).thenReturn(dataSizeMock);
+            StringToDataSizeConverter target = new StringToDataSizeConverter();
+            //Act Statement(s)
+            Object result = target.convert(objectMock, typeDescriptorMock, targetTypeMock);
+            //Assert statement(s)
+            assertAll("result", () -> {
+                assertThat(result, equalTo(dataSizeMock));
+                verify(targetTypeMock).getAnnotation(DataSizeUnit.class);
+                objectUtils.verify(() -> ObjectUtils.isEmpty(objectMock), atLeast(1));
+                dataSize.verify(() -> DataSize.parse("source", (DataUnit) null), atLeast(1));
+            });
+        }
+    }
+}

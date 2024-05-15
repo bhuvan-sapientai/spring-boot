@@ -1,0 +1,46 @@
+package org.springframework.boot.logging.logback;
+
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Test;
+import ch.qos.logback.core.joran.spi.SaxEventInterpretationContext;
+import org.xml.sax.Attributes;
+import ch.qos.logback.core.model.Model;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doReturn;
+
+@Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+class SpringPropertyActionSapientGeneratedTest {
+
+    //Sapient generated method id: ${buildCurrentModelTest}, hash: C5B43A282F1913ED321D758F2805A349
+    @Test()
+    void buildCurrentModelTest() {
+        /*
+         * TODO: Help needed! Please adjust the input/test parameter values manually to satisfy the requirements of the given test scenario.
+         *  The test code, including the assertion statements, has been successfully generated.
+         */
+        //Arrange Statement(s)
+        Attributes attributesMock = mock(Attributes.class);
+        doReturn("return_of_getValue1").when(attributesMock).getValue("name");
+        doReturn("A").when(attributesMock).getValue("source");
+        doReturn("B").when(attributesMock).getValue("scope");
+        doReturn("C").when(attributesMock).getValue("defaultValue");
+        SpringPropertyAction target = new SpringPropertyAction();
+        SaxEventInterpretationContext saxEventInterpretationContextMock = mock(SaxEventInterpretationContext.class);
+        //Act Statement(s)
+        Model result = target.buildCurrentModel(saxEventInterpretationContextMock, "name1", attributesMock);
+        SpringPropertyModel springPropertyModel = new SpringPropertyModel();
+        springPropertyModel.setName("return_of_getValue1");
+        //Assert statement(s)
+        assertAll("result", () -> {
+            assertThat(result, equalTo(springPropertyModel));
+            verify(attributesMock).getValue("name");
+            verify(attributesMock).getValue("source");
+            verify(attributesMock).getValue("scope");
+            verify(attributesMock).getValue("defaultValue");
+        });
+    }
+}

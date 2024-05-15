@@ -1,0 +1,39 @@
+package org.springframework.boot.jackson;
+
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.spy;
+
+@Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+class JsonComponentModuleSapientGeneratedTest {
+
+    //Sapient generated method id: ${afterPropertiesSetTest}, hash: FF3DBCEE0B29408BF52E6945D67AB27E
+    @Test()
+    void afterPropertiesSetTest() {
+        //Arrange Statement(s)
+        JsonComponentModule target = spy(new JsonComponentModule());
+        doNothing().when(target).registerJsonComponents();
+        
+        //Act Statement(s)
+        target.afterPropertiesSet();
+        
+        //Assert statement(s)
+        assertAll("result", () -> verify(target).registerJsonComponents());
+    }
+
+    //Sapient generated method id: ${registerJsonComponentsWhenBeanFactoryIsNull}, hash: B6E82FC18044DBE7A5853C9E064EF0CE
+    @Test()
+    void registerJsonComponentsWhenBeanFactoryIsNull() {
+        /* Branches:
+         * (beanFactory != null) : false
+         */
+         //Arrange Statement(s)
+        JsonComponentModule target = new JsonComponentModule();
+        
+        //Act Statement(s)
+        target.registerJsonComponents();
+    }
+}
