@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.boot.build.starters;
 
-import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,10 +23,12 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.file.RegularFile;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.PluginContainer;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.bundling.Jar;
 
 import org.springframework.boot.build.ConventionsPlugin;
@@ -56,8 +57,8 @@ public class StarterPlugin implements Plugin<Project> {
 		ConfigurationContainer configurations = project.getConfigurations();
 		Configuration runtimeClasspath = configurations.getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME);
 		starterMetadata.setDependencies(runtimeClasspath);
-		File destination = new File(project.getBuildDir(), "starter-metadata.properties");
-		starterMetadata.setDestination(destination);
+		Provider<RegularFile> destination = project.getLayout().getBuildDirectory().file("starter-metadata.properties");
+		starterMetadata.getDestination().set(destination);
 		configurations.create("starterMetadata");
 		project.getArtifacts()
 			.add("starterMetadata", project.provider(starterMetadata::getDestination),

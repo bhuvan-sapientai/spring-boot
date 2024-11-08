@@ -30,7 +30,6 @@ import brave.context.slf4j.MDCScopeDecorator;
 import brave.propagation.CurrentTraceContext.ScopeDecorator;
 import brave.propagation.Propagation;
 import brave.propagation.Propagation.Factory;
-import brave.propagation.Propagation.KeyFactory;
 import io.micrometer.tracing.brave.bridge.BraveBaggageManager;
 
 import org.springframework.beans.factory.ObjectProvider;
@@ -92,19 +91,19 @@ class BravePropagationConfigurations {
 				.forEach((customizer) -> customizer.customize(throwAwayBuilder));
 			CompositePropagationFactory propagationFactory = CompositePropagationFactory.create(
 					this.tracingProperties.getPropagation(),
-					new BraveBaggageManager(this.tracingProperties.getBaggage().getTagFields()),
+					new BraveBaggageManager(this.tracingProperties.getBaggage().getTagFields(),
+							this.tracingProperties.getBaggage().getRemoteFields()),
 					LocalBaggageFields.extractFrom(throwAwayBuilder));
 			FactoryBuilder builder = BaggagePropagation.newFactoryBuilder(propagationFactory);
 			throwAwayBuilder.configs().forEach(builder::add);
 			return builder;
 		}
 
-		@SuppressWarnings("deprecation")
 		private Factory createThrowAwayFactory() {
 			return new Factory() {
 
 				@Override
-				public <K> Propagation<K> create(KeyFactory<K> keyFactory) {
+				public Propagation<String> get() {
 					return null;
 				}
 

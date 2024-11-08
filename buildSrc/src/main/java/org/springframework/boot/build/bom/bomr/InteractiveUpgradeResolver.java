@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 package org.springframework.boot.build.bom.bomr;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,20 +53,37 @@ public final class InteractiveUpgradeResolver implements UpgradeResolver {
 		}
 		List<LibraryWithVersionOptions> libraryUpdates = this.libraryUpdateResolver
 			.findLibraryUpdates(librariesToUpgrade, librariesByName);
-		return libraryUpdates.stream().map(this::resolveUpgrade).filter(Objects::nonNull).toList();
+		try {
+			return libraryUpdates.stream().map(this::resolveUpgrade).filter(Objects::nonNull).toList();
+		}
+		catch (UpgradesInterruptedException ex) {
+			return Collections.emptyList();
+		}
 	}
 
 	private Upgrade resolveUpgrade(LibraryWithVersionOptions libraryWithVersionOptions) {
 		if (libraryWithVersionOptions.getVersionOptions().isEmpty()) {
 			return null;
 		}
-		VersionOption current = new VersionOption(libraryWithVersionOptions.getLibrary().getVersion().getVersion());
-		VersionOption selected = this.userInputHandler.selectOption(
-				libraryWithVersionOptions.getLibrary().getName() + " "
-						+ libraryWithVersionOptions.getLibrary().getVersion().getVersion(),
-				libraryWithVersionOptions.getVersionOptions(), current);
-		return (selected.equals(current)) ? null
+		VersionOption defaultOption = new VersionOption(
+				libraryWithVersionOptions.getLibrary().getVersion().getVersion());
+		VersionOption selected = this.userInputHandler.askUser((questions) -> {
+			String question = libraryWithVersionOptions.getLibrary().getName() + " "
+					+ libraryWithVersionOptions.getLibrary().getVersion().getVersion();
+			List<VersionOption> options = new ArrayList<>();
+			options.add(defaultOption);
+			options.addAll(libraryWithVersionOptions.getVersionOptions());
+			return questions.selectOption(question, options, defaultOption);
+		}).get();
+		if (this.userInputHandler.interrupted()) {
+			throw new UpgradesInterruptedException();
+		}
+		return (selected.equals(defaultOption)) ? null
 				: new Upgrade(libraryWithVersionOptions.getLibrary(), selected.getVersion());
+	}
+
+	static class UpgradesInterruptedException extends RuntimeException {
+
 	}
 
 }

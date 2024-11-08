@@ -61,14 +61,12 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.EmbeddedDataSourceConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
-import org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.test.City;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizationAutoConfiguration;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer;
-import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.sql.init.DatabaseInitializationMode;
 import org.springframework.boot.sql.init.DatabaseInitializationSettings;
 import org.springframework.boot.test.context.FilteredClassLoader;
@@ -80,6 +78,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -102,6 +104,7 @@ import static org.mockito.Mockito.mock;
  * @author Kazuki Shimizu
  * @author Mahmoud Ben Hassine
  * @author Lars Uffmann
+ * @author Lasse Wulff
  */
 @ExtendWith(OutputCaptureExtension.class)
 class BatchAutoConfigurationTests {
@@ -112,8 +115,7 @@ class BatchAutoConfigurationTests {
 
 	@Test
 	void testDefaultContext() {
-		this.contextRunner.withInitializer(ConditionEvaluationReportLoggingListener.forLogLevel(LogLevel.INFO))
-			.withUserConfiguration(TestConfiguration.class, EmbeddedDataSourceConfiguration.class)
+		this.contextRunner.withUserConfiguration(TestConfiguration.class, EmbeddedDataSourceConfiguration.class)
 			.run((context) -> {
 				assertThat(context).hasSingleBean(JobRepository.class);
 				assertThat(context).hasSingleBean(JobLauncher.class);
@@ -352,6 +354,34 @@ class BatchAutoConfigurationTests {
 	}
 
 	@Test
+	void testBatchTransactionManager() {
+		this.contextRunner.withUserConfiguration(TestConfiguration.class, BatchTransactionManagerConfiguration.class)
+			.run((context) -> {
+				assertThat(context).hasSingleBean(SpringBootBatchConfiguration.class);
+				PlatformTransactionManager batchTransactionManager = context.getBean("batchTransactionManager",
+						PlatformTransactionManager.class);
+				assertThat(context.getBean(SpringBootBatchConfiguration.class).getTransactionManager())
+					.isEqualTo(batchTransactionManager);
+			});
+	}
+
+	@Test
+	void testBatchTaskExecutor() {
+		this.contextRunner
+			.withUserConfiguration(TestConfiguration.class, BatchTaskExecutorConfiguration.class,
+					EmbeddedDataSourceConfiguration.class)
+			.run((context) -> {
+				assertThat(context).hasSingleBean(SpringBootBatchConfiguration.class).hasBean("batchTaskExecutor");
+				TaskExecutor batchTaskExecutor = context.getBean("batchTaskExecutor", TaskExecutor.class);
+				assertThat(batchTaskExecutor).isInstanceOf(AsyncTaskExecutor.class);
+				assertThat(context.getBean(SpringBootBatchConfiguration.class).getTaskExecutor())
+					.isEqualTo(batchTaskExecutor);
+				assertThat(context.getBean(JobLauncher.class)).hasFieldOrPropertyWithValue("taskExecutor",
+						batchTaskExecutor);
+			});
+	}
+
+	@Test
 	void jobRepositoryBeansDependOnBatchDataSourceInitializer() {
 		this.contextRunner.withUserConfiguration(TestConfiguration.class, EmbeddedDataSourceConfiguration.class)
 			.run((context) -> {
@@ -503,18 +533,55 @@ class BatchAutoConfigurationTests {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	protected static class BatchDataSourceConfiguration {
+	static class BatchDataSourceConfiguration {
 
 		@Bean
-		@Primary
-		public DataSource normalDataSource() {
+		DataSource normalDataSource() {
 			return DataSourceBuilder.create().url("jdbc:hsqldb:mem:normal").username("sa").build();
 		}
 
 		@BatchDataSource
-		@Bean
-		public DataSource batchDataSource() {
+		@Bean(defaultCandidate = false)
+		DataSource batchDataSource() {
 			return DataSourceBuilder.create().url("jdbc:hsqldb:mem:batchdatasource").username("sa").build();
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	static class BatchTransactionManagerConfiguration {
+
+		@Bean
+		DataSource dataSource() {
+			return DataSourceBuilder.create().url("jdbc:hsqldb:mem:database").username("sa").build();
+		}
+
+		@Bean
+		@Primary
+		PlatformTransactionManager normalTransactionManager() {
+			return mock(PlatformTransactionManager.class);
+		}
+
+		@BatchTransactionManager
+		@Bean(defaultCandidate = false)
+		PlatformTransactionManager batchTransactionManager() {
+			return mock(PlatformTransactionManager.class);
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	static class BatchTaskExecutorConfiguration {
+
+		@Bean
+		TaskExecutor taskExecutor() {
+			return new SyncTaskExecutor();
+		}
+
+		@BatchTaskExecutor
+		@Bean(defaultCandidate = false)
+		TaskExecutor batchTaskExecutor() {
+			return new SimpleAsyncTaskExecutor();
 		}
 
 	}
@@ -603,6 +670,7 @@ class BatchAutoConfigurationTests {
 					jobRegistry.register(getJobFactory());
 				}
 				catch (DuplicateJobException ex) {
+					// Ignore
 				}
 			}
 			return bean;

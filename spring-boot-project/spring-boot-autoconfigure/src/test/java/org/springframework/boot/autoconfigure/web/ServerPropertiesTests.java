@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,6 @@ class ServerPropertiesTests {
 		assertThat(tomcat.getRemoteip().getProtocolHeader()).isEqualTo("X-Forwarded-Protocol");
 		assertThat(tomcat.getRemoteip().getInternalProxies()).isEqualTo("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
 		assertThat(tomcat.getRemoteip().getTrustedProxies()).isEqualTo("proxy1|proxy2|proxy3");
-		assertThat(tomcat.isRejectIllegalHeader()).isFalse();
 		assertThat(tomcat.getBackgroundProcessorDelay()).hasSeconds(10);
 		assertThat(tomcat.getRelaxedPathChars()).containsExactly('|', '<');
 		assertThat(tomcat.getRelaxedQueryChars()).containsExactly('^', '|');
@@ -187,13 +186,12 @@ class ServerPropertiesTests {
 
 	@Test
 	void testDefaultMimeMapping() {
-		assertThat(this.properties.getMimeMappings())
-			.containsExactly(MimeMappings.DEFAULT.getAll().toArray(new Mapping[0]));
+		assertThat(this.properties.getMimeMappings()).isEmpty();
 	}
 
 	@Test
 	void testCustomizedMimeMapping() {
-		MimeMappings expectedMappings = MimeMappings.lazyCopy(MimeMappings.DEFAULT);
+		MimeMappings expectedMappings = new MimeMappings();
 		expectedMappings.add("mjs", "text/javascript");
 		bind("server.mime-mappings.mjs", "text/javascript");
 		assertThat(this.properties.getMimeMappings())
@@ -424,13 +422,6 @@ class ServerPropertiesTests {
 	}
 
 	@Test
-	@SuppressWarnings("removal")
-	void tomcatRejectIllegalHeaderMatchesProtocolDefault() throws Exception {
-		assertThat(getDefaultProtocol()).hasFieldOrPropertyWithValue("rejectIllegalHeader",
-				this.properties.getTomcat().isRejectIllegalHeader());
-	}
-
-	@Test
 	void tomcatUseRelativeRedirectsDefaultsToFalse() {
 		assertThat(this.properties.getTomcat().isUseRelativeRedirects()).isFalse();
 	}
@@ -464,6 +455,15 @@ class ServerPropertiesTests {
 		Server server = jetty.getServer();
 		assertThat(this.properties.getJetty().getMaxHttpFormPostSize().toBytes())
 			.isEqualTo(((ServletContextHandler) server.getHandler()).getMaxFormContentSize());
+	}
+
+	@Test
+	void jettyMaxFormKeysMatchesDefault() {
+		JettyServletWebServerFactory jettyFactory = new JettyServletWebServerFactory(0);
+		JettyWebServer jetty = (JettyWebServer) jettyFactory.getWebServer();
+		Server server = jetty.getServer();
+		assertThat(this.properties.getJetty().getMaxFormKeys())
+			.isEqualTo(((ServletContextHandler) server.getHandler()).getMaxFormKeys());
 	}
 
 	@Test

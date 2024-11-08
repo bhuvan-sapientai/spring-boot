@@ -88,21 +88,6 @@ public class NettyWebServer implements WebServer {
 	 * @param handlerAdapter the handler adapter
 	 * @param lifecycleTimeout the lifecycle timeout, may be {@code null}
 	 * @param shutdown the shutdown, may be {@code null}
-	 * @deprecated since 3.2.0 for removal in 3.4.0 in favor of
-	 * {@link #NettyWebServer(HttpServer, ReactorHttpHandlerAdapter, Duration, Shutdown, ReactorResourceFactory)}
-	 */
-	@Deprecated(since = "3.2.0", forRemoval = true)
-	public NettyWebServer(HttpServer httpServer, ReactorHttpHandlerAdapter handlerAdapter, Duration lifecycleTimeout,
-			Shutdown shutdown) {
-		this(httpServer, handlerAdapter, lifecycleTimeout, shutdown, null);
-	}
-
-	/**
-	 * Creates a new {@code NettyWebServer} instance.
-	 * @param httpServer the HTTP server
-	 * @param handlerAdapter the handler adapter
-	 * @param lifecycleTimeout the lifecycle timeout, may be {@code null}
-	 * @param shutdown the shutdown, may be {@code null}
 	 * @param resourceFactory the factory for the server's {@link LoopResources loop
 	 * resources}, may be {@code null}
 	 * @since 3.2.0
@@ -197,6 +182,14 @@ public class NettyWebServer implements WebServer {
 		return false;
 	}
 
+	/**
+	 * Initiates a graceful shutdown of the Netty web server. Handling of new requests is
+	 * prevented and the given {@code callback} is invoked at the end of the attempt. The
+	 * attempt can be explicitly ended by invoking {@link #stop}.
+	 * <p>
+	 * Once shutdown has been initiated Netty will reject any new connections. Requests +
+	 * on existing idle connections will also be rejected.
+	 */
 	@Override
 	public void shutDownGracefully(GracefulShutdownCallback callback) {
 		if (this.gracefulShutdown == null) {

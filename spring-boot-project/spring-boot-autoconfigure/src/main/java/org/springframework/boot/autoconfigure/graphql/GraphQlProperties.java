@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ public class GraphQlProperties {
 
 	private final Rsocket rsocket = new Rsocket();
 
+	private final Sse sse = new Sse();
+
 	public Graphiql getGraphiql() {
 		return this.graphiql;
 	}
@@ -65,6 +67,10 @@ public class GraphQlProperties {
 
 	public Rsocket getRsocket() {
 		return this.rsocket;
+	}
+
+	public Sse getSse() {
+		return this.sse;
 	}
 
 	public static class Schema {
@@ -217,6 +223,11 @@ public class GraphQlProperties {
 		 */
 		private Duration connectionInitTimeout = Duration.ofSeconds(60);
 
+		/**
+		 * Maximum idle period before a server keep-alive ping is sent to client.
+		 */
+		private Duration keepAlive;
+
 		public String getPath() {
 			return this.path;
 		}
@@ -231,6 +242,14 @@ public class GraphQlProperties {
 
 		public void setConnectionInitTimeout(Duration connectionInitTimeout) {
 			this.connectionInitTimeout = connectionInitTimeout;
+		}
+
+		public Duration getKeepAlive() {
+			return this.keepAlive;
+		}
+
+		public void setKeepAlive(Duration keepAlive) {
+			this.keepAlive = keepAlive;
 		}
 
 	}
@@ -248,6 +267,23 @@ public class GraphQlProperties {
 
 		public void setMapping(String mapping) {
 			this.mapping = mapping;
+		}
+
+	}
+
+	public static class Sse {
+
+		/**
+		 * Time required for concurrent handling to complete.
+		 */
+		private Duration timeout;
+
+		public Duration getTimeout() {
+			return this.timeout;
+		}
+
+		public void setTimeout(Duration timeout) {
+			this.timeout = timeout;
 		}
 
 	}

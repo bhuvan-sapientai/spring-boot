@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,8 +91,8 @@ class MavenBuildOutputTimestamp {
 				.truncatedTo(ChronoUnit.SECONDS)
 				.toInstant();
 			if (instant.isBefore(DATE_MIN) || instant.isAfter(DATE_MAX)) {
-				throw new IllegalArgumentException(String
-					.format(String.format("'%s' is not within the valid range %s to %s", instant, DATE_MIN, DATE_MAX)));
+				throw new IllegalArgumentException(
+						String.format("'%s' is not within the valid range %s to %s", instant, DATE_MIN, DATE_MAX));
 			}
 			return instant;
 		}
